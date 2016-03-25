@@ -3,7 +3,7 @@ module Pilot
     def upload(options)
       start(options)
 
-      raise "No ipa file given".red unless config[:ipa]
+      UI.user_error!("No ipa file given") unless config[:ipa]
 
       Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
 
@@ -28,7 +28,7 @@ module Pilot
           Helper.log.info "Successfully distributed build to beta testers 🚀"
         end
       else
-        raise "Error uploading ipa file, more information see above".red
+        UI.user_error!("Error uploading ipa file, more information see above")
       end
     end
 
@@ -99,7 +99,7 @@ module Pilot
         Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
         return full_build
       else
-        raise "Error: Seems like iTunes Connect didn't properly pre-process the binary".red
+        UI.user_error!("Error: Seems like iTunes Connect didn't properly pre-process the binary")
       end
     end
 

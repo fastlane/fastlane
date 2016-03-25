@@ -12,7 +12,7 @@ module Fastlane
         if is_git?
           command = 'git rev-list HEAD --count'
         else
-          raise "Not in a git repository."
+          UI.user_error!("Not in a git repository.")
         end
         return Actions.sh(command).strip.to_i
       end

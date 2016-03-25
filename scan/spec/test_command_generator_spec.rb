@@ -13,7 +13,7 @@ describe Scan do
       expect do
         options = { project: "/notExistent" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      end.to raise_error "Project file not found at path '/notExistent'".red
+      end.to raise_error "Project file not found at path '/notExistent'"
     end
 
     it "supports additional parameters" do

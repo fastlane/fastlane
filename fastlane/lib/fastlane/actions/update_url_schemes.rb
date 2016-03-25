@@ -25,7 +25,7 @@ module Fastlane
             is_string: true,
             optional: false,
             verify_block: proc do |path|
-              raise "Could not find plist at path '#{path}'".red unless File.exist?(path)
+              UI.user_error!("Could not find plist at path '#{path}'") unless File.exist?(path)
             end
           ),
 

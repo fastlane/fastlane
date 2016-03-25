@@ -12,7 +12,7 @@ module Fastlane
         @version_regex = /^(?<begin>[^#]*#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?)(?<end>['"])/i
 
         return unless (path || '').length > 0
-        raise "Could not find podspec file at path '#{path}'".red unless File.exist?(path)
+        UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)
 
         @path = File.expand_path(path)
         podspec_content = File.read(path)
@@ -23,7 +23,7 @@ module Fastlane
       def parse(podspec_content)
         @podspec_content = podspec_content
         @version_match = @version_regex.match(@podspec_content)
-        raise "Could not find version in podspec content '#{@podspec_content}'".red if @version_match.nil?
+        UI.user_error!("Could not find version in podspec content '#{@podspec_content}'") if @version_match.nil?
         @version_value = @version_match[:value]
       end
 

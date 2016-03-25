@@ -19,7 +19,7 @@ module Fastlane
           UI.success('Build successfully uploaded to Tryouts!')
           UI.message("Release download url: #{response.body['download_url']}") if response.body["download_url"]
         else
-          raise "Error when trying to upload build file to Tryouts: #{response.body}".red
+          UI.user_error!("Error when trying to upload build file to Tryouts: #{response.body}")
         end
       end
 
@@ -68,20 +68,20 @@ module Fastlane
                                      env_name: "TRYOUTS_APP_ID",
                                      description: "Tryouts application hash",
                                      verify_block: proc do |value|
-                                       raise "No application identifier for Tryouts given, pass using `app_id: 'application id'`".red unless value and !value.empty?
+                                       UI.user_error!("No application identifier for Tryouts given, pass using `app_id: 'application id'`") unless value and !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                      env_name: "TRYOUTS_API_TOKEN",
                                      description: "API Token for Tryouts Access",
                                      verify_block: proc do |value|
-                                       raise "No API token for Tryouts given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                       UI.user_error!("No API token for Tryouts given, pass using `api_token: 'token'`") unless value and !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :build_file,
                                      env_name: "TRYOUTS_BUILD_FILE",
                                      description: "Path to your IPA or APK file. Optional if you use the `gym` or `xcodebuild` action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                      verify_block: proc do |value|
-                                       raise "Couldn't find build file at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
                                      end),
           FastlaneCore::ConfigItem.new(key: :notes,
                                      env_name: "TRYOUTS_NOTES",
@@ -92,7 +92,7 @@ module Fastlane
                                      env_name: "TRYOUTS_NOTES_PATH",
                                      description: "Release notes text file path. Overrides the :notes paramether",
                                      verify_block: proc do |value|
-                                       raise "Couldn't find notes file at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error!("Couldn't find notes file at path '#{value}'") unless File.exist?(value)
                                      end,
                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :notify,
@@ -105,7 +105,7 @@ module Fastlane
                                      description: "2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update",
                                      verify_block: proc do |value|
                                        available_options = ["1", "2"]
-                                       raise "'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}".red unless available_options.include?(value.to_s)
+                                       UI.user_error!("'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}") unless available_options.include?(value.to_s)
                                      end,
                                      is_string: false,
                                      default_value: 2)

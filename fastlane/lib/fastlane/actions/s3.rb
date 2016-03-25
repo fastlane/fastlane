@@ -54,10 +54,10 @@ module Fastlane
         dsym_file = params[:dsym]
         s3_path = params[:path]
 
-        raise "No S3 access key given, pass using `access_key: 'key'`".red unless s3_access_key.to_s.length > 0
-        raise "No S3 secret access key given, pass using `secret_access_key: 'secret key'`".red unless s3_secret_access_key.to_s.length > 0
-        raise "No S3 bucket given, pass using `bucket: 'bucket'`".red unless s3_bucket.to_s.length > 0
-        raise "No IPA file path given, pass using `ipa: 'ipa path'`".red unless ipa_file.to_s.length > 0
+        UI.user_error!("No S3 access key given, pass using `access_key: 'key'`") unless s3_access_key.to_s.length > 0
+        UI.user_error!("No S3 secret access key given, pass using `secret_access_key: 'secret key'`") unless s3_secret_access_key.to_s.length > 0
+        UI.user_error!("No S3 bucket given, pass using `bucket: 'bucket'`") unless s3_bucket.to_s.length > 0
+        UI.user_error!("No IPA file path given, pass using `ipa: 'ipa path'`") unless ipa_file.to_s.length > 0
 
         plist_template_path = params[:plist_template_path]
         html_template_path = params[:html_template_path]

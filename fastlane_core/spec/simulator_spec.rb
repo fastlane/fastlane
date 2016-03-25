@@ -30,7 +30,7 @@ describe FastlaneCore do
 
       expect do
         devices = FastlaneCore::Simulator.all
-      end.to raise_error("xcrun simctl not working.".red)
+      end.to raise_error("xcrun simctl not working.")
     end
 
     it "properly parses the simctl output and generates Device objects for iOS" do

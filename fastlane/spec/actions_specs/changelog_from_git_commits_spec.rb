@@ -46,7 +46,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: 'abcd...1234')
           end").runner.execute(:test)
-        end.to raise_error(":between must be of type array".red)
+        end.to raise_error(":between must be of type array")
       end
 
       it "Does not accept a :between array of size 1" do
@@ -54,7 +54,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: ['abcd'])
           end").runner.execute(:test)
-        end.to raise_error(":between must be an array of size 2".red)
+        end.to raise_error(":between must be an array of size 2")
       end
 
       it "Does not accept a :between array with nil values" do
@@ -62,12 +62,12 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: ['abcd', nil])
           end").runner.execute(:test)
-        end.to raise_error(":between must not contain nil values".red)
+        end.to raise_error(":between must not contain nil values")
       end
 
       it "Does not accept an invalid value for :merge_commit_filtering" do
         values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')
-        error_msg = "Valid values for :merge_commit_filtering are #{values}".red
+        error_msg = "Valid values for :merge_commit_filtering are #{values}"
 
         expect do
           Fastlane::FastFile.new.parse("lane :test do

@@ -17,7 +17,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             team_name
           end").runner.execute(:test)
-        end.to raise_error("Please pass your Team Name (e.g. team_name 'Felix Krause')".red)
+        end.to raise_error("Please pass your Team Name (e.g. team_name 'Felix Krause')")
       end
     end
   end

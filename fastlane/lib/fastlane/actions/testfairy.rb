@@ -22,7 +22,7 @@ module Fastlane
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")
         else
-          raise 'Error when trying to upload ipa to TestFairy'.red
+          UI.user_error!("Error when trying to upload ipa to TestFairy")
         end
       end
 
@@ -55,14 +55,14 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
                                        description: "API Key for TestFairy", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         raise "No API key for TestFairy given, pass using `api_key: 'key'`".red unless value.to_s.length > 0
+                                         UI.user_error!("No API key for TestFairy given, pass using `api_key: 'key'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
                                        description: 'Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :comment,
                                        env_name: "FL_TESTFAIRY_COMMENT",

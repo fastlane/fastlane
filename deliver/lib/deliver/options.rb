@@ -31,12 +31,12 @@ module Deliver
                                      description: "Path to your ipa file",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       raise "Could not find ipa file at path '#{value}'".red unless File.exist?(value)
-                                       raise "'#{value}' doesn't seem to be an ipa file".red unless value.end_with?(".ipa")
+                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end,
                                      conflicting_options: [:pkg],
                                      conflict_block: proc do |value|
-                                       raise "You can't use 'ipa' and '#{value.key}' options in one run.".red
+                                       UI.user_error!("You can't use 'ipa' and '#{value.key}' options in one run.")
                                      end),
         FastlaneCore::ConfigItem.new(key: :pkg,
                                      short_option: "-c",
@@ -45,12 +45,12 @@ module Deliver
                                      description: "Path to your pkg file",
                                      default_value: Dir["*.pkg"].first,
                                      verify_block: proc do |value|
-                                       raise "Could not find pkg file at path '#{value}'".red unless File.exist?(value)
-                                       raise "'#{value}' doesn't seem to be a pkg file".red unless value.end_with?(".pkg")
+                                       UI.user_error!("Could not find pkg file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
                                      end,
                                      conflicting_options: [:ipa],
                                      conflict_block: proc do |value|
-                                       raise "You can't use 'pkg' and '#{value.key}' options in one run.".red
+                                       UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
@@ -100,7 +100,7 @@ module Deliver
                                      optional: true,
                                      conflicting_options: [:ipa, :pkg],
                                      conflict_block: proc do |value|
-                                       raise "You can't use 'build_number' and '#{value.key}' options in one run.".red
+                                       UI.user_error!("You can't use 'build_number' and '#{value.key}' options in one run.")
                                      end),
         FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
                                      short_option: "-g",
@@ -108,8 +108,8 @@ module Deliver
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Could not find config file at path '#{value}'".red unless File.exist?(value)
-                                       raise "'#{value}' doesn't seem to be a JSON file".red unless value.end_with?(".json")
+                                       UI.user_error!("Could not find config file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless value.end_with?(".json")
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
@@ -143,16 +143,16 @@ module Deliver
                                      optional: true,
                                      short_option: "-l",
                                      verify_block: proc do |value|
-                                       raise "Could not find png file at path '#{value}'".red unless File.exist?(value)
-                                       raise "'#{value}' doesn't seem to be a png file".red unless value.end_with?(".png")
+                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
                                      description: "Metadata: The path to the Apple Watch app icon",
                                      optional: true,
                                      short_option: "-q",
                                      verify_block: proc do |value|
-                                       raise "Could not find png file at path '#{value}'".red unless File.exist?(value)
-                                       raise "'#{value}' doesn't seem to be a png file".red unless value.end_with?(".png")
+                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :copyright,
                                      description: "Metadata: The copyright notice",

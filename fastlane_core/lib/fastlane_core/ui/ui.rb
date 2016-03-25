@@ -9,7 +9,7 @@ module FastlaneCore
     def self.method_missing(method_sym, *args, &_block)
       # not using `responds` beacuse we don't care about methods like .to_s and so on
       interface_methods = Interface.instance_methods - Object.instance_methods
-      raise "Unknown method '#{method_sym}', supported #{interface_methods}" unless interface_methods.include?(method_sym)
+      UI.user_error!("Unknown method '#{method_sym}', supported #{interface_methods}") unless interface_methods.include?(method_sym)
 
       self.current.send(method_sym, *args)
     end

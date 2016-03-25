@@ -74,7 +74,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         raise "Could not find Podfile".red unless File.exist?(value) || Helper.test?
+                                         UI.user_error!("Could not find Podfile") unless File.exist?(value) || Helper.test?
                                        end)
         ]
       end

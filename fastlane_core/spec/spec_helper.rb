@@ -5,6 +5,7 @@ require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'fastlane_core'
+UI = FastlaneCore::UI
 
 require 'webmock/rspec'
 

@@ -4,7 +4,7 @@ describe Fastlane do
       it "raises an error if file does not exist" do
         expect do
           Fastlane::ErbTemplateHelper.load('invalid_name')
-        end.to raise_exception "Could not find Template at path './/lib/assets/invalid_name.erb'".red
+        end.to raise_exception("Could not find Template at path './/lib/assets/invalid_name.erb'")
       end
 
       it "should load file if exists" do

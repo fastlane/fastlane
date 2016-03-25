@@ -14,9 +14,9 @@ module Scan
                                      description: "Path the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Workspace file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Workspace file invalid".red unless File.directory?(v)
-                                       raise "Workspace file is not a workspace, must end with .xcworkspace".red unless v.include?(".xcworkspace")
+                                       UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Workspace file invalid") unless File.directory?(v)
+                                       UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
@@ -25,9 +25,9 @@ module Scan
                                      description: "Path the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
-                                       raise "Project file not found at path '#{v}'".red unless File.exist?(v)
-                                       raise "Project file invalid".red unless File.directory?(v)
-                                       raise "Project file is not a project file, must end with .xcodeproj".red unless v.include?(".xcodeproj")
+                                       UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Project file invalid") unless File.directory?(v)
+                                       UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
                                      end),
         FastlaneCore::ConfigItem.new(key: :device,
                                      short_option: "-a",
@@ -66,7 +66,7 @@ module Scan
                                      description: "Define how the output should look like (standard, basic or rspec)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Invalid output_style #{value}".red unless ['standard', 'basic', "rspec"].include?(value)
+                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', "rspec"].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
@@ -121,7 +121,7 @@ module Scan
                                      description: "Use an extra XCCONFIG file to build your app",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "File not found at path '#{File.expand_path(value)}'".red unless File.exist?(value)
+                                       UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
@@ -129,7 +129,7 @@ module Scan
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Invalid URL, must start with https://" unless value.start_with? "https://"
+                                       UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_channel,
                                      short_option: "-e",

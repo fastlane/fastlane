@@ -5,7 +5,7 @@ module Snapshot
       snapfile_path = File.join(path, 'Snapfile')
 
       if File.exist?(snapfile_path)
-        raise "Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use snapshot.".red
+        UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use snapshot.")
       end
 
       gem_path = Helper.gem_path("snapshot")

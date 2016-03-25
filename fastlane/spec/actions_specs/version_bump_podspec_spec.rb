@@ -8,20 +8,20 @@ describe Fastlane do
       it "raises an exception when an incorrect path is given" do
         expect do
           Fastlane::Helper::PodspecHelper.new('invalid_podspec')
-        end.to raise_error("Could not find podspec file at path 'invalid_podspec'".red)
+        end.to raise_error("Could not find podspec file at path 'invalid_podspec'")
       end
 
       it "raises an exception when there is no version in podspec" do
         expect do
           Fastlane::Helper::PodspecHelper.new.parse("")
-        end.to raise_error("Could not find version in podspec content ''".red)
+        end.to raise_error("Could not find version in podspec content ''")
       end
 
       it "raises an exception when the version is commented-out in podspec" do
         test_content = '# version = "1.3.2"'
         expect do
           Fastlane::Helper::PodspecHelper.new.parse(test_content)
-        end.to raise_error("Could not find version in podspec content '#{test_content}'".red)
+        end.to raise_error("Could not find version in podspec content '#{test_content}'")
       end
 
       it "returns the current version once parsed" do
@@ -95,7 +95,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             version_get_podspec
           end").runner.execute(:test)
-        end.to raise_error("Please pass a path to the `version_get_podspec` action".red)
+        end.to raise_error("Please pass a path to the `version_get_podspec` action")
       end
 
       it "gets the version from a podspec file" do
@@ -117,7 +117,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             version_bump_podspec
           end").runner.execute(:test)
-        end.to raise_error("Please pass a path to the `version_bump_podspec` action".red)
+        end.to raise_error("Please pass a path to the `version_bump_podspec` action")
       end
 
       it "bumps patch version when only the path is given" do

@@ -14,11 +14,11 @@ module Snapshot
 
       matched = output.match(/iOS ([\d\.]+) \(.*/)
       if matched.nil?
-        raise "Could not determine installed iOS SDK version. Try running the _xcodebuild_ command manually to ensure it works."
+        UI.user_error!("Could not determine installed iOS SDK version. Try running the _xcodebuild_ command manually to ensure it works.")
       elsif matched.length > 1
         return @version ||= matched[1]
       else
-        raise "Could not determine installed iOS SDK version. Please pass it via the environment variable 'SNAPSHOT_IOS_VERSION'".red
+        UI.user_error!("Could not determine installed iOS SDK version. Please pass it via the environment variable 'SNAPSHOT_IOS_VERSION'")
       end
     end
   end

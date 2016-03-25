@@ -22,7 +22,7 @@ module Fastlane
 
       def self.fail_on_error(result)
         if result.include?("error")
-          raise "Server error, failed to upload the dSYM file".red
+          UI.user_error!("Server error, failed to upload the dSYM file")
         end
       end
 
@@ -45,11 +45,11 @@ module Fastlane
 
         if file_path
           expanded_file_path = File.expand_path(file_path)
-          raise "Couldn't find file at path '#{expanded_file_path}'".red unless File.exist?(expanded_file_path)
+          UI.user_error!("Couldn't find file at path '#{expanded_file_path}'") unless File.exist?(expanded_file_path)
 
           return expanded_file_path
         else
-          raise "Couldn't find any dSYM file".red
+          UI.user_error!("Couldn't find any dSYM file")
         end
       end
 

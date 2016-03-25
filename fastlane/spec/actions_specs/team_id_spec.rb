@@ -17,7 +17,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             team_id
           end").runner.execute(:test)
-        end.to raise_error("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')".red)
+        end.to raise_error("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')")
       end
     end
   end

@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         podspec_path = params[:path]
 
-        raise "Could not find podspec file at path #{podspec_path}".red unless File.exist? podspec_path
+        UI.user_error!("Could not find podspec file at path #{podspec_path}") unless File.exist? podspec_path
 
         version_podspec_file = Helper::PodspecHelper.new(podspec_path)
 
@@ -45,14 +45,14 @@ module Fastlane
                                        description: "You must specify the path to the podspec file to update",
                                        default_value: Dir["*.podspec"].last,
                                        verify_block: proc do |value|
-                                         raise "Please pass a path to the `version_bump_podspec` action".red if value.length == 0
+                                         UI.user_error!("Please pass a path to the `version_bump_podspec` action") if value.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :bump_type,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_BUMP_TYPE",
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         raise "Available values are 'patch', 'minor' and 'major'" unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_NUMBER",

@@ -25,7 +25,7 @@ module FastlaneCore
         # rubocop:enable Lint/Eval
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
-        raise "Syntax error in your configuration file '#{path}' on line #{line}: #{ex}".red
+        UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
       end
     end
 

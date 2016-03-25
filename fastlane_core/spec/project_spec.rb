@@ -158,7 +158,7 @@ describe FastlaneCore do
     it "raises an exception if path was not found" do
       expect do
         FastlaneCore::Project.new(project: "/tmp/notHere123")
-      end.to raise_error "Could not find project at path '/tmp/notHere123'".red
+      end.to raise_error "Could not find project at path '/tmp/notHere123'"
     end
 
     describe "Valid Standard Project" do
