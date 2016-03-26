@@ -78,7 +78,7 @@ module FastlaneCore
         puts "please submit an issue on GitHub and attach the following number to it: '#{crash.id}'".yellow
         puts "The crash report has been stored locally '#{path}'".yellow
       rescue => e
-        Helper.log.debug e # We don't want crash reporting to cause crash
+        UI.verbose(e) # We don't want crash reporting to cause crash
       end
     end
   end

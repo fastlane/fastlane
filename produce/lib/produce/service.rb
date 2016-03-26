@@ -10,26 +10,26 @@ module Produce
 
     def enable(options, _args)
       unless app
-        Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
+        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist")
         return
       end
 
-      Helper.log.info "[DevCenter] App found '#{app.name}'".green
-      Helper.log.info "Enabling services"
+      UI.success("[DevCenter] App found '#{app.name}'")
+      UI.message("Enabling services")
       enabled = update(true, app, options)
-      Helper.log.info "Done! Enabled #{enabled} services.".green
+      UI.success("Done! Enabled #{enabled} services.")
     end
 
     def disable(options, _args)
       unless app
-        Helper.log.info "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist".red
+        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist")
         return
       end
 
-      Helper.log.info "[DevCenter] App found '#{app.name}'".green
-      Helper.log.info "Disabling services"
+      UI.success("[DevCenter] App found '#{app.name}'")
+      UI.message("Disabling services")
       disabled = update(false, app, options)
-      Helper.log.info "Done! Disabled #{disabled} services.".green
+      UI.success("Done! Disabled #{disabled} services.")
     end
 
     def valid_services_for(options)
@@ -46,7 +46,7 @@ module Produce
       updated = valid_services_for(options).count
 
       if options.app_group
-        Helper.log.info "\tApp Groups"
+        UI.message("\tApp Groups")
 
         if on
           app.update_service(Spaceship.app_service.app_group.on)
@@ -56,7 +56,7 @@ module Produce
       end
 
       if options.associated_domains
-        Helper.log.info "\tAssociated Domains"
+        UI.message("\tAssociated Domains")
 
         if on
           app.update_service(Spaceship.app_service.associated_domains.on)
@@ -66,7 +66,7 @@ module Produce
       end
 
       if options.data_protection
-        Helper.log.info "\tData Protection"
+        UI.message("\tData Protection")
 
         if on
           case options.data_protection
@@ -85,7 +85,7 @@ module Produce
       end
 
       if options.healthkit
-        Helper.log.info "\tHealthKit"
+        UI.message("\tHealthKit")
 
         if on
           app.update_service(Spaceship.app_service.health_kit.on)
@@ -95,7 +95,7 @@ module Produce
       end
 
       if options.homekit
-        Helper.log.info "\tHomeKit"
+        UI.message("\tHomeKit")
 
         if on
           app.update_service(Spaceship.app_service.home_kit.on)
@@ -105,7 +105,7 @@ module Produce
       end
 
       if options.wireless_conf
-        Helper.log.info "\tWireless Accessory Configuration"
+        UI.message("\tWireless Accessory Configuration")
 
         if on
           app.update_service(Spaceship.app_service.wireless_accessory.on)
@@ -115,7 +115,7 @@ module Produce
       end
 
       if options.icloud
-        Helper.log.info "\tiCloud"
+        UI.message("\tiCloud")
 
         if on
           case options.icloud
@@ -134,7 +134,7 @@ module Produce
       end
 
       if options.inter_app_audio
-        Helper.log.info "\tInter-App Audio"
+        UI.message("\tInter-App Audio")
 
         if on
           app.update_service(Spaceship.app_service.inter_app_audio.on)
@@ -144,7 +144,7 @@ module Produce
       end
 
       if options.passbook
-        Helper.log.info "\tPassbook"
+        UI.message("\tPassbook")
 
         if on
           app.update_service(Spaceship.app_service.passbook.on)
@@ -154,7 +154,7 @@ module Produce
       end
 
       if options.push_notification
-        Helper.log.info "\tPush Notifications"
+        UI.message("\tPush Notifications")
 
         if on
           app.update_service(Spaceship.app_service.push_notification.on)
@@ -164,7 +164,7 @@ module Produce
       end
 
       if options.vpn_conf
-        Helper.log.info "\tVPN Configuration"
+        UI.message("\tVPN Configuration")
 
         if on
           app.update_service(Spaceship.app_service.vpn_configuration.on)
@@ -179,10 +179,10 @@ module Produce
     def app
       return @app if @app
 
-      Helper.log.info "Starting login with user '#{Produce.config[:username]}'"
+      UI.message("Starting login with user '#{Produce.config[:username]}'")
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
-      Helper.log.info "Successfully logged in"
+      UI.message("Successfully logged in")
 
       @app ||= Spaceship.app.find(Produce.config[:app_identifier].to_s)
     end

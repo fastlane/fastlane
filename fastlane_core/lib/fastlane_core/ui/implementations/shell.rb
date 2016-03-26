@@ -67,9 +67,9 @@ module FastlaneCore
 
     def header(message)
       i = message.length + 8
-      Helper.log.info(("-" * i).green)
-      Helper.log.info(("--- " + message + " ---").green)
-      Helper.log.info(("-" * i).green)
+      success("-" * i)
+      success("--- " + message + " ---")
+      success("-" * i)
     end
 
     #####################################################

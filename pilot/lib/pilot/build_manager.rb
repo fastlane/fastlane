@@ -5,7 +5,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      Helper.log.info "Ready to upload new build to TestFlight (App: #{app.apple_id})...".green
+      UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
       plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(config[:ipa]) || {}
       platform = plist["DTPlatformName"]
@@ -19,13 +19,13 @@ module Pilot
       result = transporter.upload(app.apple_id, package_path)
 
       if result
-        Helper.log.info "Successfully uploaded the new binary to iTunes Connect"
+        UI.message("Successfully uploaded the new binary to iTunes Connect")
 
         unless config[:skip_submission]
           uploaded_build = wait_for_processing_build
           distribute_build(uploaded_build, options)
 
-          Helper.log.info "Successfully distributed build to beta testers 🚀"
+          UI.message("Successfully distributed build to beta testers 🚀")
         end
       else
         UI.user_error!("Error uploading ipa file, more information see above")
@@ -72,7 +72,7 @@ module Pilot
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       loop do
-        Helper.log.info "Waiting for iTunes Connect to process the new build"
+        UI.message("Waiting for iTunes Connect to process the new build")
         sleep wait_processing_interval
         builds = app.all_processing_builds
         break if builds.count == 0
@@ -88,15 +88,15 @@ module Pilot
           b.build_version == latest_build.build_version
         end
 
-        Helper.log.info "Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})"
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})")
         sleep wait_processing_interval
       end
 
       if full_build
         minutes = ((Time.now - start) / 60).round
-        Helper.log.info "Successfully finished processing the build".green
-        Helper.log.info "You can now tweet: "
-        Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+        UI.success("Successfully finished processing the build")
+        UI.message("You can now tweet: ")
+        UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
         return full_build
       else
         UI.user_error!("Error: Seems like iTunes Connect didn't properly pre-process the binary")
@@ -104,7 +104,7 @@ module Pilot
     end
 
     def distribute_build(uploaded_build, options)
-      Helper.log.info "Distributing new build to testers"
+      UI.message("Distributing new build to testers")
 
       # First, set the changelog (if necessary)
       uploaded_build.update_build_information!(whats_new: options[:changelog])
