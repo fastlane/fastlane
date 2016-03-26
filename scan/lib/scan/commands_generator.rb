@@ -51,7 +51,7 @@ module Scan
           UI.user_error!("Scanfile already exists").yellow if File.exist?(path)
           template = File.read("#{Helper.gem_path('scan')}/lib/assets/ScanfileTemplate")
           File.write(path, template)
-          Helper.log.info "Successfully created '#{path}'. Open the file using a code editor.".green
+          UI.success("Successfully created '#{path}'. Open the file using a code editor.")
         end
       end
 

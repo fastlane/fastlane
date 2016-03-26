@@ -127,7 +127,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspace)
 
           expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
-          expect(FastlaneCore::Helper.log).to receive(:error).with(/Couldn't find/)
+          expect(FastlaneCore::UI).to receive(:error).with(/Couldn't find/)
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
@@ -144,7 +144,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p('other-directory')
 
           expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
-          expect(FastlaneCore::Helper.log).to receive(:error).with(/Path must end with/)
+          expect(FastlaneCore::UI).to receive(:error).with(/Path must end with/)
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})

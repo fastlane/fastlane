@@ -65,7 +65,7 @@ module Scan
         formatter = []
         if ENV.key?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
-          Helper.log.info "Automatically switched to Travis formatter".green
+          UI.success("Automatically switched to Travis formatter")
         end
 
         if Helper.colors_disabled?
