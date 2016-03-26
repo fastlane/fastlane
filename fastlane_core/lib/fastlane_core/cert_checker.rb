@@ -68,7 +68,7 @@ module FastlaneCore
         result.delete!(':')
         return result
       rescue
-        Helper.log.info result
+        UI.message(result)
         UI.user_error!("Error parsing certificate '#{path}'")
       end
     end

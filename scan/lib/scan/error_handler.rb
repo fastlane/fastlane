@@ -36,7 +36,7 @@ module Scan
 
       # Just to make things easier
       def print(text)
-        Helper.log.error text.red
+        UI.error(text)
       end
     end
   end

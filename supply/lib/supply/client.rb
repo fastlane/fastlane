@@ -52,7 +52,7 @@ module Supply
 
       auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: key_io, scope: scope)
 
-      Helper.log.debug "Fetching a new access token from Google..."
+      UI.verbose("Fetching a new access token from Google...")
 
       auth_client.fetch_access_token!
 
