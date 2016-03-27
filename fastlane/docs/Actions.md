@@ -2421,3 +2421,19 @@ Reset all the iOS simulators. Useful with test actions to ensure a clean simulat
 ```ruby
 reset_simulators
 ```
+
+### pod_lib_lint
+
+Execute pod lib lint command
+
+```ruby
+pod_lib_lint
+
+# Allow ouput detail in console
+pod_lib_lint(verbose: true)
+
+# Allow warnings during pod lint
+pod_lib_lint(allow_warnings: true)
+
+# If the podspec has a dependency on another private pod, then you will have to supply the sources you want the podspec to lint with for pod_push to succeed. Read more here - https://github.com/CocoaPods/CocoaPods/issues/2543.
+pod_lib_lint(sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
