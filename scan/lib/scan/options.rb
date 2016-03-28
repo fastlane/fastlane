@@ -53,6 +53,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :skip_build,
                                      description: "Should skip debug build before test build?",
                                      short_option: "-r",
+                                     env_name: "SCAN_SKIP_BUILD",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_directory,
