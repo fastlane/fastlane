@@ -50,7 +50,12 @@ module Supply
         path = File.join(metadata_path, language, "#{key}.txt")
         listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
       end
-      listing.save
+      begin
+        listing.save
+      rescue Encoding::InvalidByteSequenceError => ex
+        message = (ex.message || '').capitalize
+        UI.user_error!("Metadata must be UTF-8 encoded. #{message}")
+      end
     end
 
     def upload_images(language)
