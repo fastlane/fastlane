@@ -55,7 +55,7 @@ fastlane beta
 
 ## Installation
 
-    sudo gem install fastlane --verbose
+    sudo gem install fastlane --verbose --no-ri --no-rdoc
 
 Make sure you have the latest version of the Xcode command line tools installed:
 
