@@ -32,7 +32,7 @@ module Supply
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(containing, "#{key}.txt")
         UI.message("Writing to #{path}...")
-        File.write(path, listing.send(key))
+        File.open(path, 'w:UTF-8') { |file| file.write(listing.send(key)) }
       end
     end
 
