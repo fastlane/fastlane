@@ -9,6 +9,7 @@ module Fastlane
           Dir["./**/Info.plist"].each do |current|
             result = Actions::GetInfoPlistValueAction.run(path: current, key: "Fabric")
             next unless result
+            next unless result.kind_of?(Hash)
             params[:api_token] ||= result["APIKey"]
           end
         end
