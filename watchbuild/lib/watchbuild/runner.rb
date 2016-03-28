@@ -11,9 +11,9 @@ module WatchBuild
                                          hide_keys: [],
                                              title: "Summary for WatchBuild #{WatchBuild::VERSION}")
 
-      Helper.log.info "Starting login with user '#{WatchBuild.config[:username]}'"
+      UI.message("Starting login with user '#{WatchBuild.config[:username]}'")
       Spaceship::Tunes.login(WatchBuild.config[:username], nil)
-      Helper.log.info "Successfully logged in"
+      UI.message("Successfully logged in")
 
       start = Time.now
       build = wait_for_build(start)
@@ -39,10 +39,10 @@ module WatchBuild
             time_elapsed = Time.at(seconds_elapsed).utc.strftime "%H:%M:%S hours"
           end
 
-          Helper.log.info "Waiting #{time_elapsed} for iTunes Connect to process the build #{build.train_version} (#{build.build_version})... this might take a while..."
+          UI.message("Waiting #{time_elapsed} for iTunes Connect to process the build #{build.train_version} (#{build.build_version})... this might take a while...")
         rescue => ex
-          Helper.log.error ex
-          Helper.log.info "Something failed... trying again to recover"
+          UI.error(ex)
+          UI.message("Something failed... trying again to recover")
         end
         sleep 30
       end
@@ -58,12 +58,12 @@ module WatchBuild
                            subtitle: "#{build.train_version} (#{build.build_version})",
                             execute: "open '#{url}'")
 
-      Helper.log.info "Successfully finished processing the build".green
+      UI.success("Successfully finished processing the build")
       if minutes > 0 # it's 0 minutes if there was no new build uploaded
-        Helper.log.info "You can now tweet: "
-        Helper.log.info "iTunes Connect #iosprocessingtime #{minutes} minutes".yellow
+        UI.message("You can now tweet: ")
+        UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
       end
-      Helper.log.info url
+      UI.message(url)
     end
 
     private

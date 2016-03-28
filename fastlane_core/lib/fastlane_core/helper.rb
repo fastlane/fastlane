@@ -118,8 +118,8 @@ module FastlaneCore
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
-        Helper.log.error ex
-        Helper.log.error "Error detecting currently used Xcode installation".red
+        UI.error(ex)
+        UI.error("Error detecting currently used Xcode installation")
       end
       @xcode_version
     end

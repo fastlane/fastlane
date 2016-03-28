@@ -46,15 +46,15 @@ module FastlaneCore
     def download(app_id, dir = nil)
       dir ||= "/tmp"
 
-      Helper.log.info "Going to download app metadata from iTunes Connect"
+      UI.message("Going to download app metadata from iTunes Connect")
       command = build_download_command(@user, @password, app_id, dir)
-      Helper.log.debug build_download_command(@user, 'YourPassword', app_id, dir) if $verbose
+      UI.verbose(build_download_command(@user, 'YourPassword', app_id, dir)) if $verbose
 
       result = execute_transporter(command)
 
       itmsp_path = File.join(dir, "#{app_id}.itmsp")
       if result and File.directory? itmsp_path
-        Helper.log.info "Successfully downloaded the latest package from iTunes Connect.".green
+        UI.success("Successfully downloaded the latest package from iTunes Connect.")
       else
         handle_error(@password)
       end
@@ -71,18 +71,18 @@ module FastlaneCore
     def upload(app_id, dir)
       dir = File.join(dir, "#{app_id}.itmsp")
 
-      Helper.log.info "Going to upload updated app to iTunes Connect"
-      Helper.log.info "This might take a few minutes, please don't interrupt the script".green
+      UI.message("Going to upload updated app to iTunes Connect")
+      UI.success("This might take a few minutes, please don't interrupt the script")
 
       command = build_upload_command(@user, @password, dir)
-      Helper.log.debug build_upload_command(@user, 'YourPassword', dir) if $verbose
+      UI.verbose(build_upload_command(@user, 'YourPassword', dir)) if $verbose
 
       result = execute_transporter(command)
 
       if result
-        Helper.log.info(("-" * 102).green)
-        Helper.log.info("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.".green)
-        Helper.log.info(("-" * 102).green)
+        UI.success("-" * 102)
+        UI.success("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
+        UI.success("-" * 102)
 
         FileUtils.rm_rf(dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
       else
@@ -97,10 +97,10 @@ module FastlaneCore
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
       unless /^[0-9a-zA-Z\.\$\_]*$/ === password
-        Helper.log.error "Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
+        UI.error("Password contains special characters, which may not be handled properly by iTMSTransporter. If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters.")
       end
       # rubocop:enable Style/CaseEquality
-      Helper.log.fatal "Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection."
+      UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
     end
 
     def execute_transporter(command)
@@ -109,8 +109,8 @@ module FastlaneCore
 
       if defined?@hide_transporter_output
         # Show a one time message instead
-        Helper.log.info "Waiting for iTunes Connect transporter to be finished.".green
-        Helper.log.info "iTunes Transporter progress... this might take a few minutes...".green
+        UI.success("Waiting for iTunes Connect transporter to be finished.")
+        UI.success("iTunes Transporter progress... this might take a few minutes...")
       end
 
       begin
@@ -120,16 +120,16 @@ module FastlaneCore
           end
         end
       rescue => ex
-        Helper.log.fatal(ex.to_s)
+        UI.error(ex.to_s)
         @errors << ex.to_s
       end
 
       if @warnings.count > 0
-        Helper.log.warn(@warnings.join("\n"))
+        UI.important(@warnings.join("\n"))
       end
 
       if @errors.count > 0
-        Helper.log.error(@errors.join("\n"))
+        UI.error(@errors.join("\n"))
         return false
       end
 
@@ -147,7 +147,7 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
-        Helper.log.error "[Transporter Error Output]: #{$1}".red
+        UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
         if $1.include? "Your Apple ID or password was entered incorrectly" or
@@ -155,35 +155,35 @@ module FastlaneCore
 
           unless Helper.is_test?
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
-            Helper.log.fatal "Please run this tool again to apply the new password"
+            UI.error("Please run this tool again to apply the new password")
           end
         elsif $1.include? "Redundant Binary Upload. There already exists a binary upload with build"
-          Helper.log.fatal $1
-          Helper.log.fatal "You have to change the build number of your app to upload your ipa file"
+          UI.error($1)
+          UI.error("You have to change the build number of your app to upload your ipa file")
         end
 
         output_done = true
       elsif line =~ WARNING_REGEX
         @warnings << $1
-        Helper.log.warn "[Transporter Warning Output]: #{$1}".yellow
+        UI.important("[Transporter Warning Output]: #{$1}")
         output_done = true
       end
 
       if line =~ RETURN_VALUE_REGEX
         if $1.to_i != 0
-          Helper.log.fatal "Transporter transfer failed.".red
-          Helper.log.warn(@warnings.join("\n").yellow)
-          Helper.log.error(@errors.join("\n").red)
-          raise "Return status of iTunes Transporter was #{$1}: #{@errors.join('\n')}".red
+          UI.error("Transporter transfer failed.")
+          UI.important(@warnings.join("\n"))
+          UI.error(@errors.join("\n"))
+          UI.crash!("Return status of iTunes Transporter was #{$1}: #{@errors.join('\n')}")
         else
-          Helper.log.info "iTunes Transporter successfully finished its job".green
+          UI.success("iTunes Transporter successfully finished its job")
         end
       end
 
       if !defined?@hide_transporter_output and line =~ OUTPUT_REGEX
         # General logging for debug purposes
         unless output_done
-          Helper.log.debug "[Transporter]: #{$1}"
+          UI.verbose("[Transporter]: #{$1}")
         end
       end
     end

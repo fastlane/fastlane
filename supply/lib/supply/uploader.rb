@@ -12,7 +12,7 @@ module Supply
 
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
-          Helper.log.info "Preparing to upload for language '#{language}'..."
+          UI.message("Preparing to upload for language '#{language}'...")
 
           listing = client.listing_for_language(language)
 
@@ -25,9 +25,9 @@ module Supply
 
       upload_binary unless Supply.config[:skip_upload_apk]
 
-      Helper.log.info "Uploading all changes to Google Play..."
+      UI.message("Uploading all changes to Google Play...")
       client.commit_current_edit!
-      Helper.log.info "Successfully finished the upload to Google Play".green
+      UI.success("Successfully finished the upload to Google Play")
     end
 
     def upload_changelogs(language)
@@ -39,7 +39,7 @@ module Supply
     def upload_changelog(language, apk_version_code)
       path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
       if File.exist?(path)
-        Helper.log.info "Updating changelog for code version '#{apk_version_code}' and language '#{language}'..."
+        UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
         apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
@@ -59,7 +59,7 @@ module Supply
         path = Dir.glob(search, File::FNM_CASEFOLD).last
         next unless path
 
-        Helper.log.info "Uploading image file #{path}..."
+        UI.message("Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
                               language: language)
@@ -75,7 +75,7 @@ module Supply
         client.clear_screenshots(image_type: screenshot_type, language: language)
 
         paths.sort.each do |path|
-          Helper.log.info "Uploading screenshot #{path}..."
+          UI.message("Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
                                 language: language)
@@ -87,10 +87,10 @@ module Supply
       apk_path = Supply.config[:apk]
 
       if apk_path
-        Helper.log.info "Preparing apk at path '#{apk_path}' for upload..."
+        UI.message("Preparing apk at path '#{apk_path}' for upload...")
         apk_version_code = client.upload_apk(apk_path)
 
-        Helper.log.info "Updating track '#{Supply.config[:track]}'..."
+        UI.message("Updating track '#{Supply.config[:track]}'...")
         if Supply.config[:track].eql? "rollout"
           client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
         else
@@ -107,7 +107,7 @@ module Supply
         end
 
       else
-        Helper.log.info "No apk file found, you can pass the path to your apk using the `apk` option"
+        UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
     end
 
@@ -149,8 +149,8 @@ module Supply
         type = obb_expansion_file_type(path)
         next unless type
         if expansion_paths[type]
-          Helper.log.warn("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
-          Helper.log.warn("If you'd like this to work differently, please submit an issue.")
+          UI.important("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
+          UI.important("If you'd like this to work differently, please submit an issue.")
           return {}
         end
         expansion_paths[type] = path
@@ -159,7 +159,7 @@ module Supply
     end
 
     def upload_obb(obb_path, expansion_file_type, apk_version_code)
-      Helper.log.info "Uploading obb file #{obb_path}..."
+      UI.message("Uploading obb file #{obb_path}...")
       client.upload_obb(obb_file_path: obb_path,
                         apk_version_code: apk_version_code,
                         expansion_file_type: expansion_file_type)

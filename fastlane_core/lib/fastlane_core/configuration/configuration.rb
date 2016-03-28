@@ -104,7 +104,7 @@ module FastlaneCore
             begin
               current.conflict_block.call(conflicting_option)
             rescue => ex
-              Helper.log.fatal "Error resolving conflict between options: '#{current.key}' and '#{conflicting_option.key}'".red
+              UI.error("Error resolving conflict between options: '#{current.key}' and '#{conflicting_option.key}'")
               raise ex
             end
           else
@@ -124,7 +124,7 @@ module FastlaneCore
             item.verify_block.call(item.default_value)
           end
         rescue => ex
-          Helper.log.fatal ex
+          UI.error(ex)
           UI.user_error!("Invalid default value for #{item.key}, doesn't match verify_block")
         end
       end
@@ -195,7 +195,7 @@ module FastlaneCore
       end
 
       while value.nil?
-        Helper.log.info "To not be asked about this value, you can specify it using '#{option.key}'".yellow
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
         value = ask("#{option.description}: ")
         # Also store this value to use it from now on
         begin

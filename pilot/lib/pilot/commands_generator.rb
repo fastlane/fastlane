@@ -36,7 +36,7 @@ module Pilot
           mgr.public_send(action, config)
         rescue => ex
           failures.push(address)
-          Helper.log.info "[#{address}]: #{ex}".red
+          UI.message("[#{address}]: #{ex}")
         end
       end
       UI.user_error!("Some operations failed: #{failures}") unless failures.empty?

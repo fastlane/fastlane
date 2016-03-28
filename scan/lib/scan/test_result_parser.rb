@@ -13,7 +13,7 @@ module Scan
           failures: failures
         }
       else
-        Helper.log.error "Couldn't parse the number of tests from the output".red
+        UI.error("Couldn't parse the number of tests from the output")
         return {}
       end
     end
