@@ -21,19 +21,31 @@ begin
 rescue
   puts "Could not login to iTunes Connect...".red
 end
-begin
-  puts "Logging into the Developer Portal (#{username})..."
-  Spaceship::Portal.login(username)
-  puts "Successfully logged in to the Developer Portal".green
-  puts ""
-rescue
-  puts "Could not login to the Developer Portal...".red
+
+itc_cookie_content = Spaceship::Tunes.client.store_cookie
+
+# The only value we actually need is the "DES5c148586daa451e55afb017aa62418f91" cookie
+# We're not sure if the key changes
+#
+# Example:
+# name: DES5c148586daa451e55afb017aa62418f91
+# value: HSARMTKNSRVTWFlaF/ek8asaa9lymMA0dN8JQ6pY7B3F5kdqTxJvMT19EVEFX8EQudB/uNwBHOHzaa30KYTU/eCP/UF7vGTgxs6PAnlVWKscWssOVHfP2IKWUPaa4Dn+I6ilA7eAFQsiaaVT
+
+require 'yaml'
+cookies = YAML.load(itc_cookie_content)
+
+# We remove all the un-needed cookies
+cookies.delete_if do |current|
+  ['aa', 'X-SESS', 'site', 'acn01', 'myacinfo', 'itctx', 'wosid', 'woinst', 'NSC_17ofu-jud-jud-mc'].include?(current.name)
 end
 
-puts ""
-puts "-"
-puts ""
+yaml = cookies.to_yaml.gsub("\n", "\\n")
 
-itc_cookie_path = Spaceship::Tunes.client.persistent_cookie_path
-itc_cookie_content = File.read(itc_cookie_path)
-puts itc_cookie_content
+puts "---"
+puts ""
+puts "Pass the following via the FASTLANE_SESSION environment variable:"
+puts yaml.cyan.underline
+puts ""
+puts ""
+puts "Example:"
+puts "export FASTLANE_SESSION='#{yaml}'".cyan.underline
