@@ -148,6 +148,21 @@ module Spaceship
       @cookie.map(&:to_s).join(';')
     end
 
+    def store_cookie(path: nil)
+      path ||= persistent_cookie_path
+
+      # really important to specify the session to true
+      # otherwise myacinfo and more won't be stored
+      @cookie.save(path, :yaml, session: true)
+      return File.read(path)
+    end
+
+    def persistent_cookie_path
+      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
+      FileUtils.mkdir_p(File.expand_path("..", path))
+      return path
+    end
+
     #####################################################
     # @!group Automatic Paging
     #####################################################
@@ -223,7 +238,7 @@ module Spaceship
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
       # First we see if we have a stored cookie for 2 step enabled accounts
-      # this is needed as it stores the information on if this computer is a 
+      # this is needed as it stores the information on if this computer is a
       # trusted one. In general I think spaceship clients should be trusted
       load_session_from_file
 

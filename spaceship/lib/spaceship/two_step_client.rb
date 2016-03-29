@@ -49,6 +49,26 @@ module Spaceship
       return false
     end
 
+    def load_session_from_env
+      yaml_text = ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
+      return if yaml_text.to_s.length == 0
+      puts "Loading session from environment variable" if $verbose
+
+      file = Tempfile.new('cookie.yml')
+      file.write(yaml_text.gsub("\\n", "\n"))
+      file.close
+
+      begin
+        @cookie.load(file.path)
+      rescue => ex
+        puts "Error loading session from environment"
+        puts "Make sure to pass the session in a valid format"
+        raise ex
+      ensure
+        file.unlink
+      end
+    end
+
     def select_device(r, device_id)
       # Request Token
       r = request(:put) do |req|
@@ -99,18 +119,9 @@ module Spaceship
         req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
       end
 
-      # We want to store the myacinfo cookie
-      @cookie.save(persistent_cookie_path, :yaml, session: true)
-      # really important to specify the session
-      # otherwise myacinfo and more won't be stored
+      self.store_cookie
 
       return true
-    end
-
-    def persistent_cookie_path
-      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
-      FileUtils.mkdir_p(File.expand_path("..", path))
-      return path
     end
   end
 end
