@@ -76,13 +76,11 @@ Setup consists of setting up your Google Developers Service Account
 - Open the [Google Play Console](https://play.google.com/apps/publish/)
 - Select **Settings** tab, followed by the **API access** tab
 - Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
-- Click **Add credentials** and select **Service account**
+- Click **Create credentials** and select **Service account**
 - Select **JSON** as the Key type and click **Create**
 - Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
-- Make a note of the **Email address** under **Service accounts** - this is the user which you will need later
 - Back on the Google Play developer console, click **Done** to close the dialog
 - Click on **Grant Access** for the newly added service account
-- In the **Invite a New User** dialog, paste the service account email address you noted earlier into the **Email address** field
 - Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
 
 ### Migrating Google credential format (from .p12 key file to .json)
