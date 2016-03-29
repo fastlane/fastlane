@@ -10,6 +10,7 @@ describe Fastlane do
       }
       EOS
     end
+
     let(:api_token) { 'mysecrettoken' }
     let(:url) { 'https://example.com/app.zip' }
     let(:http) { double('http') }
@@ -20,14 +21,20 @@ describe Fastlane do
        url: url,
        platform: 'ios'}
     end
+
     before do
       allow(Net::HTTP).to receive(:new).and_return(http)
       allow(Net::HTTP::Post).to receive(:new).and_return(request)
+
       allow(http).to receive(:use_ssl=).with(true)
       allow(http).to receive(:request).with(request).and_return(response)
+
+      allow(request).to receive(:basic_auth).with(api_token, nil)
       allow(request).to receive(:body=).with(kind_of(String)).and_return(response)
+
       allow(response).to receive(:body).and_return(response_string)
     end
+
     describe "Appetize Integration" do
       it "raises an error if no parameters were given" do
         expect do
@@ -36,7 +43,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      it "raises an error if no url was given" do
+      it "raises an error if no url or path was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
@@ -54,7 +61,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      it "works with valid parameter" do
+      it "works with valid parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
