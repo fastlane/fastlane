@@ -17,7 +17,7 @@ def itc_stub_login
   # Actual login
   stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
     with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
-    to_return(status: 200, body: '{}')
+    to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
 
   # Failed login attempts
   stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
