@@ -1,10 +1,6 @@
 module Spaceship
   class Client
     def handle_two_step(response)
-      if load_session_from_file
-        return true
-      end
-
       @x_apple_web_session_token = response["x-apple-web-session-token"]
       @scnt = response["scnt"]
 
@@ -48,11 +44,7 @@ module Spaceship
     def load_session_from_file
       if File.exist?(persistent_cookie_path)
         @cookie.load(persistent_cookie_path)
-        if self.team_id.to_s.length > 0 # this will send a request that will fail if the cookie is invalid
-          return true
-        else
-          File.delete(persistent_cookie_path) # session is already invalid
-        end
+        return true
       end
       return false
     end
