@@ -241,6 +241,8 @@ module Spaceship
       # this is needed as it stores the information on if this computer is a
       # trusted one. In general I think spaceship clients should be trusted
       load_session_from_file
+      # If this is a CI, the user can pass the session via environment variable
+      load_session_from_env
 
       data = {
         accountName: user,
