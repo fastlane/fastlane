@@ -219,7 +219,14 @@ module Spaceship
       end
     end
 
-    def send_itc_login_request(user, password)
+    # This method is used for both the Apple Dev Portal and iTunes Connect
+    # This will also handle 2 step verification
+    def send_shared_login_request(user, password)
+      # First we see if we have a stored cookie for 2 step enabled accounts
+      # this is needed as it stores the information on if this computer is a 
+      # trusted one. In general I think spaceship clients should be trusted
+      load_session_from_file
+
       data = {
         accountName: user,
         password: password,
