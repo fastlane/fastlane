@@ -112,6 +112,24 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 ##### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
 
+## 2 Step Verification
+
+When your Apple account has 2 step verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
+
+Since your CI system probably doesn't allow you to input values (like the verification code), you can use `spaceauth`:
+
+```sh
+spaceauth -u apple@krausefx.com
+```
+
+This will authenticate you and provide a string that can be transfered to your CI system:
+
+```
+export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586dfd451e55afbaaa5f62418f91\n  value: HSARMTKNSRVTWFla1+yO4gVPowH17VaaaxPFnUdMUegQZxqy1Ie1c2v6bM1vSOzIbuOmrl/FNenlScsd/NbF7/Lw4cpnL15jsyg0TOJwP32tC/NguPiyOaaaU+jrj4tf4uKdIywVaaaFSRVT\n  domain: idmsa.apple.com\n  for_domain: true\n  path: "/"\n  secure: true\n  httponly: true\n  expires: 2016-04-27 23:55:56.000000000 Z\n  max_age: \n  created_at: 2016-03-28 16:55:57.032086000 -07:00\n  accessed_at: 2016-03-28 19:11:17.828141000 -07:00\n'
+```
+
+Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`. 
+
 ### Spaceship in use
 
 Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
