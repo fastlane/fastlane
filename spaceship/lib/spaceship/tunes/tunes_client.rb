@@ -118,7 +118,7 @@ module Spaceship
 
     def send_login_request(user, password)
       clear_user_cached_data
-      send_itc_login_request(user, password)
+      send_shared_login_request(user, password)
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
