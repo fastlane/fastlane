@@ -12,18 +12,14 @@ module Frameit
       joiner = "_"
 
       if screenshot.device_name.include?('iPad') || screenshot.device_name.include?('6s') || screenshot.device_name.include?('SE')
-        parts = [
-          screenshot.device_name,
-          (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver")
-        ]
-        joiner = "-"
-
         # Transform the orientation_name to the correct form with the exception of the iPhone SE vertical one.
         orientation_name_vertical = screenshot.device_name.include?('SE') ? nil : "vertical"
-        orientation_name = screenshot.orientation_name == "Horz" ? "horizontal" : orientation_name_vertical
-        if !orientation_name.nil?
-          parts.push(orientation_name)
-        end
+        parts = [
+          screenshot.device_name,
+          (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver"),
+          screenshot.orientation_name == "Horz" ? "horizontal" : orientation_name_vertical
+        ].compact
+        joiner = "-"
       end
 
       # Strict template finder according to the device name
