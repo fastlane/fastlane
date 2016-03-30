@@ -89,6 +89,25 @@ module FastlaneCore
       Excon.post(url)
     end
 
+    # (optional) Returns the app identifier for the current tool
+    def self.ios_app_identifier
+      # ARGV example:
+      # ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
+      ARGV.each_with_index do |current, index|
+        if current == "-a" || current == "--app_identifier"
+          return ARGV[index + 1] if ARGV.count > index
+        end
+      end
+
+      ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
+        return ENV["#{current}_APP_IDENTIFIER"] if ENV["#{current}_APP_IDENTIFIER"]
+      end
+
+      return nil
+    rescue
+      nil # we don't want this method to cause a crash
+    end
+
     # To not count the same projects multiple time for the number of launches
     # More information: https://github.com/fastlane/refresher
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
@@ -96,7 +115,10 @@ module FastlaneCore
     def self.p_hash
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
       require 'credentials_manager'
-      value = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+
+      value = nil
+      value ||= self.ios_app_identifier
+      value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       unless value
         value = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
         value = "android_project_#{value}" if value # if the iOS and Android app share the same app identifier
