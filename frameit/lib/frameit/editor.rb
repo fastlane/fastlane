@@ -240,12 +240,15 @@ module Frameit
 
         text.gsub! '\n', "\n"
 
+        interline_spacing = fetch_config['interline_spacing']
+
         # Add the actual title
         title_image.combine_options do |i|
           i.font current_font if current_font
           i.gravity "Center"
           i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
+          i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
         title_image.trim # remove white space
