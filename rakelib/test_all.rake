@@ -139,6 +139,6 @@ task :test_all do
   else
     box "Exceptions 💣"
     puts "\n" + exceptions.map(&:red).join("\n")
-    raise "All tests did not complete successfully".red
+    raise "All tests did not complete successfully. Search for '[[FAILURE]]' in the build logs.".red
   end
 end
