@@ -116,56 +116,9 @@ module Spaceship
       end
     end
 
-    def service_key
-      return @service_key if @service_key
-      # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
-      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
-    end
-
     def send_login_request(user, password)
       clear_user_cached_data
-
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
-
-      begin
-        response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['Accept'] = 'application/json, text/javascript'
-        end
-      rescue UnauthorizedAccessError
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      end
-
-      # get woinst, wois, and itctx cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
-
-      case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      when 200
-        return response
-      else
-        if response["Location"] == "/auth" # redirect to 2 step auth page
-          raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
-        elsif (response.body || "").include?('invalid="true"')
-          # User Credentials are wrong
-          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-        elsif (response['Set-Cookie'] || "").include?("itctx")
-          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
-        else
-          info = [response.body, response['Set-Cookie']]
-          raise ITunesConnectError.new, info.join("\n")
-        end
-      end
+      send_shared_login_request(user, password)
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
@@ -178,7 +131,8 @@ module Spaceship
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
          data.fetch('sectionInfoKeys', []).count == 0 and
-         data.fetch('sectionWarningKeys', []).count == 0
+         data.fetch('sectionWarningKeys', []).count == 0 and
+         data.fetch('validationErrors', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -203,7 +157,8 @@ module Spaceship
       end
 
       errors = handle_response_hash.call(data)
-      errors += data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
+      errors += data.fetch('sectionErrorKeys', [])
+      errors += data.fetch('validationErrors', [])
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
