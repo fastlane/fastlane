@@ -70,6 +70,11 @@ module Spaceship
       [res[1].to_i, res[2].to_i]
     end
 
-    module_function :content_type, :grab_video_preview, :portrait?, :resolution, :video_resolution
+    # @return (String) md5 checksum of given file
+    def md5digest(file_path)
+      Digest::MD5.hexdigest(File.read(file_path))
+    end
+
+    module_function :content_type, :grab_video_preview, :portrait?, :resolution, :video_resolution, :md5digest
   end
 end
