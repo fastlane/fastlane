@@ -75,17 +75,16 @@ module Deliver
 
         prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
 
+        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
+
         language = File.basename(lng_folder)
         files.each do |file_path|
-          if file_path.downcase.include?("_framed.")
-            # That's cool
-          else
-            if file_path.downcase.include?("watch")
-              # Watch doesn't support frames (yet)
-            else
-              # That might not be cool... if that screenshot is not framed but we only want framed
-              next if prefer_framed
-            end
+          is_framed = file_path.downcase.include?("_framed.")
+          is_watch = file_path.downcase.include?("watch")
+
+          if prefer_framed && !is_framed && !is_watch
+            UI.important("🏃 Skipping screenshot file: #{file_path}")
+            next
           end
 
           screenshots << AppScreenshot.new(file_path, language)
