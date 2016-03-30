@@ -21,8 +21,8 @@ module Frameit
         # Transform the orientation_name to the correct form with the exception of the iPhone SE vertical one.
         orientation_name_vertical = screenshot.device_name.include?('SE') ? nil : "vertical"
         orientation_name = screenshot.orientation_name == "Horz" ? "horizontal" : orientation_name_vertical
-        if orientation_name != nil
-            parts.push(orientation_name)
+        if !orientation_name.nil?
+          parts.push(orientation_name)
         end
       end
 
