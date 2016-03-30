@@ -26,7 +26,7 @@ module Frameit
       when sizes::IOS_47
         return 'iPhone-6s'
       when sizes::IOS_40
-        return 'iPhone_5s'
+        return 'iPhone-SE'
       when sizes::IOS_35
         return 'iPhone_4'
       when sizes::IOS_IPAD
