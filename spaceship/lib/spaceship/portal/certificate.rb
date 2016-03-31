@@ -155,15 +155,17 @@ module Spaceship
         "4APLUP237T" => ApplePay
       }
 
-      OLDER_IOS_CERTIFICATE_TYPES = [
+      OLD_IOS_CERTIFICATE_TYPE_IDS = {
+        # these are type IDs not used in new certificates, but they map to known certificate types.
+        "3BQKVH9I2X" => ProductionPush,
+
         # those are also sent by the browser, but not sure what they represent
-        "T44PTHVNID",
-        "DZQUP8189Y",
-        "FGQUP4785Z",
-        "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
-        "FUOY7LWJET"
-      ]
+        "T44PTHVNID" => nil,
+        "DZQUP8189Y" => nil,
+        "FGQUP4785Z" => nil,
+        "S5WE21TULA" => nil,
+        "FUOY7LWJET" => nil
+      }
 
       MAC_CERTIFICATE_TYPE_IDS = {
         "749Y1QAGU7" => MacDevelopment,
@@ -176,7 +178,13 @@ module Spaceship
         "DIVN2GW3XT" => DeveloperIDApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      # This is a 1:MANY map Apple ID alphanum -> Ruby type.
+      # Known Apple ID alphanums have a nil value if we have seen them but cannot yet map them to a Certificate subclass.
+      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS).merge(OLD_IOS_CERTIFICATE_TYPE_IDS)
+
+      # This is a 1:1 map Ruby type -> Apple ID alphanum
+      # All Certificate subclasses guaranteed to map to a single Apple ID alphanum.
+      CERTIFICATE_TYPES = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS).invert
 
       # Class methods
       class << self
@@ -235,10 +243,24 @@ module Spaceship
           # rubocop:enable Style/RescueModifier
 
           # Here we go
-          klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
-          klass ||= Certificate
+          certificate_type_id = attrs['certificateTypeDisplayId']
+          klass = CERTIFICATE_TYPE_IDS[certificate_type_id] || Certificate
           klass.client = @client
-          klass.new(attrs)
+          object = klass.new(attrs)
+
+          # Log to the object's client logger if we created something with a strange certificate type ID
+          if OLD_IOS_CERTIFICATE_TYPE_IDS.keys.include?(certificate_type_id)
+            object.client.logger.warn("Creating certificate with: #{certificate_type_id}")
+            object.client.logger.warn("This ID is old, and spaceship doesn't have a proper type for it.")
+            object.client.logger.warn("Please add it to the list in certificate.rb")
+          end
+          unless CERTIFICATE_TYPE_IDS.keys.include?(certificate_type_id)
+            object.client.logger.warn("Creating certificate with: #{certificate_type_id}")
+            object.client.logger.warn("This ID has not been seen by spaceship before.")
+            object.client.logger.warn("Please add it to the list in certificate.rb")
+          end
+
+          object
         end
 
         # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
@@ -249,9 +271,9 @@ module Spaceship
           if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
             types = type_ids.keys
-            types += OLDER_IOS_CERTIFICATE_TYPES unless mac
+            types += OLD_IOS_CERTIFICATE_TYPE_IDS.keys unless mac
           else
-            types = [CERTIFICATE_TYPE_IDS.key(self)]
+            types = [CERTIFICATE_TYPES[self]]
             mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
           end
 
@@ -282,7 +304,7 @@ module Spaceship
         #  Spaceship::Certificate::Production.create!(csr: csr)
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
-          type = CERTIFICATE_TYPE_IDS.key(self)
+          type = CERTIFICATE_TYPES[self]
 
           # look up the app_id by the bundle_id
           if bundle_id

@@ -44,6 +44,13 @@ describe Spaceship::Certificate do
     end
   end
 
+  it "Can consistently resolve every Certificate type to a single Apple ID alphanum" do
+    Spaceship::Portal::Certificate::CERTIFICATE_TYPES.each do |key, value|
+      expect(value).not_to be_empty
+      expect(Spaceship::Portal::Certificate::CERTIFICATE_TYPE_IDS[value]).to eq(key)
+    end
+  end
+
   it "Correctly filters the listed certificates" do
     certs = Spaceship::Portal::Certificate::Development.all
     expect(certs.count).to eq(1)
