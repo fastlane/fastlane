@@ -1908,6 +1908,21 @@ onesignal(
 )
 ```
 
+### [Flock](http://flock.co)
+
+Send a text message to a Flock group.
+
+```ruby
+flock(
+  message: "Hello"
+  token: "xxx"
+)
+```
+
+To obtain the token, create a new
+[incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)
+in your Flock admin panel.
+
 ## Other
 
 ### update_fastlane
