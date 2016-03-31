@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir["lib/**/*"] + %w( bin/fastlane README.md LICENSE )
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = spec.files.grep(%r{^(test|spec|featuresc)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'krausefx-shenzhen', '>= 0.14.7' # to upload to Hockey and Crashlytics and build the app
@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
 
-  spec.add_dependency 'fastlane_core', '>= 0.37.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.41.0', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.15.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.24.0', '< 1.0.0' # communication layer with Apple's web services
