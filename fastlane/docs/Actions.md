@@ -2404,6 +2404,16 @@ rsync(
 )
 ```
 
+### zip
+
+Compress a file or directory
+
+```ruby
+zip(path: "MyApp.app")
+
+zip(path: "MyApp.app", output_name: "Latest.app.zip")
+```
+
 ### ifttt
 
 Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this `fastlane` action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc.
