@@ -252,7 +252,7 @@ describe Spaceship::Application do
         expect(promocodes[0].contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
       end
 
-      it "fetches promocodes history", focus: true do
+      it "fetches promocodes history" do
         promocodes = app.promocodes_history
         expect(promocodes.count).to eq(7)
 
@@ -271,6 +271,34 @@ describe Spaceship::Application do
         expect(promocodes.version.number_of_codes).to eq(7)
         expect(promocodes.version.maximum_number_of_codes).to eq(100)
         expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
+    end
+
+    describe "Export Compliances" do
+      let(:app) { Spaceship::Application.all.first }
+
+      it "fetches current export compliance status" do
+        export_compliances = app.export_compliances
+        expect(export_compliances.count).to eq(2)
+        expect(export_compliances[0].id).to eq('619435001')
+        expect(export_compliances[0].upload_date).to eq(1_459_410_161_000)
+        expect(export_compliances[0].code_value).to eq(nil)
+        expect(export_compliances[0].platform).to eq('ios')
+        expect(export_compliances[0].export_compliance_required).to eq(false)
+        expect(export_compliances[0].uses_non_exempt_encryption_from_plist).to eq(nil)
+        expect(export_compliances[0].ccat_file.name).to eq('file_ERN_Accepted_1.pdf')
+        expect(export_compliances[0].builds.count).to eq(0)
+        expect(export_compliances[0].store_versions.count).to eq(0)
+
+        expect(export_compliances[1].id).to eq('619435002')
+        expect(export_compliances[1].upload_date).to eq(1_459_410_179_000)
+        expect(export_compliances[1].code_value).to eq(nil)
+        expect(export_compliances[1].platform).to eq('ios')
+        expect(export_compliances[1].export_compliance_required).to eq(false)
+        expect(export_compliances[1].uses_non_exempt_encryption_from_plist).to eq(nil)
+        expect(export_compliances[1].ccat_file.name).to eq('file_ERN_Accepted_2.pdf')
+        expect(export_compliances[1].builds).to eq(['1.3.1 (1.3.1)'])
+        expect(export_compliances[1].store_versions).to eq(['1.3.1'])
       end
     end
   end

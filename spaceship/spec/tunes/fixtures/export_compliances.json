@@ -1,0 +1,123 @@
+{
+    "data": [{
+        "sectionErrorKeys": [],
+        "sectionInfoKeys": [],
+        "sectionWarningKeys": [],
+        "usesEncryption": {
+            "value": "true",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "encryptionUpdated": null,
+        "isExempt": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "containsProprietaryCryptography": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "containsThirdPartyCryptography": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "availableOnFrenchStore": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "ccatFile": {
+            "value": {
+                "url": "http://a288.phobos.apple.com/us/r30/Purple49/v4/aa/bd/a5/aabda5fc-0d99-bf87-b0e8-854639xxxxxx/pr_source.pdf?downloadKey3=xxxxxxxxxxxxxxxx",
+                "name": "file_ERN_Accepted_1.pdf",
+                "assetToken": null,
+                "timestamp": null,
+                "fileType": null
+            },
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "appType": null,
+        "platform": "ios",
+        "exportComplianceRequired": false,
+        "usesNonExemptEncryptionFromPlist": null,
+        "status": "awaitingApproval",
+        "builds": [],
+        "storeVersions": [],
+        "codeValue": null,
+        "id": "619435001",
+        "uploadDate": 1459410161000
+    }, {
+        "sectionErrorKeys": [],
+        "sectionInfoKeys": [],
+        "sectionWarningKeys": [],
+        "usesEncryption": {
+            "value": "true",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "encryptionUpdated": null,
+        "isExempt": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "containsProprietaryCryptography": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "containsThirdPartyCryptography": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "availableOnFrenchStore": {
+            "value": "false",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "ccatFile": {
+            "value": {
+                "url": "http://a288.phobos.apple.com/us/r30/Purple49/v4/aa/bd/a5/aabda5fc-0d99-bf87-b0e8-854639xxxxxx/pr_source.pdf?downloadKey3=xxxxxxxxxxxxxxxx",
+                "name": "file_ERN_Accepted_2.pdf",
+                "assetToken": null,
+                "timestamp": null,
+                "fileType": null
+            },
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+        },
+        "appType": null,
+        "platform": "ios",
+        "exportComplianceRequired": false,
+        "usesNonExemptEncryptionFromPlist": null,
+        "status": "awaitingApproval",
+        "builds": ["1.3.1 (1.3.1)"],
+        "storeVersions": ["1.3.1"],
+        "codeValue": null,
+        "id": "619435002",
+        "uploadDate": 1459410179000
+    }],
+    "messages": {
+        "warn": null,
+        "error": null,
+        "info": null
+    },
+    "statusCode": "SUCCESS"
+}
