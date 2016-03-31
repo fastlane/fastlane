@@ -53,7 +53,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # What's gym?
 
-`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file :muscle:
+`gym` builds and packages iOS and OS X apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file :muscle:
 
 `gym` is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 

@@ -17,7 +17,11 @@ module WatchBuild
                                      short_option: "-u",
                                      env_name: "FASTLANE_USER",
                                      description: "Your Apple ID Username",
-                                     default_value: user)
+                                     default_value: user),
+        FastlaneCore::ConfigItem.new(key: :sample_only_once,
+                                     description: "Only check for the build once, instead of waiting for it to process",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
