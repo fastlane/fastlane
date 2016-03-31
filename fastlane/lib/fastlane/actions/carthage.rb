@@ -13,6 +13,7 @@ module Fastlane
         cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
+        cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
 
         Actions.sh(cmd.join(' '))
       end
@@ -78,6 +79,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid value for no_skip_current. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :derived_data,
+                                       env_name: "FL_CARTHAGE_DERIVED_DATA",
+                                       description: "Use derived data folder at path",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_CARTHAGE_VERBOSE",
                                        description: "Print xcodebuild output inline",
