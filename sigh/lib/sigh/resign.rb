@@ -29,6 +29,7 @@ module Sigh
       provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
+      verbose = "-v" if $verbose
 
       command = [
         resign_path.shellescape,
@@ -38,6 +39,7 @@ module Sigh
         entitlements,
         version,
         display_name,
+        verbose,
         ipa.shellescape
       ].join(' ')
 
