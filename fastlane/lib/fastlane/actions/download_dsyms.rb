@@ -29,6 +29,10 @@ module Fastlane
 
         UI.message(message.join(" "))
         app = Spaceship::Application.find(params[:app_identifier])
+        unless app
+          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
+        end
+
         app.all_build_train_numbers.each do |train_number|
           if version && version != train_number
             next
