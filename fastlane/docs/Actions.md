@@ -917,7 +917,7 @@ upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
 This action allows you to upload symbolication files to Sentry.
 
 ```ruby
-upload_sybols_to_sentry(
+upload_symbols_to_sentry(
   api_key: '...',
   org_slug: '...',
   project_slug: '...',
