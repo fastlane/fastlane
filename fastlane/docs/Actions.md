@@ -879,14 +879,6 @@ Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
-### [upload_symbols_to_crashlytics]
-
-This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
-
-```ruby
-upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
-```
-
 ### Apteligent
 
 Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolication.
@@ -911,6 +903,15 @@ lane :refresh_dsyms do
   clean_build_artifacts           # Delete the local dSYM files
 end
 ```
+
+### `upload_symbols_to_crashlytics`
+
+This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+
+```ruby
+upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
+```
+
 ### [upload_symbols_to_sentry](https://getsentry.com)
 
 This action allows you to upload symbolication files to Sentry.
