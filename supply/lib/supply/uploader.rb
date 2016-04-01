@@ -40,7 +40,7 @@ module Supply
       path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
       if File.exist?(path)
         UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
+        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -48,7 +48,7 @@ module Supply
     def upload_metadata(language, listing)
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(metadata_path, language, "#{key}.txt")
-        listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
+        listing.send("#{key}=".to_sym, File.read(path, encoding: 'UTF-8')) if File.exist?(path)
       end
       begin
         listing.save
