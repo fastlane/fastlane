@@ -201,8 +201,9 @@ then
 fi
 
 # Set the app name
-# The app name is the only file within the Payload directory
-APP_NAME=$(ls "$TEMP_DIR/Payload/")
+# In Payload directory may be another file except .app file, such as StoreKit folder.
+# Search the first .app file within the Payload directory
+APP_NAME=$(ls "$TEMP_DIR/Payload/"|grep ".app$"| head -1)
 
 # Make sure that PATH includes the location of the PlistBuddy helper tool as its location is not standard
 export PATH=$PATH:/usr/libexec
