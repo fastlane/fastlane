@@ -100,7 +100,11 @@ module Spaceship
       begin
         Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
       rescue => ex
-        raise "Incorrect verification code" if ex.to_s.include?("verification code") # to have a nicer output
+        if ex.to_s.include?("verification code") # to have a nicer output
+          puts "Error: Incorrect verification code"
+          return select_device(r, device_id)
+        end
+
         raise ex
       end
 
