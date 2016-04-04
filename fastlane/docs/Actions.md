@@ -55,14 +55,15 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"    # One of: build, bootstrap, update, archive. (default: bootstrap)
-  use_ssh: false,         # Use SSH for downloading GitHub repositories.
-  use_submodules: false,  # Add dependencies as Git submodules.
-  use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
-  no_build: false,        # When bootstrapping Carthage do not build
-  no_skip_current: false, # Don't skip building the current project (only for frameworks)
-  verbose: false,         # Print xcodebuild output inline
-  platform: "all"         # Define which platform to build for
+  command: "bootstrap"     # One of: build, bootstrap, update, archive. (default: bootstrap)
+  use_ssh: false,          # Use SSH for downloading GitHub repositories.
+  use_submodules: false,   # Add dependencies as Git submodules.
+  use_binaries: true,      # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,         # When bootstrapping Carthage do not build
+  no_skip_current: false,  # Don't skip building the current project (only for frameworks)
+  verbose: false,          # Print xcodebuild output inline
+  platform: "all",         # Define which platform to build for
+  configuration: "Release" # Build configuration to use when building
 )
 ```
 

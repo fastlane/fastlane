@@ -273,6 +273,26 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --platform watchOS")
       end
 
+      it "sets the configuration to Release" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: 'Release'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --configuration Release")
+      end
+
+      it "raises an error if configuration is empty" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: ' '
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the following command: `xcodebuild -list`")
+      end
+
       it "works with no parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
