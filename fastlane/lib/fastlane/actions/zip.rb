@@ -7,7 +7,6 @@ module Fastlane
         params[:output_path] ||= "#{params[:path]}.zip"
 
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
-          puts "I'm here"
           sh "zip -r #{params[:output_path].shellescape} #{File.basename(params[:path]).shellescape}"
         end
 
