@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     module SharedValues
-      APPETIZE_PRIVATE_KEY = :APPETIZE_PRIVATE_KEY
       APPETIZE_PUBLIC_KEY = :APPETIZE_PUBLIC_KEY
       APPETIZE_APP_URL = :APPETIZE_APP_URL
       APPETIZE_MANAGE_URL = :APPETIZE_MANAGE_URL
@@ -68,10 +67,8 @@ module Fastlane
         body = JSON.parse(response.body)
         app_url = body['appURL']
         manage_url = body['manageURL']
-        private_key = body['privateKey']
         public_key = body['publicKey']
 
-        Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY] = private_key
         Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
         Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
@@ -120,7 +117,6 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PRIVATE_KEY', 'a string that is used to prove "ownership" of your app.'],
           ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app. Use this to update your app after it has been initially created'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
