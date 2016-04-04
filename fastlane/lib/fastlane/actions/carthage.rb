@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.available_platforms
-        %w(all iOS Mac watchOS)
+        %w(all iOS Mac tvOS watchOS)
       end
 
       def self.available_options

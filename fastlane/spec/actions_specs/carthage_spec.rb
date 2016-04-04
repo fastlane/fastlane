@@ -78,7 +78,7 @@ describe Fastlane do
               platform: 'thisistest'
             )
           end").runner.execute(:test)
-        end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
+        end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, tvOS, watchOS")
       end
 
       it "default use case is boostrap" do
@@ -243,6 +243,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
+      it "sets the platform to all" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'all'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform all")
+      end
+
       it "sets the platform to iOS" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -261,6 +271,16 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap --platform Mac")
+      end
+
+      it "sets the platform to tvOS" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'tvOS'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform tvOS")
       end
 
       it "sets the platform to watchOS" do
