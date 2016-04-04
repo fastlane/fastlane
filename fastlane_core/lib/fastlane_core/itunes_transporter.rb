@@ -227,13 +227,16 @@ module FastlaneCore
     # Returns a new instance of the iTunesTransporter.
     # If no username or password given, it will be taken from
     # the #{CredentialsManager::AccountManager}
-    def initialize(user = nil, password = nil, avoid_shell_script = false)
-      avoid_shell_script ||= !ENV['FASTLANE_EXPERIMENTAL_TRANSPORTER_AVOID_SHELL_SCRIPT'].nil?
+    # @param use_shell_script if true, forces use of the iTMSTransporter shell script.
+    #                         if false, allows a direct call to the iTMSTransporter Java app (preferred).
+    #                         see: https://github.com/fastlane/fastlane/pull/4003
+    def initialize(user = nil, password = nil, use_shell_script = false)
+      use_shell_script ||= !ENV['FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT'].nil?
       data = CredentialsManager::AccountManager.new(user: user, password: password)
 
       @user = data.user
       @password = data.password
-      @transporter_executor = avoid_shell_script ? JavaTransporterExecutor.new : ShellScriptTransporterExecutor.new
+      @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
     end
 
     # Downloads the latest version of the app metadata package from iTC.
