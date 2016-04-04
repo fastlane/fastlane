@@ -237,7 +237,7 @@ module Spaceship
       # })
       #
       # Available Values
-      # https://github.com/KrauseFx/deliver/blob/master/Reference.md
+      # https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md
       def update_rating(hash)
         raise "Must be a hash" unless hash.kind_of?(Hash)
 
