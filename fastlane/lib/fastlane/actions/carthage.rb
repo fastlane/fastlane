@@ -25,6 +25,10 @@ module Fastlane
         %w(build bootstrap update archive)
       end
 
+      def self.available_platforms
+        %w(all iOS Mac watchOS)
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :command,
@@ -87,7 +91,7 @@ module Fastlane
                                        description: "Define which platform to build for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS") unless ["all", "iOS", "Mac", "watchOS"].include? value
+                                         UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        env_name: "FL_CARTHAGE_CONFIGURATION",
