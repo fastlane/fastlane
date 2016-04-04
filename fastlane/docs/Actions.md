@@ -1058,15 +1058,54 @@ nexus_upload(
 
 ### [Appetize.io](https://appetize.io/)
 
-Upload your zipped app to Appetize.io
+Upload your zipped app to Appetize.io to stream your app in the browser. This requires your app to be built for the iOS simulator and not the device.
 
 ```ruby
 appetize(
-  api_token: 'yourapitoken',
-  url: 'https://example.com/your/zipped/app.zip',
-  private_key: 'yourprivatekey'
+  path: './MyApp.zip',
+  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
+  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
 )
 ```
+
+Use the `appetize` action together with `appetize_url_generator`
+
+```ruby
+tmp_path = "/tmp/fl_build"
+xcodebuild(
+  workspace: "Themoji.xcworkspace",
+  sdk: "iphonesimulator",
+  scheme: "Themoji",
+  derivedDataPath: tmp_path
+)
+
+app_path = Dir[File.join(tmp_path, "**", "*.app")].last
+UI.user_error("Couldn't find app") unless app_path
+
+zipped_ipa = zip(path: app_path, output_path: File.join(tmp_path, "Result.zip"))
+
+appetize(
+  path: './MyApp.zip',
+  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
+  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
+)
+
+url = appetize_url_generator(scale: "75", color: "black")
+UI.message("Generated URL: #{url}")
+```
+
+You can check if your app is currently running on [Appetize.io](https://appetize.io/) using 
+
+```objective-c
+[[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
+```
+
+for Android use
+
+```java
+getIntent().getBooleanExtra("isAppetize", false)
+```
+
 
 ### [Appaloosa](https://www.appaloosa-store.com)
 
