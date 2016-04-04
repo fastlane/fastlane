@@ -62,7 +62,7 @@ carthage(
   no_build: false,         # When bootstrapping Carthage do not build
   no_skip_current: false,  # Don't skip building the current project (only for frameworks)
   verbose: false,          # Print xcodebuild output inline
-  platform: "all",         # Define which platform to build for
+  platform: "all",         # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
   configuration: "Release" # Build configuration to use when building
 )
 ```

@@ -293,6 +293,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --platform watchOS")
       end
 
+      it "can be set to multiple the platforms" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'iOS,Mac'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform iOS,Mac")
+      end
+
       it "sets the configuration to Release" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(

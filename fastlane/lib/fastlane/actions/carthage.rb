@@ -91,7 +91,9 @@ module Fastlane
                                        description: "Define which platform to build for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? value
+                                         value.split(',').each do |platform|
+                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? platform
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        env_name: "FL_CARTHAGE_CONFIGURATION",
