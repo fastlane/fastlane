@@ -84,5 +84,10 @@ describe FastlaneCore do
       expect(value[:rows][0][1]).to end_with '...'
       expect(value[:rows][0][1].length).to be < long_breakable_text.length
     end
+
+    it "supports non-Configuration prints" do
+      value = FastlaneCore::PrintTable.print_values(config: {key: "value"}, title: "title")
+      expect(value[:rows]).to eq([["key", "value"]])
+    end
   end
 end
