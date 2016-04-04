@@ -18,7 +18,7 @@ module Fastlane
         require 'json'
 
         params = {
-            platform: 'ios'
+          platform: 'ios'
         }
 
         if options[:path]
@@ -37,12 +37,14 @@ module Fastlane
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
+        UI.message "Uploading ipa to appetize... this might take a while"
         response = http.request(req)
 
-        UI.user_error!("Error uploading app to Appetize.io") unless parse_response(response)
+        parse_response(response) # this will raise an exception if something goes wrong
+
         UI.message("App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}")
         UI.message("Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}")
-        UI.message("App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}")
+        UI.message("Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
         UI.success("Build successfully uploaded to Appetize.io")
       end
 
@@ -73,9 +75,9 @@ module Fastlane
         Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
-      rescue
-        UI.error("Error uploading to Appetize.io: #{response.body}")
-        return false
+      rescue => ex
+        UI.error ex
+        UI.user_error!("Error uploading to Appetize.io: #{response.body}")
       end
       private_class_method :parse_response
 
@@ -106,7 +108,12 @@ module Fastlane
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "Public key of the app you wish to update. If not provided, then a new app entry will be created on Appetize.io",
                                        is_string: true,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         if value.start_with?("private_")
+                                           UI.user_error!("You provided a private key to appetize, please provide the public key")
+                                         end
+                                       end),
           FastlaneCore::ConfigItem.new(key: :note,
                                        env_name: "APPETIZE_NOTE",
                                        description: "Notes you wish to add to the uploaded app",
