@@ -251,12 +251,32 @@ module Spaceship
       }
 
       begin
+        # The below workaround is only needed for 2 step verified machines
+        # Due to escaping of cookie values we have a little workaround here
+        # By default the cookie jar would generate the following header
+        #   DES5c148...=HSARM.......xaA/O69Ws/CHfQ==SRVT
+        # However we need the following
+        #   DES5c148...="HSARM.......xaA/O69Ws/CHfQ==SRVT"
+        # There is no way to get the cookie jar value with " around the value
+        # so we manually modify the cookie (only this one) to be properly escaped
+        # Afterwards we pass this value manually as a header
+        # It's not enough to just modify @cookie, it needs to be done after self.cookie
+        # as a string operation
+        important_cookie = @cookie.store.entries.find { |a| a.name.include?("DES") }
+        if important_cookie
+          modified_cookie = self.cookie # returns a string of all cookies
+          unescaped_important_cookie = "#{important_cookie.name}=#{important_cookie.value}"
+          escaped_important_cookie = "#{important_cookie.name}=\"#{important_cookie.value}\""
+          modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
+        end
+
         response = request(:post) do |req|
           req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{itc_service_key}"
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
           req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Cookie"] = modified_cookie if modified_cookie
         end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."

@@ -43,6 +43,7 @@ module Spaceship
     # Only needed for 2 step
     def load_session_from_file
       if File.exist?(persistent_cookie_path)
+        puts "Loading session from '#{persistent_cookie_path}'" if $verbose
         @cookie.load(persistent_cookie_path)
         return true
       end
@@ -99,7 +100,11 @@ module Spaceship
       begin
         Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
       rescue => ex
-        raise "Incorrect verification code" if ex.to_s.include?("verification code") # to have a nicer output
+        if ex.to_s.include?("verification code") # to have a nicer output
+          puts "Error: Incorrect verification code"
+          return select_device(r, device_id)
+        end
+
         raise ex
       end
 
