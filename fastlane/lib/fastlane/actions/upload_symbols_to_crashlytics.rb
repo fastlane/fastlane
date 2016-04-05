@@ -8,7 +8,7 @@ module Fastlane
         find_api_token(params)
 
         dsym_paths = []
-        dsym_paths << params[:dsym_path]
+        dsym_paths << params[:dsym_path] if params[:dsym_path]
         dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
 
         if dsym_paths.count == 0
@@ -94,7 +94,9 @@ module Fastlane
         [
           "This action allows you to upload symbolication files to Crashlytics.",
           "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode"
+          "use Bitcode. This action will not fail the build if one of the uploads failed.",
+          "The reason for that is that sometimes some of dSYM files are invalid, and we don't want",
+          "them to fail the complete build."
         ].join(" ")
       end
 
