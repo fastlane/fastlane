@@ -45,7 +45,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :device,
                                        env_name: "APPETIZE_URL_GENERATOR_DEVICE",
-                                       description: "Device type",
+                                       description: "Device type: iphone4s, iphone5s, iphone6, iphone6plus, ipadair, iphone6s, iphone6splus, ipadair2, nexus5, nexus7 or nexus9",
                                        is_string: true,
                                        default_value: "iphone5s"),
           FastlaneCore::ConfigItem.new(key: :scale,
