@@ -106,7 +106,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :public_key,
                                        env_name: "APPETIZE_PUBLICKEY",
-                                       description: "Public key of the app you wish to update. If not provided, then a new app entry will be created on Appetize.io",
+                                       description: "Public key of the app you wish to overwrite an existing app. If not provided, then a new app entry will be created on Appetize.io",
                                        is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|

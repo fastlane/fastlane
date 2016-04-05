@@ -1068,6 +1068,8 @@ appetize(
 )
 ```
 
+If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
+
 Use the `appetize` action together with `appetize_url_generator`
 
 ```ruby
@@ -1086,8 +1088,7 @@ zipped_ipa = zip(path: app_path, output_path: File.join(tmp_path, "Result.zip"))
 
 appetize(
   path: zipped_ipa,
-  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
-  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
+  api_token: 'yourapitoken' # get it from https://appetize.io/docs#request-api-token
 )
 
 url = appetize_url_generator(scale: "75", color: "black")
