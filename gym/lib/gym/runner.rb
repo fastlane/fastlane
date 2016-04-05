@@ -16,6 +16,7 @@ module Gym
       FileUtils.mkdir_p(Gym.config[:output_directory])
 
       if Gym.project.ios? || Gym.project.tvos?
+        fix_archive
         package_app
         fix_package
         compress_and_move_dsym
@@ -70,6 +71,11 @@ module Gym
       if File.exist?(PackageCommandGenerator.ipa_path)
         File.delete(PackageCommandGenerator.ipa_path)
       end
+    end
+
+    def fix_archive
+      return unless Gym.config[:use_legacy_build_api]
+      Gym::XcodebuildFixes.generic_archive_fix
     end
 
     def fix_package
