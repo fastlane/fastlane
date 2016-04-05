@@ -6,10 +6,10 @@ module Fastlane
         require 'xcake'
 
         if defined? Xcake::Command::Make
-          #New `xcake make` command
+          # New `xcake make` command
           Xcake::Command::Make.run
         else
-          #Legacy `xcake` command
+          # Legacy `xcake` command
           Xcake::Command.run
         end
       end
