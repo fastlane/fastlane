@@ -9,6 +9,28 @@ describe Fastlane do
         expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200")
       end
 
+      before do
+        require 'fileutils'
+        require 'shellwords'
+
+        @project_path = File.expand_path('./fastlane/android project/')
+        FileUtils.mkdir_p @project_path
+        FileUtils.cp File.expand_path('./fastlane/README.md'), @project_path
+        @gradle_path = File.join(@project_path, 'README.md')
+      end
+
+      it "correctly uses unescape path" do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, serial: 'abc123', gradle_path: '#{@gradle_path}')
+        end").runner.execute(:build)
+
+        expect(result).to eq("ANDROID_SERIAL=abc123 #{@gradle_path.shellescape} assembleWorldDominationRelease -p . -PversionCode=200")
+      end
+
+      after do
+        FileUtils.rm_rf @project_path
+      end
+
       it "correctly uses the serial" do
         result = Fastlane::FastFile.new.parse("lane :build do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, serial: 'abc123', gradle_path: './fastlane/README.md')
