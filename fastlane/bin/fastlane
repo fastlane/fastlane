@@ -153,6 +153,16 @@ class FastlaneApplication
       end
     end
 
+    command :enable_auto_complete do |c|
+      c.syntax = 'fastlane enable_auto_complete'
+      c.description = 'Enable tab auto completion'
+
+      c.action do |args, options|
+        require 'fastlane/auto_complete'
+        Fastlane::AutoComplete.execute
+      end
+    end
+
     default_command :trigger
 
     run!
