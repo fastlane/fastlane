@@ -22,7 +22,7 @@ module Gym
 
       # Does this application have a WatchKit target
       def is_watchkit_ipa?(plist_path)
-        `/usr/libexec/PlistBuddy -c 'Print DTSDKName' '#{plist_path}' 2>&1`.match(/^\s*watchos2\.\d+\s*$/) != nil
+        `/usr/libexec/PlistBuddy -c 'Print DTSDKName' '#{plist_path..shellescape} 2>&1`.match(/^\s*watchos2\.\d+\s*$/) != nil
       end
     end
   end
