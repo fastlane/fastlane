@@ -61,7 +61,7 @@ module FastlaneCore
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI'].each do |current|
+      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -118,24 +118,49 @@ module FastlaneCore
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
-        Helper.log.error ex
-        Helper.log.error "Error detecting currently used Xcode installation".red
+        UI.error(ex)
+        UI.error("Error detecting currently used Xcode installation")
       end
       @xcode_version
     end
 
+    def self.transporter_java_executable_path
+      return File.join(self.transporter_java_path, 'bin', 'java')
+    end
+
+    def self.transporter_java_ext_dir
+      return File.join(self.transporter_java_path, 'lib', 'ext')
+    end
+
+    def self.transporter_java_jar_path
+      return File.join(self.itms_path, 'lib', 'itmstransporter-launcher.jar')
+    end
+
+    def self.transporter_user_dir
+      return File.join(self.itms_path, 'bin')
+    end
+
+    def self.transporter_java_path
+      return File.join(self.itms_path, 'java')
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+    end
+
+    # @return the full path to the iTMSTransporter executable
+    def self.itms_path
       return '' unless self.is_mac? # so tests work on Linx too
 
       [
-        "../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",
-        "../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter"
+        "../Applications/Application Loader.app/Contents/MacOS/itms",
+        "../Applications/Application Loader.app/Contents/itms"
       ].each do |path|
-        result = File.join(self.xcode_path, path)
+        result = File.expand_path(File.join(self.xcode_path, path))
         return result if File.exist?(result)
       end
-      raise "Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.".red
+      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     def self.fastlane_enabled?

@@ -45,8 +45,8 @@ module Fastlane
                                        description: "The Podspec you want to push",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find file at path '#{value}'".red unless File.exist?(value)
-                                         raise "File must be a `.podspec`".red unless value.end_with?(".podspec")
+                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("File must be a `.podspec`") unless value.end_with?(".podspec")
                                        end),
           FastlaneCore::ConfigItem.new(key: :repo,
                                        description: "The repo you want to push. Pushes to Trunk by default",
@@ -60,7 +60,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "Sources must be an array.".red unless value.kind_of?(Array)
+                                         UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end)
         ]
       end

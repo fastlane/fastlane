@@ -178,7 +178,7 @@ describe Spaceship::Application do
         end
       end
 
-      describe "BUNDLES", focus: true do
+      describe "BUNDLES" do
         let (:bundle) { Spaceship::Application.find(928_444_013) }
         it "can find a bundle" do
           expect(bundle.raw_data['type']).to eq("iOS App Bundle")
@@ -207,7 +207,7 @@ describe Spaceship::Application do
       end
     end
 
-    describe "Version history", focus: true do
+    describe "Version history" do
       it "Parses history" do
         app = Spaceship::Application.all.first
         history = app.versions_history
@@ -234,6 +234,43 @@ describe Spaceship::Application do
         expect(v.items[3].user_name).to eq("Apple")
         expect(v.items[3].user_email).to eq(nil)
         expect(v.items[3].date).to eq(1_450_461_891_000)
+      end
+    end
+
+    describe "Promo codes" do
+      let(:app) { Spaceship::Application.all.first }
+
+      it "fetches remaining promocodes" do
+        promocodes = app.promocodes
+        expect(promocodes.count).to eq(1)
+        expect(promocodes[0].app_id).to eq(816549081)
+        expect(promocodes[0].app_name).to eq('DragonBox Numbers')
+        expect(promocodes[0].version).to eq('1.5.0')
+        expect(promocodes[0].platform).to eq('ios')
+        expect(promocodes[0].number_of_codes).to eq(2)
+        expect(promocodes[0].maximum_number_of_codes).to eq(100)
+        expect(promocodes[0].contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
+
+      it "fetches promocodes history", focus: true do
+        promocodes = app.promocodes_history
+        expect(promocodes.count).to eq(7)
+
+        promocodes = promocodes[4]
+
+        expect(promocodes.effective_date).to eq(1457864552000)
+        expect(promocodes.expiration_date).to eq(1460283752000)
+        expect(promocodes.username).to eq('joe@wewanttoknow.com')
+
+        expect(promocodes.codes.count).to eq(1)
+        expect(promocodes.codes[0]).to eq('6J49JFRP----')
+        expect(promocodes.version.app_id).to eq(816549081)
+        expect(promocodes.version.app_name).to eq('DragonBox Numbers')
+        expect(promocodes.version.version).to eq('1.5.0')
+        expect(promocodes.version.platform).to eq('ios')
+        expect(promocodes.version.number_of_codes).to eq(7)
+        expect(promocodes.version.maximum_number_of_codes).to eq(100)
+        expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
       end
     end
   end

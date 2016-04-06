@@ -24,7 +24,7 @@ module Fastlane
         elsif params[:apk_path]
           command = Helper::CrashlyticsHelper.generate_android_command(params)
         else
-          raise "You have to either pass an ipa or an apk file to the Crashlytics action".red
+          UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
         end
 
         UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
@@ -49,7 +49,7 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           # Android Specific
           FastlaneCore::ConfigItem.new(key: :apk_path,
@@ -58,7 +58,7 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
                                        end),
           # General
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
@@ -67,26 +67,26 @@ module Fastlane
                                        default_value: Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find crashlytics at path '#{File.expand_path(value)}'`".red unless File.exist?(File.expand_path(value))
+                                         UI.user_error!("Couldn't find crashlytics at path '#{File.expand_path(value)}'`") unless File.exist?(File.expand_path(value))
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        description: "Crashlytics Beta API Token",
                                        verify_block: proc do |value|
-                                         raise "No API token for Crashlytics given, pass using `api_token: 'token'`".red unless value && !value.empty?
+                                         UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
                                        verify_block: proc do |value|
-                                         raise "No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red unless value && !value.empty?
+                                         UI.user_error!("No build secret for Crashlytics given, pass using `build_secret: 'secret'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                        env_name: "CRASHLYTICS_NOTES_PATH",
                                        description: "Path to the release notes",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Path '#{value}' not found".red unless File.exist?(value)
+                                         UI.user_error!("Path '#{value}' not found") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "CRASHLYTICS_NOTES",

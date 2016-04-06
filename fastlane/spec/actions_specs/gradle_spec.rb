@@ -9,6 +9,25 @@ describe Fastlane do
         expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200")
       end
 
+      it "correctly escapes the gradle path" do
+        gradle_path = '/fake gradle/path' # this value is interesting because it contains a space in the path
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with(gradle_path).and_return(true)
+
+        result = Fastlane::FastFile.new.parse("lane :build do
+          gradle(
+            task: 'assemble',
+            flavor: 'WorldDomination',
+            build_type: 'Release',
+            properties: {'versionCode' => 200},
+            serial: 'abc123',
+            gradle_path: '#{gradle_path}'
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq("ANDROID_SERIAL=abc123 #{gradle_path.shellescape} assembleWorldDominationRelease -p . -PversionCode=200")
+      end
+
       it "correctly uses the serial" do
         result = Fastlane::FastFile.new.parse("lane :build do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, serial: 'abc123', gradle_path: './fastlane/README.md')

@@ -127,7 +127,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspace)
 
           expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
-          expect(FastlaneCore::Helper.log).to receive(:error).with(/Couldn't find/)
+          expect(FastlaneCore::UI).to receive(:error).with(/Couldn't find/)
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
@@ -144,7 +144,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p('other-directory')
 
           expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
-          expect(FastlaneCore::Helper.log).to receive(:error).with(/Path must end with/)
+          expect(FastlaneCore::UI).to receive(:error).with(/Path must end with/)
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
@@ -158,7 +158,7 @@ describe FastlaneCore do
     it "raises an exception if path was not found" do
       expect do
         FastlaneCore::Project.new(project: "/tmp/notHere123")
-      end.to raise_error "Could not find project at path '/tmp/notHere123'".red
+      end.to raise_error "Could not find project at path '/tmp/notHere123'"
     end
 
     describe "Valid Standard Project" do

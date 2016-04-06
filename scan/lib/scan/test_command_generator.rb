@@ -23,7 +23,7 @@ module Scan
       def project_path_array
         proj = Scan.project.xcodebuild_parameters
         return proj if proj.count > 0
-        raise "No project/workspace found"
+        UI.user_error!("No project/workspace found")
       end
 
       def options
@@ -63,9 +63,11 @@ module Scan
         # During building we just show the output in the terminal
         # Check out the ReportCollector class for more xcpretty things
         formatter = []
-        if ENV.key?("TRAVIS")
+        if Scan.config[:formatter]
+          formatter << "-f `#{Scan.config[:formatter]}`"
+        elsif ENV.key?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
-          Helper.log.info "Automatically switched to Travis formatter".green
+          UI.success("Automatically switched to Travis formatter")
         end
 
         if Helper.colors_disabled?

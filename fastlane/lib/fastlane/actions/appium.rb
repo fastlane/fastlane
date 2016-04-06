@@ -29,7 +29,7 @@ module Fastlane
         rspec_args << params[:spec_path]
         status = RSpec::Core::Runner.run(rspec_args).to_i
         if status != 0
-          raise "Failed to run Appium spec. status code: #{status}".red
+          UI.user_error!("Failed to run Appium spec. status code: #{status}")
         end
       ensure
         Actions.sh "kill #{appium_pid}" if appium_pid
@@ -54,7 +54,7 @@ module Fastlane
         end
 
         unless File.exist?(appium_path)
-          raise 'You have to install Appium using `npm install -g appium`'.red
+          UI.user_error!("You have to install Appium using `npm install -g appium`")
         end
 
         if appium_path.end_with?('.app')
@@ -70,7 +70,7 @@ module Fastlane
           break if `lsof -i:#{params[:port]}`.to_s.length != 0
 
           if count * 5 > INVOKE_TIMEOUT
-            raise 'Invoke Appium server timed out'.red
+            UI.user_error!("Invoke Appium server timed out")
           end
           sleep 5
         end

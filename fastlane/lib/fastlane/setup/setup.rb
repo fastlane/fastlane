@@ -20,7 +20,7 @@ module Fastlane
       elsif platform == :android
         SetupAndroid.new.run
       else
-        raise "Couldn't find platform '#{platform}'"
+        UI.user_error!("Couldn't find platform '#{platform}'")
       end
     end
 
@@ -36,7 +36,6 @@ module Fastlane
       UI.message("fastlane will send the number of errors for each action to")
       UI.message("https://github.com/fastlane/enhancer to detect integration issues")
       UI.message("No sensitive/private information will be uploaded")
-      UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
   end
 end

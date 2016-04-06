@@ -42,10 +42,11 @@ module Fastlane
       nil
     end
 
+    # @deprecated Use <tt>git_author_email</tt> instead
     # Get the author email of the last git commit
     # <b>DEPRECATED:</b> Use <tt>git_author_email</tt> instead.
     def self.git_author
-      UI.important('`git_author` is deprecated. Please use `git_author_email` instead.')
+      UI.deprecated('`git_author` is deprecated. Please use `git_author_email` instead.')
       git_author_email
     end
 

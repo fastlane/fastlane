@@ -51,7 +51,7 @@ module Fastlane
         when 200, 204
           puts "Succesfully created new OneSignal app".green
         else
-          raise "Unexpected #{response.code} with response: #{response.body}".red
+          UI.user_error!("Unexpected #{response.code} with response: #{response.body}")
         end
       end
 
@@ -71,7 +71,7 @@ module Fastlane
                                       verify_block: proc do |value|
                                         unless value.to_s.length > 0
                                           UI.error("Please add 'ENV[\"ONE_SIGNAL_AUTH_KEY\"] = \"your token\"' to your Fastfile's `before_all` section.")
-                                          raise 'No ONE_SIGNAL_AUTH_KEY given.'.red
+                                          UI.user_error!("No ONE_SIGNAL_AUTH_KEY given.")
                                         end
                                       end),
 
@@ -81,7 +81,7 @@ module Fastlane
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
                                            UI.error("Please add 'ENV[\"ONE_SIGNAL_APP_NAME\"] = \"Your app name\"' to your Fastfile's `before_all` section.")
-                                           raise 'No ONE_SIGNAL_APP_NAME given.'.red
+                                           UI.user_error!("No ONE_SIGNAL_APP_NAME given.")
                                          end
                                        end),
 

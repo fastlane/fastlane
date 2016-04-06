@@ -53,7 +53,7 @@ module Fastlane
       #
       #  [:ios, :mac].include?(platform)
       #
-      raise "Implementing `is_supported?` for all actions is mandatory. Please update #{self}".red
+      UI.crash!("Implementing `is_supported?` for all actions is mandatory. Please update #{self}")
     end
 
     # Is printed out in the Steps: output in the terminal

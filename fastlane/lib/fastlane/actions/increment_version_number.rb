@@ -34,7 +34,7 @@ module Fastlane
           if Helper.test?
             version_array = [1, 0, 0]
           else
-            raise "Your current version (#{current_version}) does not respect the format A.B.C" unless current_version =~ /\d+.\d+.\d+/
+            UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ /\d+.\d+.\d+/
             version_array = current_version.split(".").map(&:to_i)
           end
 
@@ -93,7 +93,7 @@ module Fastlane
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         raise "Available values are 'patch', 'minor' and 'major'" unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
@@ -104,8 +104,8 @@ module Fastlane
                                        env_name: "FL_VERSION_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
-                                         raise "Could not find Xcode project".red unless File.exist?(value)
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end,
                                        optional: true)
         ]

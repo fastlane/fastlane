@@ -52,7 +52,7 @@ module Supply
 
       auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: key_io, scope: scope)
 
-      Helper.log.debug "Fetching a new access token from Google..."
+      UI.verbose("Fetching a new access token from Google...")
 
       auth_client.fetch_access_token!
 
@@ -76,7 +76,7 @@ module Supply
 
     # Begin modifying a certain package
     def begin_edit(package_name: nil)
-      raise "You currently have an active edit" if @current_edit
+      UI.user_error!("You currently have an active edit") if @current_edit
 
       self.current_edit = android_publisher.insert_edit(package_name)
 
@@ -193,13 +193,16 @@ module Supply
       return result_upload.version_code
     end
 
+    # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!
+
+      track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
 
       track_body = Androidpublisher::Track.new({
         track: track,
         user_fraction: rollout,
-        version_codes: [apk_version_code]
+        version_codes: track_version_codes
       })
 
       android_publisher.update_track(
@@ -280,7 +283,7 @@ module Supply
     private
 
     def ensure_active_edit!
-      raise "You need to have an active edit, make sure to call `begin_edit`" unless @current_edit
+      UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
     end
   end
 end

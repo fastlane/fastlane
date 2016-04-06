@@ -13,7 +13,7 @@ describe Scan do
       expect do
         options = { project: "/notExistent" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      end.to raise_error "Project file not found at path '/notExistent'".red
+      end.to raise_error "Project file not found at path '/notExistent'"
     end
 
     it "supports additional parameters" do
@@ -38,6 +38,14 @@ describe Scan do
                                      :build,
                                      :test
                                    ])
+    end
+
+    it "supports custom xcpretty formatter" do
+      options = { formatter: "custom-formatter", project: "./examples/standard/app.xcodeproj", sdk: "9.0" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+      result = Scan::TestCommandGenerator.generate
+      expect(result.last).to include(" | xcpretty -f `custom-formatter`")
     end
 
     describe "Standard Example" do

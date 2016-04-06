@@ -30,8 +30,8 @@ module FastlaneCore
               return xml
             end
           rescue => ex
-            Helper.log.error ex
-            Helper.log.error "Error parsing *.pkg distribution xml #{File.join(dir, file)}".red
+            UI.error(ex)
+            UI.error("Error parsing *.pkg distribution xml #{File.join(dir, file)}")
           end
         end
 

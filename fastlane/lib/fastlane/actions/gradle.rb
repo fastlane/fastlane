@@ -30,7 +30,7 @@ module Fastlane
                       end
 
         # Ensure we ended up with a valid path to gradle
-        raise "Couldn't find gradlew at path '#{File.expand_path(gradle_path)}'".red unless File.exist?(gradle_path)
+        UI.user_error!("Couldn't find gradlew at path '#{File.expand_path(gradle_path)}'") unless File.exist?(gradle_path)
 
         # Construct our flags
         flags = []

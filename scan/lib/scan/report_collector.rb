@@ -10,12 +10,12 @@ module Scan
     end
 
     def parse_raw_file(path)
-      raise "Couldn't find file at path '#{path}'".red unless File.exist?(path)
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
 
       commands = generate_commands(path)
       commands.each do |output_path, command|
         system(command)
-        Helper.log.info("Successfully generated report at '#{output_path}'".green)
+        UI.success("Successfully generated report at '#{output_path}'")
 
         if @open_report and output_path.end_with?(".html")
           # Open the HTML file
@@ -34,7 +34,7 @@ module Scan
         type = raw.strip
 
         unless SUPPORTED.include?(type)
-          Helper.log.error "Couldn't find reporter '#{type}', available #{SUPPORTED.join(', ')}"
+          UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED.join(', ')}")
           next
         end
 

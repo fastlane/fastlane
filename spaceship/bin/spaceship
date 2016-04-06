@@ -27,7 +27,7 @@ require "pry"
 require "credentials_manager"
 
 def docs
-  url = 'https://github.com/fastlane/spaceship/tree/master/docs'
+  url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
   `open '#{url}'`
   url
 end
@@ -42,7 +42,7 @@ begin
   puts "Successfully logged in to iTunes Connect".green
   puts ""
 rescue
-  puts "Could not login to iTunes Connect..."
+  puts "Could not login to iTunes Connect...".red
 end
 begin
   puts "Logging into the Developer Portal (#{username})..."
@@ -50,7 +50,7 @@ begin
   puts "Successfully logged in to the Developer Portal".green
   puts ""
 rescue
-  puts "Could not login to the Developer Portal..."
+  puts "Could not login to the Developer Portal...".red
 end
 
 puts "---------------------------------------".green

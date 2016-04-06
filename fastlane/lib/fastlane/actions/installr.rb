@@ -17,7 +17,7 @@ module Fastlane
           Actions.lane_context[SharedValues::INSTALLR_BUILD_INFORMATION] = response.body
           UI.success('Build successfully uploaded to Installr!')
         else
-          raise "Error when trying to upload build file to Installr: #{response.body}".red
+          UI.user_error!("Error when trying to upload build file to Installr: #{response.body}")
         end
       end
 
@@ -69,14 +69,14 @@ module Fastlane
                                      env_name: "INSTALLR_API_TOKEN",
                                      description: "API Token for Installr Access",
                                      verify_block: proc do |value|
-                                       raise "No API token for Installr given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value and !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                      env_name: "INSTALLR_IPA_PATH",
                                      description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                      verify_block: proc do |value|
-                                       raise "Couldn't find build file at path '#{value}'".red unless File.exist?(value)
+                                       UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
                                      end),
           FastlaneCore::ConfigItem.new(key: :notes,
                                      env_name: "INSTALLR_NOTES",

@@ -38,11 +38,15 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'fastlane', ">= 1.15.0" # yes, we use fastlane to test fastlane
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'diff_matcher'
+  spec.add_development_dependency 'multi_json'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.21.0'
   spec.add_development_dependency 'rubocop', '~> 0.38.0'

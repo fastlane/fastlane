@@ -6,7 +6,7 @@ module Fastlane
 
     class DefaultPlatformAction < Action
       def self.run(params)
-        raise "You forgot to pass the default platform".red if params.first.nil?
+        UI.user_error!("You forgot to pass the default platform") if params.first.nil?
 
         platform = params.first.to_sym
 

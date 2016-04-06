@@ -126,7 +126,7 @@ describe Fastlane do
       it "raises an exception if unsupported action is called in unsupported platform" do
         expect do
           @ff.runner.execute('unsupported_action', 'android')
-        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'.".red
+        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'."
       end
     end
 
@@ -235,7 +235,7 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid_parameters, :ios)
-          end.to raise_error "Parameters for a lane must always be a hash".red
+          end.to raise_error "Parameters for a lane must always be a hash"
         end
       end
 
@@ -291,7 +291,7 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         expect do
           ff.runner.execute(:not_here)
-        end.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific".red)
+        end.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific")
       end
 
       it "raises an error if the lane name contains spaces" do
@@ -331,7 +331,7 @@ describe Fastlane do
           end
           lane :test do
           end")
-        end.to raise_exception "Lane 'test' was defined multiple times!".red
+        end.to raise_exception("Lane 'test' was defined multiple times!")
       end
     end
   end

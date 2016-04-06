@@ -30,6 +30,7 @@ module Fastlane
           # Store the number in the shared hash
           Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
+        return build_number
       rescue => ex
         UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
         raise ex
@@ -58,8 +59,8 @@ module Fastlane
                              description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                              optional: true,
                              verify_block: proc do |value|
-                               raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
-                               raise "Could not find Xcode project".red if !File.exist?(value) and !Helper.is_test?
+                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
                              end)
         ]
       end

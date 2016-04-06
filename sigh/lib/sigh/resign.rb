@@ -6,16 +6,16 @@ module Sigh
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
 
-      ipa, signing_identity, provisioning_profiles, entitlements, version = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      resign(ipa, signing_identity, provisioning_profiles, entitlements, version)
+      resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name)
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
@@ -28,6 +28,8 @@ module Sigh
       entitlements = "-e #{entitlements}" if entitlements
       provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
       version = "-n #{version}" if version
+      display_name = "-d #{display_name.shellescape}" if display_name
+      verbose = "-v" if $verbose
 
       command = [
         resign_path.shellescape,
@@ -36,6 +38,8 @@ module Sigh
         provisioning_options, # we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
         entitlements,
         version,
+        display_name,
+        verbose,
         ipa.shellescape
       ].join(' ')
 
@@ -57,8 +61,9 @@ module Sigh
       provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
       entitlements = options.entitlements || find_entitlements
       version = options.version_number || nil
+      display_name = options.display_name || nil
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name
     end
 
     def find_resign_path

@@ -28,7 +28,7 @@ module Fastlane
         if response
           UI.success('Your tests are being executed right now. Please wait for the mail with results and decide if you want to continue.')
         else
-          raise 'Something went wrong while uploading your app to Testmunk'.red
+          UI.user_error!("Something went wrong while uploading your app to Testmunk")
         end
       end
 
@@ -43,25 +43,25 @@ module Fastlane
                                        description: "Path to IPA",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         raise "Please pass to existing ipa" unless File.exist? value
+                                         UI.user_error!("Please pass to existing ipa") unless File.exist? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :email,
                                        env_name: "TESTMUNK_EMAIL",
                                        description: "Your email address",
                                        verify_block: proc do |value|
-                                         raise "Please pass your Testmunk email address using `ENV['TESTMUNK_EMAIL'] = 'value'`" unless value
+                                         UI.user_error!("Please pass your Testmunk email address using `ENV['TESTMUNK_EMAIL'] = 'value'`") unless value
                                        end),
           FastlaneCore::ConfigItem.new(key: :api,
                                        env_name: "TESTMUNK_API",
                                        description: "Testmunk API Key",
                                        verify_block: proc do |value|
-                                         raise "Please pass your Testmunk API Key using `ENV['TESTMUNK_API'] = 'value'`" unless value
+                                         UI.user_error!("Please pass your Testmunk API Key using `ENV['TESTMUNK_API'] = 'value'`") unless value
                                        end),
           FastlaneCore::ConfigItem.new(key: :app,
                                        env_name: "TESTMUNK_APP",
                                        description: "Testmunk App Name",
                                        verify_block: proc do |value|
-                                         raise "Please pass your Testmunk app name using `ENV['TESTMUNK_APP'] = 'value'`" unless value
+                                         UI.user_error!("Please pass your Testmunk app name using `ENV['TESTMUNK_APP'] = 'value'`") unless value
                                        end)
         ]
       end

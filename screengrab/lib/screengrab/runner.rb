@@ -126,7 +126,7 @@ module Screengrab
     end
 
     def screenshot_file_names_in(output_directory, device_type)
-      Dir.glob(File.join('.', output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
+      Dir.glob(File.join(output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
     end
 
     def determine_external_screenshots_path(device_serial)
@@ -228,6 +228,8 @@ module Screengrab
       UI.message "Pulling captured screenshots from the device"
       starting_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
+      UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
+
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(device_serial, device_path) do |path|
           @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
@@ -245,6 +247,8 @@ module Screengrab
 
       ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
+      UI.verbose("Ending screenshot count is: #{ending_screenshot_count}")
+
       # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
       # success based on whether there are more screenshots there than when we started.
       if starting_screenshot_count == ending_screenshot_count
@@ -258,7 +262,7 @@ module Screengrab
     def move_pulled_screenshots(device_type_dir_name)
       # Glob pattern that finds the pulled screenshots directory for each locale
       # (Matches: fastlane/metadata/android/en-US/images/screenshots)
-      screenshots_dir_pattern = File.join('.', @config[:output_directory], '**', "screenshots")
+      screenshots_dir_pattern = File.join(@config[:output_directory], '**', "screenshots")
 
       Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
         src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)

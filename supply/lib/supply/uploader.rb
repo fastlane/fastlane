@@ -5,14 +5,14 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      raise "No local metadata found, make sure to run `supply init` to setup supply".red unless metadata_path || Supply.config[:apk]
+      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
 
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
-          Helper.log.info "Preparing to upload for language '#{language}'..."
+          UI.message("Preparing to upload for language '#{language}'...")
 
           listing = client.listing_for_language(language)
 
@@ -23,11 +23,11 @@ module Supply
         end
       end
 
-      upload_binary unless Supply.config[:skip_upload_apk]
+      upload_binaries unless Supply.config[:skip_upload_apk]
 
-      Helper.log.info "Uploading all changes to Google Play..."
+      UI.message("Uploading all changes to Google Play...")
       client.commit_current_edit!
-      Helper.log.info "Successfully finished the upload to Google Play".green
+      UI.success("Successfully finished the upload to Google Play")
     end
 
     def upload_changelogs(language)
@@ -39,8 +39,8 @@ module Supply
     def upload_changelog(language, apk_version_code)
       path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
       if File.exist?(path)
-        Helper.log.info "Updating changelog for code version '#{apk_version_code}' and language '#{language}'..."
-        apk_listing = ApkListing.new(File.read(path), language, apk_version_code)
+        UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
+        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -48,9 +48,14 @@ module Supply
     def upload_metadata(language, listing)
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(metadata_path, language, "#{key}.txt")
-        listing.send("#{key}=".to_sym, File.read(path)) if File.exist?(path)
+        listing.send("#{key}=".to_sym, File.read(path, encoding: 'UTF-8')) if File.exist?(path)
       end
-      listing.save
+      begin
+        listing.save
+      rescue Encoding::InvalidByteSequenceError => ex
+        message = (ex.message || '').capitalize
+        UI.user_error!("Metadata must be UTF-8 encoded. #{message}")
+      end
     end
 
     def upload_images(language)
@@ -59,7 +64,7 @@ module Supply
         path = Dir.glob(search, File::FNM_CASEFOLD).last
         next unless path
 
-        Helper.log.info "Uploading image file #{path}..."
+        UI.message("Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
                               language: language)
@@ -75,7 +80,7 @@ module Supply
         client.clear_screenshots(image_type: screenshot_type, language: language)
 
         paths.sort.each do |path|
-          Helper.log.info "Uploading screenshot #{path}..."
+          UI.message("Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
                                 language: language)
@@ -83,19 +88,33 @@ module Supply
       end
     end
 
-    def upload_binary
-      apk_path = Supply.config[:apk]
+    def upload_binaries
+      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
 
+      apk_version_codes = []
+
+      apk_paths.each do |apk_path|
+        apk_version_codes.push(upload_binary_data(apk_path))
+      end
+
+      update_track(apk_version_codes)
+    end
+
+    private
+
+    ##
+    # Upload binary apk and obb and corresponding change logs with client
+    #
+    # @param [String] apk_path
+    #    Path of the apk file to upload.
+    #
+    # @return [Integer] The apk version code returned after uploading, or nil if there was a problem
+    def upload_binary_data(apk_path)
+      apk_version_code = nil
       if apk_path
-        Helper.log.info "Preparing apk at path '#{apk_path}' for upload..."
+        UI.message("Preparing apk at path '#{apk_path}' for upload...")
         apk_version_code = client.upload_apk(apk_path)
-
-        Helper.log.info "Updating track '#{Supply.config[:track]}'..."
-        if Supply.config[:track].eql? "rollout"
-          client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
-        else
-          client.update_track(Supply.config[:track], 1.0, apk_version_code)
-        end
+        UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
         upload_obbs(apk_path, apk_version_code)
 
@@ -105,13 +124,20 @@ module Supply
             upload_changelog(language, apk_version_code)
           end
         end
-
       else
-        Helper.log.info "No apk file found, you can pass the path to your apk using the `apk` option"
+        UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
+      apk_version_code
     end
 
-    private
+    def update_track(apk_version_codes)
+      UI.message("Updating track '#{Supply.config[:track]}'...")
+      if Supply.config[:track].eql? "rollout"
+        client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
+      else
+        client.update_track(Supply.config[:track], 1.0, apk_version_codes)
+      end
+    end
 
     def all_languages
       Dir.foreach(metadata_path).sort { |x, y| x <=> y }
@@ -149,8 +175,8 @@ module Supply
         type = obb_expansion_file_type(path)
         next unless type
         if expansion_paths[type]
-          Helper.log.warn("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
-          Helper.log.warn("If you'd like this to work differently, please submit an issue.")
+          UI.important("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
+          UI.important("If you'd like this to work differently, please submit an issue.")
           return {}
         end
         expansion_paths[type] = path
@@ -159,7 +185,7 @@ module Supply
     end
 
     def upload_obb(obb_path, expansion_file_type, apk_version_code)
-      Helper.log.info "Uploading obb file #{obb_path}..."
+      UI.message("Uploading obb file #{obb_path}...")
       client.upload_obb(obb_file_path: obb_path,
                         apk_version_code: apk_version_code,
                         expansion_file_type: expansion_file_type)

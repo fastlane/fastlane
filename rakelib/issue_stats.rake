@@ -4,7 +4,7 @@ require 'faraday'
 require 'terminal-table'
 require 'colored'
 
-QUERY_DAYS = 4
+QUERY_DAYS = (ENV["DAYS"] || 4).to_i
 
 SECONDS_PER_DAY = 86_400
 

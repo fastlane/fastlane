@@ -121,6 +121,7 @@ describe Spaceship::AppVersion, all: true do
         expect(build.icon_url).to eq("https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png")
         expect(build.upload_date).to eq(1_443_150_586_000)
         expect(build.processing).to eq(false)
+        expect(build.apple_id).to eq("898536088")
       end
 
       it "allows choosing of the build for the version to submit" do
@@ -237,7 +238,7 @@ describe Spaceship::AppVersion, all: true do
       it "modifies the large app data after update" do
         version.upload_large_icon!("path_to_jpg")
         expect(version.large_app_icon.url).to eq(nil)
-        expect(version.large_app_icon.original_file_name).to eq("icon1024.jpg")
+        expect(version.large_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
         expect(version.large_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
       end
 
@@ -251,7 +252,7 @@ describe Spaceship::AppVersion, all: true do
       it "modifies the watch app data after update" do
         version.upload_watch_icon!("path_to_jpg")
         expect(version.watch_app_icon.url).to eq(nil)
-        expect(version.watch_app_icon.original_file_name).to eq("icon1024.jpg")
+        expect(version.watch_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
         expect(version.watch_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
       end
 
@@ -423,8 +424,10 @@ describe Spaceship::AppVersion, all: true do
       end
 
       it "modifies the geojson file data after update" do
-        version.upload_geojson!(du_fixture_file_path("upload_valid.geojson"))
-        expect(version.transit_app_file.name).to eq("upload_valid.geojson")
+        allow(Spaceship::Utilities).to receive(:md5digest).and_return("FAKEMD5")
+        file_name = "upload_valid.geojson"
+        version.upload_geojson!(du_fixture_file_path(file_name))
+        expect(version.transit_app_file.name).to eq("ftl_FAKEMD5_#{file_name}")
         expect(version.transit_app_file.url).to eq(nil)
         expect(version.transit_app_file.asset_token).to eq("Purple1/v4/45/50/9d/45509d39-6a5d-7f55-f919-0fbc7436be61/pr_source.geojson")
       end
@@ -491,6 +494,10 @@ describe Spaceship::AppVersion, all: true do
       end
 
       describe "Add, Replace, Remove screenshots" do
+        before do
+          allow(Spaceship::Utilities).to receive(:md5digest).and_return("FAKEMD5")
+        end
+
         it "can add a new screenshot to the list" do
           du_upload_screenshot_success
 
@@ -586,6 +593,30 @@ describe Spaceship::AppVersion, all: true do
       #   expect(version.name['German']).to eq("yep, that's the name")
       #   expect(version.name['English_CA']).to eq("yep, that's the name")
       # end
+    end
+  end
+
+  describe "Modifying the app live version" do
+    let(:version) { Spaceship::Application.all.first.live_version }
+
+    describe "Generate promo codes", focus: true do
+      it "fetches remaining promocodes" do
+        promocodes = version.generate_promocodes!(1)
+
+        expect(promocodes.effective_date).to eq(1457864552300)
+        expect(promocodes.expiration_date).to eq(1460283752300)
+        expect(promocodes.username).to eq('joe@wewanttoknow.com')
+
+        expect(promocodes.codes.count).to eq(1)
+        expect(promocodes.codes[0]).to eq('6J49JFRPTXXXX')
+        expect(promocodes.version.app_id).to eq(816549081)
+        expect(promocodes.version.app_name).to eq('DragonBox Numbers')
+        expect(promocodes.version.version).to eq('1.5.0')
+        expect(promocodes.version.platform).to eq('ios')
+        expect(promocodes.version.number_of_codes).to eq(3)
+        expect(promocodes.version.maximum_number_of_codes).to eq(100)
+        expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
     end
   end
 end

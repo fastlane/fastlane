@@ -32,29 +32,7 @@ module Spaceship
     end
 
     def send_login_request(user, password)
-      response = request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate", {
-        appleId: user,
-        accountPassword: password,
-        appIdKey: api_key
-      })
-
-      if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
-        # User Credentials are wrong
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      elsif (response.body || "").include?("Verify your identity")
-        raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
-      end
-
-      case response.status
-      when 302
-        return response
-      when 200
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      else
-        # Something went wrong. Was it invalid credentials or server issue
-        info = [response.body, response['Set-Cookie']]
-        raise UnexpectedResponse.new, info.join("\n")
-      end
+      send_shared_login_request(user, password)
     end
 
     # @return (Array) A list of all available teams

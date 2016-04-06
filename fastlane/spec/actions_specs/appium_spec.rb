@@ -77,7 +77,7 @@ describe Fastlane do
                 spec_path: 'appium/spec'
               })
             end").runner.execute(:test)
-          end.to raise_error("Failed to run Appium spec. status code: #{status_code}".red)
+          end.to raise_error("Failed to run Appium spec. status code: #{status_code}")
         end
       end
 

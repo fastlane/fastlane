@@ -37,18 +37,17 @@ module Supply
                                      env_name: "SUPPLY_KEY",
                                      short_option: "-k",
                                      conflicting_options: [:json_key],
-                                     optional: true, # deprecated
+                                     deprecated: 'Use --json_key instead',
                                      description: "The p12 File used to authenticate with Google",
                                      default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
                                      verify_block: proc do |value|
-                                       UI.important("DEPRECATED --key OPTION. Use --json_key instead")
                                        UI.user_error! "Could not find p12 file at path '#{File.expand_path(value)}'" unless File.exist?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :issuer,
                                      env_name: "SUPPLY_ISSUER",
                                      short_option: "-i",
                                      conflicting_options: [:json_key],
-                                     optional: true, # deprecated
+                                     deprecated: 'Use --json_key instead',
                                      description: "The issuer of the p12 file (email address of the service account)",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:issuer),
                                      verify_block: proc do |value|
@@ -68,11 +67,26 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
+                                     conflicting_options: [:apk_paths],
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find apk file at path '#{value}'" unless File.exist?(value)
-                                       UI.user_error! "apk file is not an apk" unless value.end_with?(value)
+                                       UI.user_error! "apk file is not an apk" unless value.end_with?('.apk')
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :apk_paths,
+                                     env_name: "SUPPLY_APK_PATHS",
+                                     conflicting_options: [:apk],
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of paths to APK files to upload",
+                                     short_option: "-u",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                       value.each do |path|
+                                         UI.user_error! "Could not find apk file at path '#{path}'" unless File.exist?(path)
+                                         UI.user_error! "file at path '#{path}' is not an apk" unless path.end_with?('.apk')
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",

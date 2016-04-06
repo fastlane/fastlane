@@ -50,9 +50,11 @@ describe Spaceship::Tunes::Build do
       it "properly describes a build" do
         build1 = app.build_trains.values.first.builds.first
         expect(build1.testing_status).to eq("Internal")
+        expect(build1.external_testing_status).to eq("submitForReview")
 
         build2 = app.build_trains.values.last.builds.first
         expect(build2.testing_status).to eq("Inactive")
+        expect(build2.external_testing_status).to eq("approvedInactive")
       end
     end
 
@@ -76,19 +78,7 @@ describe Spaceship::Tunes::Build do
           train: "1.0",
           build_number: "10",
           platform: "ios",
-          changelog: "Custom Changelog",
-          description: "No app description provided",
-          feedback_email: "contact@company.com",
-          marketing_url: "http://marketing.com",
-          first_name: "Felix",
-          last_name: "Krause",
-          review_email: "contact@company.com",
-          phone_number: "0123456789",
-          significant_change: false,
-          privacy_policy_url: nil,
-          review_user_name: nil,
-          review_password: nil,
-          encryption: false })
+          changelog: "Custom Changelog" })
       end
     end
   end

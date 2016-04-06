@@ -8,7 +8,7 @@ module FastlaneCore
       end
 
       def all
-        Helper.log.info "Fetching available devices" if $verbose
+        UI.message("Fetching available devices") if $verbose
 
         @devices = []
         os_type = 'unknown'
@@ -19,8 +19,8 @@ module FastlaneCore
         end
 
         unless output.include?("== Devices ==")
-          Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
-          raise "xcrun simctl not working.".red
+          UI.error("xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works")
+          UI.user_error!("xcrun simctl not working.")
         end
 
         output.split(/\n/).each do |line|
@@ -58,7 +58,7 @@ module FastlaneCore
 
       # The code below works from Xcode 7 on
       # def all
-      #   Helper.log.info "Fetching available devices" if $verbose
+      #   UI.message("Fetching available devices") if $verbose
 
       #   @devices = []
       #   output = ''
@@ -69,9 +69,9 @@ module FastlaneCore
       #   begin
       #     data = JSON.parse(output)
       #   rescue => ex
-      #     Helper.log.error ex
-      #     Helper.log.error "xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works".red
-      #     raise "xcrun simctl not working.".red
+      #     UI.error(ex)
+      #     UI.error("xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works")
+      #     UI.user_error!("xcrun simctl not working.")
       #   end
 
       #   data["devices"].each do |os_version, l|
@@ -118,7 +118,7 @@ module FastlaneCore
       end
 
       def reset
-        Helper.log.info "Resetting #{self}"
+        UI.message("Resetting #{self}")
         `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
         `xcrun simctl erase #{self.udid}`
         return

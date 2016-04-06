@@ -11,7 +11,7 @@ describe FastlaneCore do
                              description: "Directory in which the profile should be stored",
                            default_value: ".",
                             verify_block: proc do |value|
-                              raise "Could not find output directory '#{value}'".red unless File.exist?(value)
+                              UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
                             end),
         FastlaneCore::ConfigItem.new(key: :a_bool,
                                      description: "Metadata: A bool",
@@ -83,6 +83,11 @@ describe FastlaneCore do
       expect(value[:rows].count).to eq(1)
       expect(value[:rows][0][1]).to end_with '...'
       expect(value[:rows][0][1].length).to be < long_breakable_text.length
+    end
+
+    it "supports non-Configuration prints" do
+      value = FastlaneCore::PrintTable.print_values(config: {key: "value"}, title: "title")
+      expect(value[:rows]).to eq([["key", "value"]])
     end
   end
 end

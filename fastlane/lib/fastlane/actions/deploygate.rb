@@ -31,12 +31,17 @@ module Fastlane
 
         return options[:ipa] if Helper.test?
 
-        response = client.upload_build(options[:ipa], options.values)
+        filter = [:message, :distribution_key, :release_note]
+        response = client.upload_build(
+          options[:ipa],
+          options.values.select do |key, _|
+            filter.include? key
+          end)
         if parse_response(response)
           UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
           UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")
         else
-          raise 'Error when trying to upload ipa to DeployGate'.red
+          UI.user_error!("Error when trying to upload ipa to DeployGate")
         end
       end
 
@@ -87,25 +92,33 @@ module Fastlane
                                        env_name: "DEPLOYGATE_API_TOKEN",
                                        description: "Deploygate API Token",
                                        verify_block: proc do |value|
-                                         raise "No API Token for DeployGate given, pass using `api_token: 'token'`".red unless value.to_s.length > 0
+                                         UI.user_error!("No API Token for DeployGate given, pass using `api_token: 'token'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :user,
                                        env_name: "DEPLOYGATE_USER",
                                        description: "Target username or organization name",
                                        verify_block: proc do |value|
-                                         raise "No User for app given, pass using `user: 'user'`".red unless value.to_s.length > 0
+                                         UI.user_error!("No User for app given, pass using `user: 'user'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "DEPLOYGATE_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "DEPLOYGATE_MESSAGE",
                                        description: "Release Notes",
-                                       default_value: "No changelog provided")
+                                       default_value: "No changelog provided"),
+          FastlaneCore::ConfigItem.new(key: :distribution_key,
+                                       optional: true,
+                                       env_name: "DEPLOYGATE_DISTRIBUTION_KEY",
+                                       description: "Target Distribution Key"),
+          FastlaneCore::ConfigItem.new(key: :release_note,
+                                       optional: true,
+                                       env_name: "DEPLOYGATE_RELEASE_NOTE",
+                                       description: "Release note for distribution page")
         ]
       end
 

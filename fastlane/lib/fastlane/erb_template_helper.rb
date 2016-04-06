@@ -8,7 +8,7 @@ module Fastlane
 
     def self.load_from_path(template_filepath)
       unless File.exist?(template_filepath)
-        raise "Could not find Template at path '#{template_filepath}'".red
+        UI.user_error!("Could not find Template at path '#{template_filepath}'")
       end
       File.read(template_filepath)
     end

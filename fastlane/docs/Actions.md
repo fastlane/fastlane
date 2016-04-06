@@ -55,9 +55,13 @@ More options are available:
 
 ```ruby
 carthage(
+  command: "bootstrap"    # One of: build, bootstrap, update, archive. (default: bootstrap)
   use_ssh: false,         # Use SSH for downloading GitHub repositories.
   use_submodules: false,  # Add dependencies as Git submodules.
   use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,        # When bootstrapping Carthage do not build
+  no_skip_current: false, # Don't skip building the current project (only for frameworks)
+  verbose: false,         # Print xcodebuild output inline
   platform: "all"         # Define which platform to build for
 )
 ```
@@ -875,14 +879,6 @@ Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
-### [upload_symbols_to_crashlytics]
-
-This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
-
-```ruby
-upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
-```
-
 ### Apteligent
 
 Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolication.
@@ -907,12 +903,21 @@ lane :refresh_dsyms do
   clean_build_artifacts           # Delete the local dSYM files
 end
 ```
+
+### `upload_symbols_to_crashlytics`
+
+This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+
+```ruby
+upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
+```
+
 ### [upload_symbols_to_sentry](https://getsentry.com)
 
 This action allows you to upload symbolication files to Sentry.
 
 ```ruby
-upload_sybols_to_sentry(
+upload_symbols_to_sentry(
   api_key: '...',
   org_slug: '...',
   project_slug: '...',
@@ -970,6 +975,7 @@ deploygate(
   user: 'target username or organization name',
   ipa: './ipa_file.ipa',
   message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+  distribution_key: '(Optional) Target Distribution Key'
 )
 ```
 
@@ -1614,7 +1620,7 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true,              # optional, default: false
+  force: true               # optional, default: false
 )
 ```
 
@@ -2412,6 +2418,16 @@ rsync(
 )
 ```
 
+### zip
+
+Compress a file or directory
+
+```ruby
+zip(path: "MyApp.app")
+
+zip(path: "MyApp.app", output_name: "Latest.app.zip")
+```
+
 ### ifttt
 
 Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this `fastlane` action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc.
@@ -2424,4 +2440,12 @@ ifttt(
   value2: "bar",
   value3: "baz"
 )
+```
+
+### reset_simulators
+
+Reset all the iOS simulators. Useful with test actions to ensure a clean simulator.
+
+```ruby
+reset_simulators
 ```

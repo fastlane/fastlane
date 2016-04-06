@@ -180,7 +180,7 @@ module Fastlane
                                        description: 'Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa || apk file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa || apk file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: 'FL_APPALOOSA_API_TOKEN',

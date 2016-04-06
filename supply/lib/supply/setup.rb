@@ -2,7 +2,7 @@ module Supply
   class Setup
     def perform_download
       if File.exist?(metadata_path)
-        Helper.log.info "Metadata already exists at path '#{metadata_path}'".yellow
+        UI.important("Metadata already exists at path '#{metadata_path}'")
         return
       end
 
@@ -22,7 +22,7 @@ module Supply
 
       client.abort_current_edit
 
-      Helper.log.info "Successfully stored metadata in '#{metadata_path}'".green
+      UI.success("Successfully stored metadata in '#{metadata_path}'")
     end
 
     def store_metadata(listing)
@@ -31,8 +31,8 @@ module Supply
 
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(containing, "#{key}.txt")
-        Helper.log.info "Writing to #{path}..."
-        File.write(path, listing.send(key))
+        UI.message("Writing to #{path}...")
+        File.open(path, 'w:UTF-8') { |file| file.write(listing.send(key)) }
       end
     end
 
@@ -44,12 +44,12 @@ module Supply
       IMAGES_TYPES.each do |image_type|
         if ['featureGraphic'].include?(image_type)
           # we don't get all files in full resolution :(
-          Helper.log.info "Due to the limit of the Google Play API `supply` can't download your existing feature graphics..."
+          UI.message("Due to the limit of the Google Play API `supply` can't download your existing feature graphics...")
           next
         end
 
         begin
-          Helper.log.info "Downloading #{image_type} for #{listing.language}..."
+          UI.message("Downloading #{image_type} for #{listing.language}...")
 
           url = client.fetch_images(image_type: image_type, language: listing.language).last
           next unless url
@@ -57,8 +57,8 @@ module Supply
           path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
           File.write(path, Net::HTTP.get(URI.parse(url)))
         rescue => ex
-          Helper.log.error ex.to_s
-          Helper.log.error "Error downloading '#{image_type}' for #{listing.language}...".red
+          UI.error(ex.to_s)
+          UI.error("Error downloading '#{image_type}' for #{listing.language}...")
         end
       end
     end
@@ -71,7 +71,7 @@ module Supply
         FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
       end
 
-      Helper.log.info "Due to the limit of the Google Play API `supply` can't download your existing screenshots..."
+      UI.message("Due to the limit of the Google Play API `supply` can't download your existing screenshots...")
     end
 
     def store_apk_listing(apk_listing)
@@ -81,7 +81,7 @@ module Supply
       end
 
       path = File.join(containing, "#{apk_listing.apk_version_code}.txt")
-      Helper.log.info "Writing to #{path}..."
+      UI.message("Writing to #{path}...")
       File.write(path, apk_listing.recent_changes)
     end
 

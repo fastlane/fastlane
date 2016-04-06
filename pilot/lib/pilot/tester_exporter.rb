@@ -4,7 +4,7 @@ require "pilot/tester_util"
 module Pilot
   class TesterExporter < Manager
     def export_testers(options)
-      raise "Export file path is required".red unless options[:testers_file_path]
+      UI.user_error!("Export file path is required") unless options[:testers_file_path]
 
       start(options)
       require 'csv'
@@ -37,7 +37,7 @@ module Pilot
           csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, pretty_date]
         end
 
-        Helper.log.info "Successfully exported CSV to #{file}".green
+        UI.success("Successfully exported CSV to #{file}")
       end
     end
   end

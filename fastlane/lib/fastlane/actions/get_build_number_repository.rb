@@ -51,14 +51,14 @@ module Fastlane
             return 'hg parent --template "{node|short}"'
           end
         else
-          raise "No repository detected"
+          UI.user_error!("No repository detected")
         end
       end
 
       def self.run(params)
-        build_number = Action.sh command(params[:use_hg_revision_number])
+        build_number = Action.sh(command(params[:use_hg_revision_number])).strip
         Actions.lane_context[SharedValues::BUILD_NUMBER_REPOSITORY] = build_number
-        build_number
+        return build_number
       end
 
       #####################################################

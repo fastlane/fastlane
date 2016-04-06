@@ -11,10 +11,10 @@ module Pilot
     def login
       config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-      Helper.log.info "Login to iTunes Connect (#{config[:username]})"
+      UI.message("Login to iTunes Connect (#{config[:username]})")
       Spaceship::Tunes.login(config[:username])
       Spaceship::Tunes.select_team
-      Helper.log.info "Login successful"
+      UI.message("Login successful")
     end
 
     # The app object we're currently using
@@ -23,7 +23,7 @@ module Pilot
 
       @app ||= Spaceship::Application.find(@apple_id)
       unless @app
-        raise "Could not find app with #{(config[:apple_id] || config[:app_identifier])}"
+        UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
       return @app
     end
@@ -40,7 +40,7 @@ module Pilot
 
       if config[:app_identifier]
         @app ||= Spaceship::Application.find(config[:app_identifier])
-        raise "Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect".red unless @app
+        UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect") unless @app
         app_id ||= @app.apple_id
       end
 
@@ -53,7 +53,7 @@ module Pilot
       result = config[:app_identifier]
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
       result ||= ask("Please enter the app's bundle identifier: ")
-      Helper.log.debug "App identifier (#{result})"
+      UI.verbose("App identifier (#{result})")
       return result
     end
   end

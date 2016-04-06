@@ -56,8 +56,10 @@ class FastlaneApplication
       c.syntax = 'fastlane new_action'
       c.description = 'Create a new custom action for fastlane.'
 
+      c.option '--name STRING', String, 'Name of your new action'
+
       c.action do |args, options|
-        Fastlane::NewAction.run
+        Fastlane::NewAction.run(new_action_name: options.name)
       end
     end
 

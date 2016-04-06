@@ -123,20 +123,16 @@ private_lane :validate_repo do |options|
   ensure_no_debug_code(text: "now: ", extension: ".rb", path: "./lib/") # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", path: "./lib/") # Merge conflict
 
-  rubocop if File.exist?("../.rubocop.yml") # some project don't yet use rubocop
+  rubocop
 
-  # Restricted from running on Travis CI because it causes builds to hang.
+  # Verifying the --help command
   #
-  unless ENV['TRAVIS']
-    # Verifying the --help command
-    #
-    tool_name = options[:tool_name]
-    binary_path = File.join("..", "bin", tool_name)
-    unless no_binary.include? tool_name
-      content = sh "PAGER=cat #{binary_path} --help"
-      ["--version", "https://fastlane.tools", tool_name].each do |current|
-        UI.user_error!("--help missing information: '#{current}'") unless content.include? current
-      end
+  tool_name = options[:tool_name]
+  binary_path = File.join("..", "bin", tool_name)
+  unless no_binary.include? tool_name
+    content = sh "PAGER=cat #{binary_path} --help"
+    ["--version", "https://fastlane.tools", tool_name].each do |current|
+      UI.user_error!("--help missing information: '#{current}'") unless content.include? current
     end
   end
 

@@ -12,7 +12,7 @@ describe Fastlane do
               )
             end").runner.execute(:test)
         rescue => e
-          expect(e.to_s).to eq("Failed to fetch Bots from Xcode Server at https://1.2.3.4, response: 500: .".red)
+          expect(e.to_s).to eq("Failed to fetch Bots from Xcode Server at https://1.2.3.4, response: 500: .")
         else
           fail "Error should have been raised"
         end
@@ -32,7 +32,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect(e.to_s).to eq("Failed to find any completed integration for Bot \"bot-2\"".red)
+          expect(e.to_s).to eq("Failed to find any completed integration for Bot \"bot-2\"")
         else
           fail "Error should have been raised"
         end
@@ -53,7 +53,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect(e.to_s).to eq("Specified integration number 3 does not exist.".red)
+          expect(e.to_s).to eq("Specified integration number 3 does not exist.")
         else
           fail "Error should have been raised"
         end
@@ -75,7 +75,7 @@ describe Fastlane do
               )
           end").runner.execute(:test)
         rescue => e
-          expect(e.to_s).to eq("Integration doesn't have any assets (it probably never ran).".red)
+          expect(e.to_s).to eq("Integration doesn't have any assets (it probably never ran).")
         else
           fail "Error should have been raised"
         end

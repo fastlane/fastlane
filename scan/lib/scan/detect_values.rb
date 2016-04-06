@@ -50,7 +50,7 @@ module Scan
           Scan.device = found
           return
         else
-          Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+          UI.error("Couldn't find simulator '#{config[:device]}' - falling back to default simulator")
         end
       end
 
@@ -64,7 +64,7 @@ module Scan
 
       Scan.device = found
 
-      raise "No simulators found".red unless Scan.device
+      UI.user_error!("No simulators found") unless Scan.device
     end
 
     def self.default_device_tvos
@@ -81,7 +81,7 @@ module Scan
           Scan.device = found
           return
         else
-          Helper.log.error "Couldn't find simulator '#{config[:device]}' - falling back to default simulator".red
+          UI.error("Couldn't find simulator '#{config[:device]}' - falling back to default simulator")
         end
       end
 
@@ -95,16 +95,16 @@ module Scan
 
       Scan.device = found
 
-      raise "No simulators found".red unless Scan.device
+      UI.user_error!("No simulators found") unless Scan.device
     end
 
     # Is it an iOS device or a Mac?
     def self.detect_destination
       if Scan.config[:destination]
-        Helper.log.info "It's not recommended to set the `destination` value directly".yellow
-        Helper.log.info "Instead use the other options available in `scan --help`".yellow
-        Helper.log.info "Using your value '#{Scan.config[:destination]}' for now".yellow
-        Helper.log.info "because I trust you know what you're doing...".yellow
+        UI.important("It's not recommended to set the `destination` value directly")
+        UI.important("Instead use the other options available in `scan --help`")
+        UI.important("Using your value '#{Scan.config[:destination]}' for now")
+        UI.important("because I trust you know what you're doing...")
         return
       end
 
