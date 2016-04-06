@@ -6,10 +6,10 @@ require 'fastlane/version'
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Felix Krause"]
-  spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = 'Connect all iOS deployment tools into one streamlined workflow'
-  spec.description   = 'Connect all iOS deployment tools into one streamlined workflow'
+  spec.authors       = ["Fabric"]
+  spec.email         = ["support@fabric.io"]
+  spec.summary       = 'The easiest way to automate building and releasing your iOS and Android apps'
+  spec.description   = 'The easiest way to automate building and releasing your iOS and Android apps'
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
