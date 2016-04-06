@@ -133,7 +133,7 @@ module Supply
     def update_track(apk_version_codes)
       UI.message("Updating track '#{Supply.config[:track]}'...")
       if Supply.config[:track].eql? "rollout"
-        client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_code)
+        client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
       else
         client.update_track(Supply.config[:track], 1.0, apk_version_codes)
       end
