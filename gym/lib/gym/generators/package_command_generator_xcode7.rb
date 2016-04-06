@@ -43,7 +43,6 @@ module Gym
       def ipa_path
         unless Gym.cache[:ipa_path]
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
-
           # We need to process generic IPA
           if path
             # Try to find IPA file in the output directory, used when app thinning was not set
