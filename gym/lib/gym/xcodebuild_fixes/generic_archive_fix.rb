@@ -15,7 +15,7 @@ module Gym
         Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").each do |app_path|
           if is_watchkit_ipa?("#{app_path}/info.plist")
             FileUtils.rm_rf(app_path)
-            UI.verbose "Removing #{app_path}"
+            UI.verbose "Removed #{app_path}"
           end
         end
       end
