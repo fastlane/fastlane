@@ -59,7 +59,6 @@ module Gym
             ErrorHandler.handle_empty_archive unless path
           end
         end
-
         Gym.cache[:ipa_path]
       end
 
