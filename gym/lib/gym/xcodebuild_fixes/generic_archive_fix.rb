@@ -1,5 +1,4 @@
 require 'shellwords'
-
 module Gym
   class XcodebuildFixes
     class << self
@@ -15,15 +14,17 @@ module Gym
         UI.verbose "Looking For Orphaned WatchKit2 Applications"
 
         Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").each do |app_path|
-          if is_watchkit_ipa?("#{app_path}/Info.plist")
+          if is_watchkit_ipa?("#{app_path}/info.plist")
             UI.verbose "Removing Orphaned WatchKit2 Application #{app_path}"
             FileUtils.rm_rf(app_path)
           end
         end
       end
 
+
       # Does this application have a WatchKit target
       def is_watchkit_ipa?(plist_path)
+        require 'shellwords'
         `/usr/libexec/PlistBuddy -c 'Print DTSDKName' '#{plist_path..shellescape} 2>&1`.match(/^\s*watchos2\.\d+\s*$/) != nil
       end
     end
