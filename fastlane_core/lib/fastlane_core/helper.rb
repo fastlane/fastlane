@@ -151,6 +151,7 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
       return '' unless self.is_mac? # so tests work on Linx too
 
       [
