@@ -38,7 +38,7 @@ When submitting a new issue, please provide the following information:
 
 ## Helping to Resolve Existing Issues
 
-If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: A good place to start is by reviewing the list of [open issues](https://github.com/fastlane/fastlane/issues) or [open PRs](https://github.com/fastlane/fastlane/tree/master/fastlane) for things that need attention. When you find one that you'd like to help with, the [countdown](https://github.com/fastlane/countdown) repo is the best way to get set up with the source code for all of the fastlane projects. With that, working on the following things are super valuable:
+If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: We use the [`help wanted`](https://github.com/fastlane/fastlane/labels/help%20wanted) label to mark things that we think it would be great to have community help in resolving, so that's a great place to start! In addition, working on the following things are super valuable:
 
 ### Verifying Bug Reports
 
@@ -90,6 +90,10 @@ To submit the changes to the fastlane repo, you have to do the following:
 - Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
 - Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
+
+## What Do All These Labels Mean?
+
+Great question! Check out the [GitHub Labels](GitHubLabels.md) document for a quick summary of the labels we use and what they mean.
 
 ## Why Did My Issue/PR Get Closed?
 

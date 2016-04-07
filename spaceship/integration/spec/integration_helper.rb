@@ -1,4 +1,3 @@
-require 'pry'
 require 'spaceship'
 
 require 'custom_matchers'
