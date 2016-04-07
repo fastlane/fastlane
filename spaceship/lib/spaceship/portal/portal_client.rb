@@ -32,7 +32,17 @@ module Spaceship
     end
 
     def send_login_request(user, password)
-      send_shared_login_request(user, password)
+      response = send_shared_login_request(user, password)
+      return response if self.cookie.include?("myacinfo")
+
+      # When the user has 2 step enabled, we might have to call this method again
+      # This only occurs when the user doesn't have a team on iTunes Connect
+      # For 2 step verification we use the iTunes Connect back-end
+      # which is enough to get the DES... cookie, however we don't get a valid
+      # myacinfo cookie at that point. That means, after getting the DES... cookie
+      # we have to send the login request again. This will then get us a valid myacinfo
+      # cookie, additionally to the DES... cookie
+      return send_shared_login_request(user, password)
     end
 
     # @return (Array) A list of all available teams

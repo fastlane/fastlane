@@ -100,6 +100,24 @@ module Spaceship
       begin
         Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
       rescue => ex
+        # If the code was entered wrong
+        # {
+        #   "securityCode": {
+        #     "code": "1234"
+        #   },
+        #   "securityCodeLocked": false,
+        #   "recoveryKeyLocked": false,
+        #   "recoveryKeySupported": true,
+        #   "manageTrustedDevicesLinkName": "appleid.apple.com",
+        #   "suppressResend": false,
+        #   "authType": "hsa",
+        #   "accountLocked": false,
+        #   "validationErrors": [{
+        #     "code": "-21669",
+        #     "title": "Incorrect Verification Code",
+        #     "message": "Incorrect verification code."
+        #   }]
+        # }
         if ex.to_s.include?("verification code") # to have a nicer output
           puts "Error: Incorrect verification code"
           return select_device(r, device_id)
@@ -108,8 +126,9 @@ module Spaceship
         raise ex
       end
 
-      # If it works, r.body is actually nil
-      raise "Could not login" unless r.headers["set-cookie"].include?("myacinfo")
+      # If the request was successful, r.body is actually nil
+      # The previous request will fail if the user isn't on a team
+      # on iTunes Connect, but it still works, so we're good
 
       # Tell iTC that we are trustworthy (obviously)
       # This will update our local cookies to something new
@@ -117,12 +136,16 @@ module Spaceship
       # Changed Keys
       # - myacinfo
       # - DES5c148586dfd451e55afb0175f62418f91
+      # We actually only care about the DES value
 
       request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
         req.headers["scnt"] = @scnt
         req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
       end
+      # This request will fail if the user isn't added to a team on iTC
+      # However we don't really care, this request will still return the
+      # correct DES... cookie
 
       self.store_cookie
 
