@@ -6,10 +6,8 @@ module Danger
       # A danger plugin: https://github.com/danger/danger
       class DeviceGrid < Plugin
         def run(languages: nil, devices: nil)
-          puts "Running fastlane to generate and upload an ipa file..."
-          puts `fastlane streaming`
-
           public_key = File.read("fastlane/public_key.txt").strip
+          UI.user_error!("No fastlane/public_key.txt file found, make sure to run fastlane with `generate_device_grid` before calling `device_grid` in danger") if public_key.to_s.length == 0
 
           devices ||= %w(iphone4s iphone5s iphone6s iphone6splus ipadair)
           languages ||= ["en-US"]

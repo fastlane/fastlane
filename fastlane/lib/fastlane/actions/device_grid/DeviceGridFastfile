@@ -1,0 +1,22 @@
+desc "Generate and upload an .app to appetize.io"
+desc "Import this lane and call it from Danger"
+
+private_lane :generate_device_grid do |options|
+  tmp_path = "/tmp/fl_build"
+
+  xcodebuild_configs = options[:xcodebuild]
+  xcodebuild_configs[:sdk] = "iphonesimulator"
+  xcodebuild_configs[:derivedDataPath] = tmp_path
+  
+  xcodebuild(xcodebuild_configs)
+
+  app_path = Dir[File.join(tmp_path, "**", "*.app")].last
+  UI.user_error("Couldn't find app") unless app_path
+
+  zipped_ipa = zip(path: app_path, output_path: File.join(tmp_path, "Result.zip"))
+
+  appetize(path: zipped_ipa)
+
+  File.write("public_key.txt", lane_context[SharedValues::APPETIZE_PUBLIC_KEY])
+  UI.success("Generated Public Key: #{lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
+end
