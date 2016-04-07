@@ -24,7 +24,8 @@ module Fastlane
         output_directory: "--output-directory",
         binary_basename: "--binary-basename",
         binary_file: "--binary-file",
-        ignore: "--ignore"
+        ignore: "--ignore",
+        workspace: "--workspace"
       }.freeze
 
       def self.run(params)
@@ -91,6 +92,11 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        verify_block: proc do |value|
                                          UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
                                        end),
+          FastlaneCore::ConfigItem.new(key: :workspace,
+                                       env_name: "FL_SLATHER_WORKSPACE",
+                                       description: "The workspace that slather looks at",
+                                       optional: true
+                                      ),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
