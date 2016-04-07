@@ -1,6 +1,9 @@
+# rubocop:disable Style/IndentationConsistency
+# We disable this rule since we intend opening HTML labels
 module Danger
   class Dangerfile
     module DSL
+      # A danger plugin: https://github.com/danger/danger
       class DeviceGrid < Plugin
         def run(languages: nil, devices: nil)
           puts "Running fastlane to generate and upload an ipa file..."
@@ -8,7 +11,7 @@ module Danger
 
           public_key = File.read("fastlane/public_key.txt").strip
 
-          devices ||= %w{iphone4s iphone5s iphone6s iphone6splus ipadair}
+          devices ||= %w(iphone4s iphone5s iphone6s iphone6splus ipadair)
           languages ||= ["en-US"]
 
           deep_link_matches = pr_body.match(/:link:\s(.*)/) # :link: emoji
@@ -34,7 +37,7 @@ module Danger
                 params[:launch_url] = deep_link if deep_link
                 params_str = params.collect { |k, v| "#{k}:\"#{v}\"" }.join(" ")
                 url = `fastlane run appetize_url_generator #{params_str}`
-                url = url.match(/Result:.*(https\:\/\/.*)/)[1].strip
+                url = url.match(%r{Result:.*(https\:\/\/.*)})[1].strip
                 puts "Generated URL '#{url}'"
 
                 markdown("<a href='#{url}'>")
@@ -80,3 +83,4 @@ module Danger
     end
   end
 end
+# rubocop:enable Style/IndentationConsistency
