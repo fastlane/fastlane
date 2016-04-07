@@ -75,6 +75,8 @@ module Gym
 
     def fix_archive
       return unless Gym.config[:use_legacy_build_api]
+      return if ENV['FASTLANE_GYM_USE_GENERIC_ARCHIVE_FIX'].nil?
+
       Gym::XcodebuildFixes.generic_archive_fix
     end
 
