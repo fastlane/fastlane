@@ -7,6 +7,7 @@ describe Fastlane do
             use_bundle_exec: false,
             build_directory: 'foo',
             input_format: 'bah',
+            workspace: 'bar.xcworkspace',
             scheme: 'Foo',
             buildkite: true,
             jenkins: true,
@@ -27,7 +28,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("slather coverage --build-directory foo --input-format bah --workspace bar.xcworkspace --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
       end
 
       it "works with bundle" do
@@ -36,6 +37,7 @@ describe Fastlane do
             use_bundle_exec: true,
             build_directory: 'foo',
             input_format: 'bah',
+            workspace: 'bar.xcworkspace',
             scheme: 'Foo',
             buildkite: true,
             jenkins: true,
@@ -56,7 +58,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --workspace bar.xcworkspace --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
       end
 
       it "requires project to be specified" do
