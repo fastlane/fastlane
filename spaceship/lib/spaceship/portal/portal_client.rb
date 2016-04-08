@@ -17,7 +17,7 @@ module Spaceship
       end
       return cached if cached
 
-      landing_url = "https://developer.apple.com/membercenter/index.action"
+      landing_url = "https://developer.apple.com/account/"
       logger.info("GET: " + landing_url)
       headers = @client.get(landing_url).headers
       results = headers['location'].match(/.*appIdKey=(\h+)/)
