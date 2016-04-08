@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastlane_core', '>= 0.41.2', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.15.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.24.1', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.25.1', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 1.11.0', '< 2.0.0'
@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'supply', '>= 0.6.1', '< 1.0.0'
   spec.add_dependency 'scan', '>= 0.5.2', '< 1.0.0'
   spec.add_dependency 'match', '>= 0.4.0', '< 1.0.0'
-  spec.add_dependency 'screengrab', '>= 0.3.1', '< 1.0.0'
+  spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
