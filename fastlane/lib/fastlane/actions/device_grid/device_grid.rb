@@ -6,8 +6,10 @@ module Danger
       # A danger plugin: https://github.com/danger/danger
       class DeviceGrid < Plugin
         def run(languages: nil, devices: nil)
-          public_key = File.read("fastlane/public_key.txt").strip
-          UI.user_error!("No fastlane/public_key.txt file found, make sure to run fastlane with `generate_device_grid` before calling `device_grid` in danger") if public_key.to_s.length == 0
+          public_key_path = "fastlane/public_key.txt"
+          public_key = File.read(public_key_path).strip if File.exist?(public_key_path)
+          UI.user_error!("No #{public_key_path} file found, make sure to run fastlane with `generate_device_grid` before calling `device_grid` in danger") if public_key.to_s.length == 0
+          File.delete(public_key_path)
 
           devices ||= %w(iphone4s iphone5s iphone6s iphone6splus ipadair)
           languages ||= ["en-US"]
