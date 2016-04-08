@@ -5,6 +5,8 @@ module Danger
     module DSL
       # A danger plugin: https://github.com/danger/danger
       class DeviceGrid < Plugin
+        # @param languages: Array of languages you want to see (e.g. [en-US])
+        # @param devices: Array of deviecs you want to see (e.g. ["iphone4s", "ipadair"])
         def run(languages: nil, devices: nil)
           public_key_path = "fastlane/public_key.txt"
           public_key = File.read(public_key_path).strip if File.exist?(public_key_path)
