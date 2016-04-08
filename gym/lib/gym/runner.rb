@@ -74,8 +74,7 @@ module Gym
     end
 
     def fix_archive
-      return if ENV['FASTLANE_GYM_USE_GENERIC_ARCHIVE_FIX'].nil?
-
+      return if ENV["GYM_USE_GENERIC_ARCHIVE_FIX"].nil?
       Gym::XcodebuildFixes.generic_archive_fix
     end
 

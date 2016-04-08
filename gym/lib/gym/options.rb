@@ -103,16 +103,6 @@ module Gym
                                          UI.important "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816"
                                        end
                                      end),
-        FastlaneCore::ConfigItem.new(key: :use_generic_archive_fix,
-                                    env_name: "GYM_USE_GENERIC_ARCHIVE_FIX",
-                                    description: "Use fix for generic arhives https://github.com/CocoaPods/CocoaPods/issues/4178",
-                                    default_value: false,
-                                    is_string: false,
-                                    verify_block: proc do |value|
-                                      if value
-                                        UI.important "Using generic archive fix - waiting for issue to be fixed: https://github.com/CocoaPods/CocoaPods/issues/4178"
-                                      end
-                                    end),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
