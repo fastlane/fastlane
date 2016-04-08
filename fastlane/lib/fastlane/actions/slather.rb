@@ -9,6 +9,7 @@ module Fastlane
       ARGS_MAP = {
         build_directory: "--build-directory",
         input_format: "--input-format",
+        workspace: "--workspace",
         scheme: "--scheme",
         buildkite: "--buildkite",
         jenkins: "--jenkins",
@@ -91,6 +92,11 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        verify_block: proc do |value|
                                          UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
                                        end),
+          FastlaneCore::ConfigItem.new(key: :workspace,
+                                       env_name: "FL_SLATHER_WORKSPACE", # The name of the environment variable
+                                       description: "The workspace file that slather looks at",
+                                       optional: true
+                                      ),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
