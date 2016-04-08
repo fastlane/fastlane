@@ -17,6 +17,7 @@ module FastlaneCore
         validate_short_switch(used_switches, short_switch)
 
         type = option.data_type
+        type = nil if type == :bool
 
         # This is an important bit of trickery to solve the boolean option situation.
         #

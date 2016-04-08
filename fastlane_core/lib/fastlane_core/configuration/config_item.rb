@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated
+    attr_accessor :key, :data_type, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -12,12 +12,12 @@ module FastlaneCore
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
-    # @param type (Class) the data type of this config item. Takes precedence over `is_string`
+    # @param type (Class or :bool) the data type of this config item. Takes precedence over `is_string`
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil)
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: nil, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -27,6 +27,8 @@ module FastlaneCore
       if description
         UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
+
+      type = identify_type(type, is_string)
 
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
@@ -48,7 +50,6 @@ module FastlaneCore
       @short_option = short_option
       @default_value = default_value
       @verify_block = verify_block
-      @is_string = is_string
       @data_type = type
       @optional = optional
       @conflicting_options = conflicting_options
@@ -68,7 +69,7 @@ module FastlaneCore
       # we also allow nil values, which do not have to be verified.
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
-        if data_type && !value.kind_of?(data_type)
+        if data_type != :bool && !value.kind_of?(data_type)
           UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
         end
 
@@ -96,6 +97,7 @@ module FastlaneCore
       when data_type == Float
         return value.to_f
       else
+        # FIXME: should we enforce data_type == :bool ?
         # Special treatment if the user specififed true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
@@ -108,15 +110,6 @@ module FastlaneCore
       return value # fallback to not doing anything
     end
 
-    # Determines the defined data type of this ConfigItem
-    def data_type
-      if @data_type
-        @data_type
-      else
-        (@is_string ? String : nil)
-      end
-    end
-
     # Replaces the attr_accessor, but maintains the same interface
     def string?
       data_type == String
@@ -124,6 +117,31 @@ module FastlaneCore
 
     def to_s
       [@key, @description].join(": ")
+    end
+
+    private
+
+    # for backward compatibility between
+    def identify_type(type, is_string)
+      if type.nil?
+        if is_string.nil?
+          UI.deprecated("`type` parameter missing. Using `String` by default")
+          type = String
+        else
+          UI.deprecated("`is_string` is a deprecated parameter. Use `type` instead")
+          if is_string
+            type = String
+          else
+            type = :bool
+          end
+        end
+      else
+        unless is_string.nil?
+          # we should really fail here. Kept for compatibility reasons
+          UI.important("Both `type` and `is_string` are defined. Ignoring `is_string`")
+        end
+      end
+      type
     end
   end
 end
