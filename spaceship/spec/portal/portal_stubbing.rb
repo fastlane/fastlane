@@ -24,7 +24,7 @@ end
 def adp_stub_login
   # Most stuff is stubbed in tunes_stubbing (since it's shared)
 
-  stub_request(:get, "https://developer.apple.com/membercenter/index.action").
+  stub_request(:get, "https://developer.apple.com/account/").
     to_return(status: 200, body: nil,
     headers: { 'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa&path=%2F%2Fmembercenter%2Findex.action" })
 
