@@ -726,7 +726,8 @@ swiftlint(
   files: [                              # List of files to process (optional)
     'AppDelegate.swift',
     'path/to/project/Model.swift'
-  ]
+  ],
+  ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
 )
 ```
 
