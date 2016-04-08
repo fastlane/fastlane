@@ -1,0 +1,430 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1E61678B39062AB3480101DC4CFC82BC /* Pods-Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D28A2B61D945EC53D8274A8849E6F0F /* Pods-Example-dummy.m */; };
+		390FEE5DE6B7E76D3B31F92DB4F189BE /* HexColors-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9BC4948933D8D0A2B7BA9DEAF70DF2B /* HexColors-dummy.m */; };
+		482B05FD5B29431E06D5FED68BD546FB /* HexColors.h in Headers */ = {isa = PBXBuildFile; fileRef = 95B2DF27052095AEB82834C91AD72E24 /* HexColors.h */; };
+		64FC9096D006BA6B23D328A27EE3CFC1 /* HexColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 70C24FA2697948125B0A2ED55E2B7806 /* HexColors.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		914A9223DA72EB357F028193A78BC92B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87A1D5BA6EB794666229FF13963C76F7 /* Foundation.framework */; };
+		96C3A44FE5F9CBBBEF0E5676F210C55C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87A1D5BA6EB794666229FF13963C76F7 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		336849B987677F395ECE01EC4AE4BFDE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8E46265702A9FA999EF6AC4B2576B14F;
+			remoteInfo = HexColors;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		09EDE3BAA6D0478FEEAA282C3BEC3CD6 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
+		11C2E33D7AE1EE6A45C911563D72F142 /* HexColors-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "HexColors-Private.xcconfig"; sourceTree = "<group>"; };
+		1C4B67C7710EA234D6C05FAA4EFE0783 /* HexColors.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = HexColors.xcconfig; sourceTree = "<group>"; };
+		255159C2B735A30F70F0912F223D56FE /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
+		32CAEF6AC5F0ECF8403CCA994824CD06 /* libPods-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		508DAB680CF58BBDAD6FDC565E21F1D1 /* Pods-Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Example-acknowledgements.markdown"; sourceTree = "<group>"; };
+		658112C90FB850FC90B15120D242496F /* Pods-Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Example-acknowledgements.plist"; sourceTree = "<group>"; };
+		70C24FA2697948125B0A2ED55E2B7806 /* HexColors.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HexColors.m; path = Classes/HexColors.m; sourceTree = "<group>"; };
+		87A1D5BA6EB794666229FF13963C76F7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		8D28A2B61D945EC53D8274A8849E6F0F /* Pods-Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Example-dummy.m"; sourceTree = "<group>"; };
+		95B2DF27052095AEB82834C91AD72E24 /* HexColors.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HexColors.h; path = Classes/HexColors.h; sourceTree = "<group>"; };
+		A6C36B1CD98167BBDF4880B1A07882A3 /* libHexColors.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHexColors.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		BA69C1191C0800D5F936C85406AD424F /* HexColors-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "HexColors-prefix.pch"; sourceTree = "<group>"; };
+		D7E48770E992640B24A8BC3D87DD1563 /* Pods-Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Example-resources.sh"; sourceTree = "<group>"; };
+		D9BC4948933D8D0A2B7BA9DEAF70DF2B /* HexColors-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "HexColors-dummy.m"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		124BF2660EFE691C838998071A566A4C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96C3A44FE5F9CBBBEF0E5676F210C55C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BAB335417AE43F6DA5E280C6E04C417 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				914A9223DA72EB357F028193A78BC92B /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		41F19DD5E3C20A47BB679DF11F2BD1BF /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				C6CDD8057CA8D45E97169A0AC4F564A6 /* Pods-Example */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		53F661C0CA7190D2CF05023FB33D61E4 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				87A1D5BA6EB794666229FF13963C76F7 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */,
+				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
+				F9A417A795CBB0D3515C1BAEC1225A8D /* Pods */,
+				CCA510CFBEA2D207524CDA0D73C3B561 /* Products */,
+				41F19DD5E3C20A47BB679DF11F2BD1BF /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				53F661C0CA7190D2CF05023FB33D61E4 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C6CDD8057CA8D45E97169A0AC4F564A6 /* Pods-Example */ = {
+			isa = PBXGroup;
+			children = (
+				508DAB680CF58BBDAD6FDC565E21F1D1 /* Pods-Example-acknowledgements.markdown */,
+				658112C90FB850FC90B15120D242496F /* Pods-Example-acknowledgements.plist */,
+				8D28A2B61D945EC53D8274A8849E6F0F /* Pods-Example-dummy.m */,
+				D7E48770E992640B24A8BC3D87DD1563 /* Pods-Example-resources.sh */,
+				255159C2B735A30F70F0912F223D56FE /* Pods-Example.debug.xcconfig */,
+				09EDE3BAA6D0478FEEAA282C3BEC3CD6 /* Pods-Example.release.xcconfig */,
+			);
+			name = "Pods-Example";
+			path = "Target Support Files/Pods-Example";
+			sourceTree = "<group>";
+		};
+		CCA510CFBEA2D207524CDA0D73C3B561 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A6C36B1CD98167BBDF4880B1A07882A3 /* libHexColors.a */,
+				32CAEF6AC5F0ECF8403CCA994824CD06 /* libPods-Example.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE21FDC5BD6B8E6BABA0F8637D3C5363 /* HexColors */ = {
+			isa = PBXGroup;
+			children = (
+				95B2DF27052095AEB82834C91AD72E24 /* HexColors.h */,
+				70C24FA2697948125B0A2ED55E2B7806 /* HexColors.m */,
+				EFCB40367414FE348540EBECCFE9D6F9 /* Support Files */,
+			);
+			path = HexColors;
+			sourceTree = "<group>";
+		};
+		EFCB40367414FE348540EBECCFE9D6F9 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				1C4B67C7710EA234D6C05FAA4EFE0783 /* HexColors.xcconfig */,
+				11C2E33D7AE1EE6A45C911563D72F142 /* HexColors-Private.xcconfig */,
+				D9BC4948933D8D0A2B7BA9DEAF70DF2B /* HexColors-dummy.m */,
+				BA69C1191C0800D5F936C85406AD424F /* HexColors-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/HexColors";
+			sourceTree = "<group>";
+		};
+		F9A417A795CBB0D3515C1BAEC1225A8D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DE21FDC5BD6B8E6BABA0F8637D3C5363 /* HexColors */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		C3D3CDF13447F7490F01FDD13C9F091C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				482B05FD5B29431E06D5FED68BD546FB /* HexColors.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8E46265702A9FA999EF6AC4B2576B14F /* HexColors */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9FA3BE60D6702EDA3B67D4292421E4C6 /* Build configuration list for PBXNativeTarget "HexColors" */;
+			buildPhases = (
+				9C4D3EB25BDFA15F4C70CABC3DEEA423 /* Sources */,
+				124BF2660EFE691C838998071A566A4C /* Frameworks */,
+				C3D3CDF13447F7490F01FDD13C9F091C /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HexColors;
+			productName = HexColors;
+			productReference = A6C36B1CD98167BBDF4880B1A07882A3 /* libHexColors.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		FB2714B8EF1C625F78C19E0D0EF6E5A8 /* Pods-Example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A318671F2B130A8301D4FAEBB866D7AD /* Build configuration list for PBXNativeTarget "Pods-Example" */;
+			buildPhases = (
+				A50B454B83DEB5F12F6DA1FCAC38D758 /* Sources */,
+				3BAB335417AE43F6DA5E280C6E04C417 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FDE93DFCEB84FE02C41052445C067C38 /* PBXTargetDependency */,
+			);
+			name = "Pods-Example";
+			productName = "Pods-Example";
+			productReference = 32CAEF6AC5F0ECF8403CCA994824CD06 /* libPods-Example.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = CCA510CFBEA2D207524CDA0D73C3B561 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8E46265702A9FA999EF6AC4B2576B14F /* HexColors */,
+				FB2714B8EF1C625F78C19E0D0EF6E5A8 /* Pods-Example */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9C4D3EB25BDFA15F4C70CABC3DEEA423 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				390FEE5DE6B7E76D3B31F92DB4F189BE /* HexColors-dummy.m in Sources */,
+				64FC9096D006BA6B23D328A27EE3CFC1 /* HexColors.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A50B454B83DEB5F12F6DA1FCAC38D758 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E61678B39062AB3480101DC4CFC82BC /* Pods-Example-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FDE93DFCEB84FE02C41052445C067C38 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = HexColors;
+			target = 8E46265702A9FA999EF6AC4B2576B14F /* HexColors */;
+			targetProxy = 336849B987677F395ECE01EC4AE4BFDE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5CE5176205D06FF3FFE3DDDA9291E44B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				ONLY_ACTIVE_ARCH = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		74857149DC1E0D599B8A01A78349A926 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		807FFF5D3D793D0DA4D6774471001E47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 11C2E33D7AE1EE6A45C911563D72F142 /* HexColors-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/HexColors/HexColors-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A2D3FA247E4F8B06CA76387C413D95DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 255159C2B735A30F70F0912F223D56FE /* Pods-Example.debug.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A8DBF113B71794606BF1656799211BB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 09EDE3BAA6D0478FEEAA282C3BEC3CD6 /* Pods-Example.release.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		D57C0C532FD0FC49CABD5A04B4A54811 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 11C2E33D7AE1EE6A45C911563D72F142 /* HexColors-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/HexColors/HexColors-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CE5176205D06FF3FFE3DDDA9291E44B /* Debug */,
+				74857149DC1E0D599B8A01A78349A926 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9FA3BE60D6702EDA3B67D4292421E4C6 /* Build configuration list for PBXNativeTarget "HexColors" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				807FFF5D3D793D0DA4D6774471001E47 /* Debug */,
+				D57C0C532FD0FC49CABD5A04B4A54811 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A318671F2B130A8301D4FAEBB866D7AD /* Build configuration list for PBXNativeTarget "Pods-Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2D3FA247E4F8B06CA76387C413D95DA /* Debug */,
+				A8DBF113B71794606BF1656799211BB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}

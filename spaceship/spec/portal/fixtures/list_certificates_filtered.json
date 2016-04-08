@@ -1,0 +1,38 @@
+{
+    "creationTimestamp": "2015-04-04T09:41:22Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": null,
+    "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/certificate/listCertRequests.action?teamId=5A997XSHK2&types=5QPB9NHCEI",
+    "responseId": "15e02715-5535-4249-8c06-1e2c32f0aaaa",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": true,
+    "pageNumber": 0,
+    "pageSize": 0,
+    "totalRecords": 1,
+    "certRequests": [
+        {
+            "certRequestId": "2P768T2AAA",
+            "name": "Felix Krause",
+            "statusString": "Issued",
+            "dateRequestedString": "Nov 25, 2014",
+            "dateRequested": "2014-11-25T22:55:42Z",
+            "dateCreated": "2014-11-25T22:55:50Z",
+            "expirationDate": "2015-11-25T22:45:50Z",
+            "expirationDateString": "Nov 25, 2015",
+            "ownerType": "teamMember",
+            "ownerName": "Felix Krause",
+            "ownerId": "5Y354CXU3A",
+            "canDownload": true,
+            "canRevoke": true,
+            "certificateId": "C8DL7464RQ",
+            "certificateStatusCode": 0,
+            "certRequestStatusCode": 4,
+            "certificateTypeDisplayId": "5QPB9NHAAA",
+            "serialNum": "1B58B611A525FAAA",
+            "typeString": "iOS Development"
+        }
+    ]
+}

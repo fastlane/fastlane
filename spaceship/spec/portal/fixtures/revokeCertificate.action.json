@@ -1,0 +1,56 @@
+{
+  "creationTimestamp": "2015-05-04T19:11:25Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "9fb55ba7-dd61-4bae-88b4-9b4c9662225e",
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/certificate/revokeCertificate.action",
+  "responseId": "f92ef71b-5448-4741-bdbb-72db40fdebac",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "certRequests": [
+    {
+      "certRequestId": "URG8EFZ96G",
+      "name": "Revocation",
+      "statusCode": 1,
+      "statusString": "Approved",
+      "dateRequestedString": "May 04, 2015",
+      "dateRequested": "2015-05-04T19:11:25Z",
+      "expirationDate": "2016-04-28T20:14:05Z",
+      "expirationDateString": "Apr 28, 2016",
+      "certificateId": "WHT3M5V55A",
+      "typeString": "Revocation",
+      "certificateType": {
+        "certificateTypeDisplayId": "W147BDC2UZ",
+        "name": "Revocation",
+        "daysOverlap": 0,
+        "maxActive": 0
+      },
+      "certificate": {
+        "name": null,
+        "certificateId": "WHT3M5V55A",
+        "serialNumber": "73F7E6F18B54DD37",
+        "status": "Revocation Pending",
+        "statusCode": 2,
+        "expirationDate": "2016-04-28",
+        "certificatePlatform": "ios",
+        "certificateType": {
+          "certificateTypeDisplayId": "UPV3DW712I",
+          "name": "APNs Production iOS",
+          "platform": "ios",
+          "permissionType": "distribution",
+          "distributionType": "distribution",
+          "distributionMethod": "push",
+          "ownerType": "bundle",
+          "daysOverlap": 364,
+          "maxActive": 2
+        },
+        "hasAskKey": false
+      }
+    }
+  ]
+}

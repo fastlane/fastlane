@@ -1,0 +1,92 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "companyName": {
+      "value": null,
+      "isEditable": false,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "versionString": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "appRegInfo": null,
+    "bundleIds": {
+      "com.krausefx.app_name": "Spaceship App - com.krausefx.app_name",
+      "net.sunapps.*": "SunApps - net.sunapps.*",
+      "net.sunapps.947474": "My App Name - net.sunapps.947474",
+      "*": "Xcode iOS Wildcard App ID - *",
+      "net.sunapps.100": "Baconfy - net.sunapps.100"
+    },
+    "enabledPlatformsForCreation": {
+      "value": ["ios"],
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "name": null,
+    "primaryLanguage": null,
+    "bundleId": null,
+    "bundleIdSuffix": null,
+    "vendorId": null,
+    "initialPlatform": null,
+    "adamId": null,
+    "newApp": {
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "bundleId": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "bundleIdSuffix": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "vendorId": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "adamId": null,
+      "appType": "iOS App",
+      "name": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "liveVersion": null,
+      "inFlightVersion": null,
+      "primaryLanguage": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "canAddVersion": false,
+      "appPageSectionLinks": null,
+      "appPageMoreLinks": null,
+      "appPageActionLinks": null,
+      "appTransferState": null,
+      "isDeleted": false,
+      "bundleSummaryInfo": null
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

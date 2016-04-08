@@ -1,0 +1,224 @@
+[
+    {
+        "locale": "cmn-Hans",
+        "name": "Simplified Chinese",
+        "game-center": true
+    },
+    {
+        "locale": "cmn-Hant",
+        "name": "Traditional Chinese",
+        "game-center": true
+    },
+    {
+        "locale": "da-DK",
+        "name": "Danish",
+        "game-center": true,
+        "alternatives": [
+            "da"
+        ]
+    },
+    {
+        "locale": "nl-NL",
+        "name": "Dutch",
+        "game-center": true,
+        "alternatives": [
+            "nl"
+        ]
+    },
+    {
+        "locale": "en-AU",
+        "name": "Australian English",
+        "game-center": false
+    },
+    {
+        "locale": "en-AU",
+        "name": "English_Australian",
+        "game-center": false
+    },
+    {
+        "locale": "en-CA",
+        "name": "Canadian English",
+        "game-center": false
+    },
+    {
+        "locale": "en-CA",
+        "name": "English_CA",
+        "game-center": false
+    },
+    {
+        "locale": "en-GB",
+        "name": "UK English",
+        "game-center": true
+    },
+    {
+        "locale": "en-GB",
+        "name": "English_UK",
+        "game-center": true
+    },
+    {
+        "locale": "en-US",
+        "name": "English",
+        "game-center": true
+    },
+    {
+        "locale": "fi-FI",
+        "name": "Finnish",
+        "game-center": true,
+        "alternatives": [
+            "fi"
+        ]
+    },
+    {
+        "locale": "fr-CA",
+        "name": "Canadian French",
+        "game-center": false
+    },
+    {
+        "locale": "fr-CA",
+        "name": "French_CA",
+        "game-center": false
+    },
+    {
+        "locale": "fr-FR",
+        "name": "French",
+        "game-center": true,
+        "alternatives": [
+            "fr"
+        ]
+    },
+    {
+        "locale": "de-DE",
+        "name": "German",
+        "game-center": true,
+        "alternatives": [
+            "de"
+        ]
+    },
+    {
+        "locale": "el-GR",
+        "name": "Greek",
+        "game-center": true,
+        "alternatives": [
+            "el"
+        ]
+    },
+    {
+        "locale": "id-ID",
+        "name": "Indonesian",
+        "game-center": true,
+        "alternatives": [
+            "id"
+        ]
+    },
+    {
+        "locale": "it-IT",
+        "name": "Italian",
+        "game-center": true,
+        "alternatives": [
+            "it"
+        ]
+    },
+    {
+        "locale": "ja-JP",
+        "name": "Japanese",
+        "game-center": true,
+        "alternatives": [
+            "ja"
+        ]
+    },
+    {
+        "locale": "ko-KR",
+        "name": "Korean",
+        "game-center": true,
+        "alternatives": [
+            "ko"
+        ]
+    },
+    {
+        "locale": "ms-MY",
+        "name": "Malay",
+        "game-center": true,
+        "alternatives": [
+            "ms"
+        ]
+    },
+    {
+        "locale": "no-NO",
+        "name": "Norwegian",
+        "game-center": true,
+        "alternatives": [
+            "no"
+        ]
+    },
+    {
+        "locale": "pt-BR",
+        "name": "Brazilian Portuguese",
+        "game-center": true
+    },
+    {
+        "locale": "pt-PT",
+        "name": "Portuguese",
+        "game-center": true,
+        "alternatives": [
+            "pt"
+        ]
+    },
+    {
+        "locale": "ru-RU",
+        "name": "Russian",
+        "game-center": true,
+        "alternatives": [
+            "ru"
+        ]
+    },
+    {
+        "locale": "es-MX",
+        "name": "Mexican Spanish",
+        "game-center": false
+    },
+    {
+        "locale": "es-MX",
+        "name": "Spanish_MX",
+        "game-center": false
+    },
+    {
+        "locale": "es-ES",
+        "name": "Spanish",
+        "game-center": true,
+        "alternatives": [
+            "es"
+        ]
+    },
+    {
+        "locale": "sv-SE",
+        "name": "Swedish",
+        "game-center": true,
+        "alternatives": [
+            "sv"
+        ]
+    },
+    {
+        "locale": "th-TH",
+        "name": "Thai",
+        "game-center": true,
+        "alternatives": [
+            "th"
+        ]
+    },
+    {
+        "locale": "tr-TR",
+        "name": "Turkish",
+        "game-center": true,
+        "alternatives": [
+            "tr"
+        ]
+    },
+    {
+        "locale": "vi-VI",
+        "name": "Vietnamese",
+        "game-center": true,
+        "alternatives": [
+            "vi"
+        ]
+    }
+]
