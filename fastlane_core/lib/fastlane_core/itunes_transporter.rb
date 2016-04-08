@@ -37,8 +37,15 @@ module FastlaneCore
 
       begin
         PTY.spawn(command) do |stdin, stdout, pid|
-          stdin.each do |line|
-            parse_line(line, hide_output) # this is where the parsing happens
+          begin
+            stdin.each do |line|
+              parse_line(line, hide_output) # this is where the parsing happens
+            end
+          rescue Errno::EIO
+            # Exception ignored intentionally.
+            # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
+          ensure
+            Process.wait(pid)
           end
         end
       rescue => ex
