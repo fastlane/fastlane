@@ -64,6 +64,54 @@ describe Fastlane do
         end
       end
 
+      context "the `ignore_exit_status` option" do
+        context "by default" do
+          it 'should raise if swiftlint completes with a non-zero exit status' do
+            allow(FastlaneCore::UI).to receive(:important)
+            expect(FastlaneCore::UI).to receive(:important).with(/If you want fastlane to continue anyway/)
+            # This is simulating the exception raised if the return code is non-zero
+            expect(Fastlane::Actions).to receive(:sh).and_raise("fake error")
+            expect(FastlaneCore::UI).to receive(:user_error!).with(/SwiftLint finished with errors/).and_call_original
+
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                swiftlint
+              end").runner.execute(:test)
+            end.to raise_error
+          end
+        end
+
+        context "when enabled" do
+          it 'should not raise if swiftlint completes with a non-zero exit status' do
+            allow(FastlaneCore::UI).to receive(:important)
+            expect(FastlaneCore::UI).to receive(:important).with(/fastlane will continue/)
+            # This is simulating the exception raised if the return code is non-zero
+            expect(Fastlane::Actions).to receive(:sh).and_raise("fake error")
+            expect(FastlaneCore::UI).to_not receive(:user_error!)
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              swiftlint(ignore_exit_status: true)
+            end").runner.execute(:test)
+          end
+        end
+
+        context "when disabled" do
+          it 'should raise if swiftlint completes with a non-zero exit status' do
+            allow(FastlaneCore::UI).to receive(:important)
+            expect(FastlaneCore::UI).to receive(:important).with(/If you want fastlane to continue anyway/)
+            # This is simulating the exception raised if the return code is non-zero
+            expect(Fastlane::Actions).to receive(:sh).and_raise("fake error")
+            expect(FastlaneCore::UI).to receive(:user_error!).with(/SwiftLint finished with errors/).and_call_original
+
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                swiftlint(ignore_exit_status: false)
+              end").runner.execute(:test)
+            end.to raise_error
+          end
+        end
+      end
+
       context "when specify mode explicitly" do
         it "uses lint mode as default" do
           result = Fastlane::FastFile.new.parse("lane :test do
