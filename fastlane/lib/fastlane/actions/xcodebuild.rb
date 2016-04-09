@@ -162,7 +162,7 @@ module Fastlane
 
         case output_style
         when :standard
-          xcpretty_args << '--color'
+          xcpretty_args << '--color' unless Helper.colors_disabled?
         when :basic
           xcpretty_args << '--no-utf'
         end

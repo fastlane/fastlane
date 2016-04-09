@@ -19,18 +19,41 @@ module Fastlane
           command_prefix,
           'agvtool',
           'what-marketing-version',
-          '-terse1'
+          '-terse'
         ].join(' ')
 
+        line = ""
+        scheme = params[:scheme] || ""
+        results = []
+
         if Helper.test?
-          Actions.lane_context[SharedValues::VERSION_NUMBER] = command
+          results = [
+            '"SampleProject.xcodeproj/../SchemeA/SchemeA-Info.plist"=4.3.2',
+            '"SampleProject.xcodeproj/../SchemeATests/Info.plist"=4.3.2',
+            '"SampleProject.xcodeproj/../SchemeB/SchemeB-Info.plist"=5.4.3',
+            '"SampleProject.xcodeproj/../SchemeBTests/Info.plist"=5.4.3'
+          ]
         else
-
-          version_number = (Actions.sh command).split("\n").last
-
-          # Store the number in the shared hash
-          Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
+          results = (Actions.sh command).split("\n")
         end
+
+        if scheme.empty?
+          line = results.first unless results.first.nil?
+        else
+          scheme_string = "/#{scheme}/"
+          results.any? do |result|
+            if result.include? scheme_string
+              line = result
+              break
+            end
+          end
+        end
+
+        version_number = line.partition('=').last
+        return version_number if Helper.is_test?
+
+        # Store the number in the shared hash
+        Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
       rescue => ex
         UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
         raise ex
@@ -61,7 +84,11 @@ module Fastlane
                              verify_block: proc do |value|
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
                                UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) and !Helper.is_test?
-                             end)
+                             end),
+          FastlaneCore::ConfigItem.new(key: :scheme,
+                             env_name: "FL_VERSION_NUMBER_SCHEME",
+                             description: "Specify a specific scheme if you have multiple per project, optional",
+                             optional: true)
         ]
       end
 

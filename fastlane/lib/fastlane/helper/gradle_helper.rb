@@ -15,6 +15,9 @@ module Fastlane
       # Path to the gradle script
       attr_accessor :gradle_path
 
+      # Read-only path to the shell-escaped gradle script, suitable for use in shell commands
+      attr_reader :escaped_gradle_path
+
       # All the available tasks
       attr_accessor :tasks
 
@@ -25,7 +28,7 @@ module Fastlane
       # Run a certain action
       def trigger(task: nil, flags: nil, serial: nil)
         android_serial = (serial != "") ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, gradle_path, task, flags].reject(&:nil?).join(" ")
+        command = [android_serial, escaped_gradle_path, task, flags].compact.join(" ")
         Action.sh(command)
       end
 
@@ -34,12 +37,17 @@ module Fastlane
         return tasks.collect(&:title).include?(task)
       end
 
+      def gradle_path=(gradle_path)
+        @gradle_path = gradle_path
+        @escaped_gradle_path = gradle_path.shellescape
+      end
+
       private
 
       def load_all_tasks
         self.tasks = []
 
-        command = [gradle_path, "tasks", "--console=plain"].join(" ")
+        command = [escaped_gradle_path, "tasks", "--console=plain"].join(" ")
         output = Actions.sh(command, log: false)
         output.split("\n").each do |line|
           if (result = line.match(/(\w+)\s\-\s([\w\s]+)/))
