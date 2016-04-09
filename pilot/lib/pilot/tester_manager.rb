@@ -11,12 +11,12 @@ module Pilot
         tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
         if tester
-          Helper.log.info "Existing tester #{tester.email}".green
+          UI.success("Existing tester #{tester.email}")
         else
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
                                                               last_name: config[:last_name])
-          Helper.log.info "Successfully invited tester: #{tester.email}".green
+          UI.success("Successfully invited tester: #{tester.email}")
         end
 
         app_filter = (config[:apple_id] || config[:app_identifier])
@@ -25,14 +25,14 @@ module Pilot
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
             tester.add_to_app!(app.apple_id)
-            Helper.log.info "Successfully added tester to app #{app_filter}".green
+            UI.success("Successfully added tester to app #{app_filter}")
           rescue => ex
-            Helper.log.error "Could not add #{tester.email} to app: #{ex}".red
+            UI.error("Could not add #{tester.email} to app: #{ex}")
             raise ex
           end
         end
       rescue => ex
-        Helper.log.error "Could not create tester #{config[:email]}".red
+        UI.error("Could not create tester #{config[:email]}")
         raise ex
       end
     end
@@ -62,17 +62,17 @@ module Pilot
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
             tester.remove_from_app!(app.apple_id)
-            Helper.log.info "Successfully removed tester #{tester.email} from app #{app_filter}".green
+            UI.success("Successfully removed tester #{tester.email} from app #{app_filter}")
           rescue => ex
-            Helper.log.error "Could not remove #{tester.email} from app: #{ex}".red
+            UI.error("Could not remove #{tester.email} from app: #{ex}")
             raise ex
           end
         else
           tester.delete!
-          Helper.log.info "Successfully removed tester #{tester.email}".green
+          UI.success("Successfully removed tester #{tester.email}")
         end
       else
-        Helper.log.error "Tester not found: #{config[:email]}".red
+        UI.error("Tester not found: #{config[:email]}")
       end
     end
 

@@ -5,6 +5,8 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 
+require 'shellwords'
+
 require 'fastlane'
 require 'fastlane_core'
 require 'webmock/rspec'

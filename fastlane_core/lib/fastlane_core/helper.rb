@@ -118,21 +118,47 @@ module FastlaneCore
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
-        Helper.log.error ex
-        Helper.log.error "Error detecting currently used Xcode installation".red
+        UI.error(ex)
+        UI.error("Error detecting currently used Xcode installation")
       end
       @xcode_version
     end
 
+    def self.transporter_java_executable_path
+      return File.join(self.transporter_java_path, 'bin', 'java')
+    end
+
+    def self.transporter_java_ext_dir
+      return File.join(self.transporter_java_path, 'lib', 'ext')
+    end
+
+    def self.transporter_java_jar_path
+      return File.join(self.itms_path, 'lib', 'itmstransporter-launcher.jar')
+    end
+
+    def self.transporter_user_dir
+      return File.join(self.itms_path, 'bin')
+    end
+
+    def self.transporter_java_path
+      return File.join(self.itms_path, 'java')
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+    end
+
+    # @return the full path to the iTMSTransporter executable
+    def self.itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
       return '' unless self.is_mac? # so tests work on Linx too
 
       [
-        "../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",
-        "../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter"
+        "../Applications/Application Loader.app/Contents/MacOS/itms",
+        "../Applications/Application Loader.app/Contents/itms"
       ].each do |path|
-        result = File.join(self.xcode_path, path)
+        result = File.expand_path(File.join(self.xcode_path, path))
         return result if File.exist?(result)
       end
       UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")

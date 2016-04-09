@@ -14,10 +14,33 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        UI.message("Looking for dSYM files for #{params[:app_identifier]}...")
+        version = params[:version]
+        build_number = params[:build_number]
+
+        message = []
+        message << "Looking for dSYM files for #{params[:app_identifier]}"
+        if version
+          message << "v#{version}"
+        end
+
+        if build_number
+          message << "(#{build_number})"
+        end
+
+        UI.message(message.join(" "))
         app = Spaceship::Application.find(params[:app_identifier])
+        unless app
+          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
+        end
+
         app.all_build_train_numbers.each do |train_number|
+          if version && version != train_number
+            next
+          end
           app.all_builds_for_train(train: train_number).each do |build|
+            if build_number && build.build_version != build_number
+              next
+            end
             download_url = build.details.dsym_url
             if download_url
               result = self.download download_url
@@ -31,6 +54,10 @@ module Fastlane
               UI.message("No dSYM URL for #{build.build_version} (#{build.train_version})")
             end
           end
+        end
+
+        if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
+          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
         end
       end
 
@@ -91,7 +118,17 @@ module Fastlane
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       short_option: "-v",
+                                       env_name: "DOWNLOAD_DSYMS_VERSION",
+                                       description: "The app version for dSYMs you wish to download",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_number,
+                                       short_option: "-b",
+                                       env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
+                                       description: "The app build_number for dSYMs you wish to download",
+                                       optional: true)
         ]
       end
 

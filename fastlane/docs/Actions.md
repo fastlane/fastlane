@@ -55,9 +55,13 @@ More options are available:
 
 ```ruby
 carthage(
+  command: "bootstrap"    # One of: build, bootstrap, update, archive. (default: bootstrap)
   use_ssh: false,         # Use SSH for downloading GitHub repositories.
   use_submodules: false,  # Add dependencies as Git submodules.
   use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,        # When bootstrapping Carthage do not build
+  no_skip_current: false, # Don't skip building the current project (only for frameworks)
+  verbose: false,         # Print xcodebuild output inline
   platform: "all"         # Define which platform to build for
 )
 ```
@@ -722,7 +726,8 @@ swiftlint(
   files: [                              # List of files to process (optional)
     'AppDelegate.swift',
     'path/to/project/Model.swift'
-  ]
+  ],
+  ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
 )
 ```
 
@@ -875,14 +880,6 @@ Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
-### [upload_symbols_to_crashlytics]
-
-This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
-
-```ruby
-upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
-```
-
 ### `download_dsyms`
 
 This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled.
@@ -894,12 +891,21 @@ lane :refresh_dsyms do
   clean_build_artifacts           # Delete the local dSYM files
 end
 ```
+
+### `upload_symbols_to_crashlytics`
+
+This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+
+```ruby
+upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
+```
+
 ### [upload_symbols_to_sentry](https://getsentry.com)
 
 This action allows you to upload symbolication files to Sentry.
 
 ```ruby
-upload_sybols_to_sentry(
+upload_symbols_to_sentry(
   api_key: '...',
   org_slug: '...',
   project_slug: '...',
@@ -2398,6 +2404,16 @@ rsync(
   source: "root@host:/tmp/1.txt",
   destination: "/tmp/local_file.txt"
 )
+```
+
+### zip
+
+Compress a file or directory
+
+```ruby
+zip(path: "MyApp.app")
+
+zip(path: "MyApp.app", output_name: "Latest.app.zip")
 ```
 
 ### ifttt

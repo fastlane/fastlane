@@ -20,14 +20,6 @@ Before working on something, make sure to have pulled the latest changes. To pul
 git pull master
 ```
 
-## Submit a pull request
-
-To submit the changes to the fastlane main repo, you have to do the following:
-
-- Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
-- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
-- Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
-
 ## New Issues
 
 Before submitting a new issue, do the following:
@@ -46,7 +38,7 @@ When submitting a new issue, please provide the following information:
 
 ## Helping to Resolve Existing Issues
 
-If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: A good place to start is by reviewing the list of [open issues](https://github.com/fastlane/fastlane/issues) or [open PRs](https://github.com/fastlane/fastlane/tree/master/fastlane) for things that need attention. When you find one that you'd like to help with, the [countdown](https://github.com/fastlane/countdown) repo is the best way to get set up with the source code for all of the fastlane projects. With that, working on the following things are super valuable:
+If you're motivated to help out at a level beyond reporting issues, we really appreciate it! :+1: We use the [`help wanted`](https://github.com/fastlane/fastlane/labels/help%20wanted) label to mark things that we think it would be great to have community help in resolving, so that's a great place to start! In addition, working on the following things are super valuable:
 
 ### Verifying Bug Reports
 
@@ -82,9 +74,9 @@ If you're happy with what you see, leave a comment on the GitHub issue stating y
 
 Pull requests are always welcome :simple_smile:
 
-If you're working on fixing a particular issue, referring to it in the description of your PR is really helpful for establishing the context needed for review.
+PRs should reference an open GitHub issue (preferably those marked with the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label). Referring to the issue in the description of your PR is required and is really helpful for establishing the context needed for review.
 
-If your PR is contributing new functionality, did you create an issue to discuss it with the community first? Great! :raised_hands: Reference that issue in your PR.
+If you're considering contibuting new functionality, please open a new issue explaining the functionality desired first so that we can discuss as a community. We'll add the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label if we believe this to be a meaningful contribution that will benefit other fastlane users and you go ahead with the pull request. :raised_hands:
 
 **Pro tip:** GitHub will automatically turn references to issue numbers in the form `#1234` into a link to the issue/PR with that number within the same repo.
 
@@ -92,6 +84,16 @@ If your PR is contributing new functionality, did you create an issue to discuss
     - `fastlane` has a lot of moving parts and receives contributions from many developers. The best way to ensure that your contributions keep working is to ensure that there will be failing tests if something accidentally gets broken.
     - You can run the tests by executing `bundle install` and then `bundle exec rspec`.
 - Your code editor should indent using spaces with a tab size of 2 spaces.
+
+To submit the changes to the fastlane repo, you have to do the following:
+
+- Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
+- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
+- Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
+
+## What Do All These Labels Mean?
+
+Great question! Check out the [GitHub Labels](GitHubLabels.md) document for a quick summary of the labels we use and what they mean.
 
 ## Why Did My Issue/PR Get Closed?
 
@@ -175,11 +177,14 @@ UI.user_error!("You don't have a project in the current directory")
 
 ###### an actual crash when something unexpected happened
 UI.crash!("Network timeout")
+
+###### a deprecation message
+UI.deprecated("The '--key' parameter is deprecated")
 ```
 
 The output will look like this
 
-<img src="assets/UI.png" width="550" />
+<img src="fastlane_core/assets/UI.png" width="550" />
 
 ## Running tests
 

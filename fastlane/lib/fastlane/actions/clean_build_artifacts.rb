@@ -4,7 +4,8 @@ module Fastlane
       def self.run(options)
         paths = [
           Actions.lane_context[Actions::SharedValues::IPA_OUTPUT_PATH],
-          Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH]
+          Actions.lane_context[Actions::SharedValues::DSYM_OUTPUT_PATH],
+          Actions.lane_context[Actions::SharedValues::CERT_FILE_PATH]
         ]
 
         paths += Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] || []
@@ -34,7 +35,7 @@ module Fastlane
       end
 
       def self.description
-        "Deletes files created as result of running ipa or sigh"
+        "Deletes files created as result of running ipa, cert, sigh or download_dsyms"
       end
 
       def self.author

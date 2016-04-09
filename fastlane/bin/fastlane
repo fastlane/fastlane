@@ -56,8 +56,10 @@ class FastlaneApplication
       c.syntax = 'fastlane new_action'
       c.description = 'Create a new custom action for fastlane.'
 
+      c.option '--name STRING', String, 'Name of your new action'
+
       c.action do |args, options|
-        Fastlane::NewAction.run
+        Fastlane::NewAction.run(new_action_name: options.name)
       end
     end
 
@@ -148,6 +150,16 @@ class FastlaneApplication
       c.description = 'Disable crash reporting'
       c.action do |args, options|
         FastlaneCore::CrashReporting.disable
+      end
+    end
+
+    command :enable_auto_complete do |c|
+      c.syntax = 'fastlane enable_auto_complete'
+      c.description = 'Enable tab auto completion'
+
+      c.action do |args, options|
+        require 'fastlane/auto_complete'
+        Fastlane::AutoComplete.execute
       end
     end
 

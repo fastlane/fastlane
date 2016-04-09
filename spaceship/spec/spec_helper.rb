@@ -1,14 +1,18 @@
+require 'spaceship'
+require 'plist'
+
+# This module is only used to check the environment is currently a testing env
+module SpecHelper
+end
+
 require 'simplecov'
 require 'coveralls'
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-require 'spaceship'
 require 'client_stubbing'
 require 'portal/portal_stubbing'
 require 'tunes/tunes_stubbing'
 require 'du/du_stubbing'
-require 'plist'
-require 'pry'
 
 SimpleCov.at_exit do
   puts "Coverage done"
@@ -21,10 +25,6 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 ]
 
 SimpleCov.start
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
-end
 
 ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"

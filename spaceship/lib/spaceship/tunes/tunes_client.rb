@@ -116,56 +116,9 @@ module Spaceship
       end
     end
 
-    def service_key
-      return @service_key if @service_key
-      # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
-      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
-    end
-
     def send_login_request(user, password)
       clear_user_cached_data
-
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
-
-      begin
-        response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{service_key}"
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['Accept'] = 'application/json, text/javascript'
-        end
-      rescue UnauthorizedAccessError
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      end
-
-      # get woinst, wois, and itctx cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
-
-      case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      when 200
-        return response
-      else
-        if response["Location"] == "/auth" # redirect to 2 step auth page
-          raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
-        elsif (response.body || "").include?('invalid="true"')
-          # User Credentials are wrong
-          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-        elsif (response['Set-Cookie'] || "").include?("itctx")
-          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
-        else
-          info = [response.body, response['Set-Cookie']]
-          raise ITunesConnectError.new, info.join("\n")
-        end
-      end
+      send_shared_login_request(user, password)
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
@@ -178,7 +131,8 @@ module Spaceship
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
          data.fetch('sectionInfoKeys', []).count == 0 and
-         data.fetch('sectionWarningKeys', []).count == 0
+         data.fetch('sectionWarningKeys', []).count == 0 and
+         data.fetch('validationErrors', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -203,7 +157,8 @@ module Spaceship
       end
 
       errors = handle_response_hash.call(data)
-      errors += data.fetch('sectionErrorKeys') if data['sectionErrorKeys']
+      errors += data.fetch('sectionErrorKeys', [])
+      errors += data.fetch('validationErrors', [])
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
@@ -556,6 +511,9 @@ module Spaceship
     def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
 
+      # The request fails if this key is present in the data
+      data.delete("dailySubmissionCountByPlatform")
+
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
         req.body = data.to_json
@@ -622,6 +580,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # rubocop:disable Metrics/ParameterLists
     def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
                                             # Required Metadata:
                                             changelog: nil,
@@ -638,6 +597,7 @@ module Spaceship
                                             privacy_policy_url: nil,
                                             review_user_name: nil,
                                             review_password: nil,
+                                            review_notes: nil,
                                             encryption: false)
 
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
@@ -660,6 +620,7 @@ module Spaceship
       build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
       build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
       build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
+      build_info['testInfo']['reviewNotes']['value'] = review_notes if review_notes
 
       r = request(:post) do |req| # same URL, but a POST request
         req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
@@ -677,6 +638,7 @@ module Spaceship
                                    encryption_info: encryption_info,
                                    encryption: encryption)
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       r = request(:get) do |req|
@@ -862,6 +824,33 @@ module Spaceship
     def version_states_history(app_id, platform, version_id)
       r = request(:get, "ra/apps/#{app_id}/versions/#{version_id}/stateHistory?platform=#{platform}")
       parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group Promo codes
+    #####################################################
+    def app_promocodes(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/promocodes/versions")
+      parse_response(r, 'data')['versions']
+    end
+
+    def generate_app_version_promocodes!(app_id: nil, version_id: nil, quantity: nil)
+      data = {
+        numberOfCodes: { value: quantity },
+        agreedToContract: { value: true }
+      }
+      url = "ra/apps/#{app_id}/promocodes/versions/#{version_id}"
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')
+    end
+
+    def app_promocodes_history(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/promocodes/history")
+      parse_response(r, 'data')['requests']
     end
 
     private

@@ -237,7 +237,7 @@ module Spaceship
       # })
       #
       # Available Values
-      # https://github.com/KrauseFx/deliver/blob/master/Reference.md
+      # https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md
       def update_rating(hash)
         raise "Must be a hash" unless hash.kind_of?(Hash)
 
@@ -455,6 +455,18 @@ module Spaceship
 
       def release!
         client.release!(self.application.apple_id, self.version_id)
+      end
+
+      #####################################################
+      # @!group Promo codes
+      #####################################################
+      def generate_promocodes!(quantity)
+        data = client.generate_app_version_promocodes!(
+          app_id: self.application.apple_id,
+          version_id: self.version_id,
+          quantity: quantity
+        )
+        Tunes::AppVersionGeneratedPromocodes.factory(data)
       end
 
       # These methods takes care of properly parsing values that

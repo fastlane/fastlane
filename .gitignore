@@ -16,6 +16,9 @@ test_output/
 *.iml
 local.properties
 
+## Specific to screengrab
+/screengrab/example/fastlane/metadata/
+
 ## Specific to RubyMotion:
 .dat*
 .repl_history

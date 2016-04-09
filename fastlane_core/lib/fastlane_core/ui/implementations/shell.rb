@@ -45,6 +45,10 @@ module FastlaneCore
       log.info(message.to_s)
     end
 
+    def deprecated(message)
+      log.error(message.to_s.bold.blue)
+    end
+
     def command(message)
       log.info("$ #{message}".cyan.underline)
     end
@@ -63,9 +67,9 @@ module FastlaneCore
 
     def header(message)
       i = message.length + 8
-      Helper.log.info(("-" * i).green)
-      Helper.log.info(("--- " + message + " ---").green)
-      Helper.log.info(("-" * i).green)
+      success("-" * i)
+      success("--- " + message + " ---")
+      success("-" * i)
     end
 
     #####################################################

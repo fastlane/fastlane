@@ -200,10 +200,10 @@ module Snapshot
     end
 
     def erase_simulator(device_type)
-      Helper.log.debug "Erasing #{device_type}..."
+      UI.verbose("Erasing #{device_type}...")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
-      Helper.log.info "Erasing #{device_type}...".yellow
+      UI.important("Erasing #{device_type}...")
 
       `xcrun simctl erase #{device_udid} &> /dev/null`
     end

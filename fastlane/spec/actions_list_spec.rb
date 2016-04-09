@@ -61,7 +61,7 @@ describe Fastlane do
       count = 0
       Fastlane::ActionsList.all_actions("nothing special") { count += 1 }
       expect(count).to be > 40
-      expect(count).to be < 80
+      expect(count).to be < 120
     end
 
     describe "Provide action details" do

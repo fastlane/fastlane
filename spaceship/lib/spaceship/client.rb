@@ -148,6 +148,21 @@ module Spaceship
       @cookie.map(&:to_s).join(';')
     end
 
+    def store_cookie(path: nil)
+      path ||= persistent_cookie_path
+
+      # really important to specify the session to true
+      # otherwise myacinfo and more won't be stored
+      @cookie.save(path, :yaml, session: true)
+      return File.read(path)
+    end
+
+    def persistent_cookie_path
+      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
+      FileUtils.mkdir_p(File.expand_path("..", path))
+      return path
+    end
+
     #####################################################
     # @!group Automatic Paging
     #####################################################
@@ -218,6 +233,90 @@ module Spaceship
         end
       end
     end
+
+    # This method is used for both the Apple Dev Portal and iTunes Connect
+    # This will also handle 2 step verification
+    def send_shared_login_request(user, password)
+      # First we see if we have a stored cookie for 2 step enabled accounts
+      # this is needed as it stores the information on if this computer is a
+      # trusted one. In general I think spaceship clients should be trusted
+      load_session_from_file
+      # If this is a CI, the user can pass the session via environment variable
+      load_session_from_env
+
+      data = {
+        accountName: user,
+        password: password,
+        rememberMe: true
+      }
+
+      begin
+        # The below workaround is only needed for 2 step verified machines
+        # Due to escaping of cookie values we have a little workaround here
+        # By default the cookie jar would generate the following header
+        #   DES5c148...=HSARM.......xaA/O69Ws/CHfQ==SRVT
+        # However we need the following
+        #   DES5c148...="HSARM.......xaA/O69Ws/CHfQ==SRVT"
+        # There is no way to get the cookie jar value with " around the value
+        # so we manually modify the cookie (only this one) to be properly escaped
+        # Afterwards we pass this value manually as a header
+        # It's not enough to just modify @cookie, it needs to be done after self.cookie
+        # as a string operation
+        important_cookie = @cookie.store.entries.find { |a| a.name.include?("DES") }
+        if important_cookie
+          modified_cookie = self.cookie # returns a string of all cookies
+          unescaped_important_cookie = "#{important_cookie.name}=#{important_cookie.value}"
+          escaped_important_cookie = "#{important_cookie.name}=\"#{important_cookie.value}\""
+          modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
+        end
+
+        response = request(:post) do |req|
+          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{itc_service_key}"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Cookie"] = modified_cookie if modified_cookie
+        end
+      rescue UnauthorizedAccessError
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      end
+
+      # get woinst, wois, and itctx cookie values
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
+
+      case response.status
+      when 403
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      when 200
+        return response
+      else
+        if response["Location"] == "/auth" # redirect to 2 step auth page
+          handle_two_step(response)
+          return true
+        elsif (response.body || "").include?('invalid="true"')
+          # User Credentials are wrong
+          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif (response['Set-Cookie'] || "").include?("itctx")
+          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
+        else
+          info = [response.body, response['Set-Cookie']]
+          raise ITunesConnectError.new, info.join("\n")
+        end
+      end
+    end
+
+    def itc_service_key
+      return @service_key if @service_key
+      # We need a service key from a JS file to properly auth
+      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
+      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
+    end
+
+    #####################################################
+    # @!group Helpers
+    #####################################################
 
     def with_retry(tries = 5, &_block)
       return yield
@@ -339,3 +438,5 @@ module Spaceship
     end
   end
 end
+
+require 'spaceship/two_step_client'

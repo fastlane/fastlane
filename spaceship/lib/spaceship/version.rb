@@ -1,3 +1,3 @@
 module Spaceship
-  VERSION = "0.24.1".freeze
+  VERSION = "0.25.1".freeze
 end

@@ -43,6 +43,7 @@ module Fastlane
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
         params[:version_file_name] = config[:version_file_name]
+        params [:acl] = config[:acl]
 
         # Pulling parameters for other uses
         s3_region = params[:region]
@@ -53,6 +54,7 @@ module Fastlane
         ipa_file = params[:ipa]
         dsym_file = params[:dsym]
         s3_path = params[:path]
+        acl     = params[:acl].to_sym
 
         UI.user_error!("No S3 access key given, pass using `access_key: 'key'`") unless s3_access_key.to_s.length > 0
         UI.user_error!("No S3 secret access key given, pass using `secret_access_key: 'secret key'`") unless s3_secret_access_key.to_s.length > 0
@@ -74,7 +76,7 @@ module Fastlane
         ipa_file_name = "#{url_part}#{ipa_file_basename}"
         ipa_file_data = File.open(ipa_file, 'rb')
 
-        ipa_url = self.upload_file(bucket, ipa_file_name, ipa_file_data)
+        ipa_url = self.upload_file(bucket, ipa_file_name, ipa_file_data, acl)
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH] = ipa_url
@@ -85,7 +87,7 @@ module Fastlane
           dsym_file_name = "#{url_part}#{dsym_file_basename}"
           dsym_file_data = File.open(dsym_file, 'rb')
 
-          dsym_url = self.upload_file(bucket, dsym_file_name, dsym_file_data)
+          dsym_url = self.upload_file(bucket, dsym_file_name, dsym_file_data, acl)
 
           # Setting action and environment variables
           Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
@@ -175,9 +177,9 @@ module Fastlane
         #
         #####################################
 
-        plist_url = self.upload_file(bucket, plist_file_name, plist_render)
-        html_url = self.upload_file(bucket, html_file_name, html_render)
-        version_url = self.upload_file(bucket, version_file_name, version_render)
+        plist_url = self.upload_file(bucket, plist_file_name, plist_render, acl)
+        html_url = self.upload_file(bucket, html_file_name, html_render, acl)
+        version_url = self.upload_file(bucket, version_file_name, version_render, acl)
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_url
@@ -212,8 +214,8 @@ module Fastlane
         s3_client
       end
 
-      def self.upload_file(bucket, file_name, file_data)
-        obj = bucket.objects.create(file_name, file_data, acl: :public_read)
+      def self.upload_file(bucket, file_name, file_data, acl)
+        obj = bucket.objects.create(file_name, file_data, acl: acl)
 
         # When you enable versioning on a S3 bucket,
         # writing to an object will create an object version
@@ -324,7 +326,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :acl,
                                        env_name: "S3_ACL",
                                        description: "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read ",
-                                       optional: true)
+                                       optional: true,
+                                       default_value: "public_read"
+                                      )
         ]
       end
 

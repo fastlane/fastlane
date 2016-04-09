@@ -23,7 +23,7 @@ module Pilot
         first_name, last_name, email = row
 
         unless email
-          Helper.log.error "No email found in row: #{row}".red
+          UI.error("No email found in row: #{row}")
           next
         end
 
@@ -40,7 +40,7 @@ module Pilot
         end
       end
 
-      Helper.log.info "Successfully imported #{imported_tester_count} testers from #{file}".green
+      UI.success("Successfully imported #{imported_tester_count} testers from #{file}")
     end
   end
 end

@@ -17,7 +17,7 @@ module Spaceship
       end
       return cached if cached
 
-      landing_url = "https://developer.apple.com/membercenter/index.action"
+      landing_url = "https://developer.apple.com/account/"
       logger.info("GET: " + landing_url)
       headers = @client.get(landing_url).headers
       results = headers['location'].match(/.*appIdKey=(\h+)/)
@@ -32,29 +32,17 @@ module Spaceship
     end
 
     def send_login_request(user, password)
-      response = request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate", {
-        appleId: user,
-        accountPassword: password,
-        appIdKey: api_key
-      })
+      response = send_shared_login_request(user, password)
+      return response if self.cookie.include?("myacinfo")
 
-      if (response.body || "").include?("Your Apple ID or password was entered incorrectly")
-        # User Credentials are wrong
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      elsif (response.body || "").include?("Verify your identity")
-        raise "spaceship / fastlane doesn't support 2 step enabled accounts yet. Please temporary disable 2 step verification until spaceship was updated."
-      end
-
-      case response.status
-      when 302
-        return response
-      when 200
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      else
-        # Something went wrong. Was it invalid credentials or server issue
-        info = [response.body, response['Set-Cookie']]
-        raise UnexpectedResponse.new, info.join("\n")
-      end
+      # When the user has 2 step enabled, we might have to call this method again
+      # This only occurs when the user doesn't have a team on iTunes Connect
+      # For 2 step verification we use the iTunes Connect back-end
+      # which is enough to get the DES... cookie, however we don't get a valid
+      # myacinfo cookie at that point. That means, after getting the DES... cookie
+      # we have to send the login request again. This will then get us a valid myacinfo
+      # cookie, additionally to the DES... cookie
+      return send_shared_login_request(user, password)
     end
 
     # @return (Array) A list of all available teams

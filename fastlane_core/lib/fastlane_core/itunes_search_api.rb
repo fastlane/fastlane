@@ -41,7 +41,7 @@ module FastlaneCore
 
       return response['results'].first
     rescue
-      Helper.log.error "Could not find object '#{url}' using the iTunes API"
+      UI.error("Could not find object '#{url}' using the iTunes API")
       nil
     end
   end

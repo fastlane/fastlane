@@ -37,7 +37,7 @@ module Pilot
           csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, pretty_date]
         end
 
-        Helper.log.info "Successfully exported CSV to #{file}".green
+        UI.success("Successfully exported CSV to #{file}")
       end
     end
   end

@@ -43,9 +43,9 @@ module Scan
                              attachments: attachments
 
       if result.code.to_i == 200
-        Helper.log.info 'Successfully sent Slack notification'.green
+        UI.success('Successfully sent Slack notification')
       else
-        Helper.log.error result.to_s.red
+        UI.error(result.to_s)
       end
     end
   end
