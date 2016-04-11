@@ -96,7 +96,7 @@ module Gym
                                               end)
 
       mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
-      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer."
+      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer." unless Gym.config[:archive_path].nil?
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
 
