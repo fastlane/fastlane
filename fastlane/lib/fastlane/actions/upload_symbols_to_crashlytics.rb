@@ -52,7 +52,7 @@ module Fastlane
       def self.upload_dsym(params, path)
         UI.message("Uploading '#{path}'...")
         command = []
-        command << params[:binary_path]
+        command << params[:binary_path].shellescape
         command << "-a #{params[:api_token]}"
         command << "-p #{params[:platform]}"
         command << File.expand_path(path).shellescape
