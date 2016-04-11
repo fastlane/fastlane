@@ -7,6 +7,8 @@ _fastlane_complete() {
     file="Fastfile"
   elif [[ -e "fastlane/Fastfile" ]] then
     file="fastlane/Fastfile"
+  elif [[ -e ".fastlane/Fastfile" ]] then
+    file=".fastlane/Fastfile"
   fi
 
   # parse 'beta' out of 'lane :beta do', etc
