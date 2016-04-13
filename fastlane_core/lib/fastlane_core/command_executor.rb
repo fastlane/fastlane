@@ -45,7 +45,7 @@ module FastlaneCore
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
             stdin.each do |l|
-              line = l.strip # strip so that \n gets removed
+              line = l.force_encoding("utf-8").strip # strip so that \n gets removed
               output << line
 
               next unless print_all
