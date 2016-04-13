@@ -116,7 +116,7 @@ When working on something, directly edit the Ruby files in the project folders. 
 To run the modified version of the tool, run the following in the project directory
 
 ```
-./bin/[tool_name]
+.[tool_name]/bin/[tool_name]
 ```
 
 or install the local copy (might require `sudo`)
