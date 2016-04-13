@@ -24,10 +24,17 @@ module Fastlane
           '&&'
         ].join(' ')
 
+        command_suffix = [
+          '&&',
+          'cd',
+          '-'
+        ].join(' ')
+
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all'
+          params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all',
+          command_suffix
         ].join(' ')
 
         if Helper.test?
