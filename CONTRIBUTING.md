@@ -72,7 +72,7 @@ If you're happy with what you see, leave a comment on the GitHub issue stating y
 
 ## Pull Requests (PRs)
 
-Pull requests are always welcome :simple_smile:
+Pull requests are always welcome :smile:
 
 PRs should reference an open GitHub issue (preferably those marked with the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label). Referring to the issue in the description of your PR is required and is really helpful for establishing the context needed for review.
 
