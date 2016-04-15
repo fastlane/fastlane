@@ -57,7 +57,6 @@
 # 2. enables the -p option to be used more than once
 # 3. ensures the provisioning profile's bundle-identifier matches the app's bundle identifier
 # 4. extracts the entitlements from the provisioning profile
-# 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
 
 # Logging functions
@@ -480,7 +479,6 @@ function resign {
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
-        cp -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements="$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
@@ -489,7 +487,6 @@ function resign {
         checkStatus
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
-        cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements="$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
