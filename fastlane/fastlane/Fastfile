@@ -32,6 +32,14 @@ lane :bump do |options|
   end
 end
 
+desc "Display a changelog for a tool since its last release. Run from a tool directory or specify (e.g. tool:deliver)"
+lane :show_changelog do |options|
+  tool_name = options[:tool] || detect_tool
+  old_version = current_version(tool: tool_name)
+
+  print_release_changelog(tool: tool_name, old_version: old_version)
+end
+
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
   # Fetching all information required for the release
@@ -178,7 +186,7 @@ private_lane :print_release_changelog do |options|
   tool_name = options[:tool]
   old_version = options[:old_version]
 
-  cmd = "git log --pretty='* %B' #{tool_name}/#{old_version}...HEAD --no-merges .."
+  cmd = "git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges .."
   puts "Changes since release #{old_version}:\n" + `#{cmd}`.gsub("\n\n", "\n")
 end
 
