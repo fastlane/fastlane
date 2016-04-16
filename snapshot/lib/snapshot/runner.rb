@@ -207,7 +207,7 @@ module Snapshot
     end
 
     def enable_check_spelling(device_type)
-      keyboard_check_spelling  = Snapshot.config[:enable_check_spelling] ? 'YES' : 'NO' 
+      keyboard_check_spelling = Snapshot.config[:enable_check_spelling] ? 'YES' : 'NO' 
       info_enabled_check_spelling = Snapshot.config[:enable_check_spelling] ? 'enabled' : 'disabled' 
 
       UI.message "Check spelling on Simulator #{device_type} is #{info_enabled_check_spelling}" 
