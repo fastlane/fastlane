@@ -56,7 +56,7 @@ module Snapshot
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
-        FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
+        FileUtils.rm_rf(TestCommandGenerator.derived_data_pathenable_check_spelling)
       end
     end
 
@@ -136,9 +136,7 @@ module Snapshot
         uninstall_app(device_type)
       end
 
-      if Snapshot.config[:disable_spellcheck_on_simulator]
-        disable_spellcheck_on_simulator(device_type)
-      end
+      enable_check_spelling(device_type)
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
@@ -208,13 +206,15 @@ module Snapshot
       `xcrun simctl erase #{device_udid} &> /dev/null`
     end
 
-    def disable_spellcheck_on_simulator(device_type)
-      Helper.log.debug "Disable spell checking on  #{device_type}..."
+    def enable_check_spelling(device_type)
+      keyboard_check_spelling  = Snapshot.config[:enable_check_spelling] ? 'YES' : 'NO' 
+      info_enabled_check_spelling = Snapshot.config[:enable_check_spelling] ? 'enabled' : 'disabled' 
+
+      UI.message "Check spelling on Simulator #{device_type} is #{info_enabled_check_spelling}" 
       device_udid = TestCommandGenerator.device_udid(device_type)
-      Helper.log.info "Disable spell checking on #{device_type}...".yellow
-      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardAutocapitalization -bool NO`
-      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardAutocorrection -bool NO`
-      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardCheckSpelling -bool NO`
+      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardAutocapitalization -bool #{keyboard_check_spelling}`
+      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardAutocorrection -bool #{keyboard_check_spelling}`
+      `defaults write ~/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.Preferences.plist KeyboardCheckSpelling -bool #{keyboard_check_spelling}`
     end
 
     def add_media(device_type, media_type, paths)
