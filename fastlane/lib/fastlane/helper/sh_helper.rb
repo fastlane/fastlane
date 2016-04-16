@@ -41,7 +41,7 @@ module Fastlane
           else
             message = "Shell command exited with exit status #{exit_status} instead of 0."
           end
-          UI.crash!(message)
+          UI.user_error!(message)
         end
       end
 

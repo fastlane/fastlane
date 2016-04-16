@@ -23,11 +23,12 @@ describe Fastlane do
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
             binary_basename: 'YourApp',
-            binary_file: 'you'
+            binary_file: 'you',
+            workspace: 'foo.xcworkspace'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
       end
 
       it "works with bundle" do
@@ -52,11 +53,13 @@ describe Fastlane do
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
             binary_basename: 'YourApp',
-            binary_file: 'you'
+            binary_file: 'you',
+            workspace: 'foo.xcworkspace'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you " \
+                             "--ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
       end
 
       it "requires project to be specified" do
