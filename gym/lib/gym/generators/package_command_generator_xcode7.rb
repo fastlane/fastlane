@@ -130,6 +130,7 @@ module Gym
 
           # Saves configuration for later use
           Gym.config[:export_method] ||= hash[:method]
+          Gym.config[:installer_codesigning_identity] = hash[:installer_codesigning_identity] if Gym.config[:installer_codesigning_identity].nil?
           Gym.config[:include_symbols] = hash[:uploadSymbols] if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = hash[:uploadBitcode] if Gym.config[:include_bitcode].nil?
           Gym.config[:export_team_id] ||= hash[:teamID]
