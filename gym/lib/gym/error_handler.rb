@@ -1,3 +1,4 @@
+# coding: utf-8
 module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler
@@ -11,30 +12,30 @@ module Gym
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile which doesn't exist on your local machine"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         when /Provisioning profile does not match bundle identifier/
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile that doesn't match the bundle identifier of your app"
           print "Make sure you use the correct provisioning profile for this app"
           print "Take a look at the ouptput above for more information"
-          print "You can follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          print "You can follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print "You don't have the provisioning profile for '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
           print "You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
 
         # Insert more code signing specific errors here
         when /code signing is required/
           print "Your project settings define invalid code signing settings"
           print "To generate an ipa file you need to enable code signing for your project"
           print "Additionally make sure you have a code signing identity set"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         when /US\-ASCII/
           print "Your shell environment is not correctly configured"
           print "Instead of UTF-8 your shell uses US-ASCII"
@@ -98,7 +99,7 @@ module Gym
         print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
-        print "Follow this guide to setup code signing https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+        print "Follow this guide to setup code signing https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
         UI.user_error!("Archive invalid")
       end
