@@ -12,6 +12,7 @@
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
 - [Android.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Android.md) Getting started with fastlane for Android
 - [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
+- [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
 
 ## Fastfile
 
