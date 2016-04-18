@@ -78,6 +78,11 @@ module Spaceship
       # @return (String) App Review Information Email Address
       attr_accessor :review_email
 
+      # @return (Boolean) The checkbox that indiciates if a demo account
+      #   is needed. Is set automatically depending on if a user and pass
+      #   are set
+      attr_reader :review_user_needed
+
       # @return (String) App Review Information Demo Account User Name
       attr_accessor :review_demo_user
 
@@ -141,6 +146,7 @@ module Spaceship
         'appReviewInfo.phoneNumber.value' => :review_phone_number,
         'appReviewInfo.emailAddress.value' => :review_email,
         'appReviewInfo.reviewNotes.value' => :review_notes,
+        'appReviewInfo.accountRequired.value' => :review_user_needed,
         'appReviewInfo.userName.value' => :review_demo_user,
         'appReviewInfo.password.value' => :review_demo_password
       })
@@ -178,6 +184,10 @@ module Spaceship
       # @return (Bool) Is that version currently available in the App Store?
       def is_live?
         is_live
+      end
+
+      def review_user_needed
+        (self.review_demo_user.to_s + self.review_demo_password.to_s).length > 0
       end
 
       # Call this method to make sure the given languages are available for this app
