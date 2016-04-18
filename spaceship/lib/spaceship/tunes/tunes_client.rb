@@ -618,6 +618,7 @@ module Spaceship
       build_info['testInfo']['reviewLastName']['value'] = last_name if last_name
       build_info['testInfo']['reviewPhone']['value'] = phone_number if phone_number
       build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
+      build_info['testInfo']['reviewAccountRequired']['value'] = ((review_user_name || "").to_s + (review_password || "").to_s).length > 0
       build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
       build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
       build_info['testInfo']['reviewNotes']['value'] = review_notes if review_notes

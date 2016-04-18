@@ -136,6 +136,20 @@
         "maxLength": 400,
         "minLength": 1
       },
+      "reviewAccountRequired": {
+        "value": true,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "eula": {
+        "value": "",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": null,
+        "minLength": 1
+      },
       "hasExportCompliance": true,
       "installCount": 1,
       "externalInstallCount": 0,
