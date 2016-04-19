@@ -571,6 +571,10 @@ module Spaceship
         current["feedbackEmail"]["value"] = feedback_email if feedback_email
       end
 
+      review_user_name = build_info['reviewUserName']['value']
+      review_password = build_info['reviewPassword']['value']
+      build_info['reviewAccountRequired']['value'] = ((review_user_name || "").to_s + (review_password || "").to_s).length > 0
+
       # Now send everything back to iTC
       r = request(:post) do |req| # same URL, but a POST request
         req.url url
