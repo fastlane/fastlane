@@ -9,6 +9,14 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod install")
       end
 
+      it "default use case with no bundle exec" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(use_bundle_exec: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod install")
+      end
+
       it "adds no-clean to command if clean is set to false" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
