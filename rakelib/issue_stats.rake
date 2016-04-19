@@ -6,8 +6,6 @@ require 'colored'
 
 QUERY_DAYS = (ENV["DAYS"] || 4).to_i
 
-SECONDS_PER_DAY = 86_400
-
 FASTLANE_MEMBERS = %w(asfalcone chaselatta fastlane-bot hemal i2amsam kimyoutora KrauseFx mfurtak MichaelDoyle mpirri ohwutup samrobbins snatchev vpolouchkine)
 
 ALL_TOOL_LABELS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab)
@@ -98,8 +96,9 @@ task :issue_stats do
     total_row
   end
 
-  box("Issue statistics over the past #{QUERY_DAYS} days")
-  table = Terminal::Table.new :headings => ['Labels', 'Opened', 'Closed', 'Net'], :rows => pretty_issues
+  table = Terminal::Table.new(title: "Issue statistics over the past #{QUERY_DAYS} days".green,
+                              headings: ['Labels', 'Opened', 'Closed', 'Net'],
+                              rows: pretty_issues)
   table.add_separator
   table.add_row colorized_row(totals)
   puts table
