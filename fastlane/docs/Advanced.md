@@ -17,6 +17,10 @@ before_all do |lane, options|
   ...
 end
 
+before_each do |lane, options|
+  ...
+end
+
 lane :deploy do |options|
   ...
   if options[:submit]
@@ -28,6 +32,10 @@ lane :deploy do |options|
 end
 
 after_all do |lane, options|
+  ...
+end
+
+after_each do |lane, options|
   ...
 end
 

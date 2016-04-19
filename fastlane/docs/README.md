@@ -38,6 +38,16 @@ before_all do |lane|
 end
 ```
 
+### `before_each` block
+
+This block will get executed *before* each lane switch. It supports the same actions as lanes.
+
+```ruby
+before_each do |lane|
+  cocoapods
+end
+```
+
 ### `after_all` block
 
 This block will get executed *after* running the requested lane. It supports the same actions as lanes.
@@ -51,6 +61,18 @@ after_all do |lane|
     message: "Successfully submitted new App Update"
   )
   sh "./send_screenshots_to_team.sh" # Example
+end
+```
+
+### `after_each` block
+
+This block will get executed *after* each lane switch (and before returning to a parent lane). It supports the same actions as lanes.
+
+It will only be called, if the selected lane was executed **successfully**.
+
+```ruby
+after_each do |lane|
+  say "Successfully finished lane (#{lane})!"
 end
 ```
 

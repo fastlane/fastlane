@@ -2,6 +2,10 @@ before_all do
   File.write('/tmp/fastlane/before_all', '1')
 end
 
+before_each do |lane|
+  File.write("/tmp/fastlane/before_each_#{lane}", '1')
+end
+
 lane :test do 
   File.write('/tmp/fastlane/test', '1')
 end
@@ -14,6 +18,10 @@ end
 
 after_all do |lane|
   File.write('/tmp/fastlane/after_all', lane)
+end
+
+after_each do |lane|
+  File.write("/tmp/fastlane/after_each_#{lane}", '1')
 end
 
 lane :error_causing_lane do
