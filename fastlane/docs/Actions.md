@@ -2478,3 +2478,13 @@ Reset all the iOS simulators. Useful with test actions to ensure a clean simulat
 ```ruby
 reset_simulators
 ```
+
+### [danger](https://github.com/danger/danger)
+
+To run [danger](https://github.com/danger/danger) add this to your `Fastfile`
+
+```ruby
+lane :danger do
+  danger
+end
+```
