@@ -207,6 +207,14 @@ module Snapshot
       `xcrun simctl erase #{device_udid} &> /dev/null`
     end
 
+    keyboards = {
+      de_DE: "de_DE@sw=QWERTZ-German",
+      en_US: "en_US@hw=US;sw=QWERTY",
+      es_ES: "es_ES@hw=Spanish - ISO;sw=QWERTY-Spanish",
+      ex_MX: "es_MX@sw=QWERTY-Spanish",
+      fr_FR: "fr_FR@hw=French;sw=QWERTY",
+    }
+
     def localize_simulator(device_type, language, locale)
       device_udid = TestCommandGenerator.device_udid(device_type)
       if device_udid
@@ -214,7 +222,8 @@ module Snapshot
         plist = {
           AppleLocale: locale,
           AppleLanguages: [language],
-          AppleKeyboards: [locale]
+          AppleKeyboardsExpanded: 0,
+          AppleKeyboards: ["fr_FR@hw=French;sw=QWERTY", "en_US@hw=US;sw=QWERTY", "it_IT@hw=Italian - Pro;sw=QWERTY", "de_DE@sw=QWERTZ-German", "es_ES@hw=Spanish - ISO;sw=QWERTY-Spanish", "es_MX@sw=QWERTY-Spanish"]
         }
         UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
