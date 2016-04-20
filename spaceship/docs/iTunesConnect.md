@@ -63,7 +63,7 @@ version.update_price_tier("3")
 
 ## AppVersions
 
-<img src="/assets/docs/AppVersions.png" width="500">
+<img src="/spaceship/assets/docs/AppVersions.png" width="500">
 
 You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
 
@@ -177,7 +177,7 @@ version.save!
 
 ## Build Trains (TestFlight)
 
-<img src="/assets/docs/BuildTrains.png" width="700">
+<img src="/spaceship/assets/docs/BuildTrains.png" width="700">
 
 To clarify:
 
