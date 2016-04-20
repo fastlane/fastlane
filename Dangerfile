@@ -9,7 +9,7 @@ if pr_body.length < 5
 end
 
 unless pr_body.include?("https://github.com/fastlane/fastlane/issues/")
-  warn("Before submitting a Pull Request, please create an issue on GitHub to discuss the change. Please add a link to the issue in the PR body")
+  warn("Before submitting a Pull Request, please create an issue on GitHub to discuss the change. Please add a link to the issue in the PR body.")
 end
 
 require 'json'
