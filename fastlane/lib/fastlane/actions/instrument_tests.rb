@@ -128,9 +128,6 @@ module Fastlane
         ]
       end
 
-      def self.output
-      end
-
       def self.return_value
         "The output from the test execution."
       end
