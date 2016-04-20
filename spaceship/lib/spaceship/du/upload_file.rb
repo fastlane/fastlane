@@ -20,7 +20,7 @@ module Spaceship
         content_type = Utilities.content_type(path)
         self.new(
           file_path: path,
-          file_name: 'ftl_' + content_md5 + '_' + File.basename(path),
+          file_name: construct_upload_filename(content_md5, path),
           file_size: File.size(path),
           content_type: content_type,
           bytes: File.read(path)
@@ -36,6 +36,25 @@ module Spaceship
         `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null since there is warning because of the extension
         `sips -s format png '#{path}'`
         return path
+      end
+
+      # Construct proper filename for upload file, containing md5 hash of the file's content and it's original filename
+      # @param md5 (String) md5 of files content
+      # @param path (String) path to a file
+      # @return (String)
+      def construct_upload_filename(md5, path)
+        'ftl_' + md5 + '_' + File.basename(path)
+      end
+
+      # Checks if original file name contains md5 of file's content, and returns hash containing md5 and original file name
+      # @param file_name (String)
+      # @return (Hash)
+      def deconstruct_upload_filename(file_name)
+        match = file_name.match(/ftl_([0-9a-f]{32})_(.*)/)
+        unless match
+          return nil
+        end
+        { md5: match[1], original_file_name: match[2] }
       end
     end
 
