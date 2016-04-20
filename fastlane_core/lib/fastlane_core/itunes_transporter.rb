@@ -49,8 +49,12 @@ module FastlaneCore
           end
         end
       rescue => ex
-        UI.error(ex.to_s)
         @errors << ex.to_s
+      end
+
+      exit_status = $?.exitstatus
+      unless exit_status.zero?
+        @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
 
       if @warnings.count > 0
@@ -59,10 +63,9 @@ module FastlaneCore
 
       if @errors.count > 0
         UI.error(@errors.join("\n"))
-        return false
       end
 
-      true
+      @errors.count.zero?
     end
 
     private
@@ -146,6 +149,18 @@ module FastlaneCore
       ].join(' ')
     end
 
+    def handle_error(password)
+      # rubocop:disable Style/CaseEquality
+      unless /^[0-9a-zA-Z\.\$\_]*$/ === password
+        UI.error([
+          "Password contains special characters, which may not be handled properly by iTMSTransporter.",
+          "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
+        ].join(' '))
+      end
+      # rubocop:enable Style/CaseEquality
+      UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
+    end
+
     private
 
     def shell_escaped_password(password)
@@ -209,6 +224,14 @@ module FastlaneCore
         "-destination #{destination.shellescape}",
         '2>&1' # cause stderr to be written to stdout
       ].join(' ')
+    end
+
+    def handle_error(password)
+      unless File.exist?(Helper.transporter_java_jar_path)
+        UI.error("The iTMSTransporter Java app was not found at '#{Helper.transporter_java_jar_path}'.")
+        UI.error("If you're using Xcode 6, please select the shell script executor by setting the environment variable "\
+          "FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1")
+      end
     end
 
     def execute(command, hide_output)
@@ -308,15 +331,7 @@ module FastlaneCore
     private
 
     def handle_error(password)
-      # rubocop:disable Style/CaseEquality
-      unless /^[0-9a-zA-Z\.\$\_]*$/ === password
-        UI.error([
-          "Password contains special characters, which may not be handled properly by iTMSTransporter.",
-          "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
-        ].join(' '))
-      end
-      # rubocop:enable Style/CaseEquality
-      UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
+      @transporter_executor.handle_error(password)
     end
   end
 end
