@@ -1,3 +1,4 @@
+# coding: utf-8
 # rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
@@ -8,7 +9,7 @@ module Fastlane
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md")
+        UI.message("https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md")
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
