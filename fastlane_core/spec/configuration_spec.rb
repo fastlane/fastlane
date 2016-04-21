@@ -128,7 +128,7 @@ describe FastlaneCore do
                                                      short_option: '-f',
                                                      description: 'foo',
                                                      is_string: false)
-          expect(config_item.data_type).to eq(:bool)
+          expect(config_item.data_type).to eq(Boolean)
         end
 
         it "sets the data type correctly if boolean are explicit" do
@@ -136,9 +136,9 @@ describe FastlaneCore do
                                                      short_option: '-f',
                                                      description: 'foo',
                                                      default_value: false,
-                                                     type: :bool)
+                                                     type: Boolean)
 
-          expect(config_item.data_type).to eq(:bool)
+          expect(config_item.data_type).to eq(Boolean)
         end
       end
 
@@ -227,10 +227,10 @@ describe FastlaneCore do
 
         it "auto converts booleans as strings to booleans" do
           c = [
-            FastlaneCore::ConfigItem.new(key: :true_value),
-            FastlaneCore::ConfigItem.new(key: :true_value2),
-            FastlaneCore::ConfigItem.new(key: :false_value),
-            FastlaneCore::ConfigItem.new(key: :false_value2)
+            FastlaneCore::ConfigItem.new(key: :true_value, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :true_value2, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :false_value, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :false_value2, type: Boolean)
           ]
           config = FastlaneCore::Configuration.create(c, {
             true_value: "true",
@@ -364,7 +364,7 @@ describe FastlaneCore do
           ]
           config = FastlaneCore::Configuration.create(options, { verbose: true })
           expect(config[:verbose]).to eq(true)
-          expect(options[0].data_type).to eq(:bool)
+          expect(options[0].data_type).to eq(Boolean)
         end
       end
 

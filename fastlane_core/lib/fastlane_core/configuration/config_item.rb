@@ -12,7 +12,7 @@ module FastlaneCore
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
-    # @param type (Class or :bool) the data type of this config item. Takes precedence over `is_string`
+    # @param type (Class) the data type of this config item. Takes precedence over `is_string`. Use `Boolean` for booleans.
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
@@ -69,7 +69,7 @@ module FastlaneCore
       # we also allow nil values, which do not have to be verified.
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
-        if data_type != :bool && !value.kind_of?(data_type)
+        if data_type != Boolean && !value.kind_of?(data_type)
           UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
         end
 
@@ -96,17 +96,9 @@ module FastlaneCore
         return value.to_i
       when data_type == Float
         return value.to_f
-      else
-        # FIXME: should we enforce data_type == :bool ?
-        # Special treatment if the user specififed true, false or YES, NO
-        # There is no boolean type, so we just do it here
-        if %w(YES yes true TRUE).include?(value)
-          return true
-        elsif %w(NO no false FALSE).include?(value)
-          return false
-        end
+      when data_type == Boolean
+        return Boolean.convert(value)
       end
-
       return value # fallback to not doing anything
     end
 
@@ -132,7 +124,7 @@ module FastlaneCore
           if is_string
             type = String
           else
-            type = :bool
+            type = Boolean
           end
         end
       else

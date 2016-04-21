@@ -17,7 +17,6 @@ module FastlaneCore
         validate_short_switch(used_switches, short_switch)
 
         type = option.data_type
-        type = nil if type == :bool
 
         # This is an important bit of trickery to solve the boolean option situation.
         #
@@ -46,7 +45,7 @@ module FastlaneCore
         # later coerce into a boolean.
         #
         # In this way we support handling boolean flags with or without trailing values.
-        value_appendix = (type || '[VALUE]').to_s.upcase
+        value_appendix = ( type == Boolean ? '[VALUE]' : type.to_s.upcase )
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description
@@ -61,7 +60,8 @@ module FastlaneCore
         # If we don't have a data type for this option, we tell it to act like a String.
         # This allows us to get a reasonable value for boolean options that can be
         # automatically coerced or otherwise handled by the ConfigItem for others.
-        args = [short_switch, long_switch, (type || String), description].compact
+        commander_type = (type == Boolean ? String : type)
+        args = [short_switch, long_switch, commander_type, description].compact
 
         # This is the call to Commander to set up the option we've been building.
         global_option(*args)
