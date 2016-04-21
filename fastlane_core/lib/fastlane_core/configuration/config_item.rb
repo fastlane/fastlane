@@ -28,10 +28,6 @@ module FastlaneCore
         UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
 
-      if type.to_s.length > 0 and short_option.to_s.length == 0
-        UI.user_error!("Type '#{type}' for key '#{key}' requires a short option")
-      end
-
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
           UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of? Symbol
