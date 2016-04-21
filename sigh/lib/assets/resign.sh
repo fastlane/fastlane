@@ -85,10 +85,38 @@ function checkStatus {
     fi
 }
 
+usage() {
+    echo "Usage: $(basename $0) source identity -p|--provisioning provisioning [-e|--entitlements entitlements] [-k|--keychain keychain] [-d|--display-name displayName] [-n|--version-number version] [-b|--bundle-id bundleId] outputIpa" >&2
+    echo "Usage: $(basename $0) -h|--help" >&2
+    echo "Options:" >&2
+    echo -e "\t-p, --provisioning provisioning\t\tProvisioning profile option, may be provided multiple times." >&2
+    echo -e "\t\t\t\t\t\tYou can specify provisioning profile file name." >&2
+    echo -e "\t\t\t\t\t\t\t-p xxx.mobileprovision" >&2
+    echo "" >&2
+    echo -e "\t\t\t\t\t\tAlternatively you may provide multiple provisioning profiles if the application contains" >&2
+    echo -e "\t\t\t\t\t\tnested applications or app extensions, which need their own provisioning" >&2
+    echo -e "\t\t\t\t\t\tprofile. You can do so by providing -p option multiple times specifying" >&2
+    echo -e "\t\t\t\t\t\told bundle identifier and new provisioning profile for that bundle id joined with '='." >&2
+    echo -e "\t\t\t\t\t\t\t-p com.main-app=main-app.mobileprovision" >&2
+    echo -e "\t\t\t\t\t\t\t-p com.nested-app=nested-app.mobileprovision" >&2
+    echo -e "\t\t\t\t\t\t\t-p com.nested-extension=nested-extension.mobileprovision" >&2
+    echo "" >&2
+    echo -e "\t-e, --entitlements entitlements\t\tSpecify entitlements file path for code signing." >&2
+    echo -e "\t-k, --keychain keychain\t\t\tSpecify keychain for code signing." >&2
+    echo -e "\t-d, --display-name displayName\t\tSpecify new display name." >&2
+    echo -e "\t\t\t\t\t\t\tWarning: will apply for all nested apps and extensions." >&2
+    echo -e "\t-n, --version-number version\t\tSpecify new version number." >&2
+    echo -e "\t\t\t\t\t\t\tWill set CFBundleShortVersionString and CFBundleVersion values in Info.plist." >&2
+    echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
+    echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
+    echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
+    echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
+    echo -e "\t-h, --help\t\t\t\tDisplay help message." >&2
+    exit 2
+}
+
 if [ $# -lt 3 ]; then
-    echo "usage: $0 source identity -p provisioning [-e entitlements] [-d displayName] [-n version] [-b bundleId] outputIpa" >&2
-    echo "       -p option may be provided multiple times" >&2
-    exit 1
+    usage
 fi
 
 ORIGINAL_FILE="$1"
@@ -106,37 +134,49 @@ TEMP_DIR="_floatsignTemp"
 NESTED_APP_REFERENCE_KEYS=(":WKCompanionAppBundleIdentifier" ":NSExtension:NSExtensionAttributes:WKAppBundleIdentifier")
 
 # options start index
-OPTIND=3
-while getopts p:d:e:k:b:n:v opt; do
-    case $opt in
-        p)
-            RAW_PROVISIONS+=("$OPTARG")
+shift 2
+
+# Parse args
+while [ "$1" != "" ]; do
+    case $1 in
+        -p | --provisioning )
+            shift
+            RAW_PROVISIONS+=("$1")
             ;;
-        d)
-            DISPLAY_NAME="$OPTARG"
+        -e | --entitlements )
+            shift
+            ENTITLEMENTS="$1"
             ;;
-        e)
-            ENTITLEMENTS="$OPTARG"
+        -d | --display-name )
+            shift
+            DISPLAY_NAME="$1"
             ;;
-        b)
-            BUNDLE_IDENTIFIER="$OPTARG"
+        -b | --bundle-id )
+            shift
+            BUNDLE_IDENTIFIER="$1"
             ;;
-        k)
-            KEYCHAIN="$OPTARG"
+        -k | --keychain )
+            shift
+            KEYCHAIN="$1"
             ;;
-        n)
-            VERSION_NUMBER="$OPTARG"
+        -n | --version-number )
+            shift
+            VERSION_NUMBER="$1"
             ;;
-        v)
+        -v | --verbose )
             VERBOSE="--verbose"
             ;;
-        \?)
-            error "Invalid option: -$OPTARG"
+        -h | --help )
+            usage
             ;;
-        :)
-            error "Option -$OPTARG requires an argument."
+        * )
+            [[ -n "$NEW_FILE" ]] && error "Multiple output file names specified!"
+            [[ -z "$NEW_FILE" ]] && NEW_FILE="$1"
             ;;
     esac
+
+    # Next arg
+    shift
 done
 
 # Log the options
@@ -147,15 +187,17 @@ for provision in ${RAW_PROVISIONS[@]}; do
         log "Specified provisioning profile: '$provision'"
     fi
 done
+
+log "Original file: '$ORIGINAL_FILE'"
+log "Certificate: '$CERTIFICATE'"
 [[ -n "${DISPLAY_NAME}" ]] && log "Specified display name: '$DISPLAY_NAME'"
 [[ -n "${ENTITLEMENTS}" ]] && log "Specified signing entitlements: '$ENTITLEMENTS'"
 [[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
-[[ -n "${KEYCHAIN}" ]] && log "Specified Keychain to use: '$KEYCHAIN'"
-[[ -n "${VERSION_NUMBER}" ]] && log "Specified version to use: '$VERSION_NUMBER'"
+[[ -n "${KEYCHAIN}" ]] && log "Specified keychain to use: '$KEYCHAIN'"
+[[ -n "${VERSION_NUMBER}" ]] && log "Specified short version to use: '$VERSION_NUMBER'"
+[[ -n "${NEW_FILE}" ]] && log "Output file name: '$NEW_FILE'"
 
-shift $((OPTIND-1))
-
-NEW_FILE="$1"
+# Check output file name
 if [ -z "$NEW_FILE" ];
 then
     error "Output file name required"
