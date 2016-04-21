@@ -172,6 +172,7 @@ module Deliver
       v.review_email = info[:email_address] if info[:email_address]
       v.review_demo_user = info[:demo_user] if info[:demo_user]
       v.review_demo_password = info[:demo_password] if info[:demo_password]
+      v.review_user_needed = (v.review_demo_user.to_s + v.review_demo_password.to_s).length > 0
       v.review_notes = info[:notes] if info[:notes]
     end
 
