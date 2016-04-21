@@ -63,6 +63,10 @@ module Sigh
       version = options.version_number || nil
       display_name = options.display_name || nil
 
+      if options.provisioning_name
+        UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
+      end
+
       return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name
     end
 
