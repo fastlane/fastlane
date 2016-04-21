@@ -56,7 +56,7 @@ module Snapshot
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
-        FileUtils.rm_rf(TestCommandGenerator.derived_data_pathenable_check_spelling)
+        FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
       end
     end
 
