@@ -1077,6 +1077,7 @@ nexus_upload(
   repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
+  repo_classifier: "dSYM", # Optional
   endpoint: "http://localhost:8081",
   username: "admin",
   password: "admin123"
