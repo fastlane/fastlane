@@ -55,7 +55,7 @@ module FastlaneCore
         # Passing a nil value to global_option has been shown to create problems with
         # option parsing!
         #
-        # See: https://github.com/fastlane/fastlane/tree/master/fastlane_core
+        # See: https://github.com/fastlane/fastlane_core/pull/89
         #
         # If we don't have a data type for this option, we tell it to act like a String.
         # This allows us to get a reasonable value for boolean options that can be
