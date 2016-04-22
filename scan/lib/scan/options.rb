@@ -80,7 +80,7 @@ module Scan
                                      description: "The directory were to store the raw log",
                                      default_value: "~/Library/Logs/scan"),
         FastlaneCore::ConfigItem.new(key: :formatter,
-                                     short_option: "-t",
+                                     short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
                                      optional: true),
