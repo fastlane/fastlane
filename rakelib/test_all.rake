@@ -40,7 +40,7 @@ end
 
 def bundle_install
   if ENV['CI']
-    cache_path = File.expand_path("~/.bundle")
+    cache_path = File.expand_path("~/.fastlane_bundle")
     path = " --path=#{cache_path}"
   end
 
