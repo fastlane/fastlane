@@ -3,7 +3,11 @@ require 'highline/import' # to hide the entered password
 
 module CredentialsManager
   class AccountManager
-    def initialize(user: nil, password: nil)
+    # @param prefix [String] Very optional, is used for the
+    #   iTunes Transporter which uses application specofic passwords
+    def initialize(user: nil, password: nil, prefix: nil)
+      @prefix = prefix || "deliver"
+
       @user = user
       @password = password
     end
@@ -50,6 +54,10 @@ module CredentialsManager
       @password = nil
     end
 
+    def server_name
+      "#{@prefix}.#{user}"
+    end
+
     private
 
     def ask_for_login
@@ -79,10 +87,6 @@ module CredentialsManager
         puts "Could not store password in keychain".red
         return false
       end
-    end
-
-    def server_name
-      "deliver.#{user}"
     end
   end
 end
