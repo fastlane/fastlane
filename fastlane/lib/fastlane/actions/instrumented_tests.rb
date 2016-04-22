@@ -72,7 +72,7 @@ module Fastlane
       end
 
       def self.description
-        "Run android instrumented tests via a gradle command againts a newly created avd."
+        "Run android instrumented tests via a gradle command againts a newly created avd"
       end
 
       def self.details
@@ -124,7 +124,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :task,
                                        env_name: "GRADLE_TASK",
                                        description: "The gradle task you want to execute",
-                                       is_string: true)
+                                       is_string: true,
+                                       optional: false)
         ]
       end
 
