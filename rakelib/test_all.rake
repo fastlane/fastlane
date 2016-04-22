@@ -39,13 +39,12 @@ def format_failure(failure, gem_name, count)
 end
 
 def bundle_install
-  # if ENV['CI']
-  #   cache_path = File.expand_path("~/.bundle")
-  #   path = " --path=#{cache_path}"
-  # end
+  if ENV['CI']
+    cache_path = File.expand_path("~/.bundle")
+    path = " --path=#{cache_path}"
+  end
 
-  # sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
-  sh "bundle install --jobs=4 --retry=3"
+  sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
 end
 
 def get_line_from_file(line_number, file)
