@@ -15,7 +15,7 @@ module Gym
         UI.verbose "Looking For Orphaned WatchKit2 Applications"
 
         Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").each do |app_path|
-          if is_watchkit_ipa?("#{app_path}/Info.plist")
+          if is_watchkit_app?(app_path)
             UI.verbose "Removing Orphaned WatchKit2 Application #{app_path}"
             FileUtils.rm_rf(app_path)
           end
@@ -23,8 +23,9 @@ module Gym
       end
 
       # Does this application have a WatchKit target
-      def is_watchkit_ipa?(plist_path)
-        `/usr/libexec/PlistBuddy -c 'Print DTSDKName' #{plist_path.shellescape} 2>&1`.match(/^\s*watchos2\.\d+\s*$/) != nil
+      def is_watchkit_app?(app_path)
+        plist_path = "#{app_path}/Info.plist"
+        `/usr/libexec/PlistBuddy -c 'Print :DTSDKName' #{plist_path.shellescape} 2>&1`.match(/^\s*watchos2\.\d+\s*$/) != nil
       end
     end
   end

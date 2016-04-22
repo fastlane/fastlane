@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>DTSDKName</key>
-	<string>iphoneos9.2</string>
+	<string>watchos2.1</string>
 </dict>
 </plist>
