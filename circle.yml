@@ -3,7 +3,7 @@ machine:
     version: "7.3"
 dependencies:
   override:
-    - bundle check --path=~/.fastlane_bundle || bundle install --path=~/.fastlane_bundle --jobs=4 --retry=3
+    - rake bundle_install_all
   cache_directories:
     - ~/.fastlane_bundle
 test:
