@@ -59,5 +59,21 @@ describe CredentialsManager do
       expect(c).to receive(:ask_for_login).and_return(nil)
       c.invalid_credentials(force: true)
     end
+
+    it "defaults to 'deliver' as a prefix" do
+      c = CredentialsManager::AccountManager.new(user: user)
+      expect(c.server_name).to eq("deliver.#{user}")
+    end
+
+    it "supports custom prefixes" do
+      prefix = "custom-prefix"
+      c = CredentialsManager::AccountManager.new(user: user, prefix: prefix)
+      expect(c.server_name).to eq("#{prefix}.#{user}")
+    end
+  end
+
+  after(:each) do
+    ENV.delete("FASTLANE_USER")
+    ENV.delete("DELIVER_USER")
   end
 end

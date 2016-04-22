@@ -213,4 +213,9 @@ describe CredentialsManager do
       end
     end
   end
+
+  after(:each) do
+    ENV.delete("FASTLANE_USER")
+    ENV.delete("DELIVER_USER")
+  end
 end
