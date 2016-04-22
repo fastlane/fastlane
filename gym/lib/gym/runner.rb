@@ -16,7 +16,7 @@ module Gym
       FileUtils.mkdir_p(Gym.config[:output_directory])
 
       if Gym.project.ios? || Gym.project.tvos?
-        fix_archive
+        fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
         package_app
         fix_package
         compress_and_move_dsym
@@ -73,7 +73,7 @@ module Gym
       end
     end
 
-    def fix_archive
+    def fix_generic_archive
       return if ENV["GYM_USE_GENERIC_ARCHIVE_FIX"].nil?
       Gym::XcodebuildFixes.generic_archive_fix
     end
