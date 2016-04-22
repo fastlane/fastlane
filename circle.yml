@@ -3,7 +3,7 @@ machine:
     version: "7.3"
 dependencies:
   override:
-    - bundle install --path=~/.bundle --jobs=4 --retry=3
+    - bundle install --jobs=4 --retry=3
 test:
   override:
     - bundle exec danger
