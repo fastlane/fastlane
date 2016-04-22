@@ -74,7 +74,7 @@ module Fastlane
         if options
           puts Terminal::Table.new(
             title: filter.green,
-            headings: ['Key', 'Description', 'Env Var'],
+            headings: ['Key', 'Description', 'Env Var', 'Default'],
             rows: options
           )
           required_count = action.available_options.count do |o|
@@ -149,7 +149,7 @@ module Fastlane
             key_name = (current.optional ? "  " : "* ") + current.key.to_s
             description = (current.description || '') + (current.default_value ? " (default: '#{current.default_value}')" : "")
 
-            rows << [key_name.yellow, description, current.env_name]
+            rows << [key_name.yellow, description, current.env_name, current.default_value]
 
           elsif current.kind_of? Array
             # Legacy actions that don't use the new config manager
