@@ -4,8 +4,6 @@ machine:
 dependencies:
   override:
     - bundle install --path=~/.bundle --jobs=4 --retry=3
-  cache_directories:
-    - ~/.bundle
 test:
   override:
     - bundle exec danger
