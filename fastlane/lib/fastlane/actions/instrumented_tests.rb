@@ -8,8 +8,8 @@ module Fastlane
 
     class InstrumentedTestsAction < Action
       def self.run(params)
-        adb = Helper::AdbHelper.new(adb_path: "#{params[:sdk_path]}/platform-tools/adb")
-        gradle = Helper::GradleHelper.new(gradle_path: Dir["./gradlew"].last)
+        # adb = Helper::AdbHelper.new(adb_path: "#{params[:sdk_path]}/platform-tools/adb")
+        # gradle = Helper::GradleHelper.new(gradle_path: Dir["./gradlew"].last)
         file = Tempfile.new('emulator_output')
 
         # Set up params
@@ -41,21 +41,7 @@ module Fastlane
           begin
             gradle.trigger(task: params[:task], flags: params[:flags], serial: nil)
           ensure
-            temp = File.open(file.path).read
-            port = temp.match(/console on port (\d+),/)
-
-            if port
-              port = port[1]
-            else
-              Helper.log.info("Could not find emulator port number, using default port.".yellow)
-              port = "5554"
-            end
-
-            Helper.log.info("Shutting down emulator...".green)
-            adb.trigger(command: "emu kill", serial: "emulator-#{port}")
-
-            Helper.log.info("Deleting emulator....".green)
-            Action.sh("#{params[:sdk_path]}/tools/android delete avd -n #{params[:avd_name]}")
+            stop_emulator
           end
         ensure
           file.close
@@ -73,6 +59,24 @@ module Fastlane
             break
           end
         end
+      end
+
+      def self.stop_emulator
+        temp = File.open(file.path).read
+        port = temp.match(/console on port (\d+),/)
+
+        if port
+          port = port[1]
+        else
+          Helper.log.info("Could not find emulator port number, using default port.".yellow)
+          port = "5554"
+        end
+
+        Helper.log.info("Shutting down emulator...".green)
+        adb.trigger(command: "emu kill", serial: "emulator-#{port}")
+
+        Helper.log.info("Deleting emulator....".green)
+        Action.sh("#{params[:sdk_path]}/tools/android delete avd -n #{params[:avd_name]}")
       end
 
       def self.description
