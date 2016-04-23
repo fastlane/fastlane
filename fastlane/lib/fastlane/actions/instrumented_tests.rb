@@ -35,15 +35,7 @@ module Fastlane
           Action.sh(start_avd)
 
           # Wait for device to be fully
-          Helper.log.info("Waiting for emulator to finish booting.....".yellow)
-          loop do
-            stdout, _stdeerr, _status = Open3.capture3("#{params[:sdk_path]}/platform-tools/adb shell getprop sys.boot_completed")
-
-            if stdout.strip == "1"
-              Helper.log.info("Emulator Booted!".green)
-              break
-            end
-          end
+          boot_emulator
 
           Helper.log.info("Executing gradle command...".green)
           begin
@@ -68,6 +60,18 @@ module Fastlane
         ensure
           file.close
           file.unlink
+        end
+      end
+
+      def self.boot_emulator
+        Helper.log.info("Waiting for emulator to finish booting.....".yellow)
+        loop do
+          stdout, _stdeerr, _status = Open3.capture3("#{params[:sdk_path]}/platform-tools/adb shell getprop sys.boot_completed")
+
+          if stdout.strip == "1"
+            Helper.log.info("Emulator Booted!".green)
+            break
+          end
         end
       end
 
