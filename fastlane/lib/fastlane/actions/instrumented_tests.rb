@@ -8,8 +8,7 @@ module Fastlane
 
     class InstrumentedTestsAction < Action
       def self.run(params)
-        # adb = Helper::AdbHelper.new(adb_path: "#{params[:sdk_path]}/platform-tools/adb")
-        # gradle = Helper::GradleHelper.new(gradle_path: Dir["./gradlew"].last)
+        gradle = Helper::GradleHelper.new(gradle_path: Dir["./gradlew"].last)
         file = Tempfile.new('emulator_output')
 
         # Set up params
@@ -62,6 +61,7 @@ module Fastlane
       end
 
       def self.stop_emulator
+        adb = Helper::AdbHelper.new(adb_path: "#{params[:sdk_path]}/platform-tools/adb")
         temp = File.open(file.path).read
         port = temp.match(/console on port (\d+),/)
 
