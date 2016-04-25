@@ -99,6 +99,7 @@ module Fastlane
         screenshots = all_screenshots_links(screenshots)
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/mobile_application_updates/upload")
         http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
         req = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
         req.body = { store_id: store_id,
                      api_key: api_key,
