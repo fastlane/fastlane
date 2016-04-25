@@ -129,8 +129,11 @@ module Snapshot
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
       `xcrun simctl shutdown booted &> /dev/null`
 
-      if Snapshot.config[:erase_simulator]
+      if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
         erase_simulator(device_type)
+        if Snapshot.config[:localize_simulator]
+          localize_simulator(device_type, language, locale)
+        end
       elsif Snapshot.config[:reinstall_app]
         # no need to reinstall if device has been erased
         uninstall_app(device_type)
@@ -202,6 +205,20 @@ module Snapshot
       UI.important("Erasing #{device_type}...")
 
       `xcrun simctl erase #{device_udid} &> /dev/null`
+    end
+
+    def localize_simulator(device_type, language, locale)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      if device_udid
+        locale ||= language.sub("-", "_")
+        plist = {
+          AppleLocale: locale,
+          AppleLanguages: [language]
+        }
+        UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
+        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
+        File.write(plist_path, Plist::Emit.dump(plist))
+      end
     end
 
     def add_media(device_type, media_type, paths)
