@@ -291,7 +291,7 @@ function resign {
     local NESTED="$2"
     local BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER"
     local NEW_PROVISION="$NEW_PROVISION"
-    local APP_IDENTIFER_PREFIX=""
+    local APP_IDENTIFIER_PREFIX=""
     local TEAM_IDENTIFIER=""
 
     if [[ "$NESTED" == NESTED ]]; then
@@ -357,19 +357,22 @@ function resign {
     security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
     checkStatus
 
-    APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
-    if [ "$APP_IDENTIFER_PREFIX" == "" ];
+    APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
+    if [ "$APP_IDENTIFIER_PREFIX" == "" ];
     then
-        APP_IDENTIFER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"`
-        if [ "$APP_IDENTIFER_PREFIX" == "" ];
+        APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"`
+        if [ "$APP_IDENTIFIER_PREFIX" == "" ];
         then
             error "Failed to extract any app identifier prefix from '$NEW_PROVISION'"
         else
-            warning "WARNING: extracted an app identifier prefix '$APP_IDENTIFER_PREFIX' from '$NEW_PROVISION', but it was not found in the profile's entitlements"
+            warning "WARNING: extracted an app identifier prefix '$APP_IDENTIFIER_PREFIX' from '$NEW_PROVISION', but it was not found in the profile's entitlements"
         fi
     else
-        log "Profile app identifier prefix is '$APP_IDENTIFER_PREFIX'"
+        log "Profile app identifier prefix is '$APP_IDENTIFIER_PREFIX'"
     fi
+
+    # Set new app identifer prefix if such entry exists in plist file
+    PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
 
     TEAM_IDENTIFIER=`PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n'`
     if [ "$TEAM_IDENTIFIER" == "" ];
@@ -452,16 +455,16 @@ function resign {
 
     if [ "$ENTITLEMENTS" != "" ];
     then
-        if [ -n "$APP_IDENTIFER_PREFIX" ];
+        if [ -n "$APP_IDENTIFIER_PREFIX" ];
         then
             # sanity check the 'application-identifier' is present in the provided entitlements and matches the provisioning profile value
             ENTITLEMENTS_APP_ID_PREFIX=`PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
             if [ "$ENTITLEMENTS_APP_ID_PREFIX" == "" ];
             then
                 error "Provided entitlements file is missing a value for the required 'application-identifier' key"
-            elif [ "$ENTITLEMENTS_APP_ID_PREFIX" != "$APP_IDENTIFER_PREFIX" ];
+            elif [ "$ENTITLEMENTS_APP_ID_PREFIX" != "$APP_IDENTIFIER_PREFIX" ];
             then
-                error "Provided entitlements file's app identifier prefix value '$ENTITLEMENTS_APP_ID_PREFIX' does not match the provided provisioning profile's value '$APP_IDENTIFER_PREFIX'"
+                error "Provided entitlements file's app identifier prefix value '$ENTITLEMENTS_APP_ID_PREFIX' does not match the provided provisioning profile's value '$APP_IDENTIFIER_PREFIX'"
             fi
         fi
 
