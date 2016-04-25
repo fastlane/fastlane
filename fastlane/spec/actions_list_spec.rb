@@ -71,5 +71,17 @@ describe Fastlane do
         end
       end
     end
+
+    describe "with a class in the Actions namespace that does not extend action" do
+      it "trying to show its details presents a helpful error message" do
+        require 'fixtures/broken_actions/broken_action.rb'
+
+        expect(UI).to receive(:user_error!).with(/be a subclass/).and_raise("boom")
+
+        expect do
+          Fastlane::ActionsList.show_details(filter: 'broken')
+        end.to raise_error
+      end
+    end
   end
 end
