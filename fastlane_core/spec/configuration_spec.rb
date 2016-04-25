@@ -104,6 +104,44 @@ describe FastlaneCore do
         end
       end
 
+      describe "boolean 'type' and transition from deprecated is_string", booleans: true do
+        it "either type or is_string must be there" do
+          expect(FastlaneCore::UI).to receive(:deprecated).with("`type` parameter missing. Using `String` by default")
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     short_option: '-f',
+                                                     description: 'foo')
+          expect(config_item.data_type).to eq(String)
+        end
+
+        # it "If both type and is_string are defined an error happens FIXME" do
+        #  expect do
+        #    config_item = FastlaneCore::ConfigItem.new(key: :foo,
+        #                                               short_option: '-f',
+        #                                               description: 'foo',
+        #                                               is_string: true,
+        #                                               type: Array)
+        #  end.to raise_error "Both `type` and `is_string` are defined"
+        # end
+
+        it "old style booleans are detected" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     short_option: '-f',
+                                                     description: 'foo',
+                                                     is_string: false)
+          expect(config_item.data_type).to eq(Boolean)
+        end
+
+        it "sets the data type correctly if boolean are explicit" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     short_option: '-f',
+                                                     description: 'foo',
+                                                     default_value: false,
+                                                     type: Boolean)
+
+          expect(config_item.data_type).to eq(Boolean)
+        end
+      end
+
       describe "data_type" do
         it "sets the data type correctly if `is_string` is not set but type is specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
@@ -113,7 +151,8 @@ describe FastlaneCore do
           expect(config_item.data_type).to eq(Array)
         end
 
-        it "sets the data type correctly if `is_string` is set but the type is specified" do
+        it "uses `type` over `is_string` if both are set, but displays a warning" do
+          expect(FastlaneCore::UI).to receive(:important).with("Both `type` and `is_string` are defined. Ignoring `is_string`")
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      is_string: true,
@@ -188,10 +227,10 @@ describe FastlaneCore do
 
         it "auto converts booleans as strings to booleans" do
           c = [
-            FastlaneCore::ConfigItem.new(key: :true_value),
-            FastlaneCore::ConfigItem.new(key: :true_value2),
-            FastlaneCore::ConfigItem.new(key: :false_value),
-            FastlaneCore::ConfigItem.new(key: :false_value2)
+            FastlaneCore::ConfigItem.new(key: :true_value, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :true_value2, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :false_value, type: Boolean),
+            FastlaneCore::ConfigItem.new(key: :false_value2, type: Boolean)
           ]
           config = FastlaneCore::Configuration.create(c, {
             true_value: "true",
@@ -317,13 +356,15 @@ describe FastlaneCore do
           expect(config.values).to eq({})
         end
 
-        it "doesn't remove --verbose if it's a valid option" do
+        it "doesn't remove --verbose if it's a valid option", booleans: true do
           options = [
             FastlaneCore::ConfigItem.new(key: :verbose,
+                                short_option: '-f',
                                    is_string: false)
           ]
           config = FastlaneCore::Configuration.create(options, { verbose: true })
           expect(config[:verbose]).to eq(true)
+          expect(options[0].data_type).to eq(Boolean)
         end
       end
 

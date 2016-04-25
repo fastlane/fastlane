@@ -1,3 +1,4 @@
+require 'fastlane_core/configuration/boolean'
 require 'fastlane_core/configuration/config_item'
 require 'fastlane_core/configuration/commander_generator'
 require 'fastlane_core/configuration/configuration_file'
