@@ -134,6 +134,7 @@ Metrics/MethodLength:
     - '**/lib/fastlane/actions/*.rb'
     - '**/bin/fastlane'
     - '**/lib/*/options.rb'
+    - '**/bin/sigh'
   Max: 60
 
 AllCops:
