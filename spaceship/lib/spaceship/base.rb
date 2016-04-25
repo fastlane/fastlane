@@ -3,7 +3,7 @@ module Spaceship
   # Spaceship::Base is the superclass for models in Apple Developer Portal.
   # It's mainly responsible for mapping responses to objects.
   #
-  # A class-level attribute `client` is used to maintain the which spaceship we
+  # A class-level attribute `client` is used to maintain the spaceship which we
   # are using to talk to ADP.
   #
   # Example of creating a new ADP model:

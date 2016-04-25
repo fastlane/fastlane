@@ -133,11 +133,11 @@ describe Spaceship::Application do
           count += 1
           expect(current.class).to eq(Spaceship::Tunes::Build)
         end
-        expect(count).to eq(6)
+        expect(count).to eq(8)
       end
 
       it "returns a standard array" do
-        expect(app.builds.count).to eq(6)
+        expect(app.builds.count).to eq(8)
         expect(app.builds.first.class).to eq(Spaceship::Tunes::Build)
       end
     end
