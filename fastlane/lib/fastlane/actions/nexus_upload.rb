@@ -33,7 +33,7 @@ module Fastlane
         options << "-F a=#{params[:repo_project_name].shellescape}"
         options << "-F v=#{params[:repo_project_version].shellescape}"
 
-        if params.fetch(:repo_classifier, ask: false)
+        if params[:repo_classifier]
           options << "-F c=#{params[:repo_classifier].shellescape}"
         end
 
