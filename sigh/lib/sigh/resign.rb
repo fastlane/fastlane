@@ -59,7 +59,7 @@ module Sigh
       ipa = args.first || find_ipa || ask('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
       provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
-      entitlements = options.entitlements || find_entitlements
+      entitlements = options.entitlements || nil
       version = options.version_number || nil
       display_name = options.display_name || nil
 
@@ -80,10 +80,6 @@ module Sigh
 
     def find_provisioning_profile
       Dir[File.join(Dir.pwd, '*.mobileprovision')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
-    end
-
-    def find_entitlements
-      Dir[File.join(Dir.pwd, '*.entitlements')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
     def find_signing_identity(signing_identity)
