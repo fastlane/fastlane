@@ -329,7 +329,7 @@ When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the s
 
 In the test output, the Swift `snapshot` function will print out something like this
 
-  snapshot: [some random text here]
+> snapshot: [some random text here]
 
 `snapshot` finds all these entries using a regex. The number of `snapshot` outputs in the terminal and the number of `snapshot` events in the plist file should be the same. Knowing that, `snapshot` automatically matches these 2 lists to identify the name of each of these screenshots. They are then copied over to the output directory and separated by language and device.
 
