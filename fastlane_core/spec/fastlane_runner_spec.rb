@@ -14,6 +14,10 @@ describe Commander::Runner do
       end
     end
 
+    before(:each) do
+      allow(FastlaneCore::CrashReporting).to receive(:enabled?).and_return(false)
+    end
+
     it 'should reraise errors that are not of special interest' do
       expect do
         Commander::Runner.new.handle_unknown_error!(StandardError.new('my message'))
