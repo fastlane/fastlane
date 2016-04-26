@@ -92,11 +92,11 @@ module FastlaneCore
       when data_type == Array
         return value.split(',') if value.kind_of?(String)
       when data_type == Integer
-        return value.to_i
+        return value.to_i unless value.nil?
       when data_type == Float
-        return value.to_f
+        return value.to_f unless value.nil?
       else
-        # Special treatment if the user specififed true, false or YES, NO
+        # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
           return true
