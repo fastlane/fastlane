@@ -135,6 +135,16 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value
                                      end),
+        FastlaneCore::ConfigItem.new(key: :short_team_id,
+                                     short_option: "-s",
+                                     env_name: "DELIVER_SHORT_TEAM_ID",
+                                     description: "The short ID of your team if you're in multiple teams, different from itc_team_id",
+                                     optional: true,
+                                     is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_SHORT_TEAM_ID"] = value.to_s
+                                     end),
 
         # App Metadata
         # Non Localised

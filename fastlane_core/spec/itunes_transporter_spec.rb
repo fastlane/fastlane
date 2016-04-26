@@ -10,7 +10,6 @@ describe FastlaneCore do
         '-u "fabric.devtools@gmail.com"',
         "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
         "-f '/tmp/my.app.id.itmsp'",
-        nil, # This represents the environment variable which is not set
         "-t 'Signiant'",
         "-k 100000"
       ].join(' ')
@@ -134,6 +133,50 @@ describe FastlaneCore do
         it 'generates a call to java directly' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
           expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
+        end
+      end
+    end
+
+    describe "itc_provider is set" do
+      let(:team_id) { "ABCDE" }
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, team_id)
+          upload_command = "#{shell_upload_command} -itc_provider #{team_id}"
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, team_id)
+          download_command = "#{shell_download_command} -itc_provider #{team_id}"
+          expect(transporter.download('my.app.id', '/tmp')).to eq(download_command)
+        end
+      end
+    end
+
+    describe "itc_provider is set in ENV" do
+      let(:team_id) { "ABCDE" }
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script' do
+          with_env_values('FASTLANE_SHORT_TEAM_ID' => team_id) do
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true)
+            upload_command = "#{shell_upload_command} -itc_provider #{team_id}"
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(upload_command)
+          end
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell script' do
+          with_env_values('FASTLANE_SHORT_TEAM_ID' => team_id) do
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true)
+            download_command = "#{shell_download_command} -itc_provider #{team_id}"
+            expect(transporter.download('my.app.id', '/tmp')).to eq(download_command)
+          end
         end
       end
     end
