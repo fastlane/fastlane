@@ -292,7 +292,7 @@ xcode_select "/Applications/Xcode6.1.app"
 If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake make` before building your app.
 
 ```ruby
-xcake make
+xcake
 ```
 
 ### [resign](https://github.com/fastlane/fastlane/tree/master/sigh#resign)
