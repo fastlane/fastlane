@@ -35,7 +35,7 @@ describe FastlaneCore do
       end
 
       describe "config conflicts" do
-        it "raises an error if a a key was used twice" do
+        it "raises an error if a key was used twice" do
           expect do
             FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
               key: :cert_name,
@@ -46,7 +46,7 @@ describe FastlaneCore do
           end.to raise_error "Multiple entries for configuration key 'cert_name' found!"
         end
 
-        it "raises an error if a a short_option was used twice" do
+        it "raises an error if a short_option was used twice" do
           conflicting_options = [
             FastlaneCore::ConfigItem.new(key: :foo,
                                          short_option: "-f",
@@ -184,6 +184,35 @@ describe FastlaneCore do
           value = config_item.auto_convert_value('9.91')
 
           expect(value).to eq(9.91)
+        end
+
+        it "auto converts nil to nil when type is not specified" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo')
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
+        end
+
+        it "auto converts nil to nil when type is Integer" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Integer)
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
+        end
+
+        it "auto converts nil to nil when type is Float" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Float)
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
         end
 
         it "auto converts booleans as strings to booleans" do
@@ -341,18 +370,28 @@ describe FastlaneCore do
                                default_value: ".",
                                 verify_block: proc do |value|
                                   UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
+                                end),
+            FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
+                                short_option: "-k",
+                                    env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
+                                 description: "Interval in seconds to wait for iTunes Connect processing",
+                               default_value: 30,
+                                        type: Integer,
+                                verify_block: proc do |value|
+                                  UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
                                 end)
           ]
           @values = {
             cert_name: "asdf",
-            output: ".."
+            output: "..",
+            wait_processing_interval: 10
           }
           @config = FastlaneCore::Configuration.create(@options, @values)
         end
 
         describe "#keys" do
           it "returns all available keys" do
-            expect(@config.all_keys).to eq([:cert_name, :output])
+            expect(@config.all_keys).to eq([:cert_name, :output, :wait_processing_interval])
           end
         end
 
@@ -361,6 +400,7 @@ describe FastlaneCore do
             values = @config.values
             expect(values[:output]).to eq('..')
             expect(values[:cert_name]).to eq('asdf')
+            expect(values[:wait_processing_interval]).to eq(10)
           end
 
           it "returns the default values" do
@@ -368,6 +408,7 @@ describe FastlaneCore do
             values = @config.values
             expect(values[:cert_name]).to eq('production_default')
             expect(values[:output]).to eq('.')
+            expect(values[:wait_processing_interval]).to eq(30)
           end
         end
 
@@ -381,7 +422,7 @@ describe FastlaneCore do
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output"
+            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output, wait_processing_interval"
           end
 
           it "returns the value for the given key if given" do
@@ -402,13 +443,16 @@ describe FastlaneCore do
           it "throws an error if the key doesn't exist" do
             expect do
               @config.set(:non_existing, "value")
-            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output")
+            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output, wait_processing_interval")
           end
 
           it "throws an error if it's invalid" do
             expect do
               @config.set(:output, 132)
             end.to raise_error("'output' value must be a String! Found Fixnum instead.")
+            expect do
+              @config.set(:wait_processing_interval, -1)
+            end.to raise_error("Please enter a valid positive number of seconds")
           end
 
           it "allows valid updates" do
