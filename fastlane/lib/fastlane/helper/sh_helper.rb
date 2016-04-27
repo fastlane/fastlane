@@ -6,17 +6,21 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [boolean] should fastlane print out the executed command
     def self.sh(command, log: true)
-      sh_no_action(command, log: log)
+      sh_control_output(command, print_command: log, print_command_output: log)
     end
 
     def self.sh_no_action(command, log: true)
+      sh_control_output(command, print_command: log, print_command_output: log)
+    end
+
+    def self.sh_control_output(command, print_command: true, print_command_output: true)
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
       command = command.join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
-      UI.command(command) if log
+      UI.command(command) if print_command
 
       result = ''
       if Helper.test?
@@ -26,7 +30,7 @@ module Fastlane
         IO.popen(command, err: [:child, :out]) do |io|
           io.sync = true
           io.each do |line|
-            UI.command_output(line.strip) if log
+            UI.command_output(line.strip) if print_command_output
             result << line
           end
           io.close
@@ -35,7 +39,9 @@ module Fastlane
 
         if exit_status != 0
           # this will also append the output to the exception
-          if log
+          if print_command
+            message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
+          elsif print_command && print_command_output
             message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
             message += "\n#{result}"
           else
