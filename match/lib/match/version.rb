@@ -1,4 +1,4 @@
 module Match
-  VERSION = "0.4.0"
+  VERSION = "0.5.0"
   DESCRIPTION = "Easily sync your certificates and profiles across your team using git"
 end
