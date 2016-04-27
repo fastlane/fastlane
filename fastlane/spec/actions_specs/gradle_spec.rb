@@ -1,6 +1,58 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "gradle" do
+      describe "output controls" do
+        let(:expected_command) { "#{File.expand_path('README.md')} tasks -p ." }
+
+        it "prints the command and the command's output by default" do
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true).and_call_original
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(
+              task: 'tasks',
+              gradle_path: './fastlane/README.md'
+            )
+          end").runner.execute(:build)
+        end
+
+        it "suppresses the command text and prints the command's output" do
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true).and_call_original
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(
+              task: 'tasks',
+              gradle_path: './fastlane/README.md',
+              print_command: false
+            )
+          end").runner.execute(:build)
+        end
+
+        it "prints the command text and suppresses the command's output" do
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: false).and_call_original
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(
+              task: 'tasks',
+              gradle_path: './fastlane/README.md',
+              print_command_output: false
+            )
+          end").runner.execute(:build)
+        end
+
+        it "suppresses the command text and suppresses the command's output" do
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: false).and_call_original
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(
+              task: 'tasks',
+              gradle_path: './fastlane/README.md',
+              print_command: false,
+              print_command_output: false
+            )
+          end").runner.execute(:build)
+        end
+      end
+
       it "generates a valid command" do
         result = Fastlane::FastFile.new.parse("lane :build do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, gradle_path: './fastlane/README.md')
