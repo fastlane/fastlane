@@ -1984,6 +1984,18 @@ adb_devices.each  do | device |
 end
 ```
 
+### instrumented_tests
+
+Creates and boots avd device before running gradle command.
+
+```ruby
+instrumented_tests(
+    avd_name: "Nexus_10",
+    target_id: "2",
+    task: "cleanTest createMockDebugCoverageReport --continue",
+)
+```
+
 ### twitter
 
 Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
