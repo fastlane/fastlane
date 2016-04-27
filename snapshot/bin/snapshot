@@ -53,6 +53,7 @@ class SnapshotApplication
       c.description = "Updates your SnapshotHelper.swift to the latest version"
 
       c.action do |args, options|
+        load_config(options)
         require 'snapshot/update'
         Snapshot::Update.new.update
       end
