@@ -47,6 +47,11 @@ task :features do
   end
 end
 
+desc "Run bundle on TeamCity"
+task :tc_bundle do
+  puts "Running the Bundle on TeamCity!"
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
