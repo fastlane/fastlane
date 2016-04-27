@@ -132,12 +132,12 @@ module Fastlane
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :print_command,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND',
-                                       description: 'Control whether the generated Gradle command is printed as output before running it',
+                                       description: 'Control whether the generated Gradle command is printed as output before running it (true/false)',
                                        is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :print_command_output,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND_OUTPUT',
-                                       description: 'Control whether the output produced by given Gradle command is printed while running',
+                                       description: 'Control whether the output produced by given Gradle command is printed while running (true/false)',
                                        is_string: false,
                                        default_value: true)
         ]

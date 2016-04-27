@@ -38,15 +38,12 @@ module Fastlane
         end
 
         if exit_status != 0
-          # this will also append the output to the exception
-          if print_command
-            message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
-          elsif print_command && print_command_output
-            message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
-            message += "\n#{result}"
-          else
-            message = "Shell command exited with exit status #{exit_status} instead of 0."
-          end
+          message = if print_command
+                      "Exit status of command '#{command}' was #{exit_status} instead of 0."
+                    else
+                      "Shell command exited with exit status #{exit_status} instead of 0."
+                    end
+          message += "\n#{result}" if print_command_output
           UI.user_error!(message)
         end
       end
