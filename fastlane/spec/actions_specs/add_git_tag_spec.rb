@@ -69,6 +69,20 @@ describe Fastlane do
 
         expect(result).to eq("git tag -am \'#{tag} (fastlane)\' \'#{tag}\'")
       end
+
+      it "allows you to specify your own message" do
+        tag = '2.0.0'
+        message = "Test Message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am \'#{message}\' \'#{tag}\'")
+      end
     end
   end
 end
