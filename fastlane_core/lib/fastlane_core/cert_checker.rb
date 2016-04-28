@@ -73,7 +73,7 @@ module FastlaneCore
         keychains = Helper.backticks(command, print: $verbose).split("\n")
         unless keychains.empty?
           # Select first keychain name from returned keychains list
-          return keychains[0].strip.tr('"', '').split(File::SEPARATOR)[-1]
+          return keychains[0].strip.tr('"', '')
         end
       end
       return ""
