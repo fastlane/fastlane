@@ -16,6 +16,13 @@ module Scan
 
       attachments = []
 
+      if Scan.config[:slack_message]
+        attachments << {
+          text: Scan.config[:slack_message].to_s,
+          color: "good"
+        }
+      end
+
       attachments << {
         text: "Build Errors: #{results[:build_errors] || 0}",
         color: results[:build_errors].to_i > 0 ? "danger" : "good",
