@@ -11,10 +11,15 @@ require 'frameit/template_finder'
 require 'frameit/strings_parser'
 require 'frameit/mac_editor'
 require 'frameit/dependency_checker'
+require 'frameit/options'
 
 require 'fastlane_core'
 
 module Frameit
+  class << self
+    attr_accessor :config
+  end
+
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
 end

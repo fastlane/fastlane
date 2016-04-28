@@ -19,10 +19,17 @@ module Frameit
             'width' => 530
           }
         when size::IOS_40
-          return {
-            'offset' => "+54+197",
-            'width' => 544
-          }
+          if Frameit.config[:use_legacy_iphone5s]
+            return {
+              'offset' => "+54+197",
+              'width' => 544
+            }
+          else
+            return {
+             'offset' => "+48+178",
+             'width' => 485
+            }
+          end
         when size::IOS_35
           return {
             'offset' => "+59+260",
@@ -52,10 +59,17 @@ module Frameit
             'width' => 946
           }
         when size::IOS_40
-          return {
-            'offset' => "+201+48",
-            'width' => 970
-          }
+          if Frameit.config[:use_legacy_iphone5s]
+            return {
+              'offset' => "+201+48",
+              'width' => 970
+            }
+          else
+            return {
+              'offset' => "+177+41",
+              'width' => 859
+            }
+          end
         when size::IOS_35
           return {
             'offset' => "+258+52",
