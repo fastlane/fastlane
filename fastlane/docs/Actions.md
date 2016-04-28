@@ -284,7 +284,8 @@ xcode_install(version: "7.1")
 Use this command if you are supporting multiple versions of Xcode
 
 ```ruby
-xcode_select "/Applications/Xcode6.1.app"
+xcode_select path: "/Applications/Xcode6.1.app"
+xcode_select version: "~> 7.2.0"
 ```
 
 ### [Xcake](https://github.com/jcampbell05/xcake/)

@@ -13,28 +13,112 @@ describe Fastlane do
         ENV.delete "DEVELOPER_DIR"
       end
 
-      it "throws an exception if no params are passed" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            xcode_select
-          end").runner.execute(:test)
-        end.to raise_error("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")")
+      context "when no params are passed" do
+        it "raises an error" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              xcode_select
+            end").runner.execute(:test)
+          end.to raise_error("path or version must be specified")
+        end
       end
 
-      it "throws an exception if the Xcode path is not a valid directory" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            xcode_select \"#{invalid_path}\"
-          end").runner.execute(:test)
-        end.to raise_error("Path '/path/to/nonexistent/dir' doesn't exist")
+      context "when conflicting params are passed" do
+        it "raises an error" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              xcode_select path: '/valid/path/to/xcode', version: '= 6.0'
+            end").runner.execute(:test)
+          end.to raise_error("You cannot specify 'path' and 'version' options at the same time")
+        end
       end
 
-      it "sets the DEVELOPER_DIR environment variable" do
-        Fastlane::FastFile.new.parse("lane :test do
-          xcode_select \"#{valid_path}\"
-        end").runner.execute(:test)
+      context "when a path is specified" do
 
-        expect(ENV["DEVELOPER_DIR"]).to eq(valid_path + "/Contents/Developer")
+        it "raises an error if the Xcode path is not a valid directory" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              xcode_select path: '#{invalid_path}'
+            end").runner.execute(:test)
+          end.to raise_error("Path '/path/to/nonexistent/dir' does not exist")
+        end
+
+        it "sets the DEVELOPER_DIR environment variable" do
+          Fastlane::FastFile.new.parse("lane :test do
+            xcode_select path: '#{valid_path}'
+          end").runner.execute(:test)
+
+          expect(ENV["DEVELOPER_DIR"]).to eq(valid_path + "/Contents/Developer")
+        end
+
+      end
+
+      context "when a version requirement is specified" do
+
+        let(:v7_2) {
+          double("XcodeInstall::Xcode", :version => "7.2", :path => "/Test/Xcode7.2")
+        }
+
+        let(:v7_2_1) {
+          double("XcodeInstall::Xcode", :version => "7.2.1", :path => "/Test/Xcode7.2.1")
+        }
+
+        let(:v7_3) {
+          double("XcodeInstall::Xcode", :version => "7.3", :path => "/Test/Xcode7.3")
+        }
+
+        context "with an invalid requirement" do
+
+          it "raises an error" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                xcode_select version: '= aaaa'
+              end").runner.execute(:test)
+            end.to raise_error("The requirement '= aaaa' is not a valid RubyGems style requirement")
+          end
+
+        end
+
+        context "with a valid requirement" do
+
+          before {
+            require "xcode/install"
+            installer = double("XcodeInstall::Installer")
+            allow(installer).to receive(:installed_versions).and_return([v7_2, v7_2_1, v7_3])
+            allow(XcodeInstall::Installer).to receive(:new).and_return(installer)
+          }
+
+          context "with a specific requirement" do
+            it "selects the correct version of xcode" do
+              Fastlane::FastFile.new.parse("lane :test do
+                xcode_select version: '= 7.2'
+              end").runner.execute(:test)
+
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v7_2.path, "Contents/Developer"))
+            end
+          end
+
+          context "with a loose requirement" do
+            it "selects the correct version of xcode" do
+              Fastlane::FastFile.new.parse("lane :test do
+                xcode_select version: '~> 7.2.0'
+              end").runner.execute(:test)
+
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v7_2_1.path, "Contents/Developer"))
+            end
+          end
+
+          context "with an unsatisfiable requirement" do
+            it "raises an error" do
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                  xcode_select version: '= 7.1'
+                end").runner.execute(:test)
+              end.to raise_error("Cannot find an installed Xcode satisfying '= 7.1'")
+            end
+          end
+
+        end
       end
     end
   end

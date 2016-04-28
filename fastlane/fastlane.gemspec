@@ -65,4 +65,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'appium_lib', '~> 4.1.0'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
+  spec.add_development_dependency 'xcode-install'
 end

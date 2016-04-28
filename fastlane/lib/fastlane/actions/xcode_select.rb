@@ -18,15 +18,36 @@ module Fastlane
     #   environment variable into the full Developer content path.
     #
     class XcodeSelectAction < Action
+
+      def self.find_xcode(req)
+        req = Gem::Requirement.new(req.to_s)
+
+        Gem::Specification.find_by_name('xcode-install')
+        require 'xcode/install'
+
+        installer = XcodeInstall::Installer.new
+        installed = installer.installed_versions.reverse
+        installed.find do |xcode|
+          req.satisfied_by? Gem::Version.new(xcode.version)
+        end
+      rescue Gem::LoadError
+        UI.error("The 'xcode-install' gem is needed to select Xcode by version number.")
+        Actions.verify_gem!('xcode-install') # This is awkward and destined to fail but is used to get the install help messages
+      end
+
       def self.run(params)
-        params = nil unless params.kind_of? Array
-        xcode_path = (params || []).first
+        xcode_path = case
+        when params[:path]
+          params[:path]
+        when version = params[:version]
+          xcode = find_xcode(version)
+          UI.user_error!("Cannot find an installed Xcode satisfying '#{version}'") if xcode.nil?
 
-        # Verify that a param was passed in
-        UI.user_error!("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")") unless xcode_path.to_s.length > 0
-
-        # Verify that a path to a directory was passed in
-        UI.user_error!("Path '#{xcode_path}' doesn't exist") unless Dir.exist?(xcode_path)
+          UI.verbose("Found Xcode version #{xcode.version} at #{xcode.path} satisfying requirement #{version}")
+          xcode.path
+        else
+          UI.user_error!("path or version must be specified")
+        end
 
         UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
@@ -34,16 +55,54 @@ module Fastlane
       end
 
       def self.description
-        "Change the xcode-path to use. Useful for beta versions of Xcode"
+        "Select which Xcode to use, either by path or version"
       end
 
       def self.author
         "dtrenz"
       end
 
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: "DEVELOPER_DIR",
+                                       description: "The path of the Xcode to select",
+                                       optional: true,
+                                       conflicting_options: [:version],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You cannot specify 'path' and '#{value.key}' options at the same time")
+                                       end,
+                                       verify_block: Verify.method(:path_exists)
+                                      ),
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       env_name: "FL_XCODE_VERSION",
+                                       description: "The version of Xcode to select specified as a RubyGems style requirement string",
+                                       optional: true,
+                                       conflicting_options: [:path],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You cannot specify 'version' and '#{value.key}' options at the same time")
+                                       end,
+                                       verify_block: Verify.method(:requirement)
+                                      )
+        ]
+      end
+
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      module Verify
+        def self.requirement(req)
+          Gem::Requirement.new(req.to_s)
+        rescue Gem::Requirement::BadRequirementError
+          UI.user_error!("The requirement '#{req}' is not a valid RubyGems style requirement")
+        end
+
+        def self.path_exists(path)
+          UI.user_error!("Path '#{path}' does not exist") unless Dir.exist?(path)
+        end
+      end
+
     end
   end
 end
