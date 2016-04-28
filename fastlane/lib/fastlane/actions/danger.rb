@@ -7,6 +7,9 @@ module Fastlane
 
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
         cmd << ['danger']
+        cmd << ['--verbose'] if params[:verbose]
+
+        ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
 
         Actions.sh(cmd.join(' '))
       end
@@ -25,7 +28,17 @@ module Fastlane
                                        env_name: "FL_DANGER_USE_BUNDLE_EXEC",
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_DANGER_VERBOSE",
+                                       description: "Show more debugging information",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                       env_name: "FL_DANGER_GITHUB_API_TOKEN",
+                                       description: "GitHub API token for danger",
+                                       is_string: true,
+                                       optional: true)
         ]
       end
 
