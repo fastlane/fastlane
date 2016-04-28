@@ -86,7 +86,15 @@ function checkStatus {
 }
 
 usage() {
-    echo "Usage: $(basename $0) source identity -p|--provisioning provisioning [-e|--entitlements entitlements] [-k|--keychain keychain] [-d|--display-name displayName] [-n|--version-number version] [-b|--bundle-id bundleId] outputIpa" >&2
+    echo -e "Usage: $(basename $0) source identity -p|--provisioning provisioning" >&2
+    echo -e "\t\t[-e|--entitlements entitlements]" >&2
+    echo -e "\t\t[-k|--keychain keychain]" >&2
+    echo -e "\t\t[-d|--display-name displayName]" >&2
+    echo -e "\t\t[-n|--version-number version]" >&2
+    echo -e "\t\t[--short-version shortVersion]" >&2
+    echo -e "\t\t[--bundle-version bundleVersion]" >&2
+    echo -e "\t\t[-b|--bundle-id bundleId]" >&2
+    echo -e "\t\toutputIpa" >&2
     echo "Usage: $(basename $0) -h|--help" >&2
     echo "Options:" >&2
     echo -e "\t-p, --provisioning provisioning\t\tProvisioning profile option, may be provided multiple times." >&2
@@ -108,6 +116,12 @@ usage() {
     echo -e "\t-n, --version-number version\t\tSpecify new version number." >&2
     echo -e "\t\t\t\t\t\t\tWill set CFBundleShortVersionString and CFBundleVersion values in Info.plist." >&2
     echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
+    echo -e "\t    --short-version shortVersion\tSpecify new short version string (CFBundleShortVersionString)." >&2
+    echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
+    echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
+    echo -e "\t    --bundle-version bundleVersion\tSpecify new bundle version (CFBundleVersion) number." >&2
+    echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
+    echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
     echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
     echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
@@ -126,6 +140,8 @@ BUNDLE_IDENTIFIER=""
 DISPLAY_NAME=""
 KEYCHAIN=""
 VERSION_NUMBER=""
+SHORT_VERSION=
+BUNDLE_VERSION=
 RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
@@ -163,6 +179,14 @@ while [ "$1" != "" ]; do
             shift
             VERSION_NUMBER="$1"
             ;;
+        --short-version )
+            shift
+            SHORT_VERSION="$1"
+            ;;
+        --bundle-version )
+            shift
+            BUNDLE_VERSION="$1"
+            ;;
         -v | --verbose )
             VERBOSE="--verbose"
             ;;
@@ -194,8 +218,13 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "${ENTITLEMENTS}" ]] && log "Specified signing entitlements: '$ENTITLEMENTS'"
 [[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
 [[ -n "${KEYCHAIN}" ]] && log "Specified keychain to use: '$KEYCHAIN'"
-[[ -n "${VERSION_NUMBER}" ]] && log "Specified short version to use: '$VERSION_NUMBER'"
+[[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
+[[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
+[[ -n "${BUNDLE_VERSION}" ]] && log "Specified bundle version to use: '$BUNDLE_VERSION'"
 [[ -n "${NEW_FILE}" ]] && log "Output file name: '$NEW_FILE'"
+
+# Check that version number option is not clashing with short or bundle version options
+[[ -n "$VERSION_NUMBER" && (-n "$SHORT_VERSION" || -n "$BUNDLE_VERSION") ]] && error "versionNumber option cannot be used in combination with shortVersion or bundleVersion options"
 
 # Check output file name
 if [ -z "$NEW_FILE" ];
@@ -451,6 +480,24 @@ function resign {
             `PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"`
             `PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"`
         fi
+    fi
+
+    # Update short version string in the Info.plist if provided
+    if [[ -n "$SHORT_VERSION" ]];
+    then
+        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Info.plist")"
+        # Even if the old value is same - just update, less code, less debugging
+        log "Updating the short version string (CFBundleShortVersionString) from '$CURRENT_VALUE' to '$SHORT_VERSION'"
+        PlistBuddy -c "Set :CFBundleShortVersionString $SHORT_VERSION" "$APP_PATH/Info.plist"
+    fi
+
+    # Update bundle version in the Info.plist if provided
+    if [[ -n "$BUNDLE_VERSION" ]];
+    then
+        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")"
+        # Even if the old value is same - just update, less code, less debugging
+        log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
+        PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
     fi
 
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
