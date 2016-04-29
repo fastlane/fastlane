@@ -37,18 +37,18 @@ module Fastlane
 
       def self.run(params)
         xcode_path =
-        case
-        when params[:path]
-          params[:path]
-        when version = params[:version]
-          xcode = find_xcode(version)
-          UI.user_error!("Cannot find an installed Xcode satisfying '#{version}'") if xcode.nil?
+          case
+          when params[:path]
+            params[:path]
+          when version = params[:version]
+            xcode = find_xcode(version)
+            UI.user_error!("Cannot find an installed Xcode satisfying '#{version}'") if xcode.nil?
 
-          UI.verbose("Found Xcode version #{xcode.version} at #{xcode.path} satisfying requirement #{version}")
-          xcode.path
-        else
-          UI.user_error!("path or version must be specified")
-        end
+            UI.verbose("Found Xcode version #{xcode.version} at #{xcode.path} satisfying requirement #{version}")
+            xcode.path
+          else
+            UI.user_error!("path or version must be specified")
+          end
 
         UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
