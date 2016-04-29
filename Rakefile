@@ -47,6 +47,11 @@ task :features do
   end
 end
 
+desc 'Prompt build on TeamCity'
+task :tc_bundle do
+  puts 'Bundle!'
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
