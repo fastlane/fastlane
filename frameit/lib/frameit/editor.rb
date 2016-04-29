@@ -142,6 +142,12 @@ module Frameit
     end
 
     def put_device_into_background(background)
+      show_complete_frame = fetch_config['show_complete_frame']
+      if show_complete_frame
+        max_height = background.height - top_space_above_device
+        image.resize "x#{max_height}>"
+      end
+
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
