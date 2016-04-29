@@ -58,6 +58,10 @@ lane :release do |options|
     UI.user_error!("Version number #{version} was already deployed")
   end
 
+  # Actual release
+  #
+  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
+
   # Git verification
   #
   ensure_git_status_clean
@@ -93,10 +97,6 @@ lane :release do |options|
     message = [title, description, release_url].join("\n\n")
     add_fastlane_git_tag(tag: "#{tool_name}/#{version}", message: message)
   end
-
-  # Actual release
-  #
-  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
   # After publishing
   #
