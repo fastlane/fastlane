@@ -19,8 +19,12 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
+      collector = FastlaneCore::ToolCollector.new
+
       begin
+        collector.did_launch_action(@program[:name])
         run_active_command
+        collector.did_finish
       rescue InvalidCommandError => e
         abort "#{e}. Use --help for more information"
       rescue Interrupt => ex
@@ -36,8 +40,10 @@ module Commander
         OptionParser::MissingArgument => e
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+        collector.did_raise_error(@program[:name])
         display_user_error!(e, e.message)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        collector.did_raise_error(@program[:name])
         handle_unknown_error!(e)
       end
     end
