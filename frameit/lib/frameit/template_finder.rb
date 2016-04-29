@@ -11,18 +11,23 @@ module Frameit
       ]
       joiner = "_"
 
-      if screenshot.device_name.include?('iPad') || screenshot.device_name.include?('6s')
+      if screenshot.device_name.include?('iPad') || screenshot.device_name.include?('6s') || screenshot.device_name.include?('SE')
+        # Transform the orientation_name to the correct form with the exception of the iPhone SE vertical one.
+        orientation_name_vertical = screenshot.device_name.include?('SE') ? nil : "vertical"
         parts = [
           screenshot.device_name,
           (screenshot.color == 'SpaceGray' ? "Space-Gray" : "Silver"),
-          (screenshot.orientation_name == "Horz" ? "horizontal" : "vertical")
-        ]
+          screenshot.orientation_name == "Horz" ? "horizontal" : orientation_name_vertical
+        ].compact
         joiner = "-"
       end
 
+      # Strict template finder according to the device name
+      strict_finder = screenshot.device_name.include?('SE') ? "" : "*"
+
       templates_path = [ENV['HOME'], FrameConverter::FRAME_PATH].join('/')
-      templates = Dir["../**/#{parts.join(joiner)}*.{png,jpg}"] # local directory
-      templates += Dir["#{templates_path}/**/#{parts.join(joiner)}*.{png,jpg}"] # ~/.frameit folder
+      templates = Dir["../**/#{parts.join(joiner)}#{strict_finder}.{png,jpg}"] # local directory
+      templates += Dir["#{templates_path}/**/#{parts.join(joiner)}#{strict_finder}.{png,jpg}"] # ~/.frameit folder
 
       if templates.count == 0
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35
