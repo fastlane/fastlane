@@ -27,7 +27,7 @@ module Fastlane
 
         installer = XcodeInstall::Installer.new
         installed = installer.installed_versions.reverse
-        installed.find do |xcode|
+        installed.detect do |xcode|
           req.satisfied_by? Gem::Version.new(xcode.version)
         end
       rescue Gem::LoadError
@@ -36,7 +36,8 @@ module Fastlane
       end
 
       def self.run(params)
-        xcode_path = case
+        xcode_path =
+        case
         when params[:path]
           params[:path]
         when version = params[:version]

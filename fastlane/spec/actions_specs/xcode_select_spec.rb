@@ -34,7 +34,6 @@ describe Fastlane do
       end
 
       context "when a path is specified" do
-
         it "raises an error if the Xcode path is not a valid directory" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
@@ -50,25 +49,22 @@ describe Fastlane do
 
           expect(ENV["DEVELOPER_DIR"]).to eq(valid_path + "/Contents/Developer")
         end
-
       end
 
       context "when a version requirement is specified" do
+        let(:v7_2) do
+          double("XcodeInstall::Xcode", version: "7.2", path: "/Test/Xcode7.2")
+        end
 
-        let(:v7_2) {
-          double("XcodeInstall::Xcode", :version => "7.2", :path => "/Test/Xcode7.2")
-        }
+        let(:v7_2_1) do
+          double("XcodeInstall::Xcode", version: "7.2.1", path: "/Test/Xcode7.2.1")
+        end
 
-        let(:v7_2_1) {
-          double("XcodeInstall::Xcode", :version => "7.2.1", :path => "/Test/Xcode7.2.1")
-        }
-
-        let(:v7_3) {
-          double("XcodeInstall::Xcode", :version => "7.3", :path => "/Test/Xcode7.3")
-        }
+        let(:v7_3) do
+          double("XcodeInstall::Xcode", version: "7.3", path: "/Test/Xcode7.3")
+        end
 
         context "with an invalid requirement" do
-
           it "raises an error" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
@@ -76,17 +72,15 @@ describe Fastlane do
               end").runner.execute(:test)
             end.to raise_error("The requirement '= aaaa' is not a valid RubyGems style requirement")
           end
-
         end
 
         context "with a valid requirement" do
-
-          before {
+          before do
             require "xcode/install"
             installer = double("XcodeInstall::Installer")
             allow(installer).to receive(:installed_versions).and_return([v7_2, v7_2_1, v7_3])
             allow(XcodeInstall::Installer).to receive(:new).and_return(installer)
-          }
+          end
 
           context "with a specific requirement" do
             it "selects the correct version of xcode" do
@@ -117,7 +111,6 @@ describe Fastlane do
               end.to raise_error("Cannot find an installed Xcode satisfying '= 7.1'")
             end
           end
-
         end
       end
     end
