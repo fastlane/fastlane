@@ -2504,3 +2504,14 @@ lane :danger do
   danger
 end
 ```
+
+### write_properties
+
+Write to a Java properties file
+
+```ruby
+write_properties(
+  path: "build.properties",
+  properties: { BUILD: "10", VERSION: "1.0" }
+)
+```
