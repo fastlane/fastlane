@@ -73,7 +73,7 @@ module Spaceship
 
         # since buildsInProcessing appears empty, fallback to also including processing state from @builds
         @builds.each do |build|
-          @processing_builds << build if build.processing == true && build.valid == true
+          @processing_builds << build if build.processing == true && build.valid == true && build.processing_state != 'processingFailed'
         end
       end
 
