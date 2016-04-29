@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-table', '~> 1.4.5' # options summary
   spec.add_dependency 'sentry-raven', '~> 0.15' # Optional crash reporting
 
-  spec.add_dependency 'credentials_manager', '>= 0.11.0', '< 1.0.0' # fastlane password manager
+  spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # fastlane password manager
 
   # Development only
   spec.add_development_dependency 'bundler'
