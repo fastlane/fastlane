@@ -97,8 +97,9 @@ module Spaceship
           # |       build.valid = | false             | true              | false           | true               | true    |
           # | .processing_state = | "processing"      | "processing"      | "invalidBinary" | "processingFailed" | nil     |
           # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
-          @processing_builds << build if build.processing_state == 'processing' ||
-            (build.processing && build.processing_state != 'invalidBinary' && build.processing_state != 'processingFailed')
+          if build.processing_state == 'processing' || (build.processing && build.processing_state != 'invalidBinary' && build.processing_state != 'processingFailed')
+            @processing_builds << build
+          end
         end
       end
 
@@ -123,9 +124,9 @@ module Spaceship
 
             # also update the builds
             train['builds'].delete_if do |b|
-              next true if b[testing_key].nil?
-
-              if build && b["buildVersion"] == build.build_version
+              if b[testing_key].nil?
+                true
+              elsif build && b["buildVersion"] == build.build_version
                 b[testing_key]['value'] = new_value
                 false
               elsif b[testing_key]['value'] == true
