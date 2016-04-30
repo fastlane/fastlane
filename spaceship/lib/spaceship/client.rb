@@ -394,7 +394,8 @@ module Spaceship
     end
 
     def log_response(method, url, response)
-      logger.debug("<< #{method.upcase}: #{url}: #{response.body}")
+      body = response.body.is_a?(String) ? response.body.force_encoding('UTF-8') : response.body
+      logger.debug("<< #{method.upcase}: #{url}: #{body}")
     end
 
     # Actually sends the request to the remote server
