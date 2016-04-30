@@ -394,7 +394,7 @@ module Spaceship
     end
 
     def log_response(method, url, response)
-      body = response.body.is_a?(String) ? response.body.force_encoding('UTF-8') : response.body
+      body = response.body.kind_of?(String) ? response.body.force_encoding('UTF-8') : response.body
       logger.debug("<< #{method.upcase}: #{url}: #{body}")
     end
 

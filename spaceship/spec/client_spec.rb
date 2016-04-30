@@ -98,6 +98,12 @@ describe Spaceship::Client do
 
         expect(subject.req_home.body).to eq(default_body)
       end
+
+      describe "#log_response" do
+        it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
+          expect(true).to eq(false)
+        end
+      end
     end
   end
 end
