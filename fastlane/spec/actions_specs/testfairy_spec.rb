@@ -40,12 +40,25 @@ describe Fastlane do
         end.to raise_error
       end
 
-      it "works with valid parameters" do
+      it "works with valid required parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
               api_key: 'thisistest',
+            })
+          end").runner.execute(:test)
+        end.not_to raise_error
+      end
+
+      it "works with valid optional parameters" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            testfairy({
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              api_key: 'thisistest',
+              comment: 'Test Comment!',
+              testers_groups: ['group1', 'group2']
             })
           end").runner.execute(:test)
         end.not_to raise_error
