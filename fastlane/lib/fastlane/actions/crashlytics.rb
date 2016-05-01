@@ -41,12 +41,14 @@ module Fastlane
       end
 
       def self.available_options
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+
         [
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || (!platform || platform == :ios) && Dir["*.ipa"].last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -55,7 +57,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :apk_path,
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
-                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || platform == :android && Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
