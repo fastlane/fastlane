@@ -42,13 +42,15 @@ module Fastlane
 
       def self.available_options
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        ipa_path_default = (!platform || platform == :ios) && Dir["*.ipa"].last
+        apk_path_default = platform == :android && Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last
 
         [
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || (!platform || platform == :ios) && Dir["*.ipa"].last,
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -57,7 +59,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :apk_path,
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
-                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || platform == :android && Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last,
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || apk_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
