@@ -1,11 +1,6 @@
 update_fastlane
 skip_docs
 
-desc "Run bundle install and tests"
-lane :test do
-  validate_repo(tool_name: detect_tool)
-end
-
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
