@@ -2,6 +2,10 @@ require 'fastlane/actions/actions_helper'
 
 module Fastlane
   class Action
+    class << self
+      attr_accessor :runner
+    end
+
     def self.run(params)
     end
 
@@ -69,6 +73,11 @@ module Fastlane
     # instead of "AddGitAction", this will return "add_git" to print it to the user
     def self.action_name
       self.name.split('::').last.gsub('Action', '').fastlane_underscore
+    end
+
+    # Allows the user to call an action from an action
+    def self.method_missing(method_sym, *arguments, &_block)
+      self.runner.trigger_action_by_name(method_sym, *arguments)
     end
   end
 end
