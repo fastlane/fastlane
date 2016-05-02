@@ -23,26 +23,26 @@ module Fastlane
         ].join(' ')
 
         line = ""
-        scheme = params[:scheme] || ""
+        target = params[:target] || ""
         results = []
 
         if Helper.test?
           results = [
-            '"SampleProject.xcodeproj/../SchemeA/SchemeA-Info.plist"=4.3.2',
-            '"SampleProject.xcodeproj/../SchemeATests/Info.plist"=4.3.2',
-            '"SampleProject.xcodeproj/../SchemeB/SchemeB-Info.plist"=5.4.3',
-            '"SampleProject.xcodeproj/../SchemeBTests/Info.plist"=5.4.3'
+            '"SampleProject.xcodeproj/../TargetA/TargetA-Info.plist"=4.3.2',
+            '"SampleProject.xcodeproj/../TargetATests/Info.plist"=4.3.2',
+            '"SampleProject.xcodeproj/../TargetB/TargetB-Info.plist"=5.4.3',
+            '"SampleProject.xcodeproj/../TargetBTests/Info.plist"=5.4.3'
           ]
         else
           results = (Actions.sh command).split("\n")
         end
 
-        if scheme.empty?
+        if target.empty?
           line = results.first unless results.first.nil?
         else
-          scheme_string = "/#{scheme}/"
+          target_string = "/#{target}/"
           results.any? do |result|
-            if result.include? scheme_string
+            if result.include? target_string
               line = result
               break
             end
@@ -85,9 +85,9 @@ module Fastlane
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
                                UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) and !Helper.is_test?
                              end),
-          FastlaneCore::ConfigItem.new(key: :scheme,
-                             env_name: "FL_VERSION_NUMBER_SCHEME",
-                             description: "Specify a specific scheme if you have multiple per project, optional",
+          FastlaneCore::ConfigItem.new(key: :target,
+                             env_name: "FL_VERSION_NUMBER_TARGET",
+                             description: "Specify a specific target if you have multiple per project, optional",
                              optional: true)
         ]
       end
