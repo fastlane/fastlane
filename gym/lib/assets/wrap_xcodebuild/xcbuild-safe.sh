@@ -52,7 +52,7 @@ if command_exists rbenv; then
   # Unset environment variables that could break xcodebuild
   unset RUBYLIB
   unset RUBYOPT
-  uset _ORIGINAL_GEM_PATH
+  unset _ORIGINAL_GEM_PATH
   unset BUNDLE_BIN_PATH
   unset BUNDLE_GEMFILE
   unset BUNDLE_BIN_PATH
