@@ -2521,3 +2521,15 @@ pod_lib_lint(allow_warnings: true)
 # If the podspec has a dependency on another private pod, then you will have to supply the sources
 pod_lib_lint(sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
 ```
+
+### set_pod_key
+
+Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys).
+
+```ruby
+set_pod_key(
+  key: 'APIToken',
+  value: '1234',
+  project: 'MyProject'
+)
+```
