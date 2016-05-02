@@ -21,9 +21,12 @@
 # † Because, you know, that *never* happens when you are building
 # Xcode projects, say with abstruse tools like Rake or CocoaPods.
 
-which rvm > /dev/null
+# function to detect commands
+command_exists() {
+  type "$1" &> /dev/null;  
+}
 
-if [[ $? -eq 0 ]]; then
+if command_exists rvm; then
   echo "RVM detected, forcing to use system ruby"
   # This allows you to use rvm in a script. Otherwise you get a BS
   # error along the lines of "cannot use rvm as function". Jeez.
@@ -39,6 +42,22 @@ if [[ $? -eq 0 ]]; then
   unset BUNDLE_BIN_PATH
   unset _ORIGINAL_GEM_PATH
   unset BUNDLE_GEMFILE
+fi
+
+if command_exists rbenv; then
+  # Cause rbenv to use system ruby. Lasts only for the scope of this
+  # session which will normally just be this script.
+  rbenv shell system
+
+  # Unset environment variables that could break xcodebuild
+  unset RUBYLIB
+  unset RUBYOPT
+  uset _ORIGINAL_GEM_PATH
+  unset BUNDLE_BIN_PATH
+  unset BUNDLE_GEMFILE
+  unset BUNDLE_BIN_PATH
+  unset GEM_HOME
+  unset GEM_PATH
 fi
 
 # to help troubleshooting
