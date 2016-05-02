@@ -9,6 +9,7 @@ module Fastlane
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+      Fastlane.load_actions
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
