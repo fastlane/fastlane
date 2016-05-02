@@ -110,7 +110,7 @@ module Fastlane
 
       rows = []
       available.each_with_index do |lane, index|
-        rows << [index + 1, lane.last.pretty_name, lane.last.description.first]
+        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
