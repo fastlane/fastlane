@@ -26,7 +26,8 @@ lane :bump do |options|
   end
 end
 
-desc "Display a changelog for a tool since its last release. Run from a tool directory or specify (e.g. tool:deliver)"
+desc "Display a changelog for a tool since its last release."
+desc "Run from a tool directory or specify (e.g. tool:deliver)"
 lane :show_changelog do |options|
   tool_name = options[:tool] || detect_tool
   old_version = current_version(tool: tool_name)
@@ -34,7 +35,8 @@ lane :show_changelog do |options|
   print_release_changelog(tool: tool_name, old_version: old_version)
 end
 
-desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
+desc "Does everything that's needed for a release"
+desc "This includes running tests and verifying the GitHub release"
 lane :release do |options|
   update_fastlane
 
