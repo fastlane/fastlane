@@ -8,7 +8,7 @@ module Fastlane
           paths = params[:path].map(&:shellescape).join(' ')
         end
 
-        result = Actions.sh("git commit -m '#{params[:message]}' #{paths}")
+        result = Actions.sh("git commit -m #{params[:message].shellescape} #{paths}")
         UI.success("Successfully committed \"#{params[:path]}\" 💾.")
         return result
       end

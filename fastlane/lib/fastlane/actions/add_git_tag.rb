@@ -9,7 +9,7 @@ module Fastlane
         message = options[:message] || "#{tag} (fastlane)"
 
         UI.message "Adding git tag '#{tag}' 🎯."
-        Actions.sh("git tag -am '#{message}' '#{tag}'")
+        Actions.sh("git tag -am #{message.shellescape} '#{tag}'")
       end
 
       def self.description
