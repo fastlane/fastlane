@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
+  spec.add_dependency 'xcode-install', '~> 1.3.0' # Needed for xcode_select and xcode_install actions
 
   spec.add_dependency 'fastlane_core', '>= 0.42.1', '< 1.0.0' # all shared code and dependencies
 
@@ -65,5 +66,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'appium_lib', '~> 4.1.0'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
-  spec.add_development_dependency 'xcode-install'
 end
