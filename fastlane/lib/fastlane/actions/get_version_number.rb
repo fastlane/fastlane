@@ -23,28 +23,56 @@ module Fastlane
         ].join(' ')
 
         line = ""
+        scheme = params[:scheme] || ""
         target = params[:target] || ""
         results = []
 
         if Helper.test?
           results = [
+            '$(date +%s)n    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $buildnum" "${plist}"n',
             '"SampleProject.xcodeproj/../TargetA/TargetA-Info.plist"=4.3.2',
             '"SampleProject.xcodeproj/../TargetATests/Info.plist"=4.3.2',
             '"SampleProject.xcodeproj/../TargetB/TargetB-Info.plist"=5.4.3',
-            '"SampleProject.xcodeproj/../TargetBTests/Info.plist"=5.4.3'
+            '"SampleProject.xcodeproj/../TargetBTests/Info.plist"=5.4.3',
+            '"SampleProject.xcodeproj/../SampleProject/supporting_files/TargetC_internal-Info.plist"=7.5.2',
+            '"SampleProject.xcodeproj/../SampleProject/supporting_files/TargetC_production-Info.plist"=6.4.9',
+            '"SampleProject.xcodeproj/../SampleProject_tests/Info.plist"=1.0'
           ]
         else
           results = (Actions.sh command).split("\n")
         end
 
-        if target.empty?
-          line = results.first unless results.first.nil?
-        else
-          target_string = "/#{target}/"
+        if target.empty? && scheme.empty?
+          # Sometimes the results array contains nonsense as the first element
+          # This iteration finds the first 'real' result and returns that
+          # emulating the actual behavior or the -terse1 flag correctly
+          project_string = ".xcodeproj"
           results.any? do |result|
-            if result.include? target_string
+            if result.include? project_string
               line = result
               break
+            end
+          end
+        else
+          # This iteration finds the first folder structure or info plist
+          # matching the specified target
+          scheme_string = "/#{scheme}"
+          target_string = "/#{target}/"
+          plist_target_string = "/#{target}-"
+          results.any? do |result|
+            if !target.empty?
+              if result.include? target_string
+                line = result
+                break
+              elsif result.include? plist_target_string
+                line = result
+                break
+              end
+            else
+              if result.include? scheme_string
+                line = result
+                break
+              end
             end
           end
         end
@@ -85,6 +113,14 @@ module Fastlane
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
                                UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) and !Helper.is_test?
                              end),
+          FastlaneCore::ConfigItem.new(key: :scheme,
+                             env_name: "FL_VERSION_NUMBER_SCHEME",
+                             description: "Specify a specific scheme if you have multiple per project, optional.
+                                          This parameter is deprecated and will be removed in a future release.
+                                          Please use the 'target' parameter instead. The behavior of this parameter
+                                          is currently undefined if your scheme name doesn't match your target name",
+                             optional: true,
+                             deprecated: true),
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
                              description: "Specify a specific target if you have multiple per project, optional",
