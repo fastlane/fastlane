@@ -2504,3 +2504,20 @@ lane :danger do
   danger
 end
 ```
+
+### pod_lib_lint
+
+Execute pod lib lint command
+
+```ruby
+pod_lib_lint
+
+# Allow ouput detail in console
+pod_lib_lint(verbose: true)
+
+# Allow warnings during pod lint
+pod_lib_lint(allow_warnings: true)
+
+# If the podspec has a dependency on another private pod, then you will have to supply the sources
+pod_lib_lint(sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
+```

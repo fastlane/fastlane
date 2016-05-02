@@ -1,10 +1,4 @@
-update_fastlane
 skip_docs
-
-desc "Run bundle install and tests"
-lane :test do
-  validate_repo(tool_name: detect_tool)
-end
 
 desc "Increment the version number of this gem"
 lane :bump do |options|
@@ -42,6 +36,8 @@ end
 
 desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
 lane :release do |options|
+  update_fastlane
+
   # Fetching all information required for the release
   #
   tool_name = options[:tool] || detect_tool
