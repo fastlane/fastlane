@@ -34,6 +34,9 @@ module Spaceship
       #   nil
       attr_accessor :app_icon_preview_url
 
+      # @return (Array) An array of all versions sets
+      attr_accessor :version_sets
+
       attr_mapping(
         'adamId' => :apple_id,
         'name' => :name,
@@ -91,6 +94,13 @@ module Spaceship
       # @!group Getting information
       #####################################################
 
+      def version_set_for_platform(platform)
+        version_sets.each do |version_set|
+          return version_set if version_set.platform == platform
+        end
+        nil
+      end
+
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version
@@ -126,11 +136,48 @@ module Spaceship
         Tunes::AppRatings.factory(attrs)
       end
 
+      def platforms
+        platforms = []
+        version_sets.each do |version_set|
+          platforms << version_set.platform
+        end
+        platforms
+      end
+
+      def types
+        types = []
+        version_sets.each do |version_set|
+          types << version_set.type
+        end
+        types
+      end
+
+      def type
+        if self.version_sets.nil?
+          raise 'The application has no version sets and Spaceship does not know what to do here.'
+        end
+
+        if self.version_sets.length == 1
+          version_sets[0].platform
+        end
+        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
+        platform['type']
+      end
+
       # kept for backward compatibility
       # tries to guess the platform of the currently submitted apps
       # note that as ITC now supports multiple app types, this might break
       # if your app supports more than one
       def platform
+        if self.version_sets.nil?
+          raise 'The application has no version sets and Spaceship does not know what to do here.'
+        end
+
+        if self.version_sets.length == 1
+          version_sets[0].platform
+        elsif self.platforms == %w(ios appletvos)
+          'ios'
+        end
         Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])['platformString']
       end
 
@@ -200,9 +247,9 @@ module Spaceship
       #####################################################
 
       # TestFlight: A reference to all the build trains
-      # @return [Hash] a hash, the version number being the key
-      def build_trains
-        Tunes::BuildTrain.all(self, self.apple_id)
+      # @return [Hash] a hash, the version number and platform being the key
+      def build_trains(platform: nil)
+        Tunes::BuildTrain.all(self, self.apple_id, platform: platform)
       end
 
       # The numbers of all build trains that were uploaded
@@ -224,9 +271,9 @@ module Spaceship
         end
       end
 
-      # @return [Array] A list of all builds in an invalid state
-      def all_invalid_builds
-        builds = []
+      # @return [Array]A list of binaries which are in the invalid state
+      def invalid_builds(platform: nil)
+        data = client.build_trains(apple_id, 'internal', platform: platform) # we need to fetch all trains here to get the builds
 
         self.build_trains.values.each do |train|
           builds.concat(train.invalid_builds)
@@ -237,10 +284,10 @@ module Spaceship
 
       # @return [Array] This will return an array of *all* processing builds
       #   this include pre-processing or standard processing
-      def all_processing_builds
-        builds = []
+      def all_processing_builds(platform: nil)
+        builds = self.pre_processing_builds(platform: nil)
 
-        self.build_trains.values.each do |train|
+        self.build_trains(platform: nil).each do |version_number, train|
           builds.concat(train.processing_builds)
         end
 
@@ -249,9 +296,9 @@ module Spaceship
 
       # Get all builds that are already processed for all build trains
       # You can either use the return value (array) or pass a block
-      def builds
+      def builds(platform: nil)
         all_builds = []
-        self.build_trains.each do |version_number, train|
+        self.build_trains(platform: platform).each do |version_number, train|
           train.builds.each do |build|
             yield(build) if block_given?
             all_builds << build unless block_given?
@@ -301,6 +348,11 @@ module Spaceship
       # @!group General
       #####################################################
       def setup
+        super
+        @version_sets = (self.raw_data['versionSets'] || []).map do |attrs|
+          attrs[:application] = self
+          Tunes::VersionSet.factory(attrs)
+        end
       end
 
       #####################################################
@@ -381,8 +433,7 @@ module Spaceship
       # private to module
       def ensure_not_a_bundle
         # we only support applications
-        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
-        raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
+        raise "We do not support BUNDLE types right now" if self.type == 'BUNDLE'
       end
     end
   end
