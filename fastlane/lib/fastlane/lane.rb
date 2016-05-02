@@ -19,10 +19,7 @@ module Fastlane
       UI.user_error!("lane name must not contain any spaces") if name.to_s.include? " "
       UI.user_error!("lane name must start with :") unless name.kind_of? Symbol
 
-      if self.class.black_list.include?(name.to_s)
-        UI.error "Lane Name '#{name}' can not be one of the followings: #{self.class.black_list}".red
-        UI.user_error!("Name '#{name}' is already taken")
-      end
+      self.class.verify_lane_name(name)
 
       self.platform = platform
       self.name = name
@@ -42,8 +39,27 @@ module Fastlane
     end
 
     class << self
+      # Makes sure the lane name is valid
+      def verify_lane_name(name)
+        if self.black_list.include?(name.to_s)
+          UI.error "Lane Name '#{name}' can not be one of the followings: #{self.black_list}".red
+          UI.user_error!("Name '#{name}' is already taken")
+        end
+
+        if self.gray_list.include?(name.to_sym)
+          UI.error "The name '#{name}' for a lane equals the name of a fastlane tool"
+          UI.error "It is recommended to not use '#{name}' as the name of your lane"
+          # We still allow it, because we're nice
+          # Otherwise we might break existing setups
+        end
+      end
+
       def black_list
         %w(run init new_action lanes list docs action actions help)
+      end
+
+      def gray_list
+        Fastlane::TOOLS
       end
     end
   end
