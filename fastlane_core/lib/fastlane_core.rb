@@ -19,6 +19,7 @@ require 'fastlane_core/project'
 require 'fastlane_core/device_manager'
 require 'fastlane_core/crash_reporting/crash_reporting'
 require 'fastlane_core/ui/ui'
+require 'fastlane_core/tool_collector'
 
 # Third Party code
 require 'colored'
