@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     class UpdateUrbanAirshipConfigurationAction < Action
       def self.run(params)
         require "plist"
@@ -28,10 +27,10 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :plist_path,
-                                       env_name: "URBAN_AIRSHIP_PLIST_PATH", 
-                                       description: "Path to Urban Airship configuration Plist", 
+                                       env_name: "URBAN_AIRSHIP_PLIST_PATH",
+                                       description: "Path to Urban Airship configuration Plist",
                                        verify_block: proc do |value|
-                                          raise "Could not find Urban Airship plist file".red unless File.exist?(value)
+                                         raise "Could not find Urban Airship plist file".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development_app_key,
                                        env_name: "URBAN_AIRSHIP_DEVELOPMENT_APP_KEY",
@@ -50,7 +49,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        default_value: true,
-                                       description: "Automatically detect provisioning mode")                                                                               
+                                       description: "Automatically detect provisioning mode")
         ]
       end
 
