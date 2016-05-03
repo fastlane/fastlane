@@ -1628,7 +1628,7 @@ Alternatively, you can specify your own tag. Note that if you do specify a tag, 
 
 ```ruby
 add_git_tag(
-  tag: 'my_custom_tag',
+  tag: 'my_custom_tag'
 )
 ```
 
