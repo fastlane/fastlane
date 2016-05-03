@@ -44,13 +44,67 @@ module FastlaneCore
       UI.header(text)
     end
 
-    # Runs a given command using backticks (`)
-    # and prints them out using the UI.command method
-    def self.backticks(command, print: true)
+    # Execute the given command and optionally retry up to `retries` if `timeout` is exceeded.
+    def self.command(command, print: true, timeout: false, retries: 0)
       UI.command(command) if print
-      result = `#{command}`
-      UI.command_output(result) if print
-      return result
+      output = ''
+
+      if !timeout
+        output = `#{command}`
+      else
+        should_retry = true
+        retry_count = 0
+
+        while should_retry
+          begin
+            output = ''
+            stdin, stdout, thread = Open3.popen2(command)
+            start = Time.now
+
+            while (Time.now - start) < timeout && thread.alive?
+              Kernel.select([stdout], nil, nil, 0.2)
+
+              begin
+                output << stdout.read_nonblock(4096)
+              rescue IO::WaitReadable # rubocop:disable Metrics/BlockNesting
+                # Read would have blocked, we'll try again
+              rescue EOFError # rubocop:disable Metrics/BlockNesting
+                # Command completed
+                break
+              end
+            end
+
+            begin
+              Process.getpgid(thread[:pid])
+              retry_count += 1
+              should_retry = retry_count <= retries
+            rescue Errno::ESRCH
+              # Command completed
+              break
+            end
+
+            begin
+              Process.kill('TERM', thread[:pid])
+            rescue Errno::ESRCH
+              # Command completed before we could kill it, no need to retry
+              break
+            end
+
+            if should_retry
+              UI.important("Command '#{command}' timed out after #{timeout}s, retrying #{retry_count}/#{retries}...")
+            else
+              UI.crash!("Retry limit (#{retries}) reached for command '#{command}'")
+            end
+          ensure
+            stdin.close if stdin
+            stdout.close if stdout
+            thread.join if thread
+          end
+        end
+      end
+
+      UI.command_output(output) if print
+      output
     end
 
     # @return true if the currently running program is a unit test

@@ -49,7 +49,7 @@ module FastlaneCore
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain}", print: $verbose)
+      response = Helper.command("security find-certificate -c '#{certificate_name}' #{keychain}", print: $verbose)
       return response.include?("attributes:")
     end
 
@@ -70,7 +70,7 @@ module FastlaneCore
         "security default-keychain -d user"
       ]
       priority.each do |command|
-        keychains = Helper.backticks(command, print: $verbose).split("\n")
+        keychains = Helper.command(command, print: $verbose).split("\n")
         unless keychains.empty?
           # Select first keychain name from returned keychains list
           return keychains[0].strip.tr('"', '')

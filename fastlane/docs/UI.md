@@ -32,7 +32,7 @@ FastlaneCore::CommandExecutor.execute(command: "ls",
                                         end)
 
 ###### or if you just want to receive a simple value use this only if the command doesn't take long
-diff = Helper.backticks("git diff")
+diff = Helper.command("git diff")
 
 ###### fastlane "crash" because of a user error everything that is caused by the user and is not unexpected
 UI.user_error!("You don't have a project in the current directory")

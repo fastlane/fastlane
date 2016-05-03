@@ -200,7 +200,7 @@ module FastlaneCore
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         command = "xcrun xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
-        @build_settings = Helper.backticks(command, print: false)
+        @build_settings = Helper.command(command, print: false, timeout: 10, retries: 3)
       end
 
       begin

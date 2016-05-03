@@ -17,7 +17,7 @@ module FastlaneCore
 
     def self.fetch_distribution_xml_file(path)
       Dir.mktmpdir do |dir|
-        Helper.backticks("xar -C #{dir} -xf #{path}")
+        Helper.command("xar -C #{dir} -xf #{path}")
 
         Dir.foreach(dir) do |file|
           next unless file.include? 'Distribution'

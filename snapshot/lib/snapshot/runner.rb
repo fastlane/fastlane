@@ -192,10 +192,10 @@ module Snapshot
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+      Helper.command("xcrun instruments -w #{device_udid} &> /dev/null")
 
       UI.message "Uninstall application #{Snapshot.config[:app_identifier]}"
-      Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
+      Helper.command("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
     end
 
     def erase_simulator(device_type)
@@ -228,11 +228,11 @@ module Snapshot
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+      Helper.command("xcrun instruments -w #{device_udid} &> /dev/null")
 
       paths.each do |path|
         UI.message "Adding '#{path}'"
-        Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+        Helper.command("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
       end
     end
 
