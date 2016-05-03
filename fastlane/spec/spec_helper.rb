@@ -8,7 +8,7 @@ end
 require 'shellwords'
 
 require 'fastlane'
-require 'fastlane_core'
+
 require 'webmock/rspec'
 
 UI = FastlaneCore::UI
