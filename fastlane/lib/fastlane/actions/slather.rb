@@ -74,7 +74,7 @@ module Fastlane
           end
         end
 
-        command << params[:proj].shellescape
+        command << params[:proj].shellescape if params[:proj]
         command.join(" ")
       end
 

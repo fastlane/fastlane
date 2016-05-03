@@ -71,7 +71,7 @@ describe Fastlane do
       end
 
       it "does not require project if .slather.yml is found" do
-        File.write('.slather.yml', '')
+        File.write('../.slather.yml', '')
 
         result = Fastlane::FastFile.new.parse("lane :test do
           slather
@@ -117,8 +117,8 @@ describe Fastlane do
         expect(result).to eq("slather coverage --ignore Pods/\\* --ignore ../\\*\\*/\\*/Xcode\\* foo.xcodeproj")
       end
 
-      after do
-        File.delete('.slather.yml') if File.exist? '.slather.yml'
+      after(:each) do
+        File.delete('../.slather.yml') if File.exist? '../.slather.yml'
       end
     end
   end
