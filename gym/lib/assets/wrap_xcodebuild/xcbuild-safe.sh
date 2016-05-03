@@ -55,7 +55,6 @@ if command_exists rbenv; then
   unset _ORIGINAL_GEM_PATH
   unset BUNDLE_BIN_PATH
   unset BUNDLE_GEMFILE
-  unset BUNDLE_BIN_PATH
   unset GEM_HOME
   unset GEM_PATH
 fi
