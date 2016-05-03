@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
 
-  spec.add_dependency 'fastlane_core', '>= 0.43.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.43.1', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.26.2', '< 1.0.0' # communication layer with Apple's web services
