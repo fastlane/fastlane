@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
-    class ActionFromActionAction < Action
+    class ActionFromActionInvalidAction < Action
       def self.run(params)
-        return other_action.rocket
+        return rocket # no `other_action` will fail
       end
 
       def self.is_supported?(platform)

@@ -77,7 +77,15 @@ module Fastlane
 
     # Allows the user to call an action from an action
     def self.method_missing(method_sym, *arguments, &_block)
-      self.runner.trigger_action_by_name(method_sym, *arguments)
+      UI.error("Unknown method '#{method_sym}'")
+      UI.user_error!("To call another action from an action use `OtherAction.#{method_sym}` instead")
+    end
+
+    # Return a new instance of the OtherAction action
+    # We need to do this, since it has to have access to
+    # the runner object
+    def self.other_action
+      return OtherAction.new(self.runner)
     end
   end
 end
