@@ -40,11 +40,23 @@ end
 
 def bundle_install
   if ENV['CI']
-    cache_path = File.expand_path("~/.bundle")
+    cache_path = File.expand_path("~/.fastlane_bundle")
     path = " --path=#{cache_path}"
   end
 
   sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
+end
+
+task :bundle_install_all do
+  puts "Fetching dependencies in the root"
+  bundle_install
+
+  for_each_gem do |repo|
+    Dir.chdir(repo) do
+      puts "Fetching dependencies for #{repo}"
+      bundle_install
+    end
+  end
 end
 
 def get_line_from_file(line_number, file)
@@ -66,7 +78,6 @@ task :test_all do
   repos_with_exceptions = []
   rspec_log_file = "rspec_logs.json"
 
-  bundle_install
   for_each_gem do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
@@ -85,7 +96,6 @@ task :test_all do
             rspec_command_parts << "--format RspecJunitFormatter --out #{output_file}"
           end
 
-          bundle_install
           sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
         end

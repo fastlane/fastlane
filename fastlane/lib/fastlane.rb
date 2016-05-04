@@ -1,3 +1,5 @@
+require 'fastlane_core'
+
 require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/version'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
@@ -15,8 +17,6 @@ require 'fastlane/configuration_helper'
 require 'fastlane/one_off'
 require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
-
-require 'fastlane_core'
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

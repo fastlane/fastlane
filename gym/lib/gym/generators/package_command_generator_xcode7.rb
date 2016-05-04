@@ -43,6 +43,7 @@ module Gym
       def ipa_path
         unless Gym.cache[:ipa_path]
           path = Dir[File.join(temporary_output_path, "*.ipa")].last
+          # We need to process generic IPA
           if path
             # Try to find IPA file in the output directory, used when app thinning was not set
             Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
@@ -162,7 +163,7 @@ module Gym
       def print_legacy_information
         if Gym.config[:provisioning_profile_path]
           UI.important "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md"
+          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
         end
       end
     end

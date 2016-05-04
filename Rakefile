@@ -1,6 +1,8 @@
 GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab)
 RAILS = %w(boarding refresher enhancer)
 
+SECONDS_PER_DAY = 60 * 60 * 24
+
 #####################################################
 # @!group Everything to be executed in the root folder containing all fastlane repos
 #####################################################
@@ -25,26 +27,6 @@ desc 'Run `bundle update` and `rake install` for all the gems.'
 task install: :bundle do
   GEMS.each do |repo|
     sh "cd #{repo} && rake install"
-  end
-end
-
-desc 'Print out the # of unreleased commits'
-task :unreleased do
-  GEMS.each do |repo|
-    Dir.chdir(repo) do
-      `git pull --tags`
-
-      last_tag = `git describe --abbrev=0 --tags`.strip
-      output = `git log #{last_tag}..HEAD --oneline`.strip
-
-      if output.length > 0
-        box "#{repo}: #{output.split("\n").count} Commits"
-        output.split("\n").each do |line|
-          puts "\t" + line.split(' ', 1).last # we don't care about the commit ID
-        end
-        puts "\nhttps://github.com/fastlane/#{repo}/compare/#{last_tag}...master"
-      end
-    end
   end
 end
 

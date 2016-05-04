@@ -62,8 +62,8 @@ module Fastlane
     end
 
     # to allow a simple `sh` in the custom actions
-    def self.sh(command)
-      Fastlane::Actions.sh(command)
+    def self.sh(command, print_command: true, print_command_output: true)
+      Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output)
     end
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user

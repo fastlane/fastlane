@@ -154,7 +154,7 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :show,
                                        env_name: "FL_SLATHER_SHOW_ENABLED",
-                                       description: "Tell slather that it should oupen static html pages automatically",
+                                       description: "Tell slather that it should open static html pages automatically",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :source_directory,
