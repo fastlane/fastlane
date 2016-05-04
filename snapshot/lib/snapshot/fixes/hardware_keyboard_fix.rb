@@ -9,7 +9,7 @@ module Snapshot
 
         UI.verbose "Patching simulator to work with secure text fields"
 
-        Helper.backticks("defaults write com.apple.iphonesimulator ConnectHardwareKeyboard 0", print: $verbose)
+        Helper.command("defaults write com.apple.iphonesimulator ConnectHardwareKeyboard 0", print: $verbose)
       end
     end
   end

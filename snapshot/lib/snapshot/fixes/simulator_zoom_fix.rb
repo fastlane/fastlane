@@ -15,7 +15,7 @@ module Snapshot
           simulator_name = simulator.name.tr("\s", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 
-          Helper.backticks("defaults write '#{config_path}' '#{key}' '1.0'", print: $verbose)
+          Helper.command("defaults write '#{config_path}' '#{key}' '1.0'", print: $verbose)
         end
       end
 

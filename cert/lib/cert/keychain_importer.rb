@@ -8,7 +8,7 @@ module Cert
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
       command << " -T /usr/bin/security"
 
-      Helper.backticks(command)
+      Helper.command(command)
     end
   end
 end
