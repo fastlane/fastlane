@@ -82,8 +82,8 @@ If you think your extension can be used by other developers as well, let me know
 To call another action from within your action, just use the same code you would use in a `Fastfile`:
 
 ```ruby
-deliver(text: "Please input your password:", 
-         key: 123)
+other_action.deliver(text: "Please input your password:", 
+                      key: 123)
 ```
 
 In general, think twice before you do this, most of the times, these action should be separate. Only call actions from within action if it makes sense.
