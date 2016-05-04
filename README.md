@@ -100,7 +100,7 @@ Usually you'll use fastlane by triggering individual lanes:
 
 Additionally to the `fastlane` commands, you now have access to these `fastlane` tools:
 
-- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app to the App Store
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to Google Play
 - [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Command line tool for updating Android apps and their metadata on the Google Play Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`screengrab`](https://github.com/fastlane/fastlane/tree/master/screengrab): Automated localized screenshots of your Android app on every device

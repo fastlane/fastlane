@@ -36,7 +36,7 @@ supply
 [![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
-###### Command line tool for updating Android apps and their metadata on the Google Play Store
+###### Upload screenshots, metadata and your app to Google Play
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
