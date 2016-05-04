@@ -103,19 +103,19 @@ module Spaceship
 
       # @return (Spaceship::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
-      def live_version
-        Spaceship::AppVersion.find(self, self.apple_id, true)
+      def live_version(platform: nil)
+        Spaceship::AppVersion.find(self, self.apple_id, true, platform: platform)
       end
 
       # @return (Spaceship::AppVersion) Receive the version that can fully be edited
-      def edit_version
-        Spaceship::AppVersion.find(self, self.apple_id, false)
+      def edit_version(platform: nil)
+        Spaceship::AppVersion.find(self, self.apple_id, false, platform: platform)
       end
 
       # @return (Spaceship::AppVersion) This will return the `edit_version` if available
       #   and fallback to the `live_version`. Use this to just access the latest data
-      def latest_version
-        edit_version || live_version
+      def latest_version(platform: nil)
+        edit_version(platform: platform) || live_version(platform: platform)
       end
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
@@ -203,12 +203,12 @@ module Spaceship
       # Create a new version of your app
       # Since we have stored the outdated raw_data, we need to refresh this object
       # otherwise `edit_version` will return nil
-      def create_version!(version_number)
-        if edit_version
+      def create_version!(version_number, platform: nil)
+        if edit_version(platform: platform)
           raise "Cannot create a new version for this app as there already is an `edit_version` available"
         end
 
-        client.create_version!(apple_id, version_number)
+        client.create_version!(apple_id, version_number, platform.nil? ? 'ios' : platform)
 
         # Future: implemented -reload method
       end
@@ -217,8 +217,8 @@ module Spaceship
       # This will either create a new version or change the version number
       # from an existing version
       # @return (Bool) Was something changed?
-      def ensure_version!(version_number)
-        if (e = edit_version)
+      def ensure_version!(version_number, platform: nil)
+        if (e = edit_version(platform: platform))
           if e.version.to_s != version_number.to_s
             # Update an existing version
             e.version = version_number
@@ -227,7 +227,7 @@ module Spaceship
           end
           return false
         else
-          create_version!(version_number)
+          create_version!(version_number, platform: platform)
           return true
         end
       end
@@ -272,10 +272,10 @@ module Spaceship
       end
 
       # @return [Array]A list of binaries which are in the invalid state
-      def invalid_builds(platform: nil)
-        data = client.build_trains(apple_id, 'internal', platform: platform) # we need to fetch all trains here to get the builds
+      def all_invalid_builds(platform: nil)
+        builds = []
 
-        self.build_trains.values.each do |train|
+        self.build_trains(platform: platform).values.each do |train|
           builds.concat(train.invalid_builds)
         end
 
@@ -285,9 +285,9 @@ module Spaceship
       # @return [Array] This will return an array of *all* processing builds
       #   this include pre-processing or standard processing
       def all_processing_builds(platform: nil)
-        builds = self.pre_processing_builds(platform: nil)
+        builds = []
 
-        self.build_trains(platform: nil).each do |version_number, train|
+        self.build_trains(platform: platform).each do |version_number, train|
           builds.concat(train.processing_builds)
         end
 

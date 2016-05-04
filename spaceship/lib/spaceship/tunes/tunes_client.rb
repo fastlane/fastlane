@@ -328,14 +328,14 @@ module Spaceship
     # @!group AppVersions
     #####################################################
 
-    def app_version(app_id, is_live)
+    def app_version(app_id, is_live, platform: nil)
       raise "app_id is required" unless app_id
 
       # First we need to fetch the IDs for the edit / live version
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      platform = Spaceship::Tunes::AppVersionCommon.find_platform(platforms)
+      platform = Spaceship::Tunes::AppVersionCommon.find_platform(platforms, search_platform: platform)
       return nil unless platform
 
       version_id = Spaceship::Tunes::AppVersionCommon.find_version_id(platform, is_live)
