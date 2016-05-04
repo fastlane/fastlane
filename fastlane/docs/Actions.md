@@ -106,7 +106,7 @@ gradle(
 )
 ```
 
-In case of an `assemble` task, the signed apk path is accessible in: `Actions.lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
+In case of an `assemble` task, the signed apk path is accessible in: `lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
 
 
 You can pass [gradle properties](https://docs.gradle.org/current/userguide/build_environment.html):
@@ -1085,14 +1085,30 @@ nexus_upload(
 
 ### [Appetize.io](https://appetize.io/)
 
-Upload your zipped app to Appetize.io
+Upload your zipped app to Appetize.io to stream your app in the browser.
 
 ```ruby
 appetize(
-  api_token: 'yourapitoken',
-  url: 'https://example.com/your/zipped/app.zip',
-  private_key: 'yourprivatekey'
+  path: './MyApp.zip',
+  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
+  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
 )
+```
+
+If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
+
+#### `device_grid` for your Pull Requests
+
+![../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png](../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png)
+
+Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) to get a grid of devices every time you submit a pull request. The app will be uploaded to [appetize.io](https://appetize.io/) so you can stream and try them right in your browser.
+
+[Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
+
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using 
+
+```objective-c
+[[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
 ```
 
 ### [Appaloosa](https://www.appaloosa-store.com)

@@ -110,7 +110,6 @@ class FastlaneApplication
       c.description = 'Run a fastlane one-off action without a full lane'
 
       c.action do |args, options|
-        require 'fastlane/one_off'
         result = Fastlane::OneOff.execute(args: args)
         UI.success "Result: #{result}" if result
       end

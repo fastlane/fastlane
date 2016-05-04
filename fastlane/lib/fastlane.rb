@@ -12,6 +12,7 @@ require 'fastlane/action'
 require 'fastlane/action_collector'
 require 'fastlane/supported_platforms'
 require 'fastlane/configuration_helper'
+require 'fastlane/one_off'
 require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
 

@@ -5,7 +5,10 @@ module Fastlane
         UI.message "Compressing #{params[:path]}..."
 
         params[:output_path] ||= "#{params[:path]}.zip"
-        sh "zip -r #{params[:output_path]} #{params[:path].shellescape}"
+
+        Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
+          sh "zip -r #{params[:output_path].shellescape} #{File.basename(params[:path]).shellescape}"
+        end
 
         UI.success "Successfully generated zip file at path '#{File.expand_path(params[:output_path])}'"
         return File.expand_path(params[:output_path])
@@ -20,7 +23,6 @@ module Fastlane
       end
 
       def self.details
-        "This zips everything in a weird way if you're not in the directory of the file to zip"
       end
 
       def self.available_options
