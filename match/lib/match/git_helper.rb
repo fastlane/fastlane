@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false)
+    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master")
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -13,6 +13,8 @@ module Match
                                       print_command: $verbose)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
+
+      checkout_branch(branch) unless branch == "master"
 
       if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil? and File.exist?(File.join(@dir, "README.md"))
         UI.important "Migrating to new match..."
@@ -47,7 +49,7 @@ module Match
       end
     end
 
-    def self.commit_changes(path, message, git_url)
+    def self.commit_changes(path, message, git_url, branch="master")
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
@@ -57,7 +59,7 @@ module Match
         commands = []
         commands << "git add -A"
         commands << "git commit -m '#{message}'"
-        commands << "git push origin master"
+        commands << "git push origin #{branch}"
 
         UI.message "Pushing changes to remote git repo..."
 
@@ -77,6 +79,42 @@ module Match
       FileUtils.rm_rf(@dir)
       UI.success "🔒  Successfully encrypted certificates repo" # so the user is happy
       @dir = nil
+    end
+    
+    # Create and checkout an specific branch in the git repo
+    def self.checkout_branch(branch)
+      return unless @dir
+      
+      commands = []
+      if branch_exists?(branch)
+        commands << "git checkout #{branch}"
+      else
+        commands << "git checkout --orphan #{branch}"
+        commands << "git reset --hard"
+      end
+
+      UI.message "Checking out branch #{branch}..."
+
+      Dir.chdir(@dir) do
+        commands.each do |command|
+          FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: $verbose,
+                                                print_command: $verbose)
+        end
+      end
+    end
+    
+    # Checks if a specific branch exists in the git repo
+    def self.branch_exists?(branch)
+      return unless @dir
+      
+      result = nil
+      Dir.chdir(@dir) do
+        result = FastlaneCore::CommandExecutor.execute(command: "git branch --list #{branch} --no-color",
+                                                       print_all: $verbose,
+                                                       print_command: $verbose)
+      end
+      return !result.empty?
     end
 
     # Copies the README.md into the git repo

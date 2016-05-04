@@ -11,7 +11,7 @@ module Match
       self.params = params
       self.type = type
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs])
+      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
 
       had_app_identifier = self.params[:app_identifier]
       self.params[:app_identifier] = '' # we don't really need a value here
@@ -142,7 +142,7 @@ module Match
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url])
+      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch])
     end
 
     private
