@@ -56,15 +56,16 @@ lane :release do |options|
     UI.user_error!("Version number #{version} was already deployed")
   end
 
-  # Actual release
-  #
-  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
-
   # Git verification
   #
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
   git_pull
+  # Actual release
+  #
+  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
+  # Then push to git remote
+  #
   push_to_git_remote
 
   # Preparing GitHub Release
