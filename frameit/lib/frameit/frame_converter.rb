@@ -9,7 +9,7 @@ module Frameit
 
     def setup_frames
       UI.success "----------------------------------------------------"
-      UI.success "Looks like you have no device templates installed"
+      UI.success "Looks like you'd like to install new device templates"
       UI.success "The images can not be pre-installed due to licensing"
       UI.success "Press Enter to get started"
       UI.success "----------------------------------------------------"
@@ -18,7 +18,7 @@ module Frameit
       system("open '#{DOWNLOAD_URL}'")
       UI.success "----------------------------------------------------"
       UI.success "Download the zip files for the following devices"
-      UI.success "iPhone 6s, iPhone 6s Plus, iPhone 5s, iPad mini 4 and iPad Pro"
+      UI.success "iPhone 6s, iPhone 6s Plus, iPhone SE, iPad mini 4 and iPad Pro"
       UI.success "You only need to download the devices you want to use"
       UI.success "Press Enter when you downloaded the zip files"
       UI.success "----------------------------------------------------"
@@ -64,6 +64,27 @@ module Frameit
 
         UI.important "Converting PSD file '#{psd}'"
         image = MiniMagick::Image.open(psd)
+
+        if psd =~ /iPhone-SE/
+          UI.success "Removing white background 🚫 ⬜️"
+
+          # The iPhone-SE screenshots from April 2016 have
+          # 3 layers, a background, a product, and the 'put your image here' layer
+          # imagemagick seems to add an additional layer with no label which this the
+          # composite of all three.  We want to remove the background and composite layer
+          good_layers = image.layers.reject do |layer|
+            label = layer.details['Properties']['label']
+            label.to_s.length == 0 || label =~ /White B/i
+          end
+          product_layer = good_layers.shift
+
+          good_layers.each do |layer|
+            product_layer.layers << layer
+          end
+
+          image = product_layer
+        end
+
         if image
           image.format 'png'
           image.trim

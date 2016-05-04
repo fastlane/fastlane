@@ -28,10 +28,6 @@ module FastlaneCore
         UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
 
-      if type.to_s.length > 0 and short_option.to_s.length == 0
-        UI.user_error!("Type '#{type}' for key '#{key}' requires a short option")
-      end
-
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
           UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of? Symbol
@@ -96,11 +92,11 @@ module FastlaneCore
       when data_type == Array
         return value.split(',') if value.kind_of?(String)
       when data_type == Integer
-        return value.to_i
+        return value.to_i unless value.nil?
       when data_type == Float
-        return value.to_f
+        return value.to_f unless value.nil?
       else
-        # Special treatment if the user specififed true, false or YES, NO
+        # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
           return true

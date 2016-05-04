@@ -1,10 +1,4 @@
-update_fastlane
 skip_docs
-
-desc "Run bundle install and tests"
-lane :test do
-  validate_repo(tool_name: detect_tool)
-end
 
 desc "Increment the version number of this gem"
 lane :bump do |options|
@@ -32,7 +26,8 @@ lane :bump do |options|
   end
 end
 
-desc "Display a changelog for a tool since its last release. Run from a tool directory or specify (e.g. tool:deliver)"
+desc "Display a changelog for a tool since its last release."
+desc "Run from a tool directory or specify (e.g. tool:deliver)"
 lane :show_changelog do |options|
   tool_name = options[:tool] || detect_tool
   old_version = current_version(tool: tool_name)
@@ -40,8 +35,11 @@ lane :show_changelog do |options|
   print_release_changelog(tool: tool_name, old_version: old_version)
 end
 
-desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
+desc "Does everything that's needed for a release"
+desc "This includes running tests and verifying the GitHub release"
 lane :release do |options|
+  update_fastlane
+
   # Fetching all information required for the release
   #
   tool_name = options[:tool] || detect_tool
@@ -57,6 +55,10 @@ lane :release do |options|
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     UI.user_error!("Version number #{version} was already deployed")
   end
+
+  # Actual release
+  #
+  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
   # Git verification
   #
@@ -93,10 +95,6 @@ lane :release do |options|
     message = [title, description, release_url].join("\n\n")
     add_fastlane_git_tag(tag: "#{tool_name}/#{version}", message: message)
   end
-
-  # Actual release
-  #
-  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
   # After publishing
   #

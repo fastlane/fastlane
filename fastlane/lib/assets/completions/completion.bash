@@ -8,7 +8,7 @@ _fastlane_complete() {
     file="Fastfile"
   elif [[ -e "fastlane/Fastfile" ]]; then
     file="fastlane/Fastfile"
-  elif [[ -e ".fastlane/Fastfile" ]] then
+  elif [[ -e ".fastlane/Fastfile" ]]; then
     file=".fastlane/Fastfile"
   fi
 

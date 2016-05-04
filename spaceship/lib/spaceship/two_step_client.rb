@@ -1,13 +1,13 @@
 module Spaceship
   class Client
     def handle_two_step(response)
-      @x_apple_web_session_token = response["x-apple-web-session-token"]
+      @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
       r = request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.headers["Accept"] = "application/json"
       end
 
@@ -76,7 +76,7 @@ module Spaceship
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
       end
 
       # we use `Spaceship::TunesClient.new.handle_itc_response`
@@ -92,7 +92,7 @@ module Spaceship
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "code" => code.to_s }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -141,7 +141,7 @@ module Spaceship
       request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
       end
       # This request will fail if the user isn't added to a team on iTC
       # However we don't really care, this request will still return the
