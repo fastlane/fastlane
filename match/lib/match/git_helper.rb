@@ -49,7 +49,7 @@ module Match
       end
     end
 
-    def self.commit_changes(path, message, git_url, branch="master")
+    def self.commit_changes(path, message, git_url, branch = "master")
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
@@ -80,11 +80,11 @@ module Match
       UI.success "🔒  Successfully encrypted certificates repo" # so the user is happy
       @dir = nil
     end
-    
+
     # Create and checkout an specific branch in the git repo
     def self.checkout_branch(branch)
       return unless @dir
-      
+
       commands = []
       if branch_exists?(branch)
         commands << "git checkout #{branch}"
@@ -103,11 +103,11 @@ module Match
         end
       end
     end
-    
+
     # Checks if a specific branch exists in the git repo
     def self.branch_exists?(branch)
       return unless @dir
-      
+
       result = nil
       Dir.chdir(@dir) do
         result = FastlaneCore::CommandExecutor.execute(command: "git branch --list #{branch} --no-color",
