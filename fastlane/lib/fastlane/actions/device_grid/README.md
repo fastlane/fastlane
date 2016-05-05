@@ -6,6 +6,8 @@ No more manually installing and testing your app just to review a PR.
 
 ![assets/GridExampleScreenshot.png](assets/GridExampleScreenshot.png)
 
+[View Example Pull Request](https://github.com/Themoji/ios/pull/12#issuecomment-215836315)
+
 ## Requirements
 
 - [fastlane](https://fastlane.tools)
