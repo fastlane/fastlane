@@ -1,5 +1,21 @@
 describe Match do
   describe Match::GitHelper do
+    before do
+      @git_url = Dir.mktmpdir
+      Git.init(@git_url, bare: true)
+
+      # Create initial commit
+      tmp_dir = Dir.mktmpdir
+      tmp_git = Git.clone(@git_url, ".", path: tmp_dir)
+      tmp_git.commit("initial commit", allow_empty: true)
+      tmp_git.push(:origin, :master)
+      $dir = @git_url
+    end
+
+    after do
+      FileUtils.rm_rf(@git_url)
+    end
+
     describe "generate_commit_message" do
       it "works" do
         values = {
@@ -15,71 +31,35 @@ describe Match do
       it "skips README file generation if so requested" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "git clone '#{git_url}' '#{path}'"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
-
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
-
-        result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
+        result = Match::GitHelper.clone(@git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
       end
 
       it "clones the repo" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-        shallow_clone = true
-        command = "git clone '#{git_url}' '#{path}' --depth 1"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
-
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
-
-        result = Match::GitHelper.clone(git_url, shallow_clone)
+        shallow_clone = false
+        result = Match::GitHelper.clone(@git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
       end
 
       it "clones the repo (not shallow)" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "git clone '#{git_url}' '#{path}'"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
-
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
-
-        result = Match::GitHelper.clone(git_url, shallow_clone)
+        result = Match::GitHelper.clone(@git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
       end
 
       after(:each) do
         Match::GitHelper.clear_changes
+      end
+    end
+
+    describe "commit_changes" do
+      it "works" do
+        path = Match::GitHelper.clone(@git_url, false, skip_docs: false)
+        Match::GitHelper.commit_changes(path, "test commit", @git_url)
       end
     end
   end

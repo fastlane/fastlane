@@ -4,13 +4,11 @@ module Match
       return @dir if @dir
 
       @dir = Dir.mktmpdir
-      command = "git clone '#{git_url}' '#{@dir}'"
-      command << " --depth 1" if shallow_clone
 
       UI.message "Cloning remote git repo..."
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: $verbose,
-                                      print_command: $verbose)
+      opts = {path: @dir}
+      opts[:depth] = 1 if shallow_clone
+      Git.clone(git_url, ".", opts)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
@@ -48,25 +46,17 @@ module Match
     end
 
     def self.commit_changes(path, message, git_url)
-      Dir.chdir(path) do
-        return if `git status`.include?("nothing to commit")
+      git = Git.open(path)
+      return unless git.status.any?
 
-        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
-        File.write("match_version.txt", Match::VERSION) # unencrypted
+      Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+      File.write(File.join(path, "match_version.txt"), Match::VERSION) # unencrypted
 
-        commands = []
-        commands << "git add -A"
-        commands << "git commit -m '#{message}'"
-        commands << "git push origin master"
+      UI.message "Pushing changes to remote git repo..."
+      git.add(all: true)
+      git.commit("message")
+      git.push(:origin, :master)
 
-        UI.message "Pushing changes to remote git repo..."
-
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
-                                              print_all: $verbose,
-                                          print_command: $verbose)
-        end
-      end
       FileUtils.rm_rf(path)
       @dir = nil
     end
