@@ -1,11 +1,8 @@
 module Fastlane
   module Actions
-    class ActionFromActionAction < Action
+    class PwdAction < Action
       def self.run(params)
-        return {
-          rocket: other_action.rocket,
-          pwd: other_action.pwd
-        }
+        return Dir.pwd
       end
 
       def self.is_supported?(platform)
