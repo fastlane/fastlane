@@ -11,6 +11,7 @@ require 'fastlane'
 
 require 'webmock/rspec'
 
+Fastlane.load_actions
 UI = FastlaneCore::UI
 
 # This module is only used to check the environment is currently a testing env
