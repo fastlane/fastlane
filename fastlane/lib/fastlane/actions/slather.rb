@@ -35,8 +35,22 @@ module Fastlane
           Actions.verify_gem!('slather')
         end
 
+        validate_params!(params)
+
         command = build_command(params)
         sh command
+      end
+
+      def self.has_config_file
+        File.file?('.slather.yml')
+      end
+
+      def self.validate_params!(params)
+        if params[:proj] || has_config_file
+          true
+        else
+          UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
+        end
       end
 
       def self.build_command(params)
@@ -60,7 +74,7 @@ module Fastlane
           end
         end
 
-        command << params[:proj].shellescape
+        command << params[:proj].shellescape if params[:proj]
         command.join(" ")
       end
 
@@ -91,7 +105,8 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
                                          UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
-                                       end),
+                                       end,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :workspace,
                                        env_name: "FL_SLATHER_WORKSPACE",
                                        description: "The workspace that slather looks at",
