@@ -1,5 +1,6 @@
 require "fastlane_core"
 require "pilot/tester_util"
+require 'terminal-table'
 
 module Pilot
   class TesterManager < Manager
@@ -78,36 +79,71 @@ module Pilot
 
     def list_testers(options)
       start(options)
-      require 'terminal-table'
 
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
-        app = Spaceship::Application.find(app_filter)
-        UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-        int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
-        ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
+        list_testers_by_app(app_filter)
       else
-        int_testers = Spaceship::Tunes::Tester::Internal.all
-        ext_testers = Spaceship::Tunes::Tester::External.all
+        list_testers_global
       end
-
-      list(int_testers, "Internal Testers")
-      puts "" # new line
-      list(ext_testers, "External Testers")
     end
 
-    private
+    # private
 
-    def list(all_testers, title)
-      rows = []
-      all_testers.each do |tester|
-        rows << [tester.first_name, tester.last_name, tester.email, tester.devices.count, tester.full_version, tester.pretty_install_date]
+    def list_testers_by_app(app_filter)
+      app = Spaceship::Application.find(app_filter)
+      UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
+
+      int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
+      ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
+
+      list_by_app(int_testers, "Internal Testers")
+      puts ""
+      list_by_app(ext_testers, "External Testers")
+    end
+
+    def list_testers_global
+      int_testers = Spaceship::Tunes::Tester::Internal.all
+      ext_testers = Spaceship::Tunes::Tester::External.all
+
+      list_global(int_testers, "Internal Testers")
+      puts ""
+      list_global(ext_testers, "External Testers")
+    end
+
+    def list_global(all_testers, title)
+      headers = ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"]
+      list(all_testers, title, headers) do |tester|
+        [
+          tester.first_name,
+          tester.last_name,
+          tester.email,
+          tester.devices.count,
+          tester.full_version,
+          tester.pretty_install_date
+        ]
       end
+    end
 
+    def list_by_app(all_testers, title)
+      headers = ["First", "Last", "Email"]
+      list(all_testers, title, headers) do |tester|
+        [
+          tester.first_name,
+          tester.last_name,
+          tester.email
+          # Testers returned by the query made in the context of an app do not contain
+          # the devices, version, or install date information
+        ]
+      end
+    end
+
+    # Requires a block that accepts a tester and returns an array of tester column values
+    def list(all_testers, title, headings)
       puts Terminal::Table.new(
         title: title.green,
-        headings: ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"],
-        rows: rows
+        headings: headings,
+        rows: all_testers.map { |tester| yield tester }
       )
     end
 

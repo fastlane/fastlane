@@ -120,7 +120,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH",
-                                       description: "The path to the upload-symbols file",
+                                       description: "The path to the upload-symbols file of the Fabric app",
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)

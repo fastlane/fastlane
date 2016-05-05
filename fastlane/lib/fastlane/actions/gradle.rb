@@ -46,7 +46,11 @@ module Fastlane
         Actions.lane_context[SharedValues::GRADLE_FLAVOR] = flavor if flavor
 
         # We run the actual gradle task
-        result = gradle.trigger(task: gradle_task, serial: params[:serial], flags: flags.join(' '))
+        result = gradle.trigger(task: gradle_task,
+                                serial: params[:serial],
+                                flags: flags.join(' '),
+                                print_command: params[:print_command],
+                                print_command_output: params[:print_command_output])
 
         # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` scenario
         return result unless task.start_with?('assemble')
@@ -125,7 +129,17 @@ module Fastlane
                                        env_name: 'FL_ANDROID_SERIAL',
                                        description: 'Android serial, wich device should be used for this command',
                                        is_string: true,
-                                       default_value: '')
+                                       default_value: ''),
+          FastlaneCore::ConfigItem.new(key: :print_command,
+                                       env_name: 'FL_GRADLE_PRINT_COMMAND',
+                                       description: 'Control whether the generated Gradle command is printed as output before running it (true/false)',
+                                       is_string: false,
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :print_command_output,
+                                       env_name: 'FL_GRADLE_PRINT_COMMAND_OUTPUT',
+                                       description: 'Control whether the output produced by given Gradle command is printed while running (true/false)',
+                                       is_string: false,
+                                       default_value: true)
         ]
       end
 

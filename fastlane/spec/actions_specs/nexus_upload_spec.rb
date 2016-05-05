@@ -99,6 +99,7 @@ describe Fastlane do
                       repo_group_id: 'com.fastlane',
                       repo_project_name: 'myproject',
                       repo_project_version: '1.12',
+                      repo_classifier: 'dSYM',
                       endpoint: 'http://localhost:8081',
                       mount_path: '/my-nexus',
                       username: 'admin',
@@ -112,6 +113,7 @@ describe Fastlane do
         expect(result).to include('-F g=com.fastlane')
         expect(result).to include('-F a=myproject')
         expect(result).to include('-F v=1.12')
+        expect(result).to include('-F c=dSYM')
         expect(result).to include('-F e=ipa')
         expect(result).to include("-F file=@/tmp/file.ipa")
         expect(result).to include('-u admin:admin123')

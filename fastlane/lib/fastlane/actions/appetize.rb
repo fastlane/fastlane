@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     module SharedValues
-      APPETIZE_PRIVATE_KEY = :APPETIZE_PRIVATE_KEY
       APPETIZE_PUBLIC_KEY = :APPETIZE_PUBLIC_KEY
       APPETIZE_APP_URL = :APPETIZE_APP_URL
       APPETIZE_MANAGE_URL = :APPETIZE_MANAGE_URL
@@ -19,7 +18,7 @@ module Fastlane
         require 'json'
 
         params = {
-            platform: 'ios'
+          platform: 'ios'
         }
 
         if options[:path]
@@ -38,12 +37,14 @@ module Fastlane
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
+        UI.message "Uploading ipa to appetize... this might take a while"
         response = http.request(req)
 
-        UI.user_error!("Error uploading app to Appetize.io") unless parse_response(response)
+        parse_response(response) # this will raise an exception if something goes wrong
+
         UI.message("App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}")
         UI.message("Manage URL: #{Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL]}")
-        UI.message("App Private Key: #{Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY]}")
+        UI.message("Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
         UI.success("Build successfully uploaded to Appetize.io")
       end
 
@@ -68,17 +69,15 @@ module Fastlane
         body = JSON.parse(response.body)
         app_url = body['appURL']
         manage_url = body['manageURL']
-        private_key = body['privateKey']
         public_key = body['publicKey']
 
-        Actions.lane_context[SharedValues::APPETIZE_PRIVATE_KEY] = private_key
         Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
         Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
-      rescue
-        UI.error("Error uploading to Appetize.io: #{response.body}")
-        return false
+      rescue => ex
+        UI.error ex
+        UI.user_error!("Error uploading to Appetize.io: #{response.body}")
       end
       private_class_method :parse_response
 
@@ -97,7 +96,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :url,
                                        env_name: "APPETIZE_URL",
-                                       description: "Target url of the zipped build. Either this or `path` must be specified",
+                                       description: "URL from which the ipa file can be fetched. Alternative to :path",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
@@ -107,9 +106,14 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :public_key,
                                        env_name: "APPETIZE_PUBLICKEY",
-                                       description: "Public key of the app you wish to update. If not provided, then a new app entry will be created on Appetize.io",
+                                       description: "If not provided, a new app will be created. If provided, the existing build will be overwritten",
                                        is_string: true,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         if value.start_with?("private_")
+                                           UI.user_error!("You provided a private key to appetize, please provide the public key")
+                                         end
+                                       end),
           FastlaneCore::ConfigItem.new(key: :note,
                                        env_name: "APPETIZE_NOTE",
                                        description: "Notes you wish to add to the uploaded app",
@@ -120,7 +124,6 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PRIVATE_KEY', 'a string that is used to prove "ownership" of your app.'],
           ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app. Use this to update your app after it has been initially created'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
