@@ -72,6 +72,7 @@ class SighApplication
                '\nCannot be used together with -x|--version_number option.'
       c.option '--bundle-version STRING', String, 'Bundle version to force binary and all nested binaries to use (CFBundleIdentifier). '\
                'Cannot be used together with -x|--version_number option.'
+      c.option '-g', '--new_bundle_id STRING', String, 'New application bundle ID'
 
       c.action do |args, options|
         Sigh::Resign.new.run(options, args)

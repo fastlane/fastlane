@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
           UI.user_error!("Failed to re-sign .ipa")
@@ -84,6 +84,11 @@ module Fastlane
                                        env_name: "FL_RESIGN_BUNDLE_VERSION",
                                        description: "Bundle version to force resigned ipa to use (CFBundleIdentifier)",
                                        conflicting_options: [:version],
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_id,
+                                       env_name: "FL_RESIGN_BUNDLE_ID",
+                                       description: "Set new bundle ID during resign",
                                        is_string: true,
                                        optional: true)
         ]
