@@ -43,7 +43,7 @@ module Fastlane
         params = { store_id: store_id, api_key: api_key, key: path }
         uri.query = URI.encode_www_form(params)
         url_for_download_response = Net::HTTP.get_response(uri)
-        if url_for_download_response.kind_of?(Net::HTTPNotFound)
+        if invalid_response?(url_for_download_response)
           UI.user_error!("ERROR: A problem occurred with your API token and your store id. Please try again.")
         end
         json_res = JSON.parse(url_for_download_response.body)
@@ -99,6 +99,7 @@ module Fastlane
         screenshots = all_screenshots_links(screenshots)
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/mobile_application_updates/upload")
         http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
         req = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
         req.body = { store_id: store_id,
                      api_key: api_key,
@@ -215,6 +216,11 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
+      end
+
+      def self.invalid_response?(url_for_download_response)
+        url_for_download_response.kind_of?(Net::HTTPNotFound) ||
+          url_for_download_response.kind_of?(Net::HTTPForbidden)
       end
     end
   end
