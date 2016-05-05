@@ -14,10 +14,10 @@ module Fastlane
         app_path = Dir[File.join(tmp_path, "**", "*.app")].last
         UI.user_error!("Couldn't find app") unless app_path
 
-        zipped_ipa = Actions::ZipAction.run(path: app_path,
-                                     output_path: File.join(tmp_path, "Result.zip"))
+        zipped_bundle = Actions::ZipAction.run(path: app_path,
+                                        output_path: File.join(tmp_path, "Result.zip"))
 
-        Actions::AppetizeAction.run(path: zipped_ipa,
+        Actions::AppetizeAction.run(path: zipped_bundle,
                                api_token: params[:api_token])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
