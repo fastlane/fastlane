@@ -127,29 +127,7 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
-      method_str = method_sym.to_s
-      method_str.delete!('?') # as a `?` could be at the end of the method name
-
-      # First, check if there is a predefined method in the actions folder
-      class_name = method_str.fastlane_class + 'Action'
-      class_ref = nil
-      begin
-        class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError
-        # Action not found
-        # Is there a lane under this name?
-        return self.runner.try_switch_to_lane(method_sym, arguments)
-      end
-
-      # It's important to *not* have this code inside the rescue block
-      # otherwise all NameErrors will be catched and the error message is
-      # confusing
-      if class_ref && class_ref.respond_to?(:run)
-        # Action is available, now execute it
-        return self.runner.execute_action(method_sym, class_ref, arguments)
-      else
-        UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
-      end
+      self.runner.trigger_action_by_name(method_sym, *arguments)
     end
 
     #####################################################

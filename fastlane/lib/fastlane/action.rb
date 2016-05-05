@@ -2,6 +2,10 @@ require 'fastlane/actions/actions_helper'
 
 module Fastlane
   class Action
+    class << self
+      attr_accessor :runner
+    end
+
     def self.run(params)
     end
 
@@ -69,6 +73,19 @@ module Fastlane
     # instead of "AddGitAction", this will return "add_git" to print it to the user
     def self.action_name
       self.name.split('::').last.gsub('Action', '').fastlane_underscore
+    end
+
+    # Allows the user to call an action from an action
+    def self.method_missing(method_sym, *arguments, &_block)
+      UI.error("Unknown method '#{method_sym}'")
+      UI.user_error!("To call another action from an action use `OtherAction.#{method_sym}` instead")
+    end
+
+    # Return a new instance of the OtherAction action
+    # We need to do this, since it has to have access to
+    # the runner object
+    def self.other_action
+      return OtherAction.new(self.runner)
     end
   end
 end
