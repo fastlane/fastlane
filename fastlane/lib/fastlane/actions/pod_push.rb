@@ -22,6 +22,10 @@ module Fastlane
           command << " --allow-warnings"
         end
 
+        if params[:use_libraries]
+          command << " --use-libraries"
+        end
+
         result = Actions.sh(command.to_s)
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -53,6 +57,10 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :allow_warnings,
                                        description: "Allow warnings during pod push",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :use_libraries,
+                                       description: "Allow lint to use static libraries to install the spec",
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :sources,
