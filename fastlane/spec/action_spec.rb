@@ -11,7 +11,12 @@ describe Fastlane do
       it "allows the user to call it using `other_action.rocket`" do
         Fastlane::Actions.load_external_actions("spec/fixtures/actions")
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileActionFromAction')
-        expect(ff.runner.execute(:something, :ios)).to eq("🚀")
+
+        response = {
+          rocket: "🚀",
+          pwd: Dir.pwd
+        }
+        expect(ff.runner.execute(:something, :ios)).to eq(response)
       end
 
       it "shows an appropriate error message when trying to directly call an action" do

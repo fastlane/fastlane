@@ -88,7 +88,7 @@ module Fastlane
 
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    def trigger_action_by_name(method_sym, *arguments)
+    def trigger_action_by_name(method_sym, custom_dir, *arguments)
       method_str = method_sym.to_s
       method_str.delete!('?') # as a `?` could be at the end of the method name
 
@@ -108,7 +108,7 @@ module Fastlane
       # confusing
       if class_ref && class_ref.respond_to?(:run)
         # Action is available, now execute it
-        return self.execute_action(method_sym, class_ref, arguments)
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir)
       else
         UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
       end
@@ -147,7 +147,8 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: '..')
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
+      custom_dir ||= '..'
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
