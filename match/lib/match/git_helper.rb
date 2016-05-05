@@ -47,7 +47,9 @@ module Match
 
     def self.commit_changes(path, message, git_url)
       git = Git.open(path)
-      return unless git.status.any?
+
+      # Avoid calling git.status if no branch exists
+      return unless git.current_branch.nil? or git.status.any?
 
       Encrypt.new.encrypt_repo(path: path, git_url: git_url)
       File.write(File.join(path, "match_version.txt"), Match::VERSION) # unencrypted
