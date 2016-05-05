@@ -28,6 +28,7 @@ describe Fastlane do
              "-apiKey api_token",
              "-apiSecret build_secret",
              "-uploadDist '/",
+             "-betaDistributionReleaseNotesFilePath '/",
              "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
              "-betaDistributionGroupAliases 'testgroup'",
              "-betaDistributionNotifications true"].each do |to_be|
@@ -39,6 +40,30 @@ describe Fastlane do
             # "-betaDistributionReleaseNotesFilePath '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/changelog20151005-29563-1o3uf3m'",
             expect(command.join(" ")).to include("-betaDistributionReleaseNotesFilePath")
             expect(command.join(" ")).to include("-androidManifest")
+          end
+        end
+
+        it "hides sensitive parameters" do
+          with_verbose(true) do
+            expect(UI).to receive(:verbose) do |message|
+              expect(message).to_not include('PEANUTS')
+              expect(message).to_not include('MAJOR_KEY')
+
+              expect(message).to include('[[BUILD_SECRET]]')
+              expect(message).to include('[[API_TOKEN')
+            end
+
+            Fastlane::FastFile.new.parse('lane :test do
+            crashlytics(
+              crashlytics_path: "./fastlane/spec/fixtures/fastfiles/Fastfile1",
+              api_token: "PEANUTS",
+              build_secret: "MAJOR_KEY",
+              apk_path: "./fastlane/spec/fixtures/fastfiles/Fastfile2",
+              emails: ["email1@krausefx.com", "email2@krausefx.com"],
+              groups: "testgroup",
+              notes: "Such notes, very release"
+              )
+            end').runner.execute(:test)
           end
         end
       end
@@ -63,6 +88,26 @@ describe Fastlane do
                                     "-notifications YES",
                                     "-debug NO"
                                   ])
+          end
+
+          it "hides sensitive parameters" do
+            with_verbose(true) do
+              expect(UI).to receive(:verbose) do |message|
+                expect(message).to_not include('PEANUTS')
+                expect(message).to_not include('MAJOR_KEY')
+
+                expect(message).to include('[[BUILD_SECRET]]')
+                expect(message).to include('[[API_TOKEN')
+              end
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'MAJOR_KEY',
+                  build_secret: 'PEANUTS',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end
           end
 
           it "works automatically stores the notes in a file if given" do

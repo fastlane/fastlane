@@ -28,10 +28,28 @@ module Fastlane
         end
 
         UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
-        UI.verbose(command.join(" ")) if $verbose
-        Actions.sh(command.join(" "), log: false)
+
+        sanitizer = proc do |message|
+          message.gsub(params[:api_token], '[[API_TOKEN]]')
+                 .gsub(params[:build_secret], '[[BUILD_SECRET]]')
+        end
+
+        UI.verbose sanitizer.call(command.join(' ')) if $verbose
+
+        error_callback = proc do |error|
+          clean_error = sanitizer.call(error)
+          UI.error(clean_error)
+        end
+
+        result = Actions.sh_control_output(
+          command.join(" "),
+          print_command: false,
+          print_command_output: false,
+          error_callback: error_callback)
 
         return command if Helper.test?
+
+        UI.verbose sanitizer.call(result) if $verbose
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
       end
