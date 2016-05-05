@@ -139,10 +139,10 @@ xcodebuild(
 app_path = Dir[File.join(tmp_path, "**", "*.app")].last
 UI.user_error!("Couldn't find app") unless app_path
 
-zipped_ipa = zip(path: app_path, output_path: File.join(tmp_path, "Result.zip"))
+zipped_bundle = zip(path: app_path, output_path: File.join(tmp_path, "Result.zip"))
 
 appetize(
-  path: zipped_ipa,
+  path: zipped_bundle,
   api_token: 'yourapitoken' # get it from https://appetize.io/docs#request-api-token
 )
 
