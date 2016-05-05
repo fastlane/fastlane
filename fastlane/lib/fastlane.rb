@@ -1,5 +1,6 @@
 require 'fastlane/core_ext/string' # this has to be above most of the other requires
 require 'fastlane/version'
+require 'fastlane/tools'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
 require 'fastlane/runner'
