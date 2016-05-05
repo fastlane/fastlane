@@ -1990,9 +1990,9 @@ Creates and boots avd device before running gradle command.
 
 ```ruby
 instrumented_tests(
-    avd_name: "Nexus_10",
-    target_id: "2",
-    task: "cleanTest createMockDebugCoverageReport --continue",
+  avd_name: "Nexus_10",
+  target_id: "2",
+  task: "cleanTest createMockDebugCoverageReport --continue",
 )
 ```
 
