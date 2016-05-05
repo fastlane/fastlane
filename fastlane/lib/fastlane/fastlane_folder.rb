@@ -36,7 +36,7 @@ module Fastlane
     # Use this only if performance is :key:
     def self.available_lanes
       return [] if fastfile_path.nil?
-      output = Helper.backticks("cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'")
+      output = `cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
       return output.strip.split(" ").collect(&:to_sym)
     end
   end
