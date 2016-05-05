@@ -127,7 +127,7 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
-      self.runner.trigger_action_by_name(method_sym, *arguments)
+      self.runner.trigger_action_by_name(method_sym, nil, *arguments)
     end
 
     #####################################################
