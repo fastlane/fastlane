@@ -61,11 +61,10 @@ module Fastlane
       def self.available_options
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
-        ipa_path_default = nil
         if platform == :ios or platform.nil?
           ipa_path_default = Dir["*.ipa"].last
         end
-        apk_path_default = nil
+
         if platform == :android
           apk_path_default = Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last
         end

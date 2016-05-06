@@ -19,8 +19,12 @@ module Danger
 
           devices ||= %w(iphone4s iphone5s iphone6s iphone6splus ipadair)
           languages ||= ["en"]
-          prefix_command = "bundle exec" if File.exist?("Gemfile")
+
           prefix_command ||= ""
+          prefix_command += " bundle exec " if File.exist?("Gemfile")
+
+          # To use the local fastlane intead of bundle
+          prefix_command = "./bin/" if FastlaneCore::Helper.test?
 
           deep_link_matches = pr_body.match(/:link:\s(.*)/) # :link: emoji
           deep_link = deep_link_matches[1] if deep_link_matches
@@ -42,7 +46,7 @@ module Danger
                 }
                 params[:launch_url] = deep_link if deep_link
                 params_str = params.collect { |k, v| "#{k}:\"#{v}\"" }.join(" ")
-                url = `#{prefix_command} fastlane run appetize_viewing_url_generator #{params_str}`
+                url = Fastlane::Helper.backticks("#{prefix_command}fastlane run appetize_viewing_url_generator #{params_str}")
                 url = url.match(%r{Result:.*(https\:\/\/.*)})[1].strip
 
                 markdown("<a href='#{url}'>")
