@@ -154,7 +154,13 @@ module Snapshot
                                      short_option: "-f",
                                      env_name: "SNAPSHOT_DERIVED_DATA_PATH",
                                      description: "The directory where build products and other derived data will go",
-                                     optional: true)
+                                     optional: true),
+        # Everything around Updating
+        FastlaneCore::ConfigItem.new(key: :force_update,
+                                     env_name: 'FORCE_UPDATE_HELPER_FILES',
+                                     description: "Force the helper files to be overwritten if a new update is available",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
