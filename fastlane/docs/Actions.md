@@ -1995,6 +1995,19 @@ To obtain the token, create a new
 [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)
 in your Flock admin panel.
 
+### [JIRA](https://www.atlassian.com/software/jira)
+Leave a comment on a JIRA ticket.
+
+```ruby
+jira(
+  url: "https://bugs.yourdomain.com",
+  username: "Your username",
+  password: "Your password",
+  ticket_id: "Ticket ID, i.e. IOS-123",
+  comment_text: "Text to post as a comment"
+)
+```
+
 ## Other
 
 ### update_fastlane
