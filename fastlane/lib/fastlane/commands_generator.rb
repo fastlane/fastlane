@@ -34,15 +34,12 @@ module Fastlane
 
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
-        c.description = 'Drive the fastlane for a specific environment. Pass the lane name and optionally the platform first'
+        c.description = 'Run a sepcific lane. Pass the lane name and optionally the platform first.'
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
-          if Fastlane::FastlaneFolder.setup?
+          if ensure_fastfile
             Fastlane::CommandLineHandler.handle(args, options)
-          else
-            create = agree('Could not find fastlane in current directory. Would you like to set it up? (y/n)'.yellow, true)
-            Fastlane::Setup.new.run if create
           end
         end
       end
@@ -73,13 +70,15 @@ module Fastlane
         c.option "-j", "--json", "Output the lanes in JSON instead of text"
 
         c.action do |args, options|
-          require 'fastlane/lane_list'
-          path = File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile')
+          if ensure_fastfile
+            require 'fastlane/lane_list'
+            path = File.join(Fastlane::FastlaneFolder.fastfile_path)
 
-          if options.json
-            Fastlane::LaneList.output_json(path)
-          else
-            Fastlane::LaneList.output(path)
+            if options.json
+              Fastlane::LaneList.output_json(path)
+            else
+              Fastlane::LaneList.output(path)
+            end
           end
         end
       end
@@ -88,12 +87,14 @@ module Fastlane
         c.syntax = 'fastlane list'
         c.description = 'Lists all available lanes without description'
         c.action do |args, options|
-          ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
-          UI.message "Available lanes:"
-          ff.runner.available_lanes.each do |lane|
-            UI.message "- #{lane}"
+          if ensure_fastfile
+            ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+            UI.message "Available lanes:"
+            ff.runner.available_lanes.each do |lane|
+              UI.message "- #{lane}"
+            end
+            UI.important "Execute using `fastlane [lane_name]`"
           end
-          UI.important "Execute using `fastlane [lane_name]`"
         end
       end
 
@@ -103,9 +104,11 @@ module Fastlane
         c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
 
         c.action do |args, options|
-          ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
-          FastlaneCore::Helper.log.info "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
-          Fastlane::DocsGenerator.run(ff)
+          if ensure_fastfile
+            ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
+            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
+            Fastlane::DocsGenerator.run(ff)
+          end
         end
       end
 
@@ -170,6 +173,18 @@ module Fastlane
       default_command :trigger
 
       run!
+    end
+
+    # Makes sure a Fastfile is available
+    # Shows an appropriate message to the user
+    # if that's not the case
+    # return true if the Fastfile is available
+    def ensure_fastfile
+      return true if Fastlane::FastlaneFolder.setup?
+
+      create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
+      Fastlane::Setup.new.run if create
+      return false
     end
 
     # rubocop:enable Metrics/AbcSize
