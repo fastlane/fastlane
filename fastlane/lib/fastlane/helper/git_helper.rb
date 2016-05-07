@@ -12,6 +12,16 @@ module Fastlane
       nil
     end
 
+    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering)
+      command = 'git log'
+      command << " --pretty=\"#{pretty_format}\" -n #{commit_count}"
+      command << " --no-merges" if merge_commit_filtering == :exclude_merges
+      command << " --merges" if merge_commit_filtering == :only_include_merges
+      Actions.sh(command, log: false).chomp
+    rescue
+      nil
+    end
+
     def self.last_git_tag_name(match_lightweight = true, tag_match_pattern = nil)
       tag_pattern_param = tag_match_pattern ? "=#{tag_match_pattern.shellescape}" : ''
 
