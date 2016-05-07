@@ -97,7 +97,6 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%B\" -n 10")
       end
 
-
       it "Does not accept an invalid value for :merge_commit_filtering" do
         values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')
         error_msg = "Valid values for :merge_commit_filtering are #{values}"

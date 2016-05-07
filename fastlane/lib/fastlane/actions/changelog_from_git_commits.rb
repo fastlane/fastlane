@@ -23,8 +23,6 @@ module Fastlane
           UI.success("Collecting Git commits between #{from} and #{to}")
         end
 
-
-
         # Normally it is not good practice to take arbitrary input and convert it to a symbol
         # because prior to Ruby 2.2, symbols are never garbage collected. However, we've
         # already validated that the input matches one of our allowed values, so this is OK
@@ -74,15 +72,15 @@ module Fastlane
                                          UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
                                          UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
                                        end),
-         FastlaneCore::ConfigItem.new(key: :commits_count,
-                                      env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
-                                      description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
-                                      optional: true,
-                                      is_string: false,
-                                      verify_block: proc do |value|
-                                        UI.user_error!(":commits_count must be an integer") unless value.is_a? Integer
-                                        UI.user_error!(":commits_count must be >= 1") unless value >= 1
-                                      end),
+          FastlaneCore::ConfigItem.new(key: :commits_count,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
+                                       description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!(":commits_count must be an integer") unless value.kind_of? Integer
+                                         UI.user_error!(":commits_count must be >= 1") unless value >= 1
+                                       end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
                                        description: 'The format applied to each commit while generating the collected value',
