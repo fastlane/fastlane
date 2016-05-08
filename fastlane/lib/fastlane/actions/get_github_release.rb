@@ -10,6 +10,9 @@ module Fastlane
         require 'excon'
         require 'base64'
 
+        # To still get the data when a repo has been moved
+        Excon.defaults[:middlewares] << Excon::Middleware::RedirectFollower
+
         server_url = params[:server_url]
         server_url = server_url[0..-2] if server_url.end_with? '/'
 
