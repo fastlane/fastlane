@@ -17,7 +17,10 @@ module Fastlane
 
         return params[:ipa] if Helper.test?
 
-        response = client.upload_build(params[:ipa], params.values)
+        client_options = params.values
+        client_options[:testers_groups] = params[:testers_groups].join(',')
+
+        response = client.upload_build(params[:ipa], client_options)
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")
@@ -67,7 +70,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :comment,
                                        env_name: "FL_TESTFAIRY_COMMENT",
                                        description: "Additional release notes for this upload. This text will be added to email notifications",
-                                       default_value: 'No comment provided') # the default value if the user didn't provide one
+                                       default_value: 'No comment provided'), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :testers_groups,
+                                       type: Array,
+                                       short_option: '-g',
+                                       env_name: "FL_TESTFAIRY_TESTERS_GROUPS",
+                                       description: "Array of tester groups to be notified",
+                                       default_value: []) # the default value is an empty list
         ]
       end
 

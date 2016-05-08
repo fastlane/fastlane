@@ -6,5 +6,5 @@ This is **not** the fastlane source code, but the deployment of `fastlane` itsel
 For more information:
 
 - [Project Page](https://github.com/fastlane/fastlane/tree/master/fastlane)
-- [Documentation](https://github.com/fastlane/fastlane/tree/master/docs)
-- [fastlane source](https://github.com/fastlane/fastlane/tree/master/lib)
+- [Documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs)
+- [fastlane source](https://github.com/fastlane/fastlane/tree/master/fastlane/lib)

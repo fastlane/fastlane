@@ -1,2 +1,2 @@
 # Fetch and use the latest Fastfile from the fastlane main repository
-import_from_git(url: "https://github.com/fastlane/fastlane")
+import("../../fastlane/fastlane/Fastfile")

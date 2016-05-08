@@ -121,12 +121,12 @@ describe Spaceship::ProvisioningProfile do
 
     it 'creates a new development provisioning profile' do
       expect(Spaceship::Device).to receive(:all).and_return([])
-      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false).and_return({})
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil).and_return({})
       Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
     it 'creates a new appstore provisioning profile' do
-      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false).and_return({})
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil).and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
@@ -135,7 +135,9 @@ describe Spaceship::ProvisioningProfile do
                                                                     'store',
                                                                     '2UMR2S6PAA',
                                                                     "XC5PH8DAAA",
-                                                                    [], mac: false).
+                                                                    [],
+                                                                    mac: false,
+                                                                    sub_platform: nil).
         and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
     end

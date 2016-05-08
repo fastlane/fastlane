@@ -1,13 +1,13 @@
 module Spaceship
   class Client
     def handle_two_step(response)
-      @x_apple_web_session_token = response["x-apple-web-session-token"]
+      @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
       r = request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.headers["Accept"] = "application/json"
       end
 
@@ -43,6 +43,7 @@ module Spaceship
     # Only needed for 2 step
     def load_session_from_file
       if File.exist?(persistent_cookie_path)
+        puts "Loading session from '#{persistent_cookie_path}'" if $verbose
         @cookie.load(persistent_cookie_path)
         return true
       end
@@ -75,7 +76,7 @@ module Spaceship
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
       end
 
       # we use `Spaceship::TunesClient.new.handle_itc_response`
@@ -91,7 +92,7 @@ module Spaceship
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
         req.headers["Accept"] = "application/json"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "code" => code.to_s }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -99,12 +100,35 @@ module Spaceship
       begin
         Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
       rescue => ex
-        raise "Incorrect verification code" if ex.to_s.include?("verification code") # to have a nicer output
+        # If the code was entered wrong
+        # {
+        #   "securityCode": {
+        #     "code": "1234"
+        #   },
+        #   "securityCodeLocked": false,
+        #   "recoveryKeyLocked": false,
+        #   "recoveryKeySupported": true,
+        #   "manageTrustedDevicesLinkName": "appleid.apple.com",
+        #   "suppressResend": false,
+        #   "authType": "hsa",
+        #   "accountLocked": false,
+        #   "validationErrors": [{
+        #     "code": "-21669",
+        #     "title": "Incorrect Verification Code",
+        #     "message": "Incorrect verification code."
+        #   }]
+        # }
+        if ex.to_s.include?("verification code") # to have a nicer output
+          puts "Error: Incorrect verification code"
+          return select_device(r, device_id)
+        end
+
         raise ex
       end
 
-      # If it works, r.body is actually nil
-      raise "Could not login" unless r.headers["set-cookie"].include?("myacinfo")
+      # If the request was successful, r.body is actually nil
+      # The previous request will fail if the user isn't on a team
+      # on iTunes Connect, but it still works, so we're good
 
       # Tell iTC that we are trustworthy (obviously)
       # This will update our local cookies to something new
@@ -112,12 +136,16 @@ module Spaceship
       # Changed Keys
       # - myacinfo
       # - DES5c148586dfd451e55afb0175f62418f91
+      # We actually only care about the DES value
 
       request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
         req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Web-Session-Token"] = @x_apple_web_session_token
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
       end
+      # This request will fail if the user isn't added to a team on iTC
+      # However we don't really care, this request will still return the
+      # correct DES... cookie
 
       self.store_cookie
 

@@ -62,7 +62,7 @@
 				"absoluteUrl": "http://example.com/user/jerome@wewanttoknow.com",
 				"fullName": "Jerome Lacoste"
 			},
-			"comment": "Disable changelog generation from Jenkins until we sort it out\n",
+			"comment": "Disable changelog generation from Jenkins until we sort it out\nThis commit has a body",
 			"date": "2016-02-18T17:02:23+0100 +0100",
 			"id": "69d3f6b6c48bd36879bbc8b0c9e7795e2b5aacd4",
 			"msg": "Disable changelog generation from Jenkins until we sort it out",

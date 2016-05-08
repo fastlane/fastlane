@@ -5,7 +5,11 @@ if (pr_body.to_s + pr_title.to_s).include?("WIP")
 end
 
 if pr_body.length < 5
-  warn "Please provide a changelog summary in the Pull Request description @#{pr_author}"
+  warn("Please provide a changelog summary in the Pull Request description @#{pr_author}")
+end
+
+unless pr_body.include?("https://github.com/fastlane/fastlane/issues/")
+  warn("Before submitting a Pull Request, please create an issue on GitHub to discuss the change. Please add a link to the issue in the PR body.")
 end
 
 require 'json'

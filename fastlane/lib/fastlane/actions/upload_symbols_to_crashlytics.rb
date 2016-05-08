@@ -8,7 +8,7 @@ module Fastlane
         find_api_token(params)
 
         dsym_paths = []
-        dsym_paths << params[:dsym_path]
+        dsym_paths << params[:dsym_path] if params[:dsym_path]
         dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
 
         if dsym_paths.count == 0
@@ -52,7 +52,7 @@ module Fastlane
       def self.upload_dsym(params, path)
         UI.message("Uploading '#{path}'...")
         command = []
-        command << params[:binary_path]
+        command << params[:binary_path].shellescape
         command << "-a #{params[:api_token]}"
         command << "-p #{params[:platform]}"
         command << File.expand_path(path).shellescape
@@ -94,7 +94,9 @@ module Fastlane
         [
           "This action allows you to upload symbolication files to Crashlytics.",
           "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode"
+          "use Bitcode. This action will not fail the build if one of the uploads failed.",
+          "The reason for that is that sometimes some of dSYM files are invalid, and we don't want",
+          "them to fail the complete build."
         ].join(" ")
       end
 
@@ -118,7 +120,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH",
-                                       description: "The path to the upload-symbols file",
+                                       description: "The path to the upload-symbols file of the Fabric app",
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)

@@ -14,7 +14,7 @@ describe Fastlane do
           add_git_tag
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag -am \'builds/test/1337 (fastlane)\' \'builds/test/1337\'")
+        expect(result).to eq("git tag -am builds/test/1337\\ \\(fastlane\\) \'builds/test/1337\'")
       end
 
       it "allows you to specify grouping and build number" do
@@ -28,7 +28,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag -am \'#{grouping}/test/#{specified_build_number} (fastlane)\' \'#{grouping}/test/#{specified_build_number}\'")
+        expect(result).to eq("git tag -am #{grouping}/test/#{specified_build_number}\\ \\(fastlane\\) \'#{grouping}/test/#{specified_build_number}\'")
       end
 
       it "allows you to specify a prefix" do
@@ -40,7 +40,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag -am \'builds/test/#{prefix}#{build_number} (fastlane)\' \'builds/test/#{prefix}#{build_number}\'")
+        expect(result).to eq("git tag -am builds/test/#{prefix}#{build_number}\\ \\(fastlane\\) \'builds/test/#{prefix}#{build_number}\'")
       end
 
       it "allows you to specify your own tag" do
@@ -52,7 +52,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag -am \'#{tag} (fastlane)\' \'#{tag}\'")
+        expect(result).to eq("git tag -am #{tag}\\ \\(fastlane\\) \'#{tag}\'")
       end
 
       it "specified tag overrides generate tag" do
@@ -67,7 +67,36 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("git tag -am \'#{tag} (fastlane)\' \'#{tag}\'")
+        expect(result).to eq("git tag -am #{tag}\\ \\(fastlane\\) \'#{tag}\'")
+      end
+
+      it "allows you to specify your own message" do
+        tag = '2.0.0'
+        message = "message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am message \'#{tag}\'")
+      end
+
+      it "properly shell escapes its message" do
+        tag = '2.0.0'
+        message = "message with 'quotes' (and parens)"
+        escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: \"#{message}\"
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am #{escaped_message} \'#{tag}\'")
       end
     end
   end

@@ -12,6 +12,7 @@
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
 - [Android.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Android.md) Getting started with fastlane for Android
 - [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
+- [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
 
 ## Fastfile
 
@@ -78,11 +79,11 @@ From then on, you can just start using your action in your `Fastfile`.
 
 If you think your extension can be used by other developers as well, let me know, and we can bundle it with `fastlane`.
 
-To call another action from within your action, use the following code:
+To call another action from within your action, just use the same code you would use in a `Fastfile`:
 
 ```ruby
-  Actions::DeliverAction.run(text: "Please input your password:", 
-                              key: 123)
+other_action.deliver(text: "Please input your password:", 
+                      key: 123)
 ```
 
 In general, think twice before you do this, most of the times, these action should be separate. Only call actions from within action if it makes sense.

@@ -1,0 +1,16 @@
+Executable=/Users/mfurtak/Desktop/Xcode.app/Contents/MacOS/Xcode
+Identifier=com.apple.dt.Xcode
+Format=app bundle with Mach-O thin (x86_64)
+CodeDirectory v=20100 size=307 flags=0x0(none) hashes=7+5 location=embedded
+Hash type=sha1 size=20
+CandidateCDHash sha1=dc74c741271f69129ef4121960857bdd171f19cd
+Hash choices=sha1
+CDHash=dc74c741271f69129ef4121960857bdd171f19cd
+Signature size=4105
+Authority=Software Signing
+Authority=Apple Code Signing Certification Authority
+Authority=Apple Root CA
+Info.plist entries=34
+TeamIdentifier=not set
+Sealed Resources version=2 rules=12 files=387668
+Internal requirements count=1 size=68

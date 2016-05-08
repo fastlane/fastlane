@@ -123,14 +123,19 @@ module Snapshot
       File.write(File.join(prefix, "locale.txt"), locale || "")
       File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
-      Fixes::SimulatorZoomFix.patch
-      Fixes::HardwareKeyboardFix.patch
-
+      # Kill and shutdown all currently running simulators so that the following settings
+      # changes will be picked up when they are started again.
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
       `xcrun simctl shutdown booted &> /dev/null`
 
-      if Snapshot.config[:erase_simulator]
+      Fixes::SimulatorZoomFix.patch
+      Fixes::HardwareKeyboardFix.patch
+
+      if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
         erase_simulator(device_type)
+        if Snapshot.config[:localize_simulator]
+          localize_simulator(device_type, language, locale)
+        end
       elsif Snapshot.config[:reinstall_app]
         # no need to reinstall if device has been erased
         uninstall_app(device_type)
@@ -138,6 +143,8 @@ module Snapshot
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
+
+      open_simulator_for_device(device_type)
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
@@ -183,6 +190,13 @@ module Snapshot
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
+    def open_simulator_for_device(device)
+      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+
+      UI.message("Explicitly opening simulator for device: #{device}")
+      `open -a Simulator --args -CurrentDeviceUDID #{TestCommandGenerator.device_udid(device)}`
+    end
+
     def uninstall_app(device_type)
       UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
       Snapshot.config[:app_identifier] ||= ask("App Identifier: ")
@@ -202,6 +216,20 @@ module Snapshot
       UI.important("Erasing #{device_type}...")
 
       `xcrun simctl erase #{device_udid} &> /dev/null`
+    end
+
+    def localize_simulator(device_type, language, locale)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      if device_udid
+        locale ||= language.sub("-", "_")
+        plist = {
+          AppleLocale: locale,
+          AppleLanguages: [language]
+        }
+        UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
+        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
+        File.write(plist_path, Plist::Emit.dump(plist))
+      end
     end
 
     def add_media(device_type, media_type, paths)

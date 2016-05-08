@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
           UI.user_error!("Failed to re-sign .ipa")
@@ -65,12 +65,30 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_RESIGN_VERSION",
-                                       description: "Version number to force resigned ipa to use",
+                                       description: "Version number to force resigned ipa to use. Updates both CFBundleShortVersionString and CFBundleIdentifier values in Info.plist. Applies for main app and all nested apps or extensions",
+                                       conflicting_options: [:short_version, :bundle_version],
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: "FL_DISPLAY_NAME",
                                        description: "Display name to force resigned ipa to use",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :short_version,
+                                       env_name: "FL_RESIGN_SHORT_VERSION",
+                                       description: "Short version string to force resigned ipa to use (CFBundleShortVersionString)",
+                                       conflicting_options: [:version],
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_version,
+                                       env_name: "FL_RESIGN_BUNDLE_VERSION",
+                                       description: "Bundle version to force resigned ipa to use (CFBundleIdentifier)",
+                                       conflicting_options: [:version],
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_id,
+                                       env_name: "FL_RESIGN_BUNDLE_ID",
+                                       description: "Set new bundle ID during resign",
                                        is_string: true,
                                        optional: true)
         ]

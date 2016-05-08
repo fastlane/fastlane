@@ -86,6 +86,34 @@ module Fastlane
       all
     end
 
+    # This is being called from `method_missing` from the Fastfile
+    # It's also used when an action is called from another action
+    def trigger_action_by_name(method_sym, custom_dir, *arguments)
+      method_str = method_sym.to_s
+      method_str.delete!('?') # as a `?` could be at the end of the method name
+
+      # First, check if there is a predefined method in the actions folder
+      class_name = method_str.fastlane_class + 'Action'
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError
+        # Action not found
+        # Is there a lane under this name?
+        return self.try_switch_to_lane(method_sym, arguments)
+      end
+
+      # It's important to *not* have this code inside the rescue block
+      # otherwise all NameErrors will be caugth and the error message is
+      # confusing
+      if class_ref && class_ref.respond_to?(:run)
+        # Action is available, now execute it
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir)
+      else
+        UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
+      end
+    end
+
     #
     # All the methods that are usually called on execution
     #
@@ -119,7 +147,8 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: '..')
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
+      custom_dir ||= '..'
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
@@ -140,6 +169,7 @@ module Fastlane
               UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
             end
 
+            class_ref.runner = self # needed to call another action form an action
             class_ref.run(arguments)
           end
         end

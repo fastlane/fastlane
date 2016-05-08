@@ -23,11 +23,12 @@ describe Fastlane do
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
             binary_basename: 'YourApp',
-            binary_file: 'you'
+            binary_file: 'you',
+            workspace: 'foo.xcworkspace'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
       end
 
       it "works with bundle" do
@@ -52,31 +53,41 @@ describe Fastlane do
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
             binary_basename: 'YourApp',
-            binary_file: 'you'
+            binary_file: 'you',
+            workspace: 'foo.xcworkspace'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing foo.xcodeproj")
+        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you " \
+                             "--ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
       end
 
-      it "requires project to be specified" do
+      it "requires project to be specified if .slather.yml is not found" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-            slather({})
+            slather
           end").runner.execute(:test)
         end.to raise_error
       end
 
-      it "does not require any parameters other than project" do
-        expect do
-          result = Fastlane::FastFile.new.parse("lane :test do
-            slather({
-              proj: 'foo.xcodeproj'
-            })
-          end").runner.execute(:test)
+      it "does not require project if .slather.yml is found" do
+        File.write('../.slather.yml', '')
 
-          expect(result).to eq("slather coverage foo.xcodeproj")
-        end
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage")
+      end
+
+      it "does not require any parameters other than project" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage foo.xcodeproj")
       end
 
       it "works with spaces in paths" do
@@ -104,6 +115,10 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("slather coverage --ignore Pods/\\* --ignore ../\\*\\*/\\*/Xcode\\* foo.xcodeproj")
+      end
+
+      after(:each) do
+        File.delete('../.slather.yml') if File.exist? '../.slather.yml'
       end
     end
   end

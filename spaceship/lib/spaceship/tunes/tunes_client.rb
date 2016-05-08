@@ -511,6 +511,9 @@ module Spaceship
     def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
 
+      # The request fails if this key is present in the data
+      data.delete("dailySubmissionCountByPlatform")
+
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
         req.body = data.to_json
@@ -568,6 +571,10 @@ module Spaceship
         current["feedbackEmail"]["value"] = feedback_email if feedback_email
       end
 
+      review_user_name = build_info['reviewUserName']['value']
+      review_password = build_info['reviewPassword']['value']
+      build_info['reviewAccountRequired']['value'] = (review_user_name.to_s + review_password.to_s).length > 0
+
       # Now send everything back to iTC
       r = request(:post) do |req| # same URL, but a POST request
         req.url url
@@ -577,6 +584,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # rubocop:disable Metrics/ParameterLists
     def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
                                             # Required Metadata:
                                             changelog: nil,
@@ -593,6 +601,7 @@ module Spaceship
                                             privacy_policy_url: nil,
                                             review_user_name: nil,
                                             review_password: nil,
+                                            review_notes: nil,
                                             encryption: false)
 
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
@@ -613,8 +622,10 @@ module Spaceship
       build_info['testInfo']['reviewLastName']['value'] = last_name if last_name
       build_info['testInfo']['reviewPhone']['value'] = phone_number if phone_number
       build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
+      build_info['testInfo']['reviewAccountRequired']['value'] = (review_user_name.to_s + review_password.to_s).length > 0
       build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
       build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
+      build_info['testInfo']['reviewNotes']['value'] = review_notes if review_notes
 
       r = request(:post) do |req| # same URL, but a POST request
         req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
@@ -632,6 +643,7 @@ module Spaceship
                                    encryption_info: encryption_info,
                                    encryption: encryption)
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       r = request(:get) do |req|
