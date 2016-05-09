@@ -215,7 +215,7 @@ module Supply
     # Get list of version codes for track
     def track_version_codes(track)
       ensure_active_edit!
-      
+
       result = android_publisher.get_track(
         current_package_name,
         current_edit.id,
