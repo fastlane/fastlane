@@ -78,7 +78,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(commits_count: 10, between: ['abcd', '1234'])
           end").runner.execute(:test)
-        end.to raise_error(":commits_count and :between must not be used at the same time")
+        end.to raise_error("Unresolved conflict between options: 'commits_count' and 'between'")
       end
 
       it "Does not accept a :commits_count < 1" do

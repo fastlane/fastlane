@@ -6,12 +6,8 @@ module Fastlane
 
     class ChangelogFromGitCommitsAction < Action
       def self.run(params)
-        if params[:between] and params[:commits_count]
-          UI.user_error!(":commits_count and :between must not be used at the same time")
-        end
-
         if params[:commits_count]
-          UI.success("Collecting #{params[:commits_count]} last Git commits")
+          UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
           if params[:between]
             from, to = params[:between]
@@ -67,6 +63,7 @@ module Fastlane
                                        description: 'Array containing two Git revision values between which to collect messages, you mustn\'t use it with :commits_count key at the same time',
                                        optional: true,
                                        is_string: false,
+                                       conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
                                          UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
                                          UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
@@ -77,6 +74,7 @@ module Fastlane
                                        description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
                                        optional: true,
                                        is_string: false,
+                                       conflicting_options: [:between],
                                        verify_block: proc do |value|
                                          UI.user_error!(":commits_count must be an integer") unless value.kind_of? Integer
                                          UI.user_error!(":commits_count must be >= 1") unless value >= 1
@@ -123,7 +121,7 @@ module Fastlane
       end
 
       def self.author
-        ['mfurtak', 'asfalcone', 'Siarhei Fedartsou']
+        ['mfurtak', 'asfalcone', 'SiarheiFedartsou']
       end
 
       def self.is_supported?(platform)
