@@ -100,7 +100,9 @@ module Fastlane
                                        description: "Define which build configuration to use when building",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the following command: `xcodebuild -list`") if value.nil? or value.chomp(' ').empty?
+                                         if value.chomp(' ').empty?
+                                           UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
+                                         end
                                        end)
         ]
       end
