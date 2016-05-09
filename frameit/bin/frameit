@@ -21,15 +21,15 @@ class FrameItApplication
     global_option('--verbose') { $verbose = true }
     FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options)
 
-    default_command :black
+    default_command :run
 
-    command :black do |c|
+    command :run do |c|
       c.syntax = 'frameit black'
       c.description = "Adds a black frame around all screenshots."
 
       c.action do |args, options|
         load_config(options)
-        Frameit::Runner.new.run('.', Frameit::Color::BLACK)
+        Frameit::Runner.new.run('.', nil)
       end
     end
 
