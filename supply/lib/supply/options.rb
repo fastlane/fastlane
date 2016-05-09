@@ -111,7 +111,16 @@ module Supply
                                      optional: true,
                                      description: "Whether to skip uploading SCREENSHOTS",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :track_promote_to,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_TO",
+                                     optional: true,
+                                     description: "The Track to promote to: production, beta, alpha or rollout",
+                                     verify_block: proc do |value|
+                                       available = %w(production beta alpha rollout)
+                                       raise "Invalid value '#{value}', must be #{available.join(', ')}".red unless available.include? value
+                                     end)
+
       ]
     end
   end

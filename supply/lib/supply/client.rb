@@ -212,6 +212,18 @@ module Supply
         track_body)
     end
 
+    # Get list of version codes for track
+    def track_version_codes(track)
+      ensure_active_edit!
+      
+      result = android_publisher.get_track(
+        current_package_name,
+        current_edit.id,
+        track)
+
+      return result.version_codes
+    end
+
     def update_apk_listing_for_language(apk_listing)
       ensure_active_edit!
 
