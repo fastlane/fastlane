@@ -1,6 +1,6 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = "https://fastlane-enhancer.herokuapp.com"
+    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://fastlane-enhancer.herokuapp.com"
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -8,12 +8,16 @@ module FastlaneCore
     #
     # Thus, if you call `did_crash`, it will record the failure both here, and in the
     # newer, more specific `crash` field.
+    #
+    # This value is a String, which is the name of the tool that caused the error
     attr_reader :error
 
     # This is the newer field for tracking only uncontrolled exceptions.
     #
     # This is written to only when `did_crash` is called, and therefore excludes
     # controlled exceptions.
+    #
+    # This value is a String, which is the name of the tool that caused the crash
     attr_reader :crash
 
     def did_launch_action(name)
@@ -39,10 +43,10 @@ module FastlaneCore
     def did_crash(name)
       name = name.to_sym
       if is_official?(name)
-        # Write to both exception fields to maintain the historical behavior of the @error
-        # field, as well as specifically note that this exception was uncontrolled in
-        # the @crash field
+        # Write to the @error field to maintain the historical behavior of the field, so
+        # that the server gets the same data in that field from old and new clients
         @error = name
+        # Also specifically note that this exception was uncontrolled in the @crash field
         @crash = name
       end
     end
@@ -92,6 +96,15 @@ module FastlaneCore
       @launches ||= Hash.new(0)
     end
 
+    # Maintains a hash of tool names to their detected versions.
+    #
+    # This data is sent in the same manner as launches, as an inline form-encoded JSON value in the POST.
+    # For example:
+    #
+    # {
+    #   match: '0.5.0',
+    #   fastlane: '1.86.1'
+    # }
     def versions
       @versions ||= {}
     end
@@ -112,7 +125,7 @@ module FastlaneCore
         # We need to pre-load the version file because tools that are invoked through their actions
         # will not yet have run their action, and thus will not yet have loaded the file which defines
         # the module and constant we need.
-        require "#{name}/version"
+        require File.join(name.to_s, "version")
 
         # Go from :credentials_manager to 'CredentialsManager'
         class_name = name.to_s.fastlane_class
