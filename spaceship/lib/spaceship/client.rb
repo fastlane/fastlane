@@ -177,6 +177,7 @@ module Spaceship
     def paging
       page = 0
       results = []
+      puts "Page size: #{page_size}"
       loop do
         page += 1
         current = yield(page)
@@ -188,6 +189,7 @@ module Spaceship
 
       return results
     end
+
 
     #####################################################
     # @!group Login and Team Selection

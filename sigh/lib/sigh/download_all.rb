@@ -7,7 +7,8 @@ module Sigh
       Spaceship.select_team
       UI.message "Successfully logged in"
 
-      Spaceship.provisioning_profile.all.each do |profile|
+      Spaceship.provisioning_profile.all(include_invalid_profiles=false).each do |profile|
+
         if profile.valid?
           UI.message "Downloading profile '#{profile.name}'..."
           download_profile(profile)
@@ -19,7 +20,12 @@ module Sigh
 
     def download_profile(profile)
       FileUtils.mkdir_p(Sigh.config[:output_path])
-      profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision" # default name
+      # Commented out line is the original code, this is a fix to retain the original profile names in the app store.
+      if Sigh.config[:use_apple_developer_portal_profile_names]
+          profile_name = "#{profile.name}.mobileprovision"
+      else
+        profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision" # default name
+      end
 
       output_path = File.join(Sigh.config[:output_path], profile_name)
       File.open(output_path, "wb") do |f|

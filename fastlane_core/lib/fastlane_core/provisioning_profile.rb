@@ -24,7 +24,14 @@ module FastlaneCore
       def parse(path)
         require 'plist'
 
-        plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
+        puts "USING UPDATED SECURITY LOGIN--FROM STASH"
+
+        # plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
+        # Original unlock command above--use the below command for multi-executor/ CI systems like Jenkins where more than one build may run concurrently
+
+        password = ENV["PASSWORD"]
+
+        plist = Plist.parse_xml(`echo #{password} | sudo -S security cms -D -k /Users/hudson/Library/Keychains/build.keychain -i "#{path}"`)
         if (plist || []).count > 5
           plist
         else
