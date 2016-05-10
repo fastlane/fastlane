@@ -7,11 +7,11 @@ module Fastlane
         begin
           path = File.expand_path(params[:plist_path])
           plist = Plist.parse_xml(path)
-          plist['developmentAppKey'] = params[:development_app_key]
-          plist['developmentAppSecret'] = params[:development_app_secret]
-          plist['productionAppKey'] = params[:production_app_key]
-          plist['productionAppSecret'] = params[:production_app_secret]
-          plist['detectProvisioningMode'] = params[:detect_provisioning_mode]
+          plist['developmentAppKey'] = params[:development_app_key] unless params[:development_app_key] == nil
+          plist['developmentAppSecret'] = params[:development_app_secret] unless params[:development_app_secret] == nil
+          plist['productionAppKey'] = params[:production_app_key] unless params[:production_app_key] == nil
+          plist['productionAppSecret'] = params[:production_app_secret] unless params[:production_app_secret] == nil 
+          plist['detectProvisioningMode'] = params[:detect_provisioning_mode] unless params[:detect_provisioning_mode] == nil
           new_plist = plist.to_plist
           File.write(path, new_plist)
         rescue => ex
@@ -24,6 +24,10 @@ module Fastlane
         "Set the Urban Airship plist configuration values"
       end
 
+      def self.details
+        "This action updates the AirshipConfig.plist need to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for Enterprise and Production versions of the application."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :plist_path,
@@ -33,22 +37,25 @@ module Fastlane
                                          raise "Could not find Urban Airship plist file".red unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development_app_key,
+                                       optional: true,
                                        env_name: "URBAN_AIRSHIP_DEVELOPMENT_APP_KEY",
                                        description: "The development app key"),
           FastlaneCore::ConfigItem.new(key: :development_app_secret,
+                                       optional: true,
                                        env_name: "URBAN_AIRSHIP_DEVELOPMENT_APP_SECRET",
                                        description: "The development app secret"),
           FastlaneCore::ConfigItem.new(key: :production_app_key,
+                                       optional: true,
                                        env_name: "URBAN_AIRSHIP_PRODUCTION_APP_KEY",
                                        description: "The production app key"),
           FastlaneCore::ConfigItem.new(key: :production_app_secret,
+                                       optional: true,
                                        env_name: "URBAN_AIRSHIP_PRODUCTION_APP_SECRET",
                                        description: "The production app secret"),
           FastlaneCore::ConfigItem.new(key: :detect_provisioning_mode,
                                        env_name: "URBAN_AIRSHIP_DETECT_PROVISIONING_MODE",
                                        is_string: false,
                                        optional: true,
-                                       default_value: true,
                                        description: "Automatically detect provisioning mode")
         ]
       end
