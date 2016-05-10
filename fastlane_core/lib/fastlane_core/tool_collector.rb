@@ -1,8 +1,20 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = "http://localhost:3000"
+    HOST_URL = "https://fastlane-enhancer.herokuapp.com"
 
+    # This is the original error reporting mechanism, which has always represented
+    # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
+    # exceptions.
+    #
+    # Thus, if you call `did_crash`, it will record the failure both here, and in the
+    # newer, more specific `crash` field.
     attr_reader :error
+
+    # This is the newer field for tracking only uncontrolled exceptions.
+    #
+    # This is written to only when `did_crash` is called, and therefore excludes
+    # controlled exceptions.
+    attr_reader :crash
 
     def did_launch_action(name)
       name = name.to_sym
@@ -13,9 +25,26 @@ module FastlaneCore
       end
     end
 
+    # Call when the problem is a caught/controlled exception (e.g. via UI.user_error!)
     def did_raise_error(name)
       name = name.to_sym
-      @error = name if is_official?(name)
+      if is_official?(name)
+        @error = name
+        # Don't write to the @crash field so that we can distinguish this exception later
+        # as being controlled
+      end
+    end
+
+    # Call when the problem is an uncaught/uncontrolled exception (e.g. via UI.crash!)
+    def did_crash(name)
+      name = name.to_sym
+      if is_official?(name)
+        # Write to both exception fields to maintain the historical behavior of the @error
+        # field, as well as specifically note that this exception was uncontrolled in
+        # the @crash field
+        @error = name
+        @crash = name
+      end
     end
 
     def did_finish
@@ -30,7 +59,8 @@ module FastlaneCore
       url += URI.encode_www_form(
         versions: versions.to_json,
         steps: launches.to_json,
-        error: @error
+        error: @error,
+        crash: @crash
       )
 
       if Helper.is_test? # don't send test data
@@ -101,7 +131,7 @@ module FastlaneCore
         # we can report a particular version
       end
 
-      return 'unknown'
+      return nil
     end
   end
 end
