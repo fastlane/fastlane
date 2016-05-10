@@ -100,8 +100,10 @@ Usually you'll use fastlane by triggering individual lanes:
 
 Additionally to the `fastlane` commands, you now have access to these `fastlane` tools:
 
-- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app to the App Store
+- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to Google Play
+- [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Command line tool for updating Android apps and their metadata on the Google Play Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`screengrab`](https://github.com/fastlane/fastlane/tree/master/screengrab): Automated localized screenshots of your Android app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
