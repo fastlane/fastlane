@@ -2,7 +2,6 @@ require 'cert/version'
 require 'cert/runner'
 require 'cert/keychain_importer'
 require 'cert/options'
-require 'cert/options'
 
 require 'fastlane_core'
 require 'spaceship'
