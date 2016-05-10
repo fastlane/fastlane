@@ -134,7 +134,7 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app. Use this to update your app after it has been initially created'],
+          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
         ]
