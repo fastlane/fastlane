@@ -3,7 +3,6 @@ require 'pem/manager'
 require 'pem/options'
 
 require 'fastlane_core'
-require 'credentials_manager/appfile_config'
 
 module PEM
   # Use this to just setup the configuration attribute and set it later somewhere else
