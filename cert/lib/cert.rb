@@ -5,7 +5,6 @@ require 'cert/options'
 require 'cert/options'
 
 require 'fastlane_core'
-require 'credentials_manager/appfile_config'
 require 'spaceship'
 
 module Cert
