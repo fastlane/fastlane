@@ -1,6 +1,6 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = "https://fastlane-enhancer.herokuapp.com"
+    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://fastlane-enhancer.herokuapp.com"
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -17,8 +17,12 @@ module FastlaneCore
     # This is written to only when `did_crash` is called, and therefore excludes
     # controlled exceptions.
     #
-    # This value is a String, which is the name of the tool that caused the crash
+    # This value is a boolean, which is true if the error was an uncontrolled exception
     attr_reader :crash
+
+    def initialize
+      @crash = false
+    end
 
     def did_launch_action(name)
       name = name.to_sym
@@ -47,7 +51,7 @@ module FastlaneCore
         # that the server gets the same data in that field from old and new clients
         @error = name
         # Also specifically note that this exception was uncontrolled in the @crash field
-        @crash = name
+        @crash = true
       end
     end
 
@@ -64,7 +68,7 @@ module FastlaneCore
         versions: versions.to_json,
         steps: launches.to_json,
         error: @error,
-        crash: @crash
+        crash: @crash ? @error : nil
       )
 
       if Helper.is_test? # don't send test data
@@ -122,18 +126,20 @@ module FastlaneCore
 
     def determine_version(name)
       begin
+        name = name.to_s.downcase
+
         # We need to pre-load the version file because tools that are invoked through their actions
         # will not yet have run their action, and thus will not yet have loaded the file which defines
         # the module and constant we need.
-        require File.join(name.to_s, "version")
+        require File.join(name, "version")
 
-        # Go from :credentials_manager to 'CredentialsManager'
-        class_name = name.to_s.fastlane_class
+        # Go from :foo_bar to 'FooBar'
+        module_name = name.fastlane_module
 
         # Look up the VERSION constant defined for the given tool name,
         # or return 'unknown' if we can't find it where we'd expect
-        if Kernel.const_defined?(class_name)
-          tool_module = Kernel.const_get(class_name)
+        if Kernel.const_defined?(module_name)
+          tool_module = Kernel.const_get(module_name)
 
           if tool_module.const_defined?('VERSION')
             return tool_module.const_get('VERSION')

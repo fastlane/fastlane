@@ -14,13 +14,14 @@ describe FastlaneCore::ToolCollector do
     collector.did_raise_error(:scan)
 
     expect(collector.error).to eq(:scan)
+    expect(collector.crash).to be(false)
   end
 
   it "tracks which tool crashes" do
     collector.did_crash(:scan)
 
     expect(collector.error).to eq(:scan)
-    expect(collector.crash).to eq(:scan)
+    expect(collector.crash).to be(true)
   end
 
   it "does not post the collected data if the opt-out ENV var is set" do
