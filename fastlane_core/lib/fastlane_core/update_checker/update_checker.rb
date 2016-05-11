@@ -91,8 +91,7 @@ module FastlaneCore
 
     # (optional) Returns the app identifier for the current tool
     def self.ios_app_identifier
-      # ARGV example:
-      # ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
+      # ARGV example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
       ARGV.each_with_index do |current, index|
         if current == "-a" || current == "--app_identifier"
           return ARGV[index + 1] if ARGV.count > index
@@ -103,28 +102,42 @@ module FastlaneCore
         return ENV["#{current}_APP_IDENTIFIER"] if ENV["#{current}_APP_IDENTIFIER"]
       end
 
-      return nil
+      return CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
     rescue
       nil # we don't want this method to cause a crash
     end
 
     # (optional) Returns the app identifier for the current tool
-    # supply and screengrab use different param names so we have to special case here
+    # supply and screengrab use different param names and env variable patterns so we have to special case here
+    # example:
+    #   supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
+    #   screengrab -a com.test.app should return com.test.app
     def self.android_app_identifier(gem_name)
-      # ARGV example:
-      # ["-a", "com.krausefx.app"]
+      app_identifier = nil
+
+      # ARGV example: ["-a", "com.krausefx.app"]
       ARGV.each_with_index do |current, index|
-        if (current == "--package_name" || current == "--app_package_name" || (current == '-p' && gem_name == 'supply') || (current == '-a' && gem_name == 'screengrab') )
-          return ARGV[index + 1] if ARGV.count > index
+        if android_app_identifier_arg?(gem_name, current)
+          app_identifier = ARGV[index + 1] if ARGV.count > index
+          break
         end
       end
 
-      return ENV["SUPPLY_PACKAGE_NAME"] if ENV["SUPPLY_PACKAGE_NAME"]
-      return ENV["SCREENGRAB_APP_PACKAGE_NAME"] if ENV["SCREENGRAB_APP_PACKAGE_NAME"]
+      app_identifier ||= ENV["SUPPLY_PACKAGE_NAME"] if ENV["SUPPLY_PACKAGE_NAME"]
+      app_identifier ||= ENV["SCREENGRAB_APP_PACKAGE_NAME"] if ENV["SCREENGRAB_APP_PACKAGE_NAME"]
+      app_identifier ||= CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
 
-      return nil
+      # Add Android prefix to prevent collisions if there is an iOS app with the same identifier
+      app_identifier ? "android_project_#{app_identifier}" : nil
     rescue
       nil # we don't want this method to cause a crash
+    end
+
+    def self.android_app_identifier_arg?(gem_name, arg)
+      return current == "--package_name" ||
+             current == "--app_package_name" ||
+            (current == '-p' && gem_name == 'supply') ||
+            (current == '-a' && gem_name == 'screengrab')
     end
 
     # To not count the same projects multiple time for the number of launches
@@ -135,16 +148,8 @@ module FastlaneCore
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
       require 'credentials_manager'
 
-      value = nil
-      value ||= self.android_app_identifier(gem_name)
-      value ||= CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
-      value = "android_project_#{value}" if value # if the iOS and Android app share the same app identifier
-
-      unless value
-        value = self.ios_app_identifier
-        value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-      end
-
+      # check if this is an android project first because some of the same params exist for iOS and Android tools
+      value = android_app_identifier(gem_name) || ios_app_identifier
       if value
         return Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt") # hashed + salted the bundle identifier
       end
