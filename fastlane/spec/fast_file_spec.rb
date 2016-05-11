@@ -146,12 +146,10 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
         expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_each_deploy')).to eq(true)
         expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
         expect(File.exist?('/tmp/fastlane/test')).to eq(false)
         expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
         expect(File.read("/tmp/fastlane/after_all")).to eq("deploy")
-        expect(File.exist?('/tmp/fastlane/after_each_deploy')).to eq(true)
 
         ff.runner.execute(:test)
         expect(File.exist?('/tmp/fastlane/test')).to eq(true)
@@ -179,6 +177,9 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileLaneBlocks')
         ff.runner.execute(:run_ios, :ios)
 
+        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
+
         before_each = File.read("/tmp/fastlane/before_each")
         after_each = File.read("/tmp/fastlane/after_each")
 
@@ -189,6 +190,8 @@ describe Fastlane do
 
         File.delete("/tmp/fastlane/before_each")
         File.delete("/tmp/fastlane/after_each")
+        File.delete("/tmp/fastlane/before_all")
+        File.delete("/tmp/fastlane/after_all")
       end
 
       it "Parameters are also passed to the error block" do
