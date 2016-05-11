@@ -250,7 +250,7 @@ module Fastlane
 
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
-      value ||= yield
+      value ||= yield if block_given?
       collector.did_launch_action(:puts)
       Fastlane::Actions::PutsAction.run([value])
     end
