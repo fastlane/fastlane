@@ -34,7 +34,7 @@ module Fastlane
             require File.join(tool_name, "commands_generator")
 
             # Call the tool's CommandsGenerator class and let it do its thing
-            Object.const_get(module_name_for_tool(tool_name))::CommandsGenerator.start
+            Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
           rescue LoadError
             # This will only happen if the tool we call here, doesn't provide
             # a CommandsGenerator class yet
@@ -46,14 +46,6 @@ module Fastlane
           require "fastlane/commands_generator"
           Fastlane::CommandsGenerator.start
         end
-      end
-
-      # We need custom treatment for `pem`
-      def module_name_for_tool(tool_name)
-        if tool_name == "pem"
-          return PEM
-        end
-        return tool_name.fastlane_class
       end
     end
   end
