@@ -115,9 +115,19 @@ module Fastlane
       @runner.set_before_all(@current_platform, block)
     end
 
+    # Is executed before each lane
+    def before_each(&block)
+      @runner.set_before_each(@current_platform, block)
+    end
+
     # Is executed after each test run
     def after_all(&block)
       @runner.set_after_all(@current_platform, block)
+    end
+
+    # Is executed before each lane
+    def after_each(&block)
+      @runner.set_after_each(@current_platform, block)
     end
 
     # Is executed if an error occured during fastlane execution
