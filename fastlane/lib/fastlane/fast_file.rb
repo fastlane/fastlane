@@ -130,6 +130,14 @@ module Fastlane
       @runner.set_after_each(@current_platform, block)
     end
 
+    # Just experiments
+    def plugin(plugin_name)
+      puts "Loading plugin #{plugin_name}"
+      pm = PluginManager.new
+      pm.add_dependency(plugin_name)
+      pm.install_dependencies
+    end
+
     # Is executed if an error occured during fastlane execution
     def error(&block)
       @runner.set_error(@current_platform, block)
