@@ -69,7 +69,7 @@ module FastlaneCore
       params = {}
       params["ci"] = "1" if Helper.is_ci?
 
-      project_hash = p_hash
+      project_hash = p_hash(gem_name)
       params["p_hash"] = project_hash if project_hash
 
       url += "?" + URI.encode_www_form(params) if params.count > 0
@@ -108,20 +108,41 @@ module FastlaneCore
       nil # we don't want this method to cause a crash
     end
 
+    # (optional) Returns the app identifier for the current tool
+    # supply and screengrab use different param names so we have to special case here
+    def self.android_app_identifier(gem_name)
+      # ARGV example:
+      # ["-a", "com.krausefx.app"]
+      ARGV.each_with_index do |current, index|
+        if (current == "--package_name" || current == "--app_package_name" || (current == '-p' && gem_name == 'supply') || (current == '-a' && gem_name == 'screengrab') )
+          return ARGV[index + 1] if ARGV.count > index
+        end
+      end
+
+      return ENV["SUPPLY_PACKAGE_NAME"] if ENV["SUPPLY_PACKAGE_NAME"]
+      return ENV["SCREENGRAB_APP_PACKAGE_NAME"] if ENV["SCREENGRAB_APP_PACKAGE_NAME"]
+
+      return nil
+    rescue
+      nil # we don't want this method to cause a crash
+    end
+
     # To not count the same projects multiple time for the number of launches
     # More information: https://github.com/fastlane/refresher
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
-    def self.p_hash
+    def self.p_hash(gem_name)
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
       require 'credentials_manager'
 
       value = nil
-      value ||= self.ios_app_identifier
-      value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      value ||= self.android_app_identifier(gem_name)
+      value ||= CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+      value = "android_project_#{value}" if value # if the iOS and Android app share the same app identifier
+
       unless value
-        value = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
-        value = "android_project_#{value}" if value # if the iOS and Android app share the same app identifier
+        value = self.ios_app_identifier
+        value ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       end
 
       if value
