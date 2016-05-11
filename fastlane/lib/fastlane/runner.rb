@@ -173,9 +173,12 @@ module Fastlane
             class_ref.run(arguments)
           end
         end
-      rescue => ex
+      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
-        raise ex
+        raise e
+      rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        collector.did_crash(method_sym)
+        raise e
       end
     end
 
