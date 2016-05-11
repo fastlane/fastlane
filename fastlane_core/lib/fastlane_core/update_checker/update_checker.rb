@@ -69,7 +69,7 @@ module FastlaneCore
       params = {}
       params["ci"] = "1" if Helper.is_ci?
 
-      project_hash = p_hash(gem_name)
+      project_hash = p_hash(ARGV, gem_name)
       params["p_hash"] = project_hash if project_hash
 
       url += "?" + URI.encode_www_form(params) if params.count > 0
@@ -90,11 +90,11 @@ module FastlaneCore
     end
 
     # (optional) Returns the app identifier for the current tool
-    def self.ios_app_identifier
-      # ARGV example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
-      ARGV.each_with_index do |current, index|
+    def self.ios_app_identifier(args)
+      # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
+      args.each_with_index do |current, index|
         if current == "-a" || current == "--app_identifier"
-          return ARGV[index + 1] if ARGV.count > index
+          return args[index + 1] if args.count > index
         end
       end
 
@@ -112,13 +112,12 @@ module FastlaneCore
     # example:
     #   supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
     #   screengrab -a com.test.app should return com.test.app
-    def self.android_app_identifier(gem_name)
+    def self.android_app_identifier(args, gem_name)
       app_identifier = nil
-
-      # ARGV example: ["-a", "com.krausefx.app"]
-      ARGV.each_with_index do |current, index|
+      # args example: ["-a", "com.krausefx.app"]
+      args.each_with_index do |current, index|
         if android_app_identifier_arg?(gem_name, current)
-          app_identifier = ARGV[index + 1] if ARGV.count > index
+          app_identifier = args[index + 1] if args.count > index
           break
         end
       end
@@ -134,22 +133,23 @@ module FastlaneCore
     end
 
     def self.android_app_identifier_arg?(gem_name, arg)
-      return current == "--package_name" ||
-             current == "--app_package_name" ||
-            (current == '-p' && gem_name == 'supply') ||
-            (current == '-a' && gem_name == 'screengrab')
+      return arg == "--package_name" ||
+             arg == "--app_package_name" ||
+            (arg == '-p' && gem_name == 'supply') ||
+            (arg == '-a' && gem_name == 'screengrab')
     end
 
     # To not count the same projects multiple time for the number of launches
     # More information: https://github.com/fastlane/refresher
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
-    def self.p_hash(gem_name)
+    def self.p_hash(args, gem_name)
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
       require 'credentials_manager'
 
       # check if this is an android project first because some of the same params exist for iOS and Android tools
-      value = android_app_identifier(gem_name) || ios_app_identifier
+      value = android_app_identifier(args, gem_name) || ios_app_identifier(args)
+
       if value
         return Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt") # hashed + salted the bundle identifier
       end

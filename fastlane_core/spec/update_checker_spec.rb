@@ -35,5 +35,22 @@ describe FastlaneCore do
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.1.pre1')).to eq(true)
       end
     end
+
+    describe "#p_hash?" do
+      it "chooses the correct param for package name for supply" do
+        args = ["--skip_upload_screenshots", "-a", "beta", "-p", "com.test.app"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq("2d195f58610c784cd135f22bf54561487e163fb25a10726bf0a7349d645a052e")
+      end
+
+      it "chooses the correct param for package name for screengrab" do
+        args = ["--skip_open_summary", "-a", "com.test.app", "-p", "com.test.app.test"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq("2d195f58610c784cd135f22bf54561487e163fb25a10726bf0a7349d645a052e")
+      end
+
+      it "chooses the correct param for package name for gym" do
+        args = ["--clean", "-a", "com.test.app", "-p", "test.xcodeproj"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq("181a84115f14300fefd82373db6da188af898f247c67b2cd9ff713f4cf7f69e6")
+      end
+    end
   end
 end
