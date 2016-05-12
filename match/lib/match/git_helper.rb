@@ -58,8 +58,8 @@ module Match
 
         commands = []
         commands << "git add -A"
-        commands << "git commit -m '#{message}'"
-        commands << "git push origin #{branch}"
+        commands << "git commit -m '#{message.shellescape}'"
+        commands << "git push origin #{branch.shellescape}"
 
         UI.message "Pushing changes to remote git repo..."
 
@@ -87,9 +87,9 @@ module Match
 
       commands = []
       if branch_exists?(branch)
-        commands << "git checkout #{branch}"
+        commands << "git checkout #{branch.shellescape}"
       else
-        commands << "git checkout --orphan #{branch}"
+        commands << "git checkout --orphan #{branch.shellescape}"
         commands << "git reset --hard"
       end
 
@@ -109,7 +109,7 @@ module Match
       return unless @dir
 
       result = Dir.chdir(@dir) do
-        FastlaneCore::CommandExecutor.execute(command: "git branch --list origin/#{branch} --no-color -r",
+        FastlaneCore::CommandExecutor.execute(command: "git branch --list origin/#{branch.shellescape} --no-color -r",
                                               print_all: $verbose,
                                               print_command: $verbose)
       end
