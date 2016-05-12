@@ -108,11 +108,10 @@ module Match
     def self.branch_exists?(branch)
       return unless @dir
 
-      result = nil
-      Dir.chdir(@dir) do
-        result = FastlaneCore::CommandExecutor.execute(command: "git branch --list #{branch} --no-color",
-                                                       print_all: $verbose,
-                                                       print_command: $verbose)
+      result = Dir.chdir(@dir) do
+        FastlaneCore::CommandExecutor.execute(command: "git branch --list #{branch} --no-color",
+                                              print_all: $verbose,
+                                              print_command: $verbose)
       end
       return !result.empty?
     end
