@@ -87,9 +87,12 @@ module Match
 
       commands = []
       if branch_exists?(branch)
+        # Checkout the branch if it already exists
         commands << "git checkout #{branch.shellescape}"
       else
+        # If a new branch is being created, we create it as an 'orphan' to not inherit changes from the master branch.
         commands << "git checkout --orphan #{branch.shellescape}"
+        # We also need to reset the working directory to not transfer any uncommitted changes to the new branch.
         commands << "git reset --hard"
       end
 
