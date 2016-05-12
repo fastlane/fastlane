@@ -170,13 +170,17 @@ module Fastlane
         end
       end
 
+
+      # Plugins, TODO: move them
       command :add_plugin do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'TODO'
 
         c.action do |args, options|
+          plugin_name = "pem"
           pm = PluginManager.new
-          pm.add_dependency("pem")
+          pm.add_dependency(plugin_name)
+          UI.success("Sucessfully added '#{plugin_name}' plugin")
         end
       end
 
@@ -189,6 +193,17 @@ module Fastlane
           pm.update_dependencies
         end
       end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          pm = PluginManager.new
+          pm.install_dependencies
+        end
+      end
+
       default_command :trigger
 
       run!

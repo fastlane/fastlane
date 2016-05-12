@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
+  spec.add_dependency 'bundler'
 
   spec.add_dependency 'fastlane_core', '>= 0.43.5', '< 1.0.0' # all shared code and dependencies
 
@@ -52,7 +53,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
 
   # Development only
-  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
