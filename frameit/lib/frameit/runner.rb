@@ -14,7 +14,12 @@ module Frameit
       end
     end
 
-    def run(path, color = Color::BLACK)
+    def run(path, color = nil)
+      unless color
+        color = Frameit::Color::BLACK
+        color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
+      end
+
       screenshots = Dir.glob("#{path}/**/*.{png,PNG}").uniq # uniq because thanks to {png,PNG} there are duplicates
 
       if screenshots.count > 0

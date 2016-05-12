@@ -10,6 +10,8 @@ module Scan
     end
 
     def test_app
+      open_simulator_for_device(Scan.device)
+
       command = TestCommandGenerator.generate
       prefix_hash = [
         {
@@ -75,6 +77,16 @@ module Scan
 
       UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
       UI.user_error!("Tests failed") unless result[:failures] == 0
+    end
+
+    def open_simulator_for_device(device)
+      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+
+      UI.message("Killing all running simulators")
+      `killall Simulator &> /dev/null`
+
+      UI.message("Explicitly opening simulator for device: #{device.name}")
+      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
     end
   end
 end

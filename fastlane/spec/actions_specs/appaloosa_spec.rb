@@ -97,6 +97,28 @@ describe Fastlane do
         end
       end
 
+      context 'when get_s3_url return a 403' do
+        let(:presign_s3_key) { Base64.encode64('https://appaloosa.com/test') }
+        let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk' }.to_json }
+        let(:expect_error) { 'ERROR: A problem occurred with your API token and your store id. Please try again.' }
+
+        before do
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
+            to_return(status: 200, body: presign_payload)
+          stub_request(:put, "http://appaloosa.com/test").
+            to_return(status: 200)
+          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556").
+            to_return(status: 403)
+        end
+
+        it 'raises a Fastlane error for problem with API token or store id' do
+          expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
+            raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+              expect(error.message).to eq(expect_error)
+            end)
+        end
+      end
+
       context 'with valid parameters' do
         let(:presign_s3_key) { Base64.encode64('https://appaloosa.com/test') }
         let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk'}.to_json }

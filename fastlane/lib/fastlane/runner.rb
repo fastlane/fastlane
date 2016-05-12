@@ -44,17 +44,15 @@ module Fastlane
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
-          # Call the platform specific before_all block and then the general one
-
-          before_all_blocks[current_platform].call(current_lane, parameters) if before_all_blocks[current_platform] && current_platform
-          before_all_blocks[nil].call(current_lane, parameters) if before_all_blocks[nil]
+          execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
+          execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
           return_val = lane_obj.call(parameters) # by default no parameters
 
-          # `after_all` is only called if no exception was raised before
-          # Call the platform specific before_all block and then the general one
-          after_all_blocks[current_platform].call(current_lane, parameters) if after_all_blocks[current_platform] && current_platform
-          after_all_blocks[nil].call(current_lane, parameters) if after_all_blocks[nil]
+          # after blocks are only called if no exception was raised before
+          # Call the platform specific after block and then the general one
+          execute_flow_block(after_each_blocks, current_platform, current_lane, parameters)
+          execute_flow_block(after_all_blocks, current_platform, current_lane, parameters)
         end
 
         return return_val
@@ -86,6 +84,34 @@ module Fastlane
       all
     end
 
+    # This is being called from `method_missing` from the Fastfile
+    # It's also used when an action is called from another action
+    def trigger_action_by_name(method_sym, custom_dir, *arguments)
+      method_str = method_sym.to_s
+      method_str.delete!('?') # as a `?` could be at the end of the method name
+
+      # First, check if there is a predefined method in the actions folder
+      class_name = method_str.fastlane_class + 'Action'
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError
+        # Action not found
+        # Is there a lane under this name?
+        return self.try_switch_to_lane(method_sym, arguments)
+      end
+
+      # It's important to *not* have this code inside the rescue block
+      # otherwise all NameErrors will be caugth and the error message is
+      # confusing
+      if class_ref && class_ref.respond_to?(:run)
+        # Action is available, now execute it
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir)
+      else
+        UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
+      end
+    end
+
     #
     # All the methods that are usually called on execution
     #
@@ -99,6 +125,8 @@ module Fastlane
 
         UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of? Hash
 
+        execute_flow_block(before_each_blocks, current_platform, new_lane, parameters)
+
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
@@ -110,6 +138,10 @@ module Fastlane
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
+        # after blocks are only called if no exception was raised before
+        # Call the platform specific after block and then the general one
+        execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
+
         UI.success "Cruising back to lane '#{original_full}' 🚘".green
         return result
       else
@@ -119,7 +151,8 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: '..')
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
+      custom_dir ||= '..'
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
@@ -140,13 +173,23 @@ module Fastlane
               UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
             end
 
+            class_ref.runner = self # needed to call another action form an action
             class_ref.run(arguments)
           end
         end
-      rescue => ex
+      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
-        raise ex
+        raise e
+      rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        collector.did_crash(method_sym)
+        raise e
       end
+    end
+
+    def execute_flow_block(block, current_platform, lane, parameters)
+      # Call the platform specific block and default back to the general one
+      block[current_platform].call(lane, parameters) if block[current_platform] && current_platform
+      block[nil].call(lane, parameters) if block[nil]
     end
 
     def verify_supported_os(name, class_ref)
@@ -185,6 +228,14 @@ module Fastlane
       lanes[lane.platform][lane.name] = lane
     end
 
+    def set_before_each(platform, block)
+      before_each_blocks[platform] = block
+    end
+
+    def set_after_each(platform, block)
+      after_each_blocks[platform] = block
+    end
+
     def set_before_all(platform, block)
       before_all_blocks[platform] = block
     end
@@ -199,6 +250,14 @@ module Fastlane
 
     def lanes
       @lanes ||= {}
+    end
+
+    def before_each_blocks
+      @before_each ||= {}
+    end
+
+    def after_each_blocks
+      @after_each ||= {}
     end
 
     def before_all_blocks

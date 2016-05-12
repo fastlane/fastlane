@@ -19,16 +19,21 @@ module Fastlane
 
       UI.crash!("invalid syntax") unless action_name
 
-      class_name = action_name.fastlane_class + 'Action'
+      run(action: action_name,
+          parameters: action_parameters)
+    end
+
+    def self.run(action: nil, parameters: nil)
+      class_name = action.fastlane_class + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
       rescue NameError
-        UI.crash!("Action '#{class_name}' not found")
+        UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
       end
 
       r = Runner.new
-      r.execute_action(action_name, class_ref, [action_parameters], custom_dir: '.')
+      r.execute_action(action, class_ref, [parameters], custom_dir: '.')
     end
   end
 end
