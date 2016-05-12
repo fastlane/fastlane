@@ -14,7 +14,7 @@ module Fastlane
         # every time one of the tools is launched
         available_lanes = Fastlane::FastlaneFolder.available_lanes
 
-        tool_name = ARGV.first.downcase
+        tool_name = ARGV.first ? ARGV.first.downcase : nil
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
           # This happens when the users uses things like
