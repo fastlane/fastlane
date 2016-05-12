@@ -1372,6 +1372,17 @@ badge(shield: "Version-0.0.3-blue", no_badge: true)
 
 **Note** If you want to reset the badge back to default you can use `sh "git checkout -- <path>/Assets.xcassets/"`
 
+### update_urban_airship_configuration
+
+Easily update the AirshipConfig.plist for different deployment targets.
+
+```ruby
+update_urban_airship_configuration(
+  plist_path: "AirshipConfig.plist",
+  production_app_key: "PRODKEY",
+  production_app_secret: "PRODSECRET"
+)  
+```
 
 ## Developer Portal
 

@@ -7,6 +7,7 @@ module Fastlane
         xcodebuild_configs = params[:xcodebuild]
         xcodebuild_configs[:sdk] = "iphonesimulator"
         xcodebuild_configs[:derivedDataPath] = tmp_path
+        xcodebuild_configs[:xcargs] = "CONFIGURATION_BUILD_DIR=" + tmp_path
         xcodebuild_configs[:scheme] ||= params[:scheme] if params[:scheme].to_s.length > 0
 
         Actions::XcodebuildAction.run(xcodebuild_configs)

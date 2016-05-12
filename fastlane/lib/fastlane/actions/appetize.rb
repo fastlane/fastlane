@@ -8,7 +8,7 @@ module Fastlane
 
     class AppetizeAction < Action
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include?(platform)
       end
 
       def self.run(options)
@@ -18,7 +18,7 @@ module Fastlane
         require 'json'
 
         params = {
-          platform: 'ios'
+          platform: options[:platform]
         }
 
         if options[:path]
@@ -37,7 +37,12 @@ module Fastlane
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
-        UI.message "Uploading ipa to appetize... this might take a while"
+        if params[:platform] == 'ios'
+          UI.message "Uploading ipa to appetize... this might take a while"
+        else
+          UI.message "Uploading apk to appetize... this might take a while"
+        end
+
         response = http.request(req)
 
         parse_response(response) # this will raise an exception if something goes wrong
@@ -99,6 +104,11 @@ module Fastlane
                                        description: "URL from which the ipa file can be fetched. Alternative to :path",
                                        is_string: true,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       env_name: "APPETIZE_PLATFORM",
+                                       description: "Platform. Either `ios` or `android`. Default is `ios`",
+                                       is_string: true,
+                                       default_value: 'ios'),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "APPETIZE_FILE_PATH",
                                        description: "Path to zipped build on the local filesystem. Either this or `url` must be specified",
@@ -124,7 +134,7 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PUBLIC_KEY', 'a public identiifer for your app. Use this to update your app after it has been initially created'],
+          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
         ]

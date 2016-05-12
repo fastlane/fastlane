@@ -29,7 +29,7 @@ module Fastlane
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
       rescue NameError
-        UI.crash!("Action '#{class_name}' not found")
+        UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
       end
 
       r = Runner.new

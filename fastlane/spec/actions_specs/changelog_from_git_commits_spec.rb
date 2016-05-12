@@ -65,6 +65,38 @@ describe Fastlane do
         end.to raise_error(":between must not contain nil values")
       end
 
+      it "Does not accept a string value for :commits_count" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(commits_count: 'abcd')
+          end").runner.execute(:test)
+        end.to raise_error(":commits_count must be an integer")
+      end
+
+      it "Does not accept a :commits_count and :between at the same time" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(commits_count: 10, between: ['abcd', '1234'])
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'commits_count' and 'between'")
+      end
+
+      it "Does not accept a :commits_count < 1" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(commits_count: -1)
+          end").runner.execute(:test)
+        end.to raise_error(":commits_count must be >= 1")
+      end
+
+      it "Collects logs with specified number of commits" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(commits_count: 10)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" -n 10")
+      end
+
       it "Does not accept an invalid value for :merge_commit_filtering" do
         values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')
         error_msg = "Valid values for :merge_commit_filtering are #{values}"

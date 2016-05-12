@@ -287,7 +287,7 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/"
+        url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{application.apple_id}/ios/versioninfo/"
         url += "deliverable" if self.is_live?
         return url
       end

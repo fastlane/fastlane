@@ -14,7 +14,7 @@ module Fastlane
         # every time one of the tools is launched
         available_lanes = Fastlane::FastlaneFolder.available_lanes
 
-        tool_name = ARGV.first
+        tool_name = ARGV.first.downcase
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
           # This happens when the users uses things like
@@ -34,7 +34,7 @@ module Fastlane
             require File.join(tool_name, "commands_generator")
 
             # Call the tool's CommandsGenerator class and let it do its thing
-            Object.const_get(tool_name.fastlane_class)::CommandsGenerator.start
+            Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
           rescue LoadError
             # This will only happen if the tool we call here, doesn't provide
             # a CommandsGenerator class yet

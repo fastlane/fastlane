@@ -44,17 +44,15 @@ module Fastlane
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
-          # Call the platform specific before_all block and then the general one
-
-          before_all_blocks[current_platform].call(current_lane, parameters) if before_all_blocks[current_platform] && current_platform
-          before_all_blocks[nil].call(current_lane, parameters) if before_all_blocks[nil]
+          execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
+          execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
           return_val = lane_obj.call(parameters) # by default no parameters
 
-          # `after_all` is only called if no exception was raised before
-          # Call the platform specific before_all block and then the general one
-          after_all_blocks[current_platform].call(current_lane, parameters) if after_all_blocks[current_platform] && current_platform
-          after_all_blocks[nil].call(current_lane, parameters) if after_all_blocks[nil]
+          # after blocks are only called if no exception was raised before
+          # Call the platform specific after block and then the general one
+          execute_flow_block(after_each_blocks, current_platform, current_lane, parameters)
+          execute_flow_block(after_all_blocks, current_platform, current_lane, parameters)
         end
 
         return return_val
@@ -127,6 +125,8 @@ module Fastlane
 
         UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of? Hash
 
+        execute_flow_block(before_each_blocks, current_platform, new_lane, parameters)
+
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
@@ -137,6 +137,10 @@ module Fastlane
         collector.did_launch_action(:lane_switch)
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
+
+        # after blocks are only called if no exception was raised before
+        # Call the platform specific after block and then the general one
+        execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
 
         UI.success "Cruising back to lane '#{original_full}' 🚘".green
         return result
@@ -173,10 +177,19 @@ module Fastlane
             class_ref.run(arguments)
           end
         end
-      rescue => ex
+      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
-        raise ex
+        raise e
+      rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        collector.did_crash(method_sym)
+        raise e
       end
+    end
+
+    def execute_flow_block(block, current_platform, lane, parameters)
+      # Call the platform specific block and default back to the general one
+      block[current_platform].call(lane, parameters) if block[current_platform] && current_platform
+      block[nil].call(lane, parameters) if block[nil]
     end
 
     def verify_supported_os(name, class_ref)
@@ -215,6 +228,14 @@ module Fastlane
       lanes[lane.platform][lane.name] = lane
     end
 
+    def set_before_each(platform, block)
+      before_each_blocks[platform] = block
+    end
+
+    def set_after_each(platform, block)
+      after_each_blocks[platform] = block
+    end
+
     def set_before_all(platform, block)
       before_all_blocks[platform] = block
     end
@@ -229,6 +250,14 @@ module Fastlane
 
     def lanes
       @lanes ||= {}
+    end
+
+    def before_each_blocks
+      @before_each ||= {}
+    end
+
+    def after_each_blocks
+      @after_each ||= {}
     end
 
     def before_all_blocks

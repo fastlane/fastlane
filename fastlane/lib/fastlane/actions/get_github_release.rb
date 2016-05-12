@@ -10,15 +10,15 @@ module Fastlane
         require 'excon'
         require 'base64'
 
-        # To still get the data when a repo has been moved
-        Excon.defaults[:middlewares] << Excon::Middleware::RedirectFollower
-
         server_url = params[:server_url]
         server_url = server_url[0..-2] if server_url.end_with? '/'
 
         headers = { 'User-Agent' => 'fastlane-get_github_release' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
-        response = Excon.get("#{server_url}/repos/#{params[:url]}/releases", headers: headers)
+
+        # To still get the data when a repo has been moved
+        middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower]
+        response = Excon.get("#{server_url}/repos/#{params[:url]}/releases", headers: headers, middlewares: middlewares)
 
         case response[:status]
         when 404

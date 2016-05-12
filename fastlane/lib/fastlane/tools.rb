@@ -4,7 +4,6 @@ module Fastlane
     :pilot,
     :spaceship,
     :produce,
-    :cert,
     :deliver,
     :frameit,
     :pem,

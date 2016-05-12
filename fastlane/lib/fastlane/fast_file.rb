@@ -115,9 +115,19 @@ module Fastlane
       @runner.set_before_all(@current_platform, block)
     end
 
+    # Is executed before each lane
+    def before_each(&block)
+      @runner.set_before_each(@current_platform, block)
+    end
+
     # Is executed after each test run
     def after_all(&block)
       @runner.set_after_all(@current_platform, block)
+    end
+
+    # Is executed before each lane
+    def after_each(&block)
+      @runner.set_after_each(@current_platform, block)
     end
 
     # Is executed if an error occured during fastlane execution
@@ -250,7 +260,7 @@ module Fastlane
 
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
-      value ||= yield
+      value ||= yield if block_given?
       collector.did_launch_action(:puts)
       Fastlane::Actions::PutsAction.run([value])
     end
