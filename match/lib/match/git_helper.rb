@@ -109,7 +109,7 @@ module Match
       return unless @dir
 
       result = Dir.chdir(@dir) do
-        FastlaneCore::CommandExecutor.execute(command: "git branch --list #{branch} --no-color",
+        FastlaneCore::CommandExecutor.execute(command: "git branch --list origin/#{branch} --no-color -r",
                                               print_all: $verbose,
                                               print_command: $verbose)
       end
