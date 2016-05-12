@@ -87,7 +87,7 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            UI.success "Successfully loaded custom action '#{file}'."
+            UI.success "Successfully loaded custom action '#{file}'." if $verbose
           else
             UI.error "Could not find method 'run' in class #{class_name}."
             UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
