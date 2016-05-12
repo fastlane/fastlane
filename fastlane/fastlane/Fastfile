@@ -74,10 +74,6 @@ lane :release do |options|
   if (github_release || {}).fetch('body', '').length == 0
     print_release_changelog(tool: tool_name, old_version: old_version)
 
-    # For now, continue to open the git comparison from the old repository, so that we can
-    # catch any changes that were made before the mono-repo change (eventually remove this)
-    `open https://github.com/#{github_url(tool: tool_name)}/compare/#{old_version}...master`
-
     title = prompt(text: 'Title: ')
     description = prompt(text: "Please enter a changelog: ",
                          multi_line_end_keyword: "END")
