@@ -37,19 +37,29 @@ describe FastlaneCore do
     end
 
     describe "#p_hash?" do
+      let (:package_name) { 'com.test.app' }
+
+      def android_hash_of(value)
+        hash_of("android_project_#{value}")
+      end
+
+      def hash_of(value)
+        Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt")
+      end
+
       it "chooses the correct param for package name for supply" do
-        args = ["--skip_upload_screenshots", "-a", "beta", "-p", "com.test.app"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq("2d195f58610c784cd135f22bf54561487e163fb25a10726bf0a7349d645a052e")
+        args = ["--skip_upload_screenshots", "-a", "beta", "-p", package_name]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for screengrab" do
-        args = ["--skip_open_summary", "-a", "com.test.app", "-p", "com.test.app.test"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq("2d195f58610c784cd135f22bf54561487e163fb25a10726bf0a7349d645a052e")
+        args = ["--skip_open_summary", "-a", package_name, "-p", "com.test.app.test"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for gym" do
-        args = ["--clean", "-a", "com.test.app", "-p", "test.xcodeproj"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq("181a84115f14300fefd82373db6da188af898f247c67b2cd9ff713f4cf7f69e6")
+        args = ["--clean", "-a", package_name, "-p", "test.xcodeproj"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq(hash_of(package_name))
       end
     end
   end
