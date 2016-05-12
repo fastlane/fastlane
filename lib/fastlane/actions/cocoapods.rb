@@ -15,7 +15,9 @@ module Fastlane
         end
 
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
-        cmd << ['pod install']
+        cmd << ['pod']
+        cmd << "_#{params[:version]}_" if params[:version]
+        cmd << ['install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
@@ -68,6 +70,11 @@ module Fastlane
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       env_name: "FL_COCOAPODS_VERSION",
+                                       description: "Explicitly uses a specific version of cocoapds",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :podfile,
                                        env_name: "FL_COCOAPODS_PODFILE",
                                        description: "Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file",

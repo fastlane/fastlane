@@ -88,6 +88,16 @@ describe Fastlane do
 
         expect(result).to eq("cd 'Project' && pod install")
       end
+
+      it "changes gem version if a specific one is set" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            version: '0.39.0'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod _0.39.0_ install")
+      end
     end
   end
 end
