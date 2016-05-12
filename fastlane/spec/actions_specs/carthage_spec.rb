@@ -320,7 +320,7 @@ describe Fastlane do
               configuration: ' '
             )
           end").runner.execute(:test)
-        end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the following command: `xcodebuild -list`")
+        end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
       end
 
       it "works with no parameters" do
