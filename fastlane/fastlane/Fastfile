@@ -1,5 +1,18 @@
 skip_docs
 
+
+lane :beta do
+  # temporary done here, this will be moved
+  require 'fastlane/xcversion'
+  require 'fastlane/xcversion/actions/xcversion'
+  require 'fastlane/xcversion/helper/xcversion_helper'
+
+  # This is the only thing people will in the future
+  # fastlane is the future
+  xcversion(path: "/Applications/Xcode.app")
+end
+
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
