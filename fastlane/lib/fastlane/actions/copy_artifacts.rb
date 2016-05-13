@@ -1,26 +1,31 @@
+require 'fileutils'
+
 module Fastlane
   module Actions
     class CopyArtifactsAction < Action
       def self.run(params)
         # we want to make sure that our target folder exist already
-        target_folder_command = 'mkdir -p ' + params[:target_path]
-        Actions.sh(target_folder_command)
+        FileUtils.mkdir_p(params[:target_path])
 
-        # construct the main command that will do the copying/moving for us
-        base_command = params[:keep_original] ? 'cp' : 'mv'
-        options = []
-        options << '-f'
-        options << '-R' if params[:keep_original] # we only want the -R flag for the cp command, which we get when the user asks to keep the original
-        options << params[:artifacts].map { |e| e.tr(' ', '\ ') }
-        options << params[:target_path]
+        # Replace any spaces in any of the artifact paths with '\ '
+        artifacts = params[:artifacts].map { |e| e.tr(' ', '\ ') }
 
-        command = ([base_command] + options).join(' ')
+        if params[:verbose]
+          UI.message("Copying artifacts #{artifacts.join(', ')} to #{params[:target_path]}")
+          UI.message(params[:keep_original] ? "Keeping originals files" : "Not keeping original files")
+        end
 
-        # if we don't want to fail on missing files, then we need to swallow the error from our command, by ORing with the nil command, guaranteeing a 0 status code
-        command += ' || :' unless params[:fail_on_missing]
+        if params[:fail_on_missing]
+          missing = artifacts.select { |a| !File.exist?(a) }
+          UI.error "Not all files were present in copy artifacts. \
+                      Missing #{missing.join(', ')}" unless missing.empty?
+        end
 
-        # call our command
-        Actions.sh(command)
+        if params[:keep_original]
+          FileUtils.cp_r(artifacts, params[:target_path], remove_destination: true)
+        else
+          FileUtils.mv(artifacts, params[:target_path], force: true)
+        end
 
         UI.success('Build artifacts successfully copied!')
       end
@@ -52,6 +57,11 @@ module Fastlane
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :fail_on_missing,
                                        description: "Fail when a source file isn't found",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       description: "Print out additional logs that are useful for debugging or tracking the action",
                                        is_string: false,
                                        optional: true,
                                        default_value: false)
