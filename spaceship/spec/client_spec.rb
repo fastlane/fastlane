@@ -115,7 +115,7 @@ describe Spaceship::Client do
 
   describe "#log_response" do
     it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
-      response = TestResponse.new("\x82\x05\xC30\x82\x04\xAB\xA0\x03\x02".force_encoding(Encoding::ASCII_8BIT))
+      response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
       expect(subject.try_log_response(:get, TestClient.hostname, response)).to be_truthy
     end
   end
