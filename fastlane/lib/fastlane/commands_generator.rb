@@ -170,7 +170,6 @@ module Fastlane
         end
       end
 
-
       # Plugins, TODO: move them
       command :add_plugin do |c|
         c.syntax = 'fastlane [lane]'

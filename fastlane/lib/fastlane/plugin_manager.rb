@@ -4,15 +4,8 @@ module Fastlane
 
     PLUGINSFILE_NAME = "Plugins"
 
-    def initialize
-      # unless plugins_attached?
-      #   UI.important("fastlane plugins are not enabled for this project")
-      #   UI.important("Please run `fastlane ")
-      # end
-    end
-
     def gemfile_path
-      # This is pretty important, since we don't know what kind of 
+      # This is pretty important, since we don't know what kind of
       # Gemfile the user has (e.g. Gemfile, gems.rb, or custom env variable)
       Bundler::SharedHelpers.default_gemfile.to_s
     end
@@ -59,7 +52,7 @@ module Fastlane
         UI.important("fastlane will create a new Gemfile at path '#{gemfile_path}'")
       end
       UI.important("This change is neccessary for fastlane plugins to work")
-      
+
       if UI.confirm("Can fastlane modify the Gemfile at path '#{gemfile_path}' for you?")
         attach_plugins!
         UI.success("Successfully modified '#{gemfile_path}'")
@@ -74,7 +67,7 @@ module Fastlane
 
     # The code required to load the Plugins file
     def code_to_attach
-      "plugins_path = File.join(File.dirname(__FILE__), 'fastlane', '#{PLUGINSFILE_NAME}')\n" + 
+      "plugins_path = File.join(File.dirname(__FILE__), 'fastlane', '#{PLUGINSFILE_NAME}')\n" \
       "eval(File.read(plugins_path), binding) if File.exist?(plugins_path)"
     end
 
