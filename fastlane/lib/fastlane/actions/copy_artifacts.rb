@@ -22,7 +22,7 @@ module Fastlane
         # call our command
         Actions.sh(command)
 
-        UI.success('Build artifacts sucesfully copied!')
+        UI.success('Build artifacts successfully copied!')
       end
 
       #####################################################
