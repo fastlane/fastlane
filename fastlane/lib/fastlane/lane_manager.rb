@@ -9,7 +9,7 @@ module Fastlane
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -110,7 +110,7 @@ module Fastlane
 
       rows = []
       available.each_with_index do |lane, index|
-        rows << [index + 1, lane.last.pretty_name, lane.last.description.first]
+        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]

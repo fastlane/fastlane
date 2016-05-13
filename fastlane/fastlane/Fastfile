@@ -1,10 +1,4 @@
-update_fastlane
 skip_docs
-
-desc "Run bundle install and tests"
-lane :test do
-  validate_repo(tool_name: detect_tool)
-end
 
 desc "Increment the version number of this gem"
 lane :bump do |options|
@@ -32,7 +26,8 @@ lane :bump do |options|
   end
 end
 
-desc "Display a changelog for a tool since its last release. Run from a tool directory or specify (e.g. tool:deliver)"
+desc "Display a changelog for a tool since its last release."
+desc "Run from a tool directory or specify (e.g. tool:deliver)"
 lane :show_changelog do |options|
   tool_name = options[:tool] || detect_tool
   old_version = current_version(tool: tool_name)
@@ -40,8 +35,11 @@ lane :show_changelog do |options|
   print_release_changelog(tool: tool_name, old_version: old_version)
 end
 
-desc "Does everything that's needed for a release, this includes running tests and verifying the GitHub release"
+desc "Does everything that's needed for a release"
+desc "This includes running tests and verifying the GitHub release"
 lane :release do |options|
+  update_fastlane
+
   # Fetching all information required for the release
   #
   tool_name = options[:tool] || detect_tool
@@ -63,6 +61,11 @@ lane :release do |options|
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
   git_pull
+  # Actual release
+  #
+  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
+  # Then push to git remote
+  #
   push_to_git_remote
 
   # Preparing GitHub Release
@@ -70,10 +73,6 @@ lane :release do |options|
   github_release = get_github_release(url: github_url(tool: tool_name), version: version)
   if (github_release || {}).fetch('body', '').length == 0
     print_release_changelog(tool: tool_name, old_version: old_version)
-
-    # For now, continue to open the git comparison from the old repository, so that we can
-    # catch any changes that were made before the mono-repo change (eventually remove this)
-    `open https://github.com/#{github_url(tool: tool_name)}/compare/#{old_version}...master`
 
     title = prompt(text: 'Title: ')
     description = prompt(text: "Please enter a changelog: ",
@@ -93,10 +92,6 @@ lane :release do |options|
     message = [title, description, release_url].join("\n\n")
     add_fastlane_git_tag(tag: "#{tool_name}/#{version}", message: message)
   end
-
-  # Actual release
-  #
-  sh "gem push ../pkg/#{tool_name}-#{version}.gem"
 
   # After publishing
   #
@@ -156,7 +151,11 @@ end
 
 desc "e.g. fastlane/deliver"
 private_lane :github_url do |options|
-  ["fastlane", options[:tool]].join("/")
+  if options[:tool] == "fastlane"
+    "fastlane/fastlane"
+  else
+    File.join("fastlane-old", options[:tool])
+  end
 end
 
 desc "Get the version number of the last release"
@@ -186,8 +185,8 @@ private_lane :print_release_changelog do |options|
   tool_name = options[:tool]
   old_version = options[:old_version]
 
-  cmd = "git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges .."
-  puts "Changes since release #{old_version}:\n" + `#{cmd}`.gsub("\n\n", "\n")
+  changes = sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..").gsub("\n\n", "\n")
+  puts "Changes since release #{old_version}:\n#{changes}"
 end
 
 desc "Add a git tag in the fastlane repo for this release"

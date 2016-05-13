@@ -13,16 +13,33 @@ module Fastlane
       return value
     end
 
+    # Path to the Fastfile inside the fastlane folder. This is nil when none is available
+    def self.fastfile_path
+      path = File.join(self.path || '.', 'Fastfile')
+      return path if File.exist?(path)
+      return nil
+    end
+
     # Does a fastlane configuration already exist?
     def self.setup?
-      return false unless path
-      File.exist?(File.join(path, "Fastfile"))
+      return false unless self.fastfile_path
+      File.exist?(self.fastfile_path)
     end
 
     def self.create_folder!(path = nil)
       path = File.join(path || '.', FOLDER_NAME)
       FileUtils.mkdir_p(path)
       UI.success "Created new folder '#{path}'."
+    end
+
+    # Returns an array of symbols for the available lanes for the Fastfile
+    # This doesn't actually use the Fastfile parser, but only
+    # the available lanes. This way it's much faster
+    # Use this only if performance is :key:
+    def self.available_lanes
+      return [] if fastfile_path.nil?
+      output = `cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+      return output.strip.split(" ").collect(&:to_sym)
     end
   end
 end

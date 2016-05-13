@@ -4,16 +4,21 @@ module Fastlane
     # This method will output the string and execute it
     # Just an alias for sh_no_action
     # When running this in tests, it will return the actual command instead of executing it
-    # @param log [boolean] should fastlane print out the executed command
-    def self.sh(command, log: true)
-      sh_control_output(command, print_command: log, print_command_output: log)
+    # @param log [Boolean] should fastlane print out the executed command
+    # @param error_callback [Block] a callback invoked with the command ouptut if there is a non-zero exit status
+    def self.sh(command, log: true, error_callback: nil)
+      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    def self.sh_no_action(command, log: true)
-      sh_control_output(command, print_command: log, print_command_output: log)
+    def self.sh_no_action(command, log: true, error_callback: nil)
+      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    def self.sh_control_output(command, print_command: true, print_command_output: true)
+    # @param command [String] The command to be executed
+    # @param print_command [Boolean] Should we print the command that's being executed
+    # @param print_command_output [Boolean] Should we print the command output during execution
+    # @param error_callback [Block] A block that's called if the command exits with a non-zero status
+    def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
@@ -44,6 +49,8 @@ module Fastlane
                       "Shell command exited with exit status #{exit_status} instead of 0."
                     end
           message += "\n#{result}" if print_command_output
+
+          error_callback.call(result) if error_callback
           UI.user_error!(message)
         end
       end

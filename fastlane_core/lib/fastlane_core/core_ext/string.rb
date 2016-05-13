@@ -3,6 +3,10 @@ class String
     split('_').collect!(&:capitalize).join
   end
 
+  def fastlane_module
+    self == "pem" ? 'PEM' : self.fastlane_class
+  end
+
   def fastlane_underscore
     self.gsub(/::/, '/').
       gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').

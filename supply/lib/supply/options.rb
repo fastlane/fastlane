@@ -4,6 +4,7 @@ require 'credentials_manager'
 module Supply
   class Options
     def self.available_options
+      valid_tracks = %w(production beta alpha rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -13,10 +14,10 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: production, beta, alpha or rollout",
+                                     description: "The Track to upload the Application to: #{valid_tracks.join(', ')}",
                                      default_value: 'production',
                                      verify_block: proc do |value|
-                                       available = %w(production beta alpha rollout)
+                                       available = valid_tracks
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
@@ -111,7 +112,16 @@ module Supply
                                      optional: true,
                                      description: "Whether to skip uploading SCREENSHOTS",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :track_promote_to,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_TO",
+                                     optional: true,
+                                     description: "The Track to promote to: #{valid_tracks.join(', ')}",
+                                     verify_block: proc do |value|
+                                       available = valid_tracks
+                                       UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
+                                     end)
+
       ]
     end
   end
