@@ -309,8 +309,11 @@ module Spaceship
 
     def itc_service_key
       return @service_key if @service_key
+      # Some clients have had trouble with GZip encoding, so we'll request the server to return unmodified plain-text
+      headers = ENV['SPACESHIP_LOGIN_ENCODING_IDENTITY'] ? {'Accept-Encoding' => 'identity'} : {}
+      logger.debug("itc_service_key headers: #{headers}")
       # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
+      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
       @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
     end
 
