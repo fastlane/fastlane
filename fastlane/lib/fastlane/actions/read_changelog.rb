@@ -60,12 +60,12 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Reads content of a section from your project CHANGELOG.md file"
+        "Reads the content of a section from your project CHANGELOG.md file"
       end
 
       def self.details
         "This action is inspired by \"Keep a CHANGELOG\" project (see http://keepachangelog.com/). \"Keep a CHANGELOG\" introduces a structed CHANGELOG.md file,
-        which contains a curated, chronologically ordered list of notable changes for each version of a project. Use this action to read content of a section
+        which contains a curated, chronologically ordered list of notable changes for each version of a project. Use this action to read the content of a section
         from your project's CHANGELOG.md."
       end
 
