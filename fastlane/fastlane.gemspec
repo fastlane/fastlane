@@ -31,10 +31,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
 
-  spec.add_dependency 'fastlane_core', '>= 0.43.3', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.43.5', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.26.2', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.27.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 1.11.2', '< 2.0.0'
@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'produce', '>= 1.1.2', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.6.3', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.5.1', '< 2.0.0'
-  spec.add_dependency 'supply', '>= 0.6.2', '< 1.0.0'
+  spec.add_dependency 'supply', '>= 0.7.0', '< 1.0.0'
   spec.add_dependency 'scan', '>= 0.6.1', '< 1.0.0'
   spec.add_dependency 'match', '>= 0.5.0', '< 1.0.0'
   spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
