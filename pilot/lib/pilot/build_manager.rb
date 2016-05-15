@@ -71,19 +71,22 @@ module Pilot
       start = Time.now
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
+      UI.message("Waiting for iTunes Connect to process the new build")
       loop do
-        UI.message("Waiting for iTunes Connect to process the new build")
         sleep wait_processing_interval
         builds = app.all_processing_builds
         break if builds.count == 0
-        latest_build = builds.last # store the latest pre-processing build here
+        latest_build = builds.last
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
       end
 
       full_build = nil
 
       while full_build.nil? || full_build.processing
-        # Now get the full builds with a reference to the application and more
-        # As the processing build from before doesn't have a refernece to the application
+        # The build's processing state should go from true to false, and be done. But sometimes it goes true -> false ->
+        # true -> false, where the second true is transient. This causes a spurious failure. Find build by build_version
+        # and ensure it's not processing before proceeding - it had to have already been false before, to get out of the
+        # previous loop.
         full_build = app.build_trains[latest_build.train_version].builds.find do |b|
           b.build_version == latest_build.build_version
         end
@@ -92,7 +95,7 @@ module Pilot
         sleep wait_processing_interval
       end
 
-      if full_build
+      if full_build && !full_build.processing && full_build.valid
         minutes = ((Time.now - start) / 60).round
         UI.success("Successfully finished processing the build")
         UI.message("You can now tweet: ")

@@ -218,45 +218,24 @@ module Spaceship
         end
       end
 
-      # @return [Array]A list of binaries which are not even yet processing based on the version
-      #   These are all build that have no information except the upload date
-      #   Those builds can also be the builds that are stuck on iTC.
-      def pre_processing_builds
-        data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
+      # @return [Array] A list of all builds in an invalid state
+      def all_invalid_builds
+        builds = []
 
-        builds = data.fetch('processingBuilds', []).collect do |attrs|
-          attrs[:build_train] = self
-          Tunes::ProcessingBuild.factory(attrs)
+        self.build_trains.values.each do |train|
+          builds.concat(train.invalid_builds)
         end
 
-        builds.delete_if { |a| a.state.include?("invalidBinary") }
-
-        builds
-      end
-
-      # @return [Array]A list of binaries which are in the invalid state
-      def invalid_builds
-        data = client.build_trains(apple_id, 'internal') # we need to fetch all trains here to get the builds
-
-        builds = data.fetch('processingBuilds', []).collect do |attrs|
-          attrs[:build_train] = self
-          Tunes::ProcessingBuild.factory(attrs)
-        end
-
-        builds.delete_if { |a| !a.state.include?("invalidBinary") }
-
-        builds
+        return builds
       end
 
       # @return [Array] This will return an array of *all* processing builds
       #   this include pre-processing or standard processing
       def all_processing_builds
-        builds = self.pre_processing_builds
+        builds = []
 
-        self.build_trains.each do |version_number, train|
-          train.processing_builds.each do |build|
-            builds << build
-          end
+        self.build_trains.values.each do |train|
+          builds.concat(train.processing_builds)
         end
 
         return builds
