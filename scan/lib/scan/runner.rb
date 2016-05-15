@@ -10,7 +10,7 @@ module Scan
     end
 
     def test_app
-      open_simulator_for_device(Scan.device)
+      open_simulator_for_device(Scan.devices.first)
 
       command = TestCommandGenerator.generate
       prefix_hash = [
