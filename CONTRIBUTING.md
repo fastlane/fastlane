@@ -87,8 +87,7 @@ If you're considering contibuting new functionality, please open a new issue exp
 
 To submit the changes to the fastlane repo, you have to do the following:
 
-- Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
-- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
+- Run `git push upstream master`. 
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
 ## What Do All These Labels Mean?
