@@ -302,7 +302,7 @@ module Spaceship
           raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
-          raise ITunesConnectError.new, info.join("\n")
+          raise TunesClient::ITunesConnectError.new, info.join("\n")
         end
       end
     end
