@@ -20,11 +20,11 @@ module Sigh
 
     def download_profile(profile)
       FileUtils.mkdir_p(Sigh.config[:output_path])
-      # Commented out line is the original code, this is a fix to retain the original profile names in the app store.
+
       if Sigh.config[:use_apple_developer_portal_profile_names]
-          profile_name = "#{profile.name}.mobileprovision"
+        profile_name = "#{profile.name}.mobileprovision"
       else
-        profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision" # default name
+        profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision"
       end
 
       output_path = File.join(Sigh.config[:output_path], profile_name)

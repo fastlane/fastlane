@@ -98,7 +98,7 @@ module Sigh
                                      short_option: "-w"),
         FastlaneCore::ConfigItem.new(key: :use_apple_developer_portal_profile_names,
                                      env_name: "SIGH_APPLE_DEVELOPER_PORTAL_NAMES",
-                                     description: "Uses the original Apple Developer portal profile names, instead of Fastlane's generated names. For use with 'sigh --download_all.'",
+                                     description: "Uses the original Apple Developer portal profile names, instead of Fastlane's generated names. For use with 'sigh download_all.'",
                                      is_string: false,
                                      default_value: false,
                                      short_option: "-p"),
