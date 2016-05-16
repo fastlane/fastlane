@@ -98,45 +98,35 @@ module Fastlane
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID",
                                        description: "Access key ID",
                                        verify_block: proc do |value|
-                                         unless value and !value.empty?
-                                           UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`")
-                                         end
+                                           UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") if value.to_s.length == 0
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY",
                                       description: "Secret access key",
-                                      unless value and !value.empty?
                                         verify_block: proc do |value|
-                                          UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`")
-                                        end
+                                          UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :region,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_REGION",
                                       description: "The region",
                                       verify_block: proc do |value|
-                                        unless value and !value.empty?
-                                          UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`")
-                                        end
+                                        UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`") if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :bucket,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_BUCKET",
                                       description: "Bucket",
                                       verify_block: proc do |value|
-                                        unless value and !value.empty?
-                                          UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`")
-                                        end
+                                        UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`") if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :local_path,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH",
                                       description: "Path to local folder to upload",
                                       verify_block: proc do |value|
-                                        unless value and !value.empty?
-                                          UI.user_error!("Couldn't find file at path '#{value}'")
-                                        end
+                                        UI.user_error!("Couldn't find file at path '#{value}'") if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :remote_path,
