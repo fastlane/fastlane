@@ -146,8 +146,17 @@ module Fastlane
         return result
       else
         # No action and no lane, raising an exception now
-        UI.error caller.join("\n")
-        UI.user_error!("Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
+        if PluginManager.new.pluginsfile_content.to_s.include?(new_lane.to_s)
+          # That's a plugin, but for some reason we can't find it
+          # TODO: Add actual link
+          # TODO: Move that code to a method that makes more sense
+          UI.user_error!("Plugin '#{new_lane}' couldn't be found, make sure to follow the docs for troubleshooting")
+        else
+          # That's just an action or lane that doesn't exist
+          # show the appropriate error message
+          UI.error(caller.join("\n")) if $verbose
+          UI.user_error!("Could not find action or lane '#{new_lane}'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
+        end
       end
     end
 
