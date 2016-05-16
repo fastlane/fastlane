@@ -78,14 +78,20 @@ module Fastlane
       File.write(gemfile_path, content)
     end
 
+    # Warning: This will exec out
+    # This is necessary since the user might
+    # be promprted for their password
     def install_dependencies
       ensure_plugins_attached!
-      FastlaneCore::CommandExecutor.execute(command: "bundle install", print_all: true)
+      exec("bundle install")
     end
 
+    # Warning: This will exec out
+    # This is necessary since the user might
+    # be promprted for their password
     def update_dependencies
       ensure_plugins_attached!
-      FastlaneCore::CommandExecutor.execute(command: "bundle update", print_all: true)
+      exec("bundle update")
     end
   end
 end
