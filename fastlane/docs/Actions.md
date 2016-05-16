@@ -1135,7 +1135,7 @@ Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/li
 
 [Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
 
-From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using 
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
 
 ```objective-c
 [[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
@@ -1602,6 +1602,22 @@ To commit several files with a certain commit message use
 git_commit(path: ["./version.txt", "./changelog.txt"]
         message: "Version Bump")
 ```
+
+
+### git_status
+
+To simply get the status of one file or directory
+
+```ruby
+git_status(path: "./version.txt")
+```
+
+To get the status of several files or directories use
+
+```ruby
+git_status(path: ["./version.txt", "./changelog.txt"])
+```
+
 
 ### ensure_git_status_clean
 A sanity check to make sure you are working in a repo that is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work. Also needed as a prerequisite for some other actions like `reset_git_repo`.
