@@ -323,6 +323,17 @@ describe Fastlane do
         end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
       end
 
+      it "use custom derived data" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              derived_data: '../derived data'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap --derived-data ../derived\\ data")
+      end
+
       it "works with no parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
