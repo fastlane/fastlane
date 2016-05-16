@@ -98,14 +98,14 @@ module Fastlane
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID",
                                        description: "Access key ID",
                                        verify_block: proc do |value|
-                                           UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") if value.to_s.length == 0
+                                         UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") if value.to_s.length == 0
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY",
                                       description: "Secret access key",
-                                        verify_block: proc do |value|
-                                          UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") if value.to_s.length == 0
+                                      verify_block: proc do |value|
+                                        UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :region,
