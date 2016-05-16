@@ -6,9 +6,11 @@ module Fastlane
     # This will make sure to load the action
     # and all its helpers
     def self.load_plugins
-      Gem::Specification.all.to_hash.find_all do |gem_name, v| 
-        gem_name.start_with?("fastlane_") && gem_name != "fastlane_core"
-      end.each do |gem_name, current_gem|
+      Gem::Specification.each do |current_gem|
+        gem_name = current_gem.name
+        next if gem_name == "fastlane_core"
+        next unless gem_name.start_with?("fastlane_")
+
         load_plugin(gem_name)
       end
     end
