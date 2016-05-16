@@ -15,7 +15,6 @@ module Fastlane
       require 'bundler'
       Bundler.setup
 
-      Fastlane.load_actions
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -44,6 +43,8 @@ module Fastlane
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
+          Fastlane.load_actions
+
           if ensure_fastfile
             Fastlane::CommandLineHandler.handle(args, options)
           end
@@ -136,6 +137,8 @@ module Fastlane
         c.option '--platform STRING', String, 'Only show actions available on the given platform'
 
         c.action do |args, options|
+          Fastlane.load_actions
+
           require 'fastlane/documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
         end
@@ -145,6 +148,8 @@ module Fastlane
         c.syntax = 'fastlane action [tool_name]'
         c.description = 'Shows more information for a specific command'
         c.action do |args, options|
+          Fastlane.load_actions
+
           require 'fastlane/documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first)
         end
