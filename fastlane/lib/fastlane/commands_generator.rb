@@ -38,6 +38,10 @@ module Fastlane
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
+          # TODO verify that a Gemfile exists, otherwise re-route into the plugins setup process?
+          require 'bundler'
+          Bundler.setup
+
           if ensure_fastfile
             Fastlane::CommandLineHandler.handle(args, options)
           end
