@@ -130,7 +130,7 @@ username "user@fastlane.tools"
 
 #### Important: Use one git branch per team
 
-`match` was designed to use a seperate git branch per Apple account. If you work in multiple teams, make sure to set the ``git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. More information on [codesigning.guide](https://codesigning.guide)
+`match` was designed to use a separate git branch per Apple account. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. More information on [codesigning.guide](https://codesigning.guide)
 
 ### Run
 

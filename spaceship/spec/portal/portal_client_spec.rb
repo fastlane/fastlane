@@ -78,7 +78,7 @@ describe Spaceship::Client do
 
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({ csrf: 'top_secret', csrf_ts: '123123' })
-        allow(subject).to receive(:page_size).and_return(10) # to have a seperate stubbing
+        allow(subject).to receive(:page_size).and_return(10) # to have a separate stubbing
 
         expect(subject.devices.count).to eq(4)
       end
