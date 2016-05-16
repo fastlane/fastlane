@@ -9,12 +9,6 @@ module Fastlane
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
-
-      PluginManager.new.ensure_plugins_attached!
-
-      require 'bundler'
-      Bundler.setup
-
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -188,14 +182,9 @@ module Fastlane
 
         c.action do |args, options|
           plugin_name = args.last # TODO: actually parse the things
-          plugin_name = 'fastlane_' + plugin_name unless plugin_name.start_with?('fastlane_')
 
           pm = PluginManager.new
           pm.add_dependency(plugin_name)
-
-          require 'pry'
-          binding.pry
-
           pm.install_dependencies!
 
           UI.success("Sucessfully added '#{plugin_name}' plugin")

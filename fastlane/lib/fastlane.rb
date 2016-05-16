@@ -1,5 +1,6 @@
 require 'fastlane_core'
 
+require 'fastlane/fastlane_core_aliases'
 require 'fastlane/version'
 require 'fastlane/tools'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
@@ -18,13 +19,9 @@ require 'fastlane/one_off'
 require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
 require 'fastlane/other_action'
-require 'fastlane/plugin_manager'
 require 'fastlane/plugins_loader'
 
 module Fastlane
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-
   def self.load_actions
     Fastlane::Actions.load_default_actions
     Fastlane::Actions.load_helpers

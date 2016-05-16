@@ -1,5 +1,13 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
+require 'fastlane_core'
+require 'fastlane/fastlane_core_aliases'
+
+require 'bundler'
+require 'fastlane/plugin_manager'
+Fastlane::PluginManager.new.ensure_plugins_attached!
+Bundler.setup
+
 require "fastlane/cli_tools_distributor"
 Fastlane::CLIToolsDistributor.take_off
