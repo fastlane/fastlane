@@ -19,19 +19,14 @@ module Fastlane
     #
     class XcodeSelectAction < Action
       def self.run(params)
-        xcode_path =
-          case
-          when params[:path]
-            params[:path]
-          when version = params[:version]
-            xcode = Helper::XcodeSelectHelper.find_xcode(version)
-            UI.user_error!("Cannot find an installed Xcode satisfying '#{version}'") if xcode.nil?
+        params = nil unless params.kind_of? Array
+        xcode_path = (params || []).first
 
-            UI.verbose("Found Xcode version #{xcode.version} at #{xcode.path} satisfying requirement #{version}")
-            xcode.path
-          else
-            UI.user_error!("path or version must be specified")
-          end
+        # Verify that a param was passed in
+        UI.user_error!("Path to Xcode application required (e.x. \"/Applications/Xcode.app\")") unless xcode_path.to_s.length > 0
+
+        # Verify that a path to a directory was passed in
+        UI.user_error!("Path '#{xcode_path}' doesn't exist") unless Dir.exist?(xcode_path)
 
         UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
@@ -39,36 +34,11 @@ module Fastlane
       end
 
       def self.description
-        "Select which Xcode to use, either by path or version"
+        "Change the xcode-path to use. Useful for beta versions of Xcode"
       end
 
       def self.author
         "dtrenz"
-      end
-
-      def self.available_options
-        [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "DEVELOPER_DIR",
-                                       description: "The path of the Xcode to select",
-                                       optional: true,
-                                       conflicting_options: [:version],
-                                       conflict_block: proc do |value|
-                                         UI.user_error!("You cannot specify 'path' and '#{value.key}' options at the same time")
-                                       end,
-                                       verify_block: Helper::XcodeSelectHelper::Verify.method(:path_exists)
-                                      ),
-          FastlaneCore::ConfigItem.new(key: :version,
-                                       env_name: "FL_XCODE_VERSION",
-                                       description: "The version of Xcode to select specified as a RubyGems style requirement string",
-                                       optional: true,
-                                       conflicting_options: [:path],
-                                       conflict_block: proc do |value|
-                                         UI.user_error!("You cannot specify 'version' and '#{value.key}' options at the same time")
-                                       end,
-                                       verify_block: Helper::XcodeSelectHelper::Verify.method(:requirement)
-                                      )
-        ]
       end
 
       def self.is_supported?(platform)

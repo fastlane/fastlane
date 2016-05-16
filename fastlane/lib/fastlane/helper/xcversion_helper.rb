@@ -1,6 +1,6 @@
 module Fastlane
   module Helper
-    class XcodeSelectHelper
+    class XcversionHelper
       def self.find_xcode(req)
         req = Gem::Requirement.new(req.to_s)
 
@@ -14,13 +14,11 @@ module Fastlane
 
       module Verify
         def self.requirement(req)
+          puts "SFDDSFS" + req
+          UI.user_error!("version must be specified") if req.nil? || req.to_s.strip.size == 0
           Gem::Requirement.new(req.to_s)
         rescue Gem::Requirement::BadRequirementError
           UI.user_error!("The requirement '#{req}' is not a valid RubyGems style requirement")
-        end
-
-        def self.path_exists(path)
-          UI.user_error!("Path '#{path}' does not exist") unless Dir.exist?(path)
         end
       end
     end

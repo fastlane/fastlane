@@ -296,12 +296,20 @@ This will make sure to use the correct Xcode for later actions.
 xcode_install(version: "7.1")
 ```
 
-### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
-Use this command if you are supporting multiple versions of Xcode
+### xcversion
+
+Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version).
 
 ```ruby
-xcode_select path: "/Applications/Xcode6.1.app"
-xcode_select version: "~> 7.2.0"
+xcversion version: "7.1" # Selects Xcode 7.1.0
+xcversion version: "~> 7.1.0" # Selects the latest installed version from the 7.1.x set
+```
+
+### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
+Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
+
+```ruby
+xcode_select "/Applications/Xcode6.1.app"
 ```
 
 ### [Xcake](https://github.com/jcampbell05/xcake/)
@@ -1136,7 +1144,7 @@ Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/li
 
 [Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
 
-From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using 
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
 
 ```objective-c
 [[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
