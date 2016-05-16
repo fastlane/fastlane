@@ -27,11 +27,13 @@ module Fastlane
 
           obj = write_file_to_bucket(local_path, bucket, s3_path)
 
-          if obj.exists? == false
-            result = "Error while uploadin file #{local_path}"
-            Actions.lane_context[SharedValues::UPLOAD_FOLDER_TO_S3_RESULT] = result
-            return result
+          if obj.exists?
+            next
           end
+
+          result = "Error while uploadin file #{local_path}"
+          Actions.lane_context[SharedValues::UPLOAD_FOLDER_TO_S3_RESULT] = result
+          return result
         end
 
         Actions.lane_context[SharedValues::UPLOAD_FOLDER_TO_S3_RESULT] = result
@@ -96,35 +98,45 @@ module Fastlane
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID",
                                        description: "Access key ID",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") unless (value and not value.empty?)
+                                         unless value and !value.empty?
+                                           UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`")
+                                         end
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY",
                                       description: "Secret access key",
-                                      verify_block: proc do |value|
-                                        UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") unless (value and not value.empty?)
+                                      unless value and !value.empty?
+                                        verify_block: proc do |value|
+                                          UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`")
+                                        end
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :region,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_REGION",
                                       description: "The region",
                                       verify_block: proc do |value|
-                                        UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`") unless (value and not value.empty?)
+                                        unless value and !value.empty?
+                                          UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`")
+                                        end
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :bucket,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_BUCKET",
                                       description: "Bucket",
                                       verify_block: proc do |value|
-                                        UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`") unless (value and not value.empty?)
+                                        unless value and !value.empty?
+                                          UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`")
+                                        end
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :local_path,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH",
                                       description: "Path to local folder to upload",
                                       verify_block: proc do |value|
-                                        UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                        unless value and !value.empty?
+                                          UI.user_error!("Couldn't find file at path '#{value}'")
+                                        end
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :remote_path,
