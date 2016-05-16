@@ -313,6 +313,8 @@ module Spaceship
       # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
       # the content be served only as plain-text, which seems to work around their problem, while not affecting
       # other clients.
+      #
+      # https://github.com/fastlane/fastlane/issues/4610
       headers = {'Accept-Encoding' => 'identity'}
       # We need a service key from a JS file to properly auth
       js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
