@@ -58,7 +58,7 @@ module Match
 
         commands = []
         commands << "git add -A"
-        commands << "git commit -m '#{message.shellescape}'"
+        commands << "git commit -m #{message.shellescape}"
         commands << "git push origin #{branch.shellescape}"
 
         UI.message "Pushing changes to remote git repo..."
