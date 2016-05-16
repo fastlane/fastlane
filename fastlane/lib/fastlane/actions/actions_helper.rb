@@ -74,6 +74,9 @@ module Fastlane
       end
     end
 
+    # This will load up the "external" actions, which are stored
+    # locally in the same repo (usually fastlane/actions directory)
+    # This does not import plugins
     def self.load_external_actions(path)
       UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 

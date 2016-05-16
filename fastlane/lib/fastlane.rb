@@ -19,6 +19,7 @@ require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
 require 'fastlane/other_action'
 require 'fastlane/plugin_manager'
+require 'fastlane/plugins_loader'
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
@@ -27,6 +28,7 @@ module Fastlane
   def self.load_actions
     Fastlane::Actions.load_default_actions
     Fastlane::Actions.load_helpers
+    Fastlane::PluginsLoader.load_plugins
 
     if Fastlane::FastlaneFolder.path
       actions_path = File.join(Fastlane::FastlaneFolder.path, 'actions')
