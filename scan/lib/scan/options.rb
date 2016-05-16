@@ -76,7 +76,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
                                      env_name: "SCAN_OUTPUT_TYPES",
-                                     description: "Comma seperated list of the output types (e.g. html, junit)",
+                                     description: "Comma separated list of the output types (e.g. html, junit)",
                                      default_value: "html,junit"),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
