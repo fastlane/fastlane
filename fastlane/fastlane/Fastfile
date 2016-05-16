@@ -3,9 +3,9 @@ skip_docs
 
 lane :beta do
   # temporary done here, this will be moved
-  require 'fastlane/xcversion'
-  require 'fastlane/xcversion/actions/xcversion'
-  require 'fastlane/xcversion/helper/xcversion_helper'
+  require 'fastlane_xcversion'
+  require 'fastlane_xcversion/actions/xcversion'
+  require 'fastlane_xcversion/helper/xcversion_helper'
 
   # This is the only thing people will in the future
   # fastlane is the future
