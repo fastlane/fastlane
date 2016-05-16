@@ -61,7 +61,7 @@ module Fastlane
       def self.valid_s3(awscreds, s3_bucket)
         s3 = AWS::S3.new(awscreds)
 
-        if s3.buckets[s3_bucket].location_constraint != awscreds[:region] then
+        if s3.buckets[s3_bucket].location_constraint != awscreds[:region]
           s3 = AWS::S3.new(awscreds.merge(region: s3.buckets[s3_bucket].location_constraint))
         end
 
@@ -95,41 +95,41 @@ module Fastlane
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID",
                                        description: "Access key ID",
                                        verify_block: proc do |value|
-                                          UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") unless (value and not value.empty?)
+                                         UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") unless (value and not value.empty?)
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY",
                                       description: "Secret access key",
                                       verify_block: proc do |value|
-                                         UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") unless (value and not value.empty?)
+                                        UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") unless (value and not value.empty?)
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :region,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_REGION",
                                       description: "The region",
                                       verify_block: proc do |value|
-                                         UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`") unless (value and not value.empty?)
+                                        UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`") unless (value and not value.empty?)
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :bucket,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_BUCKET",
                                       description: "Bucket",
                                       verify_block: proc do |value|
-                                         UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`") unless (value and not value.empty?)
+                                        UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`") unless (value and not value.empty?)
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :local_path,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH",
                                       description: "Path to local folder to upload",
                                       verify_block: proc do |value|
-                                           UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                        UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :remote_path,
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_REMOTE_PATH",
                                        description: "The remote base path",
-                                       default_value: "") # the default value if the user didn't provide one
+                                       default_value: "")
         ]
       end
 
@@ -158,8 +158,8 @@ module Fastlane
         file_extension = File.extname(file)
 
         extensions_to_type = {
-          ".html" => "text/html" ,
-          ".png"  => "image/png" ,
+          ".html" => "text/html",
+          ".png"  => "image/png",
           ".jpg"  => "text/jpeg",
           ".gif"  => "image/gif",
           ".log"  => "text/plain",
@@ -167,7 +167,7 @@ module Fastlane
           ".js"   => "application/javascript"
         }
 
-        if extensions_to_type[file_extension] == nil
+        if extensions_to_type[file_extension].nil?
           "application/octet-stream"
         else
           extensions_to_type[file_extension]
