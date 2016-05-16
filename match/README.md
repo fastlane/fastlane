@@ -128,9 +128,9 @@ app_identifier "tools.fastlane.app"
 username "user@fastlane.tools"
 ```
 
-#### Important: Use one git repo per team
+#### Important: Use one git branch per team
 
-`match` was designed to have one git repository per Apple account. If you work in multiple teams, please create one repo for each of them. More information on [codesigning.guide](https://codesigning.guide)
+`match` was designed to use a seperate git branch per Apple account. If you work in multiple teams, make sure to set the ``git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. More information on [codesigning.guide](https://codesigning.guide)
 
 ### Run
 
