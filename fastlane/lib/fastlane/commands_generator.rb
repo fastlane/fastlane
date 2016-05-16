@@ -9,6 +9,12 @@ module Fastlane
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+
+      PluginManager.new.ensure_plugins_attached!
+
+      require 'bundler'
+      Bundler.setup
+
       Fastlane.load_actions
       self.new.run
     ensure
@@ -38,10 +44,6 @@ module Fastlane
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
-          # TODO verify that a Gemfile exists, otherwise re-route into the plugins setup process?
-          require 'bundler'
-          Bundler.setup
-
           if ensure_fastfile
             Fastlane::CommandLineHandler.handle(args, options)
           end
@@ -181,8 +183,16 @@ module Fastlane
 
         c.action do |args, options|
           plugin_name = args.last # TODO: actually parse the things
+          plugin_name = 'fastlane_' + plugin_name unless plugin_name.start_with?('fastlane_')
+
           pm = PluginManager.new
           pm.add_dependency(plugin_name)
+
+          require 'pry'
+          binding.pry
+
+          pm.install_dependencies!
+
           UI.success("Sucessfully added '#{plugin_name}' plugin")
         end
       end
@@ -192,8 +202,7 @@ module Fastlane
         c.description = 'TODO'
 
         c.action do |args, options|
-          pm = PluginManager.new
-          pm.update_dependencies
+          PluginManager.new.update_dependencies!
         end
       end
 
@@ -202,8 +211,7 @@ module Fastlane
         c.description = 'TODO'
 
         c.action do |args, options|
-          pm = PluginManager.new
-          pm.install_dependencies
+          PluginManager.new.install_dependencies!
         end
       end
 
