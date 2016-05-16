@@ -79,7 +79,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a folder, and all its content, to a S3 bucket."
+        "Upload a folder, and all its content, to a S3 bucket"
       end
 
       def self.details

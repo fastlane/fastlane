@@ -1018,6 +1018,24 @@ The uploaded `version.json` file provides an easy way for apps to poll if a new 
 }
 ```
 
+### AWS S3 Folder uploading
+
+A simpler action than `s3`, the `upload_folder_to_s3` can be used as following:
+
+```ruby
+upload_folder_to_s3(
+  access_key_id:      ENV["S3_ACCESS_KEY"],
+  secret_access_key:  ENV["S3_SECRET_ACCESS_KEY"],
+  bucket:             ENV["S3_BUCKET"],
+  region:             ENV["S3_REGION"],
+  local_path:         ENV["LOCAL_PATH"],
+  remote_path:        ENV["S3_PATH"]
+)
+```
+
+There is no way to exclude files (e.g. using a regex) in the folder you want to upload. But you can easily create a subset of your product files in `/tmp` for example.
+
+
 ### [DeployGate](https://deploygate.com/)
 
 You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).
