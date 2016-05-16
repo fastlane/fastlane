@@ -4,7 +4,14 @@ module Fastlane
       def self.run(params)
         Actions.verify_gem!('xcake')
         require 'xcake'
-        Xcake::Command.run
+
+        if defined? Xcake::Command::Make
+          # New `xcake make` command
+          Xcake::Command::Make.run
+        else
+          # Legacy `xcake` command
+          Xcake::Command.run
+        end
       end
 
       def self.description
