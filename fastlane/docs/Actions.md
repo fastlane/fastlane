@@ -306,7 +306,7 @@ xcode_select "/Applications/Xcode6.1.app"
 
 ### [Xcake](https://github.com/jcampbell05/xcake/)
 
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake make` before building your app.
 
 ```ruby
 xcake
