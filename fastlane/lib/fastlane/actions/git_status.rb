@@ -11,7 +11,6 @@ module Fastlane
         result = Actions.sh("git status --porcelain #{paths}")
         UI.success("git status \"#{params[:path]}\" 💾.")
         return result
-
       end
 
       #####################################################
