@@ -138,7 +138,7 @@ module Fastlane
 
       def self.output
         [
-          ['UPLOAD_FOLDER_TO_S3_RESULT', 'An empty string if everything is fine, a short description of the error otherwise'],
+          ['UPLOAD_FOLDER_TO_S3_RESULT', 'An empty string if everything is fine, a short description of the error otherwise']
         ]
       end
 
