@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class GitHasChangesAction < Action
+    class GitStatusAction < Action
       def self.run(params)
         if params[:path].kind_of?(String)
           paths = params[:path].shellescape
