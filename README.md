@@ -31,6 +31,8 @@ To deploy a new beta version of your app
 fastlane beta
 ```
 
+To get started with `fastlane`, follow the [guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md).
+
 
               |  fastlane
 --------------------------|------------------------------------------------------------
@@ -71,12 +73,14 @@ If you want to take a look at a project already using `fastlane`, check out the 
 
 ## Quick Start
 
-The setup assistant will create all the necessary files for you, using the existing app metadata from iTunes Connect.
+The setup assistant will create all the necessary files for you, using the existing app metadata from iTunes Connect or Google Play.
 
-- ```cd [your_project_folder]```
-- ```fastlane init```
-- Follow the setup assistant, which will set up ```fastlane``` for you
-- Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+- `cd [your_project_folder]`
+- `fastlane init`
+- Follow the setup assistant, which will set up `fastlane` for you
+- Further customise the `Fastfile` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+
+For more details, check out the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md).
 
 ## Available commands
 

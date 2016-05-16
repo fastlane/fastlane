@@ -58,6 +58,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.review_phone_number).to eq('+4123123123')
       expect(version.review_email).to eq('felix@sunapps.net')
       expect(version.review_demo_user).to eq('MyUser@gmail.com')
+      expect(version.review_user_needed).to eq(true)
       expect(version.review_demo_password).to eq('SuchPass')
       expect(version.review_notes).to eq('Such Notes here')
     end
@@ -149,11 +150,11 @@ describe Spaceship::AppVersion, all: true do
 
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/deliverable')
+        expect(app.live_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/deliverable")
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/')
+        expect(app.edit_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/")
       end
     end
 

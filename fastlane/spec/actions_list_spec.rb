@@ -61,7 +61,7 @@ describe Fastlane do
       count = 0
       Fastlane::ActionsList.all_actions("nothing special") { count += 1 }
       expect(count).to be > 40
-      expect(count).to be < 80
+      expect(count).to be < 120
     end
 
     describe "Provide action details" do
@@ -69,6 +69,18 @@ describe Fastlane do
         it "Shows the details for action '#{name}'" do
           Fastlane::ActionsList.show_details(filter: name)
         end
+      end
+    end
+
+    describe "with a class in the Actions namespace that does not extend action" do
+      it "trying to show its details presents a helpful error message" do
+        require 'fixtures/broken_actions/broken_action.rb'
+
+        expect(UI).to receive(:user_error!).with(/be a subclass/).and_raise("boom")
+
+        expect do
+          Fastlane::ActionsList.show_details(filter: 'broken')
+        end.to raise_error
       end
     end
   end

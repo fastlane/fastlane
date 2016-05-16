@@ -32,6 +32,11 @@ module Fastlane
         options << "-F g=#{params[:repo_group_id].shellescape}"
         options << "-F a=#{params[:repo_project_name].shellescape}"
         options << "-F v=#{params[:repo_project_version].shellescape}"
+
+        if params[:repo_classifier]
+          options << "-F c=#{params[:repo_classifier].shellescape}"
+        end
+
         options << "-F e=#{file_extension}"
         options << "-F file=@#{file_path}"
         options << "-u #{params[:username].shellescape}:#{params[:password].shellescape}"
@@ -92,6 +97,10 @@ module Fastlane
                                        env_name: "FL_NEXUS_REPO_PROJECT_VERSION",
                                        description: "Nexus repository commandect version",
                                        optional: false),
+          FastlaneCore::ConfigItem.new(key: :repo_classifier,
+                                       env_name: "FL_NEXUS_REPO_CLASSIFIER",
+                                       description: "Nexus repository artifact classifier (optional)",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :endpoint,
                                        env_name: "FL_NEXUS_ENDPOINT",
                                        description: "Nexus endpoint e.g. http://nexus:8081",

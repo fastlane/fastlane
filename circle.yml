@@ -1,11 +1,11 @@
 machine:
   xcode:
-    version: "7.2"
+    version: "7.3"
 dependencies:
   override:
-    - bundle check --path=~/.bundle || bundle install --path=~/.bundle --jobs=4 --retry=3
+    - rake bundle_install_all
   cache_directories:
-    - ~/.bundle
+    - ~/.fastlane_bundle
 test:
   override:
     - bundle exec danger

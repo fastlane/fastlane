@@ -4,24 +4,17 @@ module Fastlane
       def self.run(params)
         require 'terminal-notifier'
 
-        if params[:subtitle] && params[:sound]
-          TerminalNotifier.notify(params[:message],
-                                  title: params[:title],
-                                  subtitle: params[:subtitle],
-                                  sound: params[:sound])
-        elsif params[:subtitle]
-          TerminalNotifier.notify(params[:message],
-                                  title: params[:title],
-                                  subtitle: params[:subtitle])
-        elsif params[:sound]
-          TerminalNotifier.notify(params[:message],
-                                  title: params[:title],
-                                  sound: params[:sound])
-        else
-          # It should look nice without a subtitle too
-          TerminalNotifier.notify(params[:message],
-                                  title: params[:title])
-        end
+        options = params.values
+        # :message is non-optional
+        message = options.delete :message
+        # remove nil keys, since `notify` below does not ignore them and instead translates them into empty strings in output, which looks ugly
+        options = options.select { |_, v| v }
+        option_map = {
+          app_icon: :appIcon,
+          content_image: :contentImage
+        }
+        options = Hash[options.map { |k, v| [option_map.fetch(k, k), v] }]
+        TerminalNotifier.notify(message, options)
       end
 
       def self.description
@@ -29,7 +22,7 @@ module Fastlane
       end
 
       def self.author
-        ["champo", "cbowns", "KrauseFx", "amarcadet"]
+        ["champo", "cbowns", "KrauseFx", "amarcadet", "dusek"]
       end
 
       def self.available_options
@@ -45,6 +38,21 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :sound,
                                        description: "The name of a sound to play when the notification appears (names are listed in Sound Preferences)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :activate,
+                                       description: "Bundle identifier of application to be opened when the notification is clicked",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :app_icon,
+                                       description: "The URL of an image to display instead of the application icon (Mavericks+ only)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :content_image,
+                                       description: "The URL of an image to display attached to the notification (Mavericks+ only)",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :open,
+                                       description: "URL of the resource to be opened when the notification is clicked",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :execute,
+                                       description: "Shell command to run when the notification is clicked",
                                        optional: true)
         ]
       end

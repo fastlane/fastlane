@@ -1,5 +1,5 @@
 # Customise this file, documentation can be found here:
-# https://github.com/fastlane/fastlane/tree/master/docs
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
 # All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
 # can also be listed using the `fastlane actions` command
 
@@ -44,7 +44,7 @@ platform :android do
 
   after_all do |lane|
     # This block is called, only if the executed lane was successful
-    
+
     # slack(
     #   message: "Successfully deployed new App Update."
     # )
@@ -59,7 +59,7 @@ platform :android do
 end
 
 
-# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/docs/Platforms.md
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
 # All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
 
 # fastlane reports which actions are used

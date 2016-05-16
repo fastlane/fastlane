@@ -7,7 +7,7 @@ The `actions` directory contains the local actions used to deploy `fastlane`.
 
 For more information:
 
-- [All fastlane actions](https://github.com/fastlane/fastlane/tree/master/lib/fastlane/actions)
+- [All fastlane actions](https://github.com/fastlane/fastlane/tree/master/fastlane/lib/fastlane/actions)
 - [Project Page](https://github.com/fastlane/fastlane/tree/master/fastlane)
-- [Documentation](https://github.com/fastlane/fastlane/tree/master/docs)
-- [fastlane source](https://github.com/fastlane/fastlane/tree/master/lib)
+- [Documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs)
+- [fastlane source](https://github.com/fastlane/fastlane/tree/master/fastlane/lib)

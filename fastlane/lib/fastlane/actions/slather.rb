@@ -24,7 +24,8 @@ module Fastlane
         output_directory: "--output-directory",
         binary_basename: "--binary-basename",
         binary_file: "--binary-file",
-        ignore: "--ignore"
+        ignore: "--ignore",
+        workspace: "--workspace"
       }.freeze
 
       def self.run(params)
@@ -34,8 +35,22 @@ module Fastlane
           Actions.verify_gem!('slather')
         end
 
+        validate_params!(params)
+
         command = build_command(params)
         sh command
+      end
+
+      def self.has_config_file
+        File.file?('.slather.yml')
+      end
+
+      def self.validate_params!(params)
+        if params[:proj] || has_config_file
+          true
+        else
+          UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
+        end
       end
 
       def self.build_command(params)
@@ -59,7 +74,7 @@ module Fastlane
           end
         end
 
-        command << params[:proj].shellescape
+        command << params[:proj].shellescape if params[:proj]
         command.join(" ")
       end
 
@@ -74,7 +89,7 @@ module Fastlane
       def self.details
         return <<-eos
 Slather works with multiple code coverage formats including Xcode7 code coverage.
-Slather is available at https://github.com/venmo/slather
+Slather is available at https://github.com/SlatherOrg/slather
         eos
       end
 
@@ -90,7 +105,13 @@ Slather is available at https://github.com/venmo/slather
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
                                          UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
-                                       end),
+                                       end,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :workspace,
+                                       env_name: "FL_SLATHER_WORKSPACE",
+                                       description: "The workspace that slather looks at",
+                                       optional: true
+                                      ),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
@@ -148,7 +169,7 @@ Slather is available at https://github.com/venmo/slather
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :show,
                                        env_name: "FL_SLATHER_SHOW_ENABLED",
-                                       description: "Tell slather that it should oupen static html pages automatically",
+                                       description: "Tell slather that it should open static html pages automatically",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :source_directory,

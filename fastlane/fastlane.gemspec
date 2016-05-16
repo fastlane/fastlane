@@ -8,14 +8,14 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   spec.authors       = ["Felix Krause"]
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = 'Connect all iOS deployment tools into one streamlined workflow'
-  spec.description   = 'Connect all iOS deployment tools into one streamlined workflow'
+  spec.summary       = Fastlane::DESCRIPTION
+  spec.description   = Fastlane::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w( bin/fastlane README.md LICENSE )
+  spec.files = Dir["lib/**/*"] + %w(bin/fastlane bin/🚀 README.md LICENSE)
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -28,28 +28,28 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
-  spec.add_dependency 'addressable', '~> 2.3.8' # Support for URI templates
+  spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
 
-  spec.add_dependency 'fastlane_core', '>= 0.41.2', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.43.1', '< 1.0.0' # all shared code and dependencies
 
-  spec.add_dependency 'credentials_manager', '>= 0.15.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.24.1', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
+  spec.add_dependency 'spaceship', '>= 0.26.2', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.11.0', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.11.2', '< 2.0.0'
   spec.add_dependency 'snapshot', '>= 1.12.1', '< 2.0.0'
-  spec.add_dependency 'frameit', '>= 2.5.1', '< 3.0.0'
-  spec.add_dependency 'pem', '>= 1.3.0', '< 2.0.0'
-  spec.add_dependency 'cert', '>= 1.4.0', '< 2.0.0'
-  spec.add_dependency 'sigh', '>= 1.6.1', '< 2.0.0'
-  spec.add_dependency 'produce', '>= 1.1.1', '< 2.0.0'
-  spec.add_dependency 'gym', '>= 1.6.2', '< 2.0.0'
-  spec.add_dependency 'pilot', '>= 1.5.0', '< 2.0.0'
-  spec.add_dependency 'supply', '>= 0.6.1', '< 1.0.0'
-  spec.add_dependency 'scan', '>= 0.5.2', '< 1.0.0'
-  spec.add_dependency 'match', '>= 0.4.0', '< 1.0.0'
-  spec.add_dependency 'screengrab', '>= 0.3.1', '< 1.0.0'
+  spec.add_dependency 'frameit', '>= 2.6.1', '< 3.0.0'
+  spec.add_dependency 'pem', '>= 1.3.1', '< 2.0.0'
+  spec.add_dependency 'cert', '>= 1.4.1', '< 2.0.0'
+  spec.add_dependency 'sigh', '>= 1.8.0', '< 2.0.0'
+  spec.add_dependency 'produce', '>= 1.1.2', '< 2.0.0'
+  spec.add_dependency 'gym', '>= 1.6.3', '< 2.0.0'
+  spec.add_dependency 'pilot', '>= 1.5.1', '< 2.0.0'
+  spec.add_dependency 'supply', '>= 0.6.2', '< 1.0.0'
+  spec.add_dependency 'scan', '>= 0.6.0', '< 1.0.0'
+  spec.add_dependency 'match', '>= 0.5.0', '< 1.0.0'
+  spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'

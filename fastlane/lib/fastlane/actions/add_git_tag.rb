@@ -6,9 +6,10 @@ module Fastlane
         lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].delete(' ') # no spaces allowed
 
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
+        message = options[:message] || "#{tag} (fastlane)"
 
         UI.message "Adding git tag '#{tag}' 🎯."
-        Actions.sh("git tag -am '#{tag} (fastlane)' '#{tag}'")
+        Actions.sh("git tag -am #{message.shellescape} '#{tag}'")
       end
 
       def self.description
@@ -33,7 +34,11 @@ module Fastlane
                                        env_name: "FL_GIT_TAG_BUILD_NUMBER",
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
                                        default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_GIT_TAG_MESSAGE",
+                                       description: "The tag message. Defaults to the tag's name",
+                                       optional: true)
         ]
       end
 

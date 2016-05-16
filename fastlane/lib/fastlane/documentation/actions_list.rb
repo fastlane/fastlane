@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/AbcSize
-# rubocop:disable Metrics/MethodLength
 module Fastlane
   class ActionsList
     def self.run(filter: nil, platform: nil)
@@ -24,18 +22,18 @@ module Fastlane
           current << authors.first.green if authors.count == 1
           current << "Multiple".green if authors.count > 1
         else
-          UI.error("Please update your action file #{name} to be a subclass of `Action` by adding ` < Action` after your class name.")
+          UI.error action_subclass_error(name)
           current << "Please update action file".red
+          current << ' '
         end
         rows << current
       end
 
-      table = Terminal::Table.new(
+      puts Terminal::Table.new(
         title: "Available fastlane actions".green,
         headings: ['Action', 'Description', 'Author'],
         rows: rows
       )
-      puts table
       puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
 
@@ -44,98 +42,109 @@ module Fastlane
 
     def self.show_details(filter: nil)
       puts "Loading documentation for #{filter}:".green
-
       puts ""
 
-      all_actions do |action, name|
-        next unless name == filter.strip
+      action = find_action_named(filter)
 
-        rows = []
-        rows << [action.description] if action.description
-        rows << [' ']
-        if action.details
-          rows << [action.details]
-          rows << [' ']
+      if action
+        unless action < Action
+          UI.user_error! action_subclass_error(filter)
         end
 
-        authors = Array(action.author || action.authors)
-
-        rows << ["Created by #{authors.join(', ').green}"] if authors.count > 0
-
-        puts Terminal::Table.new(
-          title: filter.green,
-          rows: rows
-        )
-
-        puts "\n"
-
-        options = parse_options(action.available_options) if action.available_options
-
-        if options
-          puts Terminal::Table.new(
-            title: filter.green,
-            headings: ['Key', 'Description', 'Env Var'],
-            rows: options
-          )
-          required_count = action.available_options.count do |o|
-            if o.kind_of?(FastlaneCore::ConfigItem)
-              o.optional == false
-            else
-              false
-            end
-          end
-
-          if required_count > 0
-            puts "#{required_count} of the available parameters are required".magenta
-            puts "They are marked with an asterisk *".magenta
-          end
-        else
-          puts "No available options".yellow
-        end
-        puts "\n"
-
-        output = parse_options(action.output, false) if action.output
-        if output and output.count > 0
-          puts Terminal::Table.new(
-            title: [filter, "| Output Variables"].join(" ").green,
-            headings: ['Key', 'Description'],
-            rows: output
-          )
-          puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
-          puts ""
-        end
-
-        if action.return_value
-          puts Terminal::Table.new(
-            title: "Return Value".green,
-            headings: [],
-            rows: [[action.return_value]]
-          )
-          puts ""
-        end
+        print_summary(action, filter)
+        print_options(action, filter)
+        print_output_variables(action, filter)
+        print_return_value(action, filter)
 
         puts "More information can be found on https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md"
-        puts "\n"
+        puts ""
+      else
+        puts "Couldn't find action for the given filter.".red
+        puts "==========================================\n".red
+        print_all # show all available actions instead
+      end
+    end
 
-        return # our job is done here
+    def self.action_subclass_error(name)
+      "Please update your action '#{name}' to be a subclass of `Action` by adding ` < Action` after your class name."
+    end
+
+    def self.print_summary(action, name)
+      rows = []
+
+      if action.description
+        rows << [action.description]
+        rows << [' ']
       end
 
-      puts "Couldn't find action for the given filter.".red
-      puts "==========================================\n".red
-      print_all # show all available actions instead
+      if action.details
+        rows << [action.details]
+        rows << [' ']
+      end
+
+      authors = Array(action.author || action.authors)
+      rows << ["Created by #{authors.join(', ').green}"] unless authors.empty?
+
+      puts Terminal::Table.new(title: name.green, rows: rows)
+      puts ""
+    end
+
+    def self.print_options(action, name)
+      options = parse_options(action.available_options) if action.available_options
+
+      if options
+        puts Terminal::Table.new(
+          title: "#{name} Options".green,
+          headings: ['Key', 'Description', 'Env Var', 'Default'],
+          rows: options
+        )
+      else
+        puts "No available options".yellow
+      end
+      puts ""
+    end
+
+    def self.print_output_variables(action, name)
+      output = action.output
+      return if output.nil? || output.empty?
+
+      puts Terminal::Table.new(
+        title: "#{name} Output Variables".green,
+        headings: ['Key', 'Description'],
+        rows: output.map { |key, desc| [key.yellow, desc] }
+      )
+      puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
+      puts ""
+    end
+
+    def self.print_return_value(action, name)
+      return unless action.return_value
+
+      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
+      puts ""
     end
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      all_actions = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
-      all_actions.sort.each do |symbol|
+      action_symbols = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 
-        next if platform && !action.is_supported?(platform.to_sym)
+        # We allow classes that don't respond to is_supported? to come through because we want to list
+        # them as broken actions in the table, regardless of platform specification
+        next if platform && action.respond_to?(:is_supported?) && !action.is_supported?(platform.to_sym)
 
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
         yield action, name
       end
+    end
+
+    def self.find_action_named(name)
+      all_actions do |action, action_name|
+        return action if action_name == name
+      end
+
+      nil
     end
 
     # Helper:
@@ -146,11 +155,7 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            key_name = (current.optional ? "  " : "* ") + current.key.to_s
-            description = (current.description || '') + (current.default_value ? " (default: '#{current.default_value}')" : "")
-
-            rows << [key_name.yellow, description, current.env_name]
-
+            rows << [current.key.to_s.yellow, current.description, current.env_name, current.default_value]
           elsif current.kind_of? Array
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
@@ -165,5 +170,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize
-# rubocop:enable Metrics/MethodLength
