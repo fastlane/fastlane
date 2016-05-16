@@ -6,6 +6,8 @@ module Fastlane
     # This will make sure to load the action
     # and all its helpers
     def self.load_plugins
+      UI.verbose("Checking if there are any plugins that should be loaded...")
+
       Gem::Specification.each do |current_gem|
         gem_name = current_gem.name
         next if gem_name == "fastlane_core"
@@ -19,6 +21,8 @@ module Fastlane
     # `gem_name` must start with `fastlane_`
     def self.load_plugin(gem_name)
       action_name = gem_name.gsub("fastlane_", "")
+
+      UI.verbose("Loading '#{gem_name}' plugin for action '#{action_name}'")
 
       require gem_name
       require File.join(gem_name, "actions", action_name)
