@@ -1,5 +1,3 @@
-require 'aws-sdk-v1'
-
 module Fastlane
   module Actions
     module SharedValues
@@ -59,6 +57,9 @@ module Fastlane
       end
 
       def self.valid_s3(awscreds, s3_bucket)
+        Actions.verify_gem!('aws-sdk')
+        require 'aws-sdk'
+
         s3 = AWS::S3.new(awscreds)
 
         if s3.buckets[s3_bucket].location_constraint != awscreds[:region]
