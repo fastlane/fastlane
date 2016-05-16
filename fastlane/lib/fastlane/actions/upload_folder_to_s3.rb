@@ -42,14 +42,21 @@ module Fastlane
 
       def self.files_at_path(path)
         files = Dir.glob(path + "/**/*")
+        to_remove = []
 
         files.each do |file|
           if File.directory?(file)
-            files.remove file
+            to_remove.push file
           else
             file.slice! path
           end
         end
+
+        to_remove.each do |file|
+          files.delete file
+        end
+
+        files
       end
 
       def self.write_file_to_bucket(local_path, bucket, s3_path)
