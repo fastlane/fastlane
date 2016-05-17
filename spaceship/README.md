@@ -134,12 +134,6 @@ Copy everything from `---\n` to your CI server and provide it as environment var
 
 Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
 
-### Full Documentation
-
-The detailed documentation of all available classes is available on [RubyDoc](http://www.rubydoc.info/github/fastlane/spaceship/frames).
-
-You can find the log file here `/tmp/spaceship[time]_[pid].log`.
-
 # Technical Details
 
 ## HTTP Client
