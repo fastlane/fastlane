@@ -11,7 +11,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               xcversion
             end").runner.execute(:test)
-          end.to raise_error("version must be specified")
+          end.to raise_error("Version must be specified")
         end
       end
 
