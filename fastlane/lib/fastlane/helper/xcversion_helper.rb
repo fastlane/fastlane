@@ -14,7 +14,6 @@ module Fastlane
 
       module Verify
         def self.requirement(req)
-          puts "SFDDSFS" + req
           UI.user_error!("version must be specified") if req.nil? || req.to_s.strip.size == 0
           Gem::Requirement.new(req.to_s)
         rescue Gem::Requirement::BadRequirementError
