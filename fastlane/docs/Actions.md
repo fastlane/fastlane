@@ -1607,12 +1607,15 @@ git_commit(path: ["./version.txt", "./changelog.txt"]
 ### git_status
 
 To simply get the status of one file or directory
+Ex: "M version.txt"
 
 ```ruby
 git_status(path: "./version.txt")
 ```
 
 To get the status of several files or directories use
+Ex: "M version.txt
+     D changelog.txt"
 
 ```ruby
 git_status(path: ["./version.txt", "./changelog.txt"])
