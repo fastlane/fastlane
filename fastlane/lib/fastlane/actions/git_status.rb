@@ -46,7 +46,7 @@ module Fastlane
       end
 
       def self.return_value
-        nil
+        "The output string of the git status command"
       end
 
       def self.authors
