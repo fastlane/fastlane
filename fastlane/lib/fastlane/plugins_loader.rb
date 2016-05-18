@@ -11,7 +11,7 @@ module Fastlane
       Gem::Specification.each do |current_gem|
         gem_name = current_gem.name
         next if gem_name == "fastlane_core"
-        next unless gem_name.start_with?("fastlane_")
+        next unless gem_name.start_with?(PluginManager.plugin_prefix)
 
         load_plugin(gem_name)
       end
