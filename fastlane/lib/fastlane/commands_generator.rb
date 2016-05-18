@@ -181,13 +181,12 @@ module Fastlane
         c.description = 'TODO'
 
         c.action do |args, options|
-          plugin_name = args.last # TODO: actually parse the things
-
           pm = PluginManager.new
-          pm.add_dependency(plugin_name)
-          pm.install_dependencies!
+          args.each do |plugin_name|
+            pm.add_dependency(plugin_name)
+          end
 
-          UI.success("Sucessfully added '#{plugin_name}' plugin")
+          pm.install_dependencies!
         end
       end
 
