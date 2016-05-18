@@ -25,13 +25,6 @@ module Fastlane
       UI.verbose("Loading '#{gem_name}' plugin for action '#{action_name}'")
 
       require gem_name
-      require File.join(gem_name, "actions", action_name)
-
-      begin
-        require File.join(gem_name, "helper", "#{action_name}_helper")
-      rescue LoadError
-        # Since helpers are optional, we don't show an error message here
-      end
     rescue => ex
       UI.error("Error loading plugin '#{gem_name}': #{ex}")
       UI.error("Make sure the plugin has a properly implemented action")
