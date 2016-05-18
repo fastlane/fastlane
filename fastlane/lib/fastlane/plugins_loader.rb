@@ -20,14 +20,10 @@ module Fastlane
     # Actually imports the action and its helpers
     # `gem_name` must start with `fastlane_`
     def self.load_plugin(gem_name)
-      action_name = gem_name.gsub("fastlane_", "")
-
-      UI.verbose("Loading '#{gem_name}' plugin for action '#{action_name}'")
-
+      UI.verbose("Loading '#{gem_name}' plugin")
       require gem_name
     rescue => ex
       UI.error("Error loading plugin '#{gem_name}': #{ex}")
-      UI.error("Make sure the plugin has a properly implemented action")
     end
   end
 end
