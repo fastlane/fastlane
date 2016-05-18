@@ -11,7 +11,7 @@ module Gym
   class PackageCommandGeneratorLegacy
     class << self
       def generate
-        parts = ["/usr/bin/xcrun #{XcodebuildFixes.patch_package_application} -v"]
+        parts = ["/usr/bin/xcrun '#{XcodebuildFixes.patch_package_application}' -v"]
         parts += options
         parts += pipe
 
