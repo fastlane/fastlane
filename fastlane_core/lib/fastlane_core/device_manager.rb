@@ -9,7 +9,7 @@ module FastlaneCore
       end
 
       def simulators(requested_os_type = "")
-        UI.message("Fetching available simulator devices") if $verbose
+        UI.verbose("Fetching available simulator devices")
 
         @devices = []
         os_type = 'unknown'
@@ -42,7 +42,7 @@ module FastlaneCore
       end
 
       def connected_devices(requested_os_type)
-        Helper.log.info "Fetching available connected devices" if $verbose
+        UI.verbose("Fetching available connected devices")
 
         device_types = if requested_os_type == "tvOS"
                          ["AppleTV"]
@@ -84,7 +84,7 @@ module FastlaneCore
               match = instruments_device.match(/(.+) \(([0-9.]+)\) \[([0-9a-f]+)\]?/)
               if match && match[3] == device_uuid
                 devices << Device.new(name: match[1], udid: match[3], os_version: match[2], state: "Booted", is_simulator: false)
-                Helper.log.info "USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3] if $verbose
+                UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
               end
             end
           end
@@ -95,7 +95,7 @@ module FastlaneCore
 
       # The code below works from Xcode 7 on
       # def all
-      #   UI.message("Fetching available devices") if $verbose
+      #   UI.verbose("Fetching available devices")
 
       #   @devices = []
       #   output = ''

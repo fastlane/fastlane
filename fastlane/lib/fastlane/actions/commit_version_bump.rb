@@ -79,7 +79,7 @@ module Fastlane
               "working directory while your lane is running. You can also use the :force option to bypass this ",
               "check, and always commit a version bump regardless of the state of the working directory."
             ].join("\n")
-            raise error.red
+            UI.user_error!(error)
           end
         end
 
