@@ -57,7 +57,7 @@ module WatchBuild
       require 'terminal-notifier'
 
       if build.nil?
-        Helper.log.info "Application build is still processing"
+        UI.message "Application build is still processing"
         return
       end
 

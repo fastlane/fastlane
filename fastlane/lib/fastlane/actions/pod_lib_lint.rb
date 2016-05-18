@@ -24,7 +24,7 @@ module Fastlane
         end
 
         result = Actions.sh(command.join(' '))
-        Helper.log.info "Pod lib lint Successfully ⬆️ ".green
+        UI.success("Pod lib lint Successfully ⬆️ ")
         return result
       end
 
@@ -59,7 +59,7 @@ module Fastlane
                                          optional: true,
                                          is_string: false,
                                          verify_block: proc do |value|
-                                           raise "Sources must be an array.".red unless value.kind_of?(Array)
+                                           UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                          end)
         ]
       end
