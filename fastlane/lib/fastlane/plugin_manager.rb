@@ -1,6 +1,6 @@
 module Fastlane
   class PluginManager
-    PLUGINSFILE_NAME = "Plugins".freeze
+    PLUGINSFILE_NAME = "Pluginfile".freeze
     DEFAULT_GEMFILE_PATH = "Gemfile".freeze
     GEMFILE_SOURCE_LINE = "source \"https://rubygems.org\"\n"
     FASTLANE_PLUGIN_PREFIX = "fastlane_"
