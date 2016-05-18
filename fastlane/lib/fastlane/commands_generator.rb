@@ -185,6 +185,7 @@ module Fastlane
             pm.add_dependency(plugin_name)
           end
 
+          UI.important("Make sure to commit your Gemfile, Gemfile.lock and #{PluginManager::PLUGINSFILE_NAME} to version control")
           pm.install_dependencies!
         end
       end
