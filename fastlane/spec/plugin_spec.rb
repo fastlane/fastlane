@@ -1,6 +1,6 @@
 describe Fastlane do
   describe "Plugins" do
-    describe "Error handling of invalid plugins", now: true do
+    describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do
           expect_any_instance_of(Fastlane::PluginManager).to receive(:pluginsfile_content).and_return("fastlane_my_custom_plugin")
