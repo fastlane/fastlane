@@ -21,7 +21,7 @@ module Fastlane
         project_dir = params[:project_dir] || '.'
 
         gradle_path_param = params[:gradle_path] || './gradlew'
-    
+
         # Get the path to gradle, if it's an absolute path we take it as is, if it's relative we assume it's relative to the project_dir
         gradle_path = if Pathname.new(gradle_path_param).absolute?
                         File.expand_path(gradle_path_param)
