@@ -15,7 +15,7 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "/usr/bin/xcrun '/tmp/PackageApplication4Gym' -v",
                              "''",
                              "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
                              "exportFormat ipa",
@@ -31,7 +31,7 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "/usr/bin/xcrun '/tmp/PackageApplication4Gym' -v",
                              "Krause\\'s\\ App",
                              "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
                              "exportFormat ipa",
@@ -50,7 +50,7 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun /tmp/PackageApplication4Gym -v",
+                             "/usr/bin/xcrun '/tmp/PackageApplication4Gym' -v",
                              "''",
                              "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
                              "exportFormat ipa",
