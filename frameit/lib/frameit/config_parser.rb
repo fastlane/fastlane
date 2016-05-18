@@ -2,7 +2,7 @@ module Frameit
   class ConfigParser
     def load(path)
       return nil unless File.exist?(path) # we are okay with no config at all
-      UI.message "Parsing config file '#{path}'" if $verbose
+      UI.verbose("Parsing config file '#{path}'")
       @path = path
       self.parse(File.read(path))
     end
