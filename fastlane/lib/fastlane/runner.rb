@@ -6,6 +6,9 @@ module Fastlane
     # Symbol for the current platform
     attr_accessor :current_platform
 
+    # Path used by the executed lane
+    attr_accessor :executing_lane_path
+
     # @return [Hash] All the lanes available, first the platform, then the lane
     attr_accessor :lanes
 
@@ -40,10 +43,10 @@ module Fastlane
 
       return_val = nil
 
-      path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      self.executing_lane_path = File.expand_path(Fastlane::FastlaneFolder.path || Dir.pwd)
       parameters ||= {}
       begin
-        Dir.chdir(path_to_use) do # the file is located in the fastlane folder
+        Dir.chdir(self.executing_lane_path) do # the file is located in the fastlane folder
           execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
           execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
@@ -57,7 +60,7 @@ module Fastlane
 
         return return_val
       rescue => ex
-        Dir.chdir(path_to_use) do
+        Dir.chdir(self.executing_lane_path) do
           # Provide error block exception without colour code
           error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
 
@@ -67,6 +70,7 @@ module Fastlane
 
         raise ex
       end
+      self.executing_lane_path = nil
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -152,7 +156,13 @@ module Fastlane
     end
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
+      unless custom_dir
+        if self.executing_lane_path
+          custom_dir = File.join(self.executing_lane_path, '..')
+        else
+          custom_dir = '..'
+        end
+      end
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
