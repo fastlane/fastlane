@@ -5,13 +5,11 @@ module Fastlane
     GEMFILE_SOURCE_LINE = "source \"https://rubygems.org\"\n"
 
     def gemfile_path
-      begin
-        # This is pretty important, since we don't know what kind of
-        # Gemfile the user has (e.g. Gemfile, gems.rb, or custom env variable)
-        Bundler::SharedHelpers.default_gemfile.to_s
-      rescue Bundler::GemfileNotFound
-        nil
-      end
+      # This is pretty important, since we don't know what kind of
+      # Gemfile the user has (e.g. Gemfile, gems.rb, or custom env variable)
+      Bundler::SharedHelpers.default_gemfile.to_s
+    rescue Bundler::GemfileNotFound
+      nil
     end
 
     def pluginsfile_path
@@ -110,7 +108,6 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env { exec("bundle update --quiet") }
     end
-
 
     def with_clean_bundler_env
       # There is an interesting problem with using exec to call back into Bundler

@@ -33,7 +33,7 @@ module Fastlane
         # Since helpers are optional, we don't show an error message here
       end
     rescue => ex
-      UI.error("Error loading plugin '#{gem_name}': #{ex.to_s}")
+      UI.error("Error loading plugin '#{gem_name}': #{ex}")
       UI.error("Make sure the plugin has a properly implemented action")
     end
   end
