@@ -13,7 +13,7 @@ module Fastlane
     end
 
     def pluginsfile_path
-      File.join(FastlaneFolder.path, PLUGINSFILE_NAME)
+      File.join(FastlaneFolder.path, PLUGINSFILE_NAME) if FastlaneFolder.path
     end
 
     def gemfile_content
@@ -21,7 +21,7 @@ module Fastlane
     end
 
     def pluginsfile_content
-      File.read(pluginsfile_path) if File.exist?(pluginsfile_path)
+      File.read(pluginsfile_path) if pluginsfile_path && File.exist?(pluginsfile_path)
     end
 
     def add_dependency(plugin_name)

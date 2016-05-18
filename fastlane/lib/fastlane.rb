@@ -19,6 +19,7 @@ require 'fastlane/one_off'
 require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
 require 'fastlane/other_action'
+require 'fastlane/plugin_manager'
 require 'fastlane/plugins_loader'
 
 module Fastlane
