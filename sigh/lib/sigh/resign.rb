@@ -6,16 +6,16 @@ module Sigh
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
 
-      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version)
+      resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
@@ -32,6 +32,7 @@ module Sigh
       short_version = "--short-version #{short_version}" if short_version
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
       verbose = "-v" if $verbose
+      bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
 
       command = [
         resign_path.shellescape,
@@ -44,6 +45,7 @@ module Sigh
         short_version,
         bundle_version,
         verbose,
+        bundle_id,
         ipa.shellescape
       ].join(' ')
 
@@ -68,12 +70,13 @@ module Sigh
       display_name = options.display_name || nil
       short_version = options.short_version || nil
       bundle_version = options.bundle_version || nil
+      new_bundle_id = options.new_bundle_id || nil
 
       if options.provisioning_name
         UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
       end
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id
     end
 
     def find_resign_path

@@ -78,6 +78,66 @@ describe Match do
         expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
       end
 
+      it "checks out a branch" do
+        path = Dir.mktmpdir # to have access to the actual path
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        git_branch = "test"
+        shallow_clone = false
+        command = "git clone '#{git_url}' '#{path}'"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
+
+        command = "git branch --list origin/#{git_branch} --no-color -r"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return("")
+
+        command = "git checkout --orphan #{git_branch}"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return("Switched to a new branch '#{git_branch}'")
+
+        command = "git reset --hard"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return("")
+
+        result = Match::GitHelper.clone(git_url, shallow_clone, branch: git_branch)
+
+        expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+      end
+
       after(:each) do
         Match::GitHelper.clear_changes
       end

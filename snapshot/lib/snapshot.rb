@@ -38,7 +38,8 @@ module Snapshot
     end
 
     def kill_simulator
-      `killall iOS Simulator &> /dev/null`
+      `killall 'iOS Simulator' &> /dev/null`
+      `killall Simulator &> /dev/null`
     end
   end
 

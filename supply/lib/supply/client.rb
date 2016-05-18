@@ -78,7 +78,7 @@ module Supply
     def begin_edit(package_name: nil)
       UI.user_error!("You currently have an active edit") if @current_edit
 
-      self.current_edit = android_publisher.insert_edit(package_name)
+      self.current_edit = call_google_api { android_publisher.insert_edit(package_name) }
 
       self.current_package_name = package_name
     end
@@ -87,7 +87,7 @@ module Supply
     def abort_current_edit
       ensure_active_edit!
 
-      android_publisher.delete_edit(current_package_name, current_edit.id)
+      call_google_api { android_publisher.delete_edit(current_package_name, current_edit.id) }
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -97,7 +97,7 @@ module Supply
     def commit_current_edit!
       ensure_active_edit!
 
-      android_publisher.commit_edit(current_package_name, current_edit.id)
+      call_google_api { android_publisher.commit_edit(current_package_name, current_edit.id) }
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -112,7 +112,7 @@ module Supply
     def listings
       ensure_active_edit!
 
-      result = android_publisher.list_listings(current_package_name, current_edit.id)
+      result = call_google_api { android_publisher.list_listings(current_package_name, current_edit.id) }
 
       return result.listings.map do |row|
         Listing.new(self, row.language, row)
@@ -140,7 +140,7 @@ module Supply
     def apks_version_codes
       ensure_active_edit!
 
-      result = android_publisher.list_apks(current_package_name, current_edit.id)
+      result = call_google_api { android_publisher.list_apks(current_package_name, current_edit.id) }
 
       return result.apks.map(&:version_code)
     end
@@ -149,10 +149,12 @@ module Supply
     def apk_listings(apk_version_code)
       ensure_active_edit!
 
-      result = android_publisher.list_apk_listings(
-        current_package_name,
-        current_edit.id,
-        apk_version_code)
+      result = call_google_api do
+        android_publisher.list_apk_listings(
+          current_package_name,
+          current_edit.id,
+          apk_version_code)
+      end
 
       return (result.listings || []).map do |row|
         ApkListing.new(row.recent_changes, row.language, apk_version_code)
@@ -175,20 +177,24 @@ module Supply
         video: video
       })
 
-      android_publisher.update_listing(
-        current_package_name,
-        current_edit.id,
-        language,
-        listing)
+      call_google_api do
+        android_publisher.update_listing(
+          current_package_name,
+          current_edit.id,
+          language,
+          listing)
+      end
     end
 
     def upload_apk(path_to_apk)
       ensure_active_edit!
 
-      result_upload = android_publisher.upload_apk(
-        current_package_name,
-        current_edit.id,
-        upload_source: path_to_apk)
+      result_upload = call_google_api do
+        android_publisher.upload_apk(
+          current_package_name,
+          current_edit.id,
+          upload_source: path_to_apk)
+      end
 
       return result_upload.version_code
     end
@@ -205,11 +211,27 @@ module Supply
         version_codes: track_version_codes
       })
 
-      android_publisher.update_track(
-        current_package_name,
-        current_edit.id,
-        track,
-        track_body)
+      call_google_api do
+        android_publisher.update_track(
+          current_package_name,
+          current_edit.id,
+          track,
+          track_body)
+      end
+    end
+
+    # Get list of version codes for track
+    def track_version_codes(track)
+      ensure_active_edit!
+
+      result = call_google_api do
+        android_publisher.get_track(
+          current_package_name,
+          current_edit.id,
+          track)
+      end
+
+      return result.version_codes
     end
 
     def update_apk_listing_for_language(apk_listing)
@@ -220,12 +242,14 @@ module Supply
         recent_changes: apk_listing.recent_changes
       })
 
-      android_publisher.update_apk_listing(
-        current_package_name,
-        current_edit.id,
-        apk_listing.apk_version_code,
-        apk_listing.language,
-        apk_listing_object)
+      call_google_api do
+        android_publisher.update_apk_listing(
+          current_package_name,
+          current_edit.id,
+          apk_listing.apk_version_code,
+          apk_listing.language,
+          apk_listing_object)
+      end
     end
 
     #####################################################
@@ -235,11 +259,13 @@ module Supply
     def fetch_images(image_type: nil, language: nil)
       ensure_active_edit!
 
-      result = android_publisher.list_images(
-        current_package_name,
-        current_edit.id,
-        language,
-        image_type)
+      result = call_google_api do
+        android_publisher.list_images(
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type)
+      end
 
       (result.images || []).map(&:url)
     end
@@ -248,42 +274,54 @@ module Supply
     def upload_image(image_path: nil, image_type: nil, language: nil)
       ensure_active_edit!
 
-      android_publisher.upload_image(
-        current_package_name,
-        current_edit.id,
-        language,
-        image_type,
-        upload_source: image_path,
-        content_type: 'image/*')
+      call_google_api do
+        android_publisher.upload_image(
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type,
+          upload_source: image_path,
+          content_type: 'image/*')
+      end
     end
 
     def clear_screenshots(image_type: nil, language: nil)
       ensure_active_edit!
 
-      android_publisher.delete_all_images(
-        current_package_name,
-        current_edit.id,
-        language,
-        image_type)
+      call_google_api do
+        android_publisher.delete_all_images(
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type)
+      end
     end
 
     def upload_obb(obb_file_path: nil, apk_version_code: nil, expansion_file_type: nil)
       ensure_active_edit!
 
-      android_publisher.upload_expansion_file(
-        current_package_name,
-        current_edit.id,
-        apk_version_code,
-        expansion_file_type,
-        upload_source: obb_file_path,
-        content_type: 'application/octet-stream'
-      )
+      call_google_api do
+        android_publisher.upload_expansion_file(
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          upload_source: obb_file_path,
+          content_type: 'application/octet-stream'
+        )
+      end
     end
 
     private
 
     def ensure_active_edit!
       UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
+    end
+
+    def call_google_api
+      yield if block_given?
+    rescue Google::Apis::ClientError => e
+      UI.user_error! "Google Api Error: #{e.message}"
     end
   end
 end

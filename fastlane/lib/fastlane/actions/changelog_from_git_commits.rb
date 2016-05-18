@@ -6,15 +6,18 @@ module Fastlane
 
     class ChangelogFromGitCommitsAction < Action
       def self.run(params)
-        if params[:between]
-          from, to = params[:between]
+        if params[:commits_count]
+          UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
-          from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
-          UI.verbose("Found the last Git tag: #{from}")
-          to = 'HEAD'
+          if params[:between]
+            from, to = params[:between]
+          else
+            from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
+            UI.verbose("Found the last Git tag: #{from}")
+            to = 'HEAD'
+          end
+          UI.success("Collecting Git commits between #{from} and #{to}")
         end
-
-        UI.success("Collecting Git commits between #{from} and #{to}")
 
         # Normally it is not good practice to take arbitrary input and convert it to a symbol
         # because prior to Ruby 2.2, symbols are never garbage collected. However, we've
@@ -26,7 +29,11 @@ module Fastlane
           merge_commit_filtering = :exclude_merges
         end
 
-        changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering)
+        if params[:commits_count]
+          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering)
+        else
+          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering)
+        end
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
@@ -53,13 +60,24 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :between,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN',
-                                       description: 'Array containing two Git revision values between which to collect messages',
+                                       description: 'Array containing two Git revision values between which to collect messages, you mustn\'t use it with :commits_count key at the same time',
                                        optional: true,
                                        is_string: false,
+                                       conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
                                          UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
                                          UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
                                          UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :commits_count,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
+                                       description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
+                                       optional: true,
+                                       is_string: false,
+                                       conflicting_options: [:between],
+                                       verify_block: proc do |value|
+                                         UI.user_error!(":commits_count must be an integer") unless value.kind_of? Integer
+                                         UI.user_error!(":commits_count must be >= 1") unless value >= 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
@@ -103,7 +121,7 @@ module Fastlane
       end
 
       def self.author
-        ['mfurtak', 'asfalcone']
+        ['mfurtak', 'asfalcone', 'SiarheiFedartsou']
       end
 
       def self.is_supported?(platform)

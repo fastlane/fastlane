@@ -302,15 +302,22 @@ module Spaceship
           raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
-          raise ITunesConnectError.new, info.join("\n")
+          raise TunesClient::ITunesConnectError.new, info.join("\n")
         end
       end
     end
 
     def itc_service_key
       return @service_key if @service_key
+      # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
+      # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
+      # the content be served only as plain-text, which seems to work around their problem, while not affecting
+      # other clients.
+      #
+      # https://github.com/fastlane/fastlane/issues/4610
+      headers = {'Accept-Encoding' => 'identity'}
       # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js")
+      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
       @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
     end
 

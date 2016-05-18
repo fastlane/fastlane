@@ -17,6 +17,10 @@ before_all do |lane, options|
   ...
 end
 
+before_each do |lane, options|
+  ...
+end
+
 lane :deploy do |options|
   ...
   if options[:submit]
@@ -28,6 +32,10 @@ lane :deploy do |options|
 end
 
 after_all do |lane, options|
+  ...
+end
+
+after_each do |lane, options|
   ...
 end
 
@@ -82,6 +90,44 @@ lane :calculate do |options|
 end
 ```
 
+## `before_each` and `after_each` blocks
+
+`before_each` blocks are called before any lane is called. This would include being called before each lane you've switched to.
+```ruby
+before_each do |lane, options|
+  ...
+end
+```
+
+`after_each` blocks are called after any lane is called. This would include being called after each lane you've switched to.
+Just like `after_all`, `after_each` is not called if an error occurs. The `error` block should be used in this case.
+```ruby
+after_each do |lane, options|
+  ...
+end
+```
+
+e.g. With this scenario, `before_each` and `after_each` would be called 4 times: before the `deploy` lane, before the switch to `archive`, `sign`, and `upload`, and after each of these lanes as well.
+
+```ruby
+lane :deploy do
+  archive
+  sign
+  upload
+end
+
+lane :archive do
+  ...
+end
+
+lane :sign do
+  ...
+end
+
+lane :upload do
+  ...
+end
+```
 ## Run actions directly
 
 If you just want to try an action without adding them to your `Fastfile` yet, you can use

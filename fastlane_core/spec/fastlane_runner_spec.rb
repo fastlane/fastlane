@@ -5,7 +5,7 @@ describe Commander::Runner do
     class CommandsGenerator
       include Commander::Methods
 
-      def initialize(raise_error: false)
+      def initialize(raise_error: nil)
         @raise_error = raise_error
       end
 
@@ -26,7 +26,7 @@ describe Commander::Runner do
 
         command :run do |c|
           c.action do |args, options|
-            raise StandardError if @raise_error
+            raise @raise_error if @raise_error
           end
         end
 
@@ -50,13 +50,22 @@ describe Commander::Runner do
       CommandsGenerator.new.run
     end
 
-    it "calls the tool collector lifecycle methods for a failed run" do
+    it "calls the tool collector lifecycle methods for a crash" do
+      expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
+      expect(mock_tool_collector).to receive(:did_crash).with("tool_name").and_call_original
+
+      expect do
+        CommandsGenerator.new(raise_error: StandardError).run
+      end.to raise_error(StandardError)
+    end
+
+    it "calls the tool collector lifecycle methods for a user error" do
       expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
       expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
 
       expect do
-        CommandsGenerator.new(raise_error: true).run
-      end.to raise_error(StandardError)
+        CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
+      end.to raise_error(SystemExit)
     end
   end
 

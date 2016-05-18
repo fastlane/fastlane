@@ -52,12 +52,16 @@ describe Spaceship::Tunes::BuildTrain do
     end
 
     describe "Processing builds" do
-      it "builds that are stuck or pre-processing" do
-        expect(app.invalid_builds.count).to eq(1)
+      it "extracts builds that are stuck or pre-processing" do
+        expect(app.all_invalid_builds.count).to eq(2)
 
-        created_and_stucked = app.invalid_builds.first
-        expect(created_and_stucked.upload_date).to eq(1_436_381_720_000)
-        expect(created_and_stucked.state).to eq("invalidBinary")
+        invalid_binary = app.all_invalid_builds.first
+        expect(invalid_binary.upload_date).to eq(1_436_381_720_000)
+        expect(invalid_binary.processing_state).to eq("invalidBinary")
+
+        processing_failed = app.all_invalid_builds[1]
+        expect(processing_failed.upload_date).to eq(1_461_108_334_000)
+        expect(processing_failed.processing_state).to eq("processingFailed")
       end
 
       it "properly extracted the processing builds from a train" do

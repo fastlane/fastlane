@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Spaceship::VERSION
   spec.authors       = ["Felix Krause", "Stefan Natchev"]
   spec.email         = ["spaceship@krausefx.com", "stefan@natchev.com"]
-  spec.summary       = 'Because you would rather spend your time building stuff than fighting provisioning'
-  spec.description   = 'Because you would rather spend your time building stuff than fighting provisioning'
+  spec.summary       = Spaceship::DESCRIPTION
+  spec.description   = Spaceship::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 

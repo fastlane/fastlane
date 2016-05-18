@@ -3,6 +3,7 @@ module Fastlane
   module Actions
     module SharedValues
       XCODEBUILD_ARCHIVE = :XCODEBUILD_ARCHIVE
+      XCODEBUILD_DERIVED_DATA_PATH = :XCODEBUILD_DERIVED_DATA_PATH
     end
 
     # xcodebuild man page:
@@ -72,6 +73,7 @@ module Fastlane
 
         # Set derived data path.
         params[:derivedDataPath] ||= ENV["XCODE_DERIVED_DATA_PATH"]
+        Actions.lane_context[SharedValues::XCODEBUILD_DERIVED_DATA_PATH] = params[:derivedDataPath]
 
         # Append slash to build path, if needed
         if build_path && !build_path.end_with?("/")
