@@ -179,7 +179,7 @@ module Frameit
         # too large - resizing now
         smaller = (1.0 / ratio)
 
-        UI.message "Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}" if $verbose
+        UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}")
 
         title.resize "#{(smaller * title.width).round}x"
         keyword.resize "#{(smaller * keyword.width).round}x" if keyword
@@ -235,8 +235,8 @@ module Frameit
 
         current_font = font(key)
         text = fetch_text(key)
-        UI.message "Using #{current_font} as font the #{key} of #{screenshot.path}" if $verbose and current_font
-        UI.message "Adding text '#{text}'" if $verbose
+        UI.verbose("Using #{current_font} as font the #{key} of #{screenshot.path}") if current_font
+        UI.verbose("Adding text '#{text}'")
 
         text.gsub! '\n', "\n"
 
@@ -281,7 +281,7 @@ module Frameit
 
       # No string files, fallback to Framefile config
       result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
-      UI.message "Falling back to default text as there was nothing specified in the .strings file" if $verbose
+      UI.verbose("Falling back to default text as there was nothing specified in the .strings file")
 
       if type == :title and !result
         # title is mandatory
@@ -307,13 +307,13 @@ module Frameit
             end
           else
             # No `supported` array, this will always be true
-            UI.message "Found a font with no list of supported languages, using this now" if $verbose
+            UI.verbose("Found a font with no list of supported languages, using this now")
             return font["font"]
           end
         end
       end
 
-      UI.message "No custom font specified for #{screenshot}, using the default one" if $verbose
+      UI.verbose("No custom font specified for #{screenshot}, using the default one")
       return nil
     end
   end
