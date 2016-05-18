@@ -170,6 +170,38 @@ module Fastlane
         end
       end
 
+      command :add_plugin do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          pm = PluginManager.new
+          args.each do |plugin_name|
+            pm.add_dependency(plugin_name)
+          end
+
+          pm.install_dependencies!
+        end
+      end
+
+      command :update_plugins do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          PluginManager.new.update_dependencies!
+        end
+      end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          PluginManager.new.install_dependencies!
+        end
+      end
+
       default_command :trigger
 
       run!
