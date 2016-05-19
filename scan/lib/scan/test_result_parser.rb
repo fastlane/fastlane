@@ -2,7 +2,7 @@ module Scan
   class TestResultParser
     def parse_result(output)
       # e.g. ...<testsuites tests='2' failures='1'>...
-      matched = output.scan(%r{<testsuites\b(?=[^<>]*\s+tests='(\d+)')(?=[^<>]*\s+failures='(\d+)')[^<>]+>})
+      matched = output.scan(/<testsuites\b(?=[^<>]*\s+tests='(\d+)')(?=[^<>]*\s+failures='(\d+)')[^<>]+>/)
 
       if matched and matched.length == 1 and matched[0].length == 2
 
