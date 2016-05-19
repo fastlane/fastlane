@@ -50,6 +50,7 @@ module Fastlane
     # Check if a plugin is added as dependency to either the
     # Gemfile or the Pluginfile
     def plugin_is_added_as_dependency?(plugin_name)
+      UI.user_error!("fastlane plugins must start with '#{self.class.plugin_prefix}' string") unless plugin_name.start_with?(self.class.plugin_prefix)
       return available_plugins.include?(plugin_name)
     end
 
@@ -96,7 +97,9 @@ module Fastlane
       # Using puts instead of `UI` to have the same style as the `echo`
       puts "Installing plugin dependencies..."
       ensure_plugins_attached!
-      with_clean_bundler_env { exec("bundle install --quiet && echo 'Successfully installed plugins'") }
+      with_clean_bundler_env do
+        exec("bundle install --quiet && echo 'Successfully installed plugins'")
+      end
     end
 
     # Warning: This will exec out
@@ -104,7 +107,9 @@ module Fastlane
     def update_dependencies!
       puts "Updating plugin dependencies..."
       ensure_plugins_attached!
-      with_clean_bundler_env { exec("bundle update --quiet && echo 'Successfully updated plugins'") }
+      with_clean_bundler_env do
+        exec("bundle update --quiet && echo 'Successfully updated plugins'")
+      end
     end
 
     def with_clean_bundler_env
