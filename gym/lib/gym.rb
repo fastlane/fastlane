@@ -11,6 +11,7 @@ require 'gym/xcode'
 
 require 'fastlane_core'
 require 'terminal-table'
+require 'shellwords'
 
 module Gym
   class << self
