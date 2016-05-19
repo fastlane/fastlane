@@ -5,7 +5,6 @@ module Scan
       matched = output.scan(/<testsuites\b(?=[^<>]*\s+tests='(\d+)')(?=[^<>]*\s+failures='(\d+)')[^<>]+>/)
 
       if matched and matched.length == 1 and matched[0].length == 2
-
         tests = matched[0][0].to_i
         failures = matched[0][1].to_i
 
