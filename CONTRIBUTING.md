@@ -139,7 +139,7 @@ You then jump into an interactive debugger that allows you to print out variable
 
 In the directory of one project, run the tests using
 
-`rake test`
+`rake test_all`
 
 This will do a few things:
 
@@ -167,7 +167,7 @@ rspec -t now
 
 The `fastlane` repos use [rubocop](https://github.com/bbatsov/rubocop) to validate the code style.
 
-The style validation is automatically done when running `rake test`.
+The style validation is automatically done when running `rake test_all`.
 
 To automatically fix common code style issues (e.g. wrong spacing), run `rubocop -a`
 
