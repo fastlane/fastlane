@@ -96,7 +96,7 @@ module Fastlane
       # Using puts instead of `UI` to have the same style as the `echo`
       puts "Installing plugin dependencies..."
       ensure_plugins_attached!
-      with_clean_bundler_env { exec("bundle install --quiet && echo 'Sucessfully installed plugins'") }
+      with_clean_bundler_env { exec("bundle install --quiet && echo 'Successfully installed plugins'") }
     end
 
     # Warning: This will exec out
@@ -104,7 +104,7 @@ module Fastlane
     def update_dependencies!
       puts "Updating plugin dependencies..."
       ensure_plugins_attached!
-      with_clean_bundler_env { exec("bundle update --quiet && echo 'Sucessfully updated plugins'") }
+      with_clean_bundler_env { exec("bundle update --quiet && echo 'Successfully updated plugins'") }
     end
 
     def with_clean_bundler_env
