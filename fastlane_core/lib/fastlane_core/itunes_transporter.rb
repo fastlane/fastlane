@@ -143,7 +143,7 @@ module FastlaneCore
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         "-t 'Signiant'",
         "-k 100000",
-        ("-itc_provider #{team_id}" if team_id.length > 0)
+        ("-itc_provider #{team_id}" unless team_id.to_s.empty?)
       ].compact.join(' ')
     end
 
@@ -155,7 +155,7 @@ module FastlaneCore
         "-p #{shell_escaped_password(password)}",
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
-        ("-itc_provider #{team_id}" if team_id.length > 0)
+        ("-itc_provider #{team_id}" unless team_id.to_s.empty?)
       ].compact.join(' ')
     end
 
@@ -211,7 +211,7 @@ module FastlaneCore
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         '-t Signiant',
         '-k 100000',
-        ("-itc_provider #{team_id}" if team_id.length > 0),
+        ("-itc_provider #{team_id}" unless team_id.to_s.empty?),
         '2>&1' # cause stderr to be written to stdout
       ].compact.join(' ') # compact gets rid of the possibly nil ENV value
     end
@@ -233,7 +233,7 @@ module FastlaneCore
         "-p #{password.shellescape}",
         "-apple_id #{apple_id.shellescape}",
         "-destination #{destination.shellescape}",
-        ("-itc_provider #{team_id}" if team_id.length > 0),
+        ("-itc_provider #{team_id}" unless team_id.to_s.empty?),
         '2>&1' # cause stderr to be written to stdout
       ].compact.join(' ')
     end
@@ -348,14 +348,8 @@ module FastlaneCore
       UI.message("Going to upload updated app to iTunes Connect")
       UI.success("This might take a few minutes, please don't interrupt the script")
 
-<<<<<<< 4d22f03f0181e6085053d9e4d1cd5da23b3758e5
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir)
-      UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir))
-=======
-      command = @transporter_executor.build_upload_command(@user, @password, dir, @team_id)
-
-      UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', dir, @team_id))
->>>>>>> Ads Apple Developer Id to itunes_transporter.rb. Allows deliver to work with multiple iTunes Providers
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @team_id)
+      UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @team_id))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
