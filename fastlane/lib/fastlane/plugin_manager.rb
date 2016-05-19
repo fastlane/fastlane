@@ -153,7 +153,6 @@ module Fastlane
 
       attach_plugins_to_gemfile!(path_to_gemfile)
       UI.success("Successfully modified '#{path_to_gemfile}'")
-      return true
     end
 
     # The code required to load the Plugins file
@@ -168,8 +167,8 @@ module Fastlane
     end
 
     def ensure_plugins_attached!
-      return true if plugins_attached?
-      return self.setup
+      return if plugins_attached?
+      self.setup
     end
 
     #####################################################
