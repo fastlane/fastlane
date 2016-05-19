@@ -226,7 +226,7 @@ After building the archive it is being checked by `gym`. If it's valid, it gets 
 ### Xcode 7 and above
 
 ```
-/usr/bin/xcrun 'path/to/xcbuild-safe.sh' -exportArchive \
+/usr/bin/xcrun path/to/xcbuild-safe.sh -exportArchive \
 -exportOptionsPlist '/tmp/gym_config_1442852529.plist' \
 -archivePath '/Users/fkrause/Library/Developer/Xcode/Archives/2015-09-21/App 2015-09-21 09.21.56.xcarchive' \
 -exportPath '/tmp/1442852529'
@@ -241,7 +241,7 @@ Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/tree/mas
 ### Xcode 6 and below
 
 ```
-/usr/bin/xcrun '/path/to/PackageApplication4Gym' -v \
+/usr/bin/xcrun /path/to/PackageApplication4Gym -v \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName 2015-08-11 18.15.30.xcarchive/Products/Applications/name.app' -o \
 '/Users/felixkrause/Library/Developer/Xcode/Archives/2015-08-11/ExampleProductName.ipa' \
 --sign "identity" --embed "provProfile"
