@@ -130,7 +130,7 @@ username "user@fastlane.tools"
 
 #### Important: Use one git branch per team
 
-`match` also supports storing certificates of multiple teams in one repo, by using separate git branches. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. 
+`match` also supports storing certificates of multiple teams in one repo, by using separate git branches. Whether you work in multiple teams or not, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. (Don't use a pre-existing branch such as `master`.)
 
 ```ruby
 match(git_branch: "team1", username: "user@team1.com")
