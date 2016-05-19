@@ -47,12 +47,12 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorLegacy.generate
       expect(result).to eq([
-                            "/usr/bin/xcrun /tmp/path\\ with\\ spaces -v",
-                            "''",
-                            "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
-                            "exportFormat ipa",
-                            ""
-                          ])
+                             "/usr/bin/xcrun /tmp/path\\ with\\ spaces -v",
+                             "''",
+                             "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
+                             "exportFormat ipa",
+                             ""
+                           ])
     end
 
     it "supports passing a path to a provisioning profile" do

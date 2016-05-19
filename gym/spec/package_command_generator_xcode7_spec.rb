@@ -23,7 +23,7 @@ describe Gym do
                            ])
     end
 
-    it "works with spaces in path name", now: true do
+    it "works with spaces in path name" do
       options = { project: "./examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -31,12 +31,12 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-                            "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
-                            "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                            "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
-                            "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
-                            ""
-                          ])
+                             "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             ""
+                           ])
     end
 
     it "generates a valid plist file we need" do
