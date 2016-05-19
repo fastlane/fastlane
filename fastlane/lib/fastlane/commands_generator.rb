@@ -9,7 +9,6 @@ module Fastlane
 
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
-      Fastlane.load_actions
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -38,6 +37,8 @@ module Fastlane
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
+          Fastlane.load_actions
+
           if ensure_fastfile
             Fastlane::CommandLineHandler.handle(args, options)
           end
@@ -130,6 +131,8 @@ module Fastlane
         c.option '--platform STRING', String, 'Only show actions available on the given platform'
 
         c.action do |args, options|
+          Fastlane.load_actions
+
           require 'fastlane/documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
         end
@@ -139,6 +142,8 @@ module Fastlane
         c.syntax = 'fastlane action [tool_name]'
         c.description = 'Shows more information for a specific command'
         c.action do |args, options|
+          Fastlane.load_actions
+
           require 'fastlane/documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first)
         end
@@ -167,6 +172,39 @@ module Fastlane
         c.action do |args, options|
           require 'fastlane/auto_complete'
           Fastlane::AutoComplete.execute
+        end
+      end
+
+      # Plugins, TODO: move them
+      command :add_plugin do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          pm = PluginManager.new
+          args.each do |plugin_name|
+            pm.add_dependency(plugin_name)
+          end
+
+          pm.install_dependencies!
+        end
+      end
+
+      command :update_plugins do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          PluginManager.new.update_dependencies!
+        end
+      end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane [lane]'
+        c.description = 'TODO'
+
+        c.action do |args, options|
+          PluginManager.new.install_dependencies!
         end
       end
 

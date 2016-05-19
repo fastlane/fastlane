@@ -1,5 +1,10 @@
 skip_docs
 
+lane :beta do
+  # See ma, no requires
+  xcversion(path: "/Applications/Xcode.app")
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
