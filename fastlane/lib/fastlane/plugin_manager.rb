@@ -98,7 +98,10 @@ module Fastlane
       puts "Installing plugin dependencies..."
       ensure_plugins_attached!
       with_clean_bundler_env do
-        exec("bundle install --quiet && echo 'Successfully installed plugins'")
+        cmd = "bundle install"
+        cmd << " --quiet" unless $verbose
+        cmd << " && echo 'Successfully installed plugins'"
+        exec(cmd)
       end
     end
 
@@ -108,7 +111,10 @@ module Fastlane
       puts "Updating plugin dependencies..."
       ensure_plugins_attached!
       with_clean_bundler_env do
-        exec("bundle update --quiet && echo 'Successfully updated plugins'")
+        cmd = "bundle update"
+        cmd << " --quiet" unless $verbose
+        cmd << " && echo 'Successfully updated plugins'"
+        exec(cmd)
       end
     end
 
