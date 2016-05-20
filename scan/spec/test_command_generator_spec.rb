@@ -215,9 +215,9 @@ describe Scan do
 
       it "raises an error if both `device` and `devices` were given" do
         expect do
-          options = { 
-            project: "./examples/standard/app.xcodeproj", 
-            device: ["iPhone 6s (9.3)"], 
+          options = {
+            project: "./examples/standard/app.xcodeproj",
+            device: ["iPhone 6s (9.3)"],
             devices: ["iPhone 6"]
           }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)

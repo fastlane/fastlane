@@ -13,7 +13,7 @@ module Scan
       # We call this method, to be sure that all other simulators are killed
       # And a correct one is freshly launched. Switching between multiple simulator
       # in case the user specified multiple targets works with no issues
-      # This way it's okay to just call it for the first simulator we're using for 
+      # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first)
 
