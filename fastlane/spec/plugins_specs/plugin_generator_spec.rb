@@ -1,0 +1,1 @@
+plugin_generator_spec.rb
