@@ -37,12 +37,16 @@ module Fastlane
       FASTLANE_PLUGIN_PREFIX
     end
 
-    # Returns an array of fastlane plugins that are added to the Gemfile or Pluginfile
-    def available_plugins
+    # Returns an array of gems that are added to the Gemfile or Pluginfile
+    def available_gems
       return [] unless gemfile_path
       dsl = Bundler::Dsl.evaluate(gemfile_path, nil, true)
+      return dsl.dependencies.map(&:name)
+    end
 
-      return dsl.dependencies.map(&:name).keep_if do |current|
+    # Returns an array of fastlane plugins that are added to the Gemfile or Pluginfile
+    def available_plugins
+      available_gems.keep_if do |current|
         current.start_with?(self.class.plugin_prefix) && current != "fastlane_core"
       end
     end
@@ -81,7 +85,7 @@ module Fastlane
 
       # We have to make sure fastlane is also added to the Gemfile, since we now use
       # bundler to run fastlane
-      content += "\ngem 'fastlane'\n" unless plugin_is_added_as_dependency?('fastlane')
+      content += "\ngem 'fastlane'\n" unless available_gems.include?('fastlane')
       content += "\n#{self.class.code_to_attach}\n"
 
       File.write(path_to_gemfile, content)

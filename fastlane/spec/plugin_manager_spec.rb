@@ -17,6 +17,18 @@ describe Fastlane do
       end
     end
 
+    describe "#available_gems" do
+      it "returns [] if no Gemfile is available" do
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_raise(Bundler::GemfileNotFound)
+        expect(Fastlane::PluginManager.new.available_gems).to eq([])
+      end
+
+      it "returns all fastlane plugins with no fastlane_core" do
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        expect(Fastlane::PluginManager.new.available_gems).to eq(["fastlane_xcversion", "fastlane_core", "hemal"])
+      end
+    end
+
     describe "#available_plugins" do
       it "returns [] if no Gemfile is available" do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_raise(Bundler::GemfileNotFound)
