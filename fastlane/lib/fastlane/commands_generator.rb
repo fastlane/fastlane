@@ -175,6 +175,17 @@ module Fastlane
       # @!group Plugins
       #####################################################
 
+      command :create_plugin do |c|
+        c.syntax = 'fastlane create_plugin [plugin_name]'
+        c.description = 'Create a new plugin that can be used with fastlane'
+
+        c.action do |args, options|
+          require 'fastlane/plugin_generator'
+          pg = PluginGenerator.new
+          pg.create_gemspec
+        end
+      end
+
       command :add_plugin do |c|
         c.syntax = 'fastlane add_plugin [plugin_name]'
         c.description = 'Add a new plugin to your fastlane setup'
