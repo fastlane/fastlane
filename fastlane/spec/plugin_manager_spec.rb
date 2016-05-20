@@ -61,6 +61,20 @@ describe Fastlane do
       end
     end
 
+    describe "#plugins_attached?" do
+      it "returns true if plugins are attached" do
+        pm = Fastlane::PluginManager.new
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithAttached")
+        expect(pm.plugins_attached?).to eq(true)
+      end
+
+      it "returns false if plugins are not attached" do
+        pm = Fastlane::PluginManager.new
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithoutAttached")
+        expect(pm.plugins_attached?).to eq(false)
+      end
+    end
+
     describe "#install_dependencies!" do
       it "execs out the correct command" do
         pm = Fastlane::PluginManager.new
