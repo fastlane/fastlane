@@ -1,21 +1,26 @@
 describe Fastlane::PluginGenerator do
   describe '#generate' do
+    let(:test_ui) do
+      ui = Fastlane::PluginGeneratorUI.new
+      allow(ui).to receive(:message)
+      allow(ui).to receive(:input)
+      allow(ui).to receive(:confirm)
+      ui
+    end
+    let(:generator) { Fastlane::PluginGenerator.new(test_ui) }
+    let(:plugin_name) { "plugin" }
+    let(:gem_name) { "fastlane_#{plugin_name}" }
+    let(:author) { "Fabricio Devtoolio" }
+
     before(:each) do
-      @ui = Fastlane::PluginGeneratorUI.new
-      allow(@ui).to receive(:message)
-      allow(@ui).to receive(:input)
-      allow(@ui).to receive(:confirm)
-
-      @generator = Fastlane::PluginGenerator.new(@ui)
-
       @tmp_dir = Dir.mktmpdir
       @oldwd = Dir.pwd
       Dir.chdir(@tmp_dir)
 
-      expect(@ui).to receive(:input).and_return('plugin')
-      expect(@ui).to receive(:input).and_return('Fabricio Devtoolio')
+      expect(test_ui).to receive(:input).and_return(plugin_name)
+      expect(test_ui).to receive(:input).and_return(author)
 
-      @generator.generate
+      generator.generate
     end
 
     after(:each) do
@@ -23,8 +28,8 @@ describe Fastlane::PluginGenerator do
       FileUtils.remove_entry(@tmp_dir) if @tmp_dir
     end
 
-    it "creates plugin root directory" do
-      expect(File.directory?(File.join(@tmp_dir, 'fastlane_plugin'))).to be(true)
+    it "creates gem root directory" do
+      expect(File.directory?(File.join(@tmp_dir, gem_name))).to be(true)
     end
 
     it "creates a README" do
@@ -32,7 +37,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "README contains gem name" do
-      expect(File.read(File.join(@tmp_dir, 'README.md')).include?('fastlane_plugin'))
+      expect(File.read(File.join(@tmp_dir, 'README.md')).include?(gem_name))
     end
 
     it "creates a LICENSE" do
