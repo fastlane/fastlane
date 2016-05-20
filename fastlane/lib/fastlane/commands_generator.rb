@@ -180,9 +180,7 @@ module Fastlane
         c.description = 'Create a new plugin that can be used with fastlane'
 
         c.action do |args, options|
-          require 'fastlane/plugin_generator'
-          pg = PluginGenerator.new
-          pg.create_gemspec
+          PluginGenerator.new.generate
         end
       end
 
