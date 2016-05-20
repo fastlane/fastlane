@@ -9,56 +9,21 @@ describe Fastlane::PluginInfoCollector do
 
   let(:collector) { Fastlane::PluginInfoCollector.new(test_ui) }
 
-  describe "plugin name collection" do
+  describe "#collect_plugin_name" do
     it "accepts a valid plugin name" do
       expect(test_ui).to receive(:input).and_return('test_name')
 
       expect(collector.collect_plugin_name).to eq('test_name')
     end
 
-    it "offers a corrected plugin name for caps" do
+    it "offers a correction" do
       expect(test_ui).to receive(:input).and_return('TEST_NAME')
       expect(test_ui).to receive(:confirm).and_return(true)
 
       expect(collector.collect_plugin_name).to eq('test_name')
     end
 
-    it "offers a corrected plugin name for spaces" do
-      expect(test_ui).to receive(:input).and_return('test name')
-      expect(test_ui).to receive(:confirm).and_return(true)
-
-      expect(collector.collect_plugin_name).to eq('test_name')
-    end
-
-    it "offers a corrected plugin name for dashes" do
-      expect(test_ui).to receive(:input).and_return('test-name')
-      expect(test_ui).to receive(:confirm).and_return(true)
-
-      expect(collector.collect_plugin_name).to eq('test_name')
-    end
-
-    it "offers a corrected plugin name for starting with 'fastlane_'" do
-      expect(test_ui).to receive(:input).and_return('fastlane_test_name')
-      expect(test_ui).to receive(:confirm).and_return(true)
-
-      expect(collector.collect_plugin_name).to eq('test_name')
-    end
-
-    it "offers a corrected plugin name for starting with 'Fastlane '" do
-      expect(test_ui).to receive(:input).and_return('Fastlane test_name')
-      expect(test_ui).to receive(:confirm).and_return(true)
-
-      expect(collector.collect_plugin_name).to eq('test_name')
-    end
-
-    it "offers a corrected plugin name for characters we don't want" do
-      expect(test_ui).to receive(:input).and_return('T!EST-na$me ple&ase')
-      expect(test_ui).to receive(:confirm).and_return(true)
-
-      expect(collector.collect_plugin_name).to eq('test_name_please')
-    end
-
-    it "offers a corrected plugin name, and prompts again if declined" do
+    it "offers and prompts again if declined" do
       expect(test_ui).to receive(:input).and_return('TEST NAME')
       expect(test_ui).to receive(:confirm).and_return(false)
       expect(test_ui).to receive(:message).with(/can only contain/)
@@ -68,25 +33,92 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
-  describe 'author collection' do
+  describe '#plugin_name_valid?' do
+    it "handles valid plugin name" do
+      expect(collector.plugin_name_valid?('test_name')).to be_truthy
+    end
+
+    it "handles plugin name with all caps" do
+      expect(collector.plugin_name_valid?('TEST_NAME')).to be_falsey
+    end
+
+    it "handles plugin name with spaces" do
+      expect(collector.plugin_name_valid?('test name')).to be_falsey
+    end
+
+    it "handles plugin name with dashes" do
+      expect(collector.plugin_name_valid?('test-name')).to be_falsey
+    end
+
+    it "handles plugin name starting with 'fastlane_'" do
+      expect(collector.plugin_name_valid?('fastlane_test_name')).to be_falsey
+    end
+
+    it "handles plugin name starting with 'Fastlane '" do
+      expect(collector.plugin_name_valid?('Fastlane test_name')).to be_falsey
+    end
+
+    it "handles plugin name with characters we don't want" do
+      expect(collector.plugin_name_valid?('T!EST-na$me ple&ase')).to be_falsey
+    end
+  end
+
+  describe '#fix_plugin_name' do
+    it "handles valid plugin name" do
+      expect(collector.fix_plugin_name('test_name')).to eq('test_name')
+    end
+
+    it "handles plugin name with all caps" do
+      expect(collector.fix_plugin_name('TEST_NAME')).to eq('test_name')
+    end
+
+    it "handles plugin name with spaces" do
+      expect(collector.fix_plugin_name('test name')).to eq('test_name')
+    end
+
+    it "handles plugin name with dashes" do
+      expect(collector.fix_plugin_name('test-name')).to eq('test_name')
+    end
+
+    it "handles plugin name starting with 'fastlane_'" do
+      expect(collector.fix_plugin_name('fastlane_test_name')).to eq('test_name')
+    end
+
+    it "handles plugin name starting with 'Fastlane '" do
+      expect(collector.fix_plugin_name('Fastlane test_name')).to eq('test_name')
+    end
+
+    it "handles plugin name with characters we don't want" do
+      expect(collector.fix_plugin_name('T!EST-na$me ple&ase')).to eq('test_name_please')
+    end
+  end
+
+  describe "author collection" do
     it "accepts a valid author name" do
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
 
       expect(collector.collect_author).to eq('Fabricio Devtoolio')
     end
 
-    it "does not accept empty author name" do
+    it "accepts a valid author name after rejecting an invalid author name" do
       expect(test_ui).to receive(:input).and_return('')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
 
       expect(collector.collect_author).to eq('Fabricio Devtoolio')
     end
+  end
 
-    it "does not accept whitespace-only author name" do
-      expect(test_ui).to receive(:input).and_return('     ')
-      expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
+  describe '#author_valid?' do
+    it "handles valid author" do
+      expect(collector.author_valid?('Fabricio Devtoolio')).to be_truthy
+    end
 
-      expect(collector.collect_author).to eq('Fabricio Devtoolio')
+    it "handles empty author" do
+      expect(collector.author_valid?('')).to be_falsey
+    end
+
+    it "handles all-spaces author" do
+      expect(collector.author_valid?('    ')).to be_falsey
     end
   end
 
