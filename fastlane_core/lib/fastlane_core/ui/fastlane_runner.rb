@@ -61,7 +61,6 @@ module Commander
         error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
         display_user_error!(e, error_info)
       else
-        FastlaneCore::CrashReporting.handle_crash(e)
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
         reraise_formatted!(e, e.message)
