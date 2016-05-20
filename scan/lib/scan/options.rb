@@ -32,9 +32,23 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :device,
                                      short_option: "-a",
                                      optional: true,
-                                     is_string: false,
+                                     is_string: true,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on"),
+                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6')",
+                                     conflicting_options: [:devices],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :devices,
+                                     optional: true,
+                                     is_string: false,
+                                     env_name: "SCAN_DEVICES",
+                                     type: Array,
+                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])",
+                                     conflicting_options: [:device],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,

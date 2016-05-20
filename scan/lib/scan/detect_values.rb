@@ -37,11 +37,11 @@ module Scan
     end
 
     def self.default_device_ios
-      devices = Scan.config[:device]
-      devices = [devices] if devices.kind_of? String
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       found_devices = []
 
-      if devices # make sure it actually exists
+      if (devices || []).count > 0
+        # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
@@ -52,11 +52,11 @@ module Scan
           if found
             found_devices.push(found)
           else
-            UI.error("Ignoring '#{device}', couldn't find matching simulator.")
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
           end
         end
 
-        if !found_devices.empty?
+        if found_devices.count > 0
           Scan.devices = found_devices
           return
         else
@@ -75,16 +75,16 @@ module Scan
       if found
         Scan.devices = [found]
       else
-        UI.user_error!("No simulators found")
+        UI.user_error!("No simulators found on local machine")
       end
     end
 
     def self.default_device_tvos
-      devices = Scan.config[:device]
-      devices = [devices] if devices.kind_of? String
+      devices = Scan.config[:devices] || [Scan.config[:device]] # important to use Array(nil) for when the value is nil
       found_devices = []
 
-      if devices # make sure it actually exists
+      if (devices || []).count > 0
+        # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
@@ -95,11 +95,11 @@ module Scan
           if found
             found_devices.push(found)
           else
-            UI.error("Ignoring '#{device}', couldn't find matching simulator.")
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
           end
         end
 
-        if !found_devices.empty?
+        if found_devices.count > 0
           Scan.devices = found_devices
           return
         else
@@ -118,7 +118,7 @@ module Scan
       if found
         Scan.devices = [found]
       else
-        UI.user_error!("No simulators found")
+        UI.user_error!("No TV simulators found on the local machine")
       end
     end
 

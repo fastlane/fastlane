@@ -184,7 +184,7 @@ describe Scan do
       end
 
       it "uses multiple devices" do
-        options = { project: "./examples/standard/app.xcodeproj", device: [
+        options = { project: "./examples/standard/app.xcodeproj", devices: [
           "iPhone 6s (9.3)",
           "iPad Air (9.3)"
         ]}
@@ -201,6 +201,27 @@ describe Scan do
                                        :build,
                                        :test
                                      ])
+      end
+
+      it "raises an error if multiple devices are specified for `device`" do
+        expect do
+          options = { project: "./examples/standard/app.xcodeproj", device: [
+            "iPhone 6s (9.3)",
+            "iPad Air (9.3)"
+          ]}
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end.to raise_error("'device' value must be a String! Found Array instead.")
+      end
+
+      it "raises an error if both `device` and `devices` were given" do
+        expect do
+          options = { 
+            project: "./examples/standard/app.xcodeproj", 
+            device: ["iPhone 6s (9.3)"], 
+            devices: ["iPhone 6"]
+          }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end.to raise_error("'device' value must be a String! Found Array instead.")
       end
     end
   end
