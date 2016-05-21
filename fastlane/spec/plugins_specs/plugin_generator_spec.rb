@@ -50,7 +50,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a README that contains the gem name" do
-      expect(File.exists?(File.join(tmp_dir, 'README.md'))).to be(true)
+      expect(File.exist?(File.join(tmp_dir, 'README.md'))).to be(true)
 
       readme_contents = File.read(File.join(tmp_dir, 'README.md'))
 
@@ -61,17 +61,17 @@ describe Fastlane::PluginGenerator do
     it "creates a module for the VERSION" do
       # We'll be asserting that this file is valid Ruby when we check
       # the value of the version as evaluated by the gemspec!
-      expect(File.exists?(File.join('lib', gem_name, 'version.rb'))).to be(true)
+      expect(File.exist?(File.join('lib', gem_name, 'version.rb'))).to be(true)
     end
 
     it "creates a LICENSE" do
-      expect(File.exists?(File.join(tmp_dir, 'LICENSE'))).to be(true)
+      expect(File.exist?(File.join(tmp_dir, 'LICENSE'))).to be(true)
     end
 
     it "creates a complete, valid gemspec" do
       gemspec_file = File.join(tmp_dir, "#{gem_name}.gemspec")
 
-      expect(File.exists?(gemspec_file)).to be(true)
+      expect(File.exist?(gemspec_file)).to be(true)
 
       # If we evaluate the contents of the generated gemspec file,
       # we'll get the Gem Specification object back out, which
