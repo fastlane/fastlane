@@ -3,7 +3,7 @@ module Fastlane
     PLUGINSFILE_NAME = "Pluginfile".freeze
     DEFAULT_GEMFILE_PATH = "Gemfile".freeze
     GEMFILE_SOURCE_LINE = "source \"https://rubygems.org\"\n"
-    FASTLANE_PLUGIN_PREFIX = "fastlane_"
+    FASTLANE_PLUGIN_PREFIX = "fastlane-plugin-"
 
     #####################################################
     # @!group Reading the files and their paths
@@ -187,7 +187,7 @@ module Fastlane
 
     # Iterate over all available plugins
     # which follow the naming convention
-    #   fastlane_[plugin_name]
+    #   fastlane-plugin-[plugin_name]
     # This will make sure to load the action
     # and all its helpers
     def self.load_plugins
@@ -200,7 +200,7 @@ module Fastlane
 
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
-          require gem_name
+          require gem_name.gsub("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
         rescue => ex
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
         end

@@ -40,10 +40,10 @@ fastlane install_plugins
 
 ### Remove a plugin
 
-Open your `fastlane/Plugins` and remove the line that looks like this
+Open your `fastlane/Pluginfile` and remove the line that looks like this
 
 ```
-gem "fastlane_[plugin_name]"
+gem "fastlane-plugin-[plugin_name]"
 ```
 
 ### Create your own plugin
@@ -57,10 +57,10 @@ fastlane new_plugin
 This will do the following:
 
 - Create the directory structure that's needed to have a valid gem
-- You need to edit the `lib/fastlane_[plugin_name]/actions/[plugin_name].rb`
+- You need to edit the `lib/fastlane-plugin-[plugin_name]/actions/[plugin_name].rb` # TODO: That's probably not correct
 - Easily test the plugin locally by adding the following line to your `Plugins` file
 ```ruby
-gem 'fastlane_[plugin_name]', path: "../../path/to/fastlane_[plugin_name]"
+gem 'fastlane-plugin-[plugin_name]', path: "../../path/to/fastlane-plugin-[plugin_name]"
 ```
 
 #### Publishing your plugin
@@ -71,7 +71,7 @@ The recommended way to publish your plugin is to publish it on [RubyGems.org](ht
 
 ```sh
 bundle install && rake install
-gem push ./pkg/fastlane_[plugin_name]-0.0.1.gem
+gem push ./pkg/fastlane-plugin-[plugin_name]-0.0.1.gem
 ```
 
 Now all your users can run `fastlane add_plugin [plugin_name]` to install and use your plugin.
@@ -81,11 +81,11 @@ Now all your users can run `fastlane add_plugin [plugin_name]` to install and us
 If for some reason you don't want to use RubyGems, you can also make your plugin available on GitHub. Your users then need to add the following to the `Pluginfile`
 
 ```ruby
-gem "fastlane_[plugin_name]", git: "https://github.com/[user]/[plugin_name]"
+gem "fastlane-plugin-[plugin_name]", git: "https://github.com/[user]/[plugin_name]"
 ```
 
 ### Advanced
 
 #### Multiple actions in one plugin
 
-Let's assume you work on a `fastlane` plugin for project management software. You could call it `fastlane_pm` and it may contain any number of actions and helpers, just add them to your `actions` folder.
+Let's assume you work on a `fastlane` plugin for project management software. You could call it `fastlane-plugin-pm` and it may contain any number of actions and helpers, just add them to your `actions` folder.
