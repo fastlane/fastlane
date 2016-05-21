@@ -10,7 +10,11 @@ module Fastlane
     end
 
     def gem_name
-      "fastlane_#{plugin_name}"
+      "#{Fastlane::PluginManager::FASTLANE_PLUGIN_PREFIX}#{plugin_name}"
+    end
+
+    def require_path
+      gem_name.gsub('-', '/')
     end
 
     # Used to exposed a local binding for use in ERB templating

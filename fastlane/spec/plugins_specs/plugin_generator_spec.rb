@@ -8,16 +8,18 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
-    let(:plugin_name) { "plugin" }
-    let(:gem_name) { "fastlane_#{plugin_name}" }
-    let(:author) { "Fabricio Devtoolio" }
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio') }
+    let(:plugin_name) { plugin_info.plugin_name }
+    let(:gem_name) { plugin_info.gem_name }
+    let(:require_path) { plugin_info.require_path }
+    let(:author) { plugin_info.author }
 
     before(:each) do
       unless initialized
         test_ui = Fastlane::PluginGeneratorUI.new
         allow(test_ui).to receive(:message)
-        allow(test_ui).to receive(:input)
-        allow(test_ui).to receive(:confirm)
+        allow(test_ui).to receive(:input).and_raise(":input call was not mocked!")
+        allow(test_ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
 
         generator = Fastlane::PluginGenerator.new(test_ui)
 
@@ -50,9 +52,10 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a README that contains the gem name" do
-      expect(File.exist?(File.join(tmp_dir, 'README.md'))).to be(true)
+      readme_file = File.join(tmp_dir, gem_name, 'README.md')
+      expect(File.exist?(readme_file)).to be(true)
 
-      readme_contents = File.read(File.join(tmp_dir, 'README.md'))
+      readme_contents = File.read(readme_file)
 
       expect(readme_contents).to include(gem_name)
       expect(readme_contents.length).to be > 100
@@ -61,27 +64,30 @@ describe Fastlane::PluginGenerator do
     it "creates a module for the VERSION" do
       # We'll be asserting that this file is valid Ruby when we check
       # the value of the version as evaluated by the gemspec!
-      expect(File.exist?(File.join('lib', gem_name, 'version.rb'))).to be(true)
+      expect(File.exist?(File.join(tmp_dir, gem_name, 'lib', require_path, 'version.rb'))).to be(true)
     end
 
     it "creates a LICENSE" do
-      expect(File.exist?(File.join(tmp_dir, 'LICENSE'))).to be(true)
+      expect(File.exist?(File.join(tmp_dir, gem_name, 'LICENSE'))).to be(true)
     end
 
     it "creates a complete, valid gemspec" do
-      gemspec_file = File.join(tmp_dir, "#{gem_name}.gemspec")
-
+      gemspec_file = File.join(tmp_dir, gem_name, "#{gem_name}.gemspec")
       expect(File.exist?(gemspec_file)).to be(true)
 
-      # If we evaluate the contents of the generated gemspec file,
-      # we'll get the Gem Specification object back out, which
-      # ensures that the syntax is valid, and lets us interrogate
-      # the values!
-      gemspec = eval(File.read(gemspec_file))
+      # Because the gemspec expects to be evaluated from the same directory
+      # it lives in, we need to jump in there while we examine it.
+      Dir.chdir(gem_name) do
+        # If we evaluate the contents of the generated gemspec file,
+        # we'll get the Gem Specification object back out, which
+        # ensures that the syntax is valid, and lets us interrogate
+        # the values!
+        gemspec = eval(File.read(gemspec_file))
 
-      expect(gemspec.name).to eq(gem_name)
-      expect(gemspec.author).to eq(author)
-      expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
+        expect(gemspec.name).to eq(gem_name)
+        expect(gemspec.author).to eq(author)
+        expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
+      end
     end
   end
 end
