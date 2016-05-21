@@ -19,5 +19,26 @@ describe FastlaneCore do
         FastlaneCore::CertChecker.installed_identies
       end
     end
+
+    describe 'shell escaping' do
+      let(:keychain_name) { "keychain with spaces.keychain" }
+      let(:shell_escaped_name) { keychain_name.shellescape }
+      let(:name_regex) { Regexp.new(Regexp.escape(shell_escaped_name)) }
+
+      it 'should shell escape keychain names when checking for installation' do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, anything).and_return("")
+
+        FastlaneCore::CertChecker.wwdr_certificate_installed?
+      end
+
+      it 'should shell escape keychain names when doing installation' do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, anything).and_return("")
+        expect($?).to receive(:success?).and_return(true)
+
+        FastlaneCore::CertChecker.install_wwdr_certificate
+      end
+    end
   end
 end
