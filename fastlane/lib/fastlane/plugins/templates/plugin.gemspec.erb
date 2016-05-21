@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require '<%= gem_name %>/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "<%= gem_name %>"
-  spec.version       = <%= gem_module %>::VERSION
-  spec.authors       = <%= gem_authors %>
+  spec.name          = '<%= gem_name %>'
+  spec.version       = Fastlane::<%= plugin_name.capitalize %>::VERSION
+  spec.author        = '<%= author %>'
   #spec.email         = ["fastlane-xcversion@gmail.com"]
 
   #spec.summary       = %q{Something random}
