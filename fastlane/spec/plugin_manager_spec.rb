@@ -84,6 +84,40 @@ describe Fastlane do
       end
     end
 
+    describe "#gem_dependency_suffix" do
+      it "default to RubyGems if gem is available" do
+        pm = Fastlane::PluginManager.new
+        expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return({anything: :really})
+        expect(pm.gem_dependency_suffix("fastlane")).to eq("")
+      end
+
+      describe "Gem is not available on RubyGems.org" do
+        before do
+          expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return(nil)
+        end
+
+        it "supports specifying a custom local path" do
+          pm = Fastlane::PluginManager.new
+          expect(FastlaneCore::UI.current).to receive(:select).and_return("Local Path")
+          expect(FastlaneCore::UI.current).to receive(:input).and_return("../yoo")
+          expect(pm.gem_dependency_suffix("fastlane")).to eq(", path: '../yoo'")
+        end
+
+        it "supports specifying a custom git URL" do
+          pm = Fastlane::PluginManager.new
+          expect(FastlaneCore::UI.current).to receive(:select).and_return("Git URL")
+          expect(FastlaneCore::UI.current).to receive(:input).and_return("https://github.com/fastlane/fastlane")
+          expect(pm.gem_dependency_suffix("fastlane")).to eq(", git: 'https://github.com/fastlane/fastlane'")
+        end
+
+        it "supports falling back to RubyGems" do
+          pm = Fastlane::PluginManager.new
+          expect(FastlaneCore::UI.current).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
+          expect(pm.gem_dependency_suffix("fastlane")).to eq("")
+        end
+      end
+    end
+
     describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do
