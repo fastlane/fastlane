@@ -2,8 +2,8 @@ describe Fastlane::PluginGeneratorUI do
   let(:ui) { Fastlane::PluginGeneratorUI.new }
 
   describe '#message' do
-    it 'calls UI#message' do
-      expect(UI).to receive(:message).with('hi')
+    it 'calls puts' do
+      expect(ui).to receive(:puts).with('hi')
       ui.message('hi')
     end
   end
