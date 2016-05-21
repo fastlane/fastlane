@@ -181,7 +181,7 @@ module Fastlane
 
         c.action do |args, options|
           pm = PluginManager.new
-          args << UI.input("Enter the name of the plugin to install: ")
+          args << UI.input("Enter the name of the plugin to install: ") if args.empty?
           args.each do |plugin_name|
             pm.add_dependency(plugin_name)
           end
