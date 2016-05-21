@@ -1,0 +1,8 @@
+### Available Plugins
+
+| Plugin Name | Description | Downloads
+--------------|-------------|----------|----------
+<% @plugins.each do |current| %>
+<%= current.linked_title %> | <%= current.info %> | <%= current.downloads %>
+
+<% end %>

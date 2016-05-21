@@ -7,3 +7,8 @@ desc 'Release fastlane to the world!'
 task :push do
   sh "../fastlane/bin/fastlane release"
 end
+
+task :generate_plugins do
+  require 'fastlane/plugin_fetcher'
+  Fastlane::PluginFetcher.new.run
+end
