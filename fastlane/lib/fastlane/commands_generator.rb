@@ -175,7 +175,7 @@ module Fastlane
       # @!group Plugins
       #####################################################
 
-      command :create_plugin do |c|
+      command :new_plugin do |c|
         c.syntax = 'fastlane create_plugin [plugin_name]'
         c.description = 'Create a new plugin that can be used with fastlane'
 

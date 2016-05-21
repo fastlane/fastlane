@@ -22,24 +22,23 @@ module Fastlane
     end
 
     def generate_paths(plugin_info)
-      Dir.mkdir(plugin_info.gem_name)
-      FileUtils.mkdir_p(File.join('lib', plugin_info.gem_name))
+      FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.require_path))
     end
 
     def generate_gemspec(plugin_info)
-      write_template(plugin_info, 'plugin.gemspec.erb', "#{plugin_info.gem_name}.gemspec")
+      write_template(plugin_info, 'plugin.gemspec.erb', plugin_path(plugin_info, "#{plugin_info.gem_name}.gemspec"))
     end
 
     def generate_version(plugin_info)
-      write_template(plugin_info, 'version.rb.erb', File.join('lib', plugin_info.gem_name, 'version.rb'))
+      write_template(plugin_info, 'version.rb.erb', plugin_path(plugin_info, 'lib', plugin_info.require_path, 'version.rb'))
     end
 
     def generate_readme(plugin_info)
-      write_template(plugin_info, 'README.md.erb', 'README.md')
+      write_template(plugin_info, 'README.md.erb', plugin_path(plugin_info, "README.md"))
     end
 
     def generate_license(plugin_info)
-      FileUtils.touch('LICENSE')
+      FileUtils.touch(plugin_path(plugin_info, 'LICENSE'))
     end
 
     def write_template(plugin_info, template_name, dest_path)
@@ -47,6 +46,10 @@ module Fastlane
       erb = ERB.new(File.read(template))
       result = erb.result(plugin_info.get_binding)
       File.write(dest_path, result)
+    end
+
+    def plugin_path(plugin_info, *path)
+      File.join(plugin_info.gem_name, *path)
     end
   end
 end
