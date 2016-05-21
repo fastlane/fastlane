@@ -43,6 +43,7 @@ module Spaceship
         'primarySecondSubCategory.value' => :primary_second_sub_category,
         'secondaryCategory.value' => :secondary_category,
         'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
+        'secondarySecondSubCategory.value' => :secondary_second_sub_category,
         'primaryLocaleCode.value' => :primary_locale_code,
         'availablePrimaryLocaleCodes' => :available_primary_locale_codes
       )

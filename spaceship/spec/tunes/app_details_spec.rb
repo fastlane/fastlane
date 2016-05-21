@@ -35,8 +35,14 @@ describe Spaceship::Tunes::AppDetails do
       details.secondary_first_sub_category = "Weather"
       expect(details.secondary_first_sub_category).to eq("MZGenre.Weather")
 
-      details.secondary_second_sub_category = "Weather"
-      expect(details.secondary_second_sub_category).to eq("MZGenre.Weather")
+      details.secondary_second_sub_category = "Puzzle"
+      expect(details.secondary_second_sub_category).to eq("MZGenre.Puzzle")
+
+      details.primary_locale_code = "en-US"
+      expect(details.primary_locale_code).to eq("en-US")
+
+      details.available_primary_locale_codes = ["en-US", "de-DE"]
+      expect(details.available_primary_locale_codes).to eq(["en-US", "de-DE"])
     end
 
     it "doesn't prefix if the prefix is already there" do
