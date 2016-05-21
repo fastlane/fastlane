@@ -98,7 +98,8 @@ module Scan
       # Generate destination parameters
       def destination
         unless Scan.cache[:destination]
-          Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
+          require 'shellwords'
+          Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination #{dst.shellescape}" }.join(' ')
         end
         Scan.cache[:destination]
       end

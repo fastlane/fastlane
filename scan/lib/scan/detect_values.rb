@@ -40,7 +40,7 @@ module Scan
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       found_devices = []
 
-      if (devices || []).count > 0
+      if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
@@ -56,7 +56,7 @@ module Scan
           end
         end
 
-        if found_devices.count > 0
+        if found_devices.any?
           Scan.devices = found_devices
           return
         else
@@ -80,10 +80,10 @@ module Scan
     end
 
     def self.default_device_tvos
-      devices = Scan.config[:devices] || [Scan.config[:device]] # important to use Array(nil) for when the value is nil
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       found_devices = []
 
-      if (devices || []).count > 0
+      if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
@@ -99,7 +99,7 @@ module Scan
           end
         end
 
-        if found_devices.count > 0
+        if found_devices.any?
           Scan.devices = found_devices
           return
         else
