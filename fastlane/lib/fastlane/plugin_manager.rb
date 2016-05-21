@@ -47,7 +47,7 @@ module Fastlane
     # Returns an array of fastlane plugins that are added to the Gemfile or Pluginfile
     def available_plugins
       available_gems.keep_if do |current|
-        current.start_with?(self.class.plugin_prefix) && current != "fastlane_core"
+        current.start_with?(self.class.plugin_prefix)
       end
     end
 
@@ -195,12 +195,11 @@ module Fastlane
 
       Gem::Specification.each do |current_gem|
         gem_name = current_gem.name
-        next if gem_name == "fastlane_core"
         next unless gem_name.start_with?(PluginManager.plugin_prefix)
 
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
-          require gem_name.gsub("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
+          require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
         rescue => ex
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
         end

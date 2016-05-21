@@ -57,7 +57,7 @@ fastlane new_plugin
 This will do the following:
 
 - Create the directory structure that's needed to have a valid gem
-- You need to edit the `lib/fastlane-plugin-[plugin_name]/actions/[plugin_name].rb` # TODO: That's probably not correct
+- You need to edit the `lib/fastlane/plugin/[plugin_name]/actions/[plugin_name].rb`
 - Easily test the plugin locally by adding the following line to your `Plugins` file
 ```ruby
 gem 'fastlane-plugin-[plugin_name]', path: "../../path/to/fastlane-plugin-[plugin_name]"
