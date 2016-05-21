@@ -13,6 +13,11 @@ module Fastlane
       "fastlane_#{plugin_name}"
     end
 
+    # Used to exposed a local binding for use in ERB templating
+    def get_binding
+      binding
+    end
+
     def ==(other)
       @plugin_name == other.plugin_name &&
       @author == other.author
