@@ -16,7 +16,7 @@ module Fastlane
       lib_path = FastlaneCore::Helper.gem_path('fastlane')
       template_path = File.join(lib_path, "lib/assets/Plugins.md.erb")
       md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
-      
+
       puts md
       File.write("docs/AvailablePlugins.md", md)
     end
