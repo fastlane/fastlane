@@ -2,8 +2,8 @@ describe Fastlane::PluginInfoCollector do
   let(:test_ui) do
     ui = Fastlane::PluginGeneratorUI.new
     allow(ui).to receive(:message)
-    allow(ui).to receive(:input)
-    allow(ui).to receive(:confirm)
+    allow(ui).to receive(:input).and_raise(":input call was not mocked!")
+    allow(ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
     ui
   end
 
@@ -50,12 +50,20 @@ describe Fastlane::PluginInfoCollector do
       expect(collector.plugin_name_valid?('test-name')).to be_falsey
     end
 
-    it "handles plugin name starting with 'fastlane_'" do
-      expect(collector.plugin_name_valid?('fastlane_test_name')).to be_falsey
+    it "handles plugin name containing 'fastlane'" do
+      expect(collector.plugin_name_valid?('test_fastlane_name')).to be_falsey
+    end
+
+    it "handles plugin name containing 'plugin'" do
+      expect(collector.plugin_name_valid?('test_plugin_name')).to be_falsey
     end
 
     it "handles plugin name starting with 'Fastlane '" do
       expect(collector.plugin_name_valid?('Fastlane test_name')).to be_falsey
+    end
+
+    it "handles plugin name starting with '#{Fastlane::PluginManager::FASTLANE_PLUGIN_PREFIX}'" do
+      expect(collector.plugin_name_valid?("#{Fastlane::PluginManager::FASTLANE_PLUGIN_PREFIX}test_name")).to be_falsey
     end
 
     it "handles plugin name with characters we don't want" do
@@ -80,12 +88,20 @@ describe Fastlane::PluginInfoCollector do
       expect(collector.fix_plugin_name('test-name')).to eq('test_name')
     end
 
-    it "handles plugin name starting with 'fastlane_'" do
-      expect(collector.fix_plugin_name('fastlane_test_name')).to eq('test_name')
+    it "handles plugin name containing 'fastlane'" do
+      expect(collector.fix_plugin_name('test_fastlane_name')).to eq('test_name')
+    end
+
+    it "handles plugin name containing 'plugin'" do
+      expect(collector.fix_plugin_name('test_plugin_name')).to eq('test_name')
     end
 
     it "handles plugin name starting with 'Fastlane '" do
       expect(collector.fix_plugin_name('Fastlane test_name')).to eq('test_name')
+    end
+
+    it "handles plugin name starting with '#{Fastlane::PluginManager::FASTLANE_PLUGIN_PREFIX}'" do
+      expect(collector.fix_plugin_name("#{Fastlane::PluginManager::FASTLANE_PLUGIN_PREFIX}test_name")).to eq('test_name')
     end
 
     it "handles plugin name with characters we don't want" do
@@ -124,10 +140,10 @@ describe Fastlane::PluginInfoCollector do
 
   describe '#collect_info' do
     it "returns a PluginInfo summarizing the user input" do
-      expect(test_ui).to receive(:input).and_return('plugin_name')
+      expect(test_ui).to receive(:input).and_return('test_name')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
 
-      info = Fastlane::PluginInfo.new('plugin_name', 'Fabricio Devtoolio')
+      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio')
 
       expect(collector.collect_info).to eq(info)
     end
