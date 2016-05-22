@@ -45,6 +45,7 @@ module Fastlane
     end
 
     # Returns an array of fastlane plugins that are added to the Gemfile or Pluginfile
+    # The returned array contains the string with their prefixes (e.g. fastlane-plugin-xcversion)
     def available_plugins
       available_gems.keep_if do |current|
         current.start_with?(self.class.plugin_prefix)
@@ -236,6 +237,8 @@ module Fastlane
     # This will make sure to load the action
     # and all its helpers
     def self.load_plugins
+      @plugin_references = {}
+
       UI.verbose("Checking if there are any plugins that should be loaded...")
 
       Gem::Specification.each do |current_gem|
@@ -245,10 +248,33 @@ module Fastlane
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
           require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
+
+          # We store a collection of the imported plugins
+          # This way we can tell which action came from what plugin
+          # (a plugin may contain any number of actions)
+          references = Fastlane::Xcversion.all_classes.collect do |path|
+            next unless path.end_with?("_action.rb")
+            File.basename(path).gsub("_action.rb", "").to_sym
+          end
+          @plugin_references[gem_name] = references.keep_if {|a| !a.nil? }
+
+          # Example value of plugin_references
+          # => {"fastlane-plugin-xcversion"=>[:xcversion]}
         rescue => ex
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
         end
       end
+    end
+
+    #####################################################
+    # @!group Reference between plugins to actions
+    #####################################################
+
+    # Connection between plugins and their actions
+    # Example value of plugin_references
+    # => {"fastlane-plugin-xcversion"=>[:xcversion]}
+    def self.plugin_references
+      @plugin_references || {}
     end
   end
 end

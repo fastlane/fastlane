@@ -1,8 +1,19 @@
 module Fastlane
   class ActionCollector < FastlaneCore::ToolCollector
+    # Is this an official fastlane action, that is bundled with fastlane?
     def is_official?(name)
       return true if name == :lane_switch
-      Actions.get_all_official_actions.include? name
+      Actions.get_all_official_actions.include?(name)
+    end
+
+    def name_to_track(name)
+      return name if is_official?(name)
+
+      PluginManager.plugin_references.each do |plugin_name, actions|
+        return "#{plugin_name}/#{name}" if actions.include?(name)
+      end
+
+      return nil
     end
 
     def show_message
@@ -14,8 +25,25 @@ module Fastlane
       UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
 
+    # e.g.
+    #   :gym
+    #   :xcversion
+    #   "fastlane-plugin-my_plugin/xcversion"
     def determine_version(name)
-      super(name) || Fastlane::VERSION
+      return super(name) if super(name)
+
+      if name.to_s.include?(PluginManager.plugin_prefix)
+        # That's an action from a plugin, we need to fetch its version number
+        begin
+          plugin_name = name.split("/").first.gsub(PluginManager.plugin_prefix, '')
+          return Fastlane.const_get(plugin_name.fastlane_class)::VERSION
+        rescue => ex
+          UI.verbose(ex)
+          return "undefined"
+        end
+      end
+
+      return Fastlane::VERSION # that's the case for all built-in actions
     end
   end
 end
