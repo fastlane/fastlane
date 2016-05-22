@@ -14,13 +14,16 @@ module Fastlane
     end
 
     def require_path
-      gem_name.gsub('-', '/')
+      gem_name.tr('-', '/')
     end
 
-    # Used to exposed a local binding for use in ERB templating
+    # Used to expose a local binding for use in ERB templating
+    #
+    # rubocop:disable Style/AccessorMethodName
     def get_binding
       binding
     end
+    # rubocop:enable Style/AccessorMethodName
 
     def ==(other)
       @plugin_name == other.plugin_name &&
