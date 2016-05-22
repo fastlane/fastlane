@@ -120,7 +120,7 @@ module Fastlane
             # TODO: Add actual link
             UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting")
 
-          elsif Fastlane::Actions.formerly_bundled_actions.includes?(method_str)
+          elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)
             # This was a formerly bundled action which is now a plugin.
             UI.verbose(caller.join("\n"))
             UI.user_error!("The action '#{method_sym}' is no longer bundled with Fastlane. You can use it via the new Plugin system by running 'fastlane add_plugin #{method_sym}'.")
