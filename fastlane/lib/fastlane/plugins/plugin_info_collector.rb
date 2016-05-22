@@ -51,10 +51,10 @@ module Fastlane
     def fix_plugin_name(name)
       name = name.to_s.downcase
       fixes = {
-        /[\- ]/        => '_', # dashes and spaces become underscores
-        /[^a-z0-9_]/   => '',  # anything other than lower case letters, numbers and underscores is removed
-        /fastlane[_]?/ => '',  # 'fastlane' or 'fastlane_' is removed
-        /plugin[_]?/ => ''   # 'plugin' or 'plugin_' is removed
+        /[\- ]/ => '_', # dashes and spaces become underscores
+        /[^a-z0-9_]/ => '', # anything other than lower case letters, numbers and underscores is removed
+        /fastlane[_]?/ => '', # 'fastlane' or 'fastlane_' is removed
+        /plugin[_]?/ => '' # 'plugin' or 'plugin_' is removed
       }
       fixes.each do |regex, replacement|
         name = name.gsub(regex, replacement)

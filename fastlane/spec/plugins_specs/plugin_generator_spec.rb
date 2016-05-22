@@ -82,7 +82,10 @@ describe Fastlane::PluginGenerator do
         # we'll get the Gem Specification object back out, which
         # ensures that the syntax is valid, and lets us interrogate
         # the values!
+        #
+        # rubocop:disable Lint/Eval
         gemspec = eval(File.read(gemspec_file))
+        # rubocop:enable Lint/Eval
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
