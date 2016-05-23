@@ -32,7 +32,7 @@ module Fastlane
         if Fastlane::Actions.formerly_bundled_actions.include?(action)
           # This was a formerly bundled action which is now a plugin.
           UI.verbose(caller.join("\n"))
-          UI.user_error!("The action '#{action}' is no longer bundled with Fastlane. You can use it via the new Plugin system by running 'fastlane add_plugin #{action}'.")
+          UI.user_error!("The action '#{action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{action}`")
         else
           UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
         end
