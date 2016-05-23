@@ -18,7 +18,7 @@ module Fastlane
 
         gradle_task = [task, flavor, build_type].join
 
-        project_dir = params[:project_dir] || '.'
+        project_dir = params[:project_dir]
 
         gradle_path_param = params[:gradle_path] || './gradlew'
 
