@@ -152,13 +152,58 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
+  describe "summary collection" do
+    it "accepts a valid summary" do
+      expect(test_ui).to receive(:input).and_return('summary')
+
+      expect(collector.collect_summary).to eq('summary')
+    end
+
+    it "accepts a valid summary after rejecting an invalid summary" do
+      expect(test_ui).to receive(:input).and_return('')
+      expect(test_ui).to receive(:input).and_return('summary')
+
+      expect(collector.collect_summary).to eq('summary')
+    end
+  end
+
+  describe "#summary_valid?" do
+    it "handles valid summary" do
+      expect(collector.summary_valid?('summary')).to be_truthy
+    end
+
+    it "handles an empty summary" do
+      expect(collector.summary_valid?('')).to be_falsey
+    end
+
+    it "handles all-spaces summary" do
+      expect(collector.summary_valid?('    ')).to be_falsey
+    end
+  end
+
+  describe "description collection" do
+    it "accepts a provided description" do
+      expect(test_ui).to receive(:input).and_return('description')
+
+      expect(collector.collect_description).to eq('description')
+    end
+
+    it "accepts a blank description" do
+      expect(test_ui).to receive(:input).and_return('')
+
+      expect(collector.collect_description).to eq('')
+    end
+  end
+
   describe '#collect_info' do
     it "returns a PluginInfo summarizing the user input" do
       expect(test_ui).to receive(:input).and_return('test_name')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
       expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
+      expect(test_ui).to receive(:input).and_return('summary')
+      expect(test_ui).to receive(:input).and_return('description')
 
-      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com')
+      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'description')
 
       expect(collector.collect_info).to eq(info)
     end
