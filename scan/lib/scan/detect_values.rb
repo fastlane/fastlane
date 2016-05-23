@@ -37,20 +37,30 @@ module Scan
     end
 
     def self.default_device_ios
-      config = Scan.config
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      found_devices = []
 
-      if config[:device] # make sure it actually exists
-        device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
+      if devices.any?
+        # Optionally, we only do this if the user specified a custom device or an array of devices
+        devices.each do |device|
+          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
-        found = FastlaneCore::Simulator.all.find do |d|
-          (d.name + " " + d.ios_version).include? device
+          found = FastlaneCore::Simulator.all.detect do |d|
+            (d.name + " " + d.ios_version).include? lookup_device
+          end
+
+          if found
+            found_devices.push(found)
+          else
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
+          end
         end
 
-        if found
-          Scan.device = found
+        if found_devices.any?
+          Scan.devices = found_devices
           return
         else
-          UI.error("Couldn't find simulator '#{config[:device]}' - falling back to default simulator")
+          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
         end
       end
 
@@ -62,26 +72,38 @@ module Scan
       found = sims.detect { |d| d.name == "iPhone 5s" }
       found ||= sims.first # anything is better than nothing
 
-      Scan.device = found
-
-      UI.user_error!("No simulators found") unless Scan.device
+      if found
+        Scan.devices = [found]
+      else
+        UI.user_error!("No simulators found on local machine")
+      end
     end
 
     def self.default_device_tvos
-      config = Scan.config
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      found_devices = []
 
-      if config[:device] # make sure it actually exists
-        device = config[:device].to_s.strip.tr('()', '') # Remove parenthesis
+      if devices.any?
+        # Optionally, we only do this if the user specified a custom device or an array of devices
+        devices.each do |device|
+          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
-        found = FastlaneCore::SimulatorTV.all.find do |d|
-          (d.name + " " + d.tvos_version).include? device
+          found = FastlaneCore::SimulatorTV.all.detect do |d|
+            (d.name + " " + d.tvos_version).include? lookup_device
+          end
+
+          if found
+            found_devices.push(found)
+          else
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
+          end
         end
 
-        if found
-          Scan.device = found
+        if found_devices.any?
+          Scan.devices = found_devices
           return
         else
-          UI.error("Couldn't find simulator '#{config[:device]}' - falling back to default simulator")
+          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
         end
       end
 
@@ -93,12 +115,14 @@ module Scan
       found = sims.detect { |d| d.name == "Apple TV 1080p" }
       found ||= sims.first # anything is better than nothing
 
-      Scan.device = found
-
-      UI.user_error!("No simulators found") unless Scan.device
+      if found
+        Scan.devices = [found]
+      else
+        UI.user_error!("No TV simulators found on the local machine")
+      end
     end
 
-    # Is it an iOS device or a Mac?
+    # Is it an iOS, a tvOS or a MacOS device?
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
@@ -110,11 +134,11 @@ module Scan
 
       # building up the destination now
       if Scan.project.ios?
-        Scan.config[:destination] = "platform=iOS Simulator,id=#{Scan.device.udid}"
+        Scan.config[:destination] = Scan.devices.map { |d| "platform=iOS Simulator,id=#{d.udid}" }
       elsif Scan.project.tvos?
-        Scan.config[:destination] = "platform=tvOS Simulator,id=#{Scan.device.udid}"
+        Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
       else
-        Scan.config[:destination] = "platform=OS X"
+        Scan.config[:destination] = ["platform=OS X"]
       end
     end
   end
