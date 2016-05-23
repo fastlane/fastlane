@@ -30,6 +30,28 @@ What will this do
 - Make sure your `fastlane/Pluginfile` is properly referenced from your `./Gemfile`
 - Run `bundle install` to make sure all required dependencies are installed on your local machine (this step might ask for your admin password to install Ruby gems)
 
+#### Plugin Source
+
+Your `fastlane/Pluginfile` contains the list of all `fastlane` plugins your project uses. The `Pluginfile` is a [Gemfile](http://bundler.io/gemfile.html) that gets imported from your main `Gemfile`.
+You specificy all dependencies, including the required version numbers:
+
+```ruby
+# Fetched from RubyGems.org
+gem "fastlane-plugin-xcversion"
+
+# Fetched from GitHub
+gem "fastlane-plugin-xcversion", git: "https://github.com/fastlane/fastlane-plugin-xcversion"
+
+# Fetched from a local directory
+gem "fastlane-plugin-xcversion", path: "https://github.com/fastlane/fastlane-plugin-xcversion"
+
+# Specify a version requirements
+gem "fastlane-plugin-xcversoin", "1.1.0"
+gem "fastlane-plugin-xcversoin", ">= 1.0"
+```
+
+[More information about a Gemfile](http://bundler.io/gemfile.html)
+
 ### Install plugins on another machine
 
 To make sure all plugins are installed on the local machine, run
