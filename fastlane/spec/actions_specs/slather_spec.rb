@@ -13,22 +13,50 @@ describe Fastlane do
             travis: true,
             circleci: true,
             coveralls: true,
+            teamcity: true,
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
             html: true,
             show: true,
+            verbose: true,
             source_directory: 'baz',
             output_directory: '123',
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
             binary_basename: 'YourApp',
             binary_file: 'you',
-            workspace: 'foo.xcworkspace'
+            workspace: 'foo.xcworkspace',
+            source_files: '*.swift',
+            decimals: '2'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you --ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
+        expected = "slather coverage
+                    --travis
+                    --circleci
+                    --jenkins
+                    --buildkite
+                    --teamcity
+                    --coveralls
+                    --simple-output
+                    --gutter-json
+                    --cobertura-xml
+                    --html
+                    --show
+                    --build-directory foo
+                    --source-directory baz
+                    --output-directory 123
+                    --ignore nothing
+                    --verbose
+                    --input-format bah
+                    --scheme Foo
+                    --workspace foo.xcworkspace
+                    --binary-file you
+                    --binary-basename YourApp
+                    --source-files \\*.swift
+                    --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
+        expect(result).to eq(expected)
       end
 
       it "works with bundle" do
@@ -58,8 +86,27 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec slather coverage --build-directory foo --input-format bah --scheme Foo --buildkite --jenkins --travis --circleci --coveralls --simple-output --gutter-json --cobertura-xml --html --show --source-directory baz --output-directory 123 --binary-basename YourApp --binary-file you " \
-                             "--ignore nothing --workspace foo.xcworkspace foo.xcodeproj")
+        expected = 'bundle exec slather coverage
+                    --travis
+                    --circleci
+                    --jenkins
+                    --buildkite
+                    --coveralls
+                    --simple-output
+                    --gutter-json
+                    --cobertura-xml
+                    --html
+                    --show
+                    --build-directory foo
+                    --source-directory baz
+                    --output-directory 123
+                    --ignore nothing
+                    --input-format bah
+                    --scheme Foo
+                    --workspace foo.xcworkspace
+                    --binary-file you
+                    --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, ' ')
+        expect(result).to eq(expected)
       end
 
       it "requires project to be specified if .slather.yml is not found" do
@@ -103,7 +150,16 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --build-directory build\\ dir --input-format bah --scheme Foo\\ App --source-directory source\\ dir --output-directory output\\ dir --ignore nothing\\ to\\ ignore foo\\ bar.xcodeproj")
+        expected = "slather coverage
+                    --build-directory build\\ dir
+                    --source-directory source\\ dir
+                    --output-directory output\\ dir
+                    --ignore nothing\\ to\\ ignore
+                    --input-format bah
+                    --scheme Foo\\ App
+                    foo\\ bar.xcodeproj".gsub(/\s+/, ' ')
+
+        expect(result).to eq(expected)
       end
 
       it "works with multiple ignore patterns" do
