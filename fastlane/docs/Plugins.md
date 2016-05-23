@@ -9,12 +9,25 @@ Just run `fastlane new_action`, enter the name of the action and edit the genera
 From then on, you can just use your action in your `Fastfile`, just like any other action.
 
 ### Submitting the action to the fastlane main repo
-If you think your plugin will be useful to other developers as well, clone fastlane, copy your local action to fastlane/lib/fastlane/actions and submit a pull request.
-**TODO**: Add more information about what kind of PRs we want to merge
+
+Please be aware we may not accept all actions submitted to be bundled with `fastlane`. Before you submit a pull request adding the action to the `fastlane` code base, submit an issue proposing the new action and why it should be built-in.
+
+In general we tend to accept actions that
+
+- Generally usable for a big majority of developers (e.g. basic interactions with git)
+- Solve pain points for mobile app developers (iOS and Android)
+- have an easy to read documentation and great test coverage
+
+In general, we might not accept actions that
+
+- Solve specific use-cases for only a small subset of developers
+- Access the API of a third party service, the third party service should own and maintain the action
+- Complex actions, that will require a lot of work to maintain in the future
+- Everything that isn't mobile developer related
 
 ## Remote plugins
 
-Alternatively you can also keep the action separate from the fastlane code base, so you have the full power and responsibility of maintaining your action and keeping it up to date. This is useful if you maintain your own library or web service, and want to make sure the `fastlane` plugin is always up to date.
+`fastlane` is an open platform and we enable every developer to extend it to fit their needs. That's why we built a plugin system that allows you and your company to provide `fastlane` plugins to other `fastlane` users. You have the full power and responsibility of maintaining your plugin and keeping it up to date. This is useful if you maintain your own library or web service, and want to make sure the `fastlane` plugin is always up to date.
 
 ### Add a plugin to your project
 
