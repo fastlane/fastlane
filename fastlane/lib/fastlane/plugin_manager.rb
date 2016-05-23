@@ -249,10 +249,11 @@ module Fastlane
         begin
           require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
 
+          module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
           # We store a collection of the imported plugins
           # This way we can tell which action came from what plugin
           # (a plugin may contain any number of actions)
-          references = Fastlane::Xcversion.all_classes.collect do |path|
+          references = Fastlane.const_get(module_name).all_classes.collect do |path|
             next unless path.end_with?("_action.rb")
             File.basename(path).gsub("_action.rb", "").to_sym
           end
