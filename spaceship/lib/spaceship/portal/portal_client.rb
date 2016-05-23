@@ -49,7 +49,12 @@ module Spaceship
     def teams
       return @teams if @teams
       req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
-      @teams = parse_response(req, 'teams')
+      @teams = parse_response(req, 'teams').sort_by do |team|
+        [
+          team['name'],
+          team['teamId']
+        ]
+      end
     end
 
     # @return (String) The currently selected Team ID

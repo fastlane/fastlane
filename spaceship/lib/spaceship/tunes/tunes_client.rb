@@ -46,7 +46,12 @@ module Spaceship
     def teams
       return @teams if @teams
       r = request(:get, "ra/user/detail")
-      @teams = parse_response(r, 'data')['associatedAccounts']
+      @teams = parse_response(r, 'data')['associatedAccounts'].sort_by do |team|
+        [
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
+        ]
+      end
     end
 
     # @return (String) The currently selected Team ID

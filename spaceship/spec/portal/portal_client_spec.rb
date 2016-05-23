@@ -65,7 +65,7 @@ describe Spaceship::Client do
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         adp_stub_multiple_teams
-        expect(subject.team_id).to eq("XXXXXXXXXX")
+        expect(subject.team_id).to eq("SecondTeam")
       end
     end
 
