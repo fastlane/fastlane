@@ -101,5 +101,9 @@ module Fastlane
         end
       end
     end
+
+    def self.formerly_bundled_actions
+      ["xcake"]
+    end
   end
 end
