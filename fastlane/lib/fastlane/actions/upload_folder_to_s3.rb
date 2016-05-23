@@ -105,41 +105,43 @@ module Fastlane
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID",
                                        description: "Access key ID",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Access key ID for UploadFolderToS3Action given, pass using `access_key_id: 'token'`") if value.to_s.length == 0
+                                         UI.user_error!(UploadFolderToS3Action.no_access_key_id_error_message) if value.to_s.length == 0
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY",
                                       description: "Secret access key",
                                       verify_block: proc do |value|
-                                        UI.user_error!("No Secret access key for UploadFolderToS3Action given, pass using `secret_access_key: 'token'`") if value.to_s.length == 0
+                                        UI.user_error!(UploadFolderToS3Action.no_secret_access_key_error_message) if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :region,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_REGION",
                                       description: "The region",
                                       verify_block: proc do |value|
-                                        UI.user_error!("No region for UploadFolderToS3Action given, pass using `region: 'token'`") if value.to_s.length == 0
+                                        UI.user_error!(UploadFolderToS3Action.no_region_error_message) if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :bucket,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_BUCKET",
                                       description: "Bucket",
                                       verify_block: proc do |value|
-                                        UI.user_error!("No bucket for UploadFolderToS3Action given, pass using `bucket: 'token'`") if value.to_s.length == 0
+                                        UI.user_error!(UploadFolderToS3Action.no_bucket_error_message) if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :local_path,
                                       env_name: "FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH",
                                       description: "Path to local folder to upload",
                                       verify_block: proc do |value|
-                                        UI.user_error!("Couldn't find file at path '#{value}'") if value.to_s.length == 0
+                                        UI.user_error!(UploadFolderToS3Action.invalid_local_folder_path_message) if value.to_s.length == 0
                                       end),
 
           FastlaneCore::ConfigItem.new(key: :remote_path,
                                        env_name: "FL_UPLOAD_FOLDER_TO_S3_REMOTE_PATH",
                                        description: "The remote base path",
-                                       default_value: "")
+                                       verify_block: proc do |value|
+                                         UI.user_error!(UploadFolderToS3Action.invalid_remote_folder_path_message) if value.to_s.length == 0
+                                       end)
         ]
       end
 
@@ -183,6 +185,23 @@ module Fastlane
           extensions_to_type[file_extension]
         end
       end
+
+      @no_access_key_id_error_message     = "No Access key ID for upload_folder_to_s3 given, pass using `access_key_id: 'key_id'`"
+      @no_secret_access_key_error_message = "No Secret access key for upload_folder_to_s3 given, pass using `secret_access_key: 'access_key'`"
+      @no_region_error_message            = "No region for upload_folder_to_s3 given, pass using `region: 'region'`"
+      @no_bucket_error_message            = "No bucket for upload_folder_to_s3 given, pass using `bucket: 'bucket'`"
+      @invalid_local_folder_path_message  = "Invalid local folder path"
+      @invalid_remote_folder_path_message = "Invalid remote folder path"
+
+      class << self
+        attr_accessor :no_access_key_id_error_message
+        attr_accessor :no_secret_access_key_error_message
+        attr_accessor :no_region_error_message
+        attr_accessor :no_bucket_error_message
+        attr_accessor :invalid_local_folder_path_message
+        attr_accessor :invalid_remote_folder_path_message
+      end
+
     end
   end
 end
