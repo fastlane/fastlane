@@ -144,22 +144,6 @@ module Fastlane
         end
       end
 
-      command :enable_crash_reporting do |c|
-        c.syntax = 'fastlane enable_crash_reporting'
-        c.description = 'Enable crash reporting to improve fastlane'
-        c.action do |args, options|
-          FastlaneCore::CrashReporting.enable
-        end
-      end
-
-      command :disable_crash_reporting do |c|
-        c.syntax = 'fastlane disable_crash_reporting'
-        c.description = 'Disable crash reporting'
-        c.action do |args, options|
-          FastlaneCore::CrashReporting.disable
-        end
-      end
-
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
