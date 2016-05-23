@@ -20,7 +20,7 @@ module Fastlane
       plugin_name = nil
 
       loop do
-        plugin_name = @ui.input("What would you like to be the name of your plugin?")
+        plugin_name = @ui.input("\nWhat would you like to be the name of your plugin?")
 
         unless plugin_name_valid?(plugin_name)
           fixed_name = fix_plugin_name(plugin_name)
@@ -70,7 +70,7 @@ module Fastlane
     def collect_author
       author = nil
       loop do
-        author = @ui.input("What is the plugin author's name?")
+        author = @ui.input("\nWhat is the plugin author's name?")
         break if author_valid?(author)
 
         @ui.message('An author name is required.')
@@ -88,7 +88,7 @@ module Fastlane
     #
 
     def collect_email
-      @ui.input("What is the plugin author's email address?")
+      @ui.input("\nWhat is the plugin author's email address?")
     end
 
   end

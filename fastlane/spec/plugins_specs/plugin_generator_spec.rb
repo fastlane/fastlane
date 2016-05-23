@@ -70,7 +70,14 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a LICENSE" do
-      expect(File.exist?(File.join(tmp_dir, gem_name, 'LICENSE'))).to be(true)
+      readme_file = File.join(tmp_dir, gem_name, 'LICENSE')
+      expect(File.exist?(readme_file)).to be(true)
+
+      readme_contents = File.read(readme_file)
+
+      expect(readme_contents).to include(author)
+      expect(readme_contents).to include(email)
+      expect(readme_contents.length).to be > 100
     end
 
     it "creates a complete, valid gemspec" do
