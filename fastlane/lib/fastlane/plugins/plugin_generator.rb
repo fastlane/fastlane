@@ -38,7 +38,7 @@ module Fastlane
     end
 
     def generate_license(plugin_info)
-      FileUtils.touch(plugin_path(plugin_info, 'LICENSE'))
+      write_template(plugin_info, 'LICENSE.erb', plugin_path(plugin_info, "LICENSE"))
     end
 
     def write_template(plugin_info, template_name, dest_path)
