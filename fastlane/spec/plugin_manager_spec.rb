@@ -79,7 +79,7 @@ describe Fastlane do
       it "execs out the correct command" do
         pm = Fastlane::PluginManager.new
         expect(pm).to receive(:ensure_plugins_attached!)
-        expect(pm).to receive(:exec).with("bundle install --quiet && echo 'Successfully installed plugins'")
+        expect(pm).to receive(:exec).with("bundle install --no-development --quiet && echo 'Successfully installed plugins'")
         pm.install_dependencies!
       end
     end
