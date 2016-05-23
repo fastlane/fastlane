@@ -20,7 +20,7 @@ module Scan
 
     attr_accessor :cache
 
-    attr_accessor :device
+    attr_accessor :devices
 
     def config=(value)
       @config = value
