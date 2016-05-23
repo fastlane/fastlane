@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Upload folder to S3" do
       before(:each) do
-        ['FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID' , 'FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY' , 'FL_UPLOAD_FOLDER_TO_S3_REGION' , 'FL_UPLOAD_FOLDER_TO_S3_BUCKET' , 'FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH' , 'FL_UPLOAD_FOLDER_TO_S3_REMOTE_PATH'].each do |key|
+        ['FL_UPLOAD_FOLDER_TO_S3_ACCESS_KEY_ID', 'FL_UPLOAD_FOLDER_TO_S3_SECRET_ACCESS_KEY', 'FL_UPLOAD_FOLDER_TO_S3_REGION', 'FL_UPLOAD_FOLDER_TO_S3_BUCKET', 'FL_UPLOAD_FOLDER_TO_S3_LOCAL_PATH', 'FL_UPLOAD_FOLDER_TO_S3_REMOTE_PATH'].each do |key|
           ENV[key] = nil
         end
         @dumb_config = {secret_access_key: 'secret', access_key_id: 'id', local_path: '/tmp', remote_path: 'whatever', region: 'region', bucket: 'bucket'}
