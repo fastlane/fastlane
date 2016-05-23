@@ -89,14 +89,21 @@ cd ~/new/folder/[plugin_name]
 fastlane new_plugin
 ```
 
-This will do the following:
-
 - Create the directory structure that's needed to have a valid gem
 - Edit the `lib/fastlane/plugin/[plugin_name]/actions/[plugin_name].rb` and implement your action
-- Easily test the plugin locally by adding the following line to your `Plugins` file
-```ruby
-gem 'fastlane-plugin-[plugin_name]', path: "../../path/to/fastlane-plugin-[plugin_name]"
-```
+- Easily test the plugin locally by running `fastlane add_plugin` in your project's directory and specifying the local path when asked for it
+
+##### New plugin for existing gem
+
+If you already have an exiting gem you want to provide a `fastlane` plugin for, you'll still have to create a new Ruby gem. The reason for that is the way plugins are imported. 
+
+The example project [xcake](https://github.com/jcampbell05/xcake) contains a folder named `fastlane-plugin-xcake`. 
+
+All you have to do if you have an exiting gem:
+
+- Navigate to your gem
+- `fastlane new_plugin`
+- Inside the newly created folder, edit the `fastlane-plugin-[plugin_name].gemspec` and add your gem as a dependency. It is recommended to also specify a version number requirement
 
 #### Publishing your plugin
 
