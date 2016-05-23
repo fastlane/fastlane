@@ -141,9 +141,18 @@ That's all you need to run your tests. If you want more control, here are some a
 
     scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 
-If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
+If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
     DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
+
+To run `scan` on multiple devices via [fastlane](https://fastlane.tools), add this to your `Fastfile`:
+
+```ruby
+scan(
+  workspace: "Example.xcworkspace",
+  devices: ["iPhone 6s", "iPad Air"]
+)
+```
 
 For a list of all available parameters use
 
@@ -159,6 +168,7 @@ Run `scan init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
+devices: ["iPhone 6s", "iPad Air"]
 
 clean true
 
