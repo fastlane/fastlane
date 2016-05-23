@@ -7,8 +7,9 @@ module Fastlane
     def collect_info
       plugin_name = collect_plugin_name
       author = collect_author
+      email = collect_email
 
-      PluginInfo.new(plugin_name, author)
+      PluginInfo.new(plugin_name, author, email)
     end
 
     #
@@ -81,5 +82,14 @@ module Fastlane
     def author_valid?(author)
       !author.to_s.strip.empty?
     end
+
+    #
+    # Email
+    #
+
+    def collect_email
+      @ui.input("What is the email of the plugin's author?")
+    end
+
   end
 end

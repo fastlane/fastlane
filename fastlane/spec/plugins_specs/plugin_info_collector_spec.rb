@@ -138,12 +138,27 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
+  describe "email collection" do
+    it "accepts a provided email" do
+      expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
+
+      expect(collector.collect_email).to eq('fabric.devtools@gmail.com')
+    end
+
+    it "accepts a blank email" do
+      expect(test_ui).to receive(:input).and_return('')
+
+      expect(collector.collect_email).to eq('')
+    end
+  end
+
   describe '#collect_info' do
     it "returns a PluginInfo summarizing the user input" do
       expect(test_ui).to receive(:input).and_return('test_name')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
+      expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
 
-      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio')
+      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com')
 
       expect(collector.collect_info).to eq(info)
     end
