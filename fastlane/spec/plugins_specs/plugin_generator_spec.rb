@@ -8,11 +8,12 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
-    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio') }
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com') }
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
     let(:author) { plugin_info.author }
+    let(:email) { plugin_info.email }
 
     before(:each) do
       unless initialized
@@ -29,6 +30,7 @@ describe Fastlane::PluginGenerator do
 
         expect(test_ui).to receive(:input).and_return(plugin_name)
         expect(test_ui).to receive(:input).and_return(author)
+        expect(test_ui).to receive(:input).and_return(email)
 
         generator.generate
 
@@ -90,6 +92,7 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
+        expect(gemspec.email).to eq(email)
       end
     end
   end
