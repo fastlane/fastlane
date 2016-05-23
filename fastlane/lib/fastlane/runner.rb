@@ -197,7 +197,7 @@ module Fastlane
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
         raise e
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         collector.did_crash(method_sym)
