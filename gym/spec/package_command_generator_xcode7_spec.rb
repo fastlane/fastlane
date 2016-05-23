@@ -15,7 +15,23 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild} -exportArchive",
+                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             ""
+                           ])
+    end
+
+    it "works with spaces in path name" do
+      options = { project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      allow(Gym::XcodebuildFixes).to receive(:wrap_xcodebuild).and_return("/tmp/path with spaces")
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
                              "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",

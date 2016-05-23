@@ -49,7 +49,7 @@ module FastlaneCore
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain}", print: $verbose)
+      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: $verbose)
       return response.include?("attributes:")
     end
 
@@ -59,7 +59,7 @@ module FastlaneCore
         filename = File.basename(url)
         keychain = wwdr_keychain
         keychain.prepend("-k ") unless keychain.empty?
-        `curl -O #{url} && security import #{filename} #{keychain}`
+        Helper.backticks("curl -O #{url} && security import #{filename} #{keychain.shellescape}", print: $verbose)
         UI.user_error!("Could not install WWDR certificate") unless $?.success?
       end
     end
