@@ -70,7 +70,7 @@ module Fastlane
     def collect_author
       author = nil
       loop do
-        author = @ui.input("What is the name of the plugin's author?")
+        author = @ui.input("What is the plugin author's name?")
         break if author_valid?(author)
 
         @ui.message('An author name is required.')
@@ -88,7 +88,7 @@ module Fastlane
     #
 
     def collect_email
-      @ui.input("What is the email of the plugin's author?")
+      @ui.input("What is the plugin author's email address?")
     end
 
   end
