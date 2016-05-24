@@ -53,7 +53,8 @@ module Scan
 
       report_collector = ReportCollector.new(Scan.config[:open_report],
                                              Scan.config[:output_types],
-                                             Scan.config[:output_directory])
+                                             Scan.config[:output_directory],
+                                             Scan.config[:use_clang_report_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
                                                types: 'junit',
