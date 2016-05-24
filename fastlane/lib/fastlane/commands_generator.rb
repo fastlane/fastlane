@@ -151,7 +151,7 @@ module Fastlane
           show_crashreporter_note
         end
       end
-      
+
       command :disable_crash_reporting do |c|
         c.syntax = 'fastlane disable_crash_reporting'
         c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
@@ -189,7 +189,7 @@ module Fastlane
 
     def show_crashreporter_note
       UI.important("fastlane doesn't use a crash reporter any more")
-      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane")
+      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
       UI.important("This command will be removed in one of the next releases")
     end
 
