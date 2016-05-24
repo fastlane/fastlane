@@ -19,22 +19,25 @@ module Pilot
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
-        UI.user_error!("Error uploading ipa file, more information see above")
+        UI.user_error!("Error uploading ipa file, for more information see above")
       end
 
       UI.message("Successfully uploaded the new binary to iTunes Connect")
 
       if config[:skip_waiting_for_build_processing]
         UI.important("Skip waiting for build processing")
-        UI.important("This means, no changelog will be set and no build will be distributed to testers")
+        UI.important("This means that no changelog will be set and no build will be distributed to testers")
         return
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       uploaded_build = wait_for_processing_build # this might take a while
+
       # First, set the changelog (if necessary)
-      uploaded_build.update_build_information!(whats_new: options[:changelog])
-      UI.success "Successfully set the changelog for build"
+      if options[:changelog].to_s.length > 0
+        uploaded_build.update_build_information!(whats_new: options[:changelog])
+        UI.success "Successfully set the changelog for build"
+      end
 
       return if config[:skip_submission]
       distribute_build(uploaded_build, options)
