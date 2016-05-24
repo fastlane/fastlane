@@ -105,7 +105,7 @@ module Fastlane
                                        type: Array,
                                        env_name: "FL_TESTFAIRY_METRICS",
                                        description: "Array of metrics to record (cpu,memory,network,phone-signal,gps,battery,mic,wifi)",
-                                       default_value: [ :cpu, :memory, :network, :wifi ]),
+                                       default_value: [:cpu, :memory, :network, :wifi]),
           FastlaneCore::ConfigItem.new(key: :options,
                                        type: Array,
                                        env_name: "FL_TESTFAIRY_OPTIONS",
