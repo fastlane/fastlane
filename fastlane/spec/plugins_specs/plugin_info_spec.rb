@@ -1,15 +1,15 @@
 describe Fastlane::PluginInfo do
   describe 'object equality' do
     it "detects equal PluginInfo objects" do
-      objectA = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
-      objectB = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
-      expect(objectA).to eq(objectB)
+      object_a = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
+      object_b = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
+      expect(object_a).to eq(object_b)
     end
 
     it "detects differing PluginInfo objects" do
-      objectA = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
-      objectB = Fastlane::PluginInfo.new('name2', 'Me2', 'me2@you.com', 'summary2', 'description2')
-      expect(objectA).not_to eq(objectB)
+      object_a = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'description')
+      object_b = Fastlane::PluginInfo.new('name2', 'Me2', 'me2@you.com', 'summary2', 'description2')
+      expect(object_a).not_to eq(object_b)
     end
   end
 

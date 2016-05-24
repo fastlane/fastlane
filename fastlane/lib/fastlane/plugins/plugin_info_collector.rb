@@ -4,8 +4,8 @@ module Fastlane
       @ui = ui
     end
 
-    def collect_info
-      plugin_name = collect_plugin_name
+    def collect_info(initial_name = nil)
+      plugin_name = collect_plugin_name(initial_name)
       author = collect_author
       email = collect_email
       summary = collect_summary
@@ -18,23 +18,27 @@ module Fastlane
     # Plugin name
     #
 
-    def collect_plugin_name
-      plugin_name = nil
+    def collect_plugin_name(initial_name = nil)
+      plugin_name = initial_name
+      first_try = true
 
       loop do
-        plugin_name = @ui.input("\nWhat would you like to be the name of your plugin?")
+        if !first_try || plugin_name.to_s.empty?
+          plugin_name = @ui.input("\nWhat would you like to be the name of your plugin?")
+        end
+        first_try = false
 
         unless plugin_name_valid?(plugin_name)
           fixed_name = fix_plugin_name(plugin_name)
 
           if plugin_name_valid?(fixed_name)
-            plugin_name = fixed_name if @ui.confirm("Is '#{fixed_name}' okay?")
+            plugin_name = fixed_name if @ui.confirm("\nWould '#{fixed_name}' be okay to use for your plugin name?")
           end
         end
 
         break if plugin_name_valid?(plugin_name)
 
-        @ui.message("Plugin names can only contain lower case letters, numbers, and underscores")
+        @ui.message("\nPlugin names can only contain lower case letters, numbers, and underscores")
         @ui.message("and should not contain 'fastlane' or 'plugin'.")
       end
 

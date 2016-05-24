@@ -10,8 +10,8 @@ module Fastlane
     end
 
     # entry point
-    def generate
-      plugin_info = @info_collector.collect_info
+    def generate(plugin_name = nil)
+      plugin_info = @info_collector.collect_info(plugin_name)
 
       generate_paths(plugin_info)
 
