@@ -30,6 +30,7 @@ module Fastlane
           '-'
         ].join(' ')
 
+        params[:build_number] = params[:build_number].strip # since there might be a new-line at the end
         command = [
           command_prefix,
           'agvtool',
