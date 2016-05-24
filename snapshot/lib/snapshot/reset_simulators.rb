@@ -35,16 +35,7 @@ module Snapshot
         end
       end
 
-      phones = []
-      watches = []
-      devices.each do |device|
-        _, name, id = device
-        phones << id if name.start_with?('iPhone 6')
-        watches << id if name.end_with?('mm')
-      end
-
-      puts "Creating device pair of #{phones.last} and #{watches.last}"
-      `xcrun simctl pair #{watches.last} #{phones.last}`
+      make_phone_watch_pair
     end
 
     def self.create(device_type, os_versions, os_name = 'iOS')
@@ -59,7 +50,7 @@ module Snapshot
     end
 
     def self.devices
-      all_devices = `xcrun simctl list devices`
+      all_devices = Helper.backticks('xcrun simctl list devices', print: $verbose)
       # == Devices ==
       # -- iOS 9.0 --
       #   iPhone 4s (32246EBC-33B0-47F9-B7BB-5C23C550DF29) (Shutdown)
@@ -69,10 +60,29 @@ module Snapshot
       #   iPhone 4s (FE9D6F85-1C51-4FE6-8597-FCAB5286B869) (Shutdown) (unavailable, runtime profile not found)
 
       result = all_devices.lines.map do |line|
-        (line.match(/\s+([\w\s]+)\s\(([\w\-]+)\)/) || []).to_a
+        (line.match(/\s+(.+?)\s\(([\w\-]+)\).*/) || []).to_a
       end
 
       result.select { |parsed| parsed.length == 3 } # we don't care about those headers
+    end
+
+    def self.make_phone_watch_pair
+      phones = []
+      watches = []
+      devices.each do |device|
+        full_line, name, id = device
+        phones << id if name.start_with?('iPhone 6') && device_line_usable?(full_line)
+        watches << id if name.end_with?('mm') && device_line_usable?(full_line)
+      end
+
+      if phones.any? && watches.any?
+        puts "Creating device pair of #{phones.last} and #{watches.last}"
+        Helper.backticks("xcrun simctl pair #{watches.last} #{phones.last}", print: $verbose)
+      end
+    end
+
+    def self.device_line_usable?(line)
+      !line.include?("unavailable")
     end
   end
 end
