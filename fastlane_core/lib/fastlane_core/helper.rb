@@ -3,6 +3,13 @@ require 'colored'
 
 module FastlaneCore
   module Helper
+    # This method is deprecated, use the `UI` class
+    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
+    def self.log
+      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.current.log
+    end
+
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
     def self.backticks(command, print: true)
