@@ -15,7 +15,7 @@ module Scan
       # in case the user specified multiple targets works with no issues
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
-      open_simulator_for_device(Scan.devices.first)
+      open_simulator_for_device(Scan.devices.first) if Scan.devices
 
       command = TestCommandGenerator.generate
       prefix_hash = [
