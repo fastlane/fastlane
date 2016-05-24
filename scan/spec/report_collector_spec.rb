@@ -7,8 +7,8 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-        "/tmp/report.html" => "cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null "
-      })
+                                 "/tmp/report.html" => "cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null "
+                             })
     end
 
     it "names the json compilation database with the correct name when the json_compilation_database_clang option is set" do
@@ -16,8 +16,8 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-        "/tmp/compile_commands.json" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/compile_commands.json' &> /dev/null "
-      })
+                                 "/tmp/compile_commands.json" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/compile_commands.json' &> /dev/null "
+                             })
     end
 
     it "names the json compilation database with the correct name when the json_compilation_database_clang option is not set" do
@@ -25,8 +25,8 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-        "/tmp/report.json-compilation-database" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/report.json-compilation-database' &> /dev/null "
-                             })
+                                 "/tmp/report.json-compilation-database" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/report.json-compilation-database' &> /dev/null "
+                              })
     end
   end
 end
