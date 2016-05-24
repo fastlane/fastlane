@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    # Adds a git tag to the current commit
+    # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
         local_branch = params[:local_branch]
