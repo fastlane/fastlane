@@ -87,7 +87,7 @@ module Fastlane
                                        description: "Symbols mapping file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("Couldn't find dSYM file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_TESTFAIRY_NOTIFY",
