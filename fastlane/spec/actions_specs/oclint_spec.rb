@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "OCLint Integration" do
-      it "raises an exception when not the default compile_commands.json is present" do
+      it "raises an exception when the default compile_commands.json is not present" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             oclint
@@ -16,7 +16,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to match(/cd .* && oclint -report-type=html -o=oclint_report.html -p .*?compile_commands\.json \".*/)
+        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint \".*})
       end
 
       it "works with all parameters" do

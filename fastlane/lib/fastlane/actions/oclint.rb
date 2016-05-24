@@ -66,7 +66,7 @@ module Fastlane
         oclint_args << "-enable-clang-static-analyzer" if params[:enable_clang_static_analyzer]
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
-        oclint_args << "-p #{params[:compile_commands]}" if params[:compile_commands]
+        oclint_args << "-p #{File.dirname(params[:compile_commands])}" if params[:compile_commands]
 
         command = [
           command_prefix,
