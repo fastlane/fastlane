@@ -118,6 +118,27 @@ describe Fastlane do
       end
     end
 
+    describe "Previously bundled action" do
+      it "#formerly_bundled_actions returns an array of string" do
+        expect(Fastlane::Actions.formerly_bundled_actions).to be_kind_of(Array)
+
+        Fastlane::Actions.formerly_bundled_actions.each do |current|
+          expect(current).to be_kind_of(String)
+        end
+      end
+
+      it "shows how to install a plugin if you want to use a previously bundled action" do
+        deprecated_action = "deprecated"
+        expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return([deprecated_action])
+
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            #{deprecated_action}
+          end").runner.execute(:test)
+        end.to raise_exception("The action '#{deprecated_action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin deprecated`")
+      end
+    end
+
     describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do
