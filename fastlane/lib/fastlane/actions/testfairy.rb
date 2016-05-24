@@ -18,7 +18,12 @@ module Fastlane
         return params[:ipa] if Helper.test?
 
         client_options = params.values
-        client_options[:testers_groups] = params[:testers_groups].join(',')
+
+        client_options[:testers_groups] = client_options[:testers_groups].join(',') if client_options.key?(:testers_groups)
+        client_options[:metrics] = client_options[:metrics].join(',') if client_options.key?(:metrics)
+        client_options[:options] = client_options[:options].join(',') if client_options.key?(:options)
+        client_options['auto-update'] = client_options.delete(:auto_update) if client_options.key?(:auto_update)
+        client_options['icon-watermark'] = client_options.delete(:icon_watermark) if client_options.key?(:icon_watermark)
 
         response = client.upload_build(params[:ipa], client_options)
         if parse_response(response)
@@ -76,7 +81,36 @@ module Fastlane
                                        short_option: '-g',
                                        env_name: "FL_TESTFAIRY_TESTERS_GROUPS",
                                        description: "Array of tester groups to be notified",
-                                       default_value: []) # the default value is an empty list
+                                       default_value: []), # the default value is an empty list
+          FastlaneCore::ConfigItem.new(key: :symbols_file,
+                                       env_name: "FL_TESTFAIRY_SYMBOLS_FILE",
+                                       description: "Symbols mapping file",
+                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :notify,
+                                       env_name: "FL_TESTFAIRY_NOTIFY",
+                                       description: "Send email to testers",
+                                       default_value: 'on'),
+          FastlaneCore::ConfigItem.new(key: :auto_update,
+                                       env_name: "FL_TESTFAIRY_AUTO_UPDATE",
+                                       description: "Allows easy upgrade of all users to current version",
+                                       default_value: 'on'),
+          FastlaneCore::ConfigItem.new(key: :icon_watermark,
+                                       env_name: "FL_TESTFAIRY_ICON_WATERMARK",
+                                       description: "Add a small watermark to app icon",
+                                       default_value: 'on'),
+          FastlaneCore::ConfigItem.new(key: :metrics,
+                                       type: Array,
+                                       env_name: "FL_TESTFAIRY_METRICS",
+                                       description: "Array of metrics to record (cpu,memory,network,phone-signal,gps,battery,mic,wifi)",
+                                       default_value: [ :cpu, :memory, :network, :wifi ]),
+          FastlaneCore::ConfigItem.new(key: :options,
+                                       type: Array,
+                                       env_name: "FL_TESTFAIRY_OPTIONS",
+                                       description: "Array of options (shake,video-only-wifi,anonymous)",
+                                       default_value: [])
         ]
       end
 
