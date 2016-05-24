@@ -13,6 +13,12 @@ module PEM
           c.name == PEM.config[:app_identifier]
         end
 
+        if PEM.config[:revoke_old]
+          revoke_old_certificates
+
+          return create_certificate
+        end
+
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
           UI.message "Existing push notification profile '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
@@ -81,6 +87,20 @@ module PEM
         return x509_cert_path
       end
       # rubocop:enable Metrics/AbcSize
+
+      def revoke_old_certificates
+        UI.important "Revoking existing Push Certificates."
+        
+        begin
+          certificate.all
+            .select { |crt| crt.name == PEM.config[:app_identifier] }
+            .each { |crt|
+              crt.revoke!
+              UI.message("Certificate with ID: #{crt.id} deleted".green)
+            }
+        # rescue => ex
+        end
+      end
 
       def certificate
         if PEM.config[:development]
