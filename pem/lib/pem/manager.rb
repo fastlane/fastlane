@@ -90,16 +90,16 @@ module PEM
 
       def revoke_old_certificates
         UI.important "Revoking existing Push Certificates."
-        
+
         begin
-          certificate.all
-            .select { |crt| crt.name == PEM.config[:app_identifier] }
-            .each { |crt|
-              crt.revoke!
-              UI.message("Certificate with ID: #{crt.id} deleted".green)
-            }
-        # rescue => ex
+          certificate.all.select { |crt| crt.name == PEM.config[:app_identifier] }.each { |crt| revoke(crt) }
+          # rescue => ex
         end
+      end
+
+      def revoke(crt, print_message=true)
+        crt.revoke!
+        UI.message("Certificate with ID: #{crt.id} deleted".green)
       end
 
       def certificate
