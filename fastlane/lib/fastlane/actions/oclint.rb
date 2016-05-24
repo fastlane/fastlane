@@ -45,7 +45,7 @@ module Fastlane
         report_type = params[:report_type]
         report_path = params[:report_path] ? params[:report_path] : 'oclint_report.' + report_type
 
-        oclint_args = ["-report-type=#{report_type}", "-o=#{report_path}"]
+        oclint_args = ["-report-type=#{report_type}", "-o=#{File.dirname(report_path)}"]
 
         oclint_args << "-list-enabled-rules" if params[:list_enabled_rules]
 
