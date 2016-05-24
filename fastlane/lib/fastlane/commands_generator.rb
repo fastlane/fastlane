@@ -180,7 +180,7 @@ module Fastlane
         c.description = 'Create a new plugin that can be used with fastlane'
 
         c.action do |args, options|
-          PluginGenerator.new.generate
+          PluginGenerator.new.generate args.shift
         end
       end
 

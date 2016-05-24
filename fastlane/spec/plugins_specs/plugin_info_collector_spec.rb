@@ -10,26 +10,52 @@ describe Fastlane::PluginInfoCollector do
   let(:collector) { Fastlane::PluginInfoCollector.new(test_ui) }
 
   describe "#collect_plugin_name" do
-    it "accepts a valid plugin name" do
-      expect(test_ui).to receive(:input).and_return('test_name')
+    describe "with no initial input" do
+      it "accepts a valid plugin name" do
+        expect(test_ui).to receive(:input).and_return('test_name')
 
-      expect(collector.collect_plugin_name).to eq('test_name')
+        expect(collector.collect_plugin_name).to eq('test_name')
+      end
+
+      it "offers a correction" do
+        expect(test_ui).to receive(:input).and_return('TEST_NAME')
+        expect(test_ui).to receive(:confirm).and_return(true)
+
+        expect(collector.collect_plugin_name).to eq('test_name')
+      end
+
+      it "offers and prompts again if declined" do
+        expect(test_ui).to receive(:input).and_return('TEST NAME')
+        expect(test_ui).to receive(:confirm).and_return(false)
+        expect(test_ui).to receive(:message).with(/can only contain/)
+        expect(test_ui).to receive(:input).and_return('test_name')
+
+        expect(collector.collect_plugin_name).to eq('test_name')
+      end
     end
 
-    it "offers a correction" do
-      expect(test_ui).to receive(:input).and_return('TEST_NAME')
-      expect(test_ui).to receive(:confirm).and_return(true)
+    describe "with invalid initial input" do
+      it "offers a correction and uses it if accepted" do
+        expect(test_ui).to receive(:confirm).and_return(true)
 
-      expect(collector.collect_plugin_name).to eq('test_name')
+        expect(collector.collect_plugin_name('fastlane-whatever')).to eq('whatever')
+      end
+
+      it "offers and prompts again if declined" do
+        expect(test_ui).to receive(:confirm).and_return(false)
+        expect(test_ui).to receive(:message).with(/can only contain/)
+        expect(test_ui).to receive(:input).and_return('test_name')
+
+        expect(collector.collect_plugin_name('my plugin')).to eq('test_name')
+      end
     end
 
-    it "offers and prompts again if declined" do
-      expect(test_ui).to receive(:input).and_return('TEST NAME')
-      expect(test_ui).to receive(:confirm).and_return(false)
-      expect(test_ui).to receive(:message).with(/can only contain/)
-      expect(test_ui).to receive(:input).and_return('test_name')
+    describe "with valid initial input" do
+      it "accepts a valid plugin name" do
+        expect(test_ui).not_to receive(:input)
 
-      expect(collector.collect_plugin_name).to eq('test_name')
+        expect(collector.collect_plugin_name('test_name')).to eq('test_name')
+      end
     end
   end
 
