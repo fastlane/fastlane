@@ -97,7 +97,7 @@ module PEM
         end
       end
 
-      def revoke(crt, print_message=true)
+      def revoke(crt)
         crt.revoke!
         UI.message("Certificate with ID: #{crt.id} deleted".green)
       end
