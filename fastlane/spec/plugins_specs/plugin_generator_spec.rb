@@ -84,6 +84,33 @@ describe Fastlane::PluginGenerator do
       expect(readme_contents.length).to be > 100
     end
 
+    it "creates a Action class" do
+      action_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.actions_path, "#{plugin_info.plugin_name}_action.rb")
+      expect(File.exist?(action_file)).to be(true)
+
+      action_contents = File.read(action_file)
+
+      # rubocop:disable Lint/Eval
+      eval(action_contents)
+      # rubocop:enable Lint/Eval
+
+      # If we evaluate the contents of the generated action file,
+      # we'll get the Action class defined. This ensures that the
+      # syntax is valid, and lets us interrogate the class for its
+      # behavior!
+      action_class = Object.const_get("Fastlane::Actions::#{plugin_name.capitalize}Action")
+
+      # Check that the default `run` method behavior calls UI.message
+      expect(UI).to receive(:message).with(/#{plugin_name}/)
+      action_class.run(nil)
+
+      # Check the default behavior of the rest of the methods
+      expect(action_class.description).to eq(description)
+      expect(action_class.authors).to eq([author])
+      expect(action_class.available_options).to eq([])
+      expect(action_class.is_supported?(:ios)).to be(true)
+    end
+
     it "creates a complete, valid gemspec" do
       gemspec_file = File.join(tmp_dir, gem_name, "#{gem_name}.gemspec")
       expect(File.exist?(gemspec_file)).to be(true)

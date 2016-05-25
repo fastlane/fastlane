@@ -19,10 +19,13 @@ module Fastlane
       generate_readme(plugin_info)
       generate_version(plugin_info)
       generate_license(plugin_info)
+      generate_action(plugin_info)
     end
 
     def generate_paths(plugin_info)
       FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.require_path))
+      FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.actions_path))
+      FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.helper_path))
     end
 
     def generate_gemspec(plugin_info)
@@ -39,6 +42,10 @@ module Fastlane
 
     def generate_license(plugin_info)
       write_template(plugin_info, 'LICENSE.erb', plugin_path(plugin_info, "LICENSE"))
+    end
+
+    def generate_action(plugin_info)
+      write_template(plugin_info, 'action.rb.erb', plugin_path(plugin_info, 'lib', plugin_info.actions_path, "#{plugin_info.plugin_name}_action.rb"))
     end
 
     def write_template(plugin_info, template_name, dest_path)
