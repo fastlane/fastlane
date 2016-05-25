@@ -7,7 +7,7 @@ module Fastlane
     def run
       require 'json'
       require 'open-uri'
-      url = "https://rubygems.org/api/v1/search.json?query=fastlane-" # TODO: change to `PluginManager.plugin_prefix`
+      url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}"
       results = JSON.parse(open(url).read)
       @plugins = results.collect do |current|
         FastlanePlugin.new(current)
@@ -20,7 +20,7 @@ module Fastlane
       puts md
       output_path = "docs/AvailablePlugins.md"
       File.write(output_path, md)
-      UI.success("Successfully written plugin file to '#{output_path}'")
+      FastlaneCore::UI.success("Successfully written plugin file to '#{output_path}'")
     end
   end
 
