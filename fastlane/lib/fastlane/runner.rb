@@ -119,7 +119,6 @@ module Fastlane
             # That's a plugin, but for some reason we can't find it
             # TODO: Add actual link
             UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting")
-
           elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)
             # This was a formerly bundled action which is now a plugin.
             UI.verbose(caller.join("\n"))

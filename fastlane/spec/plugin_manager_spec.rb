@@ -137,6 +137,20 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_exception("The action '#{deprecated_action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin deprecated`")
       end
+
+      it "runs the action as expected if the plugin is available" do
+        # We don't need to set this, since this method shouldn't even be called when the plugin is available
+        # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
+
+        Fastlane::FastFile.new.parse("lane :test do
+          crashlytics({
+            crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            api_token: 'wadus',
+            build_secret: 'secret',
+            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+          })
+        end").runner.execute(:test)
+      end
     end
 
     describe "Error handling of invalid plugins" do
