@@ -57,6 +57,21 @@ describe Fastlane::PluginGenerator do
       expect(File.directory?(File.join(tmp_dir, gem_name))).to be(true)
     end
 
+    it "creates a .rspec file" do
+      dot_rspec_file = File.join(tmp_dir, gem_name, '.rspec')
+      expect(File.exist?(dot_rspec_file)).to be(true)
+
+      dot_rspec_lines = File.read(dot_rspec_file).lines
+
+      [
+        "--require spec_helper\n",
+        "--color\n",
+        "--format d\n"
+      ].each do |option|
+        expect(dot_rspec_lines).to include(option)
+      end
+    end
+
     it "creates a README that contains the gem name" do
       readme_file = File.join(tmp_dir, gem_name, 'README.md')
       expect(File.exist?(readme_file)).to be(true)
