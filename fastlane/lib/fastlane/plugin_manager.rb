@@ -77,7 +77,7 @@ module Fastlane
 
         content += "#{line_to_add}\n"
         File.write(pluginsfile_path, content)
-        UI.success("Plugin '#{plugin_name}' was added.")
+        UI.success("Plugin '#{plugin_name}' was added to '#{path}'")
       end
 
       # We do this *after* creating the Plugin file
