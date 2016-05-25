@@ -45,7 +45,7 @@ module Fastlane
         report_type = params[:report_type]
         report_path = params[:report_path] ? params[:report_path] : 'oclint_report.' + report_type
 
-        oclint_args = ["-report-type=#{report_type}", "-o=#{File.dirname(report_path)}"]
+        oclint_args = ["-report-type=#{report_type}", "-o=#{report_path}"]
 
         oclint_args << "-list-enabled-rules" if params[:list_enabled_rules]
 
@@ -66,7 +66,7 @@ module Fastlane
         oclint_args << "-enable-clang-static-analyzer" if params[:enable_clang_static_analyzer]
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
-        oclint_args << "-p #{params[:compile_commands]}" if params[:compile_commands]
+        oclint_args << "-p #{File.dirname(params[:compile_commands])}" if params[:compile_commands]
 
         command = [
           command_prefix,
