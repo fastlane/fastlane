@@ -56,7 +56,7 @@ gem "fastlane-plugin-xcversion"
 gem "fastlane-plugin-xcversion", git: "https://github.com/fastlane/fastlane-plugin-xcversion"
 
 # Fetched from a local directory
-gem "fastlane-plugin-xcversion", path: "https://github.com/fastlane/fastlane-plugin-xcversion"
+gem "fastlane-plugin-xcversion", path: "../fastlane-plugin-xcversion"
 
 # Specify a version requirements
 gem "fastlane-plugin-xcversion", "1.1.0"
