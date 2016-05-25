@@ -151,7 +151,6 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle install"
-        cmd << " --no-development" # to not install nokogiri and similar by default
         cmd << " --quiet" unless $verbose
         cmd << " && echo 'Successfully installed plugins'"
         UI.command(cmd) if $verbose
@@ -166,7 +165,6 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle update"
-        cmd << " --no-development" # to not install nokogiri and similar by default
         cmd << " --quiet" unless $verbose
         cmd << " && echo 'Successfully updated plugins'"
         UI.command(cmd) if $verbose
