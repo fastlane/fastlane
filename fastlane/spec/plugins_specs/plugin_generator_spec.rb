@@ -133,8 +133,12 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
         expect(gemspec.description).to eq(description)
-        expect(gemspec.dependencies[0].name).to eq('fastlane')
-        expect(gemspec.dependencies[0].requirement.to_s).to eq(">= #{Fastlane::VERSION}")
+        expect(gemspec.development_dependencies).to contain_exactly(
+          Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
+        )
       end
     end
   end
