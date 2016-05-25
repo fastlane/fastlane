@@ -30,11 +30,10 @@ module Fastlane
           '-'
         ].join(' ')
 
-        params[:build_number] = params[:build_number].strip # since there might be a new-line at the end
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all',
+          params[:build_number] ? "new-version -all #{params[:build_number].strip}" : 'next-version -all',
           command_suffix
         ].join(' ')
 
