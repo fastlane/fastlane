@@ -23,6 +23,14 @@ module Fastlane
       gem_name.tr('-', '/')
     end
 
+    def actions_path
+      File.join(require_path, 'actions')
+    end
+
+    def helper_path
+      File.join(require_path, 'helper')
+    end
+
     # Used to expose a local binding for use in ERB templating
     #
     # rubocop:disable Style/AccessorMethodName
