@@ -22,7 +22,6 @@ module Fastlane
       generate_license(plugin_info)
       generate_action(plugin_info)
       generate_helper(plugin_info)
-
     end
 
     def generate_paths(plugin_info)
