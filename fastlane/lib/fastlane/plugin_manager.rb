@@ -154,6 +154,7 @@ module Fastlane
         cmd << " --no-development" # to not install nokogiri and similar by default
         cmd << " --quiet" unless $verbose
         cmd << " && echo 'Successfully installed plugins'"
+        UI.command(cmd) if $verbose
         exec(cmd)
       end
     end
@@ -168,6 +169,7 @@ module Fastlane
         cmd << " --no-development" # to not install nokogiri and similar by default
         cmd << " --quiet" unless $verbose
         cmd << " && echo 'Successfully updated plugins'"
+        UI.command(cmd) if $verbose
         exec(cmd)
       end
     end
