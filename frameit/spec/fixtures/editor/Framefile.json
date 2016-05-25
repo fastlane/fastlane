@@ -1,0 +1,20 @@
+{
+  "default": {
+    "background": "../background.jpg",
+    "padding": 50
+  },
+  "data": [
+    {
+      "filter": "apostrophes",
+      "title": {
+        "text": "Don't forget the apostrophes"
+      }
+    },
+    {
+      "filter": "escaped-apostrophes",
+      "title": {
+        "text": "Don\'t forget the apostrophes"
+      }
+    }
+  ]
+}
