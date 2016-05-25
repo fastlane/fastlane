@@ -16,7 +16,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to match(/cd .* && oclint -report-type=html -o=oclint_report.html -p .\/fastlane\/spec\/fixtures\/oclint \".*/)
+        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint \".*})
       end
 
       it "works with all parameters" do
