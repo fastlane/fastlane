@@ -32,9 +32,15 @@ describe FastlaneCore do
         FastlaneCore::CertChecker.wwdr_certificate_installed?
       end
 
-      it 'should shell escape keychain names when doing installation' do
+      it 'uses the correct command to import it' do
+        # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
+        `ls`
+
+        cmd = "curl -O https://developer.apple.com/certificationauthority/AppleWWDRCA.cer "
+        cmd += "&& security import AppleWWDRCA.cer -k keychain\\ with\\ spaces.keychain"
+
+        expect(FastlaneCore::Helper).to receive(:backticks).with(cmd, { print: nil }).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, anything).and_return("")
         expect($?).to receive(:success?).and_return(true)
 
         FastlaneCore::CertChecker.install_wwdr_certificate
