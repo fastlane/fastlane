@@ -18,7 +18,9 @@ module Fastlane
       md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       puts md
-      File.write("docs/AvailablePlugins.md", md)
+      output_path = "docs/AvailablePlugins.md"
+      File.write(output_path, md)
+      UI.success("Successfully written plugin file to '#{output_path}'")
     end
   end
 
