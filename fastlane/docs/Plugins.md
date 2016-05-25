@@ -59,8 +59,8 @@ gem "fastlane-plugin-xcversion", git: "https://github.com/fastlane/fastlane-plug
 gem "fastlane-plugin-xcversion", path: "https://github.com/fastlane/fastlane-plugin-xcversion"
 
 # Specify a version requirements
-gem "fastlane-plugin-xcversoin", "1.1.0"
-gem "fastlane-plugin-xcversoin", ">= 1.0"
+gem "fastlane-plugin-xcversion", "1.1.0"
+gem "fastlane-plugin-xcversion", ">= 1.0"
 ```
 
 [More information about a Gemfile](http://bundler.io/gemfile.html)
