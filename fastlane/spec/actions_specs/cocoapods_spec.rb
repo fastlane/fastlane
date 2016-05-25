@@ -6,7 +6,7 @@ describe Fastlane do
           cocoapods
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install")
+        expect(result).to eq("bundle exec pod install --repo-update")
       end
 
       it "default use case with no bundle exec" do
@@ -14,7 +14,7 @@ describe Fastlane do
           cocoapods(use_bundle_exec: false)
         end").runner.execute(:test)
 
-        expect(result).to eq("pod install")
+        expect(result).to eq("pod install --repo-update")
       end
 
       it "adds no-clean to command if clean is set to false" do
@@ -24,7 +24,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --no-clean")
+        expect(result).to eq("bundle exec pod install --no-clean --repo-update")
       end
 
       it "adds no-integrate to command if integrate is set to false" do
@@ -34,7 +34,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --no-integrate")
+        expect(result).to eq("bundle exec pod install --no-integrate --repo-update")
       end
 
       it "adds no-repo-update to command if repo_update is set to false" do
@@ -54,7 +54,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --silent")
+        expect(result).to eq("bundle exec pod install --repo-update --silent")
       end
 
       it "adds verbose to command if verbose is set to true" do
@@ -64,7 +64,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --verbose")
+        expect(result).to eq("bundle exec pod install --repo-update --verbose")
       end
 
       it "adds no-ansi to command if ansi is set to false" do
@@ -74,7 +74,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --no-ansi")
+        expect(result).to eq("bundle exec pod install --repo-update --no-ansi")
       end
 
       it "changes directory if podfile is set to the Podfile path" do
@@ -84,7 +84,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("cd 'Project' && bundle exec pod install")
+        expect(result).to eq("cd 'Project' && bundle exec pod install --repo-update")
       end
 
       it "changes directory if podfile is set to a directory" do
@@ -94,7 +94,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("cd 'Project' && bundle exec pod install")
+        expect(result).to eq("cd 'Project' && bundle exec pod install --repo-update")
       end
     end
   end

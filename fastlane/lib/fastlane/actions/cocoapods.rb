@@ -19,6 +19,7 @@ module Fastlane
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
+        cmd << '--repo-update' if params[:repo_update]
         cmd << '--no-repo-update' unless params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
