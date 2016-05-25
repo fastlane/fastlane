@@ -141,5 +141,26 @@ describe Fastlane::PluginGenerator do
         )
       end
     end
+
+    it "creates a valid helper class" do
+      helper_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.helper_path, "#{plugin_info.plugin_name}_helper.rb")
+      expect(File.exist?(helper_file)).to be(true)
+
+      helper_contents = File.read(helper_file)
+
+      # rubocop:disable Lint/Eval
+      eval(helper_contents)
+      # rubocop:enable Lint/Eval
+
+      # If we evaluate the contents of the generated helper file,
+      # we'll get the helper class defined. This ensures that the
+      # syntax is valid, and lets us interrogate the class for its
+      # behavior!
+      helper_class = Object.const_get("Fastlane::Helper::#{plugin_name.capitalize}Helper")
+
+      # Check that the class was successfully defined
+      expect(UI).to receive(:message).with(/#{plugin_name}/)
+      helper_class.show_message
+    end
   end
 end
