@@ -3,6 +3,7 @@ module Fastlane
     attr_reader :plugin_name
     attr_reader :author
     attr_reader :gem_name
+<<<<<<< HEAD
     attr_reader :email
     attr_reader :summary
     attr_reader :description
@@ -13,6 +14,12 @@ module Fastlane
       @email = email
       @summary = summary
       @description = description
+=======
+
+    def initialize(plugin_name, author)
+      @plugin_name = plugin_name
+      @author = author
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
 
     def gem_name
@@ -20,6 +27,7 @@ module Fastlane
     end
 
     def require_path
+<<<<<<< HEAD
       gem_name.tr('-', '/')
     end
 
@@ -45,6 +53,19 @@ module Fastlane
       @email == other.email &&
       @summary == other.summary &&
       @description == other.description
+=======
+      gem_name.gsub('-', '/')
+    end
+
+    # Used to exposed a local binding for use in ERB templating
+    def get_binding
+      binding
+    end
+
+    def ==(other)
+      @plugin_name == other.plugin_name &&
+      @author == other.author
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
   end
 end

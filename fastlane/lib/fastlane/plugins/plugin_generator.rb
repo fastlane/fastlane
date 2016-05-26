@@ -10,6 +10,7 @@ module Fastlane
     end
 
     # entry point
+<<<<<<< HEAD
     def generate(plugin_name = nil)
       plugin_info = @info_collector.collect_info(plugin_name)
 
@@ -18,16 +19,27 @@ module Fastlane
       generate_dot_rspec(plugin_info)
       generate_dot_gitignore(plugin_info)
       generate_gemfile(plugin_info)
+=======
+    def generate
+      plugin_info = @info_collector.collect_info
+
+      generate_paths(plugin_info)
+
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
       generate_gemspec(plugin_info)
       generate_readme(plugin_info)
       generate_version(plugin_info)
       generate_license(plugin_info)
+<<<<<<< HEAD
       generate_action(plugin_info)
       generate_helper(plugin_info)
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
 
     def generate_paths(plugin_info)
       FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.require_path))
+<<<<<<< HEAD
       FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.actions_path))
       FileUtils.mkdir_p(plugin_path(plugin_info, 'lib', plugin_info.helper_path))
     end
@@ -42,6 +54,8 @@ module Fastlane
 
     def generate_gemfile(plugin_info)
       write_template(plugin_info, 'Gemfile.erb', plugin_path(plugin_info, "Gemfile"))
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
 
     def generate_gemspec(plugin_info)
@@ -57,6 +71,7 @@ module Fastlane
     end
 
     def generate_license(plugin_info)
+<<<<<<< HEAD
       write_template(plugin_info, 'LICENSE.erb', plugin_path(plugin_info, "LICENSE"))
     end
 
@@ -66,6 +81,9 @@ module Fastlane
 
     def generate_helper(plugin_info)
       write_template(plugin_info, 'helper.rb.erb', plugin_path(plugin_info, 'lib', plugin_info.helper_path, "#{plugin_info.plugin_name}_helper.rb"))
+=======
+      FileUtils.touch(plugin_path(plugin_info, 'LICENSE'))
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
 
     def write_template(plugin_info, template_name, dest_path)
