@@ -21,6 +21,7 @@ describe Fastlane::PluginGenerator do
       unless initialized
         test_ui = Fastlane::PluginGeneratorUI.new
         allow(test_ui).to receive(:message)
+        allow(test_ui).to receive(:success)
         allow(test_ui).to receive(:input).and_raise(":input call was not mocked!")
         allow(test_ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
 
@@ -249,6 +250,17 @@ describe Fastlane::PluginGenerator do
 
       spec_helper_module = Object.const_get("SpecHelper")
       expect(spec_helper_module).not_to be(nil)
+    end
+
+    it "creates a action_spec.rb file" do
+      action_spec_file = File.join(tmp_dir, gem_name, 'spec', 'action_spec.rb')
+      expect(File.exist?(action_spec_file)).to be(true)
+
+      # Actually run our generated spec as part of this spec #yodawg
+      Dir.chdir(gem_name) do
+        `rspec &> /dev/null`
+        expect($?.exitstatus).to be(0)
+      end
     end
   end
 end
