@@ -133,6 +133,10 @@ module FastlaneCore
     end
 
     def determine_version(name)
+      self.class.determine_version(name)
+    end
+
+    def self.determine_version(name)
       begin
         name = name.to_s.downcase
 
