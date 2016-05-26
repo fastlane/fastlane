@@ -11,7 +11,7 @@ module Fastlane
         Actions.verify_gem!('appium_lib')
 
         require 'rspec'
-        require 'appium_lib'
+        require 'appium_lib' unless Helper.test?
 
         FastlaneCore::PrintTable.print_values(
           config: params,
