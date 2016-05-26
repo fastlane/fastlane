@@ -218,7 +218,12 @@ module Fastlane
 
     # The code required to load the Plugins file
     def self.code_to_attach
-      "plugins_path = File.join(File.dirname(__FILE__), 'fastlane', '#{PluginManager::PLUGINFILE_NAME}')\n" \
+      if FastlaneFolder.path
+        fastlane_folder_name = File.basename(FastlaneFolder.path)
+      else
+        fastlane_folder_name = "fastlane"
+      end
+      "plugins_path = File.join(File.dirname(__FILE__), '#{fastlane_folder_name}', '#{PluginManager::PLUGINFILE_NAME}')\n" \
       "eval(File.read(plugins_path), binding) if File.exist?(plugins_path)"
     end
 
