@@ -262,5 +262,13 @@ describe Fastlane::PluginGenerator do
         expect($?.exitstatus).to be(0)
       end
     end
+
+    it "creates a Rakefile" do
+      rakefile = File.join(tmp_dir, gem_name, 'Rakefile')
+      expect(File.exist?(rakefile)).to be(true)
+
+      rakefile_contents = File.read(rakefile)
+      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n")
+    end
   end
 end

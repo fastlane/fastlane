@@ -27,6 +27,7 @@ module Fastlane
       generate_helper(plugin_info)
       generate_spec_helper(plugin_info)
       generate_action_spec(plugin_info)
+      generate_rakefile(plugin_info)
 
       @ui.success "\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀"
     end
@@ -84,6 +85,10 @@ module Fastlane
 
     def generate_action_spec(plugin_info)
       write_template(plugin_info, 'action_spec.rb.erb', plugin_path(plugin_info, 'spec', 'action_spec.rb'))
+    end
+
+    def generate_rakefile(plugin_info)
+      write_template(plugin_info, 'Rakefile.erb', plugin_path(plugin_info, 'Rakefile'))
     end
 
     def write_template(plugin_info, template_name, dest_path)
