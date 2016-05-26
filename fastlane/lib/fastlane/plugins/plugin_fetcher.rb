@@ -4,14 +4,26 @@ module Fastlane
     require 'fastlane_core'
     require 'fastlane/plugins/plugin_manager'
 
-    def run
+    # Returns an array of FastlanePlugin objects
+    def self.fetch_gems(search_query: nil)
       require 'json'
       require 'open-uri'
       url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}"
       results = JSON.parse(open(url).read)
-      @plugins = results.collect do |current|
+
+      plugins = results.collect do |current|
         FastlanePlugin.new(current)
       end
+
+      return plugins if search_query.to_s.length == 0
+
+      plugins.keep_if do |current|
+        current.full_name.include?(search_query)
+      end
+    end
+
+    def self.update_md_file!
+      @plugins = fetch_gems
 
       lib_path = FastlaneCore::Helper.gem_path('fastlane')
       template_path = File.join(lib_path, "lib/assets/Plugins.md.erb")

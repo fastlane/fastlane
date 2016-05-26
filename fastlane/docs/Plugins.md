@@ -29,6 +29,21 @@ In general, we might not accept actions that
 
 `fastlane` is an open platform and we enable every developer to extend it to fit their needs. That's why we built a plugin system that allows you and your company to provide `fastlane` plugins to other `fastlane` users. You have the full power and responsibility of maintaining your plugin and keeping it up to date. This is useful if you maintain your own library or web service, and want to make sure the `fastlane` plugin is always up to date.
 
+### Find a plugin
+
+Head over the [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) for a list of plugins you can use.
+
+List all available plugins using
+
+```
+fastlane search_plugin
+```
+
+To search for something specific 
+```
+fastlane search_plugin [query]
+```
+
 ### Add a plugin to your project
 
 ```
