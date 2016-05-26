@@ -209,8 +209,8 @@ module Fastlane
         end
       end
 
-      command :search_plugin do |c|
-        c.syntax = 'fastlane search_plugin [search_query]'
+      command :search_plugins do |c|
+        c.syntax = 'fastlane search_plugins [search_query]'
         c.description = 'Search for plugins, search query is optional'
 
         c.action do |args, options|

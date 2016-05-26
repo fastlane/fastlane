@@ -36,12 +36,12 @@ Head over the [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/ma
 List all available plugins using
 
 ```
-fastlane search_plugin
+fastlane search_plugins
 ```
 
 To search for something specific 
 ```
-fastlane search_plugin [query]
+fastlane search_plugins [query]
 ```
 
 ### Add a plugin to your project
