@@ -10,5 +10,5 @@ end
 
 task :generate_plugins do
   require 'fastlane/plugins/plugin_fetcher'
-  Fastlane::PluginFetcher.new.run
+  Fastlane::PluginFetcher.update_md_file!
 end

@@ -1,0 +1,88 @@
+[
+    {
+        "name": "fastlane-plugin-apprepo",
+        "downloads": 113,
+        "version": "0.1.0",
+        "version_downloads": 113,
+        "platform": "ruby",
+        "authors": "Matej Sychra",
+        "info": "experimental fastlane plugin",
+        "licenses": [
+            "MIT"
+        ],
+        "metadata": {},
+        "sha": "0339d17aebb56321d9b726d5ec842289a4b60e78db462db61df55ffba619b51b",
+        "project_uri": "https://rubygems.org/gems/fastlane-plugin-apprepo",
+        "gem_uri": "https://rubygems.org/gems/fastlane-plugin-apprepo-0.1.0.gem",
+        "homepage_uri": "https://github.com/suculent/fastlane-plugin-apprepo",
+        "wiki_uri": null,
+        "documentation_uri": "http://www.rubydoc.info/gems/fastlane-plugin-apprepo/0.1.0",
+        "mailing_list_uri": null,
+        "source_code_uri": null,
+        "bug_tracker_uri": null,
+        "dependencies": {
+            "development": [
+                {
+                    "name": "fastlane",
+                    "requirements": "~> 1.89"
+                },
+                {
+                    "name": "json",
+                    "requirements": "= 1.8.1"
+                },
+                {
+                    "name": "pry",
+                    "requirements": "~> 0"
+                },
+                {
+                    "name": "rspec",
+                    "requirements": ">= 3.4.0, ~> 3.4"
+                }
+            ],
+            "runtime": []
+        }
+    },
+    {
+        "name": "fastlane-plugin-yolokit",
+        "downloads": 321,
+        "version": "0.1.0",
+        "version_downloads": 321,
+        "platform": "ruby",
+        "authors": "Felix Krause",
+        "info": "This works",
+        "licenses": [
+            "MIT"
+        ],
+        "metadata": {},
+        "sha": "0339d17aebb56321d9b726d5ec842289a4b60e78db462db61df55ffba619b51b",
+        "project_uri": "https://rubygems.org/gems/fastlane-plugin-apprepo",
+        "gem_uri": "https://rubygems.org/gems/fastlane-plugin-apprepo-0.1.0.gem",
+        "homepage_uri": "https://github.com/suculent/fastlane-plugin-apprepo",
+        "wiki_uri": null,
+        "documentation_uri": "http://www.rubydoc.info/gems/fastlane-plugin-apprepo/0.1.0",
+        "mailing_list_uri": null,
+        "source_code_uri": null,
+        "bug_tracker_uri": null,
+        "dependencies": {
+            "development": [
+                {
+                    "name": "fastlane",
+                    "requirements": "~> 1.89"
+                },
+                {
+                    "name": "json",
+                    "requirements": "= 1.8.1"
+                },
+                {
+                    "name": "pry",
+                    "requirements": "~> 0"
+                },
+                {
+                    "name": "rspec",
+                    "requirements": ">= 3.4.0, ~> 3.4"
+                }
+            ],
+            "runtime": []
+        }
+    }
+]

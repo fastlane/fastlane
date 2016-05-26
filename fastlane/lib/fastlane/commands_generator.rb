@@ -209,6 +209,16 @@ module Fastlane
         end
       end
 
+      command :search_plugins do |c|
+        c.syntax = 'fastlane search_plugins [search_query]'
+        c.description = 'Search for plugins, search query is optional'
+
+        c.action do |args, options|
+          search_query = args.last
+          PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
       default_command :trigger
       run!
     end

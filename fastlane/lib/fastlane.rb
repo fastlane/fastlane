@@ -18,7 +18,10 @@ require 'fastlane/one_off'
 require 'fastlane/command_line_handler'
 require 'fastlane/documentation/docs_generator'
 require 'fastlane/other_action'
+
 require 'fastlane/plugins/plugin_manager'
+require 'fastlane/plugins/plugin_search'
+require 'fastlane/plugins/plugin_fetcher'
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
