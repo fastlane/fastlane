@@ -10,6 +10,8 @@ Run `fastlane update_plugins` to make sure to have all the latest plugins and th
 
 Run `fastlane` using `bundle exec fastlane [lane]` to make sure your bundle is properly loaded.
 
+This is required when you have use plugins from a local path or a git remote.
+
 ### Use the `--verbose` mode
 
 Running `fastlane [lane] --verbose` will show a lot more information, that might be useful to resolve the issue.

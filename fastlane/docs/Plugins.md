@@ -112,8 +112,9 @@ All you have to do if you have an exiting gem:
 The recommended way to publish your plugin is to publish it on [RubyGems.org](https://rubygems.org). You'll first have to create an account, and then push a new release using
 
 ```sh
-bundle install && rake install
-gem push ./pkg/fastlane-plugin-[plugin_name]-0.0.1.gem
+bundle install
+rake install
+rake release
 ```
 
 Now all your users can run `fastlane add_plugin [plugin_name]` to install and use your plugin.
