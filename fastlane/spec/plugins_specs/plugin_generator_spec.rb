@@ -72,6 +72,24 @@ describe Fastlane::PluginGenerator do
       end
     end
 
+    it "creates a .gitignore file" do
+      dot_gitignore_file = File.join(tmp_dir, gem_name, '.gitignore')
+      expect(File.exist?(dot_gitignore_file)).to be(true)
+
+      dot_gitignore_lines = File.read(dot_gitignore_file).lines
+
+      [
+        "*.gem\n",
+        "Gemfile.lock\n",
+        "/.yardoc/\n",
+        "/_yardoc/\n",
+        "/doc/\n",
+        "/rdoc/\n"
+      ].each do |item|
+        expect(dot_gitignore_lines).to include(item)
+      end
+    end
+
     it "creates a Gemfile" do
       gemfile = File.join(tmp_dir, gem_name, 'Gemfile')
       expect(File.exist?(gemfile)).to be(true)
@@ -81,8 +99,8 @@ describe Fastlane::PluginGenerator do
       [
         "source 'https://rubygems.org'\n",
         "gemspec\n"
-      ].each do |option|
-        expect(gemfile_lines).to include(option)
+      ].each do |line|
+        expect(gemfile_lines).to include(line)
       end
     end
 
