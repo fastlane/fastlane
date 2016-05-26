@@ -6,7 +6,7 @@ module Fastlane
     # Symbol for the current platform
     attr_accessor :current_platform
 
-    # Path used by the executed lane
+    # absolute path used by the executed lane
     attr_accessor :executing_lane_path
 
     # @return [Hash] All the lanes available, first the platform, then the lane
@@ -157,6 +157,10 @@ module Fastlane
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
       unless custom_dir
+        # Under normal circumstances (a lane executing under `@executing_lane_path`) the project path
+        # happens to be up one level from the current one. But being plain Ruby, the current path can be changed.
+        # Such case was triggered by the runner when an action was nested (like in a block) inside another action.
+        # We account for this by setting the custom_dir to be relative to the absolute path of the lane.
         if self.executing_lane_path
           custom_dir = File.join(self.executing_lane_path, '..')
         else
