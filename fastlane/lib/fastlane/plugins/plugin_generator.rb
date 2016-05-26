@@ -25,6 +25,8 @@ module Fastlane
       generate_license(plugin_info)
       generate_action(plugin_info)
       generate_helper(plugin_info)
+
+      @ui.success "\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀"
     end
 
     def generate_paths(plugin_info)
