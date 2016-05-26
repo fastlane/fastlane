@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     class UploadSymbolsToSentryAction < Action
       def self.run(params)
+        Actions.verify_gem!('rest-client')
         require 'rest-client'
 
         # Params - API
