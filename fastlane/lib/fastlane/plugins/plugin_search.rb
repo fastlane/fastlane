@@ -17,19 +17,18 @@ module Fastlane
 
       rows = plugins.collect do |current|
         [
-          current.name,
+          current.name.green,
           WordWrap.ww(current.info, 50),
           current.downloads
         ]
       end
 
-      params = {}
+      params = {
+        rows: rows,
+        title: (search_query ? "fastlane plugins '#{search_query}'" : "Available fastlane plugins").green,
+        headings: ["Name", "Description", "Downloads"]
+      }
       params[:rows] = rows
-      params[:title] = if search_query
-                         "fastlane plugins '#{search_query}'".green
-                       else
-                         "Available fastlane plugins".green
-                       end
 
       puts ""
       puts Terminal::Table.new(params)
