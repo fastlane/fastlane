@@ -1,5 +1,5 @@
 describe Fastlane do
-  describe Fastlane::PluginFetcher, now: true do
+  describe Fastlane::PluginFetcher do
     describe "#fetch_gems" do
       before do
         stub_request(:get, "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-").
