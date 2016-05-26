@@ -72,6 +72,20 @@ describe Fastlane::PluginGenerator do
       end
     end
 
+    it "creates a Gemfile" do
+      gemfile = File.join(tmp_dir, gem_name, 'Gemfile')
+      expect(File.exist?(gemfile)).to be(true)
+
+      gemfile_lines = File.read(gemfile).lines
+
+      [
+        "source 'https://rubygems.org'\n",
+        "gemspec\n"
+      ].each do |option|
+        expect(gemfile_lines).to include(option)
+      end
+    end
+
     it "creates a README that contains the gem name" do
       readme_file = File.join(tmp_dir, gem_name, 'README.md')
       expect(File.exist?(readme_file)).to be(true)

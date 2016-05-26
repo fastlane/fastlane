@@ -16,6 +16,7 @@ module Fastlane
       generate_paths(plugin_info)
 
       generate_dot_rspec(plugin_info)
+      generate_gemfile(plugin_info)
       generate_gemspec(plugin_info)
       generate_readme(plugin_info)
       generate_version(plugin_info)
@@ -32,6 +33,10 @@ module Fastlane
 
     def generate_dot_rspec(plugin_info)
       write_template(plugin_info, 'dot_rspec.erb', plugin_path(plugin_info, ".rspec"))
+    end
+
+    def generate_gemfile(plugin_info)
+      write_template(plugin_info, 'Gemfile.erb', plugin_path(plugin_info, "Gemfile"))
     end
 
     def generate_gemspec(plugin_info)
