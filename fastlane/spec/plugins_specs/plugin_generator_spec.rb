@@ -104,6 +104,39 @@ describe Fastlane::PluginGenerator do
       end
     end
 
+    it "creates a plugin.rb file for the plugin" do
+      plugin_rb_file = File.join(tmp_dir, gem_name, 'lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      expect(File.exist?(plugin_rb_file)).to be(true)
+
+      plugin_rb_contents = File.read(plugin_rb_file)
+
+      Dir.chdir(gem_name) do
+        # Ensure that the require statements inside the plugin.rb contents will resolve correctly
+        lib = File.expand_path('lib')
+        $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+        # rubocop:disable Lint/Eval
+        eval(plugin_rb_contents)
+        # rubocop:enable Lint/Eval
+
+        # If we evaluate the contents of the generated plugin.rb file,
+        # we'll get the all_classes helper method defined. This ensures
+        # that the syntax is valid, and lets us interrogate the class for
+        # the behavior!
+        action_class = Object.const_get("Fastlane::#{plugin_name.capitalize}")
+
+        all_classes = action_class.all_classes
+        expect(all_classes).to contain_exactly(
+          File.expand_path("lib/#{plugin_info.actions_path}/#{plugin_name}_action.rb"),
+          File.expand_path("lib/#{plugin_info.helper_path}/#{plugin_name}_helper.rb")
+        )
+
+        # Get the relative paths to require, check that they have already been required.
+        require_paths = all_classes.map { |c| c.gsub(lib + '/', '').gsub('.rb', '') }
+        require_paths.each { |path| expect(require(path)).to be(false) }
+      end
+    end
+
     it "creates a README that contains the gem name" do
       readme_file = File.join(tmp_dir, gem_name, 'README.md')
       expect(File.exist?(readme_file)).to be(true)
@@ -132,7 +165,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a Action class" do
-      action_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.actions_path, "#{plugin_info.plugin_name}_action.rb")
+      action_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.actions_path, "#{plugin_name}_action.rb")
       expect(File.exist?(action_file)).to be(true)
 
       action_contents = File.read(action_file)

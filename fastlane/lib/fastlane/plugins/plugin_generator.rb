@@ -19,6 +19,7 @@ module Fastlane
       generate_dot_gitignore(plugin_info)
       generate_gemfile(plugin_info)
       generate_gemspec(plugin_info)
+      generate_plugin_rb(plugin_info)
       generate_readme(plugin_info)
       generate_version(plugin_info)
       generate_license(plugin_info)
@@ -46,6 +47,10 @@ module Fastlane
 
     def generate_gemspec(plugin_info)
       write_template(plugin_info, 'plugin.gemspec.erb', plugin_path(plugin_info, "#{plugin_info.gem_name}.gemspec"))
+    end
+
+    def generate_plugin_rb(plugin_info)
+      write_template(plugin_info, 'plugin.rb.erb', plugin_path(plugin_info, 'lib', 'fastlane', 'plugin', "#{plugin_info.plugin_name}.rb"))
     end
 
     def generate_version(plugin_info)
