@@ -1,5 +1,9 @@
 skip_docs
 
+lane :test do
+  validate_repo(tool_name: detect_tool)
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
@@ -146,7 +150,7 @@ private_lane :validate_repo do |options|
 
   # Run the tests
   #
-  sh "cd .. && bundle exec rspec"
+  rspec
 end
 
 desc "e.g. fastlane/deliver"
