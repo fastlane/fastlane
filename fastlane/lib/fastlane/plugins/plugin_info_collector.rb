@@ -9,9 +9,8 @@ module Fastlane
       author = collect_author
       email = collect_email
       summary = collect_summary
-      description = collect_description
 
-      PluginInfo.new(plugin_name, author, email, summary, description)
+      PluginInfo.new(plugin_name, author, email, summary)
     end
 
     #
@@ -115,14 +114,6 @@ module Fastlane
 
     def summary_valid?(summary)
       !summary.to_s.strip.empty?
-    end
-
-    #
-    # Description
-    #
-
-    def collect_description
-      @ui.input("\nPlease enter a longer description of this fastlane plugin:")
     end
 
   end

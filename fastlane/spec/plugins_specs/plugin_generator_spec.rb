@@ -8,14 +8,13 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
-    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'description') }
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary') }
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
     let(:author) { plugin_info.author }
     let(:email) { plugin_info.email }
     let(:summary) { plugin_info.summary }
-    let(:description) { plugin_info.description }
 
     before(:each) do
       unless initialized
@@ -35,7 +34,6 @@ describe Fastlane::PluginGenerator do
         expect(test_ui).to receive(:input).and_return(author)
         expect(test_ui).to receive(:input).and_return(email)
         expect(test_ui).to receive(:input).and_return(summary)
-        expect(test_ui).to receive(:input).and_return(description)
 
         generator.generate
 
@@ -186,7 +184,7 @@ describe Fastlane::PluginGenerator do
       action_class.run(nil)
 
       # Check the default behavior of the rest of the methods
-      expect(action_class.description).to eq(description)
+      expect(action_class.description).to eq(summary)
       expect(action_class.authors).to eq([author])
       expect(action_class.available_options).to eq([])
       expect(action_class.is_supported?(:ios)).to be(true)
@@ -213,7 +211,6 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
-        expect(gemspec.description).to eq(description)
         expect(gemspec.development_dependencies).to contain_exactly(
           Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),

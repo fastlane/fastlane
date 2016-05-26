@@ -5,14 +5,12 @@ module Fastlane
     attr_reader :gem_name
     attr_reader :email
     attr_reader :summary
-    attr_reader :description
 
-    def initialize(plugin_name, author, email, summary, description)
+    def initialize(plugin_name, author, email, summary)
       @plugin_name = plugin_name
       @author = author
       @email = email
       @summary = summary
-      @description = description
     end
 
     def gem_name
@@ -43,8 +41,7 @@ module Fastlane
       @plugin_name == other.plugin_name &&
       @author == other.author &&
       @email == other.email &&
-      @summary == other.summary &&
-      @description == other.description
+      @summary == other.summary
     end
   end
 end
