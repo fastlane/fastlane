@@ -9,6 +9,6 @@ task :push do
 end
 
 task :generate_plugins do
-  require 'fastlane/plugin_fetcher'
+  require 'fastlane/plugins/plugin_fetcher'
   Fastlane::PluginFetcher.new.run
 end
