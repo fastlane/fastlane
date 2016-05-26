@@ -2,7 +2,7 @@ module Fastlane
   class PluginManager
     require "bundler"
 
-    PLUGINSFILE_NAME = "Pluginfile".freeze
+    PLUGINFILE_NAME = "Pluginfile".freeze
     DEFAULT_GEMFILE_PATH = "Gemfile".freeze
     GEMFILE_SOURCE_LINE = "source \"https://rubygems.org\"\n"
     FASTLANE_PLUGIN_PREFIX = "fastlane-plugin-"
@@ -20,7 +20,7 @@ module Fastlane
     end
 
     def pluginsfile_path
-      File.join(FastlaneFolder.path, PLUGINSFILE_NAME) if FastlaneFolder.path
+      File.join(FastlaneFolder.path, PLUGINFILE_NAME) if FastlaneFolder.path
     end
 
     def gemfile_content
@@ -217,7 +217,7 @@ module Fastlane
 
     # The code required to load the Plugins file
     def self.code_to_attach
-      "plugins_path = File.join(File.dirname(__FILE__), 'fastlane', '#{PluginManager::PLUGINSFILE_NAME}')\n" \
+      "plugins_path = File.join(File.dirname(__FILE__), 'fastlane', '#{PluginManager::PLUGINFILE_NAME}')\n" \
       "eval(File.read(plugins_path), binding) if File.exist?(plugins_path)"
     end
 
