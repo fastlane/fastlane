@@ -26,6 +26,8 @@ module Fastlane
       generate_action(plugin_info)
       generate_helper(plugin_info)
       generate_spec_helper(plugin_info)
+      generate_action_spec(plugin_info)
+
       @ui.success "\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀"
     end
 
@@ -78,6 +80,10 @@ module Fastlane
 
     def generate_spec_helper(plugin_info)
       write_template(plugin_info, 'spec_helper.rb.erb', plugin_path(plugin_info, 'spec', 'spec_helper.rb'))
+    end
+
+    def generate_action_spec(plugin_info)
+      write_template(plugin_info, 'action_spec.rb.erb', plugin_path(plugin_info, 'spec', 'action_spec.rb'))
     end
 
     def write_template(plugin_info, template_name, dest_path)
