@@ -52,7 +52,7 @@ fastlane add_plugin [name]
 
 `fastlane` will assist you on setting up your project to start using plugins.
 
-What will this do
+This will:
 
 - Add the plugin to `fastlane/Pluginfile`
 - Make sure your `fastlane/Pluginfile` is properly referenced from your `./Gemfile`
@@ -110,9 +110,9 @@ fastlane new_plugin
 
 ##### New plugin for existing gem
 
-If you already have an exiting gem you want to provide a `fastlane` plugin for, you'll still have to create a new Ruby gem. The reason for that is the way plugins are imported. 
+If you already have an exiting gem you want to provide a `fastlane` plugin for, you'll still have to create a new Ruby gem. The reason for that is the way plugins are imported.
 
-The example project [xcake](https://github.com/jcampbell05/xcake) contains a folder named `fastlane-plugin-xcake`. 
+The example project [xcake](https://github.com/jcampbell05/xcake) contains a folder named `fastlane-plugin-xcake`.
 
 All you have to do if you have an exiting gem:
 
