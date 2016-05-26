@@ -117,8 +117,7 @@ module Fastlane
           # No lane, no action, let's at least show the correct error message
           if PluginManager.new.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
             # That's a plugin, but for some reason we can't find it
-            url = "https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md"
-            UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{url}")
+            UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
           elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)
             # This was a formerly bundled action which is now a plugin.
             UI.verbose(caller.join("\n"))

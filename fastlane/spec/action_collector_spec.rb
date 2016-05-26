@@ -4,7 +4,10 @@ describe Fastlane::ActionCollector do
   let(:collector) { Fastlane::ActionCollector.new }
   let(:plugin_references) do
     {
-      "fastlane-plugin-my_plugin" => [:xcversion, :xcyolo_something]
+      "fastlane-plugin-my_plugin" => {
+        version_number: "0.1.0",
+        actions: [:xcversion, :xcyolo_something]
+      }
     }
   end
 

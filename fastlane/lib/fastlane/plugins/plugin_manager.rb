@@ -6,6 +6,7 @@ module Fastlane
     DEFAULT_GEMFILE_PATH = "Gemfile".freeze
     GEMFILE_SOURCE_LINE = "source \"https://rubygems.org\"\n"
     FASTLANE_PLUGIN_PREFIX = "fastlane-plugin-"
+    TROUBLESHOOTING_URL = "https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md"
 
     #####################################################
     # @!group Reading the files and their paths
@@ -241,10 +242,9 @@ module Fastlane
     # This will make sure to load the action
     # and all its helpers
     def self.load_plugins
-      @plugin_references = {}
-
       UI.verbose("Checking if there are any plugins that should be loaded...")
 
+      loaded_plugins = false
       Gem::Specification.each do |current_gem|
         gem_name = current_gem.name
         next unless gem_name.start_with?(PluginManager.plugin_prefix)
@@ -252,42 +252,37 @@ module Fastlane
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
           require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
-
-          module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
-          # We store a collection of the imported plugins
-          # This way we can tell which action came from what plugin
-          # (a plugin may contain any number of actions)
-          references = Fastlane.const_get(module_name).all_classes.collect do |path|
-            next unless File.dirname(path).end_with?("/actions") # we only want to match actions
-            File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
-          end
-          @plugin_references[gem_name] = references.keep_if {|a| !a.nil? }
-
-          # Example value of plugin_references
-          # => {"fastlane-plugin-xcversion"=>[:xcversion]}
+          store_plugin_reference(gem_name)
+          loaded_plugins = true
         rescue => ex
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
         end
       end
-      print_plugin_information(@plugin_references) unless @plugin_references.empty?
+
+      if !loaded_plugins && PluginManager.new.pluginfile_content.to_s.include?(plugin_prefix)
+        UI.error("It seems like you wanted to load some plugins, however they couldn't be loaded")
+        UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
+      end
+
+      print_plugin_information(self.plugin_references) unless self.plugin_references.empty?
     end
 
     # Prints a table all the plugins that were loaded
     def self.print_plugin_information(references)
       rows = references.collect do |current|
-        if current[1].empty?
+        if current[1][:actions].empty?
           # Something is wrong with this plugin, no available actions
-          [current[0].red, "No actions found".red]
+          [current[0].red, current[1][:version_number], "No actions found".red]
         else
-          [current[0], current[1].join("\n")]
+          [current[0], current[1][:version_number], current[1][:actions].join("\n")]
         end
       end
 
-      params = {}
-      params[:rows] = rows
-      params[:title] = "Used plugins".green
-
-      puts Terminal::Table.new(params)
+      puts Terminal::Table.new({
+        rows: rows,
+        title: "Used plugins".green,
+        headings: ["Plugin", "Version", "Action"]
+      })
       puts ""
     end
 
@@ -297,9 +292,30 @@ module Fastlane
 
     # Connection between plugins and their actions
     # Example value of plugin_references
-    # => {"fastlane-plugin-xcversion"=>[:xcversion]}
+    # => {"fastlane-plugin-ruby" => {
+    #          version_number: "0.1.0",
+    #          actions: [:rspec, :rubocop]
+    #     }}
     def self.plugin_references
-      @plugin_references || {}
+      @plugin_references ||= {}
+    end
+
+    def self.store_plugin_reference(gem_name)
+      module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
+      # We store a collection of the imported plugins
+      # This way we can tell which action came from what plugin
+      # (a plugin may contain any number of actions)
+      version_number = Fastlane::ActionCollector.determine_version(gem_name)
+      references = Fastlane.const_get(module_name).all_classes.collect do |path|
+        next unless File.dirname(path).end_with?("/actions") # we only want to match actions
+
+        File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
+      end
+
+      self.plugin_references[gem_name] = {
+        version_number: version_number,
+        actions: references.keep_if { |a| !a.nil? }
+      }
     end
   end
 end

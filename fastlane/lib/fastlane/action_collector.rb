@@ -9,8 +9,8 @@ module Fastlane
     def name_to_track(name)
       return name if is_official?(name)
 
-      PluginManager.plugin_references.each do |plugin_name, actions|
-        return "#{plugin_name}/#{name}" if actions.include?(name)
+      PluginManager.plugin_references.each do |plugin_name, value|
+        return "#{plugin_name}/#{name}" if value[:actions].include?(name)
       end
 
       return nil
@@ -25,11 +25,15 @@ module Fastlane
       UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
 
+    def determine_version(name)
+      self.class.determine_version(name)
+    end
+
     # e.g.
     #   :gym
     #   :xcversion
     #   "fastlane-plugin-my_plugin/xcversion"
-    def determine_version(name)
+    def self.determine_version(name)
       return super(name) if super(name)
 
       if name.to_s.include?(PluginManager.plugin_prefix)
