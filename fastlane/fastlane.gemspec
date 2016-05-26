@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'xcode-install', '~> 1.4.0' # Needed for xcversion and xcode_install actions
 
-  spec.add_dependency 'fastlane_core', '>= 0.43.5', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.45.0', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
   spec.add_dependency 'spaceship', '>= 0.27.0', '< 1.0.0' # communication layer with Apple's web services
