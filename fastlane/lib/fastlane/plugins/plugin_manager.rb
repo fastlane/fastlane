@@ -77,7 +77,7 @@ module Fastlane
 
         content += "#{line_to_add}\n"
         File.write(pluginsfile_path, content)
-        UI.success("Plugin '#{plugin_name}' was added to '#{path}'")
+        UI.success("Plugin '#{plugin_name}' was added to '#{pluginsfile_path}'")
       end
 
       # We do this *after* creating the Plugin file
@@ -204,7 +204,7 @@ module Fastlane
 
       UI.important("This change is neccessary for fastlane plugins to work")
 
-      unless UI.confirm("Can fastlane modify the Gemfile at path '#{path_to_gemfile}' for you?")
+      unless UI.confirm("Should fastlane modify the Gemfile at path '#{path_to_gemfile}' for you?")
         UI.important("Please add the following code to '#{path_to_gemfile}':")
         puts ""
         puts self.class.code_to_attach.magenta # we use `puts` instead of `UI` to make it easier to copy and paste

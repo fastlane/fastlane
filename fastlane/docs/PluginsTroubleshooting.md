@@ -10,6 +10,10 @@ Run `fastlane update_plugins` to make sure to have all the latest plugins and th
 
 Run `fastlane` using `bundle exec fastlane [lane]` to make sure your bundle is properly loaded.
 
+### Use the `--verbose` mode
+
+Running `fastlane [lane] --verbose` will show a lot more information, that might be useful to resolve the issue.
+
 ### Make sure the action name is correct
 
 A plugin can contain any number of actions. Make sure to read the docs of your plugin. 
