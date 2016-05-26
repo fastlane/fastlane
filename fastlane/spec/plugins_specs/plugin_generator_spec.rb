@@ -242,5 +242,13 @@ describe Fastlane::PluginGenerator do
       expect(UI).to receive(:message).with(/#{plugin_name}/)
       helper_class.show_message
     end
+
+    it "creates a spec_helper.rb file" do
+      spec_helper_file = File.join(tmp_dir, gem_name, 'spec', 'spec_helper.rb')
+      expect(File.exist?(spec_helper_file)).to be(true)
+
+      spec_helper_module = Object.const_get("SpecHelper")
+      expect(spec_helper_module).not_to be(nil)
+    end
   end
 end
