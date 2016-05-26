@@ -10,6 +10,7 @@ describe Fastlane::PluginInfoCollector do
   let(:collector) { Fastlane::PluginInfoCollector.new(test_ui) }
 
   describe "#collect_plugin_name" do
+<<<<<<< HEAD
     describe "with no initial input" do
       it "accepts a valid plugin name" do
         expect(test_ui).to receive(:input).and_return('test_name')
@@ -56,6 +57,28 @@ describe Fastlane::PluginInfoCollector do
 
         expect(collector.collect_plugin_name('test_name')).to eq('test_name')
       end
+=======
+    it "accepts a valid plugin name" do
+      expect(test_ui).to receive(:input).and_return('test_name')
+
+      expect(collector.collect_plugin_name).to eq('test_name')
+    end
+
+    it "offers a correction" do
+      expect(test_ui).to receive(:input).and_return('TEST_NAME')
+      expect(test_ui).to receive(:confirm).and_return(true)
+
+      expect(collector.collect_plugin_name).to eq('test_name')
+    end
+
+    it "offers and prompts again if declined" do
+      expect(test_ui).to receive(:input).and_return('TEST NAME')
+      expect(test_ui).to receive(:confirm).and_return(false)
+      expect(test_ui).to receive(:message).with(/can only contain/)
+      expect(test_ui).to receive(:input).and_return('test_name')
+
+      expect(collector.collect_plugin_name).to eq('test_name')
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
   end
 
@@ -164,6 +187,7 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
+<<<<<<< HEAD
   describe "email collection" do
     it "accepts a provided email" do
       expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
@@ -221,15 +245,22 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
   describe '#collect_info' do
     it "returns a PluginInfo summarizing the user input" do
       expect(test_ui).to receive(:input).and_return('test_name')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
+<<<<<<< HEAD
       expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
       expect(test_ui).to receive(:input).and_return('summary')
       expect(test_ui).to receive(:input).and_return('description')
 
       info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'description')
+=======
+
+      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio')
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 
       expect(collector.collect_info).to eq(info)
     end

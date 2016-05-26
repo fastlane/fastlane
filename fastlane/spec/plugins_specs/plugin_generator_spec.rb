@@ -8,14 +8,21 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
+<<<<<<< HEAD
     let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'description') }
+=======
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio') }
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
     let(:author) { plugin_info.author }
+<<<<<<< HEAD
     let(:email) { plugin_info.email }
     let(:summary) { plugin_info.summary }
     let(:description) { plugin_info.description }
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 
     before(:each) do
       unless initialized
@@ -32,9 +39,12 @@ describe Fastlane::PluginGenerator do
 
         expect(test_ui).to receive(:input).and_return(plugin_name)
         expect(test_ui).to receive(:input).and_return(author)
+<<<<<<< HEAD
         expect(test_ui).to receive(:input).and_return(email)
         expect(test_ui).to receive(:input).and_return(summary)
         expect(test_ui).to receive(:input).and_return(description)
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 
         generator.generate
 
@@ -57,6 +67,7 @@ describe Fastlane::PluginGenerator do
       expect(File.directory?(File.join(tmp_dir, gem_name))).to be(true)
     end
 
+<<<<<<< HEAD
     it "creates a .rspec file" do
       dot_rspec_file = File.join(tmp_dir, gem_name, '.rspec')
       expect(File.exist?(dot_rspec_file)).to be(true)
@@ -104,6 +115,8 @@ describe Fastlane::PluginGenerator do
       end
     end
 
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     it "creates a README that contains the gem name" do
       readme_file = File.join(tmp_dir, gem_name, 'README.md')
       expect(File.exist?(readme_file)).to be(true)
@@ -121,6 +134,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a LICENSE" do
+<<<<<<< HEAD
       readme_file = File.join(tmp_dir, gem_name, 'LICENSE')
       expect(File.exist?(readme_file)).to be(true)
 
@@ -156,6 +170,9 @@ describe Fastlane::PluginGenerator do
       expect(action_class.authors).to eq([author])
       expect(action_class.available_options).to eq([])
       expect(action_class.is_supported?(:ios)).to be(true)
+=======
+      expect(File.exist?(File.join(tmp_dir, gem_name, 'LICENSE'))).to be(true)
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
     end
 
     it "creates a complete, valid gemspec" do
@@ -169,14 +186,19 @@ describe Fastlane::PluginGenerator do
         # we'll get the Gem Specification object back out, which
         # ensures that the syntax is valid, and lets us interrogate
         # the values!
+<<<<<<< HEAD
         #
         # rubocop:disable Lint/Eval
         gemspec = eval(File.read(gemspec_file))
         # rubocop:enable Lint/Eval
+=======
+        gemspec = eval(File.read(gemspec_file))
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
+<<<<<<< HEAD
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
         expect(gemspec.description).to eq(description)
@@ -209,5 +231,9 @@ describe Fastlane::PluginGenerator do
       expect(UI).to receive(:message).with(/#{plugin_name}/)
       helper_class.show_message
     end
+=======
+      end
+    end
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
   end
 end

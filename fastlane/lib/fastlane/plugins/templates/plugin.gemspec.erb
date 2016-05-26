@@ -6,6 +6,7 @@ require '<%= require_path %>/version'
 Gem::Specification.new do |spec|
   spec.name          = '<%= gem_name %>'
   spec.version       = Fastlane::<%= plugin_name.capitalize %>::VERSION
+<<<<<<< HEAD
   spec.author        = %q{<%= author %>}
   spec.email         = %q{<%= email %>}
 
@@ -13,15 +14,27 @@ Gem::Specification.new do |spec|
   spec.description   = %q{<%= description %>}
   spec.homepage      = "https://github.com/<GITHUB_USERNAME>/<%= gem_name %>"
   spec.license       = "MIT"
+=======
+  spec.author        = '<%= author %>'
+  # spec.email         = ["fastlane-xcversion@gmail.com"] # TODO: fixup
+
+  spec.summary       = %q{Something random} # TODO: fixup
+  spec.description   = %q{Something random} # TODO: fixup
+  # spec.homepage      = "https://github.com/fastlane/fastlane-xcversion" # TODO: fixup
+  # spec.license       = "MIT" # TODO: fixup
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
+<<<<<<< HEAD
 
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'fastlane', '>= <%= Fastlane::VERSION %>'
+=======
+>>>>>>> 532a9a6fe97ec3038deacb16b2160abcf5ca27d0
 end
