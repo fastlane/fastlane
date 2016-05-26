@@ -258,8 +258,8 @@ module Fastlane
           # This way we can tell which action came from what plugin
           # (a plugin may contain any number of actions)
           references = Fastlane.const_get(module_name).all_classes.collect do |path|
-            next unless path.end_with?("_action.rb")
-            File.basename(path).gsub("_action.rb", "").to_sym
+            next unless File.dirname(path).end_with?("/actions") # we only want to match actions
+            File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
           end
           @plugin_references[gem_name] = references.keep_if {|a| !a.nil? }
 
@@ -269,6 +269,26 @@ module Fastlane
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
         end
       end
+      print_plugin_information(@plugin_references) unless @plugin_references.empty?
+    end
+
+    # Prints a table all the plugins that were loaded
+    def self.print_plugin_information(references)
+      rows = references.collect do |current|
+        if current[1].empty?
+          # Something is wrong with this plugin, no available actions
+          [current[0].red, "No actions found".red]
+        else
+          [current[0], current[1].join("\n")]
+        end
+      end
+
+      params = {}
+      params[:rows] = rows
+      params[:title] = "Used plugins".green
+
+      puts Terminal::Table.new(params)
+      puts ""
     end
 
     #####################################################
