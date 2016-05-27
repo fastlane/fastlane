@@ -261,6 +261,13 @@ module Fastlane
           loaded_plugins = true
         rescue => ex
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
+
+          # We'll still add it to the table, to make the error
+          # much more visible and obvious
+          self.plugin_references[gem_name] = {
+            version_number: Fastlane::ActionCollector.determine_version(gem_name),
+            actions: []
+          }
         end
       end
 
