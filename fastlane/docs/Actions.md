@@ -987,14 +987,17 @@ This action allows you to upload symbolication files to Sentry.
 
 ```ruby
 upload_symbols_to_sentry(
-  api_key: '...',
+  api_key: '...', # Do not use if using auth_token
+  auth_token: '...', # Do not use if using api_key
   org_slug: '...',
   project_slug: '...',
   dsym_path: './App.dSYM.zip'
 )
 ```
 
-The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
+`auth_token` is the preferred way to authentication method with Sentry. `api_key` will eventually become deprecated.
+
+The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
 ### AWS S3 Distribution

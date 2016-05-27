@@ -8,6 +8,7 @@ module Fastlane
         # Params - API
         host = params[:api_host]
         api_key = params[:api_key]
+        auth_token = params[:auth_token]
         org = params[:org_slug]
         project = params[:project_slug]
 
@@ -15,9 +16,24 @@ module Fastlane
         dsym_path = params[:dsym_path]
         dsym_paths = params[:dsym_paths] || []
 
+        has_api_key = !api_key.to_s.empty?
+        has_auth_token = !auth_token.to_s.empty?
+
+        # Will fail if none or both authentication methods are provided
+        if !has_api_key && !has_auth_token
+          UI.user_error!("No API key or authentication token found for SentryAction given, pass using `api_key: 'key'` or `auth_token: 'token'`")
+        elsif has_api_key && has_auth_token
+          UI.user_error!("Both API key and authentication token found for SentryAction given, please only give one")
+        end
+
         # Url to post dSYMs to
         url = "#{host}/projects/#{org}/#{project}/files/dsyms/"
-        resource = RestClient::Resource.new(url, api_key, '')
+
+        if has_api_key
+          resource = RestClient::Resource.new(url, api_key, '')
+        else
+          resource = RestClient::Resource.new(url, headers: {Authorization: "Bearer #{auth_token}"})
+        end
 
         UI.message "Will upload dSYM(s) to #{url}"
 
@@ -67,10 +83,12 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "SENTRY_API_KEY",
-                                       description: "API Key for Sentry",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No API token for SentryAction given, pass using `api_key: 'key'`") unless value and !value.empty?
-                                       end),
+                                       description: "API key for Sentry",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :auth_token,
+                                       env_name: "SENTRY_AUTH_TOKEN",
+                                       description: "Authentication token for Sentry",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :org_slug,
                                        env_name: "SENTRY_ORG_SLUG",
                                        description: "Organization slug for Sentry project",
