@@ -1683,7 +1683,7 @@ add_git_tag(
 )
 ```
 
-[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile#L105) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### git_pull
 
