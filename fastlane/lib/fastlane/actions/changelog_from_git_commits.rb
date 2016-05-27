@@ -37,6 +37,10 @@ module Fastlane
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
+        puts ""
+        puts changelog
+        puts ""
+
         changelog
       end
 

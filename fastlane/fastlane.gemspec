@@ -30,14 +30,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
+  spec.add_dependency 'xcode-install', '~> 1.4.0' # Needed for xcversion and xcode_install actions
 
-  spec.add_dependency 'fastlane_core', '>= 0.43.5', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.44.2', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.27.0', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.27.1', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency 'deliver', '>= 1.11.2', '< 2.0.0'
+  spec.add_dependency 'deliver', '>= 1.11.3', '< 2.0.0'
   spec.add_dependency 'snapshot', '>= 1.12.1', '< 2.0.0'
   spec.add_dependency 'frameit', '>= 2.6.2', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.3.1', '< 2.0.0'
@@ -45,10 +46,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sigh', '>= 1.8.0', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.1.2', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.6.3', '< 2.0.0'
-  spec.add_dependency 'pilot', '>= 1.5.1', '< 2.0.0'
+  spec.add_dependency 'pilot', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.7.0', '< 1.0.0'
-  spec.add_dependency 'scan', '>= 0.6.1', '< 1.0.0'
-  spec.add_dependency 'match', '>= 0.5.0', '< 1.0.0'
+  spec.add_dependency 'scan', '>= 0.7.1', '< 1.0.0'
+  spec.add_dependency 'match', '>= 0.6.0', '< 1.0.0'
   spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
 
   # Development only
@@ -62,7 +63,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'rubocop', '~> 0.38.0'
-  spec.add_development_dependency 'appium_lib', '~> 4.1.0'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
 end

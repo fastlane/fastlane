@@ -23,6 +23,11 @@ module Fastlane
           command << "--allow-warnings"
         end
 
+        command << "--use-libraries" if params[:use_libraries]
+        command << "--fail-fast" if params[:fail_fast]
+        command << "--private" if params[:private]
+        command << "--quick" if params[:quick]
+
         result = Actions.sh(command.join(' '))
         UI.success("Pod lib lint Successfully ⬆️ ")
         return result
@@ -60,7 +65,23 @@ module Fastlane
                                          is_string: false,
                                          verify_block: proc do |value|
                                            UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
-                                         end)
+                                         end),
+          FastlaneCore::ConfigItem.new(key: :use_libraries,
+                                       description: "Lint uses static libraries to install the spec",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :fail_fast,
+                                       description: "Lint stops on the first failing platform or subspec",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :private,
+                                       description: "Lint skips checks that apply only to public specs",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :quick,
+                                       description: "Lint skips checks that would require to download and build the spec",
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

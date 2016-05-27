@@ -25,34 +25,33 @@ module FastlaneCore
     end
 
     def did_launch_action(name)
-      name = name.to_sym
+      name = name_to_track(name.to_sym)
+      return unless name
 
-      if is_official?(name)
-        launches[name] += 1
-        versions[name] ||= determine_version(name)
-      end
+      launches[name] += 1
+      versions[name] ||= determine_version(name)
     end
 
     # Call when the problem is a caught/controlled exception (e.g. via UI.user_error!)
     def did_raise_error(name)
-      name = name.to_sym
-      if is_official?(name)
-        @error = name
-        # Don't write to the @crash field so that we can distinguish this exception later
-        # as being controlled
-      end
+      name = name_to_track(name.to_sym)
+      return unless name
+
+      @error = name
+      # Don't write to the @crash field so that we can distinguish this exception later
+      # as being controlled
     end
 
     # Call when the problem is an uncaught/uncontrolled exception (e.g. via UI.crash!)
     def did_crash(name)
-      name = name.to_sym
-      if is_official?(name)
-        # Write to the @error field to maintain the historical behavior of the field, so
-        # that the server gets the same data in that field from old and new clients
-        @error = name
-        # Also specifically note that this exception was uncontrolled in the @crash field
-        @crash = true
-      end
+      name = name_to_track(name.to_sym)
+      return unless name
+
+      # Write to the @error field to maintain the historical behavior of the field, so
+      # that the server gets the same data in that field from old and new clients
+      @error = name
+      # Also specifically note that this exception was uncontrolled in the @crash field
+      @crash = true
     end
 
     def did_finish
@@ -113,8 +112,17 @@ module FastlaneCore
       @versions ||= {}
     end
 
+    # Override this in subclasses
     def is_official?(name)
       return true
+    end
+
+    # Returns nil if we shouldn't track this action
+    # Returns a (maybe modified) name that should be sent to the enhancer web service
+    # Modificiation is used to prefix the action name with the name of the plugin
+    def name_to_track(name)
+      return nil unless is_official?(name)
+      name
     end
 
     def did_show_message?
@@ -125,6 +133,10 @@ module FastlaneCore
     end
 
     def determine_version(name)
+      self.class.determine_version(name)
+    end
+
+    def self.determine_version(name)
       begin
         name = name.to_s.downcase
 

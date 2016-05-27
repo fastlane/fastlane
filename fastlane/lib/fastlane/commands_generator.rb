@@ -146,17 +146,17 @@ module Fastlane
 
       command :enable_crash_reporting do |c|
         c.syntax = 'fastlane enable_crash_reporting'
-        c.description = 'Enable crash reporting to improve fastlane'
+        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
         c.action do |args, options|
-          FastlaneCore::CrashReporting.enable
+          show_crashreporter_note
         end
       end
 
       command :disable_crash_reporting do |c|
         c.syntax = 'fastlane disable_crash_reporting'
-        c.description = 'Disable crash reporting'
+        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
         c.action do |args, options|
-          FastlaneCore::CrashReporting.disable
+          show_crashreporter_note
         end
       end
 
@@ -185,6 +185,12 @@ module Fastlane
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create
       return false
+    end
+
+    def show_crashreporter_note
+      UI.important("fastlane doesn't use a crash reporter any more")
+      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
+      UI.important("This command will be removed in one of the next releases")
     end
 
     # rubocop:enable Metrics/AbcSize

@@ -19,5 +19,32 @@ describe FastlaneCore do
         FastlaneCore::CertChecker.installed_identies
       end
     end
+
+    describe 'shell escaping' do
+      let(:keychain_name) { "keychain with spaces.keychain" }
+      let(:shell_escaped_name) { keychain_name.shellescape }
+      let(:name_regex) { Regexp.new(Regexp.escape(shell_escaped_name)) }
+
+      it 'should shell escape keychain names when checking for installation' do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, anything).and_return("")
+
+        FastlaneCore::CertChecker.wwdr_certificate_installed?
+      end
+
+      it 'uses the correct command to import it' do
+        # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
+        `ls`
+
+        cmd = "curl -O https://developer.apple.com/certificationauthority/AppleWWDRCA.cer "
+        cmd += "&& security import AppleWWDRCA.cer -k keychain\\ with\\ spaces.keychain"
+
+        expect(FastlaneCore::Helper).to receive(:backticks).with(cmd, { print: nil }).and_return("")
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
+        expect($?).to receive(:success?).and_return(true)
+
+        FastlaneCore::CertChecker.install_wwdr_certificate
+      end
+    end
   end
 end

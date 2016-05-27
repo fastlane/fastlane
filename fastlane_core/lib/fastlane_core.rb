@@ -21,7 +21,6 @@ require 'fastlane_core/ipa_upload_package_builder'
 require 'fastlane_core/print_table'
 require 'fastlane_core/project'
 require 'fastlane_core/device_manager'
-require 'fastlane_core/crash_reporting/crash_reporting'
 require 'fastlane_core/ui/ui'
 require 'fastlane_core/tool_collector'
 
