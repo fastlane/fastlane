@@ -132,7 +132,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= (File.directory? "./fastlane" || File.directory? "./.fastlane")
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)
