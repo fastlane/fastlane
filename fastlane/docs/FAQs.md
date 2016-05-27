@@ -64,7 +64,7 @@ DLV_SCND_CATG=Games
 ```
 
 Now your Deliver file should look something like this:
-```
+```ruby
 app_review_information(
   first_name: ENV['DLV_FIRST_NAME'],
   last_name: ENV['DLV_LAST_NAME']
@@ -82,7 +82,7 @@ You can also references these environment variables almost anywhere in `fastlane
 
 You can even define a lane to perform actions on multiple targets:
 
-```
+```ruby
 desc "Deploy both versions"
 lane :deploy_all do
     sh "fastlane deploy --env paid"
