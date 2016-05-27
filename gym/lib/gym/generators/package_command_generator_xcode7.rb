@@ -10,7 +10,7 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
-        print_legacy_information unless Helper.fastlane_enabled?
+        print_legacy_information
 
         parts = ["/usr/bin/xcrun #{XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive"]
         parts += options
@@ -161,10 +161,10 @@ module Gym
       end
 
       def print_legacy_information
-        if Gym.config[:provisioning_profile_path]
-          UI.important "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
-        end
+        return if Gym.config[:provisioning_profile_path].to_s.length == 0
+
+        UI.error "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
+        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
       end
     end
   end
