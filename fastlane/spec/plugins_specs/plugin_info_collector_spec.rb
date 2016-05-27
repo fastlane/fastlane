@@ -148,6 +148,23 @@ describe Fastlane::PluginInfoCollector do
 
       expect(collector.collect_author).to eq('Fabricio Devtoolio')
     end
+
+    it "has an author name from git config" do
+      expect(test_ui).not_to receive(:input)
+      expect(collector.collect_author('Fabricio Devtoolio')).to eq('Fabricio Devtoolio')
+    end
+  end
+
+  describe "author detection" do
+    it "has an email from git config" do
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name').and_return('Fabricio Devtoolio')
+      expect(collector.detect_author).to eq('Fabricio Devtoolio')
+    end
+
+    it "does not have an email from git config" do
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name').and_return('')
+      expect(collector.detect_author).to be(nil)
+    end
   end
 
   describe '#author_valid?' do
@@ -175,6 +192,23 @@ describe Fastlane::PluginInfoCollector do
       expect(test_ui).to receive(:input).and_return('')
 
       expect(collector.collect_email).to eq('')
+    end
+
+    it "has an email from git config" do
+      expect(test_ui).not_to receive(:input)
+      expect(collector.collect_email('fabric.devtools@gmail.com')).to eq('fabric.devtools@gmail.com')
+    end
+  end
+
+  describe "email detection" do
+    it "has an email from git config" do
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email').and_return('fabric.devtools@gmail.com')
+      expect(collector.detect_email).to eq('fabric.devtools@gmail.com')
+    end
+
+    it "does not have email in git config" do
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email').and_return('')
+      expect(collector.detect_email).to be(nil)
     end
   end
 
@@ -213,9 +247,10 @@ describe Fastlane::PluginInfoCollector do
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
       expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
       expect(test_ui).to receive(:input).and_return('summary')
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email').and_return('')
+      expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name').and_return('')
 
       info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary')
-
       expect(collector.collect_info).to eq(info)
     end
   end

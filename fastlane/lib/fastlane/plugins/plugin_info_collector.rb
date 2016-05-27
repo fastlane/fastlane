@@ -6,8 +6,8 @@ module Fastlane
 
     def collect_info(initial_name = nil)
       plugin_name = collect_plugin_name(initial_name)
-      author = collect_author
-      email = collect_email
+      author = collect_author(detect_author)
+      email = collect_email(detect_email)
       summary = collect_summary
 
       PluginInfo.new(plugin_name, author, email, summary)
@@ -72,7 +72,13 @@ module Fastlane
     # Author
     #
 
-    def collect_author
+    def detect_author
+      git_name = Helper.backticks('git config --get user.name').strip
+      return git_name.empty? ? nil : git_name
+    end
+
+    def collect_author(initial_author = nil)
+      return initial_author if author_valid?(initial_author)
       author = nil
       loop do
         author = @ui.input("\nWhat is the plugin author's name?")
@@ -92,8 +98,13 @@ module Fastlane
     # Email
     #
 
-    def collect_email
-      @ui.input("\nWhat is the plugin author's email address?")
+    def detect_email
+      git_email = Helper.backticks('git config --get user.email').strip
+      return git_email.empty? ? nil : git_email
+    end
+
+    def collect_email(initial_email = nil)
+      return initial_email || @ui.input("\nWhat is the plugin author's email address?")
     end
 
     #
