@@ -5,7 +5,7 @@ require '<%= require_path %>/version'
 
 Gem::Specification.new do |spec|
   spec.name          = '<%= gem_name %>'
-  spec.version       = Fastlane::<%= plugin_name.capitalize %>::VERSION
+  spec.version       = Fastlane::<%= plugin_name.fastlane_class %>::VERSION
   spec.author        = %q{<%= author %>}
   spec.email         = %q{<%= email %>}
 
