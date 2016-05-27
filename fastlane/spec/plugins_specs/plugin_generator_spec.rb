@@ -30,8 +30,8 @@ describe Fastlane::PluginGenerator do
         oldwd = Dir.pwd
         Dir.chdir(tmp_dir)
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email').and_return('')
-        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name').and_return('')
+        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email', print: $verbose).and_return('')
+        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name', print: $verbose).and_return('')
 
         expect(test_ui).to receive(:input).and_return(plugin_name)
         expect(test_ui).to receive(:input).and_return(author)
