@@ -223,6 +223,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :decimals,
                                       env_name: "FL_SLATHER_DECIMALS",
                                       description: "The amount of decimals to use for % coverage reporting",
+                                      is_string: false,
                                       default_value: false,
                                       optional: true)
         ]
