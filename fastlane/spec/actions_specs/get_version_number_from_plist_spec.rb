@@ -1,6 +1,3 @@
-require 'xcodeproj'
-include Xcodeproj
-
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Get Version Number from Info.plist Integration" do
