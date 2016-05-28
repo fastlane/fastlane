@@ -1280,8 +1280,7 @@ You can also only receive the version number without modifying it
 version = get_version_number(xcodeproj: "Project.xcodeproj")
 ```
 
-### [increment_version_number_in_plist](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
-This action will increment the **version number**. You first have to [set up your Xcode project](https://developer.apple.com/library/ios/qa/qa1827/_index.html), if you haven't done it already.
+### increment_version_number_in_plist
 
 ```ruby
 increment_version_number_in_plist # Automatically increment patch version number.
