@@ -49,9 +49,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will return the current version number set on your project.",
-          "You first have to set up your Xcode project, if you haven't done it already:",
-          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
+          "This action will return path to Info.plist for specific target in your project.",
         ].join(' ')
       end
 
@@ -74,10 +72,6 @@ module Fastlane
                              description: "Specify a specific build configuration if you have different Info.plist build settings for each configuration")
 
         ]
-      end
-
-      def self.output
-        []
       end
 
       def self.authors
