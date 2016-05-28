@@ -49,7 +49,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will return path to Info.plist for specific target in your project.",
+          "This action will return path to Info.plist for specific target in your project."
         ].join(' ')
       end
 
