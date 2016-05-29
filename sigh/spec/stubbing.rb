@@ -23,6 +23,6 @@ def stub_spaceship
   end
 end
 
-def stub_request_valid_identities resign, value
+def stub_request_valid_identities(resign, value)
   expect(resign).to receive(:request_valid_identities).and_return(value)
 end

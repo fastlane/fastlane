@@ -1,6 +1,5 @@
 describe Sigh do
   describe Sigh::Resign do
-    
     IDENTITY_1_NAME = "iPhone Developer: ed.belarus@gmail.com (ABCDEFGHIJ)"
     IDENTITY_1_SHA1 = "T123XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYY"
     IDENTITY_2_NAME = "iPhone Distribution: Some Company LLC  (F12345678F)"
@@ -18,18 +17,18 @@ describe Sigh do
     end
 
     it "Installed identities parser" do
-      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)      
+      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identities
       expect(actualresult.keys.count).to eq(3)
       expect(actualresult[IDENTITY_1_SHA1]).to eq(IDENTITY_1_NAME)
       expect(actualresult[IDENTITY_2_SHA1]).to eq(IDENTITY_2_NAME)
       expect(actualresult[IDENTITY_3_SHA1]).to eq(IDENTITY_3_NAME)
-    end      
+    end
 
     it "Installed identities descriptions" do
       stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identity_descriptions
-      result = ["#{IDENTITY_1_NAME}","\t#{IDENTITY_1_SHA1}","#{IDENTITY_2_NAME}","\t#{IDENTITY_2_SHA1}","\t#{IDENTITY_3_SHA1}"]
+      result = [IDENTITY_1_NAME, "\t#{IDENTITY_1_SHA1}", IDENTITY_2_NAME, "\t#{IDENTITY_2_SHA1}", "\t#{IDENTITY_3_SHA1}"]
       expect(actualresult).to eq(result)
     end
 
@@ -44,6 +43,5 @@ describe Sigh do
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_1_SHA1)
       expect(actualresult).to eq(IDENTITY_1_SHA1)
     end
-
   end
 end

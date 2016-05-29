@@ -92,7 +92,7 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-        until (signing_identity = sha1_for_signing_identity(signing_identity))        
+      until (signing_identity = sha1_for_signing_identity(signing_identity))        
         UI.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
@@ -127,7 +127,7 @@ module Sigh
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n"    
+      UI.message "Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n"
     end
 
     def ask_for_signing_identity
@@ -141,14 +141,14 @@ module Sigh
       ids = {}
       available.split("\n").each do |current|
         begin
-         sha1 = current.match(/[a-zA-Z0-9]{40}/).to_s
-         name = current.match(/.*\"(.*)\"/)[1]
-         ids[sha1] = name
+          sha1 = current.match(/[a-zA-Z0-9]{40}/).to_s
+          name = current.match(/.*\"(.*)\"/)[1]
+          ids[sha1] = name
         rescue
           nil
         end # the last line does not match
       end
- 
+
       ids
     end
 
@@ -163,7 +163,7 @@ module Sigh
         # Show SHA-1 for homonymous identities
         descriptions += identities.map do |sha1, _|
           "\t#{sha1}"
-        end 
+        end
       end
       descriptions
     end
