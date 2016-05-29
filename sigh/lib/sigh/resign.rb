@@ -92,7 +92,7 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until (signing_identity = sha1_for_signing_identity(signing_identity))        
+      until (signing_identity = sha1_for_signing_identity(signing_identity))
         UI.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
