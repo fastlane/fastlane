@@ -8,7 +8,7 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
-    let(:plugin_info) { Fastlane::PluginInfo.new('tester', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary') }
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester_thing', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary') }
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
@@ -24,11 +24,11 @@ describe Fastlane::PluginGenerator do
         allow(test_ui).to receive(:input).and_raise(":input call was not mocked!")
         allow(test_ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
 
-        generator = Fastlane::PluginGenerator.new(test_ui)
-
         tmp_dir = Dir.mktmpdir
         oldwd = Dir.pwd
         Dir.chdir(tmp_dir)
+
+        generator = Fastlane::PluginGenerator.new(ui: test_ui, dest_root: tmp_dir)
 
         expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email', print: $verbose).and_return('')
         expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name', print: $verbose).and_return('')
@@ -125,7 +125,7 @@ describe Fastlane::PluginGenerator do
         # we'll get the all_classes helper method defined. This ensures
         # that the syntax is valid, and lets us interrogate the class for
         # the behavior!
-        action_class = Object.const_get("Fastlane::#{plugin_name.capitalize}")
+        action_class = Object.const_get("Fastlane::#{plugin_name.fastlane_class}")
 
         all_classes = action_class.all_classes
         expect(all_classes).to contain_exactly(
@@ -180,7 +180,7 @@ describe Fastlane::PluginGenerator do
       # we'll get the Action class defined. This ensures that the
       # syntax is valid, and lets us interrogate the class for its
       # behavior!
-      action_class = Object.const_get("Fastlane::Actions::#{plugin_name.capitalize}Action")
+      action_class = Object.const_get("Fastlane::Actions::#{plugin_name.fastlane_class}Action")
 
       # Check that the default `run` method behavior calls UI.message
       expect(UI).to receive(:message).with(/#{plugin_name}/)
@@ -237,7 +237,7 @@ describe Fastlane::PluginGenerator do
       # we'll get the helper class defined. This ensures that the
       # syntax is valid, and lets us interrogate the class for its
       # behavior!
-      helper_class = Object.const_get("Fastlane::Helper::#{plugin_name.capitalize}Helper")
+      helper_class = Object.const_get("Fastlane::Helper::#{plugin_name.fastlane_class}Helper")
 
       # Check that the class was successfully defined
       expect(UI).to receive(:message).with(/#{plugin_name}/)
@@ -253,7 +253,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a action_spec.rb file" do
-      action_spec_file = File.join(tmp_dir, gem_name, 'spec', 'action_spec.rb')
+      action_spec_file = File.join(tmp_dir, gem_name, 'spec', "#{plugin_name}_action_spec.rb")
       expect(File.exist?(action_spec_file)).to be(true)
 
       # Actually run our generated spec as part of this spec #yodawg

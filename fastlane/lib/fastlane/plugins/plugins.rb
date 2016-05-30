@@ -1,3 +1,7 @@
+require 'fileutils'
+require 'erb'
+require 'find'
+
 require 'fastlane/plugins/plugin_info'
 require 'fastlane/plugins/plugin_generator'
 require 'fastlane/plugins/plugin_generator_ui'
