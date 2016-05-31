@@ -15,6 +15,10 @@ module Fastlane
     end
 
     def determine_version(name)
+      self.class.determine_version(name)
+    end
+
+    def self.determine_version(name)
       super(name) || Fastlane::VERSION
     end
   end
