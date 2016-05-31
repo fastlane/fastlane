@@ -14,7 +14,6 @@ module Pilot
       imported_tester_count = 0
 
       CSV.foreach(file, "r") do |row|
-
         first_name, last_name, email = row
 
         unless email
