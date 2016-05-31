@@ -35,7 +35,7 @@ module Fastlane
         # Construct our flags
         flags = []
         flags << "-p #{project_dir.shellescape}"
-        flags << params[:properties].map { |k, v| "-P#{k}=#{v}" }.join(' ') unless params[:properties].nil?
+        flags << params[:properties].map { |k, v| "-P#{k.to_s.shellescape}=#{v.to_s.shellescape}" }.join(' ') unless params[:properties].nil?
         flags << params[:flags] unless params[:flags].nil?
 
         # Run the actual gradle task
