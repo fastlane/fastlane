@@ -2435,10 +2435,10 @@ fastlane_version "1.50.0"
 Install an Xcode plugin for the current user
 
 ```ruby
-install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+install_xcode_plugin(url: 'https://example.com/clubmate/plugin.zip')
 ```
 
-You can also let fastlane pick the latest version of a plugin automatically, if it is hosted on GitHub
+You can also let `fastlane` pick the latest version of a plugin automatically, if it is hosted on GitHub
 
 ```ruby
 install_xcode_plugin(github: 'https://github.com/contentful/ContentfulXcodePlugin')
