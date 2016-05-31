@@ -21,7 +21,11 @@ module Fastlane
     end
 
     def pluginfile_path
-      File.join(FastlaneFolder.path, PLUGINFILE_NAME) if FastlaneFolder.path
+      if FastlaneFolder.path
+        return File.join(FastlaneFolder.path, PLUGINFILE_NAME)
+      else
+        return nil
+      end
     end
 
     def gemfile_content
@@ -67,6 +71,7 @@ module Fastlane
     #####################################################
 
     def add_dependency(plugin_name)
+      UI.user_error!("fastlane is not setup for this project, make sure you have a fastlane folder") unless pluginfile_path
       plugin_name = self.class.plugin_prefix + plugin_name unless plugin_name.start_with?(self.class.plugin_prefix)
 
       unless plugin_is_added_as_dependency?(plugin_name)
