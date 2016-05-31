@@ -23,7 +23,7 @@ module Fastlane
         unless params[:apns_p12].nil?
           data = File.read(params[:apns_p12])
           apns_p12 = Base64.encode64(data)
-          payload["apns_env"] = [:apns_env]
+          payload["apns_env"] = params[:apns_env]
           payload["apns_p12"] = apns_p12
           # we need to have something for the p12 password, even if it's an empty string
           payload["apns_p12_password"] = apns_p12_password || ""
