@@ -2,46 +2,12 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
-  # rubocop:disable Metrics/ModuleLength
   module Helper
-    # Logging happens using this method
+    # This method is deprecated, use the `UI` class
+    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
     def self.log
-      $stdout.sync = true
-
-      if is_test?
-        @log ||= Logger.new(nil) # don't show any logs when running tests
-      else
-        @log ||= Logger.new($stdout)
-      end
-
-      @log.formatter = proc do |severity, datetime, progname, msg|
-        string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
-        string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
-        second = "#{msg}\n"
-
-        if severity == "DEBUG"
-          string = string.magenta
-        elsif severity == "INFO"
-          string = string.white
-        elsif severity == "WARN"
-          string = string.yellow
-        elsif severity == "ERROR"
-          string = string.red
-        elsif severity == "FATAL"
-          string = string.red.bold
-        end
-
-        [string, second].join("")
-      end
-
-      @log
-    end
-
-    # This method can be used to add nice lines around the actual log
-    # Use this to log more important things
-    # The logs will be green automatically
-    def self.log_alert(text)
-      UI.header(text)
+      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.current.log
     end
 
     # Runs a given command using backticks (`)
@@ -166,7 +132,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)
@@ -178,5 +144,4 @@ module FastlaneCore
       end
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end

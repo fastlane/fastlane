@@ -55,14 +55,15 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"    # One of: build, bootstrap, update, archive. (default: bootstrap)
-  use_ssh: false,         # Use SSH for downloading GitHub repositories.
-  use_submodules: false,  # Add dependencies as Git submodules.
-  use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
-  no_build: false,        # When bootstrapping Carthage do not build
-  no_skip_current: false, # Don't skip building the current project (only for frameworks)
-  verbose: false,         # Print xcodebuild output inline
-  platform: "all"         # Define which platform to build for
+  command: "bootstrap"     # One of: build, bootstrap, update, archive. (default: bootstrap)
+  use_ssh: false,          # Use SSH for downloading GitHub repositories.
+  use_submodules: false,   # Add dependencies as Git submodules.
+  use_binaries: true,      # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,         # When bootstrapping Carthage do not build
+  no_skip_current: false,  # Don't skip building the current project (only for frameworks)
+  verbose: false,          # Print xcodebuild output inline
+  platform: "all",         # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
+  configuration: "Release" # Build configuration to use when building
 )
 ```
 
@@ -106,7 +107,7 @@ gradle(
 )
 ```
 
-In case of an `assemble` task, the signed apk path is accessible in: `Actions.lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
+In case of an `assemble` task, the signed apk path is accessible in: `lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
 
 
 You can pass [gradle properties](https://docs.gradle.org/current/userguide/build_environment.html):
@@ -296,8 +297,17 @@ This will make sure to use the correct Xcode for later actions.
 xcode_install(version: "7.1")
 ```
 
+### xcversion
+
+Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version).
+
+```ruby
+xcversion version: "7.1" # Selects Xcode 7.1.0
+xcversion version: "~> 7.1.0" # Selects the latest installed version from the 7.1.x set
+```
+
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
-Use this command if you are supporting multiple versions of Xcode
+Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
@@ -305,7 +315,7 @@ xcode_select "/Applications/Xcode6.1.app"
 
 ### [Xcake](https://github.com/jcampbell05/xcake/)
 
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
+If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake make` before building your app.
 
 ```ruby
 xcake
@@ -886,7 +896,7 @@ See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/F
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
 crashlytics(
-  crashlytics_path: './Crashlytics.framework', # path to your 'Crashlytics.framework'
+  crashlytics_path: './Pods/Crashlytics/', # path to your Crashlytics submit binary.
   api_token: '...',
   build_secret: '...',
   ipa_path: './app.ipa'
@@ -921,6 +931,19 @@ _not_
 #### Environment Variables
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
+
+### Apteligent
+
+Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolication.
+
+```ruby
+apteligent(
+  app_id: '...',
+  api_key: '...'
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
 
 ### `download_dsyms`
 
@@ -1093,6 +1116,7 @@ nexus_upload(
   repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
+  repo_classifier: "dSYM", # Optional
   endpoint: "http://localhost:8081",
   username: "admin",
   password: "admin123"
@@ -1101,14 +1125,30 @@ nexus_upload(
 
 ### [Appetize.io](https://appetize.io/)
 
-Upload your zipped app to Appetize.io
+Upload your zipped app to Appetize.io to stream your app in the browser.
 
 ```ruby
 appetize(
-  api_token: 'yourapitoken',
-  url: 'https://example.com/your/zipped/app.zip',
-  private_key: 'yourprivatekey'
+  path: './MyApp.zip',
+  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
+  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
 )
+```
+
+If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
+
+#### `device_grid` for your Pull Requests
+
+![../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png](../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png)
+
+Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) to get a grid of devices every time you submit a pull request. The app will be uploaded to [appetize.io](https://appetize.io/) so you can stream and try them right in your browser.
+
+[Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
+
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
+
+```objective-c
+[[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
 ```
 
 ### [Appaloosa](https://www.appaloosa-store.com)
@@ -1341,6 +1381,17 @@ badge(shield: "Version-0.0.3-blue", no_badge: true)
 
 **Note** If you want to reset the badge back to default you can use `sh "git checkout -- <path>/Assets.xcassets/"`
 
+### update_urban_airship_configuration
+
+Easily update the AirshipConfig.plist for different deployment targets.
+
+```ruby
+update_urban_airship_configuration(
+  plist_path: "AirshipConfig.plist",
+  production_app_key: "PRODKEY",
+  production_app_secret: "PRODSECRET"
+)  
+```
 
 ## Developer Portal
 
@@ -1632,7 +1683,7 @@ add_git_tag(
 )
 ```
 
-[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile#L105) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### git_pull
 
@@ -1964,6 +2015,19 @@ flock(
 To obtain the token, create a new
 [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)
 in your Flock admin panel.
+
+### [JIRA](https://www.atlassian.com/software/jira)
+Leave a comment on a JIRA ticket.
+
+```ruby
+jira(
+  url: "https://bugs.yourdomain.com",
+  username: "Your username",
+  password: "Your password",
+  ticket_id: "Ticket ID, i.e. IOS-123",
+  comment_text: "Text to post as a comment"
+)
+```
 
 ## Other
 
@@ -2520,4 +2584,16 @@ pod_lib_lint(allow_warnings: true)
 
 # If the podspec has a dependency on another private pod, then you will have to supply the sources
 pod_lib_lint(sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
+```
+
+### set_pod_key
+
+Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys).
+
+```ruby
+set_pod_key(
+  key: 'APIToken',
+  value: '1234',
+  project: 'MyProject'
+)
 ```

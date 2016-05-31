@@ -22,7 +22,10 @@ module FastlaneCore
 
       def releases(gem_name)
         url = "https://api.github.com/repos/fastlane/#{gem_name}/releases"
-        JSON.parse(Excon.get(url).body)
+        # We have to follow redirects, since some repos were moved away into a separate org
+        server_response = Excon.get(url,
+                                    middlewares: Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower])
+        JSON.parse(server_response.body)
       end
     end
   end

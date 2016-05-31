@@ -5,6 +5,15 @@ describe Match do
       git_bare.repo.to_s
     end
 
+    let :git_url_with_test_branch do
+      git_bare = Git.init(Dir.mktmpdir, bare: true)
+      git = Git.clone(git_bare.repo.to_s, ".", {path: Dir.mktmpdir})
+      git.checkout(["--orphan", "test"])
+      git.commit("initial commit", allow_empty: true)
+      git.push(:origin, "test")
+      git_bare.repo.to_s
+    end
+
     after do
       FileUtils.rm_rf(git_url)
     end
@@ -23,6 +32,7 @@ describe Match do
     describe "#clone" do
       it "skips README file generation if so requested" do
         shallow_clone = false
+        foobar = git_url
         result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
@@ -40,6 +50,24 @@ describe Match do
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+      end
+
+      it "checks out a new branch" do
+        shallow_clone = false
+        git_branch = "test"
+        result = Match::GitHelper.clone(git_url, shallow_clone, branch: git_branch)
+        expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(Git.open(result).current_branch).to eq(git_branch)
+      end
+
+      it "checks out an existing branch" do
+        shallow_clone = false
+        git_branch = "test"
+        result = Match::GitHelper.clone(git_url_with_test_branch, shallow_clone, branch: git_branch)
+        expect(File.directory?(result)).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(Git.open(result).current_branch).to eq(git_branch)
       end
 
       after(:each) do

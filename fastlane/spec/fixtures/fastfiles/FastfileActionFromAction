@@ -1,0 +1,5 @@
+platform :ios do
+  lane :something do
+    action_from_action
+  end
+end

@@ -13,10 +13,10 @@ module FastlaneCore
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
-        Helper.log.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
-                    'To avoid issues in the future, you should not use ' \
-                    'TextEdit for editing it. If you are not using TextEdit, ' \
-                    'you should turn off smart quotes in your editor of choice.'.red
+        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
+                  'To avoid issues in the future, you should not use ' \
+                  'TextEdit for editing it. If you are not using TextEdit, ' \
+                  'you should turn off smart quotes in your editor of choice.')
       end
 
       begin

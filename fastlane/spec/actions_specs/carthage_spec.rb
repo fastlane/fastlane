@@ -78,7 +78,7 @@ describe Fastlane do
               platform: 'thisistest'
             )
           end").runner.execute(:test)
-        end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS")
+        end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, tvOS, watchOS")
       end
 
       it "default use case is boostrap" do
@@ -243,6 +243,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
+      it "sets the platform to all" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'all'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform all")
+      end
+
       it "sets the platform to iOS" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -263,6 +273,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --platform Mac")
       end
 
+      it "sets the platform to tvOS" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'tvOS'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform tvOS")
+      end
+
       it "sets the platform to watchOS" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -271,6 +291,47 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap --platform watchOS")
+      end
+
+      it "can be set to multiple the platforms" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'iOS,Mac'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform iOS,Mac")
+      end
+
+      it "sets the configuration to Release" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: 'Release'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --configuration Release")
+      end
+
+      it "raises an error if configuration is empty" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              configuration: ' '
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
+      end
+
+      it "use custom derived data" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              derived_data: '../derived data'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap --derived-data ../derived\\ data")
       end
 
       it "works with no parameters" do

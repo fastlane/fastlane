@@ -12,7 +12,7 @@ module Fastlane
           UI.success('Mercurial status is clean, all good! 😎')
           Actions.lane_context[SharedValues::HG_REPO_WAS_CLEAN_ON_START] = true
         else
-          raise 'Mercurial repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.'.red
+          UI.user_error!('Mercurial repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.')
         end
       end
 

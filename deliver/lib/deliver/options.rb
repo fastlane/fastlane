@@ -82,6 +82,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
+                                     env_name: "DELIVER_SUBMIT_FOR_REVIEW",
                                      description: "Submit the new version for Review after uploading everything",
                                      is_string: false,
                                      default_value: false),
@@ -134,6 +135,16 @@ module Deliver
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :dev_portal_team_id,
+                                     short_option: "-s",
+                                     env_name: "DELIVER_DEV_PORTAL_TEAM_ID",
+                                     description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
+                                     optional: true,
+                                     is_string: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
 
         # App Metadata

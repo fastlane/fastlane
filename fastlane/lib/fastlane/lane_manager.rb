@@ -9,7 +9,7 @@ module Fastlane
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -103,7 +103,7 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a
+      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end

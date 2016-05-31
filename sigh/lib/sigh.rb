@@ -2,6 +2,7 @@ require 'sigh/version'
 require 'sigh/resign'
 require 'sigh/manager'
 require 'sigh/options'
+require 'sigh/local_manage'
 
 require 'fastlane_core'
 

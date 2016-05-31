@@ -65,7 +65,7 @@ describe Spaceship::Client do
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         adp_stub_multiple_teams
-        expect(subject.team_id).to eq("XXXXXXXXXX")
+        expect(subject.team_id).to eq("SecondTeam")
       end
     end
 
@@ -78,7 +78,7 @@ describe Spaceship::Client do
 
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({ csrf: 'top_secret', csrf_ts: '123123' })
-        allow(subject).to receive(:page_size).and_return(10) # to have a seperate stubbing
+        allow(subject).to receive(:page_size).and_return(10) # to have a separate stubbing
 
         expect(subject.devices.count).to eq(4)
       end

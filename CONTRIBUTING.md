@@ -87,8 +87,7 @@ If you're considering contibuting new functionality, please open a new issue exp
 
 To submit the changes to the fastlane repo, you have to do the following:
 
-- Squash your commits into one. For example, to squash three commits into one, do the following: `$ git rebase -i HEAD~3`. In the text editor that comes up, replace the words "pick" with "squash" next to the commits you want to squash. Save and close the editor. For more information, take a look at [7.6 Git Tools - Rewriting History](http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
-- Run `git push upstream master`. If you pushed before squashing, go back and do the previous step, and then run `git push upstream master --force`
+- Run `git push upstream master`. 
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
 ## What Do All These Labels Mean?
@@ -140,7 +139,7 @@ You then jump into an interactive debugger that allows you to print out variable
 
 In the directory of one project, run the tests using
 
-`rake test`
+`rake test_all`
 
 This will do a few things:
 
@@ -168,7 +167,7 @@ rspec -t now
 
 The `fastlane` repos use [rubocop](https://github.com/bbatsov/rubocop) to validate the code style.
 
-The style validation is automatically done when running `rake test`.
+The style validation is automatically done when running `rake test_all`.
 
 To automatically fix common code style issues (e.g. wrong spacing), run `rubocop -a`
 

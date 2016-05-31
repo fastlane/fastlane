@@ -28,10 +28,28 @@ module Fastlane
         end
 
         UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
-        UI.verbose(command.join(" ")) if $verbose
-        Actions.sh(command.join(" "), log: false)
+
+        sanitizer = proc do |message|
+          message.gsub(params[:api_token], '[[API_TOKEN]]')
+                 .gsub(params[:build_secret], '[[BUILD_SECRET]]')
+        end
+
+        UI.verbose sanitizer.call(command.join(' ')) if $verbose
+
+        error_callback = proc do |error|
+          clean_error = sanitizer.call(error)
+          UI.error(clean_error)
+        end
+
+        result = Actions.sh_control_output(
+          command.join(" "),
+          print_command: false,
+          print_command_output: false,
+          error_callback: error_callback)
 
         return command if Helper.test?
+
+        UI.verbose sanitizer.call(result) if $verbose
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
       end
@@ -41,12 +59,22 @@ module Fastlane
       end
 
       def self.available_options
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+
+        if platform == :ios or platform.nil?
+          ipa_path_default = Dir["*.ipa"].last
+        end
+
+        if platform == :android
+          apk_path_default = Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last
+        end
+
         [
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].last,
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -55,7 +83,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :apk_path,
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
-                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || apk_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -64,7 +92,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :crashlytics_path,
                                        env_name: "CRASHLYTICS_FRAMEWORK_PATH",
                                        description: "Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)",
-                                       default_value: Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find crashlytics at path '#{File.expand_path(value)}'`") unless File.exist?(File.expand_path(value))

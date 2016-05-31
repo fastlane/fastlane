@@ -29,6 +29,11 @@ module Spaceship
       # @return (Boolean) Is this build currently processing?
       attr_accessor :processing
 
+      # @return (String) The build processing state, may be nil
+      # @example "invalidBinary"
+      # @example "processingFailed"
+      attr_accessor :processing_state
+
       # @return (Integer) The number of ticks since 1970 (e.g. 1413966436000)
       attr_accessor :upload_date
 
@@ -91,6 +96,7 @@ module Spaceship
         'id' => :id,
         'valid' => :valid,
         'processing' => :processing,
+        'processingState' => :processing_state,
 
         'installCount' => :install_count,
         'internalInstallCount' => :internal_install_count,
@@ -230,6 +236,7 @@ end
 #  "exceededFileSizeLimit"=>false,
 #  "wentLiveWithVersion"=>false,
 #  "processing"=>false,
+#  "processingState": nil,
 #  "id"=>5298023,
 #  "valid"=>true,
 #  "missingExportCompliance"=>false,

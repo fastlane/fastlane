@@ -3,6 +3,10 @@ module Fastlane
     class CrashlyticsHelper
       class << self
         def generate_ios_command(params)
+          unless params[:crashlytics_path]
+            params[:crashlytics_path] = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+          end
+
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
           submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
           submit_binary ||= "Crashlytics.framework/submit" if Helper.test?

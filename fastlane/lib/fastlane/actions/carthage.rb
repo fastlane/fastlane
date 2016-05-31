@@ -12,16 +12,22 @@ module Fastlane
         cmd << "--no-skip-current" if params[:no_skip_current] == true
         cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
+        cmd << "--configuration #{params[:configuration]}" if params[:configuration]
+        cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
 
         Actions.sh(cmd.join(' '))
       end
 
       def self.description
-        "Runs `carthage bootstrap` or `carthage update` for your project"
+        "Runs `carthage` for your project"
       end
 
       def self.available_commands
         %w(build bootstrap update archive)
+      end
+
+      def self.available_platforms
+        %w(all iOS Mac tvOS watchOS)
       end
 
       def self.available_options
@@ -73,6 +79,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid value for no_skip_current. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :derived_data,
+                                       env_name: "FL_CARTHAGE_DERIVED_DATA",
+                                       description: "Use derived data folder at path",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_CARTHAGE_VERBOSE",
                                        description: "Print xcodebuild output inline",
@@ -86,7 +96,18 @@ module Fastlane
                                        description: "Define which platform to build for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid platform. Use one of the following: all, iOS, Mac, watchOS") unless ["all", "iOS", "Mac", "watchOS"].include? value
+                                         value.split(',').each do |platform|
+                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? platform
+                                         end
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_CARTHAGE_CONFIGURATION",
+                                       description: "Define which build configuration to use when building",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         if value.chomp(' ').empty?
+                                           UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
+                                         end
                                        end)
         ]
       end
