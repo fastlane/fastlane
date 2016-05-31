@@ -4,6 +4,12 @@ module Fastlane
       def self.run(params)
         require 'fileutils'
 
+        if params.fetch(:github, ask: false)
+          github_api_url = params[:github].sub('https://github.com', 'https://api.github.com/repos')
+          release = self.fetch_json(github_api_url + '/releases/latest')
+          params[:url] = release['assets'][0]['browser_download_url']
+        end
+
         zip_path = File.join(Dir.tmpdir, 'plugin.zip')
         sh "curl -Lso #{zip_path} #{params[:url]}"
         plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
@@ -12,6 +18,12 @@ module Fastlane
 
         UI.success("Plugin #{File.basename(params[:url], '.zip')} installed successfully")
         UI.message("Please restart Xcode to use the newly installed plugin")
+      end
+
+      def self.fetch_json(url)
+        require 'excon'
+        require 'json'
+        JSON.parse(Excon.get(url).body)
       end
 
       #####################################################
@@ -29,6 +41,13 @@ module Fastlane
                                        description: "URL for Xcode plugin ZIP file",
                                        verify_block: proc do |value|
                                          UI.user_error!("No URL for InstallXcodePluginAction given, pass using `url: 'url'`") if value.to_s.length == 0
+                                         UI.user_error!("URL doesn't use HTTPS") unless value.start_with?("https://")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :github,
+                                       env_name: "FL_XCODE_PLUGIN_GITHUB",
+                                       description: "GitHub repository URL for Xcode plugin",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("No GitHub URL for InstallXcodePluginAction given, pass using `github: 'url'`") if value.to_s.length == 0
                                          UI.user_error!("URL doesn't use HTTPS") unless value.start_with?("https://")
                                        end)
         ]

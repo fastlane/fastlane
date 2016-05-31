@@ -2438,6 +2438,12 @@ Install an Xcode plugin for the current user
 install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
 ```
 
+You can also let fastlane pick the latest version of a plugin automatically, if it is hosted on GitHub
+
+```ruby
+install_xcode_plugin(github: 'https://github.com/contentful/ContentfulXcodePlugin')
+```
+
 ### opt_out_usage
 
 Add this your `Fastfile` to not send any data to the fastlane web service. You can also use the `FASTLANE_OPT_OUT_USAGE` environment variable. No personal data is shared, more information on [https://github.com/fastlane/enhancer](https://github.com/fastlane/enhancer)
