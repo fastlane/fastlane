@@ -10,6 +10,7 @@ module Fastlane
     def self.start
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
+      Fastlane::PluginManager.load_plugins
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -170,8 +171,53 @@ module Fastlane
         end
       end
 
-      default_command :trigger
+      #####################################################
+      # @!group Plugins
+      #####################################################
 
+      command :create_plugin do |c|
+        c.syntax = 'fastlane create_plugin [plugin_name]'
+        c.description = 'Create a new plugin that can be used with fastlane'
+
+        c.action do |args, options|
+          PluginGenerator.new.generate
+        end
+      end
+
+      command :add_plugin do |c|
+        c.syntax = 'fastlane add_plugin [plugin_name]'
+        c.description = 'Add a new plugin to your fastlane setup'
+
+        c.action do |args, options|
+          pm = PluginManager.new
+          args.each do |plugin_name|
+            pm.add_dependency(plugin_name)
+          end
+
+          UI.important("Make sure to commit your Gemfile, Gemfile.lock and #{PluginManager::PLUGINSFILE_NAME} to version control")
+          pm.install_dependencies!
+        end
+      end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane install_plugins'
+        c.description = 'Install all plugins for this project'
+
+        c.action do |args, options|
+          PluginManager.new.install_dependencies!
+        end
+      end
+
+      command :update_plugins do |c|
+        c.syntax = 'fastlane update_plugins'
+        c.description = 'Update all plugin dependencies'
+
+        c.action do |args, options|
+          PluginManager.new.update_dependencies!
+        end
+      end
+
+      default_command :trigger
       run!
     end
 

@@ -1,5 +1,14 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
+require 'bundler'
+begin
+  Bundler.setup
+rescue Bundler::GemNotFound
+  puts "Installing dependencies"
+  require 'fastlane/plugin_manager'
+  Fastlane::PluginManager.new.install_dependencies!
+end
+
 require "fastlane/cli_tools_distributor"
 Fastlane::CLIToolsDistributor.take_off
