@@ -10,11 +10,13 @@ module Deliver
     def setup_deliver(file_path, data, deliver_path, options)
       File.write(file_path, data)
 
-      download_screenshots(deliver_path, options)
+      unless options[:skip_screenshots]
+        download_screenshots(deliver_path, options)
 
-      # Add a README to the screenshots folder
-      FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
-      File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
+        # Add a README to the screenshots folder
+        FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
+        File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
+      end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
