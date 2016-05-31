@@ -34,7 +34,8 @@ module Fastlane
     #   :xcversion
     #   "fastlane-plugin-my_plugin/xcversion"
     def self.determine_version(name)
-      return super(name) if super(name)
+      result = super(name)
+      return result if result
 
       if name.to_s.include?(PluginManager.plugin_prefix)
         # That's an action from a plugin, we need to fetch its version number

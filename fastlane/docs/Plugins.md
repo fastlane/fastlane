@@ -56,7 +56,8 @@ This will:
 
 - Add the plugin to `fastlane/Pluginfile`
 - Make sure your `fastlane/Pluginfile` is properly referenced from your `./Gemfile`
-- Run `bundle install` to make sure all required dependencies are installed on your local machine (this step might ask for your admin password to install Ruby gems)
+- Run `fastlane install_dependencies` to make sure all required dependencies are installed on your local machine (this step might ask for your admin password to install Ruby gems)
+- You'll have 3 new files, that should all be checked into version control: `Gemfile`, `Gemfile.lock` and `fastlane/Pluginfile`
 
 #### Plugin Source
 
@@ -99,9 +100,9 @@ gem "fastlane-plugin-[plugin_name]"
 ### Create your own plugin
 
 ```
-cd ~/new/folder/[plugin_name]
+cd ~/new/folder/
 
-fastlane new_plugin
+fastlane new_plugin [plugin_name]
 ```
 
 - Create the directory structure that's needed to have a valid gem
