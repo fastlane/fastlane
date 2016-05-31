@@ -2,12 +2,12 @@ describe Fastlane do
   describe Fastlane::PluginManager do
     describe "#gemfile_path" do
       it "returns an absolute path if Gemfile available" do
-        expect(Fastlane::PluginManager.new.gemfile_path).to eq(File.expand_path("Gemfile"))
+        expect(Fastlane.plugin_manager.gemfile_path).to eq(File.expand_path("Gemfile"))
       end
 
       it "returns nil if no Gemfile available" do
         expect(Bundler::SharedHelpers).to receive(:default_gemfile).and_raise(Bundler::GemfileNotFound)
-        expect(Fastlane::PluginManager.new.gemfile_path).to eq(nil)
+        expect(Fastlane.plugin_manager.gemfile_path).to eq(nil)
       end
     end
 
@@ -20,24 +20,24 @@ describe Fastlane do
     describe "#available_gems" do
       it "returns [] if no Gemfile is available" do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_raise(Bundler::GemfileNotFound)
-        expect(Fastlane::PluginManager.new.available_gems).to eq([])
+        expect(Fastlane.plugin_manager.available_gems).to eq([])
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
-        expect(Fastlane::PluginManager.new.available_gems).to eq(["fastlane-plugin-xcversion", "fastlane_core", "hemal"])
+        expect(Fastlane.plugin_manager.available_gems).to eq(["fastlane-plugin-xcversion", "fastlane_core", "hemal"])
       end
     end
 
     describe "#available_plugins" do
       it "returns [] if no Gemfile is available" do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_raise(Bundler::GemfileNotFound)
-        expect(Fastlane::PluginManager.new.available_plugins).to eq([])
+        expect(Fastlane.plugin_manager.available_plugins).to eq([])
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
-        expect(Fastlane::PluginManager.new.available_plugins).to eq(["fastlane-plugin-xcversion"])
+        expect(Fastlane.plugin_manager.available_plugins).to eq(["fastlane-plugin-xcversion"])
       end
     end
 
@@ -47,48 +47,44 @@ describe Fastlane do
       end
 
       it "returns true if a plugin is available" do
-        expect(Fastlane::PluginManager.new.plugin_is_added_as_dependency?('fastlane-plugin-xcversion')).to eq(true)
+        expect(Fastlane.plugin_manager.plugin_is_added_as_dependency?('fastlane-plugin-xcversion')).to eq(true)
       end
 
       it "returns false if a plugin is available" do
-        expect(Fastlane::PluginManager.new.plugin_is_added_as_dependency?('fastlane-plugin-hemal')).to eq(false)
+        expect(Fastlane.plugin_manager.plugin_is_added_as_dependency?('fastlane-plugin-hemal')).to eq(false)
       end
 
       it "raises an error if parameter doesn't start with fastlane plugin prefix" do
         expect do
-          Fastlane::PluginManager.new.plugin_is_added_as_dependency?('hemal')
+          Fastlane.plugin_manager.plugin_is_added_as_dependency?('hemal')
         end.to raise_error("fastlane plugins must start with 'fastlane-plugin-' string")
       end
     end
 
     describe "#plugins_attached?" do
       it "returns true if plugins are attached" do
-        pm = Fastlane::PluginManager.new
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithAttached")
-        expect(pm.plugins_attached?).to eq(true)
+        expect(Fastlane.plugin_manager.plugins_attached?).to eq(true)
       end
 
       it "returns false if plugins are not attached" do
-        pm = Fastlane::PluginManager.new
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithoutAttached")
-        expect(pm.plugins_attached?).to eq(false)
+        expect(Fastlane.plugin_manager.plugins_attached?).to eq(false)
       end
     end
 
     describe "#install_dependencies!" do
       it "execs out the correct command" do
-        pm = Fastlane::PluginManager.new
-        expect(pm).to receive(:ensure_plugins_attached!)
-        expect(pm).to receive(:exec).with("bundle install --quiet && echo 'Successfully installed plugins'")
-        pm.install_dependencies!
+        expect(Fastlane.plugin_manager).to receive(:ensure_plugins_attached!)
+        expect(Fastlane.plugin_manager).to receive(:exec).with("bundle install --quiet && echo 'Successfully installed plugins'")
+        Fastlane.plugin_manager.install_dependencies!
       end
     end
 
     describe "#gem_dependency_suffix" do
       it "default to RubyGems if gem is available" do
-        pm = Fastlane::PluginManager.new
         expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return({anything: :really})
-        expect(pm.gem_dependency_suffix("fastlane")).to eq("")
+        expect(Fastlane.plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
       end
 
       describe "Gem is not available on RubyGems.org" do
@@ -97,23 +93,20 @@ describe Fastlane do
         end
 
         it "supports specifying a custom local path" do
-          pm = Fastlane::PluginManager.new
           expect(FastlaneCore::UI.current).to receive(:select).and_return("Local Path")
           expect(FastlaneCore::UI.current).to receive(:input).and_return("../yoo")
-          expect(pm.gem_dependency_suffix("fastlane")).to eq(", path: '../yoo'")
+          expect(Fastlane.plugin_manager.gem_dependency_suffix("fastlane")).to eq(", path: '../yoo'")
         end
 
         it "supports specifying a custom git URL" do
-          pm = Fastlane::PluginManager.new
           expect(FastlaneCore::UI.current).to receive(:select).and_return("Git URL")
           expect(FastlaneCore::UI.current).to receive(:input).and_return("https://github.com/fastlane/fastlane")
-          expect(pm.gem_dependency_suffix("fastlane")).to eq(", git: 'https://github.com/fastlane/fastlane'")
+          expect(Fastlane.plugin_manager.gem_dependency_suffix("fastlane")).to eq(", git: 'https://github.com/fastlane/fastlane'")
         end
 
         it "supports falling back to RubyGems" do
-          pm = Fastlane::PluginManager.new
           expect(FastlaneCore::UI.current).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
-          expect(pm.gem_dependency_suffix("fastlane")).to eq("")
+          expect(Fastlane.plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
         end
       end
     end
