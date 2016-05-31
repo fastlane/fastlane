@@ -1,6 +1,6 @@
 ## Timestamps
 
-To show timestamps in front of each row, set the `FASTLANE_SHOW_TIMESTAMP` environment variable.
+To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
 
 ## Interacting with the user
 
