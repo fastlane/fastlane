@@ -32,7 +32,6 @@ describe Match do
     describe "#clone" do
       it "skips README file generation if so requested" do
         shallow_clone = false
-        foobar = git_url
         result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
