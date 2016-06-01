@@ -60,10 +60,6 @@ Style/StringLiterals:
 Style/WordArray:
   MinSize: 19
 
-# Not a good thing
-Style/RedundantSelf:
-  Enabled: false
-
 # raise and fail are both okay
 Style/SignalException:
   Enabled: false
@@ -219,12 +215,6 @@ Style/MultilineOperationIndentation:
 # Cop supports --auto-correct.
 Style/NumericLiterals:
   MinDigits: 14
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
 
 # Offense count: 9
 # Cop supports --auto-correct.
