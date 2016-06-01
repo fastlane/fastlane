@@ -65,12 +65,12 @@ describe Fastlane do
         end.to raise_error(":between must not contain nil values")
       end
 
-      it "Does not accept a string value for :commits_count" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            changelog_from_git_commits(commits_count: 'abcd')
-          end").runner.execute(:test)
-        end.to raise_error(":commits_count must be an integer")
+      it "Converts a string value for :commits_count" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(commits_count: '10')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" -n 10")
       end
 
       it "Does not accept a :commits_count and :between at the same time" do
