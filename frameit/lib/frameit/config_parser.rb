@@ -89,6 +89,10 @@ module Frameit
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB'")
             end
           end
+
+          if key == 'show_complete_frame'
+            UI.user_error! "show_complete_frame must be true or false" unless !!value == value
+          end
         end
       end
     end
