@@ -431,7 +431,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new(response.body)
+        raise UnexpectedResponse.new, response.body
       else
         store_csrf_tokens(response)
         content
