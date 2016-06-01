@@ -38,7 +38,7 @@ module Fastlane
             transition = issue.transitions.build
             transition.save!("transition" => { "id" => transition_id })
 
-            if !comment_text.nil?
+            if comment_text
               comment = issue.comments.build
               comment.save({"body" => comment_text})
             end
@@ -53,7 +53,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Applies the defined JIRA transition to all the tickets mentioned in the changelog."
+        "Apply JIRA transitions to issues mentioned in the changelog"
       end
 
       def self.available_options
