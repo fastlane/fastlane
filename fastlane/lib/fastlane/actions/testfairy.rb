@@ -19,7 +19,7 @@ module Fastlane
 
         metrics_to_client = lambda do |metrics|
           metrics.map do |metric|
-          case metric
+            case metric
             when :cpu,:memory,:network,:gps,:battery,:mic,:wifi
               metric.to_s
             when :phone_signal
@@ -32,7 +32,7 @@ module Fastlane
 
         options_to_client = lambda do |options|
           options.map do |option|
-          case option
+            case option
             when :shake,:anonymous
               option.to_s
             when :video_only_wifi
@@ -43,7 +43,7 @@ module Fastlane
           end
         end
 
-        client_options = Hash[params.values.map do |key,value|
+        client_options = Hash[params.values.map do |key, value|
           case key
           when :api_key
             [key, value]
@@ -54,7 +54,7 @@ module Fastlane
           when :testers_groups
             [key, value.join(',')]
           when :metrics
-            [key, metrics_to_client.(value).join(',')]
+            [key, metrics_to_client.call(value).join(',')]
           when :icon_watermark
             ['icon-watermark', value]
           when :comment
@@ -64,7 +64,7 @@ module Fastlane
           when :notify
             [key, value]
           when :options
-            [key, options_to_client.(value).join(',')]
+            [key, options_to_client.call(value).join(',')]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
@@ -181,7 +181,7 @@ module Fastlane
       end
 
       def self.authors
-        ["taka0125","tcurdt"]
+        ["taka0125", "tcurdt"]
       end
 
       def self.is_supported?(platform)
