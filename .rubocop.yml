@@ -36,6 +36,10 @@ Style/GlobalVars:
 Style/FileName:
   Enabled: false
 
+# We want to allow class Fastlane::Class
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 # $? Exit
 Style/SpecialGlobalVars:
   Enabled: false
@@ -169,28 +173,6 @@ Metrics/ParameterLists:
 # Offense count: 3
 Metrics/PerceivedComplexity:
   Max: 18
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Alias:
-  Enabled: false
-
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
-  Enabled: false
-
-# Offense count: 22
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/ClassAndModuleChildren:
-  Enabled: false
 
 # Offense count: 19
 Style/Documentation:

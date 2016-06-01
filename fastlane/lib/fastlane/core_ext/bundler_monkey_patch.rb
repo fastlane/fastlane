@@ -8,7 +8,7 @@ if Object.const_defined?(:Bundler) &&
     !Bundler::SpecSet.instance_methods.include?(:size)
   module Bundler
     class SpecSet
-      alias_method :size, :length
+      alias size length
     end
   end
 end
