@@ -273,7 +273,7 @@ module Fastlane
         end
       end
 
-      if !loaded_plugins && Fastlane.plugin_manager.pluginfile_content.to_s.include?(PluginManager.plugin_prefix)
+      if !loaded_plugins && self.pluginfile_content.to_s.include?(PluginManager.plugin_prefix)
         UI.error("It seems like you wanted to load some plugins, however they couldn't be loaded")
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
