@@ -2,6 +2,10 @@
 
 If you're having trouble calling a plugin action, here is a simple guide on how to resolve the issue:
 
+### Make sure fastlane is up to date
+
+Run `fastlane -v` and `bundle exec fastlane -v` and make sure it's at least version 1.93.0.
+
 ### Update your plugins
 
 Run `fastlane update_plugins` to make sure to have all the latest plugins and their dependencies installed.

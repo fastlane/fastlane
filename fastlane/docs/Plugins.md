@@ -149,4 +149,4 @@ gem "fastlane-plugin-[plugin_name]", git: "https://github.com/[user]/[plugin_nam
 
 #### Multiple actions in one plugin
 
-Let's assume you work on a `fastlane` plugin for project management software. You could call it `fastlane-plugin-pm` and it may contain any number of actions and helpers, just add them to your `actions` folder.
+Let's assume you work on a `fastlane` plugin for project management software. You could call it `fastlane-plugin-pm` and it may contain any number of actions and helpers, just add them to your `actions` folder. Make sure to mention the available actions in your plugin's `README.md`.
