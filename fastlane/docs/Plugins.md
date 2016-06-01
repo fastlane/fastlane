@@ -1,5 +1,7 @@
 # fastlane Plugins
 
+The instructions below require `fastlane` 1.93.0 or higher
+
 ## Local actions
 
 You can create your own actions to extend the functionality of fastlane for your project. The action you create will behave exactly like the built in actions.
