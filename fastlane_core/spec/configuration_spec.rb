@@ -217,11 +217,12 @@ describe FastlaneCore do
 
         it "auto converts booleans as strings to booleans" do
           c = [
-            FastlaneCore::ConfigItem.new(key: :true_value),
-            FastlaneCore::ConfigItem.new(key: :true_value2),
-            FastlaneCore::ConfigItem.new(key: :false_value),
-            FastlaneCore::ConfigItem.new(key: :false_value2)
+            FastlaneCore::ConfigItem.new(key: :true_value, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :true_value2, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :false_value, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :false_value2, is_string: false)
           ]
+
           config = FastlaneCore::Configuration.create(c, {
             true_value: "true",
             true_value2: "YES",
@@ -233,6 +234,30 @@ describe FastlaneCore do
           expect(config[:true_value2]).to eq(true)
           expect(config[:false_value]).to eq(false)
           expect(config[:false_value2]).to eq(false)
+        end
+
+        it "auto converts strings to integers" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :int_value,
+                                         type: Integer)
+          ]
+          config = FastlaneCore::Configuration.create(c, {
+            int_value: "10"
+          })
+
+          expect(config[:int_value]).to eq(10)
+        end
+
+        it "auto converts '0' to the integer 0" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :int_value,
+                                         type: Integer)
+          ]
+          config = FastlaneCore::Configuration.create(c, {
+            int_value: "0"
+          })
+
+          expect(config[:int_value]).to eq(0)
         end
       end
 
