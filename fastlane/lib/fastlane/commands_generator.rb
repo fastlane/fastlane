@@ -184,7 +184,7 @@ module Fastlane
         c.description = 'Create a new plugin that can be used with fastlane'
 
         c.action do |args, options|
-          Fastlane.plugin_manager.generate args.shift
+          PluginGenerator.new.generate(args.shift)
         end
       end
 
