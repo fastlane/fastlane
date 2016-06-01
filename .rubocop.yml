@@ -117,8 +117,9 @@ Style/StringLiterals:
 Style/ConditionalAssignment:
   Enabled: false
 
-# Split
-
+# Better to have too much self than missing a self
+Style/RedundantSelf:
+  Enabled: false
 
 # e.g.
 # def self.is_supported?(platform)
@@ -229,21 +230,10 @@ Style/PerlBackrefs:
 Style/RedundantReturn:
   Enabled: false
 
-# Offense count: 77
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Enabled: false
-
 # Offense count: 38
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/SignalException:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-Style/SpaceInsideBlockBraces:
   Enabled: false
 
 # Offense count: 9
