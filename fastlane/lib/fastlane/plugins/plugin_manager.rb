@@ -252,14 +252,11 @@ module Fastlane
     #   fastlane-plugin-[plugin_name]
     # This will make sure to load the action
     # and all its helpers
-    def self.load_plugins
+    def load_plugins
       UI.verbose("Checking if there are any plugins that should be loaded...")
 
       loaded_plugins = false
-      Gem::Specification.each do |current_gem|
-        gem_name = current_gem.name
-        next unless gem_name.start_with?(PluginManager.plugin_prefix)
-
+      available_plugins.each do |gem_name|
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
           require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
@@ -277,7 +274,7 @@ module Fastlane
         end
       end
 
-      if !loaded_plugins && PluginManager.new.pluginfile_content.to_s.include?(plugin_prefix)
+      if !loaded_plugins && self.pluginfile_content.to_s.include?(PluginManager.plugin_prefix)
         UI.error("It seems like you wanted to load some plugins, however they couldn't be loaded")
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
@@ -286,7 +283,7 @@ module Fastlane
     end
 
     # Prints a table all the plugins that were loaded
-    def self.print_plugin_information(references)
+    def print_plugin_information(references)
       rows = references.collect do |current|
         if current[1][:actions].empty?
           # Something is wrong with this plugin, no available actions
@@ -314,11 +311,11 @@ module Fastlane
     #          version_number: "0.1.0",
     #          actions: [:rspec, :rubocop]
     #     }}
-    def self.plugin_references
+    def plugin_references
       @plugin_references ||= {}
     end
 
-    def self.store_plugin_reference(gem_name)
+    def store_plugin_reference(gem_name)
       module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
       # We store a collection of the imported plugins
       # This way we can tell which action came from what plugin

@@ -9,7 +9,7 @@ module Fastlane
     def name_to_track(name)
       return name if is_official?(name)
 
-      PluginManager.plugin_references.each do |plugin_name, value|
+      Fastlane.plugin_manager.plugin_references.each do |plugin_name, value|
         return "#{plugin_name}/#{name}" if value[:actions].include?(name)
       end
 

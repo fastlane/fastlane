@@ -115,7 +115,7 @@ module Fastlane
           return self.try_switch_to_lane(method_sym, arguments)
         rescue LaneNotAvailableError
           # No lane, no action, let's at least show the correct error message
-          if PluginManager.new.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
+          if Fastlane.plugin_manager.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
             # That's a plugin, but for some reason we can't find it
             UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
           elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)

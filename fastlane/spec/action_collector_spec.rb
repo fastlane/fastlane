@@ -23,7 +23,7 @@ describe Fastlane::ActionCollector do
 
     it "returns the plugin's name if the action is part of a plugin" do
       allow(collector).to receive(:is_official?).and_return(false)
-      allow(Fastlane::PluginManager).to receive(:plugin_references).and_return(plugin_references)
+      allow(Fastlane.plugin_manager).to receive(:plugin_references).and_return(plugin_references)
 
       expect(collector.name_to_track(:xcyolo_something)).to eq("fastlane-plugin-my_plugin/xcyolo_something")
       expect(collector.name_to_track(:xc_not_availalbe)).to eq(nil)
