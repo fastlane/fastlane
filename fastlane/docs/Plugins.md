@@ -118,7 +118,7 @@ The example project [xcake](https://github.com/jcampbell05/xcake) contains a fol
 All you have to do if you have an exiting gem:
 
 - Navigate to your gem
-- `fastlane new_plugin`
+- `fastlane new_plugin [plugin_name]`
 - Inside the newly created folder, edit the `fastlane-plugin-[plugin_name].gemspec` and add your gem as a dependency. It is recommended to also specify a version number requirement
 
 #### Publishing your plugin
