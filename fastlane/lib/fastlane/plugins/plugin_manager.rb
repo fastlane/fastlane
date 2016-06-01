@@ -336,7 +336,7 @@ module Fastlane
 
         File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
       end
-      references.keep_if { |a| !a.nil? }
+      references.compact!
 
       # Check if this overwrites a built-in action and
       # show a warning if that's the case
