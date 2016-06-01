@@ -88,13 +88,13 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No transition id specified") if value.to_s.length == 0
                                        end),
-        FastlaneCore::ConfigItem.new(key: :comment,
-                                     env_name: "FL_JIRA_TRANSITION_COMMENT",
-                                     description: "Comment to add if the transition is applied",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("No transition id specified") if value.to_s.length == 0
-                                     end)
+          FastlaneCore::ConfigItem.new(key: :comment,
+                                       env_name: "FL_JIRA_TRANSITION_COMMENT",
+                                       description: "Comment to add if the transition is applied",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("No transition id specified") if value.to_s.length == 0
+                                       end)
         ]
       end
 
