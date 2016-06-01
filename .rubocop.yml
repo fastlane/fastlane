@@ -112,6 +112,11 @@ Style/GuardClause:
 Style/StringLiterals:
   Enabled: false
 
+# something = if something_else
+# that's confusing
+Style/ConditionalAssignment:
+  Enabled: false
+
 # Split
 
 
@@ -260,12 +265,6 @@ Style/MutableConstant:
 
 # length > 0 is good
 Style/ZeroLengthPredicate:
-  Enabled: false
-
-Style/ConditionalAssignment:
-  Enabled: false
-
-Style/SpaceAroundKeyword:
   Enabled: false
 
 Style/IfInsideElse:
