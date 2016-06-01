@@ -20,7 +20,7 @@ module Fastlane
         metrics_to_client = lambda do |metrics|
           metrics.map do |metric|
             case metric
-            when :cpu,:memory,:network,:gps,:battery,:mic,:wifi
+            when :cpu, :memory, :network, :gps, :battery, :mic, :wifi
               metric.to_s
             when :phone_signal
               'phone-signal'
@@ -33,7 +33,7 @@ module Fastlane
         options_to_client = lambda do |options|
           options.map do |option|
             case option
-            when :shake,:anonymous
+            when :shake, :anonymous
               option.to_s
             when :video_only_wifi
               'video-only-wifi'
@@ -170,7 +170,7 @@ module Fastlane
                                        type: Array,
                                        env_name: "FL_TESTFAIRY_OPTIONS",
                                        description: "Array of options (shake,video_only_wifi,anonymous)",
-                                       default_value: []),
+                                       default_value: [])
         ]
       end
 
