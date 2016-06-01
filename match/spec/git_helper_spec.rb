@@ -24,10 +24,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return(nil)
 
         result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
@@ -46,10 +46,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return(nil)
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
@@ -68,10 +68,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return(nil)
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
@@ -91,10 +91,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return(nil)
 
         command = "git branch --list origin/#{git_branch} --no-color -r"
         to_params = {
@@ -103,10 +103,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return("")
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return("")
 
         command = "git checkout --orphan #{git_branch}"
         to_params = {
@@ -115,10 +115,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return("Switched to a new branch '#{git_branch}'")
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return("Switched to a new branch '#{git_branch}'")
 
         command = "git reset --hard"
         to_params = {
@@ -127,10 +127,10 @@ describe Match do
           print_command: nil
         }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return("")
+        expect(FastlaneCore::CommandExecutor)
+          .to receive(:execute)
+          .with(to_params)
+          .and_return("")
 
         result = Match::GitHelper.clone(git_url, shallow_clone, branch: git_branch)
 

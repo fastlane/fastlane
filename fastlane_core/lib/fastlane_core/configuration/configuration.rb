@@ -249,7 +249,7 @@ module FastlaneCore
     end
 
     # Aliases `[key]` to `fetch(key)` because Ruby can do it.
-    alias_method :[], :fetch
-    alias_method :[]=, :set
+    alias [] fetch
+    alias []= set
   end
 end

@@ -22,15 +22,15 @@ describe Spaceship::Client do
   let(:default_body) { '{foo: "bar"}' }
 
   def stub_client_request(error, times, status, body)
-    stub_request(:get, test_uri).
-      to_raise(error).times(times).then.
-      to_return(status: status, body: body)
+    stub_request(:get, test_uri)
+      .to_raise(error).times(times).then
+      .to_return(status: status, body: body)
   end
 
   def stub_client_retry_auth(status_error, times, status_ok, body)
-    stub_request(:get, test_uri).
-      to_return(status: status_error, body: body).times(times).
-      then.to_return(status: status_ok, body: body)
+    stub_request(:get, test_uri)
+      .to_return(status: status_error, body: body).times(times)
+      .then.to_return(status: status_ok, body: body)
   end
 
   describe 'retry' do
