@@ -143,7 +143,6 @@ Metrics/MethodLength:
     - '**/lib/fastlane/actions/*.rb'
     - '**/bin/fastlane'
     - '**/lib/*/options.rb'
-    - '**/bin/sigh'
   Max: 60
 
 AllCops:
@@ -203,12 +202,6 @@ Style/GuardClause:
 # Cop supports --auto-correct.
 # Configuration parameters: MaxLineLength.
 Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 74
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
   Enabled: false
 
 # Offense count: 10
