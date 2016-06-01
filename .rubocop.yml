@@ -151,24 +151,9 @@ AllCops:
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
 
-##################
-# TODO
-##################
-
-# Offense count: 19
+# We're not there yet
 Style/Documentation:
   Enabled: false
-
-# Offense count: 10
-# Cop supports --auto-correct.
-Style/NumericLiterals:
-  MinDigits: 14
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 19
 
 # Added after upgrade to 0.38.0
 Style/MutableConstant:

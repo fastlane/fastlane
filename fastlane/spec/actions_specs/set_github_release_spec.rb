@@ -21,7 +21,7 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
-        expect(result['id']).to eq(1585808)
+        expect(result['id']).to eq(1_585_808)
         expect(result).to eq(JSON.parse(File.read("./spec/fixtures/requests/github_create_release_response.json")))
       end
 
