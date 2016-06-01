@@ -259,6 +259,11 @@ module Fastlane
       available_plugins.each do |gem_name|
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
+          # BEFORE requiring the gem, we get a list of loaded actions
+          # This way we can check inside `store_plugin_reference` if
+          # any actions were overwritten
+          self.loaded_fastlane_actions.concat(Fastlane::Actions.constants)
+
           require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
           store_plugin_reference(gem_name)
           loaded_plugins = true
@@ -315,6 +320,11 @@ module Fastlane
       @plugin_references ||= {}
     end
 
+    # Contains an array of symbols for the action classes
+    def loaded_fastlane_actions
+      @fastlane_actions ||= []
+    end
+
     def store_plugin_reference(gem_name)
       module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
       # We store a collection of the imported plugins
@@ -326,10 +336,22 @@ module Fastlane
 
         File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
       end
+      references.compact!
+
+      # Check if this overwrites a built-in action and
+      # show a warning if that's the case
+      references.each do |current_ref|
+        # current_ref is a symbol, e.g. :emoji_fetcher
+        class_name = (current_ref.to_s.fastlane_class + 'Action').to_sym
+
+        if self.loaded_fastlane_actions.include?(class_name)
+          UI.important("Plugin '#{module_name}' overwrites already loaded action '#{current_ref}'")
+        end
+      end
 
       self.plugin_references[gem_name] = {
         version_number: version_number,
-        actions: references.keep_if { |a| !a.nil? }
+        actions: references
       }
     end
   end

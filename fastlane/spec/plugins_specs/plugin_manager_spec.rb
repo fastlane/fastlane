@@ -147,6 +147,21 @@ describe Fastlane do
       end
     end
 
+    describe "Overwriting plugins" do
+      it "shows a warning if a plugin overwrites an existing action" do
+        module Fastlane::Crashlytics
+        end
+
+        pm = Fastlane::PluginManager.new
+        plugin_name = "crashlytics"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(pm).to receive(:require).with(plugin_name)
+        expect(Fastlane::Crashlytics).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
+        expect(UI).to receive(:important).with("Plugin 'Crashlytics' overwrites already loaded action '#{plugin_name}'")
+        pm.load_plugins
+      end
+    end
+
     describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do
