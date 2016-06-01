@@ -220,6 +220,8 @@ describe Fastlane::PluginGenerator do
           Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rubocop", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
         )
       end
@@ -270,7 +272,7 @@ describe Fastlane::PluginGenerator do
       expect(File.exist?(rakefile)).to be(true)
 
       rakefile_contents = File.read(rakefile)
-      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n")
+      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n\nrequire 'rspec/core/rake_task'\nRSpec::Core::RakeTask.new\n\nrequire 'rubocop/rake_task'\nRuboCop::RakeTask.new(:rubocop)\n\ntask default: [:spec, :rubocop]\n")
     end
   end
 end
