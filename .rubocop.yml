@@ -18,6 +18,10 @@ Style/IndentHash:
 Style/AlignHash:
   Enabled: false
 
+# HoundCI doesn't like this rule
+Style/DotPosition:
+  Enabled: false
+
 # We allow !! as it's an easy way to convert ot boolean
 Style/DoubleNegation:
   Enabled: false
