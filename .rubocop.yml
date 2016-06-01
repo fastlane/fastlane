@@ -44,11 +44,8 @@ Style/ClassAndModuleChildren:
 Style/SpecialGlobalVars:
   Enabled: false
 
-Style/RaiseArgs:
-  Enabled: false
-
 Metrics/AbcSize:
-  Max: 63
+  Max: 60
   Exclude:
     - '**/lib/*/options.rb'
 
@@ -98,6 +95,7 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 18
 
+# Sometimes it's easier to read without guards
 Style/GuardClause:
   Enabled: false
 
