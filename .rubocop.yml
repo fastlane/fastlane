@@ -1,27 +1,28 @@
-
+# kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
+# It's better to be more explicit about the type
 Style/BracesAroundHashParameters:
   Enabled: false
 
+# specs sometimes have useless assignments, which is fine
 Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
+# IntentHash looks wrong
 Style/IndentHash:
   Enabled: false
 
 Style/RaiseArgs:
   EnforcedStyle: exploded
 
+# We allow !! as it's an easy way to convert ot boolean
 Style/DoubleNegation:
   Enabled: false
 
+# Sometimes we allow a rescue block that doesn't contain code
 Lint/HandleExceptions:
   Enabled: false
 
