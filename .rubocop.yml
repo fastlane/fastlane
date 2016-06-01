@@ -102,9 +102,6 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 18
 
-Style/DotPosition:
-  Enabled: false
-
 Style/GuardClause:
   Enabled: false
 
@@ -134,6 +131,10 @@ Lint/ParenthesesAsGroupedExpression:
 
 # We use `is_supported?` everywhere already
 Style/PredicateName:
+  Enabled: false
+
+# We allow the $
+Style/PerlBackrefs:
   Enabled: false
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
@@ -219,21 +220,10 @@ Style/MultilineOperationIndentation:
 Style/NumericLiterals:
   MinDigits: 14
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Enabled: false
-
 # Offense count: 19
 # Cop supports --auto-correct.
 # Configuration parameters: AllowMultipleReturnValues.
 Style/RedundantReturn:
-  Enabled: false
-
-# Offense count: 38
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SignalException:
   Enabled: false
 
 # Offense count: 9
@@ -243,7 +233,6 @@ Style/WordArray:
   MinSize: 19
 
 # Added after upgrade to 0.38.0
-
 Style/MutableConstant:
   Enabled: false
 
