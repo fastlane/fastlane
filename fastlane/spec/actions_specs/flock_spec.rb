@@ -49,7 +49,7 @@ describe Fastlane do
       it 'performs POST request with specified options' do
         stub_request(:post, "#{FLOCK_BASE_URL}/token").
           with(body: '{"text":"message"}',
-               headers: {'Content-Type' => 'application/json'}).
+               headers: { 'Content-Type' => 'application/json' }).
           to_return(status: 200)
         run_flock message: 'message', token: 'token'
       end

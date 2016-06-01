@@ -34,7 +34,7 @@ module Fastlane
           end
         end
         ssh.loop
-        {stdout: stdout_data, stderr: stderr_data, exit_code: exit_code, exit_signal: exit_signal}
+        { stdout: stdout_data, stderr: stderr_data, exit_code: exit_code, exit_signal: exit_signal }
       end
 
       def self.run(params)
@@ -46,7 +46,7 @@ module Fastlane
         stdout = ""
         stderr = ""
 
-        Net::SSH.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |ssh|
+        Net::SSH.start(params[:host], params[:username], { port: params[:port].to_i, password: params[:password] }) do |ssh|
           params[:commands].each do |cmd|
             UI.important(['[SSH COMMAND]', cmd].join(': ')) if params[:log]
             return_value = ssh_exec!(ssh, cmd)
@@ -61,7 +61,7 @@ module Fastlane
         UI.message("\n########### \n #{stdout} \n###############".magenta) if params[:log]
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = stdout
         Actions.lane_context[SharedValues::SSH_STDERR_VALUE] = stderr
-        return {stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE]}
+        return { stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE] }
       end
 
       #####################################################

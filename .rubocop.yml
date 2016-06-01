@@ -246,12 +246,6 @@ Style/SignalException:
 Style/SpaceInsideBlockBraces:
   Enabled: false
 
-# Offense count: 291
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: WordRegex.
