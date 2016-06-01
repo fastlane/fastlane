@@ -11,11 +11,10 @@ Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
 
-# IntentHash looks wrong
+# We could potentially enable the 2 below:
 Style/IndentHash:
   Enabled: false
 
-# That looks wrong
 Style/AlignHash:
   Enabled: false
 
@@ -47,10 +46,6 @@ Metrics/AbcSize:
   Max: 60
   Exclude:
     - '**/lib/*/options.rb'
-
-# Both string notations are okay
-Style/StringLiterals:
-  Enabled: false
 
 # The %w might be confusing for new users
 Style/WordArray:
@@ -118,6 +113,7 @@ Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - '**/spec/**/*'
 
+# This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
 Style/PredicateName:
   Enabled: false
@@ -156,5 +152,6 @@ Style/MutableConstant:
 Style/ZeroLengthPredicate:
   Enabled: false
 
+# Adds complexity
 Style/IfInsideElse:
   Enabled: false
