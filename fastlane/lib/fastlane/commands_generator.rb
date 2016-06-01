@@ -8,9 +8,13 @@ module Fastlane
     include Commander::Methods
 
     def self.start
+      # since at this point we haven't yet loaded commander
+      # however we do want to log verbose information in the PluginManager
+      $verbose = true if ARGV.include?("--verbose")
+
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
-      Fastlane::PluginManager.load_plugins
+      Fastlane.plugin_manager.load_plugins
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -180,7 +184,7 @@ module Fastlane
         c.description = 'Create a new plugin that can be used with fastlane'
 
         c.action do |args, options|
-          PluginGenerator.new.generate args.shift
+          Fastlane.plugin_manager.generate args.shift
         end
       end
 
@@ -189,14 +193,13 @@ module Fastlane
         c.description = 'Add a new plugin to your fastlane setup'
 
         c.action do |args, options|
-          pm = PluginManager.new
           args << UI.input("Enter the name of the plugin to install: ") if args.empty?
           args.each do |plugin_name|
-            pm.add_dependency(plugin_name)
+            Fastlane.plugin_manager.add_dependency(plugin_name)
           end
 
           UI.important("Make sure to commit your Gemfile, Gemfile.lock and #{PluginManager::PLUGINFILE_NAME} to version control")
-          pm.install_dependencies!
+          Fastlane.plugin_manager.install_dependencies!
         end
       end
 
@@ -205,7 +208,7 @@ module Fastlane
         c.description = 'Install all plugins for this project'
 
         c.action do |args, options|
-          PluginManager.new.install_dependencies!
+          Fastlane.plugin_manager.install_dependencies!
         end
       end
 
@@ -214,7 +217,7 @@ module Fastlane
         c.description = 'Update all plugin dependencies'
 
         c.action do |args, options|
-          PluginManager.new.update_dependencies!
+          Fastlane.plugin_manager.update_dependencies!
         end
       end
 
