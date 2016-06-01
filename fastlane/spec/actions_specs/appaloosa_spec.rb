@@ -63,8 +63,8 @@ describe Fastlane do
 
       context 'when upload_service returns an error' do
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
-            to_return(status: 200, body: '{ "errors": "A group id is incorrect" }', headers: {})
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556")
+            .to_return(status: 200, body: '{ "errors": "A group id is incorrect" }', headers: {})
         end
 
         it 'returns group_id errors' do
@@ -81,12 +81,12 @@ describe Fastlane do
         let(:expect_error) { 'ERROR: A problem occurred with your API token and your store id. Please try again.' }
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
-            to_return(status: 200, body: presign_payload)
-          stub_request(:put, "http://appaloosa.com/test").
-            to_return(status: 200)
-          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556").
-            to_return(status: 404)
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556")
+            .to_return(status: 200, body: presign_payload)
+          stub_request(:put, "http://appaloosa.com/test")
+            .to_return(status: 200)
+          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556")
+            .to_return(status: 404)
         end
 
         it 'raises a Fastlane error for problem with API token or store id' do
@@ -103,12 +103,12 @@ describe Fastlane do
         let(:expect_error) { 'ERROR: A problem occurred with your API token and your store id. Please try again.' }
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
-            to_return(status: 200, body: presign_payload)
-          stub_request(:put, "http://appaloosa.com/test").
-            to_return(status: 200)
-          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556").
-            to_return(status: 403)
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556")
+            .to_return(status: 200, body: presign_payload)
+          stub_request(:put, "http://appaloosa.com/test")
+            .to_return(status: 200)
+          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556")
+            .to_return(status: 403)
         end
 
         it 'raises a Fastlane error for problem with API token or store id' do
@@ -131,12 +131,12 @@ describe Fastlane do
         end
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
-            to_return(status: 200, body: presign_payload, headers: {})
-          stub_request(:put, "http://appaloosa.com/test").
-            to_return(status: 200, body: '', headers: {})
-          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556").
-            to_return(status: 200, body: upload_services_payload, headers: {})
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556")
+            .to_return(status: 200, body: presign_payload, headers: {})
+          stub_request(:put, "http://appaloosa.com/test")
+            .to_return(status: 200, body: '', headers: {})
+          stub_request(:get, "#{APPALOOSA_SERVER}/556/upload_services/url_for_download?api_key=xxx&key=https://appaloosa.com/file.apk&store_id=556")
+            .to_return(status: 200, body: upload_services_payload, headers: {})
         end
 
         it 'works with valid parameters' do

@@ -2,9 +2,9 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "get_github_release" do
       before do
-        stub_request(:get, "https://api.github.com/repos/fastlane/fastlane/releases").
-          with(headers: { 'Host' => 'api.github.com:443' }).
-          to_return(status: 200, body: File.read("./spec/fixtures/requests/github_releases.json"), headers: {})
+        stub_request(:get, "https://api.github.com/repos/fastlane/fastlane/releases")
+          .with(headers: { 'Host' => 'api.github.com:443' })
+          .to_return(status: 200, body: File.read("./spec/fixtures/requests/github_releases.json"), headers: {})
       end
 
       it "correctly fetches all the data from GitHub" do

@@ -9,9 +9,9 @@ describe Fastlane::PluginInfoCollector do
 
   before do
     ["my plugin", "test_name", "my_", "fastlane-whatever", "whatever"].each do |current|
-      stub_request(:get, "https://rubygems.org/api/v1/gems/#{current}.json").
-        with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-        to_return(status: 200, body: nil, headers: {})
+      stub_request(:get, "https://rubygems.org/api/v1/gems/#{current}.json")
+        .with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' })
+        .to_return(status: 200, body: nil, headers: {})
     end
   end
 
@@ -105,9 +105,9 @@ describe Fastlane::PluginInfoCollector do
     end
 
     it "detects if the plugin is already taken on RubyGems.org" do
-      stub_request(:get, "https://rubygems.org/api/v1/gems/already_taken.json").
-        with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-        to_return(status: 200, body: { version: "1.0" }.to_json, headers: {})
+      stub_request(:get, "https://rubygems.org/api/v1/gems/already_taken.json")
+        .with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' })
+        .to_return(status: 200, body: { version: "1.0" }.to_json, headers: {})
       expect(collector.plugin_name_valid?('already_taken')).to be_falsey
     end
   end
