@@ -1,5 +1,9 @@
 skip_docs
 
+lane :test do
+  validate_repo(tool_name: detect_tool)
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   tool_name = options[:tool] || detect_tool
@@ -106,6 +110,8 @@ lane :release do |options|
     )
   end
 
+  clubmate
+
   puts "You can now tweet:".green
   tag_url = "https://github.com/fastlane/fastlane/releases/tag/#{tool_name}/#{version}"
   puts "[#{tool_name}] #{github_release['name']} #{tag_url}"
@@ -146,7 +152,7 @@ private_lane :validate_repo do |options|
 
   # Run the tests
   #
-  sh "cd .. && bundle exec rspec"
+  rspec
 end
 
 desc "e.g. fastlane/deliver"
