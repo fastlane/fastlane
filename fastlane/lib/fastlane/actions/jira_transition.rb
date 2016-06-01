@@ -42,7 +42,7 @@ module Fastlane
               comment = issue.comments.build
               comment.save({"body" => comment_text})
             end
-          rescue Exception => e
+          rescue JIRA::HTTPError
             "Skipping issue #{issue_id}"
           end
         end
