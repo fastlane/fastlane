@@ -121,7 +121,7 @@ describe Fastlane do
 
       context 'with valid parameters' do
         let(:presign_s3_key) { Base64.encode64('https://appaloosa.com/test') }
-        let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk'}.to_json }
+        let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk' }.to_json }
         let(:upload_services_payload) do
           {
             store_id: '673',

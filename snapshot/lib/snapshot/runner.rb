@@ -111,6 +111,7 @@ module Snapshot
     end
 
     # Returns true if it succeded
+    # rubocop:disable Metrics/AbcSize
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -189,6 +190,7 @@ module Snapshot
 
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
+    # rubocop:enable Metrics/AbcSize
 
     def open_simulator_for_device(device)
       return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']

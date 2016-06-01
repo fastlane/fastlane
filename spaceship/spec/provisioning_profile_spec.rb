@@ -137,8 +137,8 @@ describe Spaceship::ProvisioningProfile do
                                                                     "XC5PH8DAAA",
                                                                     [],
                                                                     mac: false,
-                                                                    sub_platform: nil).
-        and_return({})
+                                                                    sub_platform: nil)
+        .and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 

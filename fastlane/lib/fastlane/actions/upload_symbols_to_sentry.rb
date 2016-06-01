@@ -17,7 +17,7 @@ module Fastlane
 
         # Url to post dSYMs to
         url = "#{host}/projects/#{org}/#{project}/files/dsyms/"
-        resource = RestClient::Resource.new( url, api_key, '' )
+        resource = RestClient::Resource.new(url, api_key, '')
 
         UI.message "Will upload dSYM(s) to #{url}"
 

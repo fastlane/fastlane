@@ -4,12 +4,11 @@ module Fastlane
     end
 
     class ScpAction < Action
-
       def self.run(params)
         Actions.verify_gem!('net-scp')
         require "net/scp"
         ret = nil
-        Net::SCP.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |scp|
+        Net::SCP.start(params[:host], params[:username], { port: params[:port].to_i, password: params[:password] }) do |scp|
           if params[:upload]
             scp.upload! params[:upload][:src], params[:upload][:dst], recursive: true
             UI.message(['[SCP COMMAND]', "Successfully Uploaded", params[:upload][:src], params[:upload][:dst]].join(': '))

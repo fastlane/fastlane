@@ -7,7 +7,7 @@ describe Fastlane::Actions::VerifyXcodeAction do
       expect(Fastlane::Actions).to receive(:sh).with(/codesign/).and_return(fixture_data)
       expect(FastlaneCore::UI).to receive(:success).with(/Successfully verified/)
 
-      Fastlane::Actions::VerifyXcodeAction.verify_codesign({xcode_path: ''})
+      Fastlane::Actions::VerifyXcodeAction.verify_codesign({ xcode_path: '' })
     end
 
     it "reports success for developer.apple.com codesign details" do
@@ -17,7 +17,7 @@ describe Fastlane::Actions::VerifyXcodeAction do
       expect(Fastlane::Actions).to receive(:sh).with(/codesign/).and_return(fixture_data)
       expect(FastlaneCore::UI).to receive(:success).with(/Successfully verified/)
 
-      Fastlane::Actions::VerifyXcodeAction.verify_codesign({xcode_path: ''})
+      Fastlane::Actions::VerifyXcodeAction.verify_codesign({ xcode_path: '' })
     end
 
     it "raises an error for invalid codesign details" do
@@ -28,7 +28,7 @@ describe Fastlane::Actions::VerifyXcodeAction do
       expect(Fastlane::Actions).to receive(:sh).with(/codesign/).and_return(fixture_data)
 
       expect do
-        Fastlane::Actions::VerifyXcodeAction.verify_codesign({xcode_path: ''})
+        Fastlane::Actions::VerifyXcodeAction.verify_codesign({ xcode_path: '' })
       end.to raise_error FastlaneCore::Interface::FastlaneError
     end
   end
