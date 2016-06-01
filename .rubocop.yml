@@ -108,7 +108,9 @@ Style/DotPosition:
 Style/GuardClause:
   Enabled: false
 
-
+# We allow both " and '
+Style/StringLiterals:
+  Enabled: false
 
 # Split
 
@@ -243,17 +245,6 @@ Style/SpaceInsideBlockBraces:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
 Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/SpaceInsideParens:
-  Enabled: false
-
-# Offense count: 881
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/StringLiterals:
   Enabled: false
 
 # Offense count: 9
