@@ -53,7 +53,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Apply JIRA transitions to issues mentioned in the changelog"
+        "Apply a JIRA transition to issues mentioned in the changelog"
       end
 
       def self.available_options
