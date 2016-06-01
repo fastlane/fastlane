@@ -7,7 +7,6 @@ module Fastlane
     end
 
     class XcodeServerGetAssetsAction < Action
-
       require 'excon'
       require 'json'
       require 'fileutils'
@@ -108,7 +107,6 @@ module Fastlane
       end
 
       class XcodeServer
-
         def initialize(host, username, password)
           @host = host.start_with?('https://') ? host : "https://#{host}"
           @username = username

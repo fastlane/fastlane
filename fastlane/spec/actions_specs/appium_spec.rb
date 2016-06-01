@@ -1,6 +1,5 @@
 module Appium
   class Driver
-
   end
 end
 

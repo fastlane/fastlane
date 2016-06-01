@@ -4,7 +4,6 @@ module Fastlane
     end
 
     class ScpAction < Action
-
       def self.run(params)
         Actions.verify_gem!('net-scp')
         require "net/scp"

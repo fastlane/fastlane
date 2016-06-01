@@ -155,37 +155,8 @@ AllCops:
 # TODO
 ##################
 
-# Offense count: 7
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 320
-
-# Offense count: 4
-Metrics/CyclomaticComplexity:
-  Max: 17
-
-# Offense count: 489
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 372
-
-# Offense count: 5
-# Configuration parameters: CountKeywordArgs.
-Metrics/ParameterLists:
-  Max: 17
-
-# Offense count: 3
-Metrics/PerceivedComplexity:
-  Max: 18
-
 # Offense count: 19
 Style/Documentation:
-  Enabled: false
-
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
   Enabled: false
 
 # Offense count: 10

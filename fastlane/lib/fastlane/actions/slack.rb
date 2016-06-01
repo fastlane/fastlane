@@ -4,7 +4,6 @@
 module Fastlane
   module Actions
     class SlackAction < Action
-
       def self.is_supported?(platform)
         true
       end

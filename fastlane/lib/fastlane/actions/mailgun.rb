@@ -3,7 +3,6 @@ require 'fastlane/erb_template_helper'
 module Fastlane
   module Actions
     class MailgunAction < Action
-
       def self.is_supported?(platform)
         true
       end
@@ -129,7 +128,6 @@ module Fastlane
         end
         eth.render(html_template, hash)
       end
-
     end
   end
 end

@@ -5,7 +5,6 @@ module Fastlane
     end
 
     class RsyncAction < Action
-
       def self.run(params)
         rsync_cmd = ["rsync"]
         rsync_cmd << params[:extra]
