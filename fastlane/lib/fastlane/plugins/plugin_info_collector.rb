@@ -37,8 +37,14 @@ module Fastlane
 
         break if plugin_name_valid?(plugin_name)
 
-        @ui.message("\nPlugin names can only contain lower case letters, numbers, and underscores")
-        @ui.message("and should not contain 'fastlane' or 'plugin'.")
+        if plugin_name_taken?(plugin_name)
+          # Plugin name is already taken on RubyGems
+          @ui.message("\nPlugin name '#{plugin_name}' is already taken on RubyGems, please choose a different one.")
+        else
+          # That's a naming error
+          @ui.message("\nPlugin names can only contain lower case letters, numbers, and underscores")
+          @ui.message("and should not contain 'fastlane' or 'plugin'.")
+        end
       end
 
       plugin_name
@@ -49,7 +55,20 @@ module Fastlane
       /^[a-z0-9_]+$/ =~ name &&
         # Does not contain the words 'fastlane' or 'plugin' since those will become
         # part of the gem name
-        [/fastlane/, /plugin/].none? { |regex| regex =~ name }
+        [/fastlane/, /plugin/].none? { |regex| regex =~ name } &&
+        # Plugin name isn't taken on RubyGems yet
+        !plugin_name_taken?(name)
+    end
+
+    # Checks if the plugin name is still free on RubyGems
+    def plugin_name_taken?(name)
+      require 'open-uri'
+      require 'json'
+      url = "https://rubygems.org/api/v1/gems/#{name}.json"
+      response = JSON.parse(open(url).read)
+      return !!response['version']
+    rescue
+      false
     end
 
     # Applies a series of replacement rules to turn the requested plugin name into one

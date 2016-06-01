@@ -7,6 +7,14 @@ describe Fastlane::PluginInfoCollector do
     ui
   end
 
+  before do
+    ["my plugin", "test_name", "my_", "fastlane-whatever", "whatever"].each do |current|
+      stub_request(:get, "https://rubygems.org/api/v1/gems/#{current}.json").
+        with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby'}).
+        to_return(status: 200, body: nil, headers: {})
+    end
+  end
+
   let(:collector) { Fastlane::PluginInfoCollector.new(test_ui) }
 
   describe "#collect_plugin_name" do
@@ -94,6 +102,13 @@ describe Fastlane::PluginInfoCollector do
 
     it "handles plugin name with characters we don't want" do
       expect(collector.plugin_name_valid?('T!EST-na$me ple&ase')).to be_falsey
+    end
+
+    it "detects if the plugin is already taken on RubyGems.org" do
+      stub_request(:get, "https://rubygems.org/api/v1/gems/already_taken.json").
+        with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby'}).
+        to_return(status: 200, body: {version: "1.0"}.to_json, headers: {})
+      expect(collector.plugin_name_valid?('already_taken')).to be_falsey
     end
   end
 
