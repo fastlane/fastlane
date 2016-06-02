@@ -3,32 +3,31 @@ require 'credentials_manager'
 
 describe FastlaneCore do
   describe FastlaneCore::ItunesTransporter do
-    def shell_upload_command(team_id = nil)
+    let(:shell_upload_command) do
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
         '-u "fabric.devtools@gmail.com"',
         "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
         "-f '/tmp/my.app.id.itmsp'",
+        nil, # This represents the environment variable which is not set
         "-t 'Signiant'",
-        "-k 100000",
-        ("-itc_provider #{team_id}" if team_id)
-      ].compact.join(' ')
+        "-k 100000"
+      ].join(' ')
     end
 
-    def shell_download_command(team_id = nil)
+    let(:shell_download_command) do
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
         '-u "fabric.devtools@gmail.com"',
         "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
         "-apple_id my.app.id",
-        "-destination '/tmp'",
-        ("-itc_provider #{team_id}" if team_id)
-      ].compact.join(' ')
+        "-destination '/tmp'"
+      ].join(' ')
     end
 
-    def java_upload_command(team_id = nil)
+    let(:java_upload_command) do
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -46,12 +45,11 @@ describe FastlaneCore do
         "-f /tmp/my.app.id.itmsp",
         "-t Signiant",
         "-k 100000",
-        ("-itc_provider #{team_id}" if team_id),
         '2>&1'
-      ].compact.join(' ')
+      ].join(' ')
     end
 
-    def java_download_command(team_id = nil)
+    let(:java_download_command) do
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -68,9 +66,8 @@ describe FastlaneCore do
         "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
         '-apple_id my.app.id',
         '-destination /tmp',
-        ("-itc_provider #{team_id}" if team_id),
         '2>&1'
-      ].compact.join(' ')
+      ].join(' ')
     end
 
     describe "with Xcode 7.x installed" do
@@ -88,38 +85,6 @@ describe FastlaneCore do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
             expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
-          end
-        end
-      end
-
-      describe "use_shell_script is false with a dev portal team ID set" do
-        describe "upload command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false, 'abcd1234')
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command('abcd1234'))
-          end
-        end
-
-        describe "download command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false, 'abcd1234')
-            expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command('abcd1234'))
-          end
-        end
-      end
-
-      describe "use_shell_script is true with a dev portal team ID set" do
-        describe "upload command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command('abcd1234'))
-          end
-        end
-
-        describe "download command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
-            expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command('abcd1234'))
           end
         end
       end
