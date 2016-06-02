@@ -45,6 +45,10 @@ module Fastlane
       FASTLANE_PLUGIN_PREFIX
     end
 
+    def self.to_gem_name(plugin_name)
+      plugin_name.start_with?(plugin_prefix) ? plugin_name : (plugin_prefix + plugin_name)
+    end
+
     # Returns an array of gems that are added to the Gemfile or Pluginfile
     def available_gems
       return [] unless gemfile_path
