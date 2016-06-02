@@ -3,7 +3,6 @@ module Fastlane
     module SharedValues
     end
 
-
     class UpdateAndroidPackageAction < Action
       def self.run(params)
         require 'nokogiri'
@@ -22,18 +21,18 @@ module Fastlane
             ## Change name
             # Find all activities inside the app
             activites = manifest.xpath("//application//activity")
-            for activity in activites do
+            activites.each do |activity|
               activity_node = Nokogiri::XML(activity.to_s)
               # Find launcher activity
-              if activity_node.at_css("intent-filter").to_s != "" then
+              if activity_node.at_css("intent-filter").to_s != ""
                 intent_filter_node = Nokogiri::XML(activity_node.at_css("intent-filter").to_s)
-                if (intent_filter_node.at_css("action").to_s != "" && intent_filter_node.at_css("category").to_s != "") then
+                if intent_filter_node.at_css("action").to_s != "" && intent_filter_node.at_css("category").to_s != ""
                   if intent_filter_node.at_css("action").attributes["android:name"].value == "android.intent.action.MAIN" && \
-                    intent_filter_node.at_css("category").attributes["android:name"].value == "android.intent.category.LAUNCHER" then
+                    intent_filter_node.at_css("category").attributes["android:name"].value == "android.intent.category.LAUNCHER"
                     # Update manifest values
-                    if activity.attributes["label"].value.start_with? "@string" then
+                    if activity.attributes["label"].value.start_with? "@string"
                       # If label is getting from strings.xml, change in strings.xml
-                      string_resource_name = activity.attributes["label"].value.sub("@string/","")                    
+                      string_resource_name = activity.attributes["label"].value.sub("@string/","")
                       app_name_resource = strings.search('string[name="' + string_resource_name + '"]')
                       app_name_resource[0].content = params[:display_name]
                       File.write(string_resource_path, strings.to_xml)
@@ -48,7 +47,7 @@ module Fastlane
             end
             UI.success("Updated #{params[:manifest_path]} 💾.")
           end
-          
+
           ## Change app identifier
           if params[:app_identifier]
             app_build_gradle_path = File.join(".", params[:app_build_gradle_path])
@@ -58,7 +57,7 @@ module Fastlane
             File.write(app_build_gradle_path, build_gradle)
 
           end
-          
+
         else
           UI.important("You haven't specified any parameters to update your package.")
           false
