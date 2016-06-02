@@ -3,11 +3,11 @@ module Scan
     SUPPORTED = %w(html junit json-compilation-database)
 
     # Intialize with values from Scan.config matching these param names
-    def initialize(open_report, output_types, output_directory, clang_report_name)
+    def initialize(open_report, output_types, output_directory, use_clang_report_name)
       @open_report = open_report
       @output_types = output_types
       @output_directory = output_directory
-      @clang_report_name = clang_report_name
+      @use_clang_report_name = use_clang_report_name
     end
 
     def parse_raw_file(path)
@@ -25,9 +25,8 @@ module Scan
       end
     end
 
-    # Returns a hash containg the resulting path as key and the command as value
+    # Returns a hash containing the resulting path as key and the command as value
     def generate_commands(path, types: nil, output_file_name: nil)
-      use_clang_naming ||= @clang_report_name
       types ||= @output_types
       types = types.split(",") if types.kind_of?(String) # might already be an array when passed via fastlane
       commands = {}
@@ -40,15 +39,8 @@ module Scan
           next
         end
 
-        file_name = "report.#{type}"
+        output_path = output_file_name || File.join(File.expand_path(@output_directory), determine_output_file_name(type))
 
-        # If the json_compilation_database_clang option is set, name the compilation database in accordance with
-        # clang conventions
-        if type == "json-compilation-database" and use_clang_naming
-          file_name = "compile_commands.json"
-        end
-
-        output_path = output_file_name || File.join(File.expand_path(@output_directory), file_name)
         parts = ["cat '#{path}' | "]
         parts << "xcpretty"
         parts << "--report #{type}"
@@ -59,6 +51,14 @@ module Scan
       end
 
       return commands
+    end
+
+    def determine_output_file_name(type)
+      if @use_clang_report_name && type == "json-compilation-database"
+        "compile_commands.json"
+      else
+        "report.#{type}"
+      end
     end
   end
 end
