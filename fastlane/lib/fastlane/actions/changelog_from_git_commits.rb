@@ -79,9 +79,9 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        conflicting_options: [:between],
+                                       type: Integer,
                                        verify_block: proc do |value|
-                                         UI.user_error!(":commits_count must be an integer") unless value.kind_of? Integer
-                                         UI.user_error!(":commits_count must be >= 1") unless value >= 1
+                                         UI.user_error!(":commits_count must be >= 1") unless value.to_i >= 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
