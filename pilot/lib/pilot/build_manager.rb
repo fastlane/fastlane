@@ -15,7 +15,7 @@ module Pilot
                                                                   package_path: "/tmp",
                                                                       platform: platform)
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
