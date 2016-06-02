@@ -1,3 +1,3 @@
 module FastlaneCore
-  VERSION = "0.46.1".freeze
+  VERSION = "0.46.2".freeze
 end
