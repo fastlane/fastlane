@@ -67,12 +67,12 @@ task :bundle_install_all do
   end
 end
 
-# Via https://coveralls.zendesk.com/hc/en-us/articles/201769485-Ruby-Rails
-
 desc "Test all fastlane projects"
 task :test_all => ['coveralls:push'] do
+  # Via https://coveralls.zendesk.com/hc/en-us/articles/201769485-Ruby-Rails
   require 'coveralls/rake/task'
   Coveralls::RakeTask.new
+
   require 'bundler/setup'
   require 'colored'
   require 'fileutils'
@@ -147,6 +147,8 @@ task :test_all => ['coveralls:push'] do
     puts "Failed examples:"
     puts "#{failure_messages.join("\n")}\n"
   end
+
+  Rake::Task['coveralls:push'].invoke
 
   if exceptions.empty?
     puts "Success 🚀".green
