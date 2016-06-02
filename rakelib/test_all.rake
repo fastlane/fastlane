@@ -47,6 +47,14 @@ def bundle_install
   sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
 end
 
+def get_line_from_file(line_number, file)
+  File.open(file) do |io|
+    io.each_with_index do |line, index|
+      return line if line_number == index + 1
+    end
+  end
+end
+
 task :bundle_install_all do
   puts "Fetching dependencies in the root"
   bundle_install
@@ -59,16 +67,12 @@ task :bundle_install_all do
   end
 end
 
-def get_line_from_file(line_number, file)
-  File.open(file) do |io|
-    io.each_with_index do |line, index|
-      return line if line_number == index + 1
-    end
-  end
-end
+# Via https://coveralls.zendesk.com/hc/en-us/articles/201769485-Ruby-Rails
+require 'coveralls/rake/task'
+Coveralls::RakeTask.new
 
 desc "Test all fastlane projects"
-task :test_all do
+task :test_all => ['coveralls:push'] do
   require 'bundler/setup'
   require 'colored'
   require 'fileutils'
