@@ -9,10 +9,20 @@ describe Fastlane do
         end.to raise_error("Could not find json compilation database at path 'compile_commands.json'")
       end
 
-      it "works with compilation database only" do
+      it "works given the path to compile_commands.json" do
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint \".*})
+      end
+
+      it "works given a path to the directory containing compile_commands.json" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            oclint(
+              compile_commands: './fastlane/spec/fixtures/oclint'
             )
           end").runner.execute(:test)
 
