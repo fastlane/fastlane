@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.authors
-        ['<%= author %>']
+        ["<%= author.gsub('"', "'") %>"]
       end
 
       def self.available_options
