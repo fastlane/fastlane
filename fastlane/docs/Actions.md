@@ -1310,6 +1310,35 @@ update_project_team(
 )
 ```
 
+## update_android_package
+
+This action allows you to modify your `AndroidManifest.xml` and `build.gradle` file to change app name and app identifier before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+
+```ruby
+# Update app identifier string
+update_android_package(
+  app_build_gradle_path: "path/to/app/build.gradle",
+  app_identifier: "com.example.newappidentifier"
+)
+
+# Change the Display Name of your app
+update_android_package(
+  manifest_path: "path/to/AndroidManifest.xml",
+  string_resource_path: "path/to/values/strings.xml",
+  display_name: "MyApp-Beta"
+)
+
+# Update both
+update_info_plist(
+  app_build_gradle_path: "path/to/app/build.gradle",
+  manifest_path: "path/to/AndroidManifest.xml",
+  string_resource_path: "path/to/res/values/strings.xml",
+  app_identifier: "com.example.newappidentifier",
+  display_name: "MyApp-Beta"
+)
+
+```
+
 ## update_info_plist
 
 This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
