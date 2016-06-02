@@ -68,7 +68,7 @@ task :bundle_install_all do
 end
 
 desc "Test all fastlane projects"
-task :test_all => ['coveralls:push'] do
+task :test_all do
   # Via https://coveralls.zendesk.com/hc/en-us/articles/201769485-Ruby-Rails
   require 'coveralls/rake/task'
   Coveralls::RakeTask.new
