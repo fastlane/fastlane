@@ -19,7 +19,7 @@ module Fastlane
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--no-repo-update' unless params[:repo_update]
+        cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
@@ -47,7 +47,7 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Run `pod repo update` before install",
                                        is_string: false,
-                                       default_value: true),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Show nothing",
