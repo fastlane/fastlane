@@ -42,6 +42,8 @@ module Fastlane
                     File.write(manifest_path, manifest.to_xml)
                   end
                 end
+              else
+                next
               end
             end
             UI.success("Updated #{params[:manifest_path]} 💾.")
