@@ -100,8 +100,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: 'FL_UPDATE_ANDROID_MANIFEST_DISPLAY_NAME',
                                        description: 'The Display Name of your app',
-                                       optional: true),
-
+                                       optional: true)
         ]
       end
 
