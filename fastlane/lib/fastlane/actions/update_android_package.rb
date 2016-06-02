@@ -26,21 +26,20 @@ module Fastlane
               # Find launcher activity
               if activity_node.at_css("intent-filter").to_s != ""
                 intent_filter_node = Nokogiri::XML(activity_node.at_css("intent-filter").to_s)
-                if intent_filter_node.at_css("action").to_s != "" && intent_filter_node.at_css("category").to_s != ""
-                  if intent_filter_node.at_css("action").attributes["android:name"].value == "android.intent.action.MAIN" && \
-                    intent_filter_node.at_css("category").attributes["android:name"].value == "android.intent.category.LAUNCHER"
-                    # Update manifest values
-                    if activity.attributes["label"].value.start_with? "@string"
-                      # If label is getting from strings.xml, change in strings.xml
-                      string_resource_name = activity.attributes["label"].value.sub("@string/","")
-                      app_name_resource = strings.search('string[name="' + string_resource_name + '"]')
-                      app_name_resource[0].content = params[:display_name]
-                      File.write(string_resource_path, strings.to_xml)
-                    else
-                      # If label is manually put in the attribute, change the attribute directly
-                      activity.attributes["label"].value = params[:display_name]
-                      File.write(manifest_path, manifest.to_xml)
-                    end
+                if intent_filter_node.at_css("action").to_s != "" && intent_filter_node.at_css("category").to_s != "" && \
+                intent_filter_node.at_css("action").attributes["android:name"].value == "android.intent.action.MAIN" && \
+                intent_filter_node.at_css("category").attributes["android:name"].value == "android.intent.category.LAUNCHER"
+                  # Update manifest values
+                  if activity.attributes["label"].value.start_with? "@string"
+                    # If label is getting from strings.xml, change in strings.xml
+                    string_resource_name = activity.attributes["label"].value.sub("@string/", "")
+                    app_name_resource = strings.search('string[name="' + string_resource_name + '"]')
+                    app_name_resource[0].content = params[:display_name]
+                    File.write(string_resource_path, strings.to_xml)
+                  else
+                    # If label is manually put in the attribute, change the attribute directly
+                    activity.attributes["label"].value = params[:display_name]
+                    File.write(manifest_path, manifest.to_xml)
                   end
                 end
               end
