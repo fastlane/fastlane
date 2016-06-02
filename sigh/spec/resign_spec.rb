@@ -35,6 +35,8 @@ describe Sigh do
     it "SHA1 for identity with name input" do
       stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_3_NAME)
+      # due to order of of identities in the VALID_IDENTITIES_OUTPUT and since names of identities 2) and 3) are aqual
+      # sha1_for_signing_identity(name) returns first matching SHA1 for identity name
       expect(actualresult).to eq(IDENTITY_2_SHA1)
     end
 
