@@ -37,7 +37,7 @@ module Fastlane
 
         break if plugin_name_valid?(plugin_name)
 
-        gem_name = PluginManager::FASTLANE_PLUGIN_PREFIX + plugin_name
+        gem_name = PluginManager.to_gem_name(plugin_name)
 
         if gem_name_taken?(gem_name)
           # Gem name is already taken on RubyGems
@@ -59,7 +59,7 @@ module Fastlane
         # part of the gem name
         [/fastlane/, /plugin/].none? { |regex| regex =~ name } &&
         # Gem name isn't taken on RubyGems yet
-        !gem_name_taken?(PluginManager::FASTLANE_PLUGIN_PREFIX + name)
+        !gem_name_taken?(PluginManager.to_gem_name(name))
     end
 
     # Checks if the gem name is still free on RubyGems
