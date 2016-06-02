@@ -6,7 +6,7 @@ module Fastlane
       end
 
       def self.description
-        '<%= summary %>'
+        "<%= summary.gsub('"', "'") %>"
       end
 
       def self.authors
