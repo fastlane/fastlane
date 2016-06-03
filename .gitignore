@@ -50,4 +50,4 @@ spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml
 **/.bundle
-fastlane/lib/fastlane/plugins/template/rubocop.yml
+fastlane/lib/fastlane/plugins/template/.rubocop.yml

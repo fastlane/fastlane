@@ -7,7 +7,7 @@ require 'fastlane/version'
 # This will use the file name without the `.` as 
 # hidden files are ignored
 rubocop_config = File.expand_path('../../.rubocop.yml', __FILE__)
-`cp #{rubocop_config} #{lib}/fastlane/plugins/template/rubocop.yml`
+`cp #{rubocop_config} #{lib}/fastlane/plugins/template/.rubocop.yml`
 
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
