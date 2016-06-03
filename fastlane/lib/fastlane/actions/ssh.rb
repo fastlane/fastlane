@@ -6,7 +6,7 @@ module Fastlane
     end
 
     class SshAction < Action
-      def self.ssh_exec!(ssh, command, log)
+      def self.ssh_exec!(ssh, command, log=true)
         stdout_data = ""
         stderr_data = ""
         exit_code = nil
