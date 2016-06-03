@@ -28,6 +28,8 @@ module Fastlane
         handle_template_path(template_path, plugin_info)
       end
 
+      after_all(File.join(@dest_root, plugin_info.gem_name))
+
       @ui.success "\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀"
       @ui.success "\nTo get started with using this plugin, run"
       @ui.message "\n    fastlane add_plugin #{plugin_info.plugin_name}\n"
@@ -81,6 +83,13 @@ module Fastlane
       end
 
       path
+    end
+
+    # This method takes care of any cleaning up we have to do
+    # after copying over all the files
+    def after_all(dest_path)
+      # Prefix the rubocop.yml file with a dot, since it's a rubocop requirement
+      FileUtils.mv(File.join(dest_path, "rubocop.yml"), File.join(dest_path, ".rubocop.yml"))
     end
   end
 end
