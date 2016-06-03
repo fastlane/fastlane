@@ -13,7 +13,8 @@ module CredentialsManager
     end
 
     def user
-      @user ||= fetch_password_from_env
+      @user ||= ENV["FASTLANE_USER"]
+      @user ||= ENV["DELIVER_USER"]
       @user ||= AppfileConfig.try_fetch_value(:apple_id)
       ask_for_login if @user.to_s.length == 0
       return @user
