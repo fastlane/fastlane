@@ -994,8 +994,6 @@ upload_symbols_to_sentry(
 )
 ```
 
-`auth_token` is the preferred way to authentication method with Sentry.
-
 The following environment variables may be used in place of parameters: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
