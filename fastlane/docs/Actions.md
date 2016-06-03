@@ -804,8 +804,19 @@ appium(
 ### [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
 
 ```ruby
-pilot(username: "felix@krausefx.com",
-      app_identifier: "com.krausefx.app")
+pilot
+```
+
+#### Options
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
+
+```ruby
+pilot(
+  username: "felix@krausefx.com",
+  app_identifier: "com.krausefx.app",
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
+)
 ```
 
 More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/fastlane/tree/master/pilot).
@@ -817,7 +828,11 @@ deliver
 
 To upload a new build to TestFlight use `pilot` instead.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
+#### Options
+
+If you don't want a PDF report for App Store builds, append `:force` to the command. This is useful when running `fastlane` on your Continuous Integration server: `deliver(force: true)`
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
 
 Other options
 
@@ -825,12 +840,13 @@ Other options
 deliver(
   force: true, # Set to true to skip PDF verification
   email: "itunes@connect.com" # different Apple ID than the dev portal
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
 )
 ```
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
-**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
+**Note:** There is an action named `appstore` which is a convenience alias to `deliver`.
 
 ### TestFlight
 
@@ -1390,7 +1406,7 @@ update_urban_airship_configuration(
   plist_path: "AirshipConfig.plist",
   production_app_key: "PRODKEY",
   production_app_secret: "PRODSECRET"
-)  
+)
 ```
 
 ## Developer Portal
