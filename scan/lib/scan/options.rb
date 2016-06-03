@@ -173,6 +173,10 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
                                     description: "Only post on Slack if the tests fail",
                                     is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
+                                    is_string: false,
                                     default_value: false)
       ]
     end
