@@ -220,6 +220,8 @@ describe Fastlane::PluginGenerator do
           Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rubocop", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
         )
       end
@@ -257,12 +259,6 @@ describe Fastlane::PluginGenerator do
     it "creates a action_spec.rb file" do
       action_spec_file = File.join(tmp_dir, gem_name, 'spec', "#{plugin_name}_action_spec.rb")
       expect(File.exist?(action_spec_file)).to be(true)
-
-      # Actually run our generated spec as part of this spec #yodawg
-      Dir.chdir(gem_name) do
-        `rspec &> /dev/null`
-        expect($?.exitstatus).to be(0)
-      end
     end
 
     it "creates a Rakefile" do
@@ -270,7 +266,34 @@ describe Fastlane::PluginGenerator do
       expect(File.exist?(rakefile)).to be(true)
 
       rakefile_contents = File.read(rakefile)
-      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n")
+      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n\nrequire 'rspec/core/rake_task'\nRSpec::Core::RakeTask.new\n\nrequire 'rubocop/rake_task'\nRuboCop::RakeTask.new(:rubocop)\n\ntask default: [:spec, :rubocop]\n")
+    end
+
+    describe "All tests and style validation of the new plugin are passing" do
+      it "rspec tests are passing" do
+        # Actually run our generated spec as part of this spec #yodawg
+        Dir.chdir(gem_name) do
+          `rspec &> /dev/null`
+          expect($?.exitstatus).to be(0)
+        end
+      end
+
+      it "rubocop validations are passing" do
+        # Actually run our generated spec as part of this spec #yodawg
+        Dir.chdir(gem_name) do
+          `rubocop &> /dev/null`
+          expect($?.exitstatus).to be(0)
+        end
+      end
+
+      it "`rake` runs both rspec and rubocop" do
+        Dir.chdir(gem_name) do
+          result = `rake`
+          expect($?.exitstatus).to be(0)
+          expect(result).to include("no offenses detected") # rubocop
+          expect(result).to include("example, 0 failures") # rspec
+        end
+      end
     end
   end
 end

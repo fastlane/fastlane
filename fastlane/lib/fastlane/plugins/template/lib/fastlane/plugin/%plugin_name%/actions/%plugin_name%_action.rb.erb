@@ -6,11 +6,11 @@ module Fastlane
       end
 
       def self.description
-        %q{<%= summary %>}
+        "<%= summary.gsub('"', "'") %>"
       end
 
       def self.authors
-        [%q{<%= author %>}]
+        ["<%= author.gsub('"', "'") %>"]
       end
 
       def self.available_options
