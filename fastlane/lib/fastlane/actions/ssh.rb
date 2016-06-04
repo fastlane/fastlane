@@ -6,7 +6,7 @@ module Fastlane
     end
 
     class SshAction < Action
-      def self.ssh_exec!(ssh, command)
+      def self.ssh_exec!(ssh, command, log = true)
         stdout_data = ""
         stderr_data = ""
         exit_code = nil
@@ -18,10 +18,13 @@ module Fastlane
             end
             channel.on_data do |ch1, data|
               stdout_data += data
+              UI.command_output(data) if log
             end
 
             channel.on_extended_data do |ch2, type, data|
-              stderr_data += data
+              # Only type 1 data is stderr (though no other types are defined by the standard)
+              # See http://net-ssh.github.io/net-ssh/Net/SSH/Connection/Channel.html#method-i-on_extended_data
+              stderr_data += data if type == 1
             end
 
             channel.on_request("exit-status") do |ch3, data|
@@ -33,6 +36,8 @@ module Fastlane
             end
           end
         end
+
+        # Wait for all open channels to close
         ssh.loop
         {stdout: stdout_data, stderr: stderr_data, exit_code: exit_code, exit_signal: exit_signal}
       end
@@ -48,17 +53,19 @@ module Fastlane
 
         Net::SSH.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |ssh|
           params[:commands].each do |cmd|
-            UI.important(['[SSH COMMAND]', cmd].join(': ')) if params[:log]
-            return_value = ssh_exec!(ssh, cmd)
-            UI.error("SSH Command failed '#{cmd}' Exit-Code: #{return_value[:exit_code]}") if return_value[:exit_code] > 0
-            UI.user_error!("SSH Command failed") if return_value[:exit_code] > 0
+            UI.command(cmd) if params[:log]
+            return_value = ssh_exec!(ssh, cmd, params[:log])
+            if return_value[:exit_code] != 0
+              UI.error("SSH Command failed '#{cmd}' Exit-Code: #{return_value[:exit_code]}")
+              UI.user_error!("SSH Command failed")
+            end
 
             stderr << return_value[:stderr]
             stdout << return_value[:stdout]
           end
         end
-        UI.message("Succesfully executed #{params[:commands].count} commands on host: #{params[:host]}")
-        UI.message("\n########### \n #{stdout} \n###############".magenta) if params[:log]
+        command_word = params[:commands].count == 1 ? "command" : "commands"
+        UI.success("Succesfully executed #{params[:commands].count} #{command_word} on host #{params[:host]}")
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = stdout
         Actions.lane_context[SharedValues::SSH_STDERR_VALUE] = stderr
         return {stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE]}
@@ -116,7 +123,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :log,
                                        short_option: "-l",
                                        env_name: "FL_SSH_LOG",
-                                       description: "Log Commands",
+                                       description: "Log commands and output",
                                        optional: true,
                                        default_value: true,
                                        is_string: false
@@ -126,8 +133,8 @@ module Fastlane
 
       def self.output
         [
-          ['SSH_STDOUT_VALUE', 'Holds the standard-output of all commands'],
-          ['SSH_STDERR_VALUE', 'Holds the standard-error of all commands']
+          ['SSH_STDOUT_VALUE', 'Holds the standard output of all commands'],
+          ['SSH_STDERR_VALUE', 'Holds the standard error of all commands']
         ]
       end
 
