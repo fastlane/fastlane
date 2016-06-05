@@ -84,7 +84,7 @@ describe Fastlane do
 
     describe "#gem_dependency_suffix" do
       it "default to RubyGems if gem is available" do
-        expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return({anything: :really})
+        expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return({ anything: :really })
         expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
       end
 

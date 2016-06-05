@@ -24,7 +24,7 @@ describe Frameit do
       end
 
       it 'returns nil for mac screenshots' do
-        screenshot = make_screenshot({mac?: true})
+        screenshot = make_screenshot({ mac?: true })
         expected_result = nil
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)

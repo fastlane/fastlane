@@ -7,7 +7,6 @@ module Fastlane
     end
 
     class XcodeServerGetAssetsAction < Action
-
       require 'excon'
       require 'json'
       require 'fileutils'
@@ -108,7 +107,6 @@ module Fastlane
       end
 
       class XcodeServer
-
         def initialize(host, username, password)
           @host = host.start_with?('https://') ? host : "https://#{host}"
           @username = username
@@ -131,7 +129,7 @@ module Fastlane
         def fetch_assets(integration_id, target_folder, action)
           # create a temp folder and a file, stream the download into it
           Dir.mktmpdir do |dir|
-            temp_file = File.join(dir, "tmp_download.#{rand(1000000)}")
+            temp_file = File.join(dir, "tmp_download.#{rand(1_000_000)}")
             f = open(temp_file, 'w')
             streamer = lambda do |chunk, remaining_bytes, total_bytes|
               if remaining_bytes && total_bytes
@@ -149,7 +147,7 @@ module Fastlane
             UI.user_error!("Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}") if response.status != 200
 
             # unzip it, it's a .tar.gz file
-            out_folder = File.join(dir, "out_#{rand(1000000)}")
+            out_folder = File.join(dir, "out_#{rand(1_000_000)}")
             FileUtils.mkdir_p(out_folder)
 
             action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"

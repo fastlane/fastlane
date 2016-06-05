@@ -167,7 +167,7 @@ describe Scan do
         options = { project: "./examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
           "platform=iOS Simulator,name=iPad Air 2,OS=9.2"
-        ]}
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate
@@ -187,7 +187,7 @@ describe Scan do
         options = { project: "./examples/standard/app.xcodeproj", devices: [
           "iPhone 6s (9.3)",
           "iPad Air (9.3)"
-        ]}
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate
@@ -208,7 +208,7 @@ describe Scan do
           options = { project: "./examples/standard/app.xcodeproj", device: [
             "iPhone 6s (9.3)",
             "iPad Air (9.3)"
-          ]}
+          ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         end.to raise_error("'device' value must be a String! Found Array instead.")
       end

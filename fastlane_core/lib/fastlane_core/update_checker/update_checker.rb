@@ -135,8 +135,8 @@ module FastlaneCore
     def self.android_app_identifier_arg?(gem_name, arg)
       return arg == "--package_name" ||
              arg == "--app_package_name" ||
-            (arg == '-p' && gem_name == 'supply') ||
-            (arg == '-a' && gem_name == 'screengrab')
+             (arg == '-p' && gem_name == 'supply') ||
+             (arg == '-a' && gem_name == 'screengrab')
     end
 
     # To not count the same projects multiple time for the number of launches

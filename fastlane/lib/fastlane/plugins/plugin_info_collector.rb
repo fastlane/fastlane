@@ -147,6 +147,5 @@ module Fastlane
     def summary_valid?(summary)
       !summary.to_s.strip.empty?
     end
-
   end
 end

@@ -112,8 +112,7 @@ module Fastlane
                        screenshot5: screenshots[4],
                        group_ids: group_ids,
                        provider: 'fastlane'
-                     }
-                   }.to_json
+                     } }.to_json
         uoa_response = http.request(req)
         json_res = JSON.parse(uoa_response.body)
         if json_res['errors']

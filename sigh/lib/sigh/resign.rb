@@ -167,6 +167,5 @@ module Sigh
       end
       descriptions
     end
-
   end
 end
