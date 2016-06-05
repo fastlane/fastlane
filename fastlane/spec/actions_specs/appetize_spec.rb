@@ -17,9 +17,9 @@ describe Fastlane do
     let(:request) { double('request') }
     let(:response) { double('response') }
     let(:params) do
-      {token: api_token,
+      { token: api_token,
        url: url,
-       platform: 'ios'}
+       platform: 'ios' }
     end
 
     before do

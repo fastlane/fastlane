@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     class LcovAction < Action
-
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
@@ -84,7 +83,6 @@ module Fastlane
       def self.exclude_dirs
         ["/Applications/*", "/Frameworks/*"]
       end
-
     end
   end
 end

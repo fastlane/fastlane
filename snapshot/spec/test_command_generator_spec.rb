@@ -30,7 +30,8 @@ describe Snapshot do
               :build,
               :test,
               "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
-            ])
+            ]
+          )
         end
       end
 

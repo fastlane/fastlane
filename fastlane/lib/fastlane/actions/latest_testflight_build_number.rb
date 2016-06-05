@@ -7,7 +7,6 @@ module Fastlane
     end
 
     class LatestTestflightBuildNumberAction < Action
-
       def self.run(params)
         require 'spaceship'
 

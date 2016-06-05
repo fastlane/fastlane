@@ -89,8 +89,7 @@ module Fastlane
                    "But found these actual changes: \n#{hg_dirty_files.join("\n")}.",
                    "Make sure you have cleaned up the build artifacts and are only left with the changed version files at this",
                    "stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to ",
-                   "bypass this check, and always commit a version bump regardless of the state of the working directory."
-                  ].join("\n")
+                   "bypass this check, and always commit a version bump regardless of the state of the working directory."].join("\n")
             UI.user_error!(str)
           end
         end
