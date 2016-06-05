@@ -1306,6 +1306,13 @@ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revisio
 
 There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash.
 
+### goodify_info_plist
+```ruby
+goodify_info_plist
+```
+
+This action will update the plist so that the built application can be deployed and managed within BlackBerry's Good Dynamics Control Center for Enterprise Mobility Management.
+
 ### set_build_number_repository
 ```ruby
 set_build_number_repository
