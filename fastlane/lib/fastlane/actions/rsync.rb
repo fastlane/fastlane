@@ -5,7 +5,6 @@ module Fastlane
     end
 
     class RsyncAction < Action
-
       def self.run(params)
         rsync_cmd = ["rsync"]
         rsync_cmd << params[:extra]
@@ -34,22 +33,19 @@ module Fastlane
                                        description: "Port", # a short description of this parameter
                                        optional: true,
                                        default_value: "-av",
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :source,
                                        short_option: "-S",
                                        env_name: "FL_RSYNC_SRC", # The name of the environment variable
                                        description: "source file/folder", # a short description of this parameter
                                        optional: false,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        short_option: "-D",
                                        env_name: "FL_RSYNC_DST", # The name of the environment variable
                                        description: "destination file/folder", # a short description of this parameter
                                        optional: false,
-                                       is_string: true
-                                      )
+                                       is_string: true)
         ]
       end
 

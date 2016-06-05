@@ -109,14 +109,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
-                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}",
+                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
                                          matches_option = GIT_MERGE_COMMIT_FILTERING_OPTIONS.any? { |opt| opt.to_s == value }
-                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}") unless matches_option
-                                       end
-                                      )
+                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}") unless matches_option
+                                       end)
         ]
       end
 

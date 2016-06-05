@@ -21,7 +21,7 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined?SpecHelper
+      defined? SpecHelper
     end
 
     # @return [boolean] true if building in a known CI environment

@@ -22,7 +22,7 @@ describe Fastlane do
         action = 'slack'
 
         expect(@runner).to receive(:execute_action).with(
-          action, Fastlane::Actions::SlackAction, [{message: "something" }], { custom_dir: "." }
+          action, Fastlane::Actions::SlackAction, [{ message: "something" }], { custom_dir: "." }
         )
 
         Fastlane::OneOff.execute(args: [action, "message:something"])

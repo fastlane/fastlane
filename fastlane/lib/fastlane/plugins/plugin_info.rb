@@ -39,9 +39,9 @@ module Fastlane
 
     def ==(other)
       @plugin_name == other.plugin_name &&
-      @author == other.author &&
-      @email == other.email &&
-      @summary == other.summary
+        @author == other.author &&
+        @email == other.email &&
+        @summary == other.summary
     end
   end
 end

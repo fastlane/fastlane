@@ -27,7 +27,8 @@ module Fastlane
       program :description, [
         "CLI for 'fastlane' - #{Fastlane::DESCRIPTION}\n",
         "\tRun using `fastlane [platform] [lane_name]`",
-        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"].join("\n")
+        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"
+      ].join("\n")
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'

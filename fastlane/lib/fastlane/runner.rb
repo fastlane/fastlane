@@ -167,7 +167,7 @@ module Fastlane
         UI.success "Cruising back to lane '#{original_full}' 🚘".green
         return result
       else
-        raise LaneNotAvailableError.new
+        raise LaneNotAvailableError.new, "Lane not found"
       end
     end
 

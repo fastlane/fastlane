@@ -26,8 +26,7 @@ module Fastlane
                                        env_name: "FL_XCODE_VERSION",
                                        description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')",
                                        optional: false,
-                                       verify_block: Helper::XcversionHelper::Verify.method(:requirement)
-                                      )
+                                       verify_block: Helper::XcversionHelper::Verify.method(:requirement))
         ]
       end
 
