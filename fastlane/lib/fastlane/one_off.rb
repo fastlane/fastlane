@@ -24,6 +24,8 @@ module Fastlane
     end
 
     def self.run(action: nil, parameters: nil)
+      Fastlane.load_actions
+
       class_name = action.fastlane_class + 'Action'
       class_ref = nil
       begin
