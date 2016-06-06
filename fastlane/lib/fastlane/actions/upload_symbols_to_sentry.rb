@@ -17,7 +17,7 @@ module Fastlane
 
         # Url to post dSYMs to
         url = "#{host}/projects/#{org}/#{project}/files/dsyms/"
-        resource = RestClient::Resource.new( url, api_key, '' )
+        resource = RestClient::Resource.new(url, api_key, '')
 
         UI.message "Will upload dSYM(s) to #{url}"
 
@@ -64,8 +64,7 @@ module Fastlane
                                        description: "API host url for Sentry",
                                        is_string: true,
                                        default_value: "https://app.getsentry.com/api/0",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "SENTRY_API_KEY",
                                        description: "API Key for Sentry",

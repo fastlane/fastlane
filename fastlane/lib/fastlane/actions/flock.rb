@@ -14,7 +14,8 @@ module Fastlane
       def self.notify_incoming_message_webhook(base_url, message, token)
         uri = URI.join(base_url + '/', token)
         response = Net::HTTP.start(
-          uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          uri.host, uri.port, use_ssl: uri.scheme == 'https'
+        ) do |http|
           request = Net::HTTP::Post.new uri.path
           request.content_type = 'application/json'
           request.body = JSON.generate("text" => message)

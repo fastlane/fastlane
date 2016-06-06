@@ -77,7 +77,7 @@ module Fastlane
 
       def self.params_hash_to_cli_args(params)
         # Remove nil and false value params
-        params = params.delete_if { |_, v| v.nil? || v == false}
+        params = params.delete_if { |_, v| v.nil? || v == false }
 
         cli_args = []
         params.each do |key, value|
