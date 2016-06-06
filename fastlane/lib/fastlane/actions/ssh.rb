@@ -39,7 +39,7 @@ module Fastlane
 
         # Wait for all open channels to close
         ssh.loop
-        {stdout: stdout_data, stderr: stderr_data, exit_code: exit_code, exit_signal: exit_signal}
+        { stdout: stdout_data, stderr: stderr_data, exit_code: exit_code, exit_signal: exit_signal }
       end
 
       def self.run(params)
@@ -51,7 +51,7 @@ module Fastlane
         stdout = ""
         stderr = ""
 
-        Net::SSH.start(params[:host], params[:username], {port: params[:port].to_i, password: params[:password]}) do |ssh|
+        Net::SSH.start(params[:host], params[:username], { port: params[:port].to_i, password: params[:password] }) do |ssh|
           params[:commands].each do |cmd|
             UI.command(cmd) if params[:log]
             return_value = ssh_exec!(ssh, cmd, params[:log])
@@ -68,7 +68,7 @@ module Fastlane
         UI.success("Succesfully executed #{params[:commands].count} #{command_word} on host #{params[:host]}")
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = stdout
         Actions.lane_context[SharedValues::SSH_STDERR_VALUE] = stderr
-        return {stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE]}
+        return { stdout: Actions.lane_context[SharedValues::SSH_STDOUT_VALUE], stderr: Actions.lane_context[SharedValues::SSH_STDERR_VALUE] }
       end
 
       #####################################################
@@ -89,45 +89,39 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "FL_SSH_USERNAME",
                                        description: "Username",
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :password,
                                        short_option: "-p",
                                        env_name: "FL_SSH_PASSWORD",
                                        description: "Password",
                                        optional: true,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :host,
                                        short_option: "-H",
                                        env_name: "FL_SSH_HOST",
                                        description: "Hostname",
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :port,
                                        short_option: "-P",
                                        env_name: "FL_SSH_PORT",
                                        description: "Port",
                                        optional: true,
                                        default_value: "22",
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :commands,
                                        short_option: "-C",
                                        env_name: "FL_SSH_COMMANDS",
                                        description: "Commands",
                                        optional: true,
                                        is_string: false,
-                                       type: Array
-                                      ),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :log,
                                        short_option: "-l",
                                        env_name: "FL_SSH_LOG",
                                        description: "Log commands and output",
                                        optional: true,
                                        default_value: true,
-                                       is_string: false
-                                      )
+                                       is_string: false)
         ]
       end
 

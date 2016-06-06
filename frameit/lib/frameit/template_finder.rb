@@ -1,7 +1,6 @@
 module Frameit
   # Responsible for finding the correct device
   class TemplateFinder
-
     class FilenameTransform
       def initialize(device_name)
         @device_name = device_name

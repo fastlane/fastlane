@@ -315,7 +315,7 @@ module Spaceship
       # other clients.
       #
       # https://github.com/fastlane/fastlane/issues/4610
-      headers = {'Accept-Encoding' => 'identity'}
+      headers = { 'Accept-Encoding' => 'identity' }
       # We need a service key from a JS file to properly auth
       js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
       @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
@@ -431,7 +431,7 @@ module Spaceship
       end
 
       if content.nil?
-        raise UnexpectedResponse.new(response.body)
+        raise UnexpectedResponse, response.body
       else
         store_csrf_tokens(response)
         content

@@ -36,7 +36,8 @@ module Fastlane
           options[:ipa],
           options.values.select do |key, _|
             filter.include? key
-          end)
+          end
+        )
         if parse_response(response)
           UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
           UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")

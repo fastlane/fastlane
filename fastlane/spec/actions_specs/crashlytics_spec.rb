@@ -126,8 +126,7 @@ describe Fastlane do
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
              "-notifications YES",
-             "-debug NO"
-            ].each do |to_be|
+             "-debug NO"].each do |to_be|
               expect(command).to include(to_be)
             end
           end

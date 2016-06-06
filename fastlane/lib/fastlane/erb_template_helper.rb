@@ -16,7 +16,6 @@ module Fastlane
     def self.render(template, template_vars_hash)
       Fastlane::ErbalT.new(template_vars_hash).render(template)
     end
-
   end
   class ErbalT < OpenStruct
     def render(template)
