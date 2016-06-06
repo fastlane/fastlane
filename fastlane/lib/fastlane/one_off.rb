@@ -2,6 +2,8 @@ module Fastlane
   # Call actions without triggering a full lane
   class OneOff
     def self.execute(args: nil)
+      Fastlane.load_actions
+
       action_parameters = {}
       action_name = nil
 
