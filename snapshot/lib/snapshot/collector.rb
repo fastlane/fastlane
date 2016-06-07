@@ -34,10 +34,10 @@ module Snapshot
         json_output_path = File.join(language_folder, components.join("-") + ".json")
         if $verbose
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
-          UI.success "Create meta json file to '#{json_output_path}' ..."
+          UI.success "Creating meta json file to '#{json_output_path}' ..."
         else
           UI.success "Copying '#{output_path}'..."
-          UI.success "Create meta json file to '#{json_output_path}' ..."
+          UI.success "Creating '#{json_output_path}' ..."
         end
         FileUtils.cp(from_path, output_path)
         IO.write(json_output_path, meta, mode: 'w')

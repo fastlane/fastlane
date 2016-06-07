@@ -22,7 +22,7 @@ func setupSnapshot(app: XCUIApplication) {
 }
 
 func snapshot(name: String, waitForLoadingIndicator: Bool = true, additionalInfos:Dictionary<String,AnyObject>? = nil) {
-    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator,additionalInfos:additionalInfos)
+    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator, additionalInfos:additionalInfos)
 }
 
 public class Snapshot: NSObject {
@@ -93,7 +93,7 @@ public class Snapshot: NSObject {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
-        var metaInfos = "";
+        var metaInfos = ""
         if let additionalInfos = additionalInfos {
             do {
                 let jsonData:NSData? = try NSJSONSerialization.dataWithJSONObject(additionalInfos,options:NSJSONWritingOptions.init(rawValue: 0))
@@ -105,7 +105,8 @@ public class Snapshot: NSObject {
             }
         }
 
-        print("snapshot: \(name) meta: \(metaInfos)") // more information about this, check out https://github.com/fastlane/snapshot
+        // more information about this, check out https://github.com/fastlane/snapshot
+        print("snapshot: \(name) meta: \(metaInfos)")
 
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown
