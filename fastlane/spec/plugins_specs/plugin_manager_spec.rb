@@ -147,6 +147,25 @@ describe Fastlane do
       end
     end
 
+    describe "#add_dependency" do
+      it "shows an error if a dash is used" do
+        pm = Fastlane::PluginManager.new
+        expect(pm).to receive(:pluginfile_path).and_return(".")
+        expect do
+          pm.add_dependency("ya-tu_sabes")
+        end.to raise_error("Plugin name must not contain a '-', did you mean '_'?")
+      end
+
+      it "works with valid parameters" do
+        pm = Fastlane::PluginManager.new
+        expect(pm).to receive(:pluginfile_path).and_return(".")
+        expect(pm).to receive(:plugin_is_added_as_dependency?).with("fastlane-plugin-tunes").and_return(true)
+        expect(pm).to receive(:ensure_plugins_attached!)
+
+        pm.add_dependency("tunes")
+      end
+    end
+
     describe "Overwriting plugins" do
       it "shows a warning if a plugin overwrites an existing action" do
         module Fastlane::Crashlytics
