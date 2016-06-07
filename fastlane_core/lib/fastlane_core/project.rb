@@ -182,9 +182,9 @@ module FastlaneCore
 
     def xcodebuild_parameters
       proj = []
-      proj << "-workspace '#{options[:workspace]}'" if options[:workspace]
-      proj << "-scheme '#{options[:scheme]}'" if options[:scheme]
-      proj << "-project '#{options[:project]}'" if options[:project]
+      proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
+      proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
+      proj << "-project #{options[:project].shellescape}" if options[:project]
 
       return proj
     end
