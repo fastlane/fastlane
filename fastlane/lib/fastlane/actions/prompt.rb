@@ -5,7 +5,7 @@ module Fastlane
         params[:text] += " (y/n)" if params[:boolean]
         UI.message(params[:text])
 
-        return params[:ci_input] if Helper.is_ci?
+        return params[:ci_input] unless UI.interactive?
 
         if params[:multi_line_end_keyword]
           # Multi line
