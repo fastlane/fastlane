@@ -73,6 +73,8 @@ module Fastlane
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
 
+      Fastlane::PluginUpdateManager.show_update_status
+
       if error
         UI.error 'fastlane finished with errors'
         raise error
