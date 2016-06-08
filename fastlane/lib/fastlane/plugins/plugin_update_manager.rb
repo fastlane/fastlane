@@ -2,10 +2,12 @@ module Fastlane
   # Alert the user when updates for plugins are available
   class PluginUpdateManager
     def self.start_looking_for_updates
+      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
       Thread.new do
-        self.references.each do |plugin_name, current_plugin|
+        self.plugin_references.each do |plugin_name, current_plugin|
           begin
-            self.server_results[plugin_name] = Gem::Version.new(fetch_latest_version(plugin_name))
+            self.server_results[plugin_name] = fetch_latest_version(plugin_name)
           rescue
           end
         end
@@ -13,13 +15,15 @@ module Fastlane
     end
 
     def self.show_update_status
+      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
       # We set self.server_results to be nil
       # this way the table is not printed twice
       # (next to the summary table or when an exception happens)
       return unless self.server_results.count > 0
 
       rows = []
-      self.references.each do |plugin_name, current_plugin|
+      self.plugin_references.each do |plugin_name, current_plugin|
         latest_version = self.server_results[plugin_name]
         next if latest_version.nil?
         current_version = Gem::Version.new(current_plugin[:version_number])
@@ -48,12 +52,12 @@ module Fastlane
       @server_results = nil
     end
 
-    def self.references
+    def self.plugin_references
       Fastlane.plugin_manager.plugin_references
     end
 
     def self.fetch_latest_version(gem_name)
-      PluginManager.fetch_gem_info_from_rubygems(gem_name)["version"]
+      Gem::Version.new(PluginManager.fetch_gem_info_from_rubygems(gem_name)["version"])
     rescue
       nil
     end
