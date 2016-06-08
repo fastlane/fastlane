@@ -15,9 +15,12 @@ module Fastlane
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
       Fastlane.plugin_manager.load_plugins
+      # *after* loading the plugins
+      Fastlane::PluginUpdateManager.start_looking_for_updates
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      Fastlane::PluginUpdateManager.show_update_status
     end
 
     # rubocop:disable Metrics/AbcSize
