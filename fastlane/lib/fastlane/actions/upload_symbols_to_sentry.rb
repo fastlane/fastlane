@@ -37,7 +37,7 @@ module Fastlane
         if has_api_key
           resource = RestClient::Resource.new(url, api_key, '')
         else
-          resource = RestClient::Resource.new(url, headers: {Authorization: "Bearer #{auth_token}"})
+          resource = RestClient::Resource.new(url, {headers: {Authorization: "Bearer #{auth_token}"}})
         end
 
         UI.message "Will upload dSYM(s) to #{url}"
