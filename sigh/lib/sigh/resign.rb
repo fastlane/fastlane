@@ -33,7 +33,7 @@ module Sigh
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
       verbose = "-v" if $verbose
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
-      specific_keychain = "--keychain-path '#{keychain_path}'" if keychain_path
+      specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
 
       command = [
         resign_path.shellescape,
