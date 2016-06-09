@@ -1708,7 +1708,7 @@ Executes a simple `git pull --tags` command
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
-Tags will be pushed as well.
+Tags will be pushed as well by default, except when setting the option 'tags' to false.
 
 ```ruby
 push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
@@ -1717,7 +1717,8 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true               # optional, default: false
+  force: true,              # optional, default: false
+  tags: false               # optional, default: true
 )
 ```
 
