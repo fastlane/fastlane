@@ -8,9 +8,9 @@ module Sigh
 
       ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      success = resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
-
-      raise "Resign failed" unless success
+      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+        UI.user_error!("Failed to re-sign .ipa")
+      end
     end
 
     def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
