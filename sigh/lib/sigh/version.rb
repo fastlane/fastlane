@@ -1,3 +1,3 @@
 module Sigh
-  VERSION = "1.8.0-maxc"
+  VERSION = "1.8.1"
 end
