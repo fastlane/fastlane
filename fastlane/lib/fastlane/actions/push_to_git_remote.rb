@@ -50,7 +50,7 @@ module Fastlane
                                        description: "Force push to remote. Defaults to false",
                                        is_string: false,
                                        default_value: false),
-	  FastlaneCore::ConfigItem.new(key: :tags,
+          FastlaneCore::ConfigItem.new(key: :tags,
 	                               env_name: "FL_PUSH_GIT_TAGS",
 	                               description: "Wether tags are pushed to remote. Defaults to true",
 	                               is_string: false,
