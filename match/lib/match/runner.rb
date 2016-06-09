@@ -58,6 +58,9 @@ module Match
           Utils.import(cert_path, params[:keychain_name])
         end
 
+        # openssl cert info
+        Utils.log_certificate_public_key(cert_path)
+
         # Import the private key
         # there seems to be no good way to check if it's already installed - so just install it
         Utils.import(keys.last, params[:keychain_name])
