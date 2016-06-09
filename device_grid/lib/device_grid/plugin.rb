@@ -1,3 +1,4 @@
+require 'danger'
 require 'fastlane'
 
 module Danger
