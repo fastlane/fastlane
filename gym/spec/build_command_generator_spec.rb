@@ -29,8 +29,8 @@ describe Gym do
       expect(result).to eq([
                              "set -o pipefail &&",
                              "xcodebuild",
-                             "-scheme 'Example'",
-                             "-project './examples/standard/Example.xcodeproj'",
+                             "-scheme Example",
+                             "-project ./examples/standard/Example.xcodeproj",
                              "-sdk '9.0'",
                              "-destination 'generic/platform=iOS'",
                              "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
@@ -53,8 +53,8 @@ describe Gym do
         expect(result).to eq([
                                "set -o pipefail &&",
                                "xcodebuild",
-                               "-scheme 'Example'",
-                               "-project './examples/standard/Example.xcodeproj'",
+                               "-scheme Example",
+                               "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                :archive,
@@ -64,7 +64,7 @@ describe Gym do
 
       it "#project_path_array" do
         result = Gym::BuildCommandGenerator.project_path_array
-        expect(result).to eq(["-scheme 'Example'", "-project './examples/standard/Example.xcodeproj'"])
+        expect(result).to eq(["-scheme Example", "-project ./examples/standard/Example.xcodeproj"])
       end
 
       it "default #build_path" do
@@ -112,8 +112,8 @@ describe Gym do
         expect(result).to eq([
                                "set -o pipefail &&",
                                "xcodebuild",
-                               "-scheme 'Example'",
-                               "-project './examples/standard/Example.xcodeproj'",
+                               "-scheme Example",
+                               "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                "-derivedDataPath '/tmp/my/derived_data'",
@@ -134,8 +134,8 @@ describe Gym do
         expect(result).to eq([
                                "set -o pipefail &&",
                                "xcodebuild",
-                               "-scheme 'Example'",
-                               "-project './examples/standard/Example.xcodeproj'",
+                               "-scheme Example",
+                               "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                "-resultBundlePath './ExampleProductName.result'",
