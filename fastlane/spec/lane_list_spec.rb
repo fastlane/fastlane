@@ -31,5 +31,10 @@ describe Fastlane do
  }
  })
     end
+
+    it "generates empty JSON if there is no Fastfile" do
+      result = Fastlane::LaneList.generate_json(nil)
+      expect(result).to eq({})
+    end
   end
 end
