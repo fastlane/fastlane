@@ -24,6 +24,7 @@ Create a `Gemfile` in your project's directory with the following content
 ```ruby
 gem "fastlane"
 gem "danger"
+gem "danger-device_grid"
 ```
 
 and run
@@ -66,9 +67,7 @@ require 'fastlane'
 result = Fastlane::OneOff.run(action: "build_and_upload_to_appetize",
                           parameters: options)
 
-require 'fastlane/actions/device_grid/device_grid'
-
-device_grid(
+device_grid.run(
   public_key: result,
   languages: ["en", "de"],
   devices: ["iphone5s", "iphone6splus", "ipadair"]
