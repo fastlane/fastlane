@@ -163,8 +163,10 @@ module Gym
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",
                                      description: "The path to the provisioning profile (optional)",
                                      optional: true,
+                                     deprecated: 'Use target specific provisioning profiles instead',
                                      verify_block: proc do |value|
                                        UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.important("DEPRECATED --provisioning_profile_path OPTION. Use target specific profiles instead")
                                      end),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
