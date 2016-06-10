@@ -1,5 +1,5 @@
 def for_each_gem
-  ['sigh', 'cert'].each do |g|
+  GEMS.each do |g|
     yield g if block_given?
   end
 end
@@ -113,6 +113,7 @@ task :test_all do
 
   require 'coveralls'
   require 'simplecov'
+  SimpleCov.command_name('Unit Tests')
   r = {}
   for_each_gem do |repo|
     begin
