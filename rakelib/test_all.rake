@@ -1,5 +1,5 @@
 def for_each_gem
-  GEMS.each do |g|
+  ['sigh', 'cert'].each do |g|
     yield g if block_given?
   end
 end
@@ -115,9 +115,13 @@ task :test_all do
   require 'simplecov'
   r = {}
   for_each_gem do |repo|
-    puts "Loading coverage data of #{repo}"
-    data = JSON.parse(File.read(File.join(repo, "coverage", ".resultset.json")))
-    r = SimpleCov::Result.from_hash(data).original_result.merge_resultset(r)
+    begin
+      puts "Loading coverage data of #{repo}"
+      data = JSON.parse(File.read(File.join(repo, "coverage", ".resultset.json")))
+      r = SimpleCov::Result.from_hash(data).original_result.merge_resultset(r)
+    rescue => ex
+      puts "No test results found for #{repo} => #{ex}"
+    end
   end
 
   Coveralls::SimpleCov::Formatter.new.format(SimpleCov::Result.new(r))
