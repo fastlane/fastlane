@@ -30,13 +30,13 @@ module Match
       out_array << output[2]
 
       oppenssl_keys_to_readable_keys = {
-          UID: 'User ID',
-          CN: 'Certificate Name',
-          OU: 'Organisation Unit',
-          O: 'Organisation Name',
-          C: 'Country',
-          notBefore: 'Start Datetime',
-          notAfter: 'End Datetime'
+          'UID' => 'User ID',
+          'CN' => 'Certificate Name',
+          'OU' => 'Organisation Unit',
+          'O' => 'Organisation Name',
+          'C' => 'Country',
+          'notBefore' => 'Start Datetime',
+          'notAfter' => 'End Datetime'
       }
 
       # collect openssl answer to structure [[key1, v1], [key2, v2], ...]
