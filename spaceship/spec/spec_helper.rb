@@ -7,7 +7,7 @@ end
 
 require 'simplecov'
 require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'client_stubbing'
 require 'portal/portal_stubbing'
