@@ -111,6 +111,17 @@ task :test_all do
     end
   end
 
+  require 'coveralls'
+  require 'simplecov'
+  r = {}
+  for_each_gem do |repo|
+    puts "Loading coverage data of #{repo}"
+    data = JSON.parse(File.read(File.join(repo, "coverage", ".resultset.json")))
+    r = SimpleCov::Result.from_hash(data).original_result.merge_resultset(r)
+  end
+
+  Coveralls::SimpleCov::Formatter.new.format(SimpleCov::Result.new(r))
+
   failed_tests_by_gem = {}
   example_count = 0
   duration = 0.0
