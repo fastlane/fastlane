@@ -1,4 +1,3 @@
-require 'danger'
 require 'fastlane'
 
 module Danger
@@ -20,9 +19,9 @@ module Danger
       languages ||= ["en"]
 
       prefix_command ||= ""
-      prefix_command += " bundle exec " if File.exist?("Gemfile")
+      #prefix_command += " bundle exec " if File.exist?("Gemfile")
 
-      # To use the local fastlane intead of bundle
+      # To use the local fastlane instead of bundle
       prefix_command = "./bin/" if FastlaneCore::Helper.test?
 
       deep_link_matches = pr_body.match(/:link:\s(.*)/) # :link: emoji
