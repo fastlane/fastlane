@@ -79,9 +79,9 @@ module Fastlane
         c.option "-j", "--json", "Output the lanes in JSON instead of text"
 
         c.action do |args, options|
-          if ensure_fastfile
+          if options.json || ensure_fastfile
             require 'fastlane/lane_list'
-            path = File.join(Fastlane::FastlaneFolder.fastfile_path)
+            path = Fastlane::FastlaneFolder.fastfile_path
 
             if options.json
               Fastlane::LaneList.output_json(path)

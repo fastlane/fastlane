@@ -45,8 +45,9 @@ module Fastlane
 
     # Returns a hash
     def self.generate_json(path)
-      ff = Fastlane::FastFile.new(path)
       output = {}
+      return output if path.nil?
+      ff = Fastlane::FastFile.new(path)
 
       all_keys = ff.runner.lanes.keys
 
