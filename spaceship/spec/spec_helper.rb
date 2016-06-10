@@ -1,3 +1,7 @@
+require 'simplecov'
+require 'coveralls'
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
 require 'spaceship'
 require 'plist'
 
@@ -5,26 +9,10 @@ require 'plist'
 module SpecHelper
 end
 
-require 'simplecov'
-require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
-
 require 'client_stubbing'
 require 'portal/portal_stubbing'
 require 'tunes/tunes_stubbing'
 require 'du/du_stubbing'
-
-SimpleCov.at_exit do
-  puts "Coverage done"
-  SimpleCov.result.format!
-end
-
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-]
-
-SimpleCov.start
 
 ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"
