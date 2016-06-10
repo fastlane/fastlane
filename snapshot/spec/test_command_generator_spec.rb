@@ -23,8 +23,8 @@ describe Snapshot do
             [
               "set -o pipefail &&",
               "xcodebuild",
-              "-scheme 'ExampleUITests'",
-              "-project './example/Example.xcodeproj'",
+              "-scheme ExampleUITests",
+              "-project ./example/Example.xcodeproj",
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
               "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
