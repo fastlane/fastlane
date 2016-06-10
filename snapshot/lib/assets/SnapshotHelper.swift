@@ -21,8 +21,8 @@ func setupSnapshot(app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
-    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
+func snapshot(name: String, waitForLoadingIndicator: Bool = true, additionalInfos:Dictionary<String,AnyObject>? = nil) {
+    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator, additionalInfos:additionalInfos)
 }
 
 public class Snapshot: NSObject {
@@ -89,12 +89,24 @@ public class Snapshot: NSObject {
         }
     }
 
-    public class func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
+    public class func snapshot(name: String, waitForLoadingIndicator: Bool = true, additionalInfos:Dictionary<String,AnyObject>? = nil) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
+        var metaInfos = ""
+        if let additionalInfos = additionalInfos {
+            do {
+                let jsonData:NSData? = try NSJSONSerialization.dataWithJSONObject(additionalInfos,options:NSJSONWritingOptions.init(rawValue: 0))
+                if let jsonData = jsonData {
+                    metaInfos = NSString(data: jsonData, encoding: NSUTF8StringEncoding) as! String
+                }
+            } catch {
+                print("Unable to serialize Additional Info ...")
+            }
+        }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/snapshot
+        // more information about this, check out https://github.com/fastlane/snapshot
+        print("snapshot: \(name) meta: \(metaInfos)")
 
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown

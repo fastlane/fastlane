@@ -8,7 +8,7 @@ module Snapshot
       attachments_path = File.join(containing, "Attachments")
 
       to_store = attachments(containing)
-      matches = output.scan(/snapshot: (.*)/)
+      matches = output.scan(/snapshot: (.*) meta: (.*)/)
 
       if to_store.count == 0 && matches.count == 0
         return false
@@ -20,6 +20,7 @@ module Snapshot
 
       matches.each_with_index do |current, index|
         name = current[0]
+        meta = current[1]
         filename = to_store[index]
 
         language_folder = File.join(Snapshot.config[:output_directory], dir_name)
@@ -30,12 +31,16 @@ module Snapshot
 
         output_path = File.join(language_folder, components.join("-") + ".png")
         from_path = File.join(attachments_path, filename)
+        json_output_path = File.join(language_folder, components.join("-") + ".json")
         if $verbose
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
+          UI.success "Creating meta json file to '#{json_output_path}' ..."
         else
           UI.success "Copying '#{output_path}'..."
+          UI.success "Creating '#{json_output_path}' ..."
         end
         FileUtils.cp(from_path, output_path)
+        IO.write(json_output_path, meta, mode: 'w')
       end
 
       return true
