@@ -19,7 +19,6 @@ module Danger
       languages ||= ["en"]
 
       prefix_command ||= ""
-      #prefix_command += " bundle exec " if File.exist?("Gemfile")
 
       # To use the local fastlane instead of bundle
       prefix_command = "./bin/" if FastlaneCore::Helper.test?
@@ -43,7 +42,7 @@ module Danger
             device: current_device
           }
           params[:launch_url] = deep_link if deep_link
-          params_str = params.collect { |k, v| "#{k}:\"#{v}\"" }.join(" ")
+          params_str = params.map { |k, v| "#{k}:\"#{v}\"" }.join(" ")
           url = Fastlane::Helper.backticks("#{prefix_command}fastlane run appetize_viewing_url_generator #{params_str}")
           url = url.match(%r{Result:.*(https\:\/\/.*)})[1].strip
 
