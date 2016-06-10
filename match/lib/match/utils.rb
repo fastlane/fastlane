@@ -25,30 +25,30 @@ module Match
       # removing subject= in first line
       subject_value = output[0][output[0].index('=') + 2, output[0].length]
 
-      # collect each line to array
       out_array = subject_value.split('/')
       out_array << output[1]
       out_array << output[2]
 
       oppenssl_keys_to_readable_keys = {
-          'UID' => 'User ID',
-          'CN' => 'Certificate Name',
-          'OU' => 'Organisation Unit',
-          'O' => 'Organisation Name',
-          'C' => 'Country',
-          'notBefore' => 'Start Datetime',
-          'notAfter' => 'End Datetime'
+          UID: 'User ID',
+          CN: 'Certificate Name',
+          OU: 'Organisation Unit',
+          O: 'Organisation Name',
+          C: 'Country',
+          notBefore: 'Start Datetime',
+          notAfter: 'End Datetime'
       }
 
-      # get table data
-      table_data = out_array.select { |x| x.include? "=" } #get arrays
-                   .map { |x| x.split(/=+/) }
-                   .map { |k, v| [oppenssl_keys_to_readable_keys.fetch(k, k), v] }
+      # collect openssl answer to structure [[key1, v1], [key2, v2], ...]
+      key_value_pairs = out_array.map { |x| x.split(/=+/) if x.include? "=" }.compact
 
+      # change keys to readable
+      table_data = key_value_pairs.map { |k, v| [oppenssl_keys_to_readable_keys.fetch(k, k), v] }
 
-      params = {}
-      params[:rows] = table_data
-      params[:title] = "Installed Code Certificate".green
+      params = {
+          rows: table_data,
+          title: "Installed Code Certificate".green
+      }
 
       puts ""
       puts Terminal::Table.new(params)
