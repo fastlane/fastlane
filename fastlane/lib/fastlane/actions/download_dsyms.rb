@@ -41,7 +41,13 @@ module Fastlane
             if build_number && build.build_version != build_number
               next
             end
-            download_url = build.details.dsym_url
+
+            begin
+              download_url = build.details.dsym_url
+            rescue Spaceship::TunesClient::ITunesConnectError => ex
+              UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+            end
+
             if download_url
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
