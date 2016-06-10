@@ -26,7 +26,7 @@ end
 ```
 
 Then to deploy a new 'beta' version of your app just run
-`fastlane beta`. :rocket:
+`fastlane beta` :rocket:
 
               |  fastlane
 --------------------------|------------------------------------------------------------
