@@ -1,6 +1,6 @@
 require 'coveralls'
 
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
