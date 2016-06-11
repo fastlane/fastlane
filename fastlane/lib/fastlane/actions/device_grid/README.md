@@ -44,7 +44,7 @@ fastlane init
 ### Setup `danger`
 
 ```
-danger init
+bundle exec danger init
 ```
 
 Follow the `danger` guide to authenticate with GitHub
