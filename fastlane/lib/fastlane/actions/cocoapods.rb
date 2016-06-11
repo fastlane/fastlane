@@ -88,7 +88,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Cocoapods #{value} is not installed") unless !Actions.verify_gem('cocoapods', Gem::Requirement.create("= #{value}")) || Helper.test?
+                                         UI.user_error!("Cocoapods #{value} is not installed") unless Actions.verify_gem('cocoapods', Gem::Requirement.create(value)) || Helper.test?
                                        end)
         ]
       end
