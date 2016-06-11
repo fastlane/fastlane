@@ -17,10 +17,10 @@ module Fastlane
         cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
 
         version = params[:version]
-        unless version.nil?
-          cmd << ["pod _#{version}_ install"]
-        else
+        if version.nil?
           cmd << ['pod install']
+        else
+          cmd << ["pod _#{version}_ install"]
         end
 
         cmd << '--no-clean' unless params[:clean]
