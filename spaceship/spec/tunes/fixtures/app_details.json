@@ -15,6 +15,18 @@
           "maxLength": 255,
           "minLength": 2
         },
+        "keywords":{
+            "value":"tank,battle,strategy,tanks,fun,battles,multiplayer,game,itanky,itank,tanky",
+            "isEditable":true,
+            "isRequired":false,
+            "errorKeys":null
+          },
+          "releaseNotes":{
+           "value":"Awesome update!",
+           "isEditable":true,
+           "isRequired":false,
+           "errorKeys":null
+         },
         "privacyPolicyUrl": {
           "value": "https://fastlane.tools",
           "isEditable": true,
@@ -71,11 +83,11 @@
       "isRequired": false,
       "errorKeys": null
     },
-    "primaryFirstSubCategory": {
-      "value": null,
-      "isEditable": true,
-      "isRequired": false,
-      "errorKeys": null
+    "primarySecondSubCategory":{
+        "value":"MZGenre.Strategy",
+        "isEditable":true,
+        "isRequired":false,
+        "errorKeys":null
     },
     "primarySecondSubCategory": {
       "value": null,
