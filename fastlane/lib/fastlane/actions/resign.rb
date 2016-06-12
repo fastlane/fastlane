@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id], params[:use_app_entitlements])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
           UI.user_error!("Failed to re-sign .ipa")
@@ -46,6 +46,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :entitlements,
                                        env_name: "FL_RESIGN_ENTITLEMENTS",
                                        description: "Path to the entitlement file to use, e.g. \"myApp/MyApp.entitlements\"",
+                                       conflicting_options: [:use_app_entitlements],
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :provisioning_profile,
@@ -90,7 +91,14 @@ module Fastlane
                                        env_name: "FL_RESIGN_BUNDLE_ID",
                                        description: "Set new bundle ID during resign",
                                        is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :use_app_entitlements,
+                                       env_name: "FL_USE_APP_ENTITLEMENTS",
+                                       description: "Extract app bundle codesigning entitlements\nand combine with entitlements from new provisionin profile",
+                                       conflicting_options: [:entitlements],
+                                       is_string: false,
                                        optional: true)
+
         ]
       end
 

@@ -6,18 +6,18 @@ module Sigh
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
 
-      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
         UI.user_error!("Failed to re-sign .ipa")
       end
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
@@ -27,7 +27,7 @@ module Sigh
 
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
-      entitlements = "-e #{entitlements}" if entitlements
+      entitlements = "-e #{entitlements.shellescape}" if entitlements
       provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
@@ -35,6 +35,7 @@ module Sigh
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
       verbose = "-v" if $verbose
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
+      use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
 
       command = [
         resign_path.shellescape,
@@ -46,6 +47,7 @@ module Sigh
         display_name,
         short_version,
         bundle_version,
+        use_app_entitlements_flag,
         verbose,
         bundle_id,
         ipa.shellescape
@@ -73,12 +75,13 @@ module Sigh
       short_version = options.short_version || nil
       bundle_version = options.bundle_version || nil
       new_bundle_id = options.new_bundle_id || nil
+      use_app_entitlements = options.use_app_entitlements || nil
 
       if options.provisioning_name
         UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
       end
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements
     end
 
     def find_resign_path
