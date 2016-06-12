@@ -66,7 +66,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_RESIGN_VERSION",
-                                       description: "Version number to force resigned ipa to use. Updates both CFBundleShortVersionString and CFBundleIdentifier values in Info.plist. Applies for main app and all nested apps or extensions",
+                                       description: "Version number to force resigned ipa to use.\nUpdates both CFBundleShortVersionString and CFBundleIdentifier values in Info.plist.\nApplies for main app and all nested apps or extensions",
                                        conflicting_options: [:short_version, :bundle_version],
                                        is_string: true,
                                        optional: true),
