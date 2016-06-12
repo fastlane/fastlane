@@ -54,6 +54,8 @@ module Match
       puts Terminal::Table.new(params)
       puts ""
       return table_data
+    rescue => ex
+      UI.error(ex)
     end
 
     # Fill in the UUID of the profiles in environment variables, much recycling
