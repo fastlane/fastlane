@@ -7,8 +7,7 @@ module Sigh
       Spaceship.select_team
       UI.message "Successfully logged in"
 
-      Spaceship.provisioning_profile.all(include_invalid_profiles=false).each do |profile|
-
+      Spaceship.provisioning_profile.all(false).each do |profile|
         if profile.valid?
           UI.message "Downloading profile '#{profile.name}'..."
           download_profile(profile)

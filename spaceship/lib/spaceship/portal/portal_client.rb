@@ -1,5 +1,4 @@
 module Spaceship
-
   class PortalClient < Spaceship::Client
     #####################################################
     # @!group Init and Login
@@ -320,41 +319,25 @@ module Spaceship
     # @!group Provisioning Profiles
     #####################################################
 
-
-def devices(mac: false)
+    def provisioning_profiles(include_invalid_profiles = true, mac: false)
+      @page_size = 10
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/device/listDevices.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
-        parse_response(r, 'devices')
-      end
-    end
-
-    def provisioning_profiles(include_invalid_profiles=true, mac: false)
-
-      @page_size = 30
-      paging do |page_number|
-
         puts "Pagination in progress, page number: '#{page_number}'..."
         req = request(:post) do |r|
-
           r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
           r.params = {
             teamId: team_id,
             includeInactiveProfiles: include_invalid_profiles,
             onlyCountLists: true,
-            pageSize:page_size,
-            pageNumber:page_number,
+            pageSize: page_size,
+            pageNumber: page_number,
             sort: "name=dasc"
           }
         end
 
-      parse_response(req, 'provisioningProfiles')
+        parse_response(req, 'provisioningProfiles')
+      end
     end
-  end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
       ensure_csrf

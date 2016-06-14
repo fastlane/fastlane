@@ -190,7 +190,6 @@ module Spaceship
       return results
     end
 
-
     #####################################################
     # @!group Login and Team Selection
     #####################################################
