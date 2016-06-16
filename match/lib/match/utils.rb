@@ -9,8 +9,7 @@ module Match
       Helper.backticks(command, print: $verbose)
     end
 
-    # logs public key's  name, user, organisation, country, availability dates
-    def self.log_certificate_public_key(cer_certificate_path)
+    def self.get_cert_info(cer_certificate_path)
       command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
       command << " &" # start in separate process
 
@@ -31,9 +30,9 @@ module Match
 
       oppenssl_keys_to_readable_keys = {
           'UID' => 'User ID',
-          'CN' => 'Certificate Name',
+          'CN' => 'Common Name',
           'OU' => 'Organisation Unit',
-          'O' => 'Organisation Name',
+          'O' => 'Organisation',
           'C' => 'Country',
           'notBefore' => 'Start Datetime',
           'notAfter' => 'End Datetime'
@@ -45,17 +44,10 @@ module Match
       # change keys to readable
       table_data = key_value_pairs.map { |k, v| [oppenssl_keys_to_readable_keys.fetch(k, k), v] }
 
-      params = {
-          rows: table_data,
-          title: "Installed Code Certificate".green
-      }
-
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
       return table_data
     rescue => ex
       UI.error(ex)
+      return {}
     end
 
     # Fill in the UUID of the profiles in environment variables, much recycling
@@ -68,6 +60,18 @@ module Match
 
     def self.environment_variable_name(params)
       ["sigh", params[:app_identifier], params[:type]].join("_")
+    end
+
+    def self.environment_variable_name_cert(params)
+      ["sigh", params[:app_identifier], params[:type], "cert"].join("_")
+    end
+
+    # Fill identity(name) of certificate to env variable
+    def self.fill_environment_cert(params, identity)
+      # instead we specify the UUID of the profiles
+      key = environment_variable_name_cert(params)
+      UI.important "Setting environment variable '#{key}' to '#{identity}'" if $verbose
+      ENV[key] = identity
     end
   end
 end
