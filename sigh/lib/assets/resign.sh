@@ -212,7 +212,7 @@ done
 KEYCHAIN_FLAG=
 if [ -n "$KEYCHAIN_PATH" ]
 then
-    KEYCHAIN_FLAG="--keychain '$KEYCHAIN_PATH'"
+    KEYCHAIN_FLAG="--keychain $KEYCHAIN_PATH"
 fi
 
 # Log the options
