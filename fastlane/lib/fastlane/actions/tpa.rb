@@ -15,7 +15,6 @@ module Fastlane
       end
 
       def self.fail_on_error(result)
-        puts result.inspect
         if result == "OK"
           UI.success('Your app has been uploaded to TPA')
         else
@@ -24,22 +23,19 @@ module Fastlane
       end
 
       def self.upload_options(params)
-        app_file = [
-          params[:ipa],
-          params[:apk]
-        ].detect { |e| !e.to_s.empty? }
+        app_file = app_file(params)
 
         options = []
-        options << "-F app=@'#{app_file}'"
+        options << "-F app=@#{app_file}"
 
         if params[:mapping]
-          options << "-F mapping=@'#{params[:mapping]}'"
+          options << "-F mapping=@#{params[:mapping]}"
         end
 
         options << "-F publish=#{params[:publish]}"
 
         if params[:notes]
-          options << "-F notes=#{params[:notes].shellescape}"
+          options << "-F notes=#{params[:notes]}"
         end
 
         options << "-F force=#{params[:force]}"
@@ -47,8 +43,21 @@ module Fastlane
         options
       end
 
+      def self.app_file(params)
+        app_file = [
+          params[:ipa],
+          params[:apk]
+        ].detect { |e| !e.to_s.empty? }
+
+        if app_file.nil?
+          UI.user_error!("You have to provide a build file")
+        end
+
+        app_file
+      end
+
       def self.upload_url(params)
-        params[:upload_url].shellescape
+        params[:upload_url]
       end
 
       def self.verbose(params)
@@ -131,7 +140,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-         [:ios, :android].include? platform
+        [:ios, :android].include? platform
       end
     end
   end
