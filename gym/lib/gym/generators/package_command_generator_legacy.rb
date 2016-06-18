@@ -30,7 +30,7 @@ module Gym
         end
 
         if Gym.config[:codesigning_identity]
-          options << "--sign '#{Gym.config[:codesigning_identity]}'"
+          options << "--sign #{Gym.config[:codesigning_identity].shellescape}"
         end
 
         options
