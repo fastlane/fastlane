@@ -77,6 +77,10 @@ module Spaceship
         end
         raise ex
       end
+
+      store_session
+
+      return true
     end
 
     # Only needed for 2 step
@@ -165,6 +169,12 @@ module Spaceship
         raise ex
       end
 
+      store_session
+
+      return true
+    end
+
+    def store_session
       # If the request was successful, r.body is actually nil
       # The previous request will fail if the user isn't on a team
       # on iTunes Connect, but it still works, so we're good
@@ -187,8 +197,6 @@ module Spaceship
       # correct DES... cookie
 
       self.store_cookie
-
-      return true
     end
   end
 end
