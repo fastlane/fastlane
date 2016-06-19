@@ -22,3 +22,5 @@ end
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
 eval(File.read(plugins_path), binding) if File.exist?(plugins_path)
+
+gem 'gh-issues-inspector', git: "https://github.com/orta/gh-issues-inspector", branch: "fixed-issue-search"
