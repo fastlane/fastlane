@@ -4,8 +4,6 @@ module Commander
   class Runner
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
     def run!
-      require 'fastlane_core/ui/github_issue_inspector_reporter'
-
       require_program :version, :description
       trap('INT') { abort program(:int_message) } if program(:int_message)
       trap('INT') { program(:int_block).call } if program(:int_block)
@@ -91,8 +89,10 @@ module Commander
       return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
       return if FastlaneCore::Helper.test?
 
-      require 'inspector'
-      inspector = Inspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
+      require 'gh_inspector'
+      require 'fastlane_core/ui/github_issue_inspector_reporter'
+
+      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
       delegate = Fastlane::InspectorReporter.new
       inspector.search_query(message, delegate)
     end
