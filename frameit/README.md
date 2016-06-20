@@ -189,6 +189,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 **Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
+**Note:** You **MUST** provide a background if you want titles. The build will silently skip adding titles if no background is specified.
 
 #### Uploading screenshots to iTC
 
