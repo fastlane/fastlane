@@ -1,5 +1,23 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
+unless ENV['BUNDLE_BIN_PATH']
+  has_gemfile = File.exist?('Gemfile')
+
+  require 'tmpdir'
+  temp_gemfile = "#{Dir.tmpdir}/Gemfile"
+  File.open(temp_gemfile, 'w') { |file| file.write("gem 'fastlane'") } unless has_gemfile
+
+  system("BUNDLE_GEMFILE=#{temp_gemfile} bundle exec fastlane #{ARGV.join(' ')}")
+  status = $?
+
+  unless has_gemfile
+    File.delete(temp_gemfile)
+    File.delete("#{temp_gemfile}.lock")
+  end
+
+  exit(status.exitstatus)
+end
+
 require "fastlane/cli_tools_distributor"
 Fastlane::CLIToolsDistributor.take_off
