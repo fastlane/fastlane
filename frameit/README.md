@@ -173,7 +173,7 @@ Use it to define the general information:
   ]
 }
 ```
-The `show_complete_frame` value specifies whether frameit should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
+The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
@@ -189,7 +189,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 **Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
-**Note:** You **MUST** provide a background if you want titles. frameit will not add the tiles if a background is not specified.
+**Note:** You **MUST** provide a background if you want titles. `frameit` will not add the tiles if a background is not specified.
 
 #### Uploading screenshots to iTC
 
