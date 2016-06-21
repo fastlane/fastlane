@@ -10,6 +10,7 @@ coverage/
 /tmp/
 rspec_logs.json
 test_output/
+.DS_STORE
 
 ## Specific to Android
 .gradle/
