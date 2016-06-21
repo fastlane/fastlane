@@ -36,6 +36,9 @@ frameit
 
 ###### Quickly put your screenshots into the right device frames
 
+`frameit` allows you to put a gorgeous device frame around your iOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails. 
+
+
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 
@@ -50,7 +53,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
-
 
 
 # Features
