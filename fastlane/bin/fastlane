@@ -2,13 +2,15 @@
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
 unless ENV['BUNDLE_BIN_PATH']
-  has_gemfile = File.exist?('Gemfile')
+  has_gemfile = File.exist?('Gemfile') && File.read('Gemfile').include?('fastlane')
 
   require 'tmpdir'
-  temp_gemfile = File.join(Dir.tmpdir, "Gemfile")
+  temp_gemfile = File.join(Dir.tmpdir, 'Gemfile')
   File.write(temp_gemfile, "gem 'fastlane'") unless has_gemfile
 
-  system("BUNDLE_GEMFILE=#{temp_gemfile} bundle exec fastlane #{ARGV.join(' ')}")
+  command = "bundle exec fastlane #{ARGV.join(' ')}"
+  command = "BUNDLE_GEMFILE=#{temp_gemfile} #{command}" unless has_gemfile
+  system(command)
   status = $?
 
   unless has_gemfile
