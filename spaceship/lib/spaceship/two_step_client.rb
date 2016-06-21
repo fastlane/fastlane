@@ -50,7 +50,6 @@ module Spaceship
       #  "tooManyCodesValidated"=>false,
       #  "securityCodeLocked"=>false}
       code_length = security_code["length"]
-      puts "Successfully requested notification"
       code = ask("Please enter the #{code_length} digit code: ")
       puts "Requesting session..."
 
