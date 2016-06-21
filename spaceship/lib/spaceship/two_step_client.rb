@@ -68,16 +68,6 @@ module Spaceship
       # since this might be from the Dev Portal, but for 2 step
       Spaceship::TunesClient.new.handle_itc_response(r.body)
 
-      begin
-        Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
-      rescue => ex
-        if ex.to_s.include?("verification code") # to have a nicer output
-          puts "Error: Incorrect verification code"
-          return handle_two_fator(r)
-        end
-        raise ex
-      end
-
       store_session
 
       return true
