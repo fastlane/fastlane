@@ -1,10 +1,9 @@
+require 'fastlane_core'
 require 'sigh/version'
 require 'sigh/resign'
 require 'sigh/manager'
 require 'sigh/options'
 require 'sigh/local_manage'
-
-require 'fastlane_core'
 
 module Sigh
   # Use this to just setup the configuration attribute and set it later somewhere else
