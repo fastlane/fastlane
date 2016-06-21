@@ -35,13 +35,12 @@ Pilot
 
 ###### The best way to manage your TestFlight testers and builds from your terminal
 
-This tool allows you to manage all important features of Apple TestFlight using your terminal.
+Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 
-- Upload new builds and distribute them to all testers
-- List all available builds
-- Add and remove beta testers
-- Get information about testers, like the registered devices
-- Export and import all your testers
+- Upload & distribute builds
+- Add & remove testers
+- Retrieve information about testers & devices
+- Import/export all available testers
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
