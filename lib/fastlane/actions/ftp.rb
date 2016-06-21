@@ -21,12 +21,12 @@ module Fastlane
           ftp.passive = true
           parts = folder.split("/")
           growing_path = ""
-          for part in parts
+          parts.each do |part|
             growing_path += "/" + part
             begin
               ftp.chdir(growing_path)
             rescue
-              ftp.mkdir(part) unless File.exists?(growing_path)
+              ftp.mkdir(part) unless File.exist?(growing_path)
               retry
             end
           end
@@ -34,7 +34,6 @@ module Fastlane
           ftp.close
         end
       end
-
 
       def self.put(params)
         Net::FTP.open(params[:host], params[:username], params[:password]) do |ftp|
@@ -44,11 +43,11 @@ module Fastlane
           filesize = File.size(params[:upload][:src])
           ftp.putbinaryfile(params[:upload][:src], params[:upload][:src].split("/").last) do |data|
             transferred += data.size
-            percent = ((transferred.to_f/filesize.to_f)*100).to_i
-            finished = ((transferred.to_f/filesize.to_f)*30).to_i
+            percent = ((transferred.to_f / filesize.to_f) * 100).to_i
+            finished = ((transferred.to_f / filesize.to_f) * 30).to_i
             not_finished = 30 - finished
             print "\r"
-            print "#{"%3i" % percent}%"
+            print "%3i %" % percent
             print "["
             finished.downto(1) { |n| print "=" }
             print ">"
