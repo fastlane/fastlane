@@ -2538,6 +2538,8 @@ scp(
 )
 ```
 
+
+
 ### rsync
 
 a wrapper around rsync, rsync is a tool that lets you synchronize files, including permissions and so on for a more detailed information about rsync please see ***rsync(1)*** manpage.
@@ -2571,6 +2573,38 @@ ifttt(
   value1: "foo",
   value2: "bar",
   value3: "baz"
+)
+```
+
+### ftp
+
+Allows FTP file transfer.
+
+**Upload file/folder:**
+
+```ruby
+ftp(
+  host: "dev.poissonballon.com",
+  username: "root",
+  password: "doctor",
+  upload: {
+    src: "/root/dir1",
+    dest: "/tmp/new_dir"
+  }
+)
+```
+
+**Download file/folder:**
+
+```ruby
+ftp(
+  host: "dev.poissonballon.com",
+  username: "root",
+  password: "doctor",
+  download: {
+    src: "/tmp/new_dir",
+    dest: "/root/dir1"
+  }
 )
 ```
 
