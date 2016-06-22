@@ -200,7 +200,17 @@ module FastlaneCore
       unless @build_settings
         # We also need to pass the workspace and scheme to this command
         command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
-        @build_settings = Helper.backticks(command, print: false)
+
+        # xcode might hang here and retrying fixes the problem, see fastlane#4059
+        begin
+          timeout = FastlaneCore::Project.xcode_build_settings_timeout
+          retries = FastlaneCore::Project.xcode_build_settings_retries
+          @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries)
+        rescue Timeout::Error
+          UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
+            " You can override the timeout value with the environment variable FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT," \
+            " and the number of retries with the environment variable FASTLANE_XCODE_BUILD_SETTINGS_RETRIES ")
+        end
       end
 
       begin
@@ -280,13 +290,33 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command and kills it if timeouts
-    # @raises Timeout::Error if timeout is passed
+    def self.xcode_build_settings_timeout
+      (ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] || 10).to_i
+    end
+
+    # @internal to module
+    def self.xcode_build_settings_retries
+      (ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] || 1).to_i
+    end
+
+    # @internal to module
+    # runs the specified command and kills it if timeouts, optionally retries before killing
+    # @raises Timeout::Error if timeout is passed after all retry attempts
     # @returns the output
-    # Note: currently affected by fastlane/fastlane_core#102
-    def self.run_command(command, timeout: 0)
+    # Note: - currently affected by fastlane/fastlane_core#102
+    #       - retry feature added to solve fastlane#4059
+    def self.run_command(command, timeout: 0, retries: 0)
       require 'timeout'
-      @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
+
+      tries = 1
+      begin
+        @raw = Timeout.timeout(timeout) { Helper.backticks(command, print: false).to_s }
+      rescue Timeout::Error
+        raise if tries >= retries
+
+        tries += 1
+        retry
+      end
     end
 
     private
