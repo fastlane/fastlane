@@ -1,6 +1,7 @@
 require 'fastlane_core'
 
 require 'fastlane/version'
+require 'fastlane/features'
 require 'fastlane/tools'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
