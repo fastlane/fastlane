@@ -1,6 +1,7 @@
 module Fastlane
   class CrashlyticsBeta
     def run
+      UI.user_error!('Beta by Crashlytics configuration is currently only available for iOS projects.') unless Setup.new.is_ios?
       config = {}
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
