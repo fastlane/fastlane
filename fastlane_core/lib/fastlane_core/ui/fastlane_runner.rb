@@ -96,7 +96,7 @@ module Commander
       delegate = Fastlane::InspectorReporter.new
       inspector.search_query(message, delegate)
     rescue => ex
-      UI.error("Error finding relevant GitHub issues: #{ex}")
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
     end
   end
 end
