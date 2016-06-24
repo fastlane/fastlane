@@ -27,7 +27,7 @@ In general, we might not accept actions that
 - Complex actions, that will require a lot of work to maintain in the future
 - Everything that isn't mobile developer related
 
-## Remote plugins
+## Plugins
 
 `fastlane` is an open platform and we enable every developer to extend it to fit their needs. That's why we built a plugin system that allows you and your company to provide `fastlane` plugins to other `fastlane` users. You have the full power and responsibility of maintaining your plugin and keeping it up to date. This is useful if you maintain your own library or web service, and want to make sure the `fastlane` plugin is always up to date.
 
