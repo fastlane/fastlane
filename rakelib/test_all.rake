@@ -159,7 +159,7 @@ task :test_all do
   end
 
   if exceptions.empty?
-    r.delete_if { |path, coverage| path.to_s.match(/spec/) }
+    # r.delete_if { |path, coverage| path.to_s.match(/spec/) }
     # Only upload coverage results if tests are successful
     # Coveralls::SimpleCov::Formatter.new.format(SimpleCov::Result.new(r))
 
