@@ -41,6 +41,14 @@ if [[ $? -eq 0 ]]; then
   unset BUNDLE_GEMFILE
 fi
 
+if which rbenv > /dev/null; then
+  echo "rbenv detected, removing env variables"
+  unset RUBYLIB
+  unset RUBYOPT
+  unset GEM_HOME
+  unset GEM_PATH
+fi
+
 # to help troubleshooting
 # env | sort > /tmp/env.wrapper
 # rvm info >> /tmp/env.wrapper

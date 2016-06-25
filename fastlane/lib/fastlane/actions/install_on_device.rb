@@ -35,22 +35,19 @@ module Fastlane
                                        env_name: "FL_IOD_EXTRA",
                                        description: "Extra Commandline arguments passed to ios-deploy",
                                        optional: true,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :device_id,
                                        short_option: "-d",
                                        env_name: "FL_IOD_DEVICE_ID",
                                        description: "id of the device / if not set defaults to first found device",
                                        optional: true,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_wifi,
                                        short_option: "-w",
                                        env_name: "FL_IOD_WIFI",
                                        description: "Do not search for devices via WiFi",
                                        optional: true,
-                                       is_string: false
-                                      ),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        short_option: "-i",
                                        env_name: "FL_IOD_IPA",
@@ -63,8 +60,7 @@ module Fastlane
                                            UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                            UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                          end
-                                       end
-                                      )
+                                       end)
         ]
       end
 

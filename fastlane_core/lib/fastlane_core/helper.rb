@@ -3,6 +3,13 @@ require 'colored'
 
 module FastlaneCore
   module Helper
+    # This method is deprecated, use the `UI` class
+    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
+    def self.log
+      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.current.log
+    end
+
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
     def self.backticks(command, print: true)
@@ -14,13 +21,13 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined?SpecHelper
+      defined? SpecHelper
     end
 
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -125,7 +132,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)

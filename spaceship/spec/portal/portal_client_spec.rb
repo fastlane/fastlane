@@ -65,7 +65,7 @@ describe Spaceship::Client do
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         adp_stub_multiple_teams
-        expect(subject.team_id).to eq("XXXXXXXXXX")
+        expect(subject.team_id).to eq("SecondTeam")
       end
     end
 
@@ -189,7 +189,8 @@ describe Spaceship::Client do
           %w(certRequestId name statusString dateRequestedString dateRequested
              dateCreated expirationDate expirationDateString ownerType ownerName
              ownerId canDownload canRevoke certificateId certificateStatusCode
-             certRequestStatusCode certificateTypeDisplayId serialNum typeString))
+             certRequestStatusCode certificateTypeDisplayId serialNum typeString)
+        )
       end
     end
 

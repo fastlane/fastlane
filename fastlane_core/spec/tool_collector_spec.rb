@@ -31,6 +31,17 @@ describe FastlaneCore::ToolCollector do
     end
   end
 
+  describe "#name_to_track" do
+    it "returns the original name when it's a built-in action" do
+      expect(collector.name_to_track(:fastlane)).to eq(:fastlane)
+    end
+
+    it "returns nil when it's an external action" do
+      expect(collector).to receive(:is_official?).and_return(false)
+      expect(collector.name_to_track(:fastlane)).to eq(nil)
+    end
+  end
+
   it "posts the collected data when finished" do
     collector.did_launch_action(:gym)
     collector.did_launch_action(:scan)

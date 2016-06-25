@@ -19,7 +19,6 @@ module Fastlane
     }
 
     class IpaAction < Action
-
       def self.is_supported?(platform)
         platform == :ios
       end

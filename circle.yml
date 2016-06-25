@@ -8,6 +8,6 @@ dependencies:
     - ~/.fastlane_bundle
 test:
   override:
-    - bundle exec danger
+    # - bundle exec danger
     - bundle exec rake test_all
-    - bundle exec danger
+    # - bundle exec danger

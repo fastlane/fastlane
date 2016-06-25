@@ -1,26 +1,38 @@
+require 'fileutils'
+require 'shellwords'
+
 module Fastlane
   module Actions
     class CopyArtifactsAction < Action
       def self.run(params)
         # we want to make sure that our target folder exist already
-        target_folder_command = 'mkdir -p ' + params[:target_path]
-        Actions.sh(target_folder_command)
+        FileUtils.mkdir_p(params[:target_path])
 
-        # construct the main command that will do the copying/moving for us
-        base_command = params[:keep_original] ? 'cp' : 'mv'
-        options = []
-        options << '-f'
-        options << '-R' if params[:keep_original] # we only want the -R flag for the cp command, which we get when the user asks to keep the original
-        options << params[:artifacts].map { |e| e.tr(' ', '\ ') }
-        options << params[:target_path]
+        # Ensure that artifacts is an array
+        artifacts_to_search = [params[:artifacts]].flatten
 
-        command = ([base_command] + options).join(' ')
+        # If any of the paths include "*", we assume that we are referring to the Unix entries
+        # e.g /tmp/fastlane/* refers to all the files in /tmp/fastlane
+        # We use Dir.glob to expand all those paths, this would create an array of arrays though, so flatten
+        # Lastly, we shell escape everything in case they contain incompatible symbols (e.g. spaces)
+        artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten.map(&:shellescape)
 
-        # if we don't want to fail on missing files, then we need to swallow the error from our command, by ORing with the nil command, guaranteeing a 0 status code
-        command += ' || :' unless params[:fail_on_missing]
+        UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{params[:target_path]}")
+        UI.verbose(params[:keep_original] ? "Keeping original files" : "Not keeping original files")
 
-        # call our command
-        Actions.sh(command)
+        if params[:fail_on_missing]
+          missing = artifacts.select { |a| !File.exist?(a) }
+          UI.user_error! "Not all files were present in copy artifacts. Missing #{missing.join(', ')}" unless missing.empty?
+        else
+          # If we don't fail on non-existant files, don't try to copy non-existant files
+          artifacts.reject! { |artifact| !File.exist?(artifact) }
+        end
+
+        if params[:keep_original]
+          FileUtils.cp_r(artifacts, params[:target_path], remove_destination: true)
+        else
+          FileUtils.mv(artifacts, params[:target_path], force: true)
+        end
 
         UI.success('Build artifacts successfully copied!')
       end

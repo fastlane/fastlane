@@ -1,9 +1,8 @@
 module Fastlane
   module Actions
     class JiraAction < Action
-
       def self.run(params)
-        Actions.verify_gem!('jira')
+        Actions.verify_gem!('jira-ruby')
         require 'jira'
 
         site         = params[:url]

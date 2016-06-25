@@ -59,8 +59,8 @@ RSpec::Matchers.define :match_example do |example_path|
     case arg
     when /^\$(.*)/ then EXAMPLE_MATCHERS[$1]
     when %r{^/(.*)/$} then Regexp.new($1)
-    when Array then arg.map {|el| expectify(el)}
-    when Hash then {}.tap {|h| arg.each {|k, v| h[k] = expectify(v) } }
+    when Array then arg.map { |el| expectify(el) }
+    when Hash then {}.tap { |h| arg.each { |k, v| h[k] = expectify(v) } }
     else arg
     end
   end

@@ -142,6 +142,12 @@ module Frameit
     end
 
     def put_device_into_background(background)
+      show_complete_frame = fetch_config['show_complete_frame']
+      if show_complete_frame
+        max_height = background.height - top_space_above_device
+        image.resize "x#{max_height}>"
+      end
+
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
@@ -240,12 +246,15 @@ module Frameit
 
         text.gsub! '\n', "\n"
 
+        interline_spacing = fetch_config['interline_spacing']
+
         # Add the actual title
         title_image.combine_options do |i|
           i.font current_font if current_font
           i.gravity "Center"
           i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
+          i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
         title_image.trim # remove white space

@@ -8,11 +8,19 @@ module Fastlane
     include Commander::Methods
 
     def self.start
+      # since at this point we haven't yet loaded commander
+      # however we do want to log verbose information in the PluginManager
+      $verbose = true if ARGV.include?("--verbose")
+
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
+      Fastlane.plugin_manager.load_plugins
+      # *after* loading the plugins
+      Fastlane::PluginUpdateManager.start_looking_for_updates
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      Fastlane::PluginUpdateManager.show_update_status
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -22,7 +30,8 @@ module Fastlane
       program :description, [
         "CLI for 'fastlane' - #{Fastlane::DESCRIPTION}\n",
         "\tRun using `fastlane [platform] [lane_name]`",
-        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"].join("\n")
+        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"
+      ].join("\n")
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
@@ -49,7 +58,12 @@ module Fastlane
         c.description = 'Helps you with your initial fastlane setup'
 
         c.action do |args, options|
-          Fastlane::Setup.new.run
+          if args[0] == 'beta' && FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
+            require 'fastlane/setup/crashlytics_beta'
+            Fastlane::CrashlyticsBeta.new.run
+          else
+            Fastlane::Setup.new.run
+          end
         end
       end
 
@@ -70,9 +84,9 @@ module Fastlane
         c.option "-j", "--json", "Output the lanes in JSON instead of text"
 
         c.action do |args, options|
-          if ensure_fastfile
+          if options.json || ensure_fastfile
             require 'fastlane/lane_list'
-            path = File.join(Fastlane::FastlaneFolder.fastfile_path)
+            path = Fastlane::FastlaneFolder.fastfile_path
 
             if options.json
               Fastlane::LaneList.output_json(path)
@@ -146,17 +160,17 @@ module Fastlane
 
       command :enable_crash_reporting do |c|
         c.syntax = 'fastlane enable_crash_reporting'
-        c.description = 'Enable crash reporting to improve fastlane'
+        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
         c.action do |args, options|
-          FastlaneCore::CrashReporting.enable
+          show_crashreporter_note
         end
       end
 
       command :disable_crash_reporting do |c|
         c.syntax = 'fastlane disable_crash_reporting'
-        c.description = 'Disable crash reporting'
+        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
         c.action do |args, options|
-          FastlaneCore::CrashReporting.disable
+          show_crashreporter_note
         end
       end
 
@@ -170,8 +184,63 @@ module Fastlane
         end
       end
 
-      default_command :trigger
+      #####################################################
+      # @!group Plugins
+      #####################################################
 
+      command :new_plugin do |c|
+        c.syntax = 'fastlane new_plugin [plugin_name]'
+        c.description = 'Create a new plugin that can be used with fastlane'
+
+        c.action do |args, options|
+          PluginGenerator.new.generate(args.shift)
+        end
+      end
+
+      command :add_plugin do |c|
+        c.syntax = 'fastlane add_plugin [plugin_name]'
+        c.description = 'Add a new plugin to your fastlane setup'
+
+        c.action do |args, options|
+          args << UI.input("Enter the name of the plugin to install: ") if args.empty?
+          args.each do |plugin_name|
+            Fastlane.plugin_manager.add_dependency(plugin_name)
+          end
+
+          UI.important("Make sure to commit your Gemfile, Gemfile.lock and #{PluginManager::PLUGINFILE_NAME} to version control")
+          Fastlane.plugin_manager.install_dependencies!
+        end
+      end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane install_plugins'
+        c.description = 'Install all plugins for this project'
+
+        c.action do |args, options|
+          Fastlane.plugin_manager.install_dependencies!
+        end
+      end
+
+      command :update_plugins do |c|
+        c.syntax = 'fastlane update_plugins'
+        c.description = 'Update all plugin dependencies'
+
+        c.action do |args, options|
+          Fastlane.plugin_manager.update_dependencies!
+        end
+      end
+
+      command :search_plugins do |c|
+        c.syntax = 'fastlane search_plugins [search_query]'
+        c.description = 'Search for plugins, search query is optional'
+
+        c.action do |args, options|
+          search_query = args.last
+          PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      default_command :trigger
       run!
     end
 
@@ -185,6 +254,12 @@ module Fastlane
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create
       return false
+    end
+
+    def show_crashreporter_note
+      UI.important("fastlane doesn't use a crash reporter any more")
+      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
+      UI.important("This command will be removed in one of the next releases")
     end
 
     # rubocop:enable Metrics/AbcSize

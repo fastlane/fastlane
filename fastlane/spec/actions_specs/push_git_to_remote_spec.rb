@@ -16,11 +16,12 @@ describe Fastlane do
             remote: 'origin',
             local_branch: 'develop',
             remote_branch: 'remote_branch',
-            force: true
+            force: true,
+            tags: false
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("git push origin develop:remote_branch --tags --force")
+        expect(result).to eq("git push origin develop:remote_branch --force")
       end
     end
   end

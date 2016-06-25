@@ -5,27 +5,34 @@ module Fastlane
     end
 
     class SlatherAction < Action
-
+      # https://github.com/SlatherOrg/slather/blob/cbc5099cd25beb43fd978b7a3e5428f02230122d/lib/slather/command/coverage_command.rb#L24
       ARGS_MAP = {
-        build_directory: "--build-directory",
-        input_format: "--input-format",
-        scheme: "--scheme",
-        buildkite: "--buildkite",
-        jenkins: "--jenkins",
-        travis: "--travis",
-        circleci: "--circleci",
-        coveralls: "--coveralls",
-        simple_output: "--simple-output",
-        gutter_json: "--gutter-json",
-        cobertura_xml: "--cobertura-xml",
-        html: "--html",
-        show: "--show",
-        source_directory: "--source-directory",
-        output_directory: "--output-directory",
-        binary_basename: "--binary-basename",
-        binary_file: "--binary-file",
-        ignore: "--ignore",
-        workspace: "--workspace"
+          travis: '--travis',
+          circleci: '--circleci',
+          jenkins: '--jenkins',
+          buildkite: '--buildkite',
+          teamcity: '--teamcity',
+
+          coveralls: '--coveralls',
+          simple_output: '--simple-output',
+          gutter_json: '--gutter-json',
+          cobertura_xml: '--cobertura-xml',
+          html: '--html',
+          show: '--show',
+
+          build_directory: '--build-directory',
+          source_directory: '--source-directory',
+          output_directory: '--output-directory',
+          ignore: '--ignore',
+          verbose: '--verbose',
+
+          input_format: '--input-format',
+          scheme: '--scheme',
+          workspace: '--workspace',
+          binary_file: '--binary-file',
+          binary_basename: '--binary-basename',
+          source_files: '--source-files',
+          decimals: '--decimals'
       }.freeze
 
       def self.run(params)
@@ -98,8 +105,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :build_directory,
                                        env_name: "FL_SLATHER_BUILD_DIRECTORY", # The name of the environment variable
                                        description: "The location of the build output", # a short description of this parameter
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :proj,
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
@@ -110,21 +116,23 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :workspace,
                                        env_name: "FL_SLATHER_WORKSPACE",
                                        description: "The workspace that slather looks at",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
                                        description: "The input format that slather should look for",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,
                                        env_name: "FL_SLATHER_BUILDKITE_ENABLED", # The name of the environment variable
                                        description: "Tell slather that it is running on Buildkite",
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :teamcity,
+                                       env_name: "FL_SLATHER_TEAMCITY_ENABLED", # The name of the environment variable
+                                       description: "Tell slather that it is running on TeamCity",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :jenkins,
@@ -185,6 +193,11 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        description: "Tell slather to ignore files matching a path or any path from an array of paths",
                                        is_string: false,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_SLATHER_VERBOSE",
+                                       description: "Tell slather to enable verbose mode",
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
                                       description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
@@ -197,7 +210,18 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :binary_file,
                                       env_name: "FL_SLATHER_BINARY_FILE",
                                       description: "Binary file name to be used for code coverage",
-                                      default_value: false)
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :source_files,
+                                       env_name: "FL_SLATHER_SOURCE_FILES",
+                                       description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
+                                       default_value: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :decimals,
+                                      env_name: "FL_SLATHER_DECIMALS",
+                                      description: "The amount of decimals to use for % coverage reporting",
+                                      is_string: false,
+                                      default_value: false,
+                                      optional: true)
         ]
       end
 

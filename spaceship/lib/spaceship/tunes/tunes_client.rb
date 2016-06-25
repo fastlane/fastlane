@@ -46,7 +46,12 @@ module Spaceship
     def teams
       return @teams if @teams
       r = request(:get, "ra/user/detail")
-      @teams = parse_response(r, 'data')['associatedAccounts']
+      @teams = parse_response(r, 'data')['associatedAccounts'].sort_by do |team|
+        [
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
+        ]
+      end
     end
 
     # @return (String) The currently selected Team ID
@@ -123,6 +128,7 @@ module Spaceship
 
     # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/PerceivedComplexity
+    # rubocop:disable Metrics/AbcSize
     def handle_itc_response(raw)
       return unless raw
       return unless raw.kind_of? Hash
@@ -182,6 +188,7 @@ module Spaceship
     end
     # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/AbcSize
 
     #####################################################
     # @!group Applications
@@ -290,7 +297,7 @@ module Spaceship
       app_version_data(app_id, version_platform: version_platform, version_id: version_id)
     end
 
-    def app_version_data(app_id, version_platform: nil, version_id:nil)
+    def app_version_data(app_id, version_platform: nil, version_id: nil)
       raise "app_id is required" unless app_id
       raise "version_platform is required" unless version_platform
       raise "version_id is required" unless version_id

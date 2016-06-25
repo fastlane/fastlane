@@ -17,9 +17,9 @@ describe Fastlane do
     let(:request) { double('request') }
     let(:response) { double('response') }
     let(:params) do
-      {token: api_token,
+      { token: api_token,
        url: url,
-       platform: 'ios'}
+       platform: 'ios' }
     end
 
     before do
@@ -43,6 +43,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
+
       it "raises an error if no url or path was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -52,15 +53,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error
       end
-      it "raises an error if no API token was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            appetize({
-              url: '#{url}'
-            })
-          end").runner.execute(:test)
-        end.to raise_error
-      end
+
       it "works with valid parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

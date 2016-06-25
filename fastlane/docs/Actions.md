@@ -297,8 +297,17 @@ This will make sure to use the correct Xcode for later actions.
 xcode_install(version: "7.1")
 ```
 
+### xcversion
+
+Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version).
+
+```ruby
+xcversion version: "7.1" # Selects Xcode 7.1.0
+xcversion version: "~> 7.1.0" # Selects the latest installed version from the 7.1.x set
+```
+
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
-Use this command if you are supporting multiple versions of Xcode
+Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
@@ -795,8 +804,19 @@ appium(
 ### [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
 
 ```ruby
-pilot(username: "felix@krausefx.com",
-      app_identifier: "com.krausefx.app")
+pilot
+```
+
+#### Options
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
+
+```ruby
+pilot(
+  username: "felix@krausefx.com",
+  app_identifier: "com.krausefx.app",
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
+)
 ```
 
 More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/fastlane/tree/master/pilot).
@@ -808,7 +828,11 @@ deliver
 
 To upload a new build to TestFlight use `pilot` instead.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
+#### Options
+
+If you don't want a PDF report for App Store builds, append `:force` to the command. This is useful when running `fastlane` on your Continuous Integration server: `deliver(force: true)`
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
 
 Other options
 
@@ -816,12 +840,13 @@ Other options
 deliver(
   force: true, # Set to true to skip PDF verification
   email: "itunes@connect.com" # different Apple ID than the dev portal
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
 )
 ```
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
-**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
+**Note:** There is an action named `appstore` which is a convenience alias to `deliver`.
 
 ### TestFlight
 
@@ -962,14 +987,14 @@ This action allows you to upload symbolication files to Sentry.
 
 ```ruby
 upload_symbols_to_sentry(
-  api_key: '...',
+  auth_token: '...',
   org_slug: '...',
   project_slug: '...',
   dsym_path: './App.dSYM.zip'
 )
 ```
 
-The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
+The following environment variables may be used in place of parameters: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
 ### AWS S3 Distribution
@@ -1136,7 +1161,7 @@ Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/li
 
 [Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
 
-From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using 
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
 
 ```objective-c
 [[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
@@ -1381,7 +1406,7 @@ update_urban_airship_configuration(
   plist_path: "AirshipConfig.plist",
   production_app_key: "PRODKEY",
   production_app_secret: "PRODSECRET"
-)  
+)
 ```
 
 ## Developer Portal
@@ -1674,7 +1699,7 @@ add_git_tag(
 )
 ```
 
-[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile#L105) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### git_pull
 
@@ -1683,7 +1708,7 @@ Executes a simple `git pull --tags` command
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
-Tags will be pushed as well.
+Tags will be pushed as well by default, except when setting the option 'tags' to false.
 
 ```ruby
 push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
@@ -1692,7 +1717,8 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true               # optional, default: false
+  force: true,              # optional, default: false
+  tags: false               # optional, default: true
 )
 ```
 
@@ -1762,9 +1788,7 @@ import_from_git(
 Get information about the last git commit, returns the commit hash, the abbreviated commit hash, the author and the git message.
 
 ```ruby
-commit = last_git_commit_message
-crashlytics(notes: commit[:message])
-puts commit[:author]
+crashlytics(notes: last_git_commit_message)
 ```
 
 ### create_pull_request
@@ -2426,7 +2450,13 @@ fastlane_version "1.50.0"
 Install an Xcode plugin for the current user
 
 ```ruby
-install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+install_xcode_plugin(url: 'https://example.com/clubmate/plugin.zip')
+```
+
+You can also let `fastlane` pick the latest version of a plugin automatically, if it is hosted on GitHub
+
+```ruby
+install_xcode_plugin(github: 'https://github.com/contentful/ContentfulXcodePlugin')
 ```
 
 ### opt_out_usage

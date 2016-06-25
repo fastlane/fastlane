@@ -165,7 +165,7 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
         time = Time.now.to_i.to_s
 
-        ff.runner.execute(:something, nil, {value: time })
+        ff.runner.execute(:something, nil, { value: time })
 
         expect(File.read("/tmp/before_all.txt")).to eq(time)
         expect(File.read("/tmp/after_all.txt")).to eq(time)
@@ -199,7 +199,7 @@ describe Fastlane do
         time = Time.now.to_i.to_s
 
         expect do
-          ff.runner.execute(:crash, nil, {value: time })
+          ff.runner.execute(:crash, nil, { value: time })
         end.to raise_error # since we cause a crash
 
         expect(File.read("/tmp/error.txt")).to eq(time)

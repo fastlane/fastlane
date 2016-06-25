@@ -126,7 +126,7 @@ module Fastlane
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      action_symbols = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of? Class }
       action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 
@@ -161,7 +161,7 @@ module Fastlane
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
-            rows.last << nil while fill_all and rows.last.count < 3 # to have a nice border in the table
+            rows.last << nil while fill_all && rows.last.count < 4 # to have a nice border in the table
           end
         end
       end

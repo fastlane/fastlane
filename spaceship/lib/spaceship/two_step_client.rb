@@ -35,6 +35,8 @@ module Spaceship
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
+      elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
+        raise "spaceship currently doesn't support the push based 2 step verification, please switch to SMS based 2 factor auth in the mean-time"
       else
         raise "Invalid 2 step response #{r.body}"
       end

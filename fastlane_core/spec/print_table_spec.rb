@@ -86,7 +86,7 @@ describe FastlaneCore do
     end
 
     it "supports non-Configuration prints" do
-      value = FastlaneCore::PrintTable.print_values(config: {key: "value"}, title: "title")
+      value = FastlaneCore::PrintTable.print_values(config: { key: "value" }, title: "title")
       expect(value[:rows]).to eq([["key", "value"]])
     end
   end

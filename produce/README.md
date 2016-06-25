@@ -35,7 +35,9 @@ produce
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+`produce` creates new iOS apps on both the Apple Developer Portal and iTunes Connect with the minimum required information.
+
+Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">
@@ -50,7 +52,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 -------
 
 <h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
-
 
 # Features
 

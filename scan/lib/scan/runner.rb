@@ -10,7 +10,12 @@ module Scan
     end
 
     def test_app
-      open_simulator_for_device(Scan.device)
+      # We call this method, to be sure that all other simulators are killed
+      # And a correct one is freshly launched. Switching between multiple simulator
+      # in case the user specified multiple targets works with no issues
+      # This way it's okay to just call it for the first simulator we're using for
+      # the first test run
+      open_simulator_for_device(Scan.devices.first) if Scan.devices
 
       command = TestCommandGenerator.generate
       prefix_hash = [
@@ -48,7 +53,8 @@ module Scan
 
       report_collector = ReportCollector.new(Scan.config[:open_report],
                                              Scan.config[:output_types],
-                                             Scan.config[:output_directory])
+                                             Scan.config[:output_directory],
+                                             Scan.config[:use_clang_report_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
                                                types: 'junit',

@@ -54,11 +54,11 @@ module FastlaneCore
       # Make sure the given value keys exist
       @values.each do |key, value|
         next if key == :trace # special treatment
-
         option = option_for_key(key)
         if option
+          @values[key] = option.auto_convert_value(value)
           UI.deprecated("Using deprecated option: '--#{key}' (#{option.deprecated})") if option.deprecated
-          option.verify!(value) # Call the verify block for it too
+          option.verify!(@values[key]) # Call the verify block for it too
         else
           UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
         end
@@ -186,7 +186,7 @@ module FastlaneCore
       return value unless ask
 
       # fallback to asking
-      if Helper.is_test? or Helper.is_ci?
+      if Helper.is_test? or !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
@@ -249,7 +249,7 @@ module FastlaneCore
     end
 
     # Aliases `[key]` to `fetch(key)` because Ruby can do it.
-    alias_method :[], :fetch
-    alias_method :[]=, :set
+    alias [] fetch
+    alias []= set
   end
 end

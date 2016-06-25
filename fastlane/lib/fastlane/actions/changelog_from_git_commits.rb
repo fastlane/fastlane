@@ -37,6 +37,10 @@ module Fastlane
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
+        puts ""
+        puts changelog
+        puts ""
+
         changelog
       end
 
@@ -75,9 +79,9 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        conflicting_options: [:between],
+                                       type: Integer,
                                        verify_block: proc do |value|
-                                         UI.user_error!(":commits_count must be an integer") unless value.kind_of? Integer
-                                         UI.user_error!(":commits_count must be >= 1") unless value >= 1
+                                         UI.user_error!(":commits_count must be >= 1") unless value.to_i >= 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
@@ -105,14 +109,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
-                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}",
+                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
                                          matches_option = GIT_MERGE_COMMIT_FILTERING_OPTIONS.any? { |opt| opt.to_s == value }
-                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}") unless matches_option
-                                       end
-                                      )
+                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}") unless matches_option
+                                       end)
         ]
       end
 

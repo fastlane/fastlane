@@ -1,3 +1,5 @@
+require File.expand_path('../spec_helper', __FILE__)
+
 module Danger
   class Dangerfile
     module DSL
@@ -15,14 +17,15 @@ module Danger
       end
     end
   end
-end
 
-describe Fastlane do
-  describe "DeviceGrid" do
+  describe Danger::DangerDeviceGrid do
+    it 'should be a plugin' do
+      expect(Danger::DangerDeviceGrid.new(nil)).to be_a Danger::Plugin
+    end
+
     it "works" do
-      require 'fastlane/actions/device_grid/device_grid'
       public_key = "1461233806"
-      dg = Danger::Dangerfile::DSL::DeviceGrid.new
+      dg = Danger::DangerDeviceGrid.new(Danger::Dangerfile::DSL::Plugin.new)
       dg.run(languages: ['en', 'de'],
              devices: ['iphone4s'],
              public_key: public_key)

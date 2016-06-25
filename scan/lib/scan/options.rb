@@ -34,7 +34,21 @@ module Scan
                                      optional: true,
                                      is_string: true,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on"),
+                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6')",
+                                     conflicting_options: [:devices],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :devices,
+                                     optional: true,
+                                     is_string: false,
+                                     env_name: "SCAN_DEVICES",
+                                     type: Array,
+                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])",
+                                     conflicting_options: [:device],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
@@ -119,6 +133,7 @@ module Scan
                                      short_option: "-d",
                                      env_name: "SCAN_DESTINATION",
                                      description: "Use only if you're a pro, use the other options instead",
+                                     is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
@@ -157,6 +172,10 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
                                     description: "Only post on Slack if the tests fail",
+                                    is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                     is_string: false,
                                     default_value: false)
       ]

@@ -33,8 +33,9 @@
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
+`spaceship` exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
 
-Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/KrauseFx) and [@snatchev](https://twitter.com/snatchev)
+Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
 
 -------
@@ -51,8 +52,6 @@ Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/K
 <h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # What's spaceship?
-
-spaceship is a Ruby library that exposes both the Apple Developer Center and the iTunes Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
 
 Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 

@@ -58,7 +58,7 @@ module Fastlane
 
         command = [
           command_prefix,
-          "agvtool new-marketing-version #{next_version_number}"
+          "agvtool new-marketing-version #{next_version_number.to_s.strip}"
         ].join(' ')
 
         if Helper.test?
@@ -98,8 +98,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
                                        description: "Change to a specific version. This will replace the bump type value",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_VERSION_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
