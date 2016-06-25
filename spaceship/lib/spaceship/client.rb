@@ -177,7 +177,6 @@ module Spaceship
     def paging
       page = 0
       results = []
-
       loop do
         page += 1
         current = yield(page)

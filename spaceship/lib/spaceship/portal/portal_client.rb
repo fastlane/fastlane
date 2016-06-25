@@ -319,15 +319,14 @@ module Spaceship
     # @!group Provisioning Profiles
     #####################################################
 
-    def provisioning_profiles(include_invalid_profiles = true, mac: false)
-      @page_size = 10
+    def provisioning_profiles(mac: false)
+      page_size = 10
       paging do |page_number|
-        puts "Pagination in progress, page number: '#{page_number}'..."
         req = request(:post) do |r|
           r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
           r.params = {
             teamId: team_id,
-            includeInactiveProfiles: include_invalid_profiles,
+            includeInactiveProfiles: true,
             onlyCountLists: true,
             pageSize: page_size,
             pageNumber: page_number,

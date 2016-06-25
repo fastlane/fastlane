@@ -242,8 +242,8 @@ module Spaceship
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all(include_invalid_profiles = true, mac: false)
-          profiles = client.provisioning_profiles(include_invalid_profiles, mac: mac).map do |profile|
+        def all(mac: false)
+          profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
           end
 

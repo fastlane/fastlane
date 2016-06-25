@@ -23,8 +23,8 @@ module FastlaneCore
       #   "Version"=>1}
       def parse(path)
         require 'plist'
-        plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
 
+        plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
         if (plist || []).count > 5
           plist
         else
