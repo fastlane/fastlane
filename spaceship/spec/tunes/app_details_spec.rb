@@ -32,12 +32,11 @@ describe Spaceship::Tunes::AppDetails do
       details.secondary_category = "Weather"
       expect(details.secondary_category).to eq("MZGenre.Weather")
 
-      details.secondary_first_sub_category = "Strategy"
-      expect(details.secondary_first_sub_category).to eq("MZGenre.Strategy")
+      details.secondary_first_sub_category = "Weather"
+      expect(details.secondary_first_sub_category).to eq("MZGenre.Weather")
 
-      details.secondary_second_sub_category = "Puzzle"
-      expect(details.secondary_second_sub_category).to eq("MZGenre.Puzzle")
-
+      details.secondary_second_sub_category = "Weather"
+      expect(details.secondary_second_sub_category).to eq("MZGenre.Weather")
     end
 
     it "doesn't prefix if the prefix is already there" do
