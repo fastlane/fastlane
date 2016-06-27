@@ -65,7 +65,8 @@ module Commander
 
         display_user_error!(e, error_info)
       else
-        show_github_issues(e.message)
+        # Pass the error instead of a message so that the inspector can do extra work to simplify the query
+        show_github_issues(e)
 
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
@@ -85,7 +86,7 @@ module Commander
       raise e, "[!] #{message}".red, e.backtrace
     end
 
-    def show_github_issues(message)
+    def show_github_issues(message_or_error)
       return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
       return if FastlaneCore::Helper.test?
 
@@ -94,7 +95,11 @@ module Commander
 
       inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
       delegate = Fastlane::InspectorReporter.new
-      inspector.search_query(message, delegate)
+      if message_or_error.kind_of?(String)
+        inspector.search_query(message_or_error, delegate)
+      else
+        inspector.search_exception(message_or_error, delegate)
+      end
     rescue => ex
       FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
     end
