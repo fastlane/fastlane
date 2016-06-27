@@ -12,6 +12,8 @@ With [match](https://fastlane.tools/match) you store your private keys and certi
 
 Getting started with [match](https://fastlane.tools/match) requires you to revoke your existing certificates.
 
+**TODO: Insert link to XcodeProject.md here**
+
 ## Using [cert](https://fastlane.tools/cert) and [sigh](https://fastlane.tools/sigh)
 
 If you don't want to revoke your existing certificates, but still want an automated setup, [cert](https://fastlane.tools/cert) and [sigh](https://fastlane.tools/sigh) are for you. 
@@ -25,8 +27,11 @@ You basically add the following lines to your `Fastfile`
 lane :beta do
   cert
   sigh
+  gym
 end
 ```
+
+**TODO: Insert link to XcodeProject.md here**
 
 ## Using Xcode's code signing feature
 
@@ -39,7 +44,6 @@ You should avoid clicking the `Fix Issue` button (There is an [Xcode plugin](htt
 Unfortunately you can't specify the name of the provisioning profile in Xcode 7.3. Instead you can specify the UUID of the profile, which changes every time the profile gets re-generated (e.g. when you add a new device).
 
 
-
 #### Xcode 8 and up
 
 Apple improved code signing a lot with the release of Xcode 8, the following has changed:
@@ -50,5 +54,4 @@ Apple improved code signing a lot with the release of Xcode 8, the following has
 
 ## Manually
 
-
-
+You can always manually manage your certificates and provisoining profiles using the Apple Developer Portal. Make sure to store the private key of your certificates in a safe place, as they can't be restored if you lose them. 
