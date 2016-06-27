@@ -2,7 +2,7 @@
 
 If you are just starting a new project, it's important to think about how you want to handle code signing. This guide will help you choose the best approach for you.
 
-For existing projects it might make sense to switch from a manual process to the [match appraoch](https://codesigning.guide) to make it easier for new team-members to onboard.
+For existing projects it might make sense to switch from a manual process to the [match approach](https://codesigning.guide) to make it easier for new team-members to onboard.
 
 ## Using [match](https://fastlane.tools/match)
 
