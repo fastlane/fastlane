@@ -58,3 +58,6 @@ Run `fastlane` in verbose mode to get even more debug information:
 fastlane [lane] --verbose
 ```
 
+## Common Issues
+
+Check out [CommonIssues.md](CommonIssues.md) for the most common code signing issues and how you can solve them.
