@@ -50,6 +50,10 @@ If a certificate gets revoked, all connected provisioning profiles get invalidat
 </p>
 1. Make sure to have deleted all expired WWDR certificates, more information [here](https://stackoverflow.com/questions/32821189/xcode-7-error-missing-ios-distribution-signing-identity-for/35401483#35401483). There might be 2 expired WWDR certificates, one in the `login`, and one in the `system` keychain
 
+## Have you tried turning it off and on again?
+
+As funny as it sounds, sometimes restarting your Mac helps.
+
 ## fastlane
 
 Run `fastlane` in verbose mode to get even more debug information:
