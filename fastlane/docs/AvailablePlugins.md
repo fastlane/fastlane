@@ -38,3 +38,5 @@ You can find more information about how to start using plugins in [Plugins.md](h
 [ya_tu_sabes](https://github.com/neonichu/fastlane-plugin-ya_tu_sabes) | Ya tu sabes. | 181
 [tunes](https://github.com/neonichu/fastlane-tunes) | Play music using fastlane, because you can. | 176
 `tpa` | TPA gives you advanced user behaviour analytics, app distribution, crash analytics and more | 139
+[unzip](https://github.com/maxoly/fastlane-plugin-unzip) | Extract compressed files in a ZIP. | 28
+[download_file](https://github.com/maxoly/fastlane-plugin-download_file) | Download a file (e.g. ZIP file) from an HTTP/HTTPS url. | 26
