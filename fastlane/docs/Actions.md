@@ -2568,6 +2568,8 @@ Extract compressed files in a ZIP
 unzip(file: "archive.zip")
 
 unzip(file: "archive.zip", destination_path: "./path/to/other/folder/")
+
+unzip(file: "archive.zip", password: "mysecret")
 ```
 
 ### ifttt
