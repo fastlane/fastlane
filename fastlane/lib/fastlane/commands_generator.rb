@@ -58,7 +58,12 @@ module Fastlane
         c.description = 'Helps you with your initial fastlane setup'
 
         c.action do |args, options|
-          Fastlane::Setup.new.run
+          if args[0] == 'beta' && FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
+            require 'fastlane/setup/crashlytics_beta'
+            Fastlane::CrashlyticsBeta.new.run
+          else
+            Fastlane::Setup.new.run
+          end
         end
       end
 

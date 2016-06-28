@@ -36,7 +36,7 @@ deliver
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
-`deliver` can upload ipa or pkg files, app screenshots and more to iTunes Connect from the command line.
+`deliver` uploads screenshots, metadata and binaries to iTunes Connect. Use `'deliver` to submit your app for App Store review.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 

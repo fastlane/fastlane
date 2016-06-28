@@ -1788,9 +1788,7 @@ import_from_git(
 Get information about the last git commit, returns the commit hash, the abbreviated commit hash, the author and the git message.
 
 ```ruby
-commit = last_git_commit_message
-crashlytics(notes: commit[:message])
-puts commit[:author]
+crashlytics(notes: last_git_commit_message)
 ```
 
 ### create_pull_request

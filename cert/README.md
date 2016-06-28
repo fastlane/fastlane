@@ -35,6 +35,8 @@ cert
 
 ###### Automatically create and maintain iOS code signing certificates.
 
+`cert` is focused exclusively on code signing. You can create new code signing identities for different environments (development and distribution) and use any existing valid certificates installed locally.
+
 Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------

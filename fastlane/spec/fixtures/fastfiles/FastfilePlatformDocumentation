@@ -1,0 +1,18 @@
+# Needs to have this name
+
+platform :ios do
+end
+
+platform :android do
+  desc "I'm a lane"
+  lane :lane do
+    UI.message("I'm a lane")
+  end
+end
+
+platform :mac do
+  desc "I'm a mac private_lane"
+  private_lane :mac_lane do
+    UI.message("I'm a lane")
+  end
+end
