@@ -15,8 +15,11 @@ module Fastlane
         FileUtils.mkdir_p('fastlane')
         File.write('fastlane/Fastfile', fastfile)
         UI.success('A Fastfile has been generated for you at ./fastlane/Fastfile')
-        UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics.')
       end
+      UI.header('Next Steps:')
+      UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics.')
+      UI.success('After submitting your beta, visit https://fabric.io/_/beta to add release notes and notify groups of testers,')
+      UI.success('or edit your Fastfile to automatically notify and permit groups to download.')
     end
 
     def keys_from_project(project)
@@ -71,7 +74,11 @@ module Fastlane
   lane :beta do
     gym(scheme: '#{scheme}')
     crashlytics(api_token: '#{api_key}',
-             build_secret: '#{build_secret}')
+             build_secret: '#{build_secret}',
+            notifications: false,
+                   emails: [],
+                   groups: []
+              )
   end
       }
     end
@@ -84,7 +91,11 @@ platform :ios do
   lane :beta do
     gym(scheme: '#{scheme}')
     crashlytics(api_token: '#{api_key}',
-             build_secret: '#{build_secret}')
+             build_secret: '#{build_secret}',
+            notifications: false,
+                   emails: [],
+                   groups: []
+            )
   end
 end
 eos
