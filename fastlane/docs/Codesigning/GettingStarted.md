@@ -4,6 +4,8 @@ If you are just starting a new project, it's important to think about how you wa
 
 For existing projects it might make sense to switch from a manual process to the [match approach](https://codesigning.guide) to make it easier for new team-members to onboard.
 
+If you are new to code signing, check out the [WWDC session](https://developer.apple.com/videos/play/wwdc2016/401/) that describes the fundamentals of code signing in Xcode.
+
 ## Using [match](https://fastlane.tools/match)
 
 The concept of [match](https://fastlane.tools/match) is described in the [codesigning guide](https://codesigning.guide). 

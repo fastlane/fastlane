@@ -14,6 +14,8 @@ Does code signing work on a different Mac, but not on yours? If so, chances are 
 
 ## Xcode project
 
+Make sure to follow [XcodeProject.md](XcodeProject.md) on how to properly set up your project.
+
 A check list on what you should verify on your Xcode project
 
 1. Make sure to have consistent code signing settings across your targets
@@ -47,4 +49,12 @@ If a certificate gets revoked, all connected provisioning profiles get invalidat
   <img src="KeychainPrivateKey.png" width=500 />
 </p>
 1. Make sure to have deleted all expired WWDR certificates, more information [here](https://stackoverflow.com/questions/32821189/xcode-7-error-missing-ios-distribution-signing-identity-for/35401483#35401483). There might be 2 expired WWDR certificates, one in the `login`, and one in the `system` keychain
+
+## fastlane
+
+Run `fastlane` in verbose mode to get even more debug information:
+
+```
+fastlane [lane] --verbose
+```
 
