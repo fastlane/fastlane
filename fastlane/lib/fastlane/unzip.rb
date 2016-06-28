@@ -24,8 +24,7 @@ module Fastlane
           end
 
           Fastlane::Actions.sh(command, log: false)
-
-          UI.success "Unzip finished ✅" 
+          UI.success "Unzip finished ✅"
         rescue => ex
           UI.user_error!("Error unzipping file: #{ex}")
         end
@@ -47,15 +46,12 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :file,
                                        env_name: "FL_UNZIP_FILE",
                                        description: "The path of the ZIP archive",
                                        verify_block: proc do |value|
-                                           UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                         UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :destination_path,
                                        env_name: "FL_UNZIP_DESTINATION_PATH",
