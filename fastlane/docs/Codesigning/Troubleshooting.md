@@ -16,35 +16,35 @@ Does code signing work on a different Mac, but not on yours? If so, chances are 
 
 A check list on what you should verify on your Xcode project
 
-- Make sure to have consistent code signing settings across your targets
-- Don't set any code signing settings on your project level, just on the target level
-- Make sure the bundle identifier matches the one of your provisioning profile
-- Make sure the code signing identity is set to `iOS Distribution` for `Release` builds
-- Make sure to set a provisioning profile for all your targets, e.g. Watch, Today widget, ...
-- Check your working copy in git - did you make any changes by mistake?
+1. Make sure to have consistent code signing settings across your targets
+1. Don't set any code signing settings on your project level, just on the target level
+1. Make sure the bundle identifier matches the one of your provisioning profile
+1. Make sure the code signing identity is set to `iOS Distribution` for `Release` builds
+1. Make sure to set a provisioning profile for all your targets, e.g. Watch, Today widget, ...
+1. Check your working copy in git - did you make any changes by mistake?
 
 ## Developer Portal
 
 If a certificate gets revoked, all connected provisioning profiles get invalidated. This however might not immediately show up in your local keychain.
 
-- Open the [Developer Portal](https://developer.apple.com/account/ios/certificate/)
+1. Open the [Developer Portal](https://developer.apple.com/account/ios/certificate/)
 - Verify your certificates are valid, and didn't expire or got revoked
 - Switch to the Provisioning Profiles and make sure the profiles you want to use are all still valid
-  - If your profile is invalid or expired, you can easily fix it:
-    - If you're using [match](https://fastlane.tools/match), run `match` with `force` enabled
+  1. If your profile is invalid or expired, you can easily fix it:
+    1. If you're using [match](https://fastlane.tools/match), run `match` with `force` enabled
     - If you're using [sigh](https://fastlane.tools/sigh), run `sigh` with `force` enabled
     - If you're doing manual code signing, edit the provisioning profile, and click on `Generate` on the bottom of the screen. Make sure to select the correct certificate, then download and open the new provisioning profile
   - If your profile is valid, but you still have issues make sure
-    - that the certificate matches the certificate you have installed locally. You can view the used certificate by editing the profile (Don't click `Generate`, unless you want to re-generate the provisioning profile)
+    1. that the certificate matches the certificate you have installed locally. You can view the used certificate by editing the profile (Don't click `Generate`, unless you want to re-generate the provisioning profile)
     - that all devices you need are included (Development and Ad-Hoc only)
     - that you are actually looking at the correct provisioning profile, that matches the bundle identifier of your app. You might have multiple provisioning profiles for the same app / certificate combination. By default Xcode will use the last modified one.
 
 ## Keychain
 
-- Run `security find-identity -v -p codesigning` to get a list of locally installed code signing identities. Does yours show up?
-- Open the `Keychain Access` app, switch to `Certificates` and find your `iOS Developer` or `iOS Distribution` entry and unfold the entry to verify the private key is locally installed: 
-
-![KeychainPrivateKey.png](KeychainPrivateKey.png)
-
-- Make sure to have deleted all expired WWDR certificates, more information [here](https://stackoverflow.com/questions/32821189/xcode-7-error-missing-ios-distribution-signing-identity-for/35401483#35401483). There might be 2 expired WWDR certificates, one in the `login`, and one in the `system` keychain
+1. Run `security find-identity -v -p codesigning` to get a list of locally installed code signing identities. Does yours show up?
+1. Open the `Keychain Access` app, switch to `Certificates` and find your `iOS Developer` or `iOS Distribution` entry and unfold the entry to verify the private key is locally installed: 
+<p align="center">
+  <img src="KeychainPrivateKey.png" width=500 />
+</p>
+1. Make sure to have deleted all expired WWDR certificates, more information [here](https://stackoverflow.com/questions/32821189/xcode-7-error-missing-ios-distribution-signing-identity-for/35401483#35401483). There might be 2 expired WWDR certificates, one in the `login`, and one in the `system` keychain
 
