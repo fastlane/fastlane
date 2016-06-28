@@ -8,6 +8,8 @@ The provisioning profile for the given app identifier "X" is not available on th
 
 > No matching codesigning identity found: No codesigning identities (i.e. certificate and private key pairs) matching "iPhone Distribution: X" were found
 
+The code signing identity you specified in the Xcode project can't be found in your local keychain. Make sure to transfer the certificate and private key from another Mac (or wherever you store the private key), or to update the project file to use the correct code signing identity.
+
 > Error Domain=IDEDistributionErrorDomain Code=1 "The operation couldn’t be completed. (IDEDistributionErrorDomain error 1.)"
 
 This error can have a lot of reasons, some things you should try:
