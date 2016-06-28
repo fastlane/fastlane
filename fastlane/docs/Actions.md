@@ -2567,7 +2567,7 @@ Extract compressed files in a ZIP
 ```ruby
 unzip(file: "archive.zip")
 
-unzip(file: "archive.zip", destinatio_path: "./folder/")
+unzip(file: "archive.zip", destination_path: "./path/to/other/folder/")
 ```
 
 ### ifttt
