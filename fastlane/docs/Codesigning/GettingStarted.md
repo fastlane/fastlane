@@ -12,7 +12,7 @@ With [match](https://fastlane.tools/match) you store your private keys and certi
 
 Getting started with [match](https://fastlane.tools/match) requires you to revoke your existing certificates.
 
-**TODO: Insert link to XcodeProject.md here**
+Make sure to follow the [Xcode Project Guide](XcodeProject.md) to set up your project properly.
 
 ## Using [cert](https://fastlane.tools/cert) and [sigh](https://fastlane.tools/sigh)
 
@@ -31,27 +31,32 @@ lane :beta do
 end
 ```
 
-**TODO: Insert link to XcodeProject.md here**
+Make sure to follow the [Xcode Project Guide](XcodeProject.md) to set up your project properly.
 
 ## Using Xcode's code signing feature
 
-Sometimes the `Automatic` setting as the provisioning profile doesn't work reliably as it will just select the most recent provisioning profile, no matter if the certificate is installed. 
+Sometimes the `Automatic` setting as the provisioning profile doesn't work reliably as it will just select the most recently updated provisioning profile, no matter if the certificate is installed. 
 
-#### Xcode 7.3 and lower
+That's why it is recommended to specify a specific provisioning profile somehow:
+
+#### Xcode 7 and lower
 
 You should avoid clicking the `Fix Issue` button (There is an [Xcode plugin](https://github.com/neonichu/FixCode#readme) that disables the button), as it sometimes revokes existing certificates, and with it the provisioning profiles.
 
-Unfortunately you can't specify the name of the provisioning profile in Xcode 7.3. Instead you can specify the UUID of the profile, which changes every time the profile gets re-generated (e.g. when you add a new device).
+Unfortunately you can't specify the name of the provisioning profile in Xcode 7. Instead you can specify the UUID of the profile, which changes every time the profile gets re-generated (e.g. when you add a new device).
 
+To work around this issue, check out the [Xcode Project Guide](XcodeProject.md) on how to pass a provisioning
 
 #### Xcode 8 and up
 
 Apple improved code signing a lot with the release of Xcode 8, the following has changed:
 
 - No more `Fix Issue` button, instead all code signing processes run in the background and show the log right in Xcode
-- You can now specify the provisioning profile by name, instead of the UUID (this is used in **TODO**)
-- Improved error messages when something goes wrong. If you run into code signing errors you should always try building and signing with Xcode to get more detailed error information.
+- You can now specify the provisioning profile by name, instead of the UUID (Check out the [Xcode Project Guide](XcodeProject.md) for more information)
+- Improved error messages when something goes wrong. If you run into code signing errors you should always try building and signing with Xcode to get more detailed error information. (Check out [Troubleshooting.md](Troubleshooting.md) for more information)
 
 ## Manually
 
-You can always manually manage your certificates and provisoining profiles using the Apple Developer Portal. Make sure to store the private key of your certificates in a safe place, as they can't be restored if you lose them. 
+You can always manually create and manage your certificates and provisioning profiles using the Apple Developer Portal. Make sure to store the private key (`.p12`) of your certificates in a safe place, as they can't be restored if you lose them. 
+
+You can always download the certificate (`.cer`) and provisioning profile (`.mobileprovision`) from the Apple Developer Portal.
