@@ -14,6 +14,8 @@ module Fastlane
         fastfile = fastfile_template(keys[:api_key], keys[:build_secret], project.schemes.first)
         FileUtils.mkdir_p('fastlane')
         File.write('fastlane/Fastfile', fastfile)
+        UI.success('A Fastfile has been generated for you at ./fastlane/Fastfile')
+        UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics.')
       end
     end
 
@@ -34,7 +36,9 @@ module Fastlane
           build_secret: script_array[2]
         }
       else
-        UI.important('Please enter your API Key and Build Secret:')
+        UI.important('fastlane was unable to detect your Fabric API Key and Build Secret.')
+        UI.important('Navigate to https://www.fabric.io/settings/organizations, select the appropriate organization,')
+        UI.important('and copy the API Key and Build Secret.')
         keys = {}
         loop do
           keys[:api_key] = UI.input('API Key:')
