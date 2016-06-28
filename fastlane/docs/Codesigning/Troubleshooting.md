@@ -46,7 +46,7 @@ If a certificate gets revoked, all connected provisioning profiles get invalidat
 1. Run `security find-identity -v -p codesigning` to get a list of locally installed code signing identities. Does yours show up?
 1. Open the `Keychain Access` app, switch to `Certificates` and find your `iOS Developer` or `iOS Distribution` entry and unfold the entry to verify the private key is locally installed: 
 <p align="center">
-  <img src="KeychainPrivateKey.png" width=500 />
+  <img src="assets/KeychainPrivateKey.png" width=500 />
 </p>
 1. Make sure to have deleted all expired WWDR certificates, more information [here](https://stackoverflow.com/questions/32821189/xcode-7-error-missing-ios-distribution-signing-identity-for/35401483#35401483). There might be 2 expired WWDR certificates, one in the `login`, and one in the `system` keychain
 
