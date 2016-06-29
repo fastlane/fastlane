@@ -14,12 +14,13 @@ module Fastlane
         fastfile = fastfile_template(keys[:api_key], keys[:build_secret], project.schemes.first)
         FileUtils.mkdir_p('fastlane')
         File.write('fastlane/Fastfile', fastfile)
-        UI.success('A Fastfile has been generated for you at ./fastlane/Fastfile')
+        UI.success('A Fastfile has been generated for you at ./fastlane/Fastfile 🚀')
       end
-      UI.header('Next Steps:')
-      UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics.')
-      UI.success('After submitting your beta, visit https://fabric.io/_/beta to add release notes and notify groups of testers,')
-      UI.success('or edit your Fastfile to automatically notify and permit groups to download.')
+      UI.header('Next Steps')
+      UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics. 🎯')
+      UI.success('After submitting your beta, visit https://fabric.io/_/beta to add release notes and notify testers.')
+      UI.success('You can edit your Fastfile to distribute and notify testers automatically.')
+      UI.success('Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀')
     end
 
     def keys_from_project(project)
@@ -39,7 +40,7 @@ module Fastlane
           build_secret: script_array[2]
         }
       else
-        UI.important('fastlane was unable to detect your Fabric API Key and Build Secret.')
+        UI.important('fastlane was unable to detect your Fabric API Key and Build Secret. 🔑')
         UI.important('Navigate to https://www.fabric.io/settings/organizations, select the appropriate organization,')
         UI.important('and copy the API Key and Build Secret.')
         keys = {}
