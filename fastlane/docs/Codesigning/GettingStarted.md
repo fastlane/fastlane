@@ -23,7 +23,7 @@ If you don't want to revoke your existing certificates, but still want an automa
 - [cert](https://fastlane.tools/cert) will make sure you have a valid certificate and its private key installed on the local machine
 - [sigh](https://fastlane.tools/sigh) will make sure you have a valid provisioning profile installed locally, that matches the installed certificate
 
-You basically add the following lines to your `Fastfile`
+Add the following lines to your `Fastfile`
 
 ```ruby
 lane :beta do
@@ -37,7 +37,7 @@ Make sure to follow the [Xcode Project Guide](XcodeProject.md) to set up your pr
 
 ## Using Xcode's code signing feature
 
-Sometimes the `Automatic` setting as the provisioning profile doesn't work reliably as it will just select the most recently updated provisioning profile, no matter if the certificate is installed. 
+Occasionally the `Automatic` setting as the provisioning profile doesn't work reliably as it will just select the most recently updated provisioning profile, no matter if the certificate is installed. 
 
 That's why it is recommended to specify a specific provisioning profile somehow:
 
@@ -47,7 +47,7 @@ You should avoid clicking the `Fix Issue` button (There is an [Xcode plugin](htt
 
 Unfortunately you can't specify the name of the provisioning profile in Xcode 7. Instead you can specify the UUID of the profile, which changes every time the profile gets re-generated (e.g. when you add a new device).
 
-To work around this issue, check out the [Xcode Project Guide](XcodeProject.md) on how to pass a provisioning
+To work around this issue, check out the [Xcode Project Guide](XcodeProject.md) on how to pass a provisioning profile to Xcode when building your app.
 
 #### Xcode 8 and up
 

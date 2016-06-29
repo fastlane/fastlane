@@ -1,10 +1,12 @@
-# Commong code signing issues
+# Common code signing issues
 
 ## Xcode errors
 
 > Code Sign error: No matching provisioning profiles found: No provisioning profiles with a valid signing identity (i.e. certificate and private key pair) matching the bundle identifier "X" were found.
 
-The provisioning profile for the given app identifier "X" is not available on the local machine. Make sure you have a valid provisioning profile for the correct distribution type (App Store, Development or Ad Hoc) on the Apple Developer Portal, download and install it, and select the profile in the Xcode settings (See [XcodeProject.md](XcodeProject.md))
+The provisioning profile for the given app identifier "X" is not available on the local machine. Make sure you have a valid provisioning profile for the correct distribution type (App Store, Development or Ad Hoc) on the Apple Developer Portal, download and install it, and select the profile in the Xcode settings (See [XcodeProject.md](XcodeProject.md)).
+
+You might have the provisioning profile installed locally, but miss the private key or certificate for it. 
 
 > No matching codesigning identity found: No codesigning identities (i.e. certificate and private key pairs) matching "iPhone Distribution: X" were found
 
@@ -15,7 +17,7 @@ The code signing identity you specified in the Xcode project can't be found in y
 This error can have a lot of reasons, some things you should try:
 
 - Verify your Keychain is valid and you don't have an expired WWDR certificate using [this guide](Troubleshooting.md#keychain)
-- Verify both your certificate and provisioning profile are valid
+- Verify both your certificate and provisioning profile are valid in both your Keychain and on the Apple Developer Portal (Check out [Troubleshooting.md](Troubleshooting.md) for more information)
 - If you're using [gym](https://fastlane.tools/gym), try using the `use_legacy_build_api` flag to fallback to the Xcode 6 build API
 - Follow the other steps of [Troubleshooting.md](Troubleshooting.md)
 

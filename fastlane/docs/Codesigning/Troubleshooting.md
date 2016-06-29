@@ -10,7 +10,7 @@ To get even more details, try archiving using Xcode 8.
 
 ## Different machine
 
-Does code signing work on a different Mac, but not on yours? If so, chances are high you miss the latest private key, the certificate or the provisioning profile. Also follow the [Keychain](#keychain) part of this document to make sure you don't have any expired certificates installed.
+Does code signing work on a different Mac, but not on yours? If so, chances are high you don't have the latest private key, the certificate or the provisioning profile. Also follow the [Keychain](#keychain) part of this document to make sure you don't have any expired certificates installed.
 
 ## Xcode project
 
@@ -30,7 +30,7 @@ A check list on what you should verify on your Xcode project
 If a certificate gets revoked, all connected provisioning profiles get invalidated. This however might not immediately show up in your local keychain.
 
 1. Open the [Developer Portal](https://developer.apple.com/account/ios/certificate/)
-- Verify your certificates are valid, and didn't expire or got revoked
+- Verify your certificates are valid, and didn't expire or get revoked
 - Switch to the Provisioning Profiles and make sure the profiles you want to use are all still valid
   1. If your profile is invalid or expired, you can easily fix it:
     1. If you're using [match](https://fastlane.tools/match), run `match` with `force` enabled
