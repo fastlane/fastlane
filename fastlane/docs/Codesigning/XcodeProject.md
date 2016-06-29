@@ -43,7 +43,7 @@ Since it is not recommended to update the project file, every time you update yo
 
 To do so, open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
 
-<img src="assets/XcodeProjectSettings.png" width="700" />
+<img src="/match/assets/XcodeProjectSettings.png" width="700" />
 
 Using the `$(...)` notation, Xcode will use the provisioning profile matching the UUID, and fallback to `Automatic` if it's not provided. 
 
