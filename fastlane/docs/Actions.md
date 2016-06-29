@@ -313,14 +313,6 @@ Select and build with the Xcode installed at the provided path. Use the `xcversi
 xcode_select "/Applications/Xcode6.1.app"
 ```
 
-### [Xcake](https://github.com/jcampbell05/xcake/)
-
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake make` before building your app.
-
-```ruby
-xcake
-```
-
 ### [resign](https://github.com/fastlane/fastlane/tree/master/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
@@ -2196,14 +2188,6 @@ data["users"].each do |user|
 end
 ```
 
-### download_file
-
-Download a file from a remote server (e.g. ZIP file) and puts it in a destination folder.
-
-```ruby
-download_file(url: 'https://example.com/archive.zip', destination_path: './path/to/folder/archive.zip')
-```
-
 ### version_get_podspec
 
 To receive the current version number from your `.podspec` file use
@@ -2564,18 +2548,6 @@ Compress a file or directory
 zip(path: "MyApp.app")
 
 zip(path: "MyApp.app", output_name: "Latest.app.zip")
-```
-
-### unzip
-
-Extract compressed files in a ZIP 
-
-```ruby
-unzip(
-  file: "path/to/archive.zip",
-  destination_path: "./path/to/other/folder/", # optional
-  password: "secret" # optional
-)
 ```
 
 ### ifttt
