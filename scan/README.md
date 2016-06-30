@@ -168,7 +168,7 @@ Run `scan init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
-devices: ["iPhone 6s", "iPad Air"]
+devices ["iPhone 6s", "iPad Air"]
 
 clean true
 
