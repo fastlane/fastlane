@@ -1,6 +1,7 @@
 require 'date'
 require 'terminal-table'
 require 'colored'
+require 'shellwords'
 
 RED_COMMIT_COUNT = 5
 RED_DAY_COUNT = 14
