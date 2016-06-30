@@ -6,6 +6,11 @@ For existing projects it might make sense to switch from a manual process to the
 
 If you are new to code signing, check out the [WWDC session](https://developer.apple.com/videos/play/wwdc2016/401/) that describes the fundamentals of code signing in Xcode.
 
+- [Using match](#using-match)
+- [Using cert and sigh](#using-cert-and-sigh)
+- [Using Xcode's code signing feature](#using-xcodes-code-signing-feature)
+- [Manually](#manually)
+
 ## Using [match](https://fastlane.tools/match)
 
 The concept of [match](https://fastlane.tools/match) is described in the [codesigning guide](https://codesigning.guide). 
