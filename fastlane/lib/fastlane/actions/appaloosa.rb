@@ -10,7 +10,7 @@ module Fastlane
         binary_url = get_binary_link(binary, api_key, store_id, params[:group_ids])
         return if binary_url.nil?
         screenshots_url = get_screenshots_links(api_key, store_id, params[:screenshots], params[:locale], params[:device])
-        upload_on_appaloosa(api_key, store_id, binary_url, screenshots_url, params[:group_ids])
+        upload_on_appaloosa(api_key, store_id, binary_url, screenshots_url, params[:group_ids], params[:description])
       end
 
       def self.get_binary_link(binary, api_key, store_id, group_ids)
@@ -95,7 +95,7 @@ module Fastlane
         end.compact
       end
 
-      def self.upload_on_appaloosa(api_key, store_id, binary_path, screenshots, group_ids)
+      def self.upload_on_appaloosa(api_key, store_id, binary_path, screenshots, group_ids, description)
         screenshots = all_screenshots_links(screenshots)
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/mobile_application_updates/upload")
         http = Net::HTTP.new(uri.host, uri.port)
@@ -104,6 +104,7 @@ module Fastlane
         req.body = { store_id: store_id,
                      api_key: api_key,
                      mobile_application_update: {
+                       description: description,
                        binary_path: binary_path,
                        screenshot1: screenshots[0],
                        screenshot2: screenshots[1],
@@ -205,6 +206,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :device,
                                        env_name: 'FL_APPALOOSA_DEVICE',
                                        description: 'Select the device format for yours screenshots',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :description,
+                                       env_name: 'FL_APPALOOSA_DESCRIPTION',
+                                       description: 'Your app description',
                                        optional: true)
         ]
       end
