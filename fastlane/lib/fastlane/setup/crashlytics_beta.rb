@@ -84,7 +84,7 @@ module Fastlane
 
     def fastfile_template(api_key, build_secret, scheme)
       <<-eos
-fastlane_version "1.93.0"
+fastlane_version "#{Fastlane::VERSION}"
 default_platform :ios
 platform :ios do
   lane :beta do
