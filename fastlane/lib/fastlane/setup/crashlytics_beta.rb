@@ -76,9 +76,7 @@ module Fastlane
     gym(scheme: '#{scheme}')
     crashlytics(api_token: '#{api_key}',
              build_secret: '#{build_secret}',
-            notifications: false,
-                   emails: [],
-                   groups: []
+            notifications: false
               )
   end
       }
@@ -93,9 +91,7 @@ platform :ios do
     gym(scheme: '#{scheme}')
     crashlytics(api_token: '#{api_key}',
              build_secret: '#{build_secret}',
-            notifications: false,
-                   emails: [],
-                   groups: []
+            notifications: false
             )
   end
 end
