@@ -38,7 +38,7 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
       end
 
-      it "raises an error if block is missing", nower: true do
+      it "raises an error if block is missing" do
         expect(UI).to receive(:user_error!).with("You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.")
         @ff.lane(:my_name)
       end

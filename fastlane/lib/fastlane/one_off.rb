@@ -26,11 +26,8 @@ module Fastlane
     def self.run(action: nil, parameters: nil)
       Fastlane.load_actions
 
-      class_name = action.fastlane_class + 'Action'
-      class_ref = nil
-      begin
-        class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError
+      class_ref = Actions.action_class_ref(action)
+      unless class_ref
         if Fastlane::Actions.formerly_bundled_actions.include?(action)
           # This was a formerly bundled action which is now a plugin.
           UI.verbose(caller.join("\n"))
