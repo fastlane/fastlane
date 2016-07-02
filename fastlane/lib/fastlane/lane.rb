@@ -52,6 +52,8 @@ module Fastlane
           # We still allow it, because we're nice
           # Otherwise we might break existing setups
         end
+
+        self.ensure_name_not_conflicts(name.to_s)
       end
 
       def black_list
@@ -60,6 +62,12 @@ module Fastlane
 
       def gray_list
         Fastlane::TOOLS
+      end
+
+      def ensure_name_not_conflicts(name)
+        # First, check if there is a predefined method in the actions folder
+        return unless Actions.action_class_ref(name)
+        UI.error("Name of the lane '#{name}' is already taken by the action named '#{name}'")
       end
     end
   end
