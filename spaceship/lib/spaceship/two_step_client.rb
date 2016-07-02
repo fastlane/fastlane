@@ -36,10 +36,40 @@ module Spaceship
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
       elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
-        raise "spaceship currently doesn't support the push based 2 step verification, please switch to SMS based 2 factor auth in the mean-time"
+        puts "Two Fator Authentication for account '#{self.user}' is enabled"
+        handle_two_fator(r)
       else
         raise "Invalid 2 step response #{r.body}"
       end
+    end
+
+    def handle_two_fator(response)
+      security_code = response.body["phoneNumberVerification"]["securityCode"]
+      # {"length"=>6,
+      #  "tooManyCodesSent"=>false,
+      #  "tooManyCodesValidated"=>false,
+      #  "securityCodeLocked"=>false}
+      code_length = security_code["length"]
+      code = ask("Please enter the #{code_length} digit code: ")
+      puts "Requesting session..."
+
+      # Send securityCode back to server to get a valid session
+      r = request(:post) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode"
+        req.headers["Accept"] = "application/json"
+        req.headers['Content-Type'] = 'application/json'
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
+        req.body = { "securityCode" => { "code" => code.to_s } }.to_json
+      end
+
+      # we use `Spaceship::TunesClient.new.handle_itc_response`
+      # since this might be from the Dev Portal, but for 2 step
+      Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+      store_session
+
+      return true
     end
 
     # Only needed for 2 step
@@ -128,6 +158,12 @@ module Spaceship
         raise ex
       end
 
+      store_session
+
+      return true
+    end
+
+    def store_session
       # If the request was successful, r.body is actually nil
       # The previous request will fail if the user isn't on a team
       # on iTunes Connect, but it still works, so we're good
@@ -150,8 +186,6 @@ module Spaceship
       # correct DES... cookie
 
       self.store_cookie
-
-      return true
     end
   end
 end
