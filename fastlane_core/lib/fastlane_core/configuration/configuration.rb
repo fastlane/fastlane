@@ -16,6 +16,9 @@ module FastlaneCore
 
     def self.create(available_options, values)
       v = values.dup
+      v.each do |key, val|
+        v[key] = val.dup # this is necessary when fetching a value from an environment variable
+      end
 
       if v.kind_of?(Hash) && available_options.kind_of?(Array) # we only want to deal with the new configuration system
         # Now see if --verbose would be a valid input
