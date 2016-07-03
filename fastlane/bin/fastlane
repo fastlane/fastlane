@@ -2,23 +2,13 @@
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
 unless ENV['BUNDLE_BIN_PATH']
-  has_gemfile = File.exist?('Gemfile') && File.read('Gemfile').include?('fastlane')
+  require 'bundler'
+  gemfile = Bundler::SharedHelpers.in_bundle?
 
-  require 'tmpdir'
-  temp_gemfile = File.join(Dir.tmpdir, 'Gemfile')
-  File.write(temp_gemfile, "gem 'fastlane'") unless has_gemfile
-
-  command = "bundle exec fastlane #{ARGV.join(' ')}"
-  command = "BUNDLE_GEMFILE=#{temp_gemfile} #{command}" unless has_gemfile
-  system(command)
-  status = $?
-
-  unless has_gemfile
-    File.delete(temp_gemfile)
-    File.delete("#{temp_gemfile}.lock")
+  if gemfile && File.read(gemfile).include?('fastlane')
+    system("bundle exec fastlane #{ARGV.join(' ')}")
+    exit($?.exitstatus)
   end
-
-  exit(status.exitstatus)
 end
 
 require "fastlane/cli_tools_distributor"
