@@ -9,7 +9,7 @@ module Fastlane
 
         require "fastlane" # this might take a long time if there is no Gemfile :(
 
-        if Time.now - before_import_time > 0
+        if Time.now - before_import_time > 3
           print_slow_fastlane_warning
         end
 
