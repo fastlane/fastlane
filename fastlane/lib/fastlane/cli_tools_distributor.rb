@@ -9,7 +9,7 @@ module Fastlane
 
         require "fastlane" # this might take a long time if there is no Gemfile :(
 
-        if Time.now - before_import_time > 3
+        if Time.now - before_import_time > 0
           print_slow_fastlane_warning
         end
 
@@ -55,19 +55,37 @@ module Fastlane
       end
 
       def print_slow_fastlane_warning
-        UI.important "Seems like launching fastlane takes a while - please run"
-        UI.message ""
-        UI.command "gem cleanup"
-        UI.message ""
-        UI.important "to uninstall outdated gems and make fastlane launch faster"
-        UI.important "Alternatively it's recommended to start using a Gemfile to lock your dependencies"
-        UI.important "To get started with a Gemfile, run"
-        UI.message ""
-        UI.command "bundle init"
-        UI.command "echo 'gem \"fastlane\"' >> Gemfile"
-        UI.command "bundle install"
-        UI.message ""
-        UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
+        return if ENV['BUNDLE_BIN_PATH'] # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
+
+        gemfile_path = PluginManager.new.gemfile_path
+        if gemfile_path
+          # The user has a Gemfile, but fastlane is still slow
+          # Let's tell the user how to use `bundle exec`
+          UI.important "Seems like launching fastlane takes a while"
+          UI.important "fastlane detected a Gemfile in this directory"
+          UI.important "however it seems like you don't use `bundle exec`"
+          UI.important "to launch fastlane faster, please use"
+          UI.message ""
+          UI.command "bundle exec fastlane #{ARGV.join(' ')}"
+        else
+          # fastlane is slow and there is no Gemfile
+          # Let's tell the user how to use `gem cleanup` and how to
+          # start using a Gemfile
+          UI.important "Seems like launching fastlane takes a while - please run"
+          UI.message ""
+          UI.command "[sudo] gem cleanup"
+          UI.message ""
+          UI.important "to uninstall outdated gems and make fastlane launch faster"
+          UI.important "Alternatively it's recommended to start using a Gemfile to lock your dependencies"
+          UI.important "To get started with a Gemfile, run"
+          UI.message ""
+          UI.command "bundle init"
+          UI.command "echo 'gem \"fastlane\"' >> Gemfile"
+          UI.command "bundle install"
+          UI.message ""
+          UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
+        end
+
         sleep 1
       end
     end
