@@ -5,7 +5,13 @@ module Fastlane
   class CLIToolsDistributor
     class << self
       def take_off
-        require "fastlane"
+        before_import_time = Time.now
+
+        require "fastlane" # this might take a long time if there is no Gemfile :(
+
+        if Time.now - before_import_time > 3
+          print_slow_fastlane_warning
+        end
 
         # Array of symbols for the names of the available lanes
         # This doesn't actually use the Fastfile parser, but only
@@ -46,6 +52,23 @@ module Fastlane
           require "fastlane/commands_generator"
           Fastlane::CommandsGenerator.start
         end
+      end
+
+      def print_slow_fastlane_warning
+        UI.important "Seems like launching fastlane takes a while - please run"
+        UI.message ""
+        UI.command "gem cleanup"
+        UI.message ""
+        UI.important "to uninstall outdated gems and make fastlane launch faster"
+        UI.important "Alternatively it's recommended to start using a Gemfile to lock your dependencies"
+        UI.important "To get started with a Gemfile, run"
+        UI.message ""
+        UI.command "bundle init"
+        UI.command "echo 'gem \"fastlane\"' >> Gemfile"
+        UI.command "bundle install"
+        UI.message ""
+        UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
+        sleep 1
       end
     end
   end
