@@ -67,6 +67,7 @@ module Fastlane
           UI.important "to launch fastlane faster, please use"
           UI.message ""
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
+          UI.important "For more information, check out https://guides.cocoapods.org/using/a-gemfile.html"
         else
           # fastlane is slow and there is no Gemfile
           # Let's tell the user how to use `gem cleanup` and how to
@@ -84,6 +85,7 @@ module Fastlane
           UI.command "bundle install"
           UI.message ""
           UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
+          UI.important "For more information, check out https://guides.cocoapods.org/using/a-gemfile.html"
         end
 
         sleep 1
