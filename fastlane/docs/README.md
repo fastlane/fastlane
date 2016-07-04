@@ -16,7 +16,7 @@
 
 - [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) Getting started with using and building fastlane plugins
 - [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) A list of all available fastlane plugins
-- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) for help when plugins don't work
+- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) for help when plugins don't work
 
 ### CI Systems
 
