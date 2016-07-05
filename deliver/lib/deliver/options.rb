@@ -213,7 +213,12 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       value.each do |language, keywords|
+                                         UI.user_error!(":keywords must be a string") unless keywords.kind_of?(String)
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :release_notes,
                                      description: "Metadata: Localised release notes for this version",
                                      optional: true,
