@@ -8,8 +8,13 @@ module Fastlane
         command << " -P #{params[:certificate_password].shellescape}" if params[:certificate_password]
         command << " -T /usr/bin/codesign"
         command << " -T /usr/bin/security"
+        
+        log_output = false
+        if params[:log_output]
+            log_output = params[:log_output]
+        end
 
-        Fastlane::Actions.sh(command, log: false)
+        Fastlane::Actions.sh(command, log: log_output)
       end
 
       def self.description
@@ -27,6 +32,10 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :certificate_password,
                                        description: "Certificate password",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :log_output,
+                                       description: "If output should be logged to the console",
+                                       default_value: false,
                                        optional: true)
         ]
       end
