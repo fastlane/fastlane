@@ -9,12 +9,7 @@ module Fastlane
         command << " -T /usr/bin/codesign"
         command << " -T /usr/bin/security"
 
-        log_output = false
-        if params[:log_output]
-          log_output = params[:log_output]
-        end
-
-        Fastlane::Actions.sh(command, log: log_output)
+        Fastlane::Actions.sh(command, log: params[:log_output])
       end
 
       def self.description
