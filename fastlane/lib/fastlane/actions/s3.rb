@@ -10,6 +10,7 @@ module Fastlane
       S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
       S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
       S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
+      S3_ICON_OUTPUT_PATH = :S3_ICON_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -143,6 +144,9 @@ module Fastlane
           title: title
         })
 
+        # Gets icon from ipa and uploads it
+        icon_url = self.upload_icon(ipa_file, info, url_part, bucket, acl)
+
         # Creates html from template
         if html_template_path && File.exist?(html_template_path)
           html_template = eth.load_from_path(html_template_path)
@@ -158,7 +162,8 @@ module Fastlane
           bundle_id: bundle_id,
           bundle_version: bundle_version,
           title: title,
-          device_family: device_family
+          device_family: device_family,
+          app_icon: icon_url
         })
 
         # Creates version from template
@@ -197,6 +202,15 @@ module Fastlane
         ENV[SharedValues::S3_VERSION_OUTPUT_PATH.to_s] = version_url
 
         UI.success("Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'")
+        UI.success("Successfully uploaded plist file to '#{Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH]}'")
+        UI.success("Successfully uploaded html file to '#{Actions.lane_context[SharedValues::S3_HTML_OUTPUT_PATH]}'")
+        UI.success("Successfully uploaded version file to '#{Actions.lane_context[SharedValues::S3_VERSION_OUTPUT_PATH]}'")
+
+        if icon_url
+          Actions.lane_context[SharedValues::S3_ICON_OUTPUT_PATH] = icon_url
+          ENV[SharedValues::S3_ICON_OUTPUT_PATH.to_s] = icon_url
+          UI.success("Successfully uploaded icon file to '#{Actions.lane_context[SharedValues::S3_ICON_OUTPUT_PATH]}'")
+        end
 
         return true
       end
@@ -304,6 +318,53 @@ module Fastlane
         return path
       end
 
+      def self.icon_files(info)
+        icons = info['CFBundleIcons']
+        unless icons.nil?
+          primary_icon = icons['CFBundlePrimaryIcon']
+          unless primary_icon.nil?
+            return primary_icon['CFBundleIconFiles']
+          end
+        end
+        []
+      end
+
+      def self.upload_icon(ipa_file, info, url_part, bucket, acl)
+        icon_files = self.icon_files(info)
+        return if icon_files.empty?
+        icon_file = icon_files.first
+        icon_file_basename = File.basename(icon_file)
+        icon_file_name = "#{url_part}#{icon_file_basename}.png"
+        icon_file_data = self.extract_icon_from_ipa(ipa_file, icon_file)
+        self.upload_file(bucket, icon_file_name, icon_file_data, acl)
+      end
+
+      def self.extract_icon_from_ipa(ipa_file, icon_file_name)
+        Zip::File.open(ipa_file) do |zipfile|
+          icon_file = self.largest_icon(zipfile.glob("**/Payload/**/#{icon_file_name}*.png"))
+          return nil unless icon_file
+          tmp_path = "/tmp/app_icon.png"
+          processed_tmp_path = "/tmp/processed_app_icon.png"
+          File.write(tmp_path, zipfile.read(icon_file))
+          # need to transform png from http://iphonedevwiki.net/index.php/CgBI_file_format
+          Actions.sh("xcrun -sdk iphoneos pngcrush -revert-iphone-optimizations #{tmp_path} #{processed_tmp_path}", print_command_output: false)
+          data = File.open(processed_tmp_path, 'rb')
+          File.delete(tmp_path)
+          data
+        end
+      end
+
+      def self.largest_icon(icons)
+        icons.max_by do |file, _|
+          case file.name
+          when /@(\d+)x/
+            $1.to_i
+          else
+            1
+          end
+        end
+      end
+
       def self.description
         "Generates a plist file and uploads all to AWS S3"
       end
@@ -403,7 +464,8 @@ module Fastlane
           ['S3_DSYM_OUTPUT_PATH', 'Direct HTTP link to the uploaded dsym file'],
           ['S3_PLIST_OUTPUT_PATH', 'Direct HTTP link to the uploaded plist file'],
           ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file'],
-          ['S3_VERSION_OUTPUT_PATH', 'Direct HTTP link to the uploaded Version file']
+          ['S3_VERSION_OUTPUT_PATH', 'Direct HTTP link to the uploaded Version file'],
+          ['S3_ICON_OUTPUT_PATH', 'Direct HTTP link to the uploaded icon file']
         ]
       end
 

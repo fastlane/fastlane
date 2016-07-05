@@ -49,18 +49,41 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`")
       end
+    end
+  end
+end
 
-      it "raise an error if no IPA was given" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            s3({
-              access_key: 'access_key',
-              secret_access_key: 'secret_access_key',
-              bucket: 'bucket'
-              })
-          end").runner.execute(:test)
-        end.to raise_error("No IPA file path given, pass using `ipa: 'ipa path'`")
+describe Fastlane::Actions::S3Action do
+  describe '#icon_files' do
+    it "should get icons from ipa" do
+      info = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file("spec/fixtures/ipas/iOSAppOnly.ipa")
+      icons = Fastlane::Actions::S3Action.icon_files(info)
+      expect(icons).to eq(["AppIcon29x29", "AppIcon40x40", "AppIcon57x57", "AppIcon60x60"])
+    end
+  end
+  describe "#largest_icon" do
+    class IconMock
+      attr_reader :name
+      def initialize(path)
+        @name = path
       end
+    end
+    it "should order icons by size multiplier" do
+      icon_files = [
+        IconMock.new("/tmp/AppIcon60x60.png"),
+        IconMock.new("/tmp/AppIcon60x60@2x.png"),
+        IconMock.new("/tmp/AppIcon60x60@3x.png")
+      ]
+      icon = Fastlane::Actions::S3Action.largest_icon(icon_files)
+      expect(icon).to eq(icon_files[2])
+    end
+    it "should pick first icon if there's no multiplier" do
+      icon_files = [
+        IconMock.new("/tmp/AppIcon60x60.png"),
+        IconMock.new("/tmp/AppIcon60x61.png")
+      ]
+      icon = Fastlane::Actions::S3Action.largest_icon(icon_files)
+      expect(icon).to eq(icon_files[0])
     end
   end
 end
