@@ -8,10 +8,10 @@ module Fastlane
         command << " -P #{params[:certificate_password].shellescape}" if params[:certificate_password]
         command << " -T /usr/bin/codesign"
         command << " -T /usr/bin/security"
-        
+
         log_output = false
         if params[:log_output]
-            log_output = params[:log_output]
+          log_output = params[:log_output]
         end
 
         Fastlane::Actions.sh(command, log: log_output)
