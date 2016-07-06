@@ -55,7 +55,7 @@ describe Fastlane do
       end
 
       it "raises an error if the name is on a black list" do
-        expect(UI).to receive(:user_error!).with("Name 'run' is already taken")
+        expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
         @ff.lane :run do
         end
       end

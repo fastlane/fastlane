@@ -58,3 +58,5 @@ def box(str)
   puts '| ' + str + ' |'
   puts '=' * l
 end
+
+task default: :test_all

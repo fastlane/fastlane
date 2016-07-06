@@ -33,14 +33,44 @@ module Pilot
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       uploaded_build = wait_for_processing_build # this might take a while
 
+      distribute(options, uploaded_build)
+    end
+
+    def distribute(options, build = nil)
+      start(options)
+      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+        config[:app_identifier] = ask("App Identifier: ")
+      end
+
+      if build.nil?
+        builds = app.all_processing_builds + app.builds
+        # sort by upload_date
+        builds.sort! { |a, b| a.upload_date <=> b.upload_date }
+        build = builds.last
+        if build.nil?
+          UI.user_error!("No builds found.")
+          return
+        end
+        if build.processing
+          UI.user_error!("Build #{build.train_version}(#{build.build_version}) is still processing.")
+          return
+        end
+        if build.testing_status == "External"
+          UI.user_error!("Build #{build.train_version}(#{build.build_version}) has already been distributed.")
+          return
+        end
+
+        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
+      end
+
       # First, set the changelog (if necessary)
       if options[:changelog].to_s.length > 0
-        uploaded_build.update_build_information!(whats_new: options[:changelog])
+        build.update_build_information!(whats_new: options[:changelog])
         UI.success "Successfully set the changelog for build"
       end
 
       return if config[:skip_submission]
-      distribute_build(uploaded_build, options)
+      distribute_build(build, options)
       UI.message("Successfully distributed build to beta testers 🚀")
     end
 

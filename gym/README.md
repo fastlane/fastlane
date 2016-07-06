@@ -180,7 +180,12 @@ export_options(
 
 For the list of available options run `xcodebuild -help`.
 
-# Automating the whole process
+## Setup code signing
+
+- [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
+- [Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+
+## Automating the whole process
 
 `gym` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 

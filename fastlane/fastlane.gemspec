@@ -34,14 +34,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
-  spec.add_dependency 'xcode-install', '~> 1.4.0' # Needed for xcversion and xcode_install actions
+  spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions
   spec.add_dependency 'word_wrap', '~> 1.0.0'  # to add line breaks for tables with long strings
 
-  spec.add_dependency 'fastlane_core', '>= 0.48.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.48.1', '< 1.0.0' # all shared code and dependencies
 
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.27.2', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.28.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 1.13.1', '< 2.0.0'
@@ -57,6 +57,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'scan', '>= 0.8.0', '< 1.0.0'
   spec.add_dependency 'match', '>= 0.6.0', '< 1.0.0'
   spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
+
+  # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
+  spec.add_dependency 'activesupport', '< 5'
 
   # Development only
   spec.add_development_dependency 'rake'

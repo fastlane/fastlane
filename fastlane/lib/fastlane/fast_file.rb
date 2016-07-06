@@ -264,5 +264,10 @@ module Fastlane
       collector.did_launch_action(:puts)
       Fastlane::Actions::PutsAction.run([value])
     end
+
+    def test(params = {})
+      # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
+      self.runner.try_switch_to_lane(:test, [params])
+    end
   end
 end
