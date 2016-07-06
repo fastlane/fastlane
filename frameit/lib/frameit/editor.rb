@@ -245,6 +245,7 @@ module Frameit
         UI.verbose("Adding text '#{text}'")
 
         text.gsub! '\n', "\n"
+        text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
 
         interline_spacing = fetch_config['interline_spacing']
 
