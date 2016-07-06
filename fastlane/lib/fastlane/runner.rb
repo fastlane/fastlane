@@ -91,12 +91,7 @@ module Fastlane
       method_str.delete!('?') # as a `?` could be at the end of the method name
 
       # First, check if there is a predefined method in the actions folder
-      class_name = method_str.fastlane_class + 'Action'
-      class_ref = nil
-      begin
-        class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError
-      end
+      class_ref = Actions.action_class_ref(method_str)
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is

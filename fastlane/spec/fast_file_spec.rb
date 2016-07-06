@@ -38,7 +38,7 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
       end
 
-      it "raises an error if block is missing", nower: true do
+      it "raises an error if block is missing" do
         expect(UI).to receive(:user_error!).with("You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.")
         @ff.lane(:my_name)
       end
@@ -153,6 +153,11 @@ describe Fastlane do
 
         ff.runner.execute(:test)
         expect(File.exist?('/tmp/fastlane/test')).to eq(true)
+      end
+
+      it "prints a warning if a lane is called like an action" do
+        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
       end
 
       it "allows calling a lane directly even with a default_platform" do
