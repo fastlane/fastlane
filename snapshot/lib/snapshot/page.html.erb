@@ -11,11 +11,11 @@
       .language {
 
       }
+      .sectionName {
+
+      }
       .deviceName {
-        display: block;
-        font-size: 30px;
-        padding-bottom: 24px;
-        padding-top: 45px;
+
       }
       .screenshot {
         cursor: pointer;
@@ -70,34 +70,37 @@
     <% image_counter = 0 %>
 
 
-    <% @data.each do |language, content| %>
+    <% @data.each do |language, devices| %>
       <h1 class="language"><%= language %></h1>
       <hr>
-      <table>
-        <% content.each do |device_name, screens| %>
-          <tr>
-            <th colspan="<%= screens.count %>">
-              <span class="deviceName"><%= device_name %></span>
-            </th>
-          </tr>
-          <tr>
-            <% screens.each do |screen_path| %>
-              <% next if screen_path.include?"_framed.png" %>
-              <td>
-                <% style = "width: 100%;" %>
-                <% image_counter += 1 %>
-                <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-                  <img class="screenshot"
-                         src="<%= screen_path %>"
-                       style="<%= style %>"
-                         alt="<%= language %> <%= device_name %>"
-                data-counter="<%= image_counter %>" />
-                </a>
-              </td>
+      <% devices.each do |device_name, sections| %>
+        <h2 class="deviceName"><%= device_output_name(device_name) %></h1>
+        <% sections.each do |section_name, screenshots| %>
+          <fieldset>
+            <% if section_name != "$undefined" %>
+              <legend class="sectionName"><%= section_name %></legend>
             <% end %>
-          </tr>
+            <table>
+              <tr>
+                <% screenshots.each do |screen_path| %>
+                  <% next if screen_path.include?"_framed.png" %>
+                  <td>
+                    <% style = "width: 100%;" %>
+                    <% image_counter += 1 %>
+                    <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
+                      <img class="screenshot"
+                             src="<%= screen_path %>"
+                           style="<%= style %>"
+                             alt="<%= language %> <%= device_name %>"
+                    data-counter="<%= image_counter %>" />
+                    </a>
+                  </td>
+                <% end %>
+              </tr>
+            </table>
+          </fieldset>
         <% end %>
-      </table>
+      <% end %>
     <% end %>
       <div id="overlay">
         <img id="imageDisplay" src="" alt="" />
