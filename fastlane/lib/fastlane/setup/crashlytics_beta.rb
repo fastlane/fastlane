@@ -30,6 +30,7 @@ module Fastlane
       UI.crash!("No project available at path #{path}") unless File.exist?(path)
       xcode_project = Xcodeproj::Project.open(path)
       target = xcode_project.targets.find { |t| t.name == target_name }
+      UI.crash!("Unable to locate a target by the name of #{target_name}") if target.nil?
       scripts = target.build_phases.select { |t| t.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase }
       crash_script = scripts.find { |s| includes_run_script?(s.shell_script) }
       UI.user_error!("Unable to find Crashlytics Run Script Build Phase") if crash_script.nil?
