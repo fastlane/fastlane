@@ -17,15 +17,16 @@ module Snapshot
 
       puts "-------------------------------------------------------".yellow
       puts "Open your Xcode project and make sure to do the following:".yellow
-      puts "1) Add the ./fastlane/SnapshotHelper.swift to your UI Test target".yellow
+      puts "1) Add a new UI Test target to your project".yellow
+      puts "2) Add the ./fastlane/SnapshotHelper.swift to your UI Test target".yellow
       puts "   You can move the file anywhere you want".yellow
-      puts "2) Call `setupSnapshot(app)` when launching your app".yellow
+      puts "3) Call `setupSnapshot(app)` when launching your app".yellow
       puts ""
       puts "  let app = XCUIApplication()"
       puts "  setupSnapshot(app)"
       puts "  app.launch()"
       puts ""
-      puts "3) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
+      puts "4) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
       puts ""
       puts "More information on GitHub: https://github.com/fastlane/fastlane/tree/master/snapshot".green
     end
