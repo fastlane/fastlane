@@ -296,7 +296,7 @@ module FastlaneCore
 
     # @internal to module
     def self.xcode_build_settings_retries
-      (ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] || 1).to_i
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] || 3).to_i
     end
 
     # @internal to module

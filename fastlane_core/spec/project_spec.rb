@@ -323,7 +323,7 @@ describe FastlaneCore do
         ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
       end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(1)
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
       end
       it "returns specified value" do
         ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
