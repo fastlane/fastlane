@@ -27,6 +27,7 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_file(path)
+      UI.user_error!("Could not find file at path '#{path}'") unless File.exist?(path)
       Zip::File.open(path) do |zipfile|
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
