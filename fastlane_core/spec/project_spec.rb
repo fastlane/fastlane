@@ -299,42 +299,42 @@ describe FastlaneCore do
 
     describe 'Project.xcode_build_settings_timeout' do
       before do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] = nil
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
       end
       it "returns default value" do
         expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(10)
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] = '5'
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
         expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] = ''
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = ''
         expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] = 'hiho'
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = 'hiho'
         expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
       end
     end
 
     describe 'Project.xcode_build_settings_retries' do
       before do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] = nil
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
       end
       it "returns default value" do
         expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(1)
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] = '5'
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
         expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] = ''
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = ''
         expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] = 'hiho'
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = 'hiho'
         expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
       end
     end
@@ -376,7 +376,7 @@ describe FastlaneCore do
         text = "NEEDSRETRY"
         cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
 
-        expect(FastlaneCore::Helper).to receive(:backticks).and_call_original.exactly(3).times
+        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(3).times
 
         expect do
           FastlaneCore::Project.run_command(cmd, timeout: 1, retries: 3)

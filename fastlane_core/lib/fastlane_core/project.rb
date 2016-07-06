@@ -208,8 +208,8 @@ module FastlaneCore
           @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries)
         rescue Timeout::Error
           UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
-            " You can override the timeout value with the environment variable FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT," \
-            " and the number of retries with the environment variable FASTLANE_XCODE_BUILD_SETTINGS_RETRIES ")
+            " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
+            " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ")
         end
       end
 
@@ -291,12 +291,12 @@ module FastlaneCore
 
     # @internal to module
     def self.xcode_build_settings_timeout
-      (ENV['FASTLANE_XCODE_BUILD_SETTINGS_TIMEOUT'] || 10).to_i
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
     end
 
     # @internal to module
     def self.xcode_build_settings_retries
-      (ENV['FASTLANE_XCODE_BUILD_SETTINGS_RETRIES'] || 1).to_i
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] || 1).to_i
     end
 
     # @internal to module
@@ -310,7 +310,7 @@ module FastlaneCore
 
       tries = 1
       begin
-        @raw = Timeout.timeout(timeout) { Helper.backticks(command, print: false).to_s }
+        @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
       rescue Timeout::Error
         raise if tries >= retries
 
