@@ -8,7 +8,7 @@ module Snapshot
 
       generate_data
 
-      html_path = "/Users/dkloeck/Code/GitHub/fastlane/snapshot/lib/snapshot/page.html.erb"#File.join(lib_path, "snapshot/page.html.erb")
+      html_path = File.join(lib_path, "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       export_path = File.join(Snapshot.config[:output_directory], "screenshots.html")
