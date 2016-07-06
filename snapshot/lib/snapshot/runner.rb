@@ -250,12 +250,10 @@ module Snapshot
     end
 
     def clear_previous_screenshots
-      UI.important "Clearing previously generated screenshots"
-      path = File.join(Snapshot.config[:output_directory], "*", "*.png")
-      Dir[path].each do |current|
-        UI.verbose "Deleting #{current}"
-        File.delete(current)
-      end
+      UI.important "Clearing the screenshots folder"
+      screenshots_folder = File.join(Snapshot.config[:output_directory], "screenshots")
+      UI.verbose "Deleting #{screenshots_folder}"
+      FileUtils.rm_rf(screenshots_folder)
     end
 
     def version_of_bundled_helper
