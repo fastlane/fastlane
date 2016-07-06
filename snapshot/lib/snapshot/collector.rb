@@ -8,7 +8,7 @@ module Snapshot
       attachments_path = File.join(containing, "Attachments")
 
       to_store = attachments(containing)
-      matches = output.scan(/snapshot: (.*)/)
+      matches = output.scan(/snapshot: (.*), section: (.*)/)
 
       if to_store.count == 0 && matches.count == 0
         return false
@@ -20,15 +20,18 @@ module Snapshot
 
       matches.each_with_index do |current, index|
         name = current[0]
+        section = current[1]
         filename = to_store[index]
 
-        language_folder = File.join(Snapshot.config[:output_directory], dir_name)
-        FileUtils.mkdir_p(language_folder)
-
+        language_folder = File.join(Snapshot.config[:output_directory], "screenshots", dir_name)
         device_name = device_type.delete(" ")
-        components = [device_name, launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
+        device_folder = File.join(language_folder, device_name)
+        section_folder = File.join(device_folder, section)
+        FileUtils.mkdir_p(section_folder)
 
-        output_path = File.join(language_folder, components.join("-") + ".png")
+        components = [launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
+
+        output_path = File.join(section_folder, components.join("-") + ".png")
         from_path = File.join(attachments_path, filename)
         if $verbose
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
