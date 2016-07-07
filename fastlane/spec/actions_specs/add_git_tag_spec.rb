@@ -98,6 +98,21 @@ describe Fastlane do
 
         expect(result).to eq("git tag -am #{escaped_message} \'#{tag}\'")
       end
+
+      it "allows you to force the tag creation" do
+        tag = '2.0.0'
+        message = "message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}',
+            force: true
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am message --force \'#{tag}\'")
+      end
     end
   end
 end
