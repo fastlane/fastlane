@@ -74,7 +74,7 @@ module Fastlane
       end
 
       def self.description
-        "Update projects code signing settings from your profisioning profile"
+        "Update projects code signing settings from your provisioning profile"
       end
 
       def self.details
