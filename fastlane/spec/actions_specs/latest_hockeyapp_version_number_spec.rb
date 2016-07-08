@@ -35,15 +35,6 @@ describe Fastlane do
         end.to raise_error("No App Name for LatestHockeyappVersionNumberAction given, pass using `app_name: 'token'`")
       end
 
-      it "works with valid parameters" do
-        Fastlane::FastFile.new.parse("lane :test do
-          latest_hockeyapp_version_number({
-            api_token: 'xxx',
-            app_name: 'HockeyTest'
-          })
-        end").runner.execute(:test)
-      end
-
       it "returns the latest version" do
         version = Fastlane::FastFile.new.parse("lane :test do
           latest_hockeyapp_version_number({
