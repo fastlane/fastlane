@@ -15,7 +15,7 @@ module Fastlane
         UI.message "Fetching latest version of #{params[:app_name]} from HockeyApp"
         client = HockeyApp.build_client
         apps = client.get_apps
-        app = apps.select {|a| a.title == params[:app_name] && a.platform == params[:platform] && a.release_type == params[:release_type].to_i}.first
+        app = apps.find { |a| a.title == params[:app_name] && a.platform == params[:platform] && a.release_type == params[:release_type].to_i }
         version = app.versions.first.version.to_i
         UI.message "Found version #{version}"
 
@@ -40,13 +40,13 @@ module Fastlane
                                        env_name: "FL_LATEST_HOCKEYAPP_VERSION_NUMBER_APP_NAME",
                                        description: "The app name to use when fetching the version number",
                                        verify_block: proc do |value|
-                                          UI.user_error!("No App Name for LatestHockeyappVersionNumberAction given, pass using `app_name: 'token'`") unless (value and not value.empty?)
+                                         UI.user_error!("No App Name for LatestHockeyappVersionNumberAction given, pass using `app_name: 'token'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
-                                          UI.user_error!("No API token for LatestHockeyappVersionNumberAction given, pass using `api_token: 'token'`") unless (value and not value.empty?)
+                                         UI.user_error!("No API token for LatestHockeyappVersionNumberAction given, pass using `api_token: 'token'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_type,
                                        env_name: "FL_LATEST_HOCKEYAPP_VERSION_NUMBER_RELEASE_TYPE",
