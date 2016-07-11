@@ -21,7 +21,6 @@ module Commander
 
       collector = FastlaneCore::ToolCollector.new
 
-      # rubocop:disable Lint/ShadowedException
       begin
         collector.did_launch_action(@program[:name])
         run_active_command
@@ -49,7 +48,6 @@ module Commander
       ensure
         collector.did_finish
       end
-      # rubocop:enable Lint/ShadowedException
     end
 
     def handle_unknown_error!(e)

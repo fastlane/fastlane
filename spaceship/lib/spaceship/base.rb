@@ -121,12 +121,10 @@ module Spaceship
           end
           include(mapping_module(@attr_mapping))
         else
-          # rubocop:disable Lint/ShadowedException
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
           rescue NameError, NoMethodError
           end
-          # rubocop:enable Lint/ShadowedException
         end
         return @attr_mapping
       end
