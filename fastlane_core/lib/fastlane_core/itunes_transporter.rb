@@ -348,7 +348,7 @@ module FastlaneCore
       actual_dir = File.join(dir, "#{app_id}.itmsp")
 
       UI.message("Going to upload updated app to iTunes Connect")
-      UI.success("This might take a few minutes, please don't interrupt the script")
+      UI.success("This might take a few minutes. Please don't interrupt the script.")
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name)
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
