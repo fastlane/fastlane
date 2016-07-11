@@ -1,6 +1,6 @@
-require 'fastlane_core/configuration/config_item'
-require 'fastlane_core/configuration/commander_generator'
-require 'fastlane_core/configuration/configuration_file'
+require "fastlane_core/configuration/config_item"
+require "fastlane_core/configuration/commander_generator"
+require "fastlane_core/configuration/configuration_file"
 
 module FastlaneCore
   class Configuration
@@ -193,7 +193,7 @@ module FastlaneCore
       if Helper.is_test? or !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
-        set(key, '')
+        set(key, "")
         # If this didn't raise an exception, just raise a default one
         UI.user_error!("No value found for '#{key}'")
       end

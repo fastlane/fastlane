@@ -13,10 +13,10 @@ module Spaceship
       attr_accessor :url
 
       attr_mapping(
-        'assetToken' => :asset_token,
-        'sortOrder' => :sort_order,
-        'url' => :url,
-        'originalFileName' => :original_file_name
+        "assetToken" => :asset_token,
+        "sortOrder" => :sort_order,
+        "url" => :url,
+        "originalFileName" => :original_file_name
       )
 
       class << self

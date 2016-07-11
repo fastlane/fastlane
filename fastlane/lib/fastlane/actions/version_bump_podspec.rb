@@ -52,7 +52,7 @@ module Fastlane
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ["patch", "minor", "major"].include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_NUMBER",
@@ -63,7 +63,7 @@ module Fastlane
 
       def self.output
         [
-          ['PODSPEC_VERSION_NUMBER', 'The new podspec version number']
+          ["PODSPEC_VERSION_NUMBER", "The new podspec version number"]
         ]
       end
 

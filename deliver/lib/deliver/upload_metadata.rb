@@ -178,7 +178,7 @@ module Deliver
     def set_app_rating(v, options)
       return unless options[:app_rating_config_path]
 
-      require 'json'
+      require "json"
       begin
         json = JSON.parse(File.read(options[:app_rating_config_path]))
       rescue => ex

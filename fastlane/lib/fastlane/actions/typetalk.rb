@@ -14,7 +14,7 @@ module Fastlane
           UI.user_error!("No #{key} given.") unless options[key]
         end
 
-        emoticon = (options[:success] ? ':smile:' : ':rage:')
+        emoticon = (options[:success] ? ":smile:" : ":rage:")
         message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
@@ -28,16 +28,16 @@ module Fastlane
 
         self.post_to_typetalk(message, topic_id, typetalk_token)
 
-        UI.success('Successfully sent Typetalk notification')
+        UI.success("Successfully sent Typetalk notification")
       end
 
       def self.post_to_typetalk(message, topic_id, typetalk_token)
-        require 'net/http'
-        require 'uri'
+        require "net/http"
+        require "uri"
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topic_id}")
-        response = Net::HTTP.post_form(uri, { 'message' => message,
-                                             'typetalkToken' => typetalk_token })
+        response = Net::HTTP.post_form(uri, { "message" => message,
+                                             "typetalkToken" => typetalk_token })
 
         self.check_response(response)
       end
@@ -57,11 +57,11 @@ module Fastlane
 
       def self.available_options
         [
-          ['message', 'The message to post'],
-          ['note_path', 'Path to an additional note'],
-          ['topic_id', 'Typetalk topic id'],
-          ['success', 'Successful build?'],
-          ['typetalk_token', 'typetalk token']
+          ["message", "The message to post"],
+          ["note_path", "Path to an additional note"],
+          ["topic_id", "Typetalk topic id"],
+          ["success", "Successful build?"],
+          ["typetalk_token", "typetalk token"]
         ]
       end
 

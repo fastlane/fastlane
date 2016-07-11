@@ -3,13 +3,13 @@ module Fastlane
     class PushGitTagsAction < Action
       def self.run(params)
         command = [
-          'git',
-          'push',
-          '--tags'
+          "git",
+          "push",
+          "--tags"
         ]
 
-        result = Actions.sh(command.join(' '))
-        UI.success('Tags pushed to remote')
+        result = Actions.sh(command.join(" "))
+        UI.success("Tags pushed to remote")
         result
       end
 
@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.author
-        ['vittoriom']
+        ["vittoriom"]
       end
 
       def self.is_supported?(platform)

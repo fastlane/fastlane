@@ -1,9 +1,9 @@
-require 'digest/md5'
+require "digest/md5"
 
 module FastlaneCore
   # Builds a package for the pkg ready to be uploaded with the iTunes Transporter
   class PkgUploadPackageBuilder
-    METADATA_FILE_NAME = 'metadata.xml'
+    METADATA_FILE_NAME = "metadata.xml"
 
     attr_accessor :package_path
 
@@ -12,7 +12,7 @@ module FastlaneCore
       FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
       FileUtils.mkdir_p self.package_path
 
-      lib_path = Helper.gem_path('fastlane_core')
+      lib_path = Helper.gem_path("fastlane_core")
 
       pkg_path = copy_pkg(pkg_path)
       @data = {
@@ -20,11 +20,11 @@ module FastlaneCore
         file_size: File.size(pkg_path),
         ipa_path: File.basename(pkg_path), # this is only the base name as the ipa is inside the package
         md5: Digest::MD5.hexdigest(File.read(pkg_path)),
-        archive_type: 'product-archive',
-        platform: 'osx'
+        archive_type: "product-archive",
+        platform: "osx"
       }
 
-      xml_path = File.join(lib_path, 'lib/assets/XMLTemplate.xml.erb')
+      xml_path = File.join(lib_path, "lib/assets/XMLTemplate.xml.erb")
       xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)

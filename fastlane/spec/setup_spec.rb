@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::Setup do
     it "#files_to_copy" do
-      expect(Fastlane::SetupIos.new.files_to_copy).to eq(['Deliverfile', 'deliver', 'screenshots', 'metadata'])
+      expect(Fastlane::SetupIos.new.files_to_copy).to eq(["Deliverfile", "deliver", "screenshots", "metadata"])
     end
 
     it "#show_infos" do
@@ -12,22 +12,22 @@ describe Fastlane do
       let (:fixtures) { File.expand_path("./spec/fixtures/setup_workspace/") }
       let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
       before do
-        fastlane_folder = File.join(workspace, 'fastlane')
+        fastlane_folder = File.join(workspace, "fastlane")
         FileUtils.rm_rf(workspace) if File.directory? workspace
-        FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
+        FileUtils.cp_r(fixtures, File.expand_path("..", workspace)) # copy workspace to work on to /tmp
 
         $terminal = HighLine.new # mock user inputs :)
         allow($terminal).to receive(:ask).and_return("y")
 
         allow(Fastlane::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
 
-        ENV['DELIVER_USER'] = 'felix@sunapps.net'
+        ENV["DELIVER_USER"] = "felix@sunapps.net"
       end
 
       it "setup is successful and generated inital Fastfile" do
-        require 'produce'
+        require "produce"
 
-        allow(FastlaneCore::Helper).to receive(:gem_path).with('fastlane').and_return(File.expand_path(".")) # since we chdir later on
+        allow(FastlaneCore::Helper).to receive(:gem_path).with("fastlane").and_return(File.expand_path(".")) # since we chdir later on
 
         app = "app"
 
@@ -60,13 +60,13 @@ describe Fastlane do
           expect(setup.run).to eq(true)
           expect(setup.tools).to eq({ snapshot: false, cocoapods: true, carthage: false })
 
-          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+          content = File.read(File.join(Fastlane::FastlaneFolder.path, "Fastfile"))
           expect(content).to include "# update_fastlane"
           expect(content).to include "deliver"
           expect(content).to include "scan"
           expect(content).to include "gym(scheme: \"MyScheme\")"
 
-          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Appfile'))
+          content = File.read(File.join(Fastlane::FastlaneFolder.path, "Appfile"))
 
           expect(content).to include "app_identifier \"#{app_identifier}\""
           expect(content).to include "team_id \"#{dev_team_id}\""
@@ -76,7 +76,7 @@ describe Fastlane do
       end
 
       after do
-        ENV.delete('DELIVER_USER')
+        ENV.delete("DELIVER_USER")
       end
     end
   end

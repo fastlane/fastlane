@@ -2,16 +2,16 @@ module Fastlane
   module Actions
     class DangerAction < Action
       def self.run(params)
-        Actions.verify_gem!('danger')
+        Actions.verify_gem!("danger")
         cmd = []
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
-        cmd << ['danger']
-        cmd << ['--verbose'] if params[:verbose]
+        cmd << ["bundle exec"] if File.exist?("Gemfile") && params[:use_bundle_exec]
+        cmd << ["danger"]
+        cmd << ["--verbose"] if params[:verbose]
 
-        ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
+        ENV["DANGER_GITHUB_API_TOKEN"] = params[:github_api_token] if params[:github_api_token]
 
-        Actions.sh(cmd.join(' '))
+        Actions.sh(cmd.join(" "))
       end
 
       def self.description

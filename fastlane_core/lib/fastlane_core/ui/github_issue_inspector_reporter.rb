@@ -37,7 +37,7 @@ module Fastlane
     private
 
     def print_issue_full(issue)
-      resolved = issue.state == 'closed'
+      resolved = issue.state == "closed"
       status = (resolved ? issue.state.green : issue.state.red)
 
       puts "➡️  #{issue.title.yellow}"

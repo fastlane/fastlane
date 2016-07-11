@@ -1,6 +1,6 @@
 # rubocop:disable Metrics/AbcSize
-require 'fastlane/erb_template_helper'
-require 'ostruct'
+require "fastlane/erb_template_helper"
+require "ostruct"
 
 module Fastlane
   module Actions
@@ -13,15 +13,15 @@ module Fastlane
     end
 
     S3_ARGS_MAP = {
-      ipa: '-f',
-      dsym: '-d',
-      access_key: '-a',
-      secret_access_key: '-s',
-      bucket: '-b',
-      region: '-r',
-      acl: '--acl',
-      source: '--source-dir',
-      path: '-P'
+      ipa: "-f",
+      dsym: "-d",
+      access_key: "-a",
+      secret_access_key: "-s",
+      bucket: "-b",
+      region: "-r",
+      acl: "--acl",
+      source: "--source-dir",
+      path: "-P"
     }
 
     class S3Action < Action
@@ -74,7 +74,7 @@ module Fastlane
 
         ipa_file_basename = File.basename(ipa_file)
         ipa_file_name = "#{url_part}#{ipa_file_basename}"
-        ipa_file_data = File.open(ipa_file, 'rb')
+        ipa_file_data = File.open(ipa_file, "rb")
 
         ipa_url = self.upload_file(bucket, ipa_file_name, ipa_file_data, acl)
 
@@ -85,7 +85,7 @@ module Fastlane
         if dsym_file
           dsym_file_basename = File.basename(dsym_file)
           dsym_file_name = "#{url_part}#{dsym_file_basename}"
-          dsym_file_data = File.open(dsym_file, 'rb')
+          dsym_file_data = File.open(dsym_file, "rb")
 
           dsym_url = self.upload_file(bucket, dsym_file_name, dsym_file_data, acl)
 
@@ -108,10 +108,10 @@ module Fastlane
         # Gets info used for the plist
         info = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa_file)
 
-        build_num = info['CFBundleVersion']
-        bundle_id = info['CFBundleIdentifier']
-        bundle_version = info['CFBundleShortVersionString']
-        title = info['CFBundleName']
+        build_num = info["CFBundleVersion"]
+        bundle_id = info["CFBundleIdentifier"]
+        bundle_version = info["CFBundleShortVersionString"]
+        title = info["CFBundleName"]
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
@@ -197,8 +197,8 @@ module Fastlane
       end
 
       def self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
-        Actions.verify_gem!('aws-sdk')
-        require 'aws-sdk'
+        Actions.verify_gem!("aws-sdk")
+        require "aws-sdk"
         if s3_region
           s3_client = AWS::S3.new(
             access_key_id: s3_access_key,
@@ -298,27 +298,27 @@ module Fastlane
                                        env_name: "S3_ACCESS_KEY",
                                        description: "AWS Access Key ID ",
                                        optional: true,
-                                       default_value: ENV['AWS_ACCESS_KEY_ID']),
+                                       default_value: ENV["AWS_ACCESS_KEY_ID"]),
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                        env_name: "S3_SECRET_ACCESS_KEY",
                                        description: "AWS Secret Access Key ",
                                        optional: true,
-                                       default_value: ENV['AWS_SECRET_ACCESS_KEY']),
+                                       default_value: ENV["AWS_SECRET_ACCESS_KEY"]),
           FastlaneCore::ConfigItem.new(key: :bucket,
                                        env_name: "S3_BUCKET",
                                        description: "AWS bucket name",
                                        optional: true,
-                                       default_value: ENV['AWS_BUCKET_NAME']),
+                                       default_value: ENV["AWS_BUCKET_NAME"]),
           FastlaneCore::ConfigItem.new(key: :region,
                                        env_name: "S3_REGION",
                                        description: "AWS region (for bucket creation) ",
                                        optional: true,
-                                       default_value: ENV['AWS_REGION']),
+                                       default_value: ENV["AWS_REGION"]),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",
                                        description: "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  ",
                                        optional: true,
-                                       default_value: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'),
+                                       default_value: "v{CFBundleShortVersionString}_b{CFBundleVersion}/"),
           FastlaneCore::ConfigItem.new(key: :source,
                                        env_name: "S3_SOURCE",
                                        description: "Optional source directory e.g. ./build ",
@@ -333,11 +333,11 @@ module Fastlane
 
       def self.output
         [
-          ['S3_IPA_OUTPUT_PATH', 'Direct HTTP link to the uploaded ipa file'],
-          ['S3_DSYM_OUTPUT_PATH', 'Direct HTTP link to the uploaded dsym file'],
-          ['S3_PLIST_OUTPUT_PATH', 'Direct HTTP link to the uploaded plist file'],
-          ['S3_HTML_OUTPUT_PATH', 'Direct HTTP link to the uploaded HTML file'],
-          ['S3_VERSION_OUTPUT_PATH', 'Direct HTTP link to the uploaded Version file']
+          ["S3_IPA_OUTPUT_PATH", "Direct HTTP link to the uploaded ipa file"],
+          ["S3_DSYM_OUTPUT_PATH", "Direct HTTP link to the uploaded dsym file"],
+          ["S3_PLIST_OUTPUT_PATH", "Direct HTTP link to the uploaded plist file"],
+          ["S3_HTML_OUTPUT_PATH", "Direct HTTP link to the uploaded HTML file"],
+          ["S3_VERSION_OUTPUT_PATH", "Direct HTTP link to the uploaded Version file"]
         ]
       end
 

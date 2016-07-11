@@ -21,7 +21,7 @@ module Fastlane
           File.delete(file)
         end
 
-        UI.success('Cleaned up build artifacts 🐙')
+        UI.success("Cleaned up build artifacts 🐙")
       end
 
       def self.available_options

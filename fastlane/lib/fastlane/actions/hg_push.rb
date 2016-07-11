@@ -3,15 +3,15 @@ module Fastlane
     # Pushes commits to the remote hg repo
     class HgPushAction < Action
       def self.run(params)
-        command = ['hg', 'push']
+        command = ["hg", "push"]
 
-        command << '--force' if params[:force]
+        command << "--force" if params[:force]
         command << params[:destination] unless params[:destination].empty?
 
-        return command.join(' ') if Helper.is_test?
+        return command.join(" ") if Helper.is_test?
 
-        Actions.sh(command.join(' '))
-        UI.success('Successfully pushed changes to remote 🚀.')
+        Actions.sh(command.join(" "))
+        UI.success("Successfully pushed changes to remote 🚀.")
       end
 
       def self.description
@@ -28,7 +28,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "FL_HG_PUSH_DESTINATION",
                                        description: "The destination to push to",
-                                       default_value: '',
+                                       default_value: "",
                                        optional: true)
         ]
       end

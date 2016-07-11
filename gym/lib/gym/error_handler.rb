@@ -106,7 +106,7 @@ module Gym
 
       def find_standard_output_path(output)
         m = /Created bundle at path '(.*)'/.match(output)
-        return File.join(m[1], 'IDEDistribution.standard.log') unless m.nil?
+        return File.join(m[1], "IDEDistribution.standard.log") unless m.nil?
       end
 
       private

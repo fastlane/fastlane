@@ -3,7 +3,7 @@ module Fastlane
     class TwitterAction < Action
       def self.run(params)
         Actions.verify_gem!("twitter")
-        require 'twitter'
+        require "twitter"
         client = Twitter::REST::Client.new do |config|
           config.consumer_key        = params[:consumer_key]
           config.consumer_secret     = params[:consumer_secret]
@@ -11,7 +11,7 @@ module Fastlane
           config.access_token_secret = params[:access_token_secret]
         end
         client.update(params[:message])
-        UI.message(['[TWITTER]', "Successfully tweeted ", params[:message]].join(': '))
+        UI.message(["[TWITTER]", "Successfully tweeted ", params[:message]].join(": "))
       end
 
       #####################################################

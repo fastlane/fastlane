@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "S3 Integration" do
       before(:each) do
-        ['S3_ACCESS_KEY', 'S3_SECRET_ACCESS_KEY', 'S3_BUCKET', 'S3_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_BUCKET_NAME', 'AWS_REGION'].each do |key|
+        ["S3_ACCESS_KEY", "S3_SECRET_ACCESS_KEY", "S3_BUCKET", "S3_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_BUCKET_NAME", "AWS_REGION"].each do |key|
           ENV[key] = nil
         end
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil

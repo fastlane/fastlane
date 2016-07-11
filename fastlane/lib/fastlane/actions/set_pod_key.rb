@@ -2,17 +2,17 @@ module Fastlane
   module Actions
     class SetPodKeyAction < Action
       def self.run(params)
-        Actions.verify_gem!('cocoapods-keys')
+        Actions.verify_gem!("cocoapods-keys")
         cmd = []
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
-        cmd << ['pod keys set']
+        cmd << ["bundle exec"] if File.exist?("Gemfile") && params[:use_bundle_exec]
+        cmd << ["pod keys set"]
 
         cmd << ["\"#{params[:key].shellescape}\""]
         cmd << ["\"#{params[:value].shellescape}\""]
         cmd << ["\"#{params[:project].shellescape}\""] if params[:project]
 
-        Actions.sh(cmd.join(' '))
+        Actions.sh(cmd.join(" "))
       end
 
       def self.author

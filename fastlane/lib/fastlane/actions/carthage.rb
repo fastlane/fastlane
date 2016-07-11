@@ -15,7 +15,7 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
 
-        Actions.sh(cmd.join(' '))
+        Actions.sh(cmd.join(" "))
       end
 
       def self.description
@@ -35,7 +35,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :command,
                                        env_name: "FL_CARTHAGE_COMMAND",
                                        description: "Carthage command (one of: #{available_commands.join(', ')})",
-                                       default_value: 'bootstrap',
+                                       default_value: "bootstrap",
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
                                        end),
@@ -96,7 +96,7 @@ module Fastlane
                                        description: "Define which platform to build for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         value.split(',').each do |platform|
+                                         value.split(",").each do |platform|
                                            UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? platform
                                          end
                                        end),
@@ -105,7 +105,7 @@ module Fastlane
                                        description: "Define which build configuration to use when building",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         if value.chomp(' ').empty?
+                                         if value.chomp(" ").empty?
                                            UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
                                          end
                                        end)

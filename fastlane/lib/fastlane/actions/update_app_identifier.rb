@@ -2,25 +2,25 @@ module Fastlane
   module Actions
     class UpdateAppIdentifierAction < Action
       def self.run(params)
-        require 'plist'
-        require 'xcodeproj'
+        require "plist"
+        require "xcodeproj"
 
-        info_plist_key = 'INFOPLIST_FILE'
-        identifier_key = 'PRODUCT_BUNDLE_IDENTIFIER'
+        info_plist_key = "INFOPLIST_FILE"
+        identifier_key = "PRODUCT_BUNDLE_IDENTIFIER"
 
         # Read existing plist file
-        info_plist_path = File.join(params[:xcodeproj], '..', params[:plist_path])
+        info_plist_path = File.join(params[:xcodeproj], "..", params[:plist_path])
         UI.user_error!("Couldn't find info plist file at path '#{params[:plist_path]}'") unless File.exist?(info_plist_path)
         plist = Plist.parse_xml(info_plist_path)
 
         # Check if current app identifier product bundle identifier
-        if plist['CFBundleIdentifier'] == "$(#{identifier_key})"
+        if plist["CFBundleIdentifier"] == "$(#{identifier_key})"
           # Load .xcodeproj
           project_path = params[:xcodeproj]
           project = Xcodeproj::Project.open(project_path)
 
           # Fetch the build configuration objects
-          configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
+          configs = project.objects.select { |obj| obj.isa == "XCBuildConfiguration" && !obj.build_settings[identifier_key].nil? }
           UI.user_error!("Info plist uses $(#{identifier_key}), but xcodeproj does not") unless configs.count > 0
 
           configs = configs.select { |obj| obj.build_settings[info_plist_key] == params[:plist_path] }
@@ -37,7 +37,7 @@ module Fastlane
           UI.success("Updated #{params[:xcodeproj]} 💾.")
         else
           # Update plist value
-          plist['CFBundleIdentifier'] = params[:app_identifier]
+          plist["CFBundleIdentifier"] = params[:app_identifier]
 
           # Write changes to file
           plist_string = Plist::Emit.dump(plist)
@@ -64,7 +64,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PROJECT_PATH",
                                        description: "Path to your Xcode project",
-                                       default_value: Dir['*.xcodeproj'].first,
+                                       default_value: Dir["*.xcodeproj"].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass the path to the project, not the workspace") unless value.end_with?(".xcodeproj")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
@@ -76,14 +76,14 @@ module Fastlane
                                          UI.user_error!("Invalid plist file") unless value[-6..-1].casecmp(".plist").zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       env_name: 'FL_UPDATE_APP_IDENTIFIER',
-                                       description: 'The app Identifier you want to set',
-                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'])
+                                       env_name: "FL_UPDATE_APP_IDENTIFIER",
+                                       description: "The app Identifier you want to set",
+                                       default_value: ENV["PRODUCE_APP_IDENTIFIER"])
         ]
       end
 
       def self.authors
-        ['squarefrog', 'tobiasstrebitzer']
+        ["squarefrog", "tobiasstrebitzer"]
       end
     end
   end

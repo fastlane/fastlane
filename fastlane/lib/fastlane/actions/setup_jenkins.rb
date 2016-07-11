@@ -45,35 +45,35 @@ module Fastlane
         if params[:set_code_signing_identity] && params[:code_signing_identity]
           code_signing_identity = params[:code_signing_identity]
           UI.message "Set code signing identity: \"#{code_signing_identity}\"."
-          ENV['GYM_CODE_SIGNING_IDENTITY'] = code_signing_identity
+          ENV["GYM_CODE_SIGNING_IDENTITY"] = code_signing_identity
         end
 
         # Set output directory
         if params[:output_directory]
           output_directory_path = File.expand_path(params[:output_directory])
           UI.message "Set output directory path to: \"#{output_directory_path}\"."
-          ENV['GYM_BUILD_PATH'] = output_directory_path
-          ENV['GYM_OUTPUT_DIRECTORY'] = output_directory_path
-          ENV['SCAN_OUTPUT_DIRECTORY'] = output_directory_path
-          ENV['BACKUP_XCARCHIVE_DESTINATION'] = output_directory_path
+          ENV["GYM_BUILD_PATH"] = output_directory_path
+          ENV["GYM_OUTPUT_DIRECTORY"] = output_directory_path
+          ENV["SCAN_OUTPUT_DIRECTORY"] = output_directory_path
+          ENV["BACKUP_XCARCHIVE_DESTINATION"] = output_directory_path
         end
 
         # Set derived data
         if params[:derived_data_path]
           derived_data_path = File.expand_path(params[:derived_data_path])
           UI.message "Set derived data path to: \"#{derived_data_path}\"."
-          ENV['DERIVED_DATA_PATH'] = derived_data_path # Used by clear_derived_data.
-          ENV['XCODE_DERIVED_DATA_PATH'] = derived_data_path
-          ENV['GYM_DERIVED_DATA_PATH'] = derived_data_path
-          ENV['SCAN_DERIVED_DATA_PATH'] = derived_data_path
-          ENV['FL_CARTHAGE_DERIVED_DATA'] = derived_data_path
+          ENV["DERIVED_DATA_PATH"] = derived_data_path # Used by clear_derived_data.
+          ENV["XCODE_DERIVED_DATA_PATH"] = derived_data_path
+          ENV["GYM_DERIVED_DATA_PATH"] = derived_data_path
+          ENV["SCAN_DERIVED_DATA_PATH"] = derived_data_path
+          ENV["FL_CARTHAGE_DERIVED_DATA"] = derived_data_path
         end
 
         # Set result bundle
         if params[:result_bundle]
           UI.message "Set result bundle."
-          ENV['GYM_RESULT_BUNDLE'] = "YES"
-          ENV['SCAN_RESULT_BUNDLE'] = "YES"
+          ENV["GYM_RESULT_BUNDLE"] = "YES"
+          ENV["SCAN_RESULT_BUNDLE"] = "YES"
         end
       end
 

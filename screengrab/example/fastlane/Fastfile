@@ -42,7 +42,7 @@ platform :android do
 
   desc "Assemble the debug app and tests APKs"
   lane :assemble do
-    gradle(task: "assemble assembleAndroidTest", gradle_path: '../gradlew')
+    gradle(task: "assemble assembleAndroidTest", gradle_path: "../gradlew")
   end
 
   # You can define as many lanes as you want

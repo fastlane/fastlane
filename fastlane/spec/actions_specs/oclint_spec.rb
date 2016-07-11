@@ -50,17 +50,17 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include(' oclint -report-type=pmd -o=report_path.xml ')
-        expect(result).to include(' -max-priority-1=10 ')
-        expect(result).to include(' -max-priority-2=20 ')
-        expect(result).to include(' -max-priority-3=30 ')
-        expect(result).to include(' -rc=LONG_LINE=200 -rc=LONG_METHOD=200 ')
-        expect(result).to include(' -rule DoubleNegative -rule DeadCode ')
-        expect(result).to include(' -disable-rule GotoStatement -disable-rule ShortVariableName ')
-        expect(result).to include(' -list-enabled-rules ')
-        expect(result).to include(' -enable-clang-static-analyzer ')
-        expect(result).to include(' -enable-global-analysis ')
-        expect(result).to include(' -allow-duplicated-violations ')
+        expect(result).to include(" oclint -report-type=pmd -o=report_path.xml ")
+        expect(result).to include(" -max-priority-1=10 ")
+        expect(result).to include(" -max-priority-2=20 ")
+        expect(result).to include(" -max-priority-3=30 ")
+        expect(result).to include(" -rc=LONG_LINE=200 -rc=LONG_METHOD=200 ")
+        expect(result).to include(" -rule DoubleNegative -rule DeadCode ")
+        expect(result).to include(" -disable-rule GotoStatement -disable-rule ShortVariableName ")
+        expect(result).to include(" -list-enabled-rules ")
+        expect(result).to include(" -enable-clang-static-analyzer ")
+        expect(result).to include(" -enable-global-analysis ")
+        expect(result).to include(" -allow-duplicated-violations ")
       end
 
       it "works with single quote in rule name" do
@@ -108,11 +108,11 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
-        expect(result).not_to include('Test')
+        expect(result).not_to include("Test")
       end
 
-      context 'with valid path to compile_commands.json' do
-        context 'with no path to oclint' do
+      context "with valid path to compile_commands.json" do
+        context "with no path to oclint" do
           let(:result) do
             Fastlane::FastFile.new.parse('lane :test do
               oclint( compile_commands: "./fastlane/spec/fixtures/oclint/compile_commands.json" )
@@ -120,12 +120,12 @@ describe Fastlane do
           end
           let(:command) { "cd #{File.expand_path('..').shellescape} && oclint -report-type=html -o=oclint_report.html" }
 
-          it 'uses system wide oclint' do
+          it "uses system wide oclint" do
             expect(result).to include(command)
           end
         end
 
-        context 'with given path to oclint' do
+        context "with given path to oclint" do
           let(:result) do
             Fastlane::FastFile.new.parse('lane :test do
               oclint(
@@ -136,7 +136,7 @@ describe Fastlane do
           end
           let(:command) { "cd #{File.expand_path('..').shellescape} && test/bin/oclint -report-type=html -o=oclint_report.html" }
 
-          it 'uses oclint provided' do
+          it "uses oclint provided" do
             expect(result).to include(command)
           end
         end

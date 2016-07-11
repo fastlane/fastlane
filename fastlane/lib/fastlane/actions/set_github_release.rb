@@ -13,21 +13,21 @@ module Fastlane
         UI.important("Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".")
         UI.important("Will also upload assets #{params[:upload_assets]}.") if params[:upload_assets]
 
-        require 'json'
+        require "json"
         body_obj = {
-          'tag_name' => params[:tag_name],
-          'name' => params[:name],
-          'body' => params[:description],
-          'draft' => !!params[:is_draft],
-          'prerelease' => !!params[:is_prerelease]
+          "tag_name" => params[:tag_name],
+          "name" => params[:name],
+          "body" => params[:description],
+          "draft" => !!params[:is_draft],
+          "prerelease" => !!params[:is_prerelease]
         }
-        body_obj['target_commitish'] = params[:commitish] if params[:commitish]
+        body_obj["target_commitish"] = params[:commitish] if params[:commitish]
         body = body_obj.to_json
 
         repo_name = params[:repository_name]
         api_token = params[:api_token]
         server_url = params[:server_url]
-        server_url = server_url[0..-2] if server_url.end_with? '/'
+        server_url = server_url[0..-2] if server_url.end_with? "/"
 
         # create the release
         response = call_releases_endpoint("post", server_url, repo_name, "/releases", api_token, body)
@@ -36,8 +36,8 @@ module Fastlane
         when 201
           UI.success("Successfully created release at tag \"#{params[:tag_name]}\" on GitHub")
           body = JSON.parse(response.body)
-          html_url = body['html_url']
-          release_id = body['id']
+          html_url = body["html_url"]
+          release_id = body["id"]
           UI.important("See release at \"#{html_url}\"")
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
@@ -46,7 +46,7 @@ module Fastlane
           assets = params[:upload_assets]
           if assets && assets.count > 0
             # upload assets
-            self.upload_assets(assets, body['upload_url'], api_token)
+            self.upload_assets(assets, body["upload_url"], api_token)
 
             # fetch the release again, so that it contains the uploaded assets
             get_response = self.call_releases_endpoint("get", server_url, repo_name, "/releases/#{release_id}", api_token, nil)
@@ -96,7 +96,7 @@ module Fastlane
         response = nil
         if File.directory?(absolute_path)
           Dir.mktmpdir do |dir|
-            tmpzip = File.join(dir, File.basename(absolute_path) + '.zip')
+            tmpzip = File.join(dir, File.basename(absolute_path) + ".zip")
             name = File.basename(tmpzip)
             sh "cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null"
             response = self.upload_file(tmpzip, upload_url_template, api_token)
@@ -108,11 +108,11 @@ module Fastlane
       end
 
       def self.upload_file(file, url_template, api_token)
-        require 'addressable/template'
+        require "addressable/template"
         name = File.basename(file)
         expanded_url = Addressable::Template.new(url_template).expand(name: name).to_s
         headers = self.headers(api_token)
-        headers['Content-Type'] = 'application/zip' # how do we detect other types e.g. other binary files? file extensions?
+        headers["Content-Type"] = "application/zip" # how do we detect other types e.g. other binary files? file extensions?
 
         UI.important("Uploading #{name}")
         response = self.call_endpoint(expanded_url, "post", headers, File.read(file))
@@ -129,7 +129,7 @@ module Fastlane
       end
 
       def self.call_endpoint(url, method, headers, body)
-        require 'excon'
+        require "excon"
         case method
         when "post"
           response = Excon.post(url, headers: headers, body: body)
@@ -147,9 +147,9 @@ module Fastlane
       end
 
       def self.headers(api_token)
-        require 'base64'
-        headers = { 'User-Agent' => 'fastlane-set_github_release' }
-        headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
+        require "base64"
+        headers = { "User-Agent" => "fastlane-set_github_release" }
+        headers["Authorization"] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
         headers
       end
 
@@ -176,7 +176,7 @@ module Fastlane
                                        description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
                                          UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include? "github.com"
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split("/").count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
                                        env_name: "FL_GITHUB_RELEASE_SERVER_URL",
@@ -237,9 +237,9 @@ module Fastlane
 
       def self.output
         [
-          ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release'],
-          ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)'],
-          ['SET_GITHUB_RELEASE_JSON', 'The whole release JSON object']
+          ["SET_GITHUB_RELEASE_HTML_LINK", "Link to your created release"],
+          ["SET_GITHUB_RELEASE_RELEASE_ID", "Release id (useful for subsequent editing)"],
+          ["SET_GITHUB_RELEASE_JSON", "The whole release JSON object"]
         ]
       end
 

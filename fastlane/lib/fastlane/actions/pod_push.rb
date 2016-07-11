@@ -6,7 +6,7 @@ module Fastlane
           repo = params[:repo]
           command = "pod repo push #{repo}"
         else
-          command = 'pod trunk push'
+          command = "pod trunk push"
         end
 
         if params[:path]

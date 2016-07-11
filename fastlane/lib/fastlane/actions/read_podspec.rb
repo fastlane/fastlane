@@ -6,11 +6,11 @@ module Fastlane
 
     class ReadPodspecAction < Action
       def self.run(params)
-        Actions.verify_gem!('cocoapods')
+        Actions.verify_gem!("cocoapods")
 
         path = params[:path]
 
-        require 'cocoapods-core'
+        require "cocoapods-core"
         spec = Pod::Spec.from_file(path).to_hash
 
         UI.success("Reading podspec from file #{path}")
@@ -40,7 +40,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_READ_PODSPEC_PATH",
                                        description: "Path to the podspec to be read",
-                                       default_value: Dir['*.podspec*'].first,
+                                       default_value: Dir["*.podspec*"].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("File #{value} not found") unless File.exist?(value)
                                        end)
@@ -49,7 +49,7 @@ module Fastlane
 
       def self.output
         [
-          ['READ_PODSPEC_JSON', 'Podspec JSON payload']
+          ["READ_PODSPEC_JSON", "Podspec JSON payload"]
         ]
       end
 

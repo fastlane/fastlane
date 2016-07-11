@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require "fastlane_core"
+require "credentials_manager"
 
 module Deliver
   class Options
@@ -53,11 +53,11 @@ module Deliver
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
-                                     short_option: '-m',
+                                     short_option: "-m",
                                      description: "Path to the folder containing the metadata files",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :screenshots_path,
-                                     short_option: '-w',
+                                     short_option: "-w",
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
@@ -69,7 +69,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_version,
-                                     short_option: '-z',
+                                     short_option: "-z",
                                      description: "The version that should be edited or created",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_metadata,

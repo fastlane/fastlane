@@ -38,7 +38,7 @@ module Fastlane
       end
 
       r = Runner.new
-      r.execute_action(action, class_ref, [parameters], custom_dir: '.')
+      r.execute_action(action, class_ref, [parameters], custom_dir: ".")
     end
   end
 end

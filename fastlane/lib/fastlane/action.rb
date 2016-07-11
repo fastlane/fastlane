@@ -1,4 +1,4 @@
-require 'fastlane/actions/actions_helper'
+require "fastlane/actions/actions_helper"
 
 module Fastlane
   class Action
@@ -72,7 +72,7 @@ module Fastlane
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user
     def self.action_name
-      self.name.split('::').last.gsub('Action', '').fastlane_underscore
+      self.name.split("::").last.gsub("Action", "").fastlane_underscore
     end
 
     # Allows the user to call an action from an action

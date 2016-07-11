@@ -4,7 +4,7 @@ module Match
     def initialize(user)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
-      require 'credentials_manager'
+      require "credentials_manager"
 
       keychain_entry = CredentialsManager::AccountManager.new(user: user)
 
@@ -24,7 +24,7 @@ module Match
       found = Spaceship.app.find(params[:app_identifier])
       return if found
 
-      require 'sigh'
+      require "sigh"
       Sigh::Runner.new.print_produce_command({
         username: params[:username],
         app_identifier: params[:app_identifier]

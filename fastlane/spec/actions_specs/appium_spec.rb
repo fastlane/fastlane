@@ -10,8 +10,8 @@ describe Fastlane do
         allow_any_instance_of(Appium::Driver).to receive(:start_driver)
       end
 
-      context 'no parameters were given' do
-        it 'should raises an error' do
+      context "no parameters were given" do
+        it "should raises an error" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               appium()
@@ -20,8 +20,8 @@ describe Fastlane do
         end
       end
 
-      context 'no platform were given' do
-        it 'should raises an error' do
+      context "no platform were given" do
+        it "should raises an error" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               appium({
@@ -33,8 +33,8 @@ describe Fastlane do
         end
       end
 
-      context 'no app_path were given' do
-        it 'should raises an error' do
+      context "no app_path were given" do
+        it "should raises an error" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               appium({
@@ -46,8 +46,8 @@ describe Fastlane do
         end
       end
 
-      context 'no spec_path were given' do
-        it 'should raises an error' do
+      context "no spec_path were given" do
+        it "should raises an error" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               appium({
@@ -59,7 +59,7 @@ describe Fastlane do
         end
       end
 
-      context 'with valid parameters' do
+      context "with valid parameters" do
         before do
           allow(Fastlane::Actions::AppiumAction).to receive(:invoke_appium_server)
           allow(Fastlane::Actions::AppiumAction).to receive(:wait_for_appium_server)
@@ -69,10 +69,10 @@ describe Fastlane do
           allow(RSpec::Core::Runner).to receive(:run).and_return(status_code)
         end
 
-        context 'when spec failed' do
+        context "when spec failed" do
           let(:status_code) { 1 }
 
-          it 'should raises an error' do
+          it "should raises an error" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 appium({
@@ -85,10 +85,10 @@ describe Fastlane do
           end
         end
 
-        context 'when spec succeeded' do
+        context "when spec succeeded" do
           let(:status_code) { 0 }
 
-          it 'should not raises an error' do
+          it "should not raises an error" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 appium({
@@ -102,13 +102,13 @@ describe Fastlane do
         end
       end
 
-      context 'with invoke_appium_server' do
-        context 'is false' do
+      context "with invoke_appium_server" do
+        context "is false" do
           before :each do
             allow(RSpec::Core::Runner).to receive(:run).and_return(0)
           end
 
-          it 'should not invoke and wait appium server' do
+          it "should not invoke and wait appium server" do
             expect(Fastlane::Actions::AppiumAction).not_to receive(:invoke_appium_server)
             expect(Fastlane::Actions::AppiumAction).not_to receive(:wait_for_appium_server)
 
@@ -125,12 +125,12 @@ describe Fastlane do
           end
         end
 
-        context 'is true' do
+        context "is true" do
           before :each do
             allow(RSpec::Core::Runner).to receive(:run).and_return(0)
           end
 
-          it 'should invoke and wait appium server' do
+          it "should invoke and wait appium server" do
             expect(Fastlane::Actions::AppiumAction).to receive(:invoke_appium_server)
             expect(Fastlane::Actions::AppiumAction).to receive(:wait_for_appium_server)
 

@@ -1,4 +1,4 @@
-require 'commander'
+require "commander"
 
 HighLine.track_eof = false
 
@@ -7,30 +7,30 @@ module Snapshot
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
+      FastlaneCore::UpdateChecker.start_looking_for_update("snapshot")
       self.new.run
     ensure
-      FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
+      FastlaneCore::UpdateChecker.show_update_status("snapshot", Snapshot::VERSION)
     end
 
     # rubocop:disable Metrics/MethodLength
     def run
       program :version, Snapshot::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
-      program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
-      program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/snapshot'
+      program :help, "Author", "Felix Krause <snapshot@krausefx.com>"
+      program :help, "Website", "https://fastlane.tools"
+      program :help, "GitHub", "https://github.com/fastlane/snapshot"
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+      global_option("--verbose", "Shows a more verbose output") { $verbose = true }
 
       always_trace!
 
       FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'snapshot'
-        c.description = 'Take new screenshots based on the Snapfile.'
+        c.syntax = "snapshot"
+        c.description = "Take new screenshots based on the Snapfile."
 
         c.action do |args, options|
           load_config(options)
@@ -41,42 +41,42 @@ module Snapshot
       end
 
       command :init do |c|
-        c.syntax = 'snapshot init'
+        c.syntax = "snapshot init"
         c.description = "Creates a new Snapfile in the current directory"
 
         c.action do |args, options|
-          require 'snapshot/setup'
-          path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
+          require "snapshot/setup"
+          path = (Snapshot::Helper.fastlane_enabled? ? "./fastlane" : ".")
           Snapshot::Setup.create(path)
         end
       end
 
       command :update do |c|
-        c.syntax = 'snapshot update'
+        c.syntax = "snapshot update"
         c.description = "Updates your SnapshotHelper.swift to the latest version"
 
         c.action do |args, options|
-          require 'snapshot/update'
+          require "snapshot/update"
           Snapshot::Update.new.update
         end
       end
 
       command :reset_simulators do |c|
-        c.syntax = 'snapshot reset_simulators'
+        c.syntax = "snapshot reset_simulators"
         c.description = "This will remove all your existing simulators and re-create new ones"
-        c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
+        c.option "-i", "--ios String", String, "The comma separated list of iOS Versions you want to use"
 
         c.action do |args, options|
           options.default ios_version: Snapshot::LatestIosVersion.version
-          versions = options.ios_version.split(',') if options.ios_version
-          require 'snapshot/reset_simulators'
+          versions = options.ios_version.split(",") if options.ios_version
+          require "snapshot/reset_simulators"
 
           Snapshot::ResetSimulators.clear_everything!(versions)
         end
       end
 
       command :clear_derived_data do |c|
-        c.syntax = 'snapshot clear_derived_data -f path'
+        c.syntax = "snapshot clear_derived_data -f path"
         c.description = "Clear the directory where build products and other derived data will go"
 
         c.action do |args, options|

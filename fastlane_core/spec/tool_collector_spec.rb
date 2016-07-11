@@ -25,7 +25,7 @@ describe FastlaneCore::ToolCollector do
   end
 
   it "does not post the collected data if the opt-out ENV var is set" do
-    with_env_values('FASTLANE_OPT_OUT_USAGE' => '1') do
+    with_env_values("FASTLANE_OPT_OUT_USAGE" => "1") do
       collector.did_launch_action(:scan)
       expect(collector.did_finish).to eq(false)
     end

@@ -2,11 +2,11 @@ module Fastlane
   module Actions
     class SupplyAction < Action
       def self.run(params)
-        require 'supply'
-        require 'supply/options'
+        require "supply"
+        require "supply/options"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('supply') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("supply") unless Helper.is_test?
 
           all_apk_paths = Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] || []
           if all_apk_paths.length > 1
@@ -19,7 +19,7 @@ module Fastlane
 
           Supply::Uploader.new.perform_upload
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('supply', Supply::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("supply", Supply::VERSION)
         end
       end
 
@@ -36,8 +36,8 @@ module Fastlane
       end
 
       def self.available_options
-        require 'supply'
-        require 'supply/options'
+        require "supply"
+        require "supply/options"
         Supply::Options.available_options
       end
 

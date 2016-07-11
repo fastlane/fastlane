@@ -1,7 +1,7 @@
 module Frameit
   class FrameConverter
-    DOWNLOAD_URL = 'https://developer.apple.com/app-store/marketing/guidelines/#images'
-    FRAME_PATH = '.frameit/devices_frames'
+    DOWNLOAD_URL = "https://developer.apple.com/app-store/marketing/guidelines/#images"
+    FRAME_PATH = ".frameit/devices_frames"
 
     def run
       self.setup_frames
@@ -59,7 +59,7 @@ module Frameit
       end
 
       Dir["#{templates_path}/**/*.psd"].each do |psd|
-        resulting_path = psd.gsub('.psd', '.png')
+        resulting_path = psd.gsub(".psd", ".png")
         next if File.exist?(resulting_path)
 
         UI.important "Converting PSD file '#{psd}'"
@@ -73,7 +73,7 @@ module Frameit
           # imagemagick seems to add an additional layer with no label which this the
           # composite of all three.  We want to remove the background and composite layer
           good_layers = image.layers.reject do |layer|
-            label = layer.details['Properties']['label']
+            label = layer.details["Properties"]["label"]
             label.to_s.length == 0 || label =~ /White B/i
           end
           product_layer = good_layers.shift
@@ -86,7 +86,7 @@ module Frameit
         end
 
         if image
-          image.format 'png'
+          image.format "png"
           image.trim
 
           image.write(resulting_path)

@@ -4,7 +4,7 @@ require "credentials_manager"
 module Scan
   class Options
     def self.available_options
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = Helper.fastlane_enabled? ? "./fastlane" : "."
 
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -85,7 +85,7 @@ module Scan
                                      description: "Define how the output should look like (standard, basic or rspec)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', "rspec"].include?(value)
+                                       UI.user_error!("Invalid output_style #{value}") unless ["standard", "basic", "rspec"].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",

@@ -32,17 +32,17 @@ module Supply
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(containing, "#{key}.txt")
         UI.message("Writing to #{path}...")
-        File.open(path, 'w:UTF-8') { |file| file.write(listing.send(key)) }
+        File.open(path, "w:UTF-8") { |file| file.write(listing.send(key)) }
       end
     end
 
     def download_images(listing)
       # We cannot download existing screenshots as they are compressed
       # But we can at least download the images
-      require 'net/http'
+      require "net/http"
 
       IMAGES_TYPES.each do |image_type|
-        if ['featureGraphic'].include?(image_type)
+        if ["featureGraphic"].include?(image_type)
           # we don't get all files in full resolution :(
           UI.message("Due to the limit of the Google Play API `supply` can't download your existing feature graphics...")
           next

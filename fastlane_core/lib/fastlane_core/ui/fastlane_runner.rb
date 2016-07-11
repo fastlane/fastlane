@@ -5,14 +5,14 @@ module Commander
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
     def run!
       require_program :version, :description
-      trap('INT') { abort program(:int_message) } if program(:int_message)
-      trap('INT') { program(:int_block).call } if program(:int_block)
-      global_option('-h', '--help', 'Display help documentation') do
+      trap("INT") { abort program(:int_message) } if program(:int_message)
+      trap("INT") { program(:int_block).call } if program(:int_block)
+      global_option("-h", "--help", "Display help documentation") do
         args = @args - %w(-h --help)
         command(:help).run(*args)
         return
       end
-      global_option('-v', '--version', 'Display version information') do
+      global_option("-v", "--version", "Display version information") do
         say version
         return
       end
@@ -21,6 +21,7 @@ module Commander
 
       collector = FastlaneCore::ToolCollector.new
 
+      # rubocop:disable Lint/ShadowedException
       begin
         collector.did_launch_action(@program[:name])
         run_active_command
@@ -48,6 +49,7 @@ module Commander
       ensure
         collector.did_finish
       end
+      # rubocop:enable Lint/ShadowedException
     end
 
     def handle_unknown_error!(e)
@@ -90,8 +92,8 @@ module Commander
       return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
       return if FastlaneCore::Helper.test?
 
-      require 'gh_inspector'
-      require 'fastlane_core/ui/github_issue_inspector_reporter'
+      require "gh_inspector"
+      require "fastlane_core/ui/github_issue_inspector_reporter"
 
       inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
       delegate = Fastlane::InspectorReporter.new

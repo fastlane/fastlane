@@ -14,7 +14,7 @@ module Fastlane
       end
 
       def self.plugin_options
-        require 'cocoapods-core'
+        require "cocoapods-core"
         podfile = Pod::Podfile.from_file "Podfile"
         podfile.plugins["cocoapods-keys"]
       end

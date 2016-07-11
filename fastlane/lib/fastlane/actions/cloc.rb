@@ -3,7 +3,7 @@ module Fastlane
     class ClocAction < Action
       def self.run(params)
         cloc_binary = params[:binary_path]
-        exclude_dirs = params[:exclude_dir].nil? ? '' : "--exclude-dir=#{params[:exclude_dir]}"
+        exclude_dirs = params[:exclude_dir].nil? ? "" : "--exclude-dir=#{params[:exclude_dir]}"
         xml_format = params[:xml]
         out_dir = params[:output_directory]
         output_file = xml_format ? "#{out_dir}/cloc.xml" : "#{out_dir}/cloc.txt"
@@ -12,11 +12,11 @@ module Fastlane
         command = [
           cloc_binary,
           exclude_dirs,
-          '--by-file',
-          xml_format ? '--xml ' : '',
+          "--by-file",
+          xml_format ? "--xml " : "",
           "--out=#{output_file}",
           source_directory
-        ].join(' ').strip
+        ].join(" ").strip
 
         Actions.sh command
       end
@@ -36,7 +36,7 @@ module Fastlane
                                        description: "Where the cloc binary lives on your system (full path including 'cloc')",
                                        optional: true,
                                        is_string: true,
-                                       default_value: '/usr/local/bin/cloc'),
+                                       default_value: "/usr/local/bin/cloc"),
           FastlaneCore::ConfigItem.new(key: :exclude_dir,
                                        env_name: "FL_CLOC_EXCLUDE_DIR",
                                        description: "Comma separated list of directories to exclude", # a short description of this parameter

@@ -30,7 +30,7 @@ module Fastlane
         next if current_version >= latest_version
 
         rows << [
-          plugin_name.gsub(PluginManager.plugin_prefix, ''),
+          plugin_name.gsub(PluginManager.plugin_prefix, ""),
           current_version.to_s.red,
           latest_version.to_s.green
         ]
@@ -48,7 +48,7 @@ module Fastlane
       })
       UI.message "To update all plugins, just run"
       UI.command "fastlane update_plugins"
-      puts ''
+      puts ""
       @server_results = nil
     end
 

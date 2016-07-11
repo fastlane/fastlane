@@ -5,8 +5,8 @@ module Spaceship
       attr_accessor :sso_token_for_video
 
       attr_mapping(
-        'ssoTokenForImage' => :sso_token_for_image,
-        'ssoTokenForVideo' => :sso_token_for_video
+        "ssoTokenForImage" => :sso_token_for_image,
+        "ssoTokenForVideo" => :sso_token_for_video
       )
 
       class << self

@@ -55,7 +55,7 @@ module Fastlane
       end
 
       def print_slow_fastlane_warning
-        return if ENV['BUNDLE_BIN_PATH'] # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
+        return if ENV["BUNDLE_BIN_PATH"] # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
 
         gemfile_path = PluginManager.new.gemfile_path
         if gemfile_path

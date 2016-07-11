@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Portal::AppGroup do
   before { Spaceship.login }
@@ -41,19 +41,19 @@ describe Spaceship::Portal::AppGroup do
     end
   end
 
-  describe '#create' do
-    it 'creates an app group' do
-      expect(client).to receive(:create_app_group!).with('Production App Group', 'group.tools.fastlane').and_return({})
-      group = Spaceship::Portal::AppGroup.create!(group_id: 'group.tools.fastlane', name: 'Production App Group')
+  describe "#create" do
+    it "creates an app group" do
+      expect(client).to receive(:create_app_group!).with("Production App Group", "group.tools.fastlane").and_return({})
+      group = Spaceship::Portal::AppGroup.create!(group_id: "group.tools.fastlane", name: "Production App Group")
     end
   end
 
-  describe '#delete' do
+  describe "#delete" do
     subject { Spaceship::Portal::AppGroup.find("group.com.example.two") }
-    it 'deletes the app group by a given app_group_id' do
-      expect(client).to receive(:delete_app_group!).with('2GKKV64NUG')
+    it "deletes the app group by a given app_group_id" do
+      expect(client).to receive(:delete_app_group!).with("2GKKV64NUG")
       group = subject.delete!
-      expect(group.app_group_id).to eq('2GKKV64NUG')
+      expect(group.app_group_id).to eq("2GKKV64NUG")
     end
   end
 end

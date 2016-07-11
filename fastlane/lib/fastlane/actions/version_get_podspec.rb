@@ -34,7 +34,7 @@ module Fastlane
 
       def self.output
         [
-          ['PODSPEC_VERSION_NUMBER', 'The podspec version number']
+          ["PODSPEC_VERSION_NUMBER", "The podspec version number"]
         ]
       end
 

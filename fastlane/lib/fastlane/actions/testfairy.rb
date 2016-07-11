@@ -6,10 +6,10 @@ module Fastlane
 
     class TestfairyAction < Action
       def self.run(params)
-        require 'shenzhen'
-        require 'shenzhen/plugins/testfairy'
+        require "shenzhen"
+        require "shenzhen/plugins/testfairy"
 
-        UI.success('Starting with ipa upload to TestFairy...')
+        UI.success("Starting with ipa upload to TestFairy...")
 
         client = Shenzhen::Plugins::TestFairy::Client.new(
           params[:api_key]
@@ -23,7 +23,7 @@ module Fastlane
             when :cpu, :memory, :network, :gps, :battery, :mic, :wifi
               metric.to_s
             when :phone_signal
-              'phone-signal'
+              "phone-signal"
             else
               UI.user_error!("Unknown metric: #{metric}")
             end
@@ -36,7 +36,7 @@ module Fastlane
             when :shake, :anonymous
               option.to_s
             when :video_only_wifi
-              'video-only-wifi'
+              "video-only-wifi"
             else
               UI.user_error!("Unknown option: #{option}")
             end
@@ -52,19 +52,19 @@ module Fastlane
           when :symbols_file
             [key, value]
           when :testers_groups
-            [key, value.join(',')]
+            [key, value.join(",")]
           when :metrics
-            [key, metrics_to_client.call(value).join(',')]
+            [key, metrics_to_client.call(value).join(",")]
           when :icon_watermark
-            ['icon-watermark', value]
+            ["icon-watermark", value]
           when :comment
             [key, value]
           when :auto_update
-            ['auto-update', value]
+            ["auto-update", value]
           when :notify
             [key, value]
           when :options
-            [key, options_to_client.call(value).join(',')]
+            [key, options_to_client.call(value).join(",")]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
@@ -84,8 +84,8 @@ module Fastlane
       #####################################################
 
       def self.parse_response(response)
-        if response.body && response.body.key?('status') && response.body['status'] == 'ok'
-          build_url = response.body['build_url']
+        if response.body && response.body.key?("status") && response.body["status"] == "ok"
+          build_url = response.body["build_url"]
 
           Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL] = build_url
 
@@ -99,7 +99,7 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        'Upload a new build to TestFairy'
+        "Upload a new build to TestFairy"
       end
 
       def self.available_options
@@ -112,8 +112,8 @@ module Fastlane
                                          UI.user_error!("No API key for TestFairy given, pass using `api_key: 'key'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
-                                       env_name: 'TESTFAIRY_IPA_PATH',
-                                       description: 'Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action',
+                                       env_name: "TESTFAIRY_IPA_PATH",
+                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -130,7 +130,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :testers_groups,
                                        optional: true,
                                        type: Array,
-                                       short_option: '-g',
+                                       short_option: "-g",
                                        env_name: "FL_TESTFAIRY_TESTERS_GROUPS",
                                        description: "Array of tester groups to be notified",
                                        default_value: []), # the default value is an empty list
@@ -148,23 +148,23 @@ module Fastlane
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_ICON_WATERMARK",
                                        description: "Add a small watermark to app icon",
-                                       default_value: 'off'),
+                                       default_value: "off"),
           FastlaneCore::ConfigItem.new(key: :comment,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_COMMENT",
                                        description: "Additional release notes for this upload. This text will be added to email notifications",
-                                       default_value: 'No comment provided'), # the default value if the user didn't provide one
+                                       default_value: "No comment provided"), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :auto_update,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_AUTO_UPDATE",
                                        description: "Allows easy upgrade of all users to current version",
-                                       default_value: 'off'),
+                                       default_value: "off"),
           # not well documented
           FastlaneCore::ConfigItem.new(key: :notify,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_NOTIFY",
                                        description: "Send email to testers",
-                                       default_value: 'off'),
+                                       default_value: "off"),
           FastlaneCore::ConfigItem.new(key: :options,
                                        optional: true,
                                        type: Array,
@@ -176,7 +176,7 @@ module Fastlane
 
       def self.output
         [
-          ['TESTFAIRY_BUILD_URL', 'URL of the newly uploaded build']
+          ["TESTFAIRY_BUILD_URL", "URL of the newly uploaded build"]
         ]
       end
 

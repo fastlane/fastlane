@@ -32,7 +32,7 @@ describe Fastlane do
       end
 
       it "raises an error if file does not exist" do
-        file_path = File.expand_path('/tmp/xfile.ipa')
+        file_path = File.expand_path("/tmp/xfile.ipa")
 
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -55,7 +55,7 @@ describe Fastlane do
       end
 
       it "mandatory options are used correctly" do
-        file_path = '/tmp/file.ipa'
+        file_path = "/tmp/file.ipa"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
           nexus_upload(file: '/tmp/file.ipa',
@@ -74,24 +74,24 @@ describe Fastlane do
                       proxy_password: 'admin')
         end").runner.execute(:test)
 
-        expect(result).to include('-F p=zip')
-        expect(result).to include('-F hasPom=false')
-        expect(result).to include('-F r=artefacts')
-        expect(result).to include('-F g=com.fastlane')
-        expect(result).to include('-F a=myproject')
-        expect(result).to include('-F v=1.12')
-        expect(result).to include('-F e=ipa')
+        expect(result).to include("-F p=zip")
+        expect(result).to include("-F hasPom=false")
+        expect(result).to include("-F r=artefacts")
+        expect(result).to include("-F g=com.fastlane")
+        expect(result).to include("-F a=myproject")
+        expect(result).to include("-F v=1.12")
+        expect(result).to include("-F e=ipa")
         expect(result).to include("-F file=@/tmp/file.ipa")
-        expect(result).to include('-u admin:admin123')
-        expect(result).to include('--verbose')
-        expect(result).to include('http://localhost:8081/nexus/service/local/artifact/maven/content')
-        expect(result).to include('-x http://server:30')
-        expect(result).to include('--proxy-user admin:admin')
-        expect(result).to include('--insecure')
+        expect(result).to include("-u admin:admin123")
+        expect(result).to include("--verbose")
+        expect(result).to include("http://localhost:8081/nexus/service/local/artifact/maven/content")
+        expect(result).to include("-x http://server:30")
+        expect(result).to include("--proxy-user admin:admin")
+        expect(result).to include("--insecure")
       end
 
       it "optional options are used correctly" do
-        file_path = '/tmp/file.ipa'
+        file_path = "/tmp/file.ipa"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
           nexus_upload(file: '/tmp/file.ipa',
@@ -107,20 +107,20 @@ describe Fastlane do
                       verbose: true)
         end").runner.execute(:test)
 
-        expect(result).to include('-F p=zip')
-        expect(result).to include('-F hasPom=false')
-        expect(result).to include('-F r=artefacts')
-        expect(result).to include('-F g=com.fastlane')
-        expect(result).to include('-F a=myproject')
-        expect(result).to include('-F v=1.12')
-        expect(result).to include('-F c=dSYM')
-        expect(result).to include('-F e=ipa')
+        expect(result).to include("-F p=zip")
+        expect(result).to include("-F hasPom=false")
+        expect(result).to include("-F r=artefacts")
+        expect(result).to include("-F g=com.fastlane")
+        expect(result).to include("-F a=myproject")
+        expect(result).to include("-F v=1.12")
+        expect(result).to include("-F c=dSYM")
+        expect(result).to include("-F e=ipa")
         expect(result).to include("-F file=@/tmp/file.ipa")
-        expect(result).to include('-u admin:admin123')
-        expect(result).to include('--verbose')
-        expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
-        expect(result).not_to include('-x')
-        expect(result).not_to include('--proxy-user')
+        expect(result).to include("-u admin:admin123")
+        expect(result).to include("--verbose")
+        expect(result).to include("http://localhost:8081/my-nexus/service/local/artifact/maven/content")
+        expect(result).not_to include("-x")
+        expect(result).not_to include("--proxy-user")
       end
     end
   end

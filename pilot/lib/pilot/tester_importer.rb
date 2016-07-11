@@ -7,7 +7,7 @@ module Pilot
 
       start(options)
 
-      require 'csv'
+      require "csv"
 
       file = config[:testers_file_path]
       tester_manager = Pilot::TesterManager.new

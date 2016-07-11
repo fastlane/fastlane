@@ -3,7 +3,7 @@
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
-require 'tempfile'
+require "tempfile"
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -37,7 +37,7 @@ module Gym
 
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
-        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
+        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir("gym_output")
       end
 
       def ipa_path
@@ -145,13 +145,13 @@ module Gym
       end
 
       def config_content
-        require 'plist'
+        require "plist"
 
         hash = read_export_options
 
         # Overrides export options if needed
         hash[:method] = Gym.config[:export_method]
-        if Gym.config[:export_method] == 'app-store'
+        if Gym.config[:export_method] == "app-store"
           hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false) unless Gym.config[:include_symbols].nil?
           hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false) unless Gym.config[:include_bitcode].nil?
         end

@@ -1,21 +1,21 @@
-require 'tmpdir'
-require 'fileutils'
+require "tmpdir"
+require "fileutils"
 
-require 'coveralls'
+require "coveralls"
 Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-require 'fastlane_core'
+require "fastlane_core"
 UI = FastlaneCore::UI
 
-require 'webmock/rspec'
+require "webmock/rspec"
 
-require 'test_commander_program'
+require "test_commander_program"
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")
 
 # Executes the provided block after adjusting the ENV to have the
 # provided keys and values set as defined in hash. After the block

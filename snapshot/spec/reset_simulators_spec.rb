@@ -1,4 +1,4 @@
-require 'snapshot/reset_simulators'
+require "snapshot/reset_simulators"
 
 describe Snapshot::ResetSimulators do
   let(:usable_devices) do
@@ -24,18 +24,18 @@ describe Snapshot::ResetSimulators do
     usable_devices + unusable_devices
   end
 
-  let(:fixture_data) { File.read('spec/fixtures/xcrun-simctl-list-devices.txt') }
+  let(:fixture_data) { File.read("spec/fixtures/xcrun-simctl-list-devices.txt") }
 
-  describe '#devices' do
-    it 'should read simctl output into arrays of device info' do
+  describe "#devices" do
+    it "should read simctl output into arrays of device info" do
       expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: $verbose).and_return(fixture_data)
 
       expect(Snapshot::ResetSimulators.devices).to eq(all_devices)
     end
   end
 
-  describe '#device_line_usable?' do
-    describe 'usable devices' do
+  describe "#device_line_usable?" do
+    describe "usable devices" do
       it "should find normal devices to be be usable" do
         usable_devices.each do |usable|
           expect(Snapshot::ResetSimulators.device_line_usable?(usable[0])).to be(true)
@@ -43,7 +43,7 @@ describe Snapshot::ResetSimulators do
       end
     end
 
-    describe 'unusable devices' do
+    describe "unusable devices" do
       it "should find devices in bad states to be be unusable" do
         unusable_devices.each do |unusable|
           expect(Snapshot::ResetSimulators.device_line_usable?(unusable[0])).to be(false)
@@ -52,9 +52,9 @@ describe Snapshot::ResetSimulators do
     end
   end
 
-  describe '#make_phone_watch_pair' do
-    describe 'with no phones present' do
-      it 'does not call out to simctl' do
+  describe "#make_phone_watch_pair" do
+    describe "with no phones present" do
+      it "does not call out to simctl" do
         mocked_devices = [
           ["    iPad Pro (AD6A06DF-16EF-492D-8AF3-8128FCC03CBF) (Shutdown)", "iPad Pro", "AD6A06DF-16EF-492D-8AF3-8128FCC03CBF"],
           ["    Apple TV 1080p (D7D591A8-17D2-47B4-8D2A-AFAFA28874C9) (Shutdown)", "Apple TV 1080p", "D7D591A8-17D2-47B4-8D2A-AFAFA28874C9"],
@@ -68,8 +68,8 @@ describe Snapshot::ResetSimulators do
       end
     end
 
-    describe 'with no watches present' do
-      it 'does not call out to simctl' do
+    describe "with no watches present" do
+      it "does not call out to simctl" do
         mocked_devices = [
           ["    iPhone 6s Plus (0311D4EC-14E7-443B-9F27-F32E72342799) (Shutdown)", "iPhone 6s Plus", "0311D4EC-14E7-443B-9F27-F32E72342799"],
           ["    iPad Pro (AD6A06DF-16EF-492D-8AF3-8128FCC03CBF) (Shutdown)", "iPad Pro", "AD6A06DF-16EF-492D-8AF3-8128FCC03CBF"],
@@ -82,8 +82,8 @@ describe Snapshot::ResetSimulators do
       end
     end
 
-    describe 'with an available phone-watch pair' do
-      it 'calls out to simctl pair' do
+    describe "with an available phone-watch pair" do
+      it "calls out to simctl pair" do
         expected_command = "xcrun simctl pair C8250DD7-8C4E-4803-838A-731B42785262 0311D4EC-14E7-443B-9F27-F32E72342799"
 
         # By checking against all_devices, we expect those which are in an unusuable state

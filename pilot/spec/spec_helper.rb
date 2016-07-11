@@ -24,4 +24,4 @@ ENV["DELIVER_HTML_EXPORT_PATH"] = "/tmp" # to not pollute the working directory
 #   end
 # end
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")

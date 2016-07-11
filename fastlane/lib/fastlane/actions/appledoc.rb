@@ -69,7 +69,7 @@ module Fastlane
         # Maps parameter hash to CLI args
         appledoc_args = params_hash_to_cli_args(params_hash)
         UI.success("Generating documentation.")
-        cli_args = appledoc_args.join(' ')
+        cli_args = appledoc_args.join(" ")
         command = "appledoc #{cli_args}".strip + " \"#{params_hash[:input]}\""
         UI.verbose(command)
         Actions.sh command
@@ -180,7 +180,7 @@ module Fastlane
 
       def self.output
         [
-          ['APPLEDOC_DOCUMENTATION_OUTPUT', 'Documentation set output path']
+          ["APPLEDOC_DOCUMENTATION_OUTPUT", "Documentation set output path"]
         ]
       end
 

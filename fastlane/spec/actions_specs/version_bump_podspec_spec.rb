@@ -7,7 +7,7 @@ describe Fastlane do
 
       it "raises an exception when an incorrect path is given" do
         expect do
-          Fastlane::Helper::PodspecHelper.new('invalid_podspec')
+          Fastlane::Helper::PodspecHelper.new("invalid_podspec")
         end.to raise_error("Could not find podspec file at path 'invalid_podspec'")
       end
 
@@ -27,32 +27,32 @@ describe Fastlane do
       it "returns the current version once parsed" do
         test_content = 'version = "1.3.2"'
         result = @version_podspec_file.parse(test_content)
-        expect(result).to eq('1.3.2')
-        expect(@version_podspec_file.version_value).to eq('1.3.2')
+        expect(result).to eq("1.3.2")
+        expect(@version_podspec_file.version_value).to eq("1.3.2")
       end
 
       it "bumps the patch version when passing 'patch'" do
         test_content = 'version = "1.3.2"'
         @version_podspec_file.parse(test_content)
-        result = @version_podspec_file.bump_version('patch')
-        expect(result).to eq('1.3.3')
-        expect(@version_podspec_file.version_value).to eq('1.3.3')
+        result = @version_podspec_file.bump_version("patch")
+        expect(result).to eq("1.3.3")
+        expect(@version_podspec_file.version_value).to eq("1.3.3")
       end
 
       it "bumps the minor version when passing 'minor'" do
         test_content = 'version = "1.3.2"'
         @version_podspec_file.parse(test_content)
-        result = @version_podspec_file.bump_version('minor')
-        expect(result).to eq('1.4.0')
-        expect(@version_podspec_file.version_value).to eq('1.4.0')
+        result = @version_podspec_file.bump_version("minor")
+        expect(result).to eq("1.4.0")
+        expect(@version_podspec_file.version_value).to eq("1.4.0")
       end
 
       it "bumps the major version when passing 'major'" do
         test_content = 'version = "1.3.2"'
         @version_podspec_file.parse(test_content)
-        result = @version_podspec_file.bump_version('major')
-        expect(result).to eq('2.0.0')
-        expect(@version_podspec_file.version_value).to eq('2.0.0')
+        result = @version_podspec_file.bump_version("major")
+        expect(result).to eq("2.0.0")
+        expect(@version_podspec_file.version_value).to eq("2.0.0")
       end
 
       it "appears to do nothing if reinjecting the same version number" do
@@ -70,7 +70,7 @@ describe Fastlane do
         s.version = "1.3.2"
       end'
         @version_podspec_file.parse(test_content)
-        expect(@version_podspec_file.update_podspec('2.0.0')).to eq('Pod::Spec.new do |s|
+        expect(@version_podspec_file.update_podspec("2.0.0")).to eq('Pod::Spec.new do |s|
         s.version = "2.0.0"
       end')
       end
@@ -80,9 +80,9 @@ describe Fastlane do
         s.version = "1.3.2"
       end'
         @version_podspec_file.parse(test_content)
-        result = @version_podspec_file.bump_version('major')
-        expect(result).to eq('2.0.0')
-        expect(@version_podspec_file.version_value).to eq('2.0.0')
+        result = @version_podspec_file.bump_version("major")
+        expect(result).to eq("2.0.0")
+        expect(@version_podspec_file.version_value).to eq("2.0.0")
         expect(@version_podspec_file.update_podspec).to eq('Pod::Spec.new do |s|
         s.version = "2.0.0"
       end')
@@ -103,13 +103,13 @@ describe Fastlane do
           version_get_podspec(path: './fastlane/spec/fixtures/podspecs/test.podspec')
         end").runner.execute(:test)
 
-        expect(result).to eq('1.5.1')
+        expect(result).to eq("1.5.1")
       end
     end
 
     describe "version_bump_podspec" do
       before do
-        @podspec_path = './fastlane/spec/fixtures/podspecs/test.podspec'
+        @podspec_path = "./fastlane/spec/fixtures/podspecs/test.podspec"
       end
 
       it "raises an exception when no path is given" do
@@ -125,7 +125,7 @@ describe Fastlane do
           version_bump_podspec(path: '#{@podspec_path}')
         end").runner.execute(:test)
 
-        expect(result).to eq('1.5.2')
+        expect(result).to eq("1.5.2")
       end
 
       it "bumps patch version when bump_type is set to patch the path is given" do
@@ -133,7 +133,7 @@ describe Fastlane do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'patch')
         end").runner.execute(:test)
 
-        expect(result).to eq('1.5.2')
+        expect(result).to eq("1.5.2")
       end
 
       it "bumps minor version when bump_type is set to minor the path is given" do
@@ -141,7 +141,7 @@ describe Fastlane do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'minor')
         end").runner.execute(:test)
 
-        expect(result).to eq('1.6.0')
+        expect(result).to eq("1.6.0")
       end
 
       it "bumps major version when bump_type is set to major the path is given" do
@@ -149,7 +149,7 @@ describe Fastlane do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'major')
         end").runner.execute(:test)
 
-        expect(result).to eq('2.0.0')
+        expect(result).to eq("2.0.0")
       end
     end
   end

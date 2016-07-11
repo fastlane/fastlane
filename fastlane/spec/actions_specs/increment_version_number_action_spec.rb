@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Increment Version Number Integration" do
-      require 'shellwords'
+      require "shellwords"
 
       it "it increments all targets patch version number" do
         Fastlane::FastFile.new.parse("lane :test do

@@ -1,13 +1,13 @@
 module Fastlane
   # Use the RubyGems API to get all fastlane plugins
   class PluginFetcher
-    require 'fastlane_core'
-    require 'fastlane/plugins/plugin_manager'
+    require "fastlane_core"
+    require "fastlane/plugins/plugin_manager"
 
     # Returns an array of FastlanePlugin objects
     def self.fetch_gems(search_query: nil)
-      require 'json'
-      require 'open-uri'
+      require "json"
+      require "open-uri"
       url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}"
       results = JSON.parse(open(url).read)
 
@@ -25,9 +25,9 @@ module Fastlane
     def self.update_md_file!
       @plugins = fetch_gems
 
-      lib_path = FastlaneCore::Helper.gem_path('fastlane')
+      lib_path = FastlaneCore::Helper.gem_path("fastlane")
       template_path = File.join(lib_path, "lib/assets/AvailablePlugins.md.erb")
-      md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      md = ERB.new(File.read(template_path), nil, "<>").result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       puts md
       output_path = "docs/AvailablePlugins.md"
@@ -45,7 +45,7 @@ module Fastlane
 
     def initialize(hash)
       self.full_name = hash["name"]
-      self.name = self.full_name.gsub(PluginManager.plugin_prefix, '')
+      self.name = self.full_name.gsub(PluginManager.plugin_prefix, "")
       self.downloads = hash["downloads"]
       self.info = hash["info"]
       self.homepage = hash["homepage_uri"]

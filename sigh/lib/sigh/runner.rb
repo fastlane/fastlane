@@ -1,4 +1,4 @@
-require 'spaceship'
+require "spaceship"
 
 module Sigh
   class Runner
@@ -83,7 +83,7 @@ module Sigh
         # Also make sure we have the certificate installed on the local machine
         installed = false
         a.certificates.each do |cert|
-          file = Tempfile.new('cert')
+          file = Tempfile.new("cert")
           file.write(cert.download_raw)
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
@@ -100,7 +100,7 @@ module Sigh
     def create_profile!
       cert = certificate_to_use
       bundle_id = Sigh.config[:app_identifier]
-      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
+      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(" ")
 
       unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all.find { |p| p.name == name }
@@ -142,7 +142,7 @@ module Sigh
 
       unless Sigh.config[:skip_certificate_verification]
         certificates = certificates.find_all do |c|
-          file = Tempfile.new('cert')
+          file = Tempfile.new("cert")
           file.write(c.download_raw)
           file.close
 
@@ -176,7 +176,7 @@ module Sigh
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
       profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
-      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
+      profile_name += ".mobileprovision" unless profile_name.include? "mobileprovision"
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)

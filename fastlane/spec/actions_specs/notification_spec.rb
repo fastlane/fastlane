@@ -24,7 +24,7 @@ describe Fastlane do
       end
 
       it "provides default title of 'fastlane'" do
-        expect(TerminalNotifier).to receive(:notify).with("hello", hash_including(title: 'fastlane'))
+        expect(TerminalNotifier).to receive(:notify).with("hello", hash_including(title: "fastlane"))
 
         Fastlane::FastFile.new.parse("lane :test do
           notification(

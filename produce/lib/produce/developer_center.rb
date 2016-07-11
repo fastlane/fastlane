@@ -1,5 +1,5 @@
-require 'spaceship'
-require 'babosa'
+require "spaceship"
+require "babosa"
 
 module Produce
   class DeveloperCenter
@@ -36,7 +36,7 @@ module Produce
 
     def valid_name_for(input)
       latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinazed.gsub(/[^0-9A-Za-z\d\s]/, "") # remove non-valid characters
     end
 
     def app_identifier

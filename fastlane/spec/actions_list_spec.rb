@@ -1,4 +1,4 @@
-require 'fastlane/documentation/actions_list'
+require "fastlane/documentation/actions_list"
 
 describe Fastlane do
   describe "Action List" do
@@ -7,11 +7,11 @@ describe Fastlane do
     end
 
     it "doesn't throw an exception with filter" do
-      Fastlane::ActionsList.run(filter: 'deliver')
+      Fastlane::ActionsList.run(filter: "deliver")
     end
 
     it "shows all available actions if action can't be found" do
-      Fastlane::ActionsList.run(filter: 'nonExistingHere')
+      Fastlane::ActionsList.run(filter: "nonExistingHere")
     end
 
     it "returns all available actions with the type `Class`" do
@@ -30,7 +30,7 @@ describe Fastlane do
 
           expect(action.description.length).to be <= 80, "Provided description for '#{name}'-action is too long"
           expect(action.description.length).to be > 5, "Provided description for '#{name}'-action is too short"
-          expect(action.description.strip.end_with?('.')).to eq(false), "The description of '#{name}' shouldn't end with a `.`"
+          expect(action.description.strip.end_with?(".")).to eq(false), "The description of '#{name}' shouldn't end with a `.`"
           action.is_supported?(nil) # this will raise an exception if the method is not implemented
 
           expect(action).to be < Fastlane::Action
@@ -74,12 +74,12 @@ describe Fastlane do
 
     describe "with a class in the Actions namespace that does not extend action" do
       it "trying to show its details presents a helpful error message" do
-        require 'fixtures/broken_actions/broken_action.rb'
+        require "fixtures/broken_actions/broken_action.rb"
 
         expect(UI).to receive(:user_error!).with(/be a subclass/).and_raise("boom")
 
         expect do
-          Fastlane::ActionsList.show_details(filter: 'broken')
+          Fastlane::ActionsList.show_details(filter: "broken")
         end.to raise_error
       end
     end

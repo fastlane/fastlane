@@ -4,31 +4,31 @@ module Fastlane
     class PushToGitRemoteAction < Action
       def self.run(params)
         local_branch = params[:local_branch]
-        local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
-        local_branch ||= 'master'
+        local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, "") if Actions.git_branch
+        local_branch ||= "master"
 
         remote_branch = params[:remote_branch] || local_branch
 
         # construct our command as an array of components
         command = [
-          'git',
-          'push',
+          "git",
+          "push",
           params[:remote],
           "#{local_branch}:#{remote_branch}"
         ]
 
         # optionally add the tags component
-        command << '--tags' if params[:tags]
+        command << "--tags" if params[:tags]
 
         # optionally add the force component
-        command << '--force' if params[:force]
+        command << "--force" if params[:force]
 
         # execute our command
-        Actions.sh('pwd')
-        return command.join(' ') if Helper.is_test?
+        Actions.sh("pwd")
+        return command.join(" ") if Helper.is_test?
 
-        Actions.sh(command.join(' '))
-        UI.message('Successfully pushed to remote.')
+        Actions.sh(command.join(" "))
+        UI.message("Successfully pushed to remote.")
       end
 
       def self.description
@@ -58,7 +58,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to. Defaults to `origin`",
-                                       default_value: 'origin')
+                                       default_value: "origin")
         ]
       end
 

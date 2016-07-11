@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require "fastlane_core"
+require "credentials_manager"
 
 module Sigh
   class Options
@@ -97,7 +97,7 @@ module Sigh
                                      default_value: false,
                                      short_option: "-w"),
         FastlaneCore::ConfigItem.new(key: :skip_certificate_verification,
-                                     short_option: '-z',
+                                     short_option: "-z",
                                      env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
                                      description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine",
                                      is_string: false,

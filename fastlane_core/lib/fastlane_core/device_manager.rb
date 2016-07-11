@@ -1,5 +1,5 @@
-require 'open3'
-require 'plist'
+require "open3"
+require "plist"
 
 module FastlaneCore
   class DeviceManager
@@ -12,10 +12,10 @@ module FastlaneCore
         UI.verbose("Fetching available simulator devices")
 
         @devices = []
-        os_type = 'unknown'
-        os_version = 'unknown'
-        output = ''
-        Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
+        os_type = "unknown"
+        os_version = "unknown"
+        output = ""
+        Open3.popen3("xcrun simctl list devices") do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
         end
 
@@ -57,24 +57,24 @@ module FastlaneCore
           return devices
         end
 
-        usb_devices_output = ''
+        usb_devices_output = ""
         Open3.popen3("system_profiler SPUSBDataType -xml") do |stdin, stdout, stderr, wait_thr|
           usb_devices_output = stdout.read
         end
 
         device_uuids = []
         result = Plist.parse_xml(usb_devices_output)
-        result[0]['_items'].each do |host_controller| # loop just incase the host system has more then 1 controller
-          host_controller['_items'].each do |usb_device|
-            is_supported_device = device_types.any? { |device_type| usb_device['_name'] == device_type }
-            if is_supported_device && usb_device['serial_num'].length == 40
-              device_uuids.push(usb_device['serial_num'])
+        result[0]["_items"].each do |host_controller| # loop just incase the host system has more then 1 controller
+          host_controller["_items"].each do |usb_device|
+            is_supported_device = device_types.any? { |device_type| usb_device["_name"] == device_type }
+            if is_supported_device && usb_device["serial_num"].length == 40
+              device_uuids.push(usb_device["serial_num"])
             end
           end
         end
 
         if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
-          instruments_devices_output = ''
+          instruments_devices_output = ""
           Open3.popen3("instruments -s devices") do |stdin, stdout, stderr, wait_thr|
             instruments_devices_output = stdout.read
           end
@@ -168,7 +168,7 @@ module FastlaneCore
   class Simulator
     class << self
       def all
-        return DeviceManager.simulators('iOS')
+        return DeviceManager.simulators("iOS")
       end
 
       # Reset all simulators of this type
@@ -192,7 +192,7 @@ module FastlaneCore
   class SimulatorTV < Simulator
     class << self
       def all
-        return DeviceManager.simulators('tvOS')
+        return DeviceManager.simulators("tvOS")
       end
     end
   end
@@ -200,7 +200,7 @@ module FastlaneCore
   class SimulatorWatch < Simulator
     class << self
       def all
-        return DeviceManager.simulators('watchOS')
+        return DeviceManager.simulators("watchOS")
       end
     end
   end

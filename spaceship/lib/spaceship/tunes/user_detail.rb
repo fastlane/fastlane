@@ -4,7 +4,7 @@ module Spaceship
       attr_accessor :content_provider_id
 
       attr_mapping(
-        'contentProviderId' => :content_provider_id
+        "contentProviderId" => :content_provider_id
       )
 
       class << self

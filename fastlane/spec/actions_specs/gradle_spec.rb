@@ -62,7 +62,7 @@ describe Fastlane do
       end
 
       it "correctly escapes the gradle path" do
-        gradle_path = '/fake gradle/path' # this value is interesting because it contains a space in the path
+        gradle_path = "/fake gradle/path" # this value is interesting because it contains a space in the path
         allow(File).to receive(:exist?).and_call_original
         allow(File).to receive(:exist?).with(gradle_path).and_return(true)
 
@@ -81,8 +81,8 @@ describe Fastlane do
       end
 
       it "correctly escapes multiple properties and types" do
-        notes_key = 'Release Notes' # this value is interesting because it contains a space in the key
-        notes_result = 'World Domination Achieved!' # this value is interesting because it contains multiple spaces
+        notes_key = "Release Notes" # this value is interesting because it contains a space in the key
+        notes_result = "World Domination Achieved!" # this value is interesting because it contains multiple spaces
         result = Fastlane::FastFile.new.parse("lane :build do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200, '#{notes_key}' => '#{notes_result}'}, gradle_path: './fastlane/README.md')
         end").runner.execute(:build)

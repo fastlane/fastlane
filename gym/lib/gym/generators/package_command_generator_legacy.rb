@@ -44,7 +44,7 @@ module Gym
 
       # Place where the IPA file will be created, so it can be safely moved to the destination folder
       def temporary_output_path
-        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
+        Gym.cache[:temporary_output_path] ||= Dir.mktmpdir("gym_output")
       end
 
       def appfile_path

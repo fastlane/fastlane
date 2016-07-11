@@ -2,16 +2,16 @@ module Fastlane
   module Actions
     class InstallXcodePluginAction < Action
       def self.run(params)
-        require 'fileutils'
+        require "fileutils"
 
         unless params[:github].nil?
-          github_api_url = params[:github].sub('https://github.com', 'https://api.github.com/repos')
-          release = self.fetch_json(github_api_url + '/releases/latest')
+          github_api_url = params[:github].sub("https://github.com", "https://api.github.com/repos")
+          release = self.fetch_json(github_api_url + "/releases/latest")
           return if release.nil?
-          params[:url] = release['assets'][0]['browser_download_url']
+          params[:url] = release["assets"][0]["browser_download_url"]
         end
 
-        zip_path = File.join(Dir.tmpdir, 'plugin.zip')
+        zip_path = File.join(Dir.tmpdir, "plugin.zip")
         sh "curl -Lso #{zip_path} #{params[:url]}"
         plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
         FileUtils.mkdir_p(plugins_path)
@@ -22,8 +22,8 @@ module Fastlane
       end
 
       def self.fetch_json(url)
-        require 'excon'
-        require 'json'
+        require "excon"
+        require "json"
 
         response = Excon.get(url)
 

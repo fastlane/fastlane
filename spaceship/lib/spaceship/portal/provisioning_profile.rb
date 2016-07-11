@@ -120,17 +120,17 @@ module Spaceship
       attr_accessor :devices
 
       attr_mapping({
-        'provisioningProfileId' => :id,
-        'UUID' => :uuid,
-        'dateExpire' => :expires,
-        'distributionMethod' => :distribution_method,
-        'name' => :name,
-        'status' => :status,
-        'type' => :type,
-        'version' => :version,
-        'proProPlatform' => :platform,
-        'managingApp' => :managing_app,
-        'appId' => :app
+        "provisioningProfileId" => :id,
+        "UUID" => :uuid,
+        "dateExpire" => :expires,
+        "distributionMethod" => :distribution_method,
+        "name" => :name,
+        "status" => :status,
+        "type" => :type,
+        "version" => :version,
+        "proProPlatform" => :platform,
+        "managingApp" => :managing_app,
+        "appId" => :app
       })
 
       class << self
@@ -148,26 +148,26 @@ module Spaceship
         # This is used to create a new object based on the server response.
         def factory(attrs)
           # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
-          attrs['distributionMethod'] = 'adhoc' if attrs['distributionMethod'] == 'store' && attrs['devices'].size > 0
+          attrs["distributionMethod"] = "adhoc" if attrs["distributionMethod"] == "store" && attrs["devices"].size > 0
           # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
 
-          klass = case attrs['distributionMethod']
-                  when 'limited'
+          klass = case attrs["distributionMethod"]
+                  when "limited"
                     Development
-                  when 'store'
+                  when "store"
                     AppStore
-                  when 'adhoc'
+                  when "adhoc"
                     AdHoc
-                  when 'inhouse'
+                  when "inhouse"
                     InHouse
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
           # eagerload the Apps, Devices, and Certificates using the same client if we have to.
-          attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
-          attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
-          attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
+          attrs["appId"] = App.set_client(@client).factory(attrs["appId"])
+          attrs["devices"].map! { |device| Device.set_client(@client).factory(device) }
+          attrs["certificates"].map! { |cert| Certificate.set_client(@client).factory(cert) }
 
           klass.client = @client
           klass.new(attrs)
@@ -180,7 +180,7 @@ module Spaceship
         #  "Development"
         #  "InHouse"
         def pretty_type
-          name.split('::').last
+          name.split("::").last
         end
 
         # Create a new provisioning profile
@@ -203,7 +203,7 @@ module Spaceship
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
           # Fill in sensible default values
-          name ||= [bundle_id, self.pretty_type].join(' ')
+          name ||= [bundle_id, self.pretty_type].join(" ")
 
           devices = [] if self == AppStore || self == InHouse # App Store Profiles MUST NOT have devices
 
@@ -218,7 +218,7 @@ module Spaceship
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
                 devices = Spaceship::Device.all_macs
-              elsif sub_platform == 'tvOS'
+              elsif sub_platform == "tvOS"
                 devices = Spaceship::Device.all_apple_tvs
               else
                 devices = Spaceship::Device.all_ios_profile_devices
@@ -272,28 +272,28 @@ module Spaceship
       # Represents a Development profile from the Dev Portal
       class Development < ProvisioningProfile
         def self.type
-          'limited'
+          "limited"
         end
       end
 
       # Represents an AppStore profile from the Dev Portal
       class AppStore < ProvisioningProfile
         def self.type
-          'store'
+          "store"
         end
       end
 
       # Represents an AdHoc profile from the Dev Portal
       class AdHoc < ProvisioningProfile
         def self.type
-          'adhoc'
+          "adhoc"
         end
       end
 
       # Represents an Enterprise InHouse profile from the Dev Portal
       class InHouse < ProvisioningProfile
         def self.type
-          'inhouse'
+          "inhouse"
         end
       end
 
@@ -379,17 +379,17 @@ module Spaceship
 
       # @return (Bool) Is the current provisioning profile valid?
       def valid?
-        return (status == 'Active' and certificate_valid?)
+        return (status == "Active" and certificate_valid?)
       end
 
       # @return (Bool) Is this profile managed by Xcode?
       def managed_by_xcode?
-        managing_app == 'Xcode'
+        managing_app == "Xcode"
       end
 
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
-        platform == 'mac'
+        platform == "mac"
       end
     end
   end

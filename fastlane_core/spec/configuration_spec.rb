@@ -110,7 +110,7 @@ describe FastlaneCore do
       describe "data_type" do
         it "sets the data type correctly if `is_string` is not set but type is specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Array)
 
           expect(config_item.data_type).to eq(Array)
@@ -118,7 +118,7 @@ describe FastlaneCore do
 
         it "sets the data type correctly if `is_string` is set but the type is specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      is_string: true,
                                                      type: Array)
 
@@ -127,7 +127,7 @@ describe FastlaneCore do
 
         it "sets the data type correctly if `is_string` is set but the type is not specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      is_string: true)
 
           expect(config_item.data_type).to eq(String)
@@ -137,33 +137,33 @@ describe FastlaneCore do
       describe "arrays" do
         it "returns Array default values correctly" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Array,
                                                      optional: true,
-                                                     default_value: ['5', '4', '3', '2', '1'])
+                                                     default_value: ["5", "4", "3", "2", "1"])
           config = FastlaneCore::Configuration.create([config_item], {})
 
-          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+          expect(config[:foo]).to eq(["5", "4", "3", "2", "1"])
         end
 
         it "returns Array input values correctly" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Array)
-          config = FastlaneCore::Configuration.create([config_item], { foo: ['5', '4', '3', '2', '1'] })
+          config = FastlaneCore::Configuration.create([config_item], { foo: ["5", "4", "3", "2", "1"] })
 
-          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+          expect(config[:foo]).to eq(["5", "4", "3", "2", "1"])
         end
 
         it "returns Array environment variable values correctly" do
-          ENV["FOO"] = '5,4,3,2,1'
+          ENV["FOO"] = "5,4,3,2,1"
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
-                                                     env_name: 'FOO',
+                                                     description: "foo",
+                                                     env_name: "FOO",
                                                      type: Array)
           config = FastlaneCore::Configuration.create([config_item], {})
 
-          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+          expect(config[:foo]).to eq(["5", "4", "3", "2", "1"])
           ENV.delete("FOO")
         end
       end
@@ -171,27 +171,27 @@ describe FastlaneCore do
       describe "auto_convert_value" do
         it "auto converts string values to Integers" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Integer)
 
-          value = config_item.auto_convert_value('987')
+          value = config_item.auto_convert_value("987")
 
           expect(value).to eq(987)
         end
 
         it "auto converts string values to Floats" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Float)
 
-          value = config_item.auto_convert_value('9.91')
+          value = config_item.auto_convert_value("9.91")
 
           expect(value).to eq(9.91)
         end
 
         it "auto converts nil to nil when type is not specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo')
+                                                     description: "foo")
 
           value = config_item.auto_convert_value(nil)
 
@@ -200,7 +200,7 @@ describe FastlaneCore do
 
         it "auto converts nil to nil when type is Integer" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Integer)
 
           value = config_item.auto_convert_value(nil)
@@ -210,7 +210,7 @@ describe FastlaneCore do
 
         it "auto converts nil to nil when type is Float" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Float)
 
           value = config_item.auto_convert_value(nil)
@@ -267,11 +267,11 @@ describe FastlaneCore do
       describe "validation" do
         it "raises an exception if the data type is not as expected" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
+                                                     description: "foo",
                                                      type: Float)
 
           expect do
-            config_item.valid?('ABC')
+            config_item.valid?("ABC")
           end.to raise_error
         end
 
@@ -292,31 +292,31 @@ describe FastlaneCore do
       describe "deprecation", focus: true do
         it "deprecated changes the description" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
-                                                     deprecated: 'replaced by bar')
+                                                     description: "foo",
+                                                     deprecated: "replaced by bar")
           expect(config_item.description).to eq("[DEPRECATED!] replaced by bar - foo")
         end
 
         it "deprecated makes it optional" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                     description: 'foo',
-                                                     deprecated: 'replaced by bar')
+                                                     description: "foo",
+                                                     deprecated: "replaced by bar")
           expect(config_item.optional).to eq(true)
         end
 
         it "raises an exception if a deprecated option is not optional" do
           expect do
             config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                       description: 'foo',
+                                                       description: "foo",
                                                        optional: false,
-                                                       deprecated: 'replaced by bar')
+                                                       deprecated: "replaced by bar")
           end.to raise_error
         end
 
         it "doesn't display a deprecation message when loading a config if a deprecated option doesn't have a value" do
           c = FastlaneCore::ConfigItem.new(key: :foo,
-                                           description: 'foo',
-                                           deprecated: 'replaced by bar')
+                                           description: "foo",
+                                           deprecated: "replaced by bar")
           values = {
             foo: "something"
           }
@@ -326,8 +326,8 @@ describe FastlaneCore do
 
         it "displays a deprecation message when loading a config if a deprecated option has a value" do
           c = FastlaneCore::ConfigItem.new(key: :foo,
-                                           description: 'foo',
-                                           deprecated: 'replaced by bar')
+                                           description: "foo",
+                                           deprecated: "replaced by bar")
 
           expect(FastlaneCore::UI).not_to receive(:deprecated)
           config = FastlaneCore::Configuration.create([c], {})
@@ -337,15 +337,15 @@ describe FastlaneCore do
       describe "misc features" do
         it "makes it non optional by default" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                 default_value: '123')
+                                 default_value: "123")
           expect(c.optional).to eq(false)
         end
 
         it "supports options without 'env_name'" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                 default_value: '123')
+                                 default_value: "123")
           config = FastlaneCore::Configuration.create([c], {})
-          expect(config.values[:test]).to eq('123')
+          expect(config.values[:test]).to eq("123")
         end
 
         it "takes the values frmo the environment if available" do
@@ -353,7 +353,7 @@ describe FastlaneCore do
                                       env_name: "FL_TEST")
           config = FastlaneCore::Configuration.create([c], {})
           ENV["FL_TEST"] = "123value"
-          expect(config.values[:test]).to eq('123value')
+          expect(config.values[:test]).to eq("123value")
           ENV.delete("FL_TEST")
         end
 
@@ -363,7 +363,7 @@ describe FastlaneCore do
           config = FastlaneCore::Configuration.create([c], {})
           ENV["FL_TEST"] = "123value"
           config.values[:test].gsub!("123", "456")
-          expect(config.values[:test]).to eq('456value')
+          expect(config.values[:test]).to eq("456value")
           ENV.delete("FL_TEST")
         end
       end
@@ -426,16 +426,16 @@ describe FastlaneCore do
         describe "#values" do
           it "returns the user values" do
             values = @config.values
-            expect(values[:output]).to eq('..')
-            expect(values[:cert_name]).to eq('asdf')
+            expect(values[:output]).to eq("..")
+            expect(values[:cert_name]).to eq("asdf")
             expect(values[:wait_processing_interval]).to eq(10)
           end
 
           it "returns the default values" do
             @config = FastlaneCore::Configuration.create(@options, {}) # no user inputs
             values = @config.values
-            expect(values[:cert_name]).to eq('production_default')
-            expect(values[:output]).to eq('.')
+            expect(values[:cert_name]).to eq("production_default")
+            expect(values[:output]).to eq(".")
             expect(values[:wait_processing_interval]).to eq(30)
           end
         end

@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Snapshot
   # This class takes care of rotating images
@@ -10,7 +10,7 @@ module Snapshot
     end
 
     def rotate(path)
-      Dir.glob([path, '/**/*.png'].join('/')).each do |file|
+      Dir.glob([path, "/**/*.png"].join("/")).each do |file|
         UI.verbose "Rotating '#{file}'"
 
         command = nil

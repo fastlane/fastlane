@@ -2,11 +2,11 @@ module Fastlane
   module Actions
     class CocoapodsAction < Action
       def self.run(params)
-        Actions.verify_gem!('cocoapods')
+        Actions.verify_gem!("cocoapods")
         cmd = []
 
         unless params[:podfile].nil?
-          if params[:podfile].end_with?('Podfile')
+          if params[:podfile].end_with?("Podfile")
             podfile_folder = File.dirname(params[:podfile])
           else
             podfile_folder = params[:podfile]
@@ -14,17 +14,17 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
-        cmd << ['pod install']
+        cmd << ["bundle exec"] if File.exist?("Gemfile") && params[:use_bundle_exec]
+        cmd << ["pod install"]
 
-        cmd << '--no-clean' unless params[:clean]
-        cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--repo-update' if params[:repo_update]
-        cmd << '--silent' if params[:silent]
-        cmd << '--verbose' if params[:verbose]
-        cmd << '--no-ansi' unless params[:ansi]
+        cmd << "--no-clean" unless params[:clean]
+        cmd << "--no-integrate" unless params[:integrate]
+        cmd << "--repo-update" if params[:repo_update]
+        cmd << "--silent" if params[:silent]
+        cmd << "--verbose" if params[:verbose]
+        cmd << "--no-ansi" unless params[:ansi]
 
-        Actions.sh(cmd.join(' '))
+        Actions.sh(cmd.join(" "))
       end
 
       def self.description

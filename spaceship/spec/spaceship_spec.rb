@@ -1,13 +1,13 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship do
   before { Spaceship.login }
 
   it "#select_team" do
-    expect(Spaceship.select_team).to eq('XXXXXXXXXX')
+    expect(Spaceship.select_team).to eq("XXXXXXXXXX")
   end
 
-  it 'should initialize with a client' do
+  it "should initialize with a client" do
     expect(Spaceship.client).to be_instance_of(Spaceship::PortalClient)
   end
 
@@ -32,11 +32,11 @@ describe Spaceship do
   end
 
   describe Spaceship::Launcher do
-    it 'has a client' do
+    it "has a client" do
       expect(subject.client).to be_instance_of(Spaceship::PortalClient)
     end
 
-    it 'returns a scoped model class' do
+    it "returns a scoped model class" do
       expect(subject.app).to eq(Spaceship::App)
       expect(subject.app_group).to eq(Spaceship::AppGroup)
       expect(subject.certificate).to eq(Spaceship::Certificate)
@@ -44,7 +44,7 @@ describe Spaceship do
       expect(subject.provisioning_profile).to eq(Spaceship::ProvisioningProfile)
     end
 
-    it 'passes the client to the models' do
+    it "passes the client to the models" do
       expect(subject.device.client).to eq(subject.client)
     end
   end

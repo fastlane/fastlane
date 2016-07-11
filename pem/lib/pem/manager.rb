@@ -1,5 +1,5 @@
-require 'pathname'
-require 'spaceship'
+require "pathname"
+require "spaceship"
 
 module PEM
   # Creates the push profile and stores it in the correct location
@@ -56,7 +56,7 @@ module PEM
         end
 
         x509_certificate = cert.download
-        certificate_type = (PEM.config[:development] ? 'development' : 'production')
+        certificate_type = (PEM.config[:development] ? "development" : "production")
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 

@@ -15,27 +15,27 @@ module Spaceship
     #####################################################
 
     def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device))
+      upload_file(app_version, upload_file, "/upload/image", content_provider_id, sso_token_for_image, screenshot_picture_type(device))
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.LargeApplicationIcon')
+      upload_file(app_version, upload_file, "/upload/image", content_provider_id, sso_token_for_image, "MZPFT.LargeApplicationIcon")
     end
 
     def upload_watch_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.GizmoAppIcon')
+      upload_file(app_version, upload_file, "/upload/image", content_provider_id, sso_token_for_image, "MZPFT.GizmoAppIcon")
     end
 
     def upload_geojson(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/geo-json', content_provider_id, sso_token_for_image)
+      upload_file(app_version, upload_file, "/upload/geo-json", content_provider_id, sso_token_for_image)
     end
 
     def upload_trailer(app_version, upload_file, content_provider_id, sso_token_for_video)
-      upload_file(app_version, upload_file, '/upload/purple-video', content_provider_id, sso_token_for_video)
+      upload_file(app_version, upload_file, "/upload/purple-video", content_provider_id, sso_token_for_video)
     end
 
     def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/app-screenshot-image', content_provider_id, sso_token_for_image)
+      upload_file(app_version, upload_file, "/upload/app-screenshot-image", content_provider_id, sso_token_for_image)
     end
 
     private
@@ -52,18 +52,18 @@ module Spaceship
       r = request(:post) do |req|
         req.url "#{self.class.hostname}#{path}"
         req.body = upload_file.bytes
-        req.headers['Accept'] = 'application/json, text/plain, */*'
-        req.headers['Content-Type'] = upload_file.content_type
-        req.headers['X-Apple-Upload-Referrer'] = referrer
-        req.headers['Referrer'] = referrer
-        req.headers['X-Apple-Upload-AppleId'] = app_id
-        req.headers['X-Apple-Jingle-Correlation-Key'] = "#{app_type}:AdamId=#{app_id}:Version=#{version}"
-        req.headers['X-Apple-Upload-itctoken'] = sso_token
-        req.headers['X-Apple-Upload-ContentProviderId'] = content_provider_id
-        req.headers['X-Original-Filename'] = upload_file.file_name
-        req.headers['X-Apple-Upload-Validation-RuleSets'] = du_validation_rule_set if du_validation_rule_set
-        req.headers['Content-Length'] = upload_file.file_size.to_s
-        req.headers['Connection'] = "keep-alive"
+        req.headers["Accept"] = "application/json, text/plain, */*"
+        req.headers["Content-Type"] = upload_file.content_type
+        req.headers["X-Apple-Upload-Referrer"] = referrer
+        req.headers["Referrer"] = referrer
+        req.headers["X-Apple-Upload-AppleId"] = app_id
+        req.headers["X-Apple-Jingle-Correlation-Key"] = "#{app_type}:AdamId=#{app_id}:Version=#{version}"
+        req.headers["X-Apple-Upload-itctoken"] = sso_token
+        req.headers["X-Apple-Upload-ContentProviderId"] = content_provider_id
+        req.headers["X-Original-Filename"] = upload_file.file_name
+        req.headers["X-Apple-Upload-Validation-RuleSets"] = du_validation_rule_set if du_validation_rule_set
+        req.headers["Content-Length"] = upload_file.file_size.to_s
+        req.headers["Connection"] = "keep-alive"
       end
 
       if r.status == 500 and r.body.include?("Server Error")
@@ -98,9 +98,9 @@ module Spaceship
 
     def parse_upload_response(response)
       content = response.body
-      if !content['statusCode'].nil? && content['statusCode'] != 200
+      if !content["statusCode"].nil? && content["statusCode"] != 200
         error_codes = ""
-        error_codes = content['errorCodes'].join(',') unless content['errorCodes'].nil?
+        error_codes = content["errorCodes"].join(",") unless content["errorCodes"].nil?
         error_message = "[#{error_codes}] #{content['localizedMessage']}"
         raise UnexpectedResponse.new, error_message
       end

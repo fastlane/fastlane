@@ -5,8 +5,8 @@ module Fastlane
 
     class DotgpgEnvironmentAction < Action
       def self.run(options)
-        Actions.verify_gem!('dotgpg')
-        require 'dotgpg/environment'
+        Actions.verify_gem!("dotgpg")
+        require "dotgpg/environment"
 
         UI.message("Reading secrets from #{options[:dotgpg_file]}")
         Dotgpg::Environment.new(options[:dotgpg_file]).apply

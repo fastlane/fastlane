@@ -1,4 +1,4 @@
-require 'net/http'
+require "net/http"
 
 ## monkey-patch Net::HTTP
 #

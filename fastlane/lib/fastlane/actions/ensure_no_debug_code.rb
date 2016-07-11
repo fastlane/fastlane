@@ -9,7 +9,7 @@ module Fastlane
 
         if params[:extensions]
           params[:extensions].each do |extension|
-            extension.delete!('.') if extension.include? "."
+            extension.delete!(".") if extension.include? "."
             extensions << extension
           end
         end
@@ -70,7 +70,7 @@ module Fastlane
                                        description: "The extension that should be searched for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         value.delete!('.') if value.include? "."
+                                         value.delete!(".") if value.include? "."
                                        end),
           FastlaneCore::ConfigItem.new(key: :extensions,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",

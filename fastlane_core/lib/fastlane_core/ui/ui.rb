@@ -16,11 +16,11 @@ module FastlaneCore
   end
 end
 
-require 'fastlane_core/ui/interface'
+require "fastlane_core/ui/interface"
 
 # Import all available implementations
-Dir[File.expand_path('implementations/*.rb', File.dirname(__FILE__))].each do |file|
+Dir[File.expand_path("implementations/*.rb", File.dirname(__FILE__))].each do |file|
   require file
 end
 
-require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
+require "fastlane_core/ui/disable_colors" if FastlaneCore::Helper.colors_disabled?

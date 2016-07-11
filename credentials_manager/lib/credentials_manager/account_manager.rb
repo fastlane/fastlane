@@ -1,5 +1,5 @@
-require 'security'
-require 'highline/import' # to hide the entered password
+require "security"
+require "highline/import" # to hide the entered password
 
 module CredentialsManager
   class AccountManager

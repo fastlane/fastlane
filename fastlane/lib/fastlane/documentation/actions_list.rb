@@ -1,7 +1,7 @@
 module Fastlane
   class ActionsList
     def self.run(filter: nil, platform: nil)
-      require 'terminal-table'
+      require "terminal-table"
       if filter
         show_details(filter: filter)
       else
@@ -24,14 +24,14 @@ module Fastlane
         else
           UI.error action_subclass_error(name)
           current << "Please update action file".red
-          current << ' '
+          current << " "
         end
         rows << current
       end
 
       puts Terminal::Table.new(
         title: "Available fastlane actions".green,
-        headings: ['Action', 'Description', 'Author'],
+        headings: ["Action", "Description", "Author"],
         rows: rows
       )
       puts "  Platform filter: #{platform}".magenta if platform
@@ -74,12 +74,12 @@ module Fastlane
 
       if action.description
         rows << [action.description]
-        rows << [' ']
+        rows << [" "]
       end
 
       if action.details
         rows << [action.details]
-        rows << [' ']
+        rows << [" "]
       end
 
       authors = Array(action.author || action.authors)
@@ -95,7 +95,7 @@ module Fastlane
       if options
         puts Terminal::Table.new(
           title: "#{name} Options".green,
-          headings: ['Key', 'Description', 'Env Var', 'Default'],
+          headings: ["Key", "Description", "Env Var", "Default"],
           rows: options
         )
       else
@@ -110,7 +110,7 @@ module Fastlane
 
       puts Terminal::Table.new(
         title: "#{name} Output Variables".green,
-        headings: ['Key', 'Description'],
+        headings: ["Key", "Description"],
         rows: output.map { |key, desc| [key.yellow, desc] }
       )
       puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
@@ -134,7 +134,7 @@ module Fastlane
         # them as broken actions in the table, regardless of platform specification
         next if platform && action.respond_to?(:is_supported?) && !action.is_supported?(platform.to_sym)
 
-        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        name = symbol.to_s.gsub("Action", "").fastlane_underscore
         yield action, name
       end
     end

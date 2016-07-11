@@ -1,5 +1,5 @@
-require 'rubygems/spec_fetcher'
-require 'rubygems/command_manager'
+require "rubygems/spec_fetcher"
+require "rubygems/command_manager"
 
 module Fastlane
   module Actions
@@ -32,7 +32,7 @@ module Fastlane
           return
         end
 
-        tools_to_update = options[:tools].split ',' unless options[:tools].nil?
+        tools_to_update = options[:tools].split "," unless options[:tools].nil?
         tools_to_update ||= all_installed_tools
 
         if tools_to_update.count == 0

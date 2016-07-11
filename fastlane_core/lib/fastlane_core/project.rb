@@ -276,7 +276,7 @@ module FastlaneCore
 
     # @internal to module
     def self.xcode_list_timeout
-      (ENV['FASTLANE_XCODE_LIST_TIMEOUT'] || 10).to_i
+      (ENV["FASTLANE_XCODE_LIST_TIMEOUT"] || 10).to_i
     end
 
     # @internal to module
@@ -285,7 +285,7 @@ module FastlaneCore
     # @returns the output
     # Note: currently affected by fastlane/fastlane_core#102
     def self.run_command(command, timeout: 0)
-      require 'timeout'
+      require "timeout"
       @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
     end
 

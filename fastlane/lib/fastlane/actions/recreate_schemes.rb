@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class RecreateSchemesAction < Action
       def self.run(params)
-        require 'xcodeproj'
+        require "xcodeproj"
 
         UI.message("Recreate schemes for project: #{params[:project]}")
 

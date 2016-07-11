@@ -6,10 +6,10 @@ module Fastlane
 
     class ScreengrabAction < Action
       def self.run(params)
-        require 'screengrab'
+        require "screengrab"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('screengrab') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("screengrab") unless Helper.is_test?
 
           Screengrab.config = params
           Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
@@ -21,21 +21,21 @@ module Fastlane
 
           true
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('screengrab', Screengrab::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("screengrab", Screengrab::VERSION)
         end
       end
 
       def self.description
-        'Automated localized screenshots of your Android app on every device'
+        "Automated localized screenshots of your Android app on every device"
       end
 
       def self.available_options
-        require 'screengrab'
+        require "screengrab"
         Screengrab::Options.available_options
       end
 
       def self.author
-        ['asfalcone', 'i2amsam', 'mfurtak']
+        ["asfalcone", "i2amsam", "mfurtak"]
       end
 
       def self.is_supported?(platform)

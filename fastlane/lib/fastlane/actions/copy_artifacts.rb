@@ -1,5 +1,5 @@
-require 'fileutils'
-require 'shellwords'
+require "fileutils"
+require "shellwords"
 
 module Fastlane
   module Actions
@@ -34,7 +34,7 @@ module Fastlane
           FileUtils.mv(artifacts, params[:target_path], force: true)
         end
 
-        UI.success('Build artifacts successfully copied!')
+        UI.success("Build artifacts successfully copied!")
       end
 
       #####################################################
@@ -56,7 +56,7 @@ module Fastlane
                                        description: "The directory in which you want your artifacts placed",
                                        is_string: false,
                                        optional: false,
-                                       default_value: 'artifacts'),
+                                       default_value: "artifacts"),
           FastlaneCore::ConfigItem.new(key: :artifacts,
                                        description: "An array of file patterns of the files/folders you want to preserve",
                                        is_string: false,

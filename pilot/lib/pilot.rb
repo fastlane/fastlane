@@ -3,7 +3,7 @@ require "fastlane_core"
 
 require "json"
 require "pilot/version"
-require 'pilot/features'
+require "pilot/features"
 require "pilot/options"
 require "pilot/manager"
 require "pilot/build_manager"

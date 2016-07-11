@@ -2,32 +2,32 @@ describe FastlaneCore do
   describe FastlaneCore::Helper do
     describe "#is_ci?" do
       it "returns false when not building in a known CI environment" do
-        stub_const('ENV', {})
+        stub_const("ENV", {})
         expect(FastlaneCore::Helper.is_ci?).to be false
       end
 
       it "returns true when building in Jenkins" do
-        stub_const('ENV', { 'JENKINS_URL' => 'http://fake.jenkins.url' })
+        stub_const("ENV", { "JENKINS_URL" => "http://fake.jenkins.url" })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
       it "returns true when building in Jenkins Slave" do
-        stub_const('ENV', { 'JENKINS_HOME' => '/fake/jenkins/home' })
+        stub_const("ENV", { "JENKINS_HOME" => "/fake/jenkins/home" })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
       it "returns true when building in Travis CI" do
-        stub_const('ENV', { 'TRAVIS' => true })
+        stub_const("ENV", { "TRAVIS" => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
       it "returns true when building in gitlab-ci" do
-        stub_const('ENV', { 'GITLAB_CI' => true })
+        stub_const("ENV", { "GITLAB_CI" => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
       it "returns true when building in Xcode Server" do
-        stub_const('ENV', { 'XCS' => true })
+        stub_const("ENV", { "XCS" => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
     end
@@ -37,7 +37,7 @@ describe FastlaneCore do
       describe "Xcode" do
         # Those tests also work when using a beta version of Xcode
         it "#xcode_path" do
-          expect(FastlaneCore::Helper.xcode_path[-1]).to eq('/')
+          expect(FastlaneCore::Helper.xcode_path[-1]).to eq("/")
           expect(FastlaneCore::Helper.xcode_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/})
         end
 

@@ -6,29 +6,29 @@ module Fastlane
 
     class CreatePullRequestAction < Action
       def self.run(params)
-        require 'excon'
-        require 'base64'
+        require "excon"
+        require "base64"
 
         UI.message("Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'")
 
         url = "#{params[:api_url]}/repos/#{params[:repo]}/pulls"
-        headers = { 'User-Agent' => 'fastlane-create_pull_request' }
-        headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
+        headers = { "User-Agent" => "fastlane-create_pull_request" }
+        headers["Authorization"] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
 
         data = {
-          'title' => params[:title],
-          'head' => params[:head],
-          'base' => params[:base]
+          "title" => params[:title],
+          "head" => params[:head],
+          "base" => params[:base]
         }
 
-        data['body'] = params[:body] if params[:body]
+        data["body"] = params[:body] if params[:body]
 
         response = Excon.post(url, headers: headers, body: data.to_json)
 
         if response[:status] == 201
           body = JSON.parse(response.body)
-          number = body['number']
-          html_url = body['html_url']
+          number = body["number"]
+          html_url = body["html_url"]
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
@@ -77,13 +77,13 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_BASE",
                                        description: "The name of the branch you want your changes pulled into (defaults to `master`)",
                                        is_string: true,
-                                       default_value: 'master',
+                                       default_value: "master",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_url,
                                        env_name: "GITHUB_PULL_REQUEST_API_URL",
                                        description: "The URL of Github API - used when the Enterprise (default to `https://api.github.com`)",
                                        is_string: true,
-                                       default_value: 'https://api.github.com',
+                                       default_value: "https://api.github.com",
                                        optional: true)
         ]
       end

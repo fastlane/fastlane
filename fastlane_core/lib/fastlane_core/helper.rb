@@ -1,5 +1,5 @@
-require 'logger'
-require 'colored'
+require "logger"
+require "colored"
 
 module FastlaneCore
   module Helper
@@ -27,7 +27,7 @@ module FastlaneCore
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ["JENKINS_HOME", "JENKINS_URL", "TRAVIS", "CIRCLECI", "CI", "TEAMCITY_VERSION", "GO_PIPELINE_NAME", "bamboo_buildKey", "GITLAB_CI", "XCS"].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -82,7 +82,7 @@ module FastlaneCore
 
       begin
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
-        @xcode_version = output.split("\n").first.split(' ')[1]
+        @xcode_version = output.split("\n").first.split(" ")[1]
       rescue => ex
         UI.error(ex)
         UI.error("Error detecting currently used Xcode installation")
@@ -91,34 +91,34 @@ module FastlaneCore
     end
 
     def self.transporter_java_executable_path
-      return File.join(self.transporter_java_path, 'bin', 'java')
+      return File.join(self.transporter_java_path, "bin", "java")
     end
 
     def self.transporter_java_ext_dir
-      return File.join(self.transporter_java_path, 'lib', 'ext')
+      return File.join(self.transporter_java_path, "lib", "ext")
     end
 
     def self.transporter_java_jar_path
-      return File.join(self.itms_path, 'lib', 'itmstransporter-launcher.jar')
+      return File.join(self.itms_path, "lib", "itmstransporter-launcher.jar")
     end
 
     def self.transporter_user_dir
-      return File.join(self.itms_path, 'bin')
+      return File.join(self.itms_path, "bin")
     end
 
     def self.transporter_java_path
-      return File.join(self.itms_path, 'java')
+      return File.join(self.itms_path, "java")
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+      return File.join(self.itms_path, "bin", "iTMSTransporter")
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
-      return '' unless self.is_mac? # so tests work on Linx too
+      return "" unless self.is_mac? # so tests work on Linx too
 
       [
         "../Applications/Application Loader.app/Contents/MacOS/itms",
@@ -140,7 +140,7 @@ module FastlaneCore
       if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
-        return './'
+        return "./"
       end
     end
   end

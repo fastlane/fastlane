@@ -21,7 +21,7 @@ describe FastlaneCore do
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        description: "Mac",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid identifier '#{value}'") unless value.split('.').count == 3
+                                         UI.user_error!("Invalid identifier '#{value}'") unless value.split(".").count == 3
                                        end),
           FastlaneCore::ConfigItem.new(key: :apple_id,
                                        description: "yo",
@@ -31,7 +31,7 @@ describe FastlaneCore do
 
       it "fills in the values from a valid config file" do
         config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileValid')
+        config.load_configuration_file("ConfigFileValid")
         expect(config[:app_identifier]).to eq("com.krausefx.app")
         expect(config[:apple_id]).to eq("from_le_block")
       end
@@ -53,27 +53,27 @@ describe FastlaneCore do
       it "overwrites existing values" do
         # not overwrite
         config = FastlaneCore::Configuration.create(options, { app_identifier: "detlef.app.super" })
-        config.load_configuration_file('ConfigFileEmpty')
+        config.load_configuration_file("ConfigFileEmpty")
         expect(config[:app_identifier]).to eq("detlef.app.super")
       end
 
       it "properly loads boolean values" do
         config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileBooleanValues')
+        config.load_configuration_file("ConfigFileBooleanValues")
         expect(config[:a_boolean]).to be(false)
         expect(config[:another_boolean]).to be(true)
       end
 
       it "ignores the same item being set after the first time" do
         config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileRepeatedValueSet')
-        expect(config[:app_identifier]).to eq('the.expected.value')
+        config.load_configuration_file("ConfigFileRepeatedValueSet")
+        expect(config[:app_identifier]).to eq("the.expected.value")
       end
 
       describe "Handling invalid broken configuration files" do
         it "automatically corrects invalid quotations" do
           config = FastlaneCore::Configuration.create(options, {})
-          config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
+          config.load_configuration_file("./spec/fixtures/ConfigInvalidQuotation")
           # Not raising an error, even though we have invalid quotes
           expect(config[:app_identifier]).to eq("net.sunapps.1")
         end
@@ -81,14 +81,14 @@ describe FastlaneCore do
         it "properly shows an error message when there is a syntax error in the Fastfile" do
           config = FastlaneCore::Configuration.create(options, {})
           expect do
-            config.load_configuration_file('./spec/fixtures/ConfigSytnaxError')
+            config.load_configuration_file("./spec/fixtures/ConfigSytnaxError")
           end.to raise_error(/Syntax error in your configuration file .* on line 15/)
         end
       end
 
       it "allows using a custom block to handle special callbacks" do
         config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileUnhandledBlock', proc do |method_sym, arguments, block|
+        config.load_configuration_file("ConfigFileUnhandledBlock", proc do |method_sym, arguments, block|
           if method_sym == :some_custom_block
             if arguments == ["parameter"]
               expect do

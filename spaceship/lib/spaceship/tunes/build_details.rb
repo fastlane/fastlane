@@ -27,13 +27,13 @@ module Spaceship
       attr_accessor :file_name
 
       attr_mapping(
-        'apple_id' => :apple_id,
-        'dsymurl' => :dsym_url,
-        'includesSymbols' => :include_symbols,
-        'numberOfAssetPacks' => :number_of_asset_packs,
-        'containsODR' => :contains_odr,
-        'buildSdk' => :build_sdk,
-        'fileName' => :file_name
+        "apple_id" => :apple_id,
+        "dsymurl" => :dsym_url,
+        "includesSymbols" => :include_symbols,
+        "numberOfAssetPacks" => :number_of_asset_packs,
+        "containsODR" => :contains_odr,
+        "buildSdk" => :build_sdk,
+        "fileName" => :file_name
       )
 
       class << self

@@ -1,5 +1,5 @@
-require 'deliver'
-require 'fastimage'
+require "deliver"
+require "fastimage"
 
 module Frameit
   class Runner

@@ -30,10 +30,10 @@ module Spaceship
       attr_reader :invalid_builds
 
       attr_mapping(
-        'versionString' => :version_string,
-        'platform' => :platform,
-        'externalTesting.value' => :external_testing_enabled,
-        'internalTesting.value' => :internal_testing_enabled
+        "versionString" => :version_string,
+        "platform" => :platform,
+        "externalTesting.value" => :external_testing_enabled,
+        "internalTesting.value" => :internal_testing_enabled
       )
 
       class << self
@@ -47,8 +47,8 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id)
           trains = []
-          trains += client.build_trains(app_id, 'internal')['trains']
-          trains += client.build_trains(app_id, 'external')['trains']
+          trains += client.build_trains(app_id, "internal")["trains"]
+          trains += client.build_trains(app_id, "external")["trains"]
 
           result = {}
           trains.each do |attrs|
@@ -64,18 +64,18 @@ module Spaceship
       def setup
         super
 
-        @builds = (self.raw_data['builds'] || []).collect do |attrs|
+        @builds = (self.raw_data["builds"] || []).collect do |attrs|
           attrs[:build_train] = self
           Tunes::Build.factory(attrs)
         end
 
         @invalid_builds = @builds.select do |build|
-          build.processing_state == 'processingFailed' || build.processing_state == 'invalidBinary'
+          build.processing_state == "processingFailed" || build.processing_state == "invalidBinary"
         end
 
         # This step may not be necessary anymore - it seems as if every processing build will be caught by the
         # @builds.each below, but not every processing build makes it to buildsInProcessing, so this is redundant
-        @processing_builds = (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
+        @processing_builds = (self.raw_data["buildsInProcessing"] || []).collect do |attrs|
           attrs[:build_train] = self
           Tunes::Build.factory(attrs)
         end
@@ -97,7 +97,7 @@ module Spaceship
           # |       build.valid = | false             | true              | false           | true               | true    |
           # | .processing_state = | "processing"      | "processing"      | "invalidBinary" | "processingFailed" | nil     |
           # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
-          if build.processing_state == 'processing' || (build.processing && build.processing_state != 'invalidBinary' && build.processing_state != 'processingFailed')
+          if build.processing_state == "processing" || (build.processing && build.processing_state != "invalidBinary" && build.processing_state != "processingFailed")
             @processing_builds << build
           end
         end
@@ -112,25 +112,25 @@ module Spaceship
       def update_testing_status!(new_value, testing_type, build = nil)
         data = client.build_trains(self.application.apple_id, testing_type)
 
-        build ||= latest_build if testing_type == 'external'
+        build ||= latest_build if testing_type == "external"
         testing_key = "#{testing_type}Testing"
 
         # Delete the irrelevant trains and update the relevant one to enable testing
-        data['trains'].delete_if do |train|
-          if train['versionString'] != version_string
+        data["trains"].delete_if do |train|
+          if train["versionString"] != version_string
             true
           else
-            train[testing_key]['value'] = new_value
+            train[testing_key]["value"] = new_value
 
             # also update the builds
-            train['builds'].delete_if do |b|
+            train["builds"].delete_if do |b|
               if b[testing_key].nil?
                 true
               elsif build && b["buildVersion"] == build.build_version
-                b[testing_key]['value'] = new_value
+                b[testing_key]["value"] = new_value
                 false
-              elsif b[testing_key]['value'] == true
-                b[testing_key]['value'] = false
+              elsif b[testing_key]["value"] == true
+                b[testing_key]["value"] = false
                 false
               else
                 true
@@ -142,8 +142,8 @@ module Spaceship
         end
 
         result = client.update_build_trains!(application.apple_id, testing_type, data)
-        self.internal_testing_enabled = new_value if testing_type == 'internal'
-        self.external_testing_enabled = new_value if testing_type == 'external'
+        self.internal_testing_enabled = new_value if testing_type == "internal"
+        self.external_testing_enabled = new_value if testing_type == "external"
 
         result
       end

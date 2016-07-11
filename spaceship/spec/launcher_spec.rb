@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship do
   describe Spaceship::Launcher do
-    let(:username) { 'spaceship@krausefx.com' }
-    let(:password) { 'so_secret' }
+    let(:username) { "spaceship@krausefx.com" }
+    let(:password) { "so_secret" }
     let(:spaceship1) { Spaceship::Launcher.new }
     let(:spaceship2) { Spaceship::Launcher.new }
 
@@ -12,11 +12,11 @@ describe Spaceship do
       spaceship2.login(username, password)
     end
 
-    it 'should have 2 separate spaceships' do
+    it "should have 2 separate spaceships" do
       expect(spaceship1).to_not eq(spaceship2)
     end
 
-    it '#select_team' do
+    it "#select_team" do
       expect(spaceship1.select_team).to eq("XXXXXXXXXX")
     end
 

@@ -55,8 +55,8 @@ module Fastlane
     # returns a list of official integrations
     # rubocop:disable Style/AccessorMethodName
     def self.get_all_official_actions
-      Dir[File.expand_path('*.rb', File.dirname(__FILE__))].collect do |file|
-        File.basename(file).gsub('.rb', '').to_sym
+      Dir[File.expand_path("*.rb", File.dirname(__FILE__))].collect do |file|
+        File.basename(file).gsub(".rb", "").to_sym
       end
     end
     # rubocop:enable Style/AccessorMethodName
@@ -64,7 +64,7 @@ module Fastlane
     # Returns the class ref to the action based on the action name
     # Returns nil if the action is not aailable
     def self.action_class_ref(action_name)
-      class_name = action_name.to_s.fastlane_class + 'Action'
+      class_name = action_name.to_s.fastlane_class + "Action"
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
@@ -75,14 +75,14 @@ module Fastlane
     end
 
     def self.load_default_actions
-      Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
+      Dir[File.expand_path("*.rb", File.dirname(__FILE__))].each do |file|
         require file
       end
     end
 
     # Import all the helpers
     def self.load_helpers
-      Dir[File.expand_path('../helper/*.rb', File.dirname(__FILE__))].each do |file|
+      Dir[File.expand_path("../helper/*.rb", File.dirname(__FILE__))].each do |file|
         require file
       end
     end
@@ -90,12 +90,12 @@ module Fastlane
     def self.load_external_actions(path)
       UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
-      Dir[File.expand_path('*.rb', path)].each do |file|
+      Dir[File.expand_path("*.rb", path)].each do |file|
         require file
 
-        file_name = File.basename(file).gsub('.rb', '')
+        file_name = File.basename(file).gsub(".rb", "")
 
-        class_name = file_name.fastlane_class + 'Action'
+        class_name = file_name.fastlane_class + "Action"
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
 
@@ -103,13 +103,13 @@ module Fastlane
             UI.success "Successfully loaded custom action '#{file}'." if $verbose
           else
             UI.error "Could not find method 'run' in class #{class_name}."
-            UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
+            UI.error "For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane"
             UI.user_error!("Action '#{file_name}' is damaged!")
           end
         rescue NameError
           # Action not found
           UI.error "Could not find '#{class_name}' class defined."
-          UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
+          UI.error "For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane"
           UI.user_error!("Action '#{file_name}' is damaged!")
         end
       end

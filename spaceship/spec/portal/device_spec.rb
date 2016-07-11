@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Device do
   before { Spaceship.login }
@@ -8,65 +8,65 @@ describe Spaceship::Device do
   it "successfully loads and parses all devices" do
     expect(all_devices.count).to eq(4)
     device = all_devices.first
-    expect(device.id).to eq('AAAAAAAAAA')
+    expect(device.id).to eq("AAAAAAAAAA")
     expect(device.name).to eq('Felix\'s iPhone')
-    expect(device.udid).to eq('a03b816861e89fac0a4da5884cb9d2f01bd5641e')
-    expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
-    expect(device.model).to eq('iPhone 5 (Model A1428)')
-    expect(device.device_type).to eq('iphone')
+    expect(device.udid).to eq("a03b816861e89fac0a4da5884cb9d2f01bd5641e")
+    expect(device.platform).to eq("ios")
+    expect(device.status).to eq("c")
+    expect(device.model).to eq("iPhone 5 (Model A1428)")
+    expect(device.device_type).to eq("iphone")
   end
 
   subject(:all_phones) { Spaceship::Device.all_iphones }
   it "successfully loads and parses all iPhones" do
     expect(all_phones.count).to eq(3)
     device = all_phones.first
-    expect(device.id).to eq('AAAAAAAAAA')
+    expect(device.id).to eq("AAAAAAAAAA")
     expect(device.name).to eq('Felix\'s iPhone')
-    expect(device.udid).to eq('a03b816861e89fac0a4da5884cb9d2f01bd5641e')
-    expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
-    expect(device.model).to eq('iPhone 5 (Model A1428)')
-    expect(device.device_type).to eq('iphone')
+    expect(device.udid).to eq("a03b816861e89fac0a4da5884cb9d2f01bd5641e")
+    expect(device.platform).to eq("ios")
+    expect(device.status).to eq("c")
+    expect(device.model).to eq("iPhone 5 (Model A1428)")
+    expect(device.device_type).to eq("iphone")
   end
 
   subject(:all_ipods) { Spaceship::Device.all_ipod_touches }
   it "successfully loads and parses all iPods" do
     expect(all_ipods.count).to eq(1)
     device = all_ipods.first
-    expect(device.id).to eq('CCCCCCCCCC')
-    expect(device.name).to eq('Personal iPhone')
-    expect(device.udid).to eq('97467684eb8dfa3c6d272eac3890dab0d001c706')
-    expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
+    expect(device.id).to eq("CCCCCCCCCC")
+    expect(device.name).to eq("Personal iPhone")
+    expect(device.udid).to eq("97467684eb8dfa3c6d272eac3890dab0d001c706")
+    expect(device.platform).to eq("ios")
+    expect(device.status).to eq("c")
     expect(device.model).to eq(nil)
-    expect(device.device_type).to eq('ipod')
+    expect(device.device_type).to eq("ipod")
   end
 
   subject(:all_apple_tvs) { Spaceship::Device.all_apple_tvs }
   it "successfully loads and parses all Apple TVs" do
     expect(all_apple_tvs.count).to eq(1)
     device = all_apple_tvs.first
-    expect(device.id).to eq('EEEEEEEEEE')
+    expect(device.id).to eq("EEEEEEEEEE")
     expect(device.name).to eq('Tracy\'s Apple TV')
-    expect(device.udid).to eq('8defe35b2cad44affacabd124834acbd8746ff34')
-    expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
-    expect(device.model).to eq('The new Apple TV')
-    expect(device.device_type).to eq('tvOS')
+    expect(device.udid).to eq("8defe35b2cad44affacabd124834acbd8746ff34")
+    expect(device.platform).to eq("ios")
+    expect(device.status).to eq("c")
+    expect(device.model).to eq("The new Apple TV")
+    expect(device.device_type).to eq("tvOS")
   end
 
   subject(:all_watches) { Spaceship::Device.all_watches }
   it "successfully loads and parses all Watches" do
     expect(all_watches.count).to eq(1)
     device = all_watches.first
-    expect(device.id).to eq('FFFFFFFFFF')
+    expect(device.id).to eq("FFFFFFFFFF")
     expect(device.name).to eq('Tracy\'s Watch')
-    expect(device.udid).to eq('8defe35b2cad44aff7d8e9dfe4ca4d2fb94ae509')
-    expect(device.platform).to eq('ios')
-    expect(device.status).to eq('c')
-    expect(device.model).to eq('Apple Watch 38mm')
-    expect(device.device_type).to eq('watch')
+    expect(device.udid).to eq("8defe35b2cad44aff7d8e9dfe4ca4d2fb94ae509")
+    expect(device.platform).to eq("ios")
+    expect(device.status).to eq("c")
+    expect(device.model).to eq("Apple Watch 38mm")
+    expect(device.device_type).to eq("watch")
   end
 
   it "inspect works" do

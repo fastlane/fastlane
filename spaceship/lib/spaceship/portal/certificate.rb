@@ -1,4 +1,4 @@
-require 'openssl'
+require "openssl"
 
 module Spaceship
   module Portal
@@ -70,16 +70,16 @@ module Spaceship
       attr_accessor :can_download
 
       attr_mapping({
-        'certificateId' => :id,
-        'name' => :name,
-        'statusString' => :status,
-        'dateCreated' => :created,
-        'expirationDate' => :expires,
-        'ownerType' => :owner_type,
-        'ownerName' => :owner_name,
-        'ownerId' => :owner_id,
-        'certificateTypeDisplayId' => :type_display_id,
-        'canDownload' => :can_download
+        "certificateId" => :id,
+        "name" => :name,
+        "statusString" => :status,
+        "dateCreated" => :created,
+        "expirationDate" => :expires,
+        "ownerType" => :owner_type,
+        "ownerName" => :owner_name,
+        "ownerId" => :owner_id,
+        "certificateTypeDisplayId" => :type_display_id,
+        "canDownload" => :can_download
       })
 
       #####################################################
@@ -193,7 +193,7 @@ module Spaceship
           csr = OpenSSL::X509::Request.new
           csr.version = 0
           csr.subject = OpenSSL::X509::Name.new([
-                                                  ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
+                                                  ["CN", "PEM", OpenSSL::ASN1::UTF8STRING]
                                                 ])
           csr.public_key = key.public_key
           csr.sign(key, OpenSSL::Digest::SHA1.new)
@@ -222,20 +222,20 @@ module Spaceship
           #    "daysOverlap"=>364,
           #    "maxActive"=>2}}
 
-          if attrs['certificateType']
+          if attrs["certificateType"]
             # On some accounts this is nested, so we need to flatten it
-            attrs.merge!(attrs['certificateType'])
-            attrs.delete('certificateType')
+            attrs.merge!(attrs["certificateType"])
+            attrs.delete("certificateType")
           end
 
           # Parse the dates
           # rubocop:disable Style/RescueModifier
-          attrs['expirationDate'] = (Time.parse(attrs['expirationDate']) rescue attrs['expirationDate'])
-          attrs['dateCreated'] = (Time.parse(attrs['dateCreated']) rescue attrs['dateCreated'])
+          attrs["expirationDate"] = (Time.parse(attrs["expirationDate"]) rescue attrs["expirationDate"])
+          attrs["dateCreated"] = (Time.parse(attrs["dateCreated"]) rescue attrs["dateCreated"])
           # rubocop:enable Style/RescueModifier
 
           # Here we go
-          klass = CERTIFICATE_TYPE_IDS[attrs['certificateTypeDisplayId']]
+          klass = CERTIFICATE_TYPE_IDS[attrs["certificateTypeDisplayId"]]
           klass ||= Certificate
           klass.client = @client
           klass.new(attrs)
@@ -297,7 +297,7 @@ module Spaceship
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
           response = client.create_certificate!(type, csr.to_pem, app_id)
           # munge the response to make it work for the factory
-          response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
+          response["certificateTypeDisplayId"] = response["certificateType"]["certificateTypeDisplayId"]
           self.new(response)
         end
       end

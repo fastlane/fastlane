@@ -6,7 +6,7 @@ module Fastlane
 
     class DownloadAction < Action
       def self.run(params)
-        require 'net/http'
+        require "net/http"
 
         begin
           result = Net::HTTP.get(URI(params[:url]))
@@ -50,7 +50,7 @@ module Fastlane
 
       def self.output
         [
-          ['DOWNLOAD_CONTENT', 'The content of the file we just downloaded']
+          ["DOWNLOAD_CONTENT", "The content of the file we just downloaded"]
         ]
       end
 

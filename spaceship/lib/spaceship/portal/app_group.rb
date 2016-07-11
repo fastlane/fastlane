@@ -28,11 +28,11 @@ module Spaceship
       attr_accessor :app_group_id
 
       attr_mapping(
-        'applicationGroup' => :app_group_id,
-        'name' => :name,
-        'prefix' => :prefix,
-        'identifier' => :group_id,
-        'status' => :status
+        "applicationGroup" => :app_group_id,
+        "name" => :name,
+        "prefix" => :prefix,
+        "identifier" => :group_id,
+        "status" => :status
       )
 
       class << self

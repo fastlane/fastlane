@@ -4,19 +4,19 @@ module Fastlane
     # Commits version bump.
     class HgCommitVersionBumpAction < Action
       def self.run(params)
-        require 'xcodeproj'
-        require 'pathname'
-        require 'set'
-        require 'shellwords'
+        require "xcodeproj"
+        require "pathname"
+        require "set"
+        require "shellwords"
 
-        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
+        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join(".", params[:xcodeproj])) : nil
 
         if Helper.is_test?
           xcodeproj_path = "/tmp/Test.xcodeproj"
         end
 
         # get the repo root path
-        repo_path = Helper.is_test? ? '/tmp/repo' : Actions.sh('hg root').strip
+        repo_path = Helper.is_test? ? "/tmp/repo" : Actions.sh("hg root").strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
@@ -26,7 +26,7 @@ module Fastlane
           end
         else
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, "**/*.xcodeproj"))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -46,22 +46,22 @@ module Fastlane
           hg_dirty_files = params[:test_dirty_files].split(",")
           expected_changed_files = params[:test_expected_files].split(",")
         else
-          pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
+          pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, "project.pbxproj"))
           pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
           # find the info_plist files
           # rubocop:disable Style/MultilineBlockChain
           project = Xcodeproj::Project.open(xcodeproj_path)
           info_plist_files = project.objects.select do |object|
-            object.isa == 'XCBuildConfiguration'
+            object.isa == "XCBuildConfiguration"
           end.map(&:to_hash).map do |object_hash|
-            object_hash['buildSettings']
+            object_hash["buildSettings"]
           end.select do |build_settings|
-            build_settings.key?('INFOPLIST_FILE')
+            build_settings.key?("INFOPLIST_FILE")
           end.map do |build_settings|
-            build_settings['INFOPLIST_FILE']
+            build_settings["INFOPLIST_FILE"]
           end.uniq.map do |info_plist_path|
-            Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
+            Pathname.new(File.expand_path(File.join(xcodeproj_path, "..", info_plist_path))).relative_path_from(repo_pathname).to_s
           end
           # rubocop:enable Style/MultilineBlockChain
 
@@ -72,7 +72,7 @@ module Fastlane
           expected_changed_files.flatten!.uniq!
 
           # get the list of files that have actually changed in our hg workdir
-          hg_dirty_files = Actions.sh('hg status -n').split("\n")
+          hg_dirty_files = Actions.sh("hg status -n").split("\n")
         end
 
         # little user hint

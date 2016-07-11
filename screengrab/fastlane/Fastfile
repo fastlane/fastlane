@@ -6,9 +6,9 @@ lane :deploy_aar do
   ensure_git_status_clean
 
   gradle(task: [
-    'screengrab-lib:clean',
-    'screengrab-lib:assembleRelease',
-    'screengrab-lib:bintrayUpload',
-    '-PdryRun=false'
-  ].join(' '))
+    "screengrab-lib:clean",
+    "screengrab-lib:assembleRelease",
+    "screengrab-lib:bintrayUpload",
+    "-PdryRun=false"
+  ].join(" "))
 end

@@ -36,15 +36,15 @@ module Spaceship
 
         raise "Your account is in no teams" if teams.count == 0
 
-        team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
-        team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
+        team_id = (ENV["FASTLANE_TEAM_ID"] || "").strip
+        team_name = (ENV["FASTLANE_TEAM_NAME"] || "").strip
 
         if team_id.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
             # There are 2 different values - one from the login page one from the Dev Team Page
-            return team['teamId'] if team['teamId'].strip == team_id
-            return team['teamId'] if team['currentTeamMember']['teamMemberId'].to_s.strip == team_id
+            return team["teamId"] if team["teamId"].strip == team_id
+            return team["teamId"] if team["currentTeamMember"]["teamMemberId"].to_s.strip == team_id
           end
           puts "Couldn't find team with ID '#{team_id}'"
         end
@@ -52,12 +52,12 @@ module Spaceship
         if team_name.length > 0
           # User provided a value, let's see if it's valid
           teams.each_with_index do |team, i|
-            return team['teamId'] if team['name'].strip == team_name
+            return team["teamId"] if team["name"].strip == team_name
           end
           puts "Couldn't find team with Name '#{team_name}'"
         end
 
-        return teams[0]['teamId'] if teams.count == 1 # user is just in one team
+        return teams[0]["teamId"] if teams.count == 1 # user is just in one team
 
         # User Selection
         loop do
@@ -67,10 +67,10 @@ module Spaceship
             puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
           end
 
-          selected = ($stdin.gets || '').strip.to_i - 1
+          selected = ($stdin.gets || "").strip.to_i - 1
           team_to_use = teams[selected] if selected >= 0
 
-          return team_to_use['teamId'] if team_to_use
+          return team_to_use["teamId"] if team_to_use
         end
       end
     end

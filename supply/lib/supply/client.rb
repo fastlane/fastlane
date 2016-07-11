@@ -1,9 +1,9 @@
-require 'googleauth'
-require 'google/apis/androidpublisher_v2'
+require "googleauth"
+require "google/apis/androidpublisher_v2"
 Androidpublisher = Google::Apis::AndroidpublisherV2
 CredentialsLoader = Google::Auth::CredentialsLoader
 
-require 'net/http'
+require "net/http"
 
 module Supply
   class Client
@@ -41,8 +41,8 @@ module Supply
       if path_to_service_account_json
         key_io = File.open(File.expand_path(path_to_service_account_json))
       else
-        require 'google/api_client/auth/key_utils'
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
+        require "google/api_client/auth/key_utils"
+        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), "notasecret")
         cred_json = {
           private_key: key.to_s,
           client_email: issuer
@@ -289,7 +289,7 @@ module Supply
           language,
           image_type,
           upload_source: image_path,
-          content_type: 'image/*'
+          content_type: "image/*"
         )
       end
     end
@@ -317,7 +317,7 @@ module Supply
           apk_version_code,
           expansion_file_type,
           upload_source: obb_file_path,
-          content_type: 'application/octet-stream'
+          content_type: "application/octet-stream"
         )
       end
     end

@@ -48,16 +48,16 @@ describe Fastlane do
       end
 
       it "returns true if a plugin is available" do
-        expect(plugin_manager.plugin_is_added_as_dependency?('fastlane-plugin-xcversion')).to eq(true)
+        expect(plugin_manager.plugin_is_added_as_dependency?("fastlane-plugin-xcversion")).to eq(true)
       end
 
       it "returns false if a plugin is available" do
-        expect(plugin_manager.plugin_is_added_as_dependency?('fastlane-plugin-hemal')).to eq(false)
+        expect(plugin_manager.plugin_is_added_as_dependency?("fastlane-plugin-hemal")).to eq(false)
       end
 
       it "raises an error if parameter doesn't start with fastlane plugin prefix" do
         expect do
-          plugin_manager.plugin_is_added_as_dependency?('hemal')
+          plugin_manager.plugin_is_added_as_dependency?("hemal")
         end.to raise_error("fastlane plugins must start with 'fastlane-plugin-' string")
       end
     end

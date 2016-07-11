@@ -1,4 +1,4 @@
-require 'commander'
+require "commander"
 
 module FastlaneCore
   class CommanderGenerator
@@ -46,7 +46,7 @@ module FastlaneCore
         # later coerce into a boolean.
         #
         # In this way we support handling boolean flags with or without trailing values.
-        value_appendix = (type || '[VALUE]').to_s.upcase
+        value_appendix = (type || "[VALUE]").to_s.upcase
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description

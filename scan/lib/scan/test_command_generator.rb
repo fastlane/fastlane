@@ -75,11 +75,11 @@ module Scan
           formatter << "--no-color"
         end
 
-        if Scan.config[:output_style] == 'basic'
+        if Scan.config[:output_style] == "basic"
           formatter << "--no-utf"
         end
 
-        if Scan.config[:output_style] == 'rspec'
+        if Scan.config[:output_style] == "rspec"
           formatter << "--test"
         end
 
@@ -98,7 +98,7 @@ module Scan
       # Generate destination parameters
       def destination
         unless Scan.cache[:destination]
-          Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
+          Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(" ")
         end
         Scan.cache[:destination]
       end

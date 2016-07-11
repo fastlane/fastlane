@@ -69,27 +69,27 @@ module Spaceship
 
       attr_mapping({
         # Ad ID Info Section
-        'adIdInfo.limitsTracking.value' => :add_id_info_limits_tracking,
-        'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
-        'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
-        'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
-        'adIdInfo.usesIdfa.value' => :add_id_info_uses_idfa,
+        "adIdInfo.limitsTracking.value" => :add_id_info_limits_tracking,
+        "adIdInfo.servesAds.value" => :add_id_info_serves_ads,
+        "adIdInfo.tracksAction.value" => :add_id_info_tracks_action,
+        "adIdInfo.tracksInstall.value" => :add_id_info_tracks_install,
+        "adIdInfo.usesIdfa.value" => :add_id_info_uses_idfa,
 
         # Content Rights Section
-        'contentRights.containsThirdPartyContent.value' => :content_rights_contains_third_party_content,
-        'contentRights.hasRights.value' => :content_rights_has_rights,
+        "contentRights.containsThirdPartyContent.value" => :content_rights_contains_third_party_content,
+        "contentRights.hasRights.value" => :content_rights_has_rights,
 
         # Export Compliance Section
-        'exportCompliance.availableOnFrenchStore.value' => :export_compliance_available_on_french_store,
-        'exportCompliance.ccatFile.value' => :export_compliance_ccat_file,
-        'exportCompliance.containsProprietaryCryptography.value' => :export_compliance_contains_proprietary_cryptography,
-        'exportCompliance.containsThirdPartyCryptography.value' => :export_compliance_contains_third_party_cryptography,
-        'exportCompliance.isExempt.value' => :export_compliance_is_exempt,
-        'exportCompliance.usesEncryption.value' => :export_compliance_uses_encryption,
-        'exportCompliance.appType' => :export_compliance_app_type,
-        'exportCompliance.encryptionUpdated.value' => :export_compliance_encryption_updated,
-        'exportCompliance.exportComplianceRequired' => :export_compliance_compliance_required,
-        'exportCompliance.platform' => :export_compliance_platform
+        "exportCompliance.availableOnFrenchStore.value" => :export_compliance_available_on_french_store,
+        "exportCompliance.ccatFile.value" => :export_compliance_ccat_file,
+        "exportCompliance.containsProprietaryCryptography.value" => :export_compliance_contains_proprietary_cryptography,
+        "exportCompliance.containsThirdPartyCryptography.value" => :export_compliance_contains_third_party_cryptography,
+        "exportCompliance.isExempt.value" => :export_compliance_is_exempt,
+        "exportCompliance.usesEncryption.value" => :export_compliance_uses_encryption,
+        "exportCompliance.appType" => :export_compliance_app_type,
+        "exportCompliance.encryptionUpdated.value" => :export_compliance_encryption_updated,
+        "exportCompliance.exportComplianceRequired" => :export_compliance_compliance_required,
+        "exportCompliance.platform" => :export_compliance_platform
       })
 
       class << self

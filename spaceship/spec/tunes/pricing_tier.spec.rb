@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Tunes::PricingTier do
   before { Spaceship::Tunes.login }
@@ -25,21 +25,21 @@ describe Spaceship::Tunes::PricingTier do
       tier_1 = client.pricing_tiers[1]
 
       expect(tier_1).not_to be_nil
-      expect(tier_1.tier_stem).to eq('1')
-      expect(tier_1.tier_name).to eq('Tier 1')
+      expect(tier_1.tier_stem).to eq("1")
+      expect(tier_1.tier_name).to eq("Tier 1")
       expect(tier_1.pricing_info).not_to be_empty
     end
 
     it "correctly parses the pricing information" do
       tier_1_first_pricing_info = client.pricing_tiers[1].pricing_info[0]
 
-      expect(tier_1_first_pricing_info.country).to eq('United States')
-      expect(tier_1_first_pricing_info.country_code).to eq('US')
-      expect(tier_1_first_pricing_info.currency_symbol).to eq('$')
+      expect(tier_1_first_pricing_info.country).to eq("United States")
+      expect(tier_1_first_pricing_info.country_code).to eq("US")
+      expect(tier_1_first_pricing_info.currency_symbol).to eq("$")
       expect(tier_1_first_pricing_info.wholesale_price).to eq(0.7)
       expect(tier_1_first_pricing_info.retail_price).to eq(0.99)
-      expect(tier_1_first_pricing_info.f_retail_price).to eq('$0.99')
-      expect(tier_1_first_pricing_info.f_wholesale_price).to eq('$0.70')
+      expect(tier_1_first_pricing_info.f_retail_price).to eq("$0.99")
+      expect(tier_1_first_pricing_info.f_wholesale_price).to eq("$0.70")
     end
   end
 end

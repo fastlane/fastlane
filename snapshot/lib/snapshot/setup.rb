@@ -2,7 +2,7 @@ module Snapshot
   class Setup
     # This method will take care of creating a Snapfile and other necessary files
     def self.create(path)
-      snapfile_path = File.join(path, 'Snapfile')
+      snapfile_path = File.join(path, "Snapfile")
 
       if File.exist?(snapfile_path)
         UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use snapshot.")
@@ -10,7 +10,7 @@ module Snapshot
 
       gem_path = Helper.gem_path("snapshot")
       File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))
-      File.write(File.join(path, 'SnapshotHelper.swift'), File.read("#{gem_path}/lib/assets/SnapshotHelper.swift"))
+      File.write(File.join(path, "SnapshotHelper.swift"), File.read("#{gem_path}/lib/assets/SnapshotHelper.swift"))
 
       puts "Successfully created SnapshotHelper.swift '#{File.join(path, 'SnapshotHelper.swift')}'".green
       puts "Successfully created new Snapfile at '#{snapfile_path}'".green

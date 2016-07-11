@@ -1,8 +1,8 @@
-require 'watchbuild/version'
-require 'watchbuild/options'
-require 'watchbuild/runner'
+require "watchbuild/version"
+require "watchbuild/options"
+require "watchbuild/runner"
 
-require 'fastlane_core'
+require "fastlane_core"
 
 module WatchBuild
   # Use this to just setup the configuration attribute and set it later somewhere else

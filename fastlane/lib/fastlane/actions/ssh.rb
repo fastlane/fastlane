@@ -43,7 +43,7 @@ module Fastlane
       end
 
       def self.run(params)
-        Actions.verify_gem!('net-ssh')
+        Actions.verify_gem!("net-ssh")
         require "net/ssh"
 
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = ""
@@ -127,8 +127,8 @@ module Fastlane
 
       def self.output
         [
-          ['SSH_STDOUT_VALUE', 'Holds the standard output of all commands'],
-          ['SSH_STDERR_VALUE', 'Holds the standard error of all commands']
+          ["SSH_STDOUT_VALUE", "Holds the standard output of all commands"],
+          ["SSH_STDERR_VALUE", "Holds the standard error of all commands"]
         ]
       end
 

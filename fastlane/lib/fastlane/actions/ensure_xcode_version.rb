@@ -47,7 +47,7 @@ module Fastlane
 
       def self.output
         [
-          ['FL_ENSURE_XCODE_VERSION', 'Xcode version to verify that is selected']
+          ["FL_ENSURE_XCODE_VERSION", "Xcode version to verify that is selected"]
         ]
       end
 

@@ -49,8 +49,8 @@ describe Fastlane do
             get_build_number_repository
         end").runner.execute(:test)
 
-        expect(result).to eq('git rev-parse --short HEAD')
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER_REPOSITORY]).to eq('git rev-parse --short HEAD')
+        expect(result).to eq("git rev-parse --short HEAD")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER_REPOSITORY]).to eq("git rev-parse --short HEAD")
       end
     end
 
@@ -78,8 +78,8 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq('hg parent --template {rev}')
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER_REPOSITORY]).to eq('hg parent --template {rev}')
+        expect(result).to eq("hg parent --template {rev}")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER_REPOSITORY]).to eq("hg parent --template {rev}")
       end
     end
   end

@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require "fastlane_core"
+require "credentials_manager"
 
 module Match
   class Options
@@ -16,13 +16,13 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_branch,
                                      env_name: "MATCH_GIT_BRANCH",
                                      description: "Specific git branch to use",
-                                     default_value: 'master'),
+                                     default_value: "master"),
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
                                      description: "Create a development certificate instead of a distribution one",
                                      is_string: true,
                                      short_option: "-y",
-                                     default_value: 'development',
+                                     default_value: "development",
                                      verify_block: proc do |value|
                                        unless Match.environments.include?(value)
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")

@@ -43,13 +43,13 @@ module Spaceship
       # Get the app status matching based on a string (given by iTunes Connect)
       def self.get_from_string(text)
         mapping = {
-          'readyForSale' => READY_FOR_SALE,
-          'prepareForUpload' => PREPARE_FOR_SUBMISSION,
-          'devRejected' => DEVELOPER_REJECTED,
-          'pendingContract' => PENDING_CONTRACT,
-          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
-          'waitingForReview' => WAITING_FOR_REVIEW,
-          'inReview' => IN_REVIEW
+          "readyForSale" => READY_FOR_SALE,
+          "prepareForUpload" => PREPARE_FOR_SUBMISSION,
+          "devRejected" => DEVELOPER_REJECTED,
+          "pendingContract" => PENDING_CONTRACT,
+          "developerRemovedFromSale" => DEVELOPER_REMOVED_FROM_SALE,
+          "waitingForReview" => WAITING_FOR_REVIEW,
+          "inReview" => IN_REVIEW
         }
 
         mapping.each do |k, v|

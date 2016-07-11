@@ -8,14 +8,14 @@ module Fastlane
       TRYOUTS_API_BUILD_RELEASE_TEMPLATE = "https://api.tryouts.io/v1/applications/%s/releases/"
 
       def self.run(params)
-        UI.success('Upload to Tryouts has been started. This may take some time.')
+        UI.success("Upload to Tryouts has been started. This may take some time.")
 
         response = self.upload_build(params)
 
         case response.status
         when 200...300
           Actions.lane_context[SharedValues::TRYOUTS_BUILD_INFORMATION] = response.body
-          UI.success('Build successfully uploaded to Tryouts!')
+          UI.success("Build successfully uploaded to Tryouts!")
           UI.message("Release download url: #{response.body['download_url']}") if response.body["download_url"]
         else
           UI.user_error!("Error when trying to upload build file to Tryouts: #{response.body}")
@@ -23,8 +23,8 @@ module Fastlane
       end
 
       def self.upload_build(params)
-        require 'faraday'
-        require 'faraday_middleware'
+        require "faraday"
+        require "faraday_middleware"
 
         url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_id]
         connection = Faraday.new(url) do |builder|
@@ -36,7 +36,7 @@ module Fastlane
         end
 
         options = {}
-        options[:build] = Faraday::UploadIO.new(params[:build_file], 'application/octet-stream')
+        options[:build] = Faraday::UploadIO.new(params[:build_file], "application/octet-stream")
 
         if params[:notes_path]
           options[:notes] = File.read(params[:notes_path])
@@ -48,7 +48,7 @@ module Fastlane
         options[:status] = params[:status].to_s
 
         post_request = connection.post do |req|
-          req.headers['Authorization'] = params[:api_token]
+          req.headers["Authorization"] = params[:api_token]
           req.body = options
         end
 
@@ -113,7 +113,7 @@ module Fastlane
 
       def self.output
         [
-          ['TRYOUTS_BUILD_INFORMATION', 'Contains release info like :application_name, :download_url. See http://tryouts.readthedocs.org/en/latest/releases.html#create-release']
+          ["TRYOUTS_BUILD_INFORMATION", "Contains release info like :application_name, :download_url. See http://tryouts.readthedocs.org/en/latest/releases.html#create-release"]
         ]
       end
 

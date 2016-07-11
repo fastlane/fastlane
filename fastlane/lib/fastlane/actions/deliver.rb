@@ -5,10 +5,10 @@ module Fastlane
 
     class DeliverAction < Action
       def self.run(config)
-        require 'deliver'
+        require "deliver"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('deliver') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("deliver") unless Helper.is_test?
 
           config.load_configuration_file("Deliverfile")
           config[:screenshots_path] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
@@ -17,7 +17,7 @@ module Fastlane
           return config if Helper.test?
           Deliver::Runner.new(config).run
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("deliver", Deliver::VERSION)
         end
       end
 

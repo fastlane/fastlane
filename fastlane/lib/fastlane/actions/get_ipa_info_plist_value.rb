@@ -47,7 +47,7 @@ module Fastlane
 
       def self.output
         [
-          ['GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE', 'The value of the last plist file that was parsed']
+          ["GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE", "The value of the last plist file that was parsed"]
         ]
       end
 

@@ -3,7 +3,7 @@ module Gym
     class << self
       # Fix PackageApplication Perl script by Xcode to create the IPA from the archive
       def patch_package_application
-        require 'fileutils'
+        require "fileutils"
 
         # Initialization
         @patched_package_application_path = File.join("/tmp", "PackageApplication4Gym")
@@ -12,7 +12,7 @@ module Gym
 
         Dir.mktmpdir do |tmpdir|
           # Check current PackageApplication MD5
-          require 'digest'
+          require "digest"
 
           path = File.join(Helper.gem_path("gym"), "lib/assets/package_application_patches/PackageApplication_MD5")
           expected_md5 = File.read(path)
@@ -45,7 +45,7 @@ module Gym
 
       # Wrap xcodebuild to work-around ipatool dependecy to system ruby
       def wrap_xcodebuild
-        require 'fileutils'
+        require "fileutils"
         @wrapped_xcodebuild_path ||= File.join(Helper.gem_path("gym"), "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
       end
     end

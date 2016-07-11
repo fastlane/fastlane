@@ -19,9 +19,9 @@ module Fastlane
       end
 
       def self.run(options)
-        require 'slack-notifier'
+        require "slack-notifier"
 
-        options[:message] = self.trim_message(options[:message].to_s || '')
+        options[:message] = self.trim_message(options[:message].to_s || "")
         options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
 
         notifier = Slack::Notifier.new(options[:slack_url])
@@ -31,19 +31,19 @@ module Fastlane
 
         if options[:channel].to_s.length > 0
           notifier.channel = options[:channel]
-          notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
+          notifier.channel = ("#" + notifier.channel) unless ["#", "@"].include?(notifier.channel[0]) # send message to channel by default
         end
 
         slack_attachment = generate_slack_attachments(options)
 
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
-        result = notifier.ping '',
+        result = notifier.ping "",
                                icon_url: icon_url,
                                attachments: [slack_attachment]
 
         if result.code.to_i == 200
-          UI.success('Successfully sent Slack notification')
+          UI.success("Successfully sent Slack notification")
         else
           UI.verbose(result)
           UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.")
@@ -121,7 +121,7 @@ module Fastlane
       #####################################################
 
       def self.generate_slack_attachments(options)
-        color = (options[:success] ? 'good' : 'danger')
+        color = (options[:success] ? "good" : "danger")
         should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
 
         slack_attachment = {
@@ -144,7 +144,7 @@ module Fastlane
         # lane
         if should_add_payload[:lane]
           slack_attachment[:fields] << {
-            title: 'Lane',
+            title: "Lane",
             value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
             short: true
           }
@@ -153,8 +153,8 @@ module Fastlane
         # test_result
         if should_add_payload[:test_result]
           slack_attachment[:fields] << {
-            title: 'Result',
-            value: (options[:success] ? 'Success' : 'Error'),
+            title: "Result",
+            value: (options[:success] ? "Success" : "Error"),
             short: true
           }
         end
@@ -162,7 +162,7 @@ module Fastlane
         # git branch
         if Actions.git_branch && should_add_payload[:git_branch]
           slack_attachment[:fields] << {
-            title: 'Git Branch',
+            title: "Git Branch",
             value: Actions.git_branch,
             short: true
           }
@@ -170,11 +170,11 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if ENV["FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS"] && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
-              title: 'Git Author',
+              title: "Git Author",
               value: Actions.git_author_email,
               short: true
             }
@@ -184,7 +184,7 @@ module Fastlane
         # last_git_commit
         if Actions.last_git_commit_message && should_add_payload[:last_git_commit]
           slack_attachment[:fields] << {
-            title: 'Git Commit',
+            title: "Git Commit",
             value: Actions.last_git_commit_message,
             short: false
           }

@@ -7,9 +7,9 @@ module Fastlane
     end
 
     class XcodeServerGetAssetsAction < Action
-      require 'excon'
-      require 'json'
-      require 'fileutils'
+      require "excon"
+      require "json"
+      require "fileutils"
 
       def self.run(params)
         host = params[:host]
@@ -32,10 +32,10 @@ module Fastlane
         UI.important("Fetched #{bots.count} Bots from Xcode Server at #{host}.")
 
         # pull out names
-        bot_names = bots.map { |bot| bot['name'] }
+        bot_names = bots.map { |bot| bot["name"] }
 
         # match the bot name with a found bot, otherwise fail
-        found_bots = bots.select { |bot| bot['name'] == bot_name }
+        found_bots = bots.select { |bot| bot["name"] == bot_name }
         UI.user_error!("Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}") if found_bots.count == 0
 
         bot = found_bots[0]
@@ -43,12 +43,12 @@ module Fastlane
         UI.success("Found Bot with name #{bot_name} with id #{bot['_id']}.")
 
         # we have our bot, get finished integrations, sorted from newest to oldest
-        integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
+        integrations = xcs.fetch_integrations(bot["_id"]).select { |i| i["currentStep"] == "completed" }
         UI.user_error!("Failed to find any completed integration for Bot \"#{bot_name}\"") if (integrations || []).count == 0
 
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override
-          integration = integrations.find { |i| i['number'] == integration_number_override }
+          integration = integrations.find { |i| i["number"] == integration_number_override }
           UI.user_error!("Specified integration number #{integration_number_override} does not exist.") unless integration
         else
           integration = integrations.first
@@ -59,7 +59,7 @@ module Fastlane
         UI.important("Using integration #{integration['number']}.")
 
         # fetch assets for this integration
-        assets_path = xcs.fetch_assets(integration['_id'], target_folder, self)
+        assets_path = xcs.fetch_assets(integration["_id"], target_folder, self)
         UI.user_error!("Failed to fetch assets for integration #{integration['number']}.") unless assets_path
 
         asset_entries = Dir.entries(assets_path).map { |i| File.join(assets_path, i) }
@@ -67,7 +67,7 @@ module Fastlane
         UI.success("Successfully downloaded #{asset_entries.count} assets to file #{assets_path}!")
 
         # now find the archive and unzip it
-        zipped_archive_path = asset_entries.find { |i| i.end_with?('xcarchive.zip') }
+        zipped_archive_path = asset_entries.find { |i| i.end_with?("xcarchive.zip") }
 
         if zipped_archive_path
 
@@ -90,7 +90,7 @@ module Fastlane
           # optionally delete everything except for the archive
           unless keep_all_assets
             files_to_delete = asset_entries.select do |i|
-              File.extname(i) != '.xcarchive' && ![".", ".."].include?(File.basename(i))
+              File.extname(i) != ".xcarchive" && ![".", ".."].include?(File.basename(i))
             end
 
             files_to_delete.each do |i|
@@ -108,29 +108,29 @@ module Fastlane
 
       class XcodeServer
         def initialize(host, username, password)
-          @host = host.start_with?('https://') ? host : "https://#{host}"
+          @host = host.start_with?("https://") ? host : "https://#{host}"
           @username = username
           @password = password
         end
 
         def fetch_all_bots
-          response = get_endpoint('/bots')
+          response = get_endpoint("/bots")
           UI.user_error!("You are unauthorized to access data on #{@host}, please check that you're passing in a correct username and password.") if response.status == 401
           UI.user_error!("Failed to fetch Bots from Xcode Server at #{@host}, response: #{response.status}: #{response.body}.") if response.status != 200
-          JSON.parse(response.body)['results']
+          JSON.parse(response.body)["results"]
         end
 
         def fetch_integrations(bot_id)
           response = get_endpoint("/bots/#{bot_id}/integrations?last=10")
           UI.user_error!("Failed to fetch Integrations for Bot #{bot_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}") if response.status != 200
-          JSON.parse(response.body)['results']
+          JSON.parse(response.body)["results"]
         end
 
         def fetch_assets(integration_id, target_folder, action)
           # create a temp folder and a file, stream the download into it
           Dir.mktmpdir do |dir|
             temp_file = File.join(dir, "tmp_download.#{rand(1_000_000)}")
-            f = open(temp_file, 'w')
+            f = open(temp_file, "w")
             streamer = lambda do |chunk, remaining_bytes, total_bytes|
               if remaining_bytes && total_bytes
                 UI.important("Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%")
@@ -153,11 +153,11 @@ module Fastlane
             action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"
 
             # then pull the real name from headers
-            asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].delete('"')
-            asset_foldername = asset_filename.split('.')[0]
+            asset_filename = response.headers["Content-Disposition"].split(";")[1].split("=")[1].delete('"')
+            asset_foldername = asset_filename.split(".")[0]
 
             # rename the folder in out_folder to asset_foldername
-            found_folder = Dir.entries(out_folder).select { |item| item != '.' && item != '..' }[0]
+            found_folder = Dir.entries(out_folder).select { |item| item != "." && item != ".." }[0]
 
             UI.user_error!("Internal error, couldn't find unzipped folder") if found_folder.nil?
 
@@ -181,15 +181,15 @@ module Fastlane
         end
 
         def headers
-          require 'base64'
+          require "base64"
           headers = {
-            'User-Agent' => 'fastlane-xcode_server_get_assets', # XCS wants user agent. for some API calls. not for others. sigh.
-            'X-XCSAPIVersion' => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
+            "User-Agent" => "fastlane-xcode_server_get_assets", # XCS wants user agent. for some API calls. not for others. sigh.
+            "X-XCSAPIVersion" => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
           }
 
           if @username and @password
             userpass = "#{@username}:#{@password}"
-            headers['Authorization'] = "Basic #{Base64.strict_encode64(userpass)}"
+            headers["Authorization"] = "Basic #{Base64.strict_encode64(userpass)}"
           end
 
           return headers
@@ -260,7 +260,7 @@ module Fastlane
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_TARGET_FOLDER",
                                        description: "Relative path to a folder into which to download assets",
                                        optional: true,
-                                       default_value: './xcs_assets'),
+                                       default_value: "./xcs_assets"),
           FastlaneCore::ConfigItem.new(key: :keep_all_assets,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_KEEP_ALL_ASSETS",
                                        description: "Whether to keep all assets or let the script delete everything except for the .xcarchive",
@@ -278,8 +278,8 @@ module Fastlane
 
       def self.output
         [
-          ['XCODE_SERVER_GET_ASSETS_PATH', 'Absolute path to the downloaded assets folder'],
-          ['XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH', 'Absolute path to the downloaded xcarchive file']
+          ["XCODE_SERVER_GET_ASSETS_PATH", "Absolute path to the downloaded assets folder"],
+          ["XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH", "Absolute path to the downloaded xcarchive file"]
         ]
       end
 

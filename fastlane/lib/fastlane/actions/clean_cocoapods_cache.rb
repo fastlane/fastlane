@@ -2,18 +2,18 @@ module Fastlane
   module Actions
     class CleanCocoapodsCacheAction < Action
       def self.run(params)
-        Actions.verify_gem!('cocoapods')
+        Actions.verify_gem!("cocoapods")
 
-        cmd = ['pod cache clean']
+        cmd = ["pod cache clean"]
 
         cmd << params[:name].to_s if params[:name]
-        cmd << '--all'
+        cmd << "--all"
 
-        Actions.sh(cmd.join(' '))
+        Actions.sh(cmd.join(" "))
       end
 
       def self.description
-        'Remove the cache for pods'
+        "Remove the cache for pods"
       end
 
       def self.available_options

@@ -15,10 +15,10 @@ module Spaceship
       attr_reader :date
 
       attr_mapping({
-        'stateKey' => :state_key,
-        'userName' => :user_name,
-        'userEmail' => :user_email,
-        'date' => :date
+        "stateKey" => :state_key,
+        "userName" => :user_name,
+        "userEmail" => :user_email,
+        "date" => :date
       })
 
       class << self

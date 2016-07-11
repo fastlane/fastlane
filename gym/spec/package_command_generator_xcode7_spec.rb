@@ -47,9 +47,9 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "app-store",
-        'uploadBitcode' => false,
-        'uploadSymbols' => true
+        "method" => "app-store",
+        "uploadBitcode" => false,
+        "uploadSymbols" => true
       })
     end
 
@@ -61,13 +61,13 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => true,
-        'manifest' => {
-          'appURL' => 'https://www.example.com/Example.ipa',
-          'displayImageURL' => 'https://www.example.com/display.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
+        "embedOnDemandResourcesAssetPacksInBundle" => true,
+        "manifest" => {
+          "appURL" => "https://www.example.com/Example.ipa",
+          "displayImageURL" => "https://www.example.com/display.png",
+          "fullSizeImageURL" => "https://www.example.com/fullSize.png"
         },
-        'method' => 'ad-hoc'
+        "method" => "ad-hoc"
       })
       expect(Gym.config[:export_method]).to eq("ad-hoc")
       expect(Gym.config[:include_symbols]).to be_nil
@@ -90,16 +90,16 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => true,
-        'manifest' => {
-          'appURL' => 'https://www.example.com/Example.ipa',
-          'displayImageURL' => 'https://www.example.com/display.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
+        "embedOnDemandResourcesAssetPacksInBundle" => true,
+        "manifest" => {
+          "appURL" => "https://www.example.com/Example.ipa",
+          "displayImageURL" => "https://www.example.com/display.png",
+          "fullSizeImageURL" => "https://www.example.com/fullSize.png"
         },
-        'method' => 'app-store',
-        'uploadSymbols' => false,
-        'uploadBitcode' => true,
-        'teamID' => '1234567890'
+        "method" => "app-store",
+        "uploadSymbols" => false,
+        "uploadBitcode" => true,
+        "teamID" => "1234567890"
       })
     end
 
@@ -129,28 +129,28 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => false,
-        'manifest' => {
-          'appURL' => 'https://example.com/My%20App.ipa',
-          'displayImageURL' => 'https://www.example.com/display%20image.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize%20image.png'
+        "embedOnDemandResourcesAssetPacksInBundle" => false,
+        "manifest" => {
+          "appURL" => "https://example.com/My%20App.ipa",
+          "displayImageURL" => "https://www.example.com/display%20image.png",
+          "fullSizeImageURL" => "https://www.example.com/fullSize%20image.png"
         },
-        'method' => 'app-store',
-        'uploadSymbols' => true,
-        'uploadBitcode' => false,
-        'teamID' => 'ASDFGHJK'
+        "method" => "app-store",
+        "uploadSymbols" => true,
+        "uploadBitcode" => false,
+        "teamID" => "ASDFGHJK"
       })
     end
 
     it "doesn't store bitcode/symbols information for non app-store builds" do
-      options = { project: "./examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
+      options = { project: "./examples/standard/Example.xcodeproj", export_method: "ad-hoc" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "ad-hoc"
+        "method" => "ad-hoc"
       })
     end
 

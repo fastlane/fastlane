@@ -1,15 +1,15 @@
-require 'faraday' # HTTP Client
-require 'logger'
-require 'faraday_middleware'
-require 'faraday-cookie_jar'
-require 'spaceship/ui'
-require 'spaceship/helper/plist_middleware'
-require 'spaceship/helper/net_http_generic_request'
+require "faraday" # HTTP Client
+require "logger"
+require "faraday_middleware"
+require "faraday-cookie_jar"
+require "spaceship/ui"
+require "spaceship/helper/plist_middleware"
+require "spaceship/helper/net_http_generic_request"
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
 if ENV["DEBUG"]
-  require 'openssl'
+  require "openssl"
   # this has to be on top of this file, since the value can't be changed later
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
@@ -32,7 +32,7 @@ module Spaceship
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
     class BasicPreferredInfoError < StandardError
-      TITLE = 'The request could not be completed because:'.freeze
+      TITLE = "The request could not be completed because:".freeze
 
       def preferred_error_info
         message ? [TITLE, message] : nil
@@ -54,12 +54,12 @@ module Spaceship
       end
 
       def preferred_error_info
-        return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
+        return nil unless @error_info.kind_of?(Hash) && @error_info["resultString"]
 
         [
           "Apple provided the following error info:",
-          @error_info['resultString'],
-          @error_info['userString']
+          @error_info["resultString"],
+          @error_info["userString"]
         ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
       end
     end
@@ -111,7 +111,7 @@ module Spaceship
         c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
-        if ENV['DEBUG']
+        if ENV["DEBUG"]
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.response :logger
@@ -145,7 +145,7 @@ module Spaceship
     #
     # @return (String) the cookie-string in the RFC6265 format: https://tools.ietf.org/html/rfc6265#section-4.2.1
     def cookie
-      @cookie.map(&:to_s).join(';')
+      @cookie.map(&:to_s).join(";")
     end
 
     def store_cookie(path: nil)
@@ -208,7 +208,7 @@ module Spaceship
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
       if user.to_s.empty? or password.to_s.empty?
-        require 'credentials_manager'
+        require "credentials_manager"
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
@@ -273,9 +273,9 @@ module Spaceship
         response = request(:post) do |req|
           req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{itc_service_key}"
           req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Content-Type"] = "application/json"
+          req.headers["X-Requested-With"] = "XMLHttpRequest"
+          req.headers["Accept"] = "application/json, text/javascript"
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
       rescue UnauthorizedAccessError
@@ -298,10 +298,10 @@ module Spaceship
         elsif (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-        elsif (response['Set-Cookie'] || "").include?("itctx")
+        elsif (response["Set-Cookie"] || "").include?("itctx")
           raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
-          info = [response.body, response['Set-Cookie']]
+          info = [response.body, response["Set-Cookie"]]
           raise TunesClient::ITunesConnectError.new, info.join("\n")
         end
       end
@@ -315,7 +315,7 @@ module Spaceship
       # other clients.
       #
       # https://github.com/fastlane/fastlane/issues/4610
-      headers = { 'Accept-Encoding' => 'identity' }
+      headers = { "Accept-Encoding" => "identity" }
       # We need a service key from a JS file to properly auth
       js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
       @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
@@ -372,7 +372,7 @@ module Spaceship
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
       headers.merge!(csrf_tokens)
-      headers['User-Agent'] = USER_AGENT
+      headers["User-Agent"] = USER_AGENT
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)
@@ -440,10 +440,10 @@ module Spaceship
 
     def encode_params(params, headers)
       params = Faraday::Utils::ParamsHash[params].to_query
-      headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }.merge(headers)
+      headers = { "Content-Type" => "application/x-www-form-urlencoded" }.merge(headers)
       return params, headers
     end
   end
 end
 
-require 'spaceship/two_step_client'
+require "spaceship/two_step_client"

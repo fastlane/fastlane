@@ -7,7 +7,7 @@ module Pilot
       UI.user_error!("Export file path is required") unless options[:testers_file_path]
 
       start(options)
-      require 'csv'
+      require "csv"
 
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
@@ -20,7 +20,7 @@ module Pilot
       file = config[:testers_file_path]
 
       CSV.open(file, "w") do |csv|
-        csv << ['First', 'Last', 'Email', 'Devices', 'Groups', 'Installed Version', 'Install Date']
+        csv << ["First", "Last", "Email", "Devices", "Groups", "Installed Version", "Install Date"]
 
         testers.each do |tester|
           groups = tester.raw_data.get("groups")
@@ -28,7 +28,7 @@ module Pilot
           group_names = ""
           if groups && groups.length > 0
             names = groups.map { |group| group["name"]["value"] }
-            group_names = names.join(';')
+            group_names = names.join(";")
           end
 
           install_version = tester.full_version || ""

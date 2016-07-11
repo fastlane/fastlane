@@ -11,12 +11,12 @@ module Fastlane
         if params[:notes]
           UI.error("Overwriting :notes_path, because you specified :notes") if params[:notes_path]
 
-          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
+          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], "changelog").path
         elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
           UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
-            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
+            Actions.lane_context[SharedValues::FL_CHANGELOG], "changelog"
           ).path
         end
 
@@ -28,14 +28,14 @@ module Fastlane
           UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
         end
 
-        UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
+        UI.success("Uploading the build to Crashlytics Beta. Time for some ☕️.")
 
         sanitizer = proc do |message|
-          message.gsub(params[:api_token], '[[API_TOKEN]]')
-                 .gsub(params[:build_secret], '[[BUILD_SECRET]]')
+          message.gsub(params[:api_token], "[[API_TOKEN]]")
+                 .gsub(params[:build_secret], "[[BUILD_SECRET]]")
         end
 
-        UI.verbose sanitizer.call(command.join(' ')) if $verbose
+        UI.verbose sanitizer.call(command.join(" ")) if $verbose
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
@@ -53,7 +53,7 @@ module Fastlane
 
         UI.verbose sanitizer.call(result) if $verbose
 
-        UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
+        UI.success("Build successfully uploaded to Crashlytics Beta 🌷")
       end
 
       def self.description

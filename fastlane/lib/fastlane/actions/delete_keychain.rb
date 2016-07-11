@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Fastlane
   module Actions

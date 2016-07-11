@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Fastlane do
   describe Fastlane::CommandLineHandler do
@@ -9,7 +9,7 @@ describe Fastlane do
 
     it "properly handles calls with custom parameters" do
       expect(Fastlane::LaneManager).to receive(:cruise_lane).with("ios", "deploy",
-                                                                  { key: "value", build_number: '123' },
+                                                                  { key: "value", build_number: "123" },
                                                                   nil)
       Fastlane::CommandLineHandler.handle(["ios", "deploy", "key:value", "build_number:123"], {})
     end

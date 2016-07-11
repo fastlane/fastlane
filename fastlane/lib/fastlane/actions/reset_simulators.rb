@@ -3,7 +3,7 @@ module Fastlane
     class ResetSimulatorsAction < Action
       def self.run(params)
         FastlaneCore::Simulator.reset_all
-        UI.success('Simulators reset')
+        UI.success("Simulators reset")
       end
 
       def self.description

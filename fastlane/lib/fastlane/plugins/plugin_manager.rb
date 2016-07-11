@@ -79,7 +79,7 @@ module Fastlane
       UI.user_error!("fastlane is not setup for this project, make sure you have a fastlane folder") unless pluginfile_path
       plugin_name = self.class.plugin_prefix + plugin_name unless plugin_name.start_with?(self.class.plugin_prefix)
 
-      if plugin_name.gsub(self.class.plugin_prefix, '').include?("-")
+      if plugin_name.gsub(self.class.plugin_prefix, "").include?("-")
         # e.g. "fastlane-plugin-ya_tu-sabes" (which is invalid)
         UI.user_error!("Plugin name must not contain a '-', did you mean '_'?")
       end
@@ -116,10 +116,10 @@ module Fastlane
       )
 
       if selection == selection_git_url
-        git_url = UI.input('Please enter the URL to the plugin, including the protocol (e.g. https:// or git://)')
+        git_url = UI.input("Please enter the URL to the plugin, including the protocol (e.g. https:// or git://)")
         return ", git: '#{git_url}'"
       elsif selection == selection_path
-        path = UI.input('Please enter the relative path to the plugin you want to use. It has to point to the directory containing the .gemspec file')
+        path = UI.input("Please enter the relative path to the plugin you want to use. It has to point to the directory containing the .gemspec file")
         return ", path: '#{path}'"
       elsif selection == selection_rubygems
         return ""
@@ -134,7 +134,7 @@ module Fastlane
 
       # We have to make sure fastlane is also added to the Gemfile, since we now use
       # bundler to run fastlane
-      content += "\ngem 'fastlane'\n" unless available_gems.include?('fastlane')
+      content += "\ngem 'fastlane'\n" unless available_gems.include?("fastlane")
       content += "\n#{self.class.code_to_attach}\n"
 
       File.write(path_to_gemfile, content)
@@ -145,8 +145,8 @@ module Fastlane
     #####################################################
 
     def self.fetch_gem_info_from_rubygems(gem_name)
-      require 'open-uri'
-      require 'json'
+      require "open-uri"
+      require "json"
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
         JSON.parse(open(url).read)
@@ -335,7 +335,7 @@ module Fastlane
     end
 
     def store_plugin_reference(gem_name)
-      module_name = gem_name.gsub(PluginManager.plugin_prefix, '').fastlane_class
+      module_name = gem_name.gsub(PluginManager.plugin_prefix, "").fastlane_class
       # We store a collection of the imported plugins
       # This way we can tell which action came from what plugin
       # (a plugin may contain any number of actions)
@@ -351,7 +351,7 @@ module Fastlane
       # show a warning if that's the case
       references.each do |current_ref|
         # current_ref is a symbol, e.g. :emoji_fetcher
-        class_name = (current_ref.to_s.fastlane_class + 'Action').to_sym
+        class_name = (current_ref.to_s.fastlane_class + "Action").to_sym
 
         if self.loaded_fastlane_actions.include?(class_name)
           UI.important("Plugin '#{module_name}' overwrites already loaded action '#{current_ref}'")

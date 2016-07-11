@@ -10,12 +10,12 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to start_with 'security'
-        expect(result).to include 'import test.cer'
-        expect(result).to include '-k ~/Library/Keychains/test.keychain'
-        expect(result).to include '-P testpassword'
-        expect(result).to include '-T /usr/bin/codesign'
-        expect(result).to include '-T /usr/bin/security'
+        expect(result).to start_with "security"
+        expect(result).to include "import test.cer"
+        expect(result).to include "-k ~/Library/Keychains/test.keychain"
+        expect(result).to include "-P testpassword"
+        expect(result).to include "-T /usr/bin/codesign"
+        expect(result).to include "-T /usr/bin/security"
       end
 
       it "works with certificate and password that contain spaces or `\"`" do
@@ -27,12 +27,12 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to start_with 'security'
+        expect(result).to start_with "security"
         expect(result).to include %(import \\\"\\ test\\ \\\".cer)
         expect(result).to include %(-k ~/Library/Keychains/\\\"\\ test\\ \\\".keychain)
         expect(result).to include %(-P \\\"test\\ password\\\")
-        expect(result).to include '-T /usr/bin/codesign'
-        expect(result).to include '-T /usr/bin/security'
+        expect(result).to include "-T /usr/bin/codesign"
+        expect(result).to include "-T /usr/bin/security"
       end
 
       it "works with certificate" do
@@ -43,12 +43,12 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to start_with 'security'
-        expect(result).to include 'import test.cer'
-        expect(result).to include '-k ~/Library/Keychains/test.keychain'
-        expect(result).to_not include '-P'
-        expect(result).to include '-T /usr/bin/codesign'
-        expect(result).to include '-T /usr/bin/security'
+        expect(result).to start_with "security"
+        expect(result).to include "import test.cer"
+        expect(result).to include "-k ~/Library/Keychains/test.keychain"
+        expect(result).to_not include "-P"
+        expect(result).to include "-T /usr/bin/codesign"
+        expect(result).to include "-T /usr/bin/security"
       end
     end
   end

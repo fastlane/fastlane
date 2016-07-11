@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Tunes::AppDetails do
   before { Spaceship::Tunes.login }
@@ -10,9 +10,9 @@ describe Spaceship::Tunes::AppDetails do
     it "contains all the relevant information" do
       details = app.details
 
-      expect(details.name['en-US']).to eq("Updated by fastlane")
-      expect(details.privacy_url['en-US']).to eq('https://fastlane.tools')
-      expect(details.primary_category).to eq('MZGenre.Sports')
+      expect(details.name["en-US"]).to eq("Updated by fastlane")
+      expect(details.privacy_url["en-US"]).to eq("https://fastlane.tools")
+      expect(details.primary_category).to eq("MZGenre.Sports")
     end
   end
 

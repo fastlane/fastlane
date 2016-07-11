@@ -1,4 +1,4 @@
-require 'rubygems'
+require "rubygems"
 
 initialized = false
 test_ui = nil
@@ -7,8 +7,8 @@ tmp_dir = nil
 oldwd = nil
 
 describe Fastlane::PluginGenerator do
-  describe '#generate' do
-    let(:plugin_info) { Fastlane::PluginInfo.new('tester_thing', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary') }
+  describe "#generate" do
+    let(:plugin_info) { Fastlane::PluginInfo.new("tester_thing", "Fabricio Devtoolio", "fabric.devtools@gmail.com", "summary") }
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
@@ -32,8 +32,8 @@ describe Fastlane::PluginGenerator do
 
         generator = Fastlane::PluginGenerator.new(ui: test_ui, dest_root: tmp_dir)
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email', print: $verbose).and_return('')
-        expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name', print: $verbose).and_return('')
+        expect(FastlaneCore::Helper).to receive(:backticks).with("git config --get user.email", print: $verbose).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with("git config --get user.name", print: $verbose).and_return("")
 
         expect(test_ui).to receive(:input).and_return(plugin_name)
         expect(test_ui).to receive(:input).and_return(author)
@@ -62,7 +62,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a .rspec file" do
-      dot_rspec_file = File.join(tmp_dir, gem_name, '.rspec')
+      dot_rspec_file = File.join(tmp_dir, gem_name, ".rspec")
       expect(File.exist?(dot_rspec_file)).to be(true)
 
       dot_rspec_lines = File.read(dot_rspec_file).lines
@@ -77,7 +77,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a .gitignore file" do
-      dot_gitignore_file = File.join(tmp_dir, gem_name, '.gitignore')
+      dot_gitignore_file = File.join(tmp_dir, gem_name, ".gitignore")
       expect(File.exist?(dot_gitignore_file)).to be(true)
 
       dot_gitignore_lines = File.read(dot_gitignore_file).lines
@@ -95,7 +95,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a Gemfile" do
-      gemfile = File.join(tmp_dir, gem_name, 'Gemfile')
+      gemfile = File.join(tmp_dir, gem_name, "Gemfile")
       expect(File.exist?(gemfile)).to be(true)
 
       gemfile_lines = File.read(gemfile).lines
@@ -109,14 +109,14 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a plugin.rb file for the plugin" do
-      plugin_rb_file = File.join(tmp_dir, gem_name, 'lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      plugin_rb_file = File.join(tmp_dir, gem_name, "lib", "fastlane", "plugin", "#{plugin_name}.rb")
       expect(File.exist?(plugin_rb_file)).to be(true)
 
       plugin_rb_contents = File.read(plugin_rb_file)
 
       Dir.chdir(gem_name) do
         # Ensure that the require statements inside the plugin.rb contents will resolve correctly
-        lib = File.expand_path('lib')
+        lib = File.expand_path("lib")
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
         # rubocop:disable Lint/Eval
@@ -136,13 +136,13 @@ describe Fastlane::PluginGenerator do
         )
 
         # Get the relative paths to require, check that they have already been required.
-        require_paths = all_classes.map { |c| c.gsub(lib + '/', '').gsub('.rb', '') }
+        require_paths = all_classes.map { |c| c.gsub(lib + "/", "").gsub(".rb", "") }
         require_paths.each { |path| expect(require(path)).to be(false) }
       end
     end
 
     it "creates a README that contains the gem name" do
-      readme_file = File.join(tmp_dir, gem_name, 'README.md')
+      readme_file = File.join(tmp_dir, gem_name, "README.md")
       expect(File.exist?(readme_file)).to be(true)
 
       readme_contents = File.read(readme_file)
@@ -154,11 +154,11 @@ describe Fastlane::PluginGenerator do
     it "creates a module for the VERSION" do
       # We'll be asserting that this file is valid Ruby when we check
       # the value of the version as evaluated by the gemspec!
-      expect(File.exist?(File.join(tmp_dir, gem_name, 'lib', require_path, 'version.rb'))).to be(true)
+      expect(File.exist?(File.join(tmp_dir, gem_name, "lib", require_path, "version.rb"))).to be(true)
     end
 
     it "creates a LICENSE" do
-      readme_file = File.join(tmp_dir, gem_name, 'LICENSE')
+      readme_file = File.join(tmp_dir, gem_name, "LICENSE")
       expect(File.exist?(readme_file)).to be(true)
 
       readme_contents = File.read(readme_file)
@@ -169,7 +169,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a Action class" do
-      action_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.actions_path, "#{plugin_name}_action.rb")
+      action_file = File.join(tmp_dir, gem_name, "lib", plugin_info.actions_path, "#{plugin_name}_action.rb")
       expect(File.exist?(action_file)).to be(true)
 
       action_contents = File.read(action_file)
@@ -213,7 +213,7 @@ describe Fastlane::PluginGenerator do
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
-        expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
+        expect(gemspec.version).to eq(Gem::Version.new("0.1.0"))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
         expect(gemspec.development_dependencies).to contain_exactly(
@@ -228,7 +228,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a valid helper class" do
-      helper_file = File.join(tmp_dir, gem_name, 'lib', plugin_info.helper_path, "#{plugin_info.plugin_name}_helper.rb")
+      helper_file = File.join(tmp_dir, gem_name, "lib", plugin_info.helper_path, "#{plugin_info.plugin_name}_helper.rb")
       expect(File.exist?(helper_file)).to be(true)
 
       helper_contents = File.read(helper_file)
@@ -249,7 +249,7 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a spec_helper.rb file" do
-      spec_helper_file = File.join(tmp_dir, gem_name, 'spec', 'spec_helper.rb')
+      spec_helper_file = File.join(tmp_dir, gem_name, "spec", "spec_helper.rb")
       expect(File.exist?(spec_helper_file)).to be(true)
 
       spec_helper_module = Object.const_get("SpecHelper")
@@ -257,12 +257,12 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a action_spec.rb file" do
-      action_spec_file = File.join(tmp_dir, gem_name, 'spec', "#{plugin_name}_action_spec.rb")
+      action_spec_file = File.join(tmp_dir, gem_name, "spec", "#{plugin_name}_action_spec.rb")
       expect(File.exist?(action_spec_file)).to be(true)
     end
 
     it "creates a Rakefile" do
-      rakefile = File.join(tmp_dir, gem_name, 'Rakefile')
+      rakefile = File.join(tmp_dir, gem_name, "Rakefile")
       expect(File.exist?(rakefile)).to be(true)
 
       rakefile_contents = File.read(rakefile)

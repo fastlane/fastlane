@@ -21,7 +21,7 @@ module Fastlane
         # download certificate
         unless File.exist?(params[:certificate])
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
+          require "open-uri"
           File.open(params[:certificate], "w") do |file|
             file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
           end
@@ -43,7 +43,7 @@ module Fastlane
 
         # manipulate project file
         UI.success("Going to update project '#{folder}' with UUID")
-        require 'xcodeproj'
+        require "xcodeproj"
 
         project = Xcodeproj::Project.open(folder)
         project.targets.each do |target|

@@ -1,4 +1,4 @@
-require 'open3'
+require "open3"
 
 describe FastlaneCore do
   describe FastlaneCore::Simulator do

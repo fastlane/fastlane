@@ -121,34 +121,34 @@ module Spaceship
       attr_reader :trailers
 
       attr_mapping({
-        'appType' => :app_type,
-        'platform' => :platform,
-        'canBetaTest' => :can_beta_test,
-        'canPrepareForUpload' => :can_prepare_for_upload,
-        'canRejectVersion' => :can_reject_version,
-        'canSendVersionLive' => :can_send_version_live,
-        'copyright.value' => :copyright,
-        'details.value' => :languages,
-        'largeAppIcon.value.originalFileName' => :app_icon_original_name,
-        'largeAppIcon.value.url' => :app_icon_url,
-        'releaseOnApproval.value' => :release_on_approval,
-        'status' => :raw_status,
-        'supportsAppleWatch' => :supports_apple_watch,
-        'versionId' => :version_id,
-        'version.value' => :version,
+        "appType" => :app_type,
+        "platform" => :platform,
+        "canBetaTest" => :can_beta_test,
+        "canPrepareForUpload" => :can_prepare_for_upload,
+        "canRejectVersion" => :can_reject_version,
+        "canSendVersionLive" => :can_send_version_live,
+        "copyright.value" => :copyright,
+        "details.value" => :languages,
+        "largeAppIcon.value.originalFileName" => :app_icon_original_name,
+        "largeAppIcon.value.url" => :app_icon_url,
+        "releaseOnApproval.value" => :release_on_approval,
+        "status" => :raw_status,
+        "supportsAppleWatch" => :supports_apple_watch,
+        "versionId" => :version_id,
+        "version.value" => :version,
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
 
         # App Review Information
-        'appReviewInfo.firstName.value' => :review_first_name,
-        'appReviewInfo.lastName.value' => :review_last_name,
-        'appReviewInfo.phoneNumber.value' => :review_phone_number,
-        'appReviewInfo.emailAddress.value' => :review_email,
-        'appReviewInfo.reviewNotes.value' => :review_notes,
-        'appReviewInfo.accountRequired.value' => :review_user_needed,
-        'appReviewInfo.userName.value' => :review_demo_user,
-        'appReviewInfo.password.value' => :review_demo_password
+        "appReviewInfo.firstName.value" => :review_first_name,
+        "appReviewInfo.lastName.value" => :review_last_name,
+        "appReviewInfo.phoneNumber.value" => :review_phone_number,
+        "appReviewInfo.emailAddress.value" => :review_email,
+        "appReviewInfo.reviewNotes.value" => :review_notes,
+        "appReviewInfo.accountRequired.value" => :review_user_needed,
+        "appReviewInfo.userName.value" => :review_demo_user,
+        "appReviewInfo.password.value" => :review_demo_password
       })
 
       class << self
@@ -166,8 +166,8 @@ module Spaceship
         # @param is_live (Boolean)
         def find(application, app_id, is_live)
           # we only support applications
-          platform = Spaceship::Tunes::AppVersionCommon.find_platform(application.raw_data['versionSets'])
-          raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
+          platform = Spaceship::Tunes::AppVersionCommon.find_platform(application.raw_data["versionSets"])
+          raise "We do not support BUNDLE types right now" if platform["type"] == "BUNDLE"
 
           # too bad the "id" field is empty, it forces us to make more requests to the server
           # these could also be cached
@@ -198,17 +198,17 @@ module Spaceship
         languages = [languages] if languages.kind_of?(String)
         raise "Please pass an array" unless languages.kind_of? Array
 
-        copy_from = self.languages.find { |a| a['language'] == 'en-US' } || self.languages.first
+        copy_from = self.languages.find { |a| a["language"] == "en-US" } || self.languages.first
 
         languages.each do |language|
           # First, see if it's already available
           found = self.languages.find do |local|
-            local['language'] == language
+            local["language"] == language
           end
           next if found
 
           new_language = copy_from.clone
-          new_language['language'] = language
+          new_language["language"] = language
 
           self.languages << new_language
         end
@@ -231,9 +231,9 @@ module Spaceship
       # You have to pass a build you got from - candidate_builds
       # Don't forget to call save! after calling this method
       def select_build(build)
-        raw_data.set(['preReleaseBuildVersionString', 'value'], build.build_version)
-        raw_data.set(['preReleaseBuildTrainVersionString'], build.train_version)
-        raw_data.set(['preReleaseBuildUploadDate'], build.upload_date)
+        raw_data.set(["preReleaseBuildVersionString", "value"], build.build_version)
+        raw_data.set(["preReleaseBuildTrainVersionString"], build.train_version)
+        raw_data.set(["preReleaseBuildUploadDate"], build.upload_date)
         true
       end
 
@@ -252,8 +252,8 @@ module Spaceship
         raise "Must be a hash" unless hash.kind_of?(Hash)
 
         hash.each do |key, value|
-          to_edit = self.raw_data['ratings']['nonBooleanDescriptors'].find do |current|
-            current['name'].include?(key)
+          to_edit = self.raw_data["ratings"]["nonBooleanDescriptors"].find do |current|
+            current["name"].include?(key)
           end
 
           if to_edit
@@ -261,17 +261,17 @@ module Spaceship
             to_set = "INFREQUENT_MILD" if value == 1
             to_set = "FREQUENT_INTENSE" if value == 2
             raise "Invalid value '#{value}' for '#{key}', must be 0-2" unless to_set
-            to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
+            to_edit["level"] = "ITC.apps.ratings.level.#{to_set}"
           else
             # Maybe it's a boolean descriptor?
-            to_edit = self.raw_data['ratings']['booleanDescriptors'].find do |current|
-              current['name'].include?(key)
+            to_edit = self.raw_data["ratings"]["booleanDescriptors"].find do |current|
+              current["name"].include?(key)
             end
 
             if to_edit
               to_set = "NO"
               to_set = "YES" if value.to_i > 0
-              to_edit['level'] = "ITC.apps.ratings.level.#{to_set}"
+              to_edit["level"] = "ITC.apps.ratings.level.#{to_set}"
             else
               raise "Could not find option '#{key}' in the list of available options"
             end
@@ -295,7 +295,7 @@ module Spaceship
       # Private methods
       def setup
         # Properly parse the AppStatus
-        status = raw_data['status']
+        status = raw_data["status"]
         @app_status = Tunes::AppStatus.get_from_string(status)
         setup_large_app_icon
         setup_watch_app_icon
@@ -314,7 +314,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_large_icon(self, upload_image)
 
-        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
+        @large_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
       end
 
       # Uploads or removes the watch icon
@@ -404,7 +404,7 @@ module Spaceship
       # @param device (String): The device for this screenshot
       # @param timestamp (String): The optional timestamp of the screenshot to grab
       def upload_trailer!(trailer_path, language, device, timestamp = "05.00", preview_image_path = nil)
-        raise "No app trailer supported for iphone35" if device == 'iphone35'
+        raise "No app trailer supported for iphone35" if device == "iphone35"
 
         device_lang_trailer = trailer_data_for_language_and_device(language, device)
         if trailer_path # adding / replacing trailer / replacing preview
@@ -425,7 +425,7 @@ module Spaceship
           if trailer.nil? # add trailer
             upload_file = UploadFile.from_path trailer_path
             trailer_data = client.upload_trailer(self, upload_file)
-            trailer_data = trailer_data['responses'][0]
+            trailer_data = trailer_data["responses"][0]
             trailer = {
                 "videoAssetToken" => trailer_data["token"],
                 "descriptionXML" => trailer_data["descriptionDoc"],
@@ -436,7 +436,7 @@ module Spaceship
           # add / update preview
           # different format required
           ts = "00:00:#{timestamp}"
-          ts[8] = ':'
+          ts[8] = ":"
 
           trailer.merge!({
             "pictureAssetToken" => video_preview_data["token"],
@@ -482,7 +482,7 @@ module Spaceship
       # These methods takes care of properly parsing values that
       # are not returned in the right format, e.g. boolean as string
       def release_on_approval
-        super == 'true'
+        super == "true"
       end
 
       def supports_apple_watch
@@ -537,7 +537,7 @@ module Spaceship
         @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
-          @screenshots[row['language']] = setup_screenshots_for(row)
+          @screenshots[row["language"]] = setup_screenshots_for(row)
         end
       end
 

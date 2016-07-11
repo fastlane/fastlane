@@ -5,8 +5,8 @@ module Fastlane
 
     class HipchatAction < Action
       def self.run(options)
-        require 'net/http'
-        require 'uri'
+        require "net/http"
+        require "uri"
 
         api_token = options[:api_token]
         api_version = options[:version]
@@ -15,10 +15,10 @@ module Fastlane
         message_format = options[:message_format]
 
         channel = options[:channel]
-        if ['yellow', 'red', 'green', 'purple', 'gray', 'random'].include?(options[:custom_color]) == true
+        if ["yellow", "red", "green", "purple", "gray", "random"].include?(options[:custom_color]) == true
           color = options[:custom_color]
         else
-          color = (options[:success] ? 'green' : 'red')
+          color = (options[:success] ? "green" : "red")
         end
 
         from = options[:from]
@@ -34,22 +34,22 @@ module Fastlane
             UI.user_error!("HipChat private message not working with API V1 please use API V2 instead")
           else
             uri = URI.parse("https://#{api_host}/v1/rooms/message")
-            response = Net::HTTP.post_form(uri, { 'from' => from,
-                                                  'auth_token' => api_token,
-                                                  'color' => color,
-                                                  'message_format' => message_format,
-                                                  'room_id' => channel,
-                                                  'message' => message,
-                                                  'notify' => options[:notify_room] ? '1' : '0' })
+            response = Net::HTTP.post_form(uri, { "from" => from,
+                                                  "auth_token" => api_token,
+                                                  "color" => color,
+                                                  "message_format" => message_format,
+                                                  "room_id" => channel,
+                                                  "message" => message,
+                                                  "notify" => options[:notify_room] ? "1" : "0" })
 
             check_response_code(response, channel)
           end
         else
           ########## running on V2 ##########
           if user?(channel)
-            params = { 'message' => message, 'message_format' => message_format }
-            json_headers = { 'Content-Type' => 'application/json',
-                             'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
+            params = { "message" => message, "message_format" => message_format }
+            json_headers = { "Content-Type" => "application/json",
+                             "Accept" => "application/json", "Authorization" => "Bearer #{api_token}" }
 
             uri = URI.parse("https://#{api_host}/v2/user/#{channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
@@ -58,19 +58,19 @@ module Fastlane
             response = http.post(uri.path, params.to_json, json_headers)
           else
             uri = URI.parse("https://#{api_host}/v2/room/#{channel}/notification")
-            response = Net::HTTP.post_form(uri, { 'from' => from,
-                                                  'auth_token' => api_token,
-                                                  'color' => color,
-                                                  'message_format' => message_format,
-                                                  'message' => message,
-                                                  'notify' => options[:notify_room] ? 'true' : 'false' })
+            response = Net::HTTP.post_form(uri, { "from" => from,
+                                                  "auth_token" => api_token,
+                                                  "color" => color,
+                                                  "message_format" => message_format,
+                                                  "message" => message,
+                                                  "notify" => options[:notify_room] ? "true" : "false" })
           end
           check_response_code(response, channel)
         end
       end
 
       def self.user?(channel)
-        channel.to_s.start_with?('@')
+        channel.to_s.start_with?("@")
       end
 
       def self.check_response_code(response, channel)
@@ -95,7 +95,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_HIPCHAT_MESSAGE",
                                        description: "The message to post on HipChat",
-                                       default_value: ''),
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :channel,
                                        env_name: "FL_HIPCHAT_CHANNEL",
                                        description: "The room or @username"),

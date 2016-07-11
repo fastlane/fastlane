@@ -2,16 +2,16 @@ module Fastlane
   module Actions
     class AppiumAction < Action
       INVOKE_TIMEOUT = 30
-      APPIUM_PATH_HOMEBREW = '/usr/local/bin/appium'
-      APPIUM_APP_PATH = '/Applications/Appium.app'
-      APPIUM_APP_BUNDLE_PATH = 'Contents/Resources/node_modules/.bin/appium'
+      APPIUM_PATH_HOMEBREW = "/usr/local/bin/appium"
+      APPIUM_APP_PATH = "/Applications/Appium.app"
+      APPIUM_APP_BUNDLE_PATH = "Contents/Resources/node_modules/.bin/appium"
 
       def self.run(params)
-        Actions.verify_gem!('rspec')
-        Actions.verify_gem!('appium_lib')
+        Actions.verify_gem!("rspec")
+        Actions.verify_gem!("appium_lib")
 
-        require 'rspec'
-        require 'appium_lib' unless Helper.test?
+        require "rspec"
+        require "appium_lib" unless Helper.test?
 
         FastlaneCore::PrintTable.print_values(
           config: params,
@@ -57,7 +57,7 @@ module Fastlane
           UI.user_error!("You have to install Appium using `npm install -g appium`")
         end
 
-        if appium_path.end_with?('.app')
+        if appium_path.end_with?(".app")
           appium_path = "#{appium_path}/#{APPIUM_APP_BUNDLE_PATH}"
         end
 
@@ -99,64 +99,64 @@ module Fastlane
       end
 
       def self.description
-        'Run UI test by Appium with RSpec'
+        "Run UI test by Appium with RSpec"
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
             key: :platform,
-            env_name: 'FL_APPIUM_PLATFORM',
-            description: 'Appium platform name',
+            env_name: "FL_APPIUM_PLATFORM",
+            description: "Appium platform name",
             is_string: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :spec_path,
-            env_name: 'FL_APPIUM_SPEC_PATH',
-            description: 'Path to Appium spec directory',
+            env_name: "FL_APPIUM_SPEC_PATH",
+            description: "Path to Appium spec directory",
             is_string: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :app_path,
-            env_name: 'FL_APPIUM_APP_FILE_PATH',
-            description: 'Path to Appium target app file',
+            env_name: "FL_APPIUM_APP_FILE_PATH",
+            description: "Path to Appium target app file",
             is_string: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :invoke_appium_server,
-            env_name: 'FL_APPIUM_INVOKE_APPIUM_SERVER',
-            description: 'Use local Appium server with invoke automatically',
+            env_name: "FL_APPIUM_INVOKE_APPIUM_SERVER",
+            description: "Use local Appium server with invoke automatically",
             is_string: false,
             default_value: true,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :host,
-            env_name: 'FL_APPIUM_HOST',
-            description: 'Hostname of Appium server',
+            env_name: "FL_APPIUM_HOST",
+            description: "Hostname of Appium server",
             is_string: true,
-            default_value: '0.0.0.0',
+            default_value: "0.0.0.0",
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :port,
-            env_name: 'FL_APPIUM_PORT',
-            description: 'HTTP port of Appium server',
+            env_name: "FL_APPIUM_PORT",
+            description: "HTTP port of Appium server",
             is_string: false,
             default_value: 4723,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :appium_path,
-            env_name: 'FL_APPIUM_EXECUTABLE_PATH',
-            description: 'Path to Appium executable',
+            env_name: "FL_APPIUM_EXECUTABLE_PATH",
+            description: "Path to Appium executable",
             is_string: true,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :caps,
-            env_name: 'FL_APPIUM_CAPS',
-            description: 'Hash of caps for Appium::Driver',
+            env_name: "FL_APPIUM_CAPS",
+            description: "Hash of caps for Appium::Driver",
             is_string: false,
             optional: true
           )
@@ -164,7 +164,7 @@ module Fastlane
       end
 
       def self.author
-        'yonekawa'
+        "yonekawa"
       end
 
       def self.is_supported?(platform)

@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Update Info Plist Integration" do
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
       let (:entitlements_path) { "com.test.entitlements" }
-      let (:new_app_group) { 'group.com.enterprise.test' }
+      let (:new_app_group) { "group.com.enterprise.test" }
 
       before do
         # Set up example info.plist
@@ -41,7 +41,7 @@ describe Fastlane do
             app_group_identifiers: '#{new_app_group}'
           )
           end").runner.execute(:test)
-        end.to raise_error('The parameter app_group_identifiers need to be an Array.')
+        end.to raise_error("The parameter app_group_identifiers need to be an Array.")
       end
 
       it "throws an error when the entitlements file is not parsable" do

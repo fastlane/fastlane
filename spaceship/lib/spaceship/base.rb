@@ -85,12 +85,12 @@ module Spaceship
             setter = "#{dest}=".to_sym
 
             define_method(getter) do
-              raw_data.get(*source.split('.'))
+              raw_data.get(*source.split("."))
             end
 
             define_method(setter) do |value|
               self.raw_data ||= DataHash.new({})
-              raw_data.set(source.split('.'), value)
+              raw_data.set(source.split("."), value)
             end
           end
         end
@@ -121,10 +121,12 @@ module Spaceship
           end
           include(mapping_module(@attr_mapping))
         else
+          # rubocop:disable Lint/ShadowedException
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
           rescue NameError, NoMethodError
           end
+          # rubocop:enable Lint/ShadowedException
         end
         return @attr_mapping
       end

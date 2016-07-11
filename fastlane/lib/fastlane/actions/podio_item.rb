@@ -5,13 +5,13 @@ module Fastlane
     end
 
     class PodioItemAction < Action
-      AUTH_URL = 'https://podio.com/oauth/token'
-      BASE_URL = 'https://api.podio.com'
+      AUTH_URL = "https://podio.com/oauth/token"
+      BASE_URL = "https://api.podio.com"
 
       def self.run(params)
-        require 'rest_client'
-        require 'json'
-        require 'uri'
+        require "rest_client"
+        require "json"
+        require "uri"
 
         post_item(params)
       end
@@ -21,7 +21,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Creates or updates an item within your Podio app'
+        "Creates or updates an item within your Podio app"
       end
 
       def self.details
@@ -35,48 +35,48 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :client_id,
-                                       env_name: 'PODIO_ITEM_CLIENT_ID',
-                                       description: 'Client ID for Podio API (see https://developers.podio.com/api-key)',
+                                       env_name: "PODIO_ITEM_CLIENT_ID",
+                                       description: "Client ID for Podio API (see https://developers.podio.com/api-key)",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No Client ID for Podio given, pass using `client_id: 'id'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :client_secret,
-                                       env_name: 'PODIO_ITEM_CLIENT_SECRET',
-                                       description: 'Client secret for Podio API (see https://developers.podio.com/api-key)',
+                                       env_name: "PODIO_ITEM_CLIENT_SECRET",
+                                       description: "Client secret for Podio API (see https://developers.podio.com/api-key)",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No Client Secret for Podio given, pass using `client_secret: 'secret'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_id,
-                                       env_name: 'PODIO_ITEM_APP_ID',
-                                       description: 'App ID of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)',
+                                       env_name: "PODIO_ITEM_APP_ID",
+                                       description: "App ID of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No App ID for Podio given, pass using `app_id: 'id'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_token,
-                                       env_name: 'PODIO_ITEM_APP_TOKEN',
-                                       description: 'App token of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)',
+                                       env_name: "PODIO_ITEM_APP_TOKEN",
+                                       description: "App token of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No App token for Podio given, pass using `app_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :identifying_field,
-                                       env_name: 'PODIO_ITEM_IDENTIFYING_FIELD',
-                                       description: 'String specifying the field key used for identification of an item',
+                                       env_name: "PODIO_ITEM_IDENTIFYING_FIELD",
+                                       description: "String specifying the field key used for identification of an item",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No Identifying field given, pass using `identifying_field: 'field name'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :identifying_value,
-                                       description: 'String uniquely specifying an item within the app',
+                                       description: "String uniquely specifying an item within the app",
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No Identifying value given, pass using `identifying_value: 'unique value'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :other_fields,
-                                       description: 'Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items',
+                                       description: "Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items",
                                        is_string: false,
                                        optional: true)
         ]
@@ -84,12 +84,12 @@ module Fastlane
 
       def self.output
         [
-          ['PODIO_ITEM_URL', 'URL to newly created (or updated) Podio item']
+          ["PODIO_ITEM_URL", "URL to newly created (or updated) Podio item"]
         ]
       end
 
       def self.authors
-        ['pprochazka72', 'laugejepsen']
+        ["pprochazka72", "laugejepsen"]
       end
 
       def self.is_supported?(_platform)
@@ -126,7 +126,7 @@ module Fastlane
       end
 
       def self.authenticate(client_id, client_secret, app_id, app_token)
-        auth_response = RestClient.post AUTH_URL, grant_type: 'app',
+        auth_response = RestClient.post AUTH_URL, grant_type: "app",
                                                   app_id: app_id,
                                                   app_token: app_token,
                                                   client_id: client_id,
@@ -134,7 +134,7 @@ module Fastlane
         UI.user_error!("Failed to authenticate with Podio API") if auth_response.code != 200
 
         auth_response_dictionary = JSON.parse(auth_response.body)
-        access_token = auth_response_dictionary['access_token']
+        access_token = auth_response_dictionary["access_token"]
 
         { Authorization: "OAuth2 #{access_token}", content_type: :json, accept: :json }
       end
@@ -150,7 +150,7 @@ module Fastlane
       end
 
       def self.get_existing_item(auth_config, identifying_value, app_id)
-        filter_request_body = { query: identifying_value, limit: 1, ref_type: 'item' }.to_json
+        filter_request_body = { query: identifying_value, limit: 1, ref_type: "item" }.to_json
         filter_response = RestClient.post "#{BASE_URL}/search/app/#{app_id}/", filter_request_body, auth_config
         UI.user_error!("Failed to search for already existing item #{identifying_value}") if filter_response.code != 200
 
@@ -159,9 +159,9 @@ module Fastlane
         existing_item_url = nil
         if existing_items.length > 0
           existing_item = existing_items[0]
-          if existing_item['title'] == identifying_value
-            existing_item_id = existing_item['id']
-            existing_item_url = existing_item['link']
+          if existing_item["title"] == identifying_value
+            existing_item_id = existing_item["id"]
+            existing_item_url = existing_item["link"]
           end
         end
 
@@ -174,7 +174,7 @@ module Fastlane
         UI.user_error!("Failed to create item \"#{identifying_value}\"") if item_response.code != 200
 
         item_response_dictionary = JSON.parse(item_response.body)
-        [item_response_dictionary['item_id'], item_response_dictionary['link']]
+        [item_response_dictionary["item_id"], item_response_dictionary["link"]]
       end
 
       def self.update_item(auth_config, item_id, fields)
@@ -191,7 +191,7 @@ module Fastlane
         UI.user_error!("Failed to create embed for link #{link}") if embed_response.code != 200
 
         embed_response_dictionary = JSON.parse(embed_response.body)
-        embed_response_dictionary['embed_id']
+        embed_response_dictionary["embed_id"]
       end
     end
   end

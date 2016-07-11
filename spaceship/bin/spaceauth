@@ -9,7 +9,7 @@ require "colored"
 require "spaceship"
 require "credentials_manager"
 
-username = ARGV[1] if ARGV[0] == '-u'
+username = ARGV[1] if ARGV[0] == "-u"
 username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 username ||= ask("Username: ")
 
@@ -31,12 +31,12 @@ itc_cookie_content = Spaceship::Tunes.client.store_cookie
 # name: DES5c148586daa451e55afb017aa62418f91
 # value: HSARMTKNSRVTWFlaF/ek8asaa9lymMA0dN8JQ6pY7B3F5kdqTxJvMT19EVEFX8EQudB/uNwBHOHzaa30KYTU/eCP/UF7vGTgxs6PAnlVWKscWssOVHfP2IKWUPaa4Dn+I6ilA7eAFQsiaaVT
 
-require 'yaml'
+require "yaml"
 cookies = YAML.load(itc_cookie_content)
 
 # We remove all the un-needed cookies
 cookies.delete_if do |current|
-  ['aa', 'X-SESS', 'site', 'acn01', 'myacinfo', 'itctx', 'wosid', 'woinst', 'NSC_17ofu-jud-jud-mc'].include?(current.name)
+  ["aa", "X-SESS", "site", "acn01", "myacinfo", "itctx", "wosid", "woinst", "NSC_17ofu-jud-jud-mc"].include?(current.name)
 end
 
 yaml = cookies.to_yaml.gsub("\n", "\\n")

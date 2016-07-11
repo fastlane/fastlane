@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class IncrementVersionNumberAction < Action
-      require 'shellwords'
+      require "shellwords"
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
@@ -15,15 +15,15 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], "..") : "."
 
         command_prefix = [
-          'cd',
+          "cd",
           File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+          "&&"
+        ].join(" ")
 
-        current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
+        current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ""
 
         if params[:version_number]
           UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ /\d.\d.\d/
@@ -59,7 +59,7 @@ module Fastlane
         command = [
           command_prefix,
           "agvtool new-marketing-version #{next_version_number.to_s.strip}"
-        ].join(' ')
+        ].join(" ")
 
         if Helper.test?
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
@@ -70,7 +70,7 @@ module Fastlane
 
         return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
-        UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
+        UI.error("Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html")
         raise ex
       end
 
@@ -93,7 +93,7 @@ module Fastlane
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ["patch", "minor", "major"].include? value
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
@@ -112,7 +112,7 @@ module Fastlane
 
       def self.output
         [
-          ['VERSION_NUMBER', 'The new version number']
+          ["VERSION_NUMBER", "The new version number"]
         ]
       end
 

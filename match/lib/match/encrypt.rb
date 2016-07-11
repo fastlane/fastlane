@@ -1,7 +1,7 @@
 module Match
   class Encrypt
-    require 'security'
-    require 'shellwords'
+    require "security"
+    require "shellwords"
 
     def server_name(git_url)
       ["match", git_url].join("_")
@@ -84,7 +84,7 @@ module Match
       command << "-a"
       command << "-d" unless encrypt
       command << "&> /dev/null" unless $verbose # to show show an error message is something goes wrong
-      success = system(command.join(' '))
+      success = system(command.join(" "))
 
       UI.crash!("Error decrypting '#{path}'") unless success
       FileUtils.mv(tmpfile, path)

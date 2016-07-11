@@ -32,9 +32,9 @@ module Deliver
     end
 
     def find_folders(options)
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
-      options[:screenshots_path] ||= File.join(containing, 'screenshots')
-      options[:metadata_path] ||= File.join(containing, 'metadata')
+      containing = Helper.fastlane_enabled? ? "./fastlane" : "."
+      options[:screenshots_path] ||= File.join(containing, "screenshots")
+      options[:metadata_path] ||= File.join(containing, "metadata")
 
       FileUtils.mkdir_p(options[:screenshots_path])
       FileUtils.mkdir_p(options[:metadata_path])

@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Fastlane
   module Actions
@@ -59,7 +59,7 @@ module Fastlane
         UI.message("This will take up to a few minutes, now is a great time to go for a coffee ☕...")
 
         command = "/usr/sbin/spctl --assess --verbose #{params[:xcode_path].shellescape}"
-        must_includes = ['accepted']
+        must_includes = ["accepted"]
 
         output = verify(command: command, must_includes: must_includes, params: params)
 
@@ -117,7 +117,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcode_path,
                                        env_name: "FL_VERIFY_XCODE_XCODE_PATH",
                                        description: "The path to the Xcode installation to test",
-                                       default_value: File.expand_path('../../', FastlaneCore::Helper.xcode_path),
+                                       default_value: File.expand_path("../../", FastlaneCore::Helper.xcode_path),
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find Xcode at path '#{value}'") unless File.exist?(value)
                                        end)

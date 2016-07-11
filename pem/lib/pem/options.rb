@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require "fastlane_core"
+require "credentials_manager"
 
 module PEM
   class Options

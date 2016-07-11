@@ -27,7 +27,7 @@ module Gym
       # Does this application have a WatchKit target
       def watchkit?
         Dir["#{PackageCommandGenerator.appfile_path}/**/*.plist"].any? do |plist_path|
-          `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == 'true'
+          `/usr/libexec/PlistBuddy -c 'Print WKWatchKitApp' '#{plist_path}' 2>&1`.strip == "true"
         end
       end
 

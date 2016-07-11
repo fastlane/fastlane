@@ -19,13 +19,13 @@ module FastlaneCore
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
-      UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
+      UI.user_error!("env_name must be a String") unless (env_name || "").kind_of? String
 
       if short_option
-        UI.user_error!("short_option must be a String of length 1") unless short_option.kind_of? String and short_option.delete('-').length == 1
+        UI.user_error!("short_option must be a String of length 1") unless short_option.kind_of? String and short_option.delete("-").length == 1
       end
       if description
-        UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
+        UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == "."
       end
 
       if conflicting_options
@@ -90,7 +90,7 @@ module FastlaneCore
       return nil if value.nil?
 
       if data_type == Array
-        return value.split(',') if value.kind_of?(String)
+        return value.split(",") if value.kind_of?(String)
       elsif data_type == Integer
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float

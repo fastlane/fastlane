@@ -1,7 +1,7 @@
-require 'pty'
-require 'open3'
-require 'fileutils'
-require 'terminal-table'
+require "pty"
+require "open3"
+require "fileutils"
+require "terminal-table"
 
 module Scan
   class Runner
@@ -48,7 +48,7 @@ module Scan
 
     def handle_results(tests_exit_status)
       # First, generate a JUnit report to get the number of tests
-      require 'tempfile'
+      require "tempfile"
       output_file = Tempfile.new("junit_report")
 
       report_collector = ReportCollector.new(Scan.config[:open_report],
@@ -57,7 +57,7 @@ module Scan
                                              Scan.config[:use_clang_report_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                               types: 'junit',
+                                               types: "junit",
                                                output_file_name: output_file.path).values.last
       system(cmd)
 
@@ -86,7 +86,7 @@ module Scan
     end
 
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless ENV["FASTLANE_EXPLICIT_OPEN_SIMULATOR"]
 
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`

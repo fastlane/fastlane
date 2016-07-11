@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class NotificationAction < Action
       def self.run(params)
-        require 'terminal-notifier'
+        require "terminal-notifier"
 
         options = params.values
         # :message is non-optional
@@ -29,7 +29,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :title,
                                        description: "The title to display in the notification",
-                                       default_value: 'fastlane'),
+                                       default_value: "fastlane"),
           FastlaneCore::ConfigItem.new(key: :subtitle,
                                        description: "A subtitle to display in the notification",
                                        optional: true),

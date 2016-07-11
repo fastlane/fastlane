@@ -7,11 +7,11 @@ module Fastlane
 
     class CertAction < Action
       def self.run(params)
-        require 'cert'
+        require "cert"
 
         return if Helper.test?
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('cert') unless Helper.is_test?
+        FastlaneCore::UpdateChecker.start_looking_for_update("cert") unless Helper.is_test?
 
         begin
           Cert.config = params # we alread have the finished config
@@ -26,7 +26,7 @@ module Fastlane
 
           ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('cert', Cert::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("cert", Cert::VERSION)
         end
       end
 
@@ -35,7 +35,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'cert'
+        require "cert"
         Cert::Options.available_options
       end
 

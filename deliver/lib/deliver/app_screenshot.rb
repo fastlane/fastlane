@@ -1,4 +1,4 @@
-require 'fastimage'
+require "fastimage"
 
 module Deliver
   # AppScreenshot represents one screenshots for one specific locale and

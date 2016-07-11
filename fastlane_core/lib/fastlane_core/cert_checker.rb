@@ -26,7 +26,7 @@ module FastlaneCore
           "You can run `security find-identity -v -p codesigning` to get this output.",
           "This Stack Overflow thread has more information: http://stackoverflow.com/q/35390072/774.",
           "(Check in Keychain Access for an expired WWDR certificate: http://stackoverflow.com/a/35409835/774 has more info.)"
-        ].join(' '))
+        ].join(" "))
       end
 
       ids = []
@@ -54,8 +54,8 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificate
-      Dir.chdir('/tmp') do
-        url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+      Dir.chdir("/tmp") do
+        url = "https://developer.apple.com/certificationauthority/AppleWWDRCA.cer"
         filename = File.basename(url)
         keychain = wwdr_keychain
         keychain = "-k #{keychain.shellescape}" unless keychain.empty?
@@ -73,7 +73,7 @@ module FastlaneCore
         keychains = Helper.backticks(command, print: $verbose).split("\n")
         unless keychains.empty?
           # Select first keychain name from returned keychains list
-          return keychains[0].strip.tr('"', '')
+          return keychains[0].strip.tr('"', "")
         end
       end
       return ""
@@ -83,7 +83,7 @@ module FastlaneCore
       result = `openssl x509 -in "#{path}" -inform der -noout -sha1 -fingerprint`
       begin
         result = result.match(/SHA1 Fingerprint=(.*)/)[1]
-        result.delete!(':')
+        result.delete!(":")
         return result
       rescue
         UI.message(result)

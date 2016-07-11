@@ -1,5 +1,5 @@
-require 'shellwords'
-require 'plist'
+require "shellwords"
+require "plist"
 
 module Snapshot
   class Runner
@@ -49,7 +49,7 @@ module Snapshot
 
       print_results(results)
 
-      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
+      UI.user_error!(self.collected_errors.join("; ")) if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -193,7 +193,7 @@ module Snapshot
     # rubocop:enable Metrics/AbcSize
 
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless ENV["FASTLANE_EXPLICIT_OPEN_SIMULATOR"]
 
       UI.message("Explicitly opening simulator for device: #{device}")
       `open -a Simulator --args -CurrentDeviceUDID #{TestCommandGenerator.device_udid(device)}`
@@ -260,11 +260,11 @@ module Snapshot
 
     def version_of_bundled_helper
       runner_dir = File.dirname(__FILE__)
-      bundled_helper = File.read File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
+      bundled_helper = File.read File.expand_path("../assets/SnapshotHelper.swift", runner_dir)
       current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
 
       ## Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
-      current_version.gsub(%r{^//\w*}, '').strip
+      current_version.gsub(%r{^//\w*}, "").strip
     end
 
     # rubocop:disable Style/Next

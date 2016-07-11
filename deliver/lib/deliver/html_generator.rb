@@ -7,7 +7,7 @@ module Deliver
 
     def run(options, screenshots)
       begin
-        html_path = self.render(options, screenshots, '.')
+        html_path = self.render(options, screenshots, ".")
       rescue => ex
         UI.error(ex.inspect)
         UI.error(ex.backtrace.join("\n"))
@@ -31,12 +31,12 @@ module Deliver
     # Renders all data available to quickly see if everything was correctly generated.
     # @param export_path (String) The path to a folder where the resulting HTML file should be stored.
     def render(options, screenshots, export_path = nil)
-      lib_path = Helper.gem_path('deliver')
+      lib_path = Helper.gem_path("deliver")
 
       @screenshots = screenshots || []
       @options = options
 
-      @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
+      @app_name = (options[:name]["en-US"] || options[:name].values.first) if options[:name]
       @app_name ||= options[:app].name
 
       @languages = options[:description].keys if options[:description]

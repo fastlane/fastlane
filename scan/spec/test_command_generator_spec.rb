@@ -47,7 +47,7 @@ describe Scan do
       xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       xcargs = xcargs_hash.map do |k, v|
         "#{k.to_s.shellescape}=#{v.shellescape}"
-      end.join ' '
+      end.join " "
       options = { project: "./examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -145,7 +145,7 @@ describe Scan do
       it "uses the correct build command with the example project" do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = { project: "./examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
+        options = { project: "./examples/standard/app.xcodeproj", result_bundle: true, scheme: "app" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate

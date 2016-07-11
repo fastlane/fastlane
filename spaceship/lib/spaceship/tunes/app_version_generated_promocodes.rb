@@ -12,9 +12,9 @@ module Spaceship
       attr_reader :codes
 
       attr_mapping({
-        'effectiveDate' => :effective_date,
-        'expirationDate' => :expiration_date,
-        'username' => :username
+        "effectiveDate" => :effective_date,
+        "expirationDate" => :expiration_date,
+        "username" => :username
       })
 
       class << self
@@ -27,8 +27,8 @@ module Spaceship
       end
 
       def setup
-        @version = Tunes::AppVersionPromocodes.factory(raw_data['version'])
-        @codes = raw_data['codes']
+        @version = Tunes::AppVersionPromocodes.factory(raw_data["version"])
+        @codes = raw_data["codes"]
       end
     end
   end

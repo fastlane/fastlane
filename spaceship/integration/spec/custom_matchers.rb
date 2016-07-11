@@ -1,5 +1,5 @@
-require 'diff_matcher'
-require 'multi_json'
+require "diff_matcher"
+require "multi_json"
 
 RSpec::Matchers.define :match_apple_ten_char_id do |example_path|
   match do |actual|
@@ -26,14 +26,14 @@ RSpec::Matchers.define :match_udid do |example_path|
 end
 
 EXAMPLE_MATCHERS = {
-  'number' => ->(arg) { arg.kind_of? Fixnum },
-  'anything-or-empty' => ->(arg) { /.*/ || arg.nil? },
-  'apple-app-id' => /^[A-Z0-9]{10}$/,
-  'boolean' => ->(arg) { arg.kind_of?(TrueClass) || arg.kind_of?(FalseClass) },
-  'email' => /^[^@]+@\w+.\w+$/,
-  'text' => /.+/,
-  'anything' => /.*/,
-  'url' => %r{http[s]?://.*}
+  "number" => ->(arg) { arg.kind_of? Fixnum },
+  "anything-or-empty" => ->(arg) { /.*/ || arg.nil? },
+  "apple-app-id" => /^[A-Z0-9]{10}$/,
+  "boolean" => ->(arg) { arg.kind_of?(TrueClass) || arg.kind_of?(FalseClass) },
+  "email" => /^[^@]+@\w+.\w+$/,
+  "text" => /.+/,
+  "anything" => /.*/,
+  "url" => %r{http[s]?://.*}
 }.freeze
 
 #
@@ -80,13 +80,13 @@ RSpec::Matchers.define :match_example do |example_path|
   end
 
   match do |actual|
-    expected = File.read(File.join(File.expand_path("../../", __FILE__), '/', example_path))
+    expected = File.read(File.join(File.expand_path("../../", __FILE__), "/", example_path))
 
     parsed_hash = MultiJson.load(expected)
     # We have a special section called "path_params" so it's clear what params are passed
     # in the URL path (ids and such) rather than as query params.
-    if parsed_hash['$path_params']
-      parsed_hash.merge!(parsed_hash.delete('$path_params'))
+    if parsed_hash["$path_params"]
+      parsed_hash.merge!(parsed_hash.delete("$path_params"))
     end
 
     actual_hash = if actual.kind_of?(Hash)

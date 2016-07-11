@@ -5,7 +5,7 @@ describe Spaceship do
         it "creates an active profile and delete it" do
           cert = Spaceship::Certificate::Development.all.first
           bundle_id = Spaceship::App.all.first.bundle_id
-          profile = Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me iOS', bundle_id: bundle_id, certificate: cert, devices: nil, mac: false)
+          profile = Spaceship::ProvisioningProfile::Development.create!(name: "Delete Me iOS", bundle_id: bundle_id, certificate: cert, devices: nil, mac: false)
           expect(profile.nil? == false)
           expect(profile.status.equal?("Active"))
 
@@ -20,7 +20,7 @@ describe Spaceship do
         it "creates an active profile and delete it" do
           cert = Spaceship::Certificate::Development.all.first
           bundle_id = Spaceship::App.all.first.bundle_id
-          profile = Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me tvOS', bundle_id: bundle_id, certificate: cert, devices: nil, mac: false, sub_platform: "tvOS")
+          profile = Spaceship::ProvisioningProfile::Development.create!(name: "Delete Me tvOS", bundle_id: bundle_id, certificate: cert, devices: nil, mac: false, sub_platform: "tvOS")
           expect(profile.nil? == false)
           expect(profile.status.equal?("Active"))
           expect(profile.platform.equal?("tvos"))

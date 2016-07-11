@@ -90,7 +90,7 @@ module Sigh
       if $verbose
         "#{profile['Name']} - #{File.basename profile['Path']}"
       else
-        profile['Name']
+        profile["Name"]
       end
     end
 
@@ -129,7 +129,7 @@ module Sigh
       profiles = []
       profile_paths.each do |profile_path|
         profile = Plist.parse_xml(`security cms -D -i '#{profile_path}'`)
-        profile['Path'] = profile_path
+        profile["Path"] = profile_path
         profiles << profile
       end
 

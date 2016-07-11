@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Get Build Number Integration" do
-      require 'shellwords'
+      require "shellwords"
 
       it "gets the build number of the Xcode project" do
         Fastlane::FastFile.new.parse("lane :test do

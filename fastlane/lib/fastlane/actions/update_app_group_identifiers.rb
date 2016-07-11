@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class UpdateAppGroupIdentifiersAction < Action
-      require 'plist'
+      require "plist"
 
       def self.run(params)
         UI.message("Entitlements File: #{params[:entitlements_file]}")
@@ -19,18 +19,18 @@ module Fastlane
         UI.user_error!("Entitlements file at '#{entitlements_file}' cannot be parsed.") unless result
 
         # get app group field
-        app_group_field = result['com.apple.security.application-groups']
+        app_group_field = result["com.apple.security.application-groups"]
         UI.user_error!("No existing App group field specified. Please specify an App Group in the entitlements file.") unless app_group_field
 
         # set new app group identifiers
         UI.message("Old App Group Identifiers: #{app_group_field}")
-        result['com.apple.security.application-groups'] = params[:app_group_identifiers]
+        result["com.apple.security.application-groups"] = params[:app_group_identifiers]
 
         # save entitlements file
         result.save_plist(entitlements_file)
         UI.message("New App Group Identifiers set: #{result['com.apple.security.application-groups']}")
 
-        Actions.lane_context[SharedValues::APP_GROUP_IDENTIFIERS] = result['com.apple.security.application-groups']
+        Actions.lane_context[SharedValues::APP_GROUP_IDENTIFIERS] = result["com.apple.security.application-groups"]
       end
 
       def self.description
@@ -57,7 +57,7 @@ module Fastlane
       end
 
       def self.output
-        ['APP_GROUP_IDENTIFIERS', 'The new App Group Identifiers']
+        ["APP_GROUP_IDENTIFIERS", "The new App Group Identifiers"]
       end
 
       def self.authors

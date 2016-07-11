@@ -52,19 +52,19 @@ module Spaceship
       attr_accessor :identifiers_count
 
       attr_mapping(
-        'appIdId' => :app_id,
-        'name' => :name,
-        'appIdPlatform' => :platform,
-        'prefix' => :prefix,
-        'identifier' => :bundle_id,
-        'isWildCard' => :is_wildcard,
-        'features' => :features,
-        'enabledFeatures' => :enabled_features,
-        'isDevPushEnabled' => :dev_push_enabled,
-        'isProdPushEnabled' => :prod_push_enabled,
-        'associatedApplicationGroupsCount' => :app_groups_count,
-        'associatedCloudContainersCount' => :cloud_containers_count,
-        'associatedIdentifiersCount' => :identifiers_count
+        "appIdId" => :app_id,
+        "name" => :name,
+        "appIdPlatform" => :platform,
+        "prefix" => :prefix,
+        "identifier" => :bundle_id,
+        "isWildCard" => :is_wildcard,
+        "features" => :features,
+        "enabledFeatures" => :enabled_features,
+        "isDevPushEnabled" => :dev_push_enabled,
+        "isProdPushEnabled" => :prod_push_enabled,
+        "associatedApplicationGroupsCount" => :app_groups_count,
+        "associatedCloudContainersCount" => :cloud_containers_count,
+        "associatedIdentifiersCount" => :identifiers_count
       )
 
       class << self
@@ -88,7 +88,7 @@ module Spaceship
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
         def create!(bundle_id: nil, name: nil, mac: false)
-          if bundle_id.end_with?('*')
+          if bundle_id.end_with?("*")
             type = :wildcard
           else
             type = :explicit
@@ -141,7 +141,7 @@ module Spaceship
 
       # @return (Bool) Is this a Mac app?
       def mac?
-        platform == 'mac'
+        platform == "mac"
       end
     end
   end

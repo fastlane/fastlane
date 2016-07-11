@@ -22,19 +22,19 @@ module Frameit
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
       when sizes::IOS_55
-        return 'iPhone-6s-Plus'
+        return "iPhone-6s-Plus"
       when sizes::IOS_47
-        return 'iPhone-6s'
+        return "iPhone-6s"
       when sizes::IOS_40
-        return Frameit.config[:use_legacy_iphone5s] ? 'iPhone_5s' : 'iPhone-SE'
+        return Frameit.config[:use_legacy_iphone5s] ? "iPhone_5s" : "iPhone-SE"
       when sizes::IOS_35
-        return 'iPhone_4'
+        return "iPhone_4"
       when sizes::IOS_IPAD
-        return 'iPad-mini'
+        return "iPad-mini"
       when sizes::IOS_IPAD_PRO
-        return 'iPad-Pro'
+        return "iPad-Pro"
       when sizes::MAC
-        return 'Mac'
+        return "Mac"
       else
         UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
       end
@@ -51,7 +51,7 @@ module Frameit
     end
 
     def mac?
-      return device_name == 'Mac'
+      return device_name == "Mac"
     end
 
     # The name of the orientation of a screenshot. Used to find the correct template

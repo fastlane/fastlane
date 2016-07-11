@@ -7,14 +7,14 @@ module Fastlane
     class GetGithubReleaseAction < Action
       def self.run(params)
         UI.message("Getting release on GitHub (#{params[:server_url]}/#{params[:url]}: #{params[:version]})")
-        require 'excon'
-        require 'base64'
+        require "excon"
+        require "base64"
 
         server_url = params[:server_url]
-        server_url = server_url[0..-2] if server_url.end_with? '/'
+        server_url = server_url[0..-2] if server_url.end_with? "/"
 
-        headers = { 'User-Agent' => 'fastlane-get_github_release' }
-        headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
+        headers = { "User-Agent" => "fastlane-get_github_release" }
+        headers["Authorization"] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
 
         # To still get the data when a repo has been moved
         middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower]
@@ -36,7 +36,7 @@ module Fastlane
 
         result = JSON.parse(response.body)
         result.each do |current|
-          next unless current['tag_name'] == params[:version]
+          next unless current["tag_name"] == params[:version]
 
           # Found it
           Actions.lane_context[SharedValues::GET_GITHUB_RELEASE_INFO] = current
@@ -103,7 +103,7 @@ module Fastlane
 
       def self.output
         [
-          ['GET_GITHUB_RELEASE_INFO', 'Contains all the information about this release']
+          ["GET_GITHUB_RELEASE_INFO", "Contains all the information about this release"]
         ]
       end
 
@@ -114,7 +114,7 @@ module Fastlane
                                        description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
                                        verify_block: proc do |value|
                                          UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.include? "github.com"
-                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.split('/').count != 2
+                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.split("/").count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
                                        env_name: "FL_GITHUB_RELEASE_SERVER_URL",

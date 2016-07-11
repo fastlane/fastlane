@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Commander::Runner do
-  describe 'tool collector interactions' do
+  describe "tool collector interactions" do
     class CommandsGenerator
       include Commander::Methods
 
@@ -10,9 +10,9 @@ describe Commander::Runner do
       end
 
       def run
-        program :name, 'tool_name'
-        program :version, '1.9'
-        program :description, 'Description'
+        program :name, "tool_name"
+        program :version, "1.9"
+        program :description, "Description"
 
         # This is required because we're running this real Commander instance inside of
         # the real rspec tests command. When we run rspec for all projects, these options
@@ -21,8 +21,8 @@ describe Commander::Runner do
         #
         # This is not ideal, but the downside is potential broken tests in the future,
         # which we can quickly adjust.
-        global_option '--format', String
-        global_option '--out', String
+        global_option "--format", String
+        global_option "--out", String
 
         command :run do |c|
           c.action do |args, options|
@@ -69,10 +69,10 @@ describe Commander::Runner do
     end
   end
 
-  describe '#handle_unknown_error' do
+  describe "#handle_unknown_error" do
     class CustomError < StandardError
       def preferred_error_info
-        ['Title', 'Line 1', 'Line 2']
+        ["Title", "Line 1", "Line 2"]
       end
     end
 
@@ -82,19 +82,19 @@ describe Commander::Runner do
       end
     end
 
-    it 'should reraise errors that are not of special interest' do
+    it "should reraise errors that are not of special interest" do
       expect do
-        Commander::Runner.new.handle_unknown_error!(StandardError.new('my message'))
-      end.to raise_error(StandardError, '[!] my message'.red)
+        Commander::Runner.new.handle_unknown_error!(StandardError.new("my message"))
+      end.to raise_error(StandardError, "[!] my message".red)
     end
 
-    it 'should reraise errors that return nil from #preferred_error_info' do
+    it "should reraise errors that return nil from #preferred_error_info" do
       expect do
-        Commander::Runner.new.handle_unknown_error!(NilReturningError.new('my message'))
-      end.to raise_error(StandardError, '[!] my message'.red)
+        Commander::Runner.new.handle_unknown_error!(NilReturningError.new("my message"))
+      end.to raise_error(StandardError, "[!] my message".red)
     end
 
-    it 'should abort and show custom info for errors that have the Apple error info provider method with $verbose=false' do
+    it "should abort and show custom info for errors that have the Apple error info provider method with $verbose=false" do
       runner = Commander::Runner.new
       expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
 
@@ -103,7 +103,7 @@ describe Commander::Runner do
       end
     end
 
-    it 'should reraise and show custom info for errors that have the Apple error info provider method with $verbose=true' do
+    it "should reraise and show custom info for errors that have the Apple error info provider method with $verbose=true" do
       with_verbose(true) do
         expect do
           Commander::Runner.new.handle_unknown_error!(CustomError.new)

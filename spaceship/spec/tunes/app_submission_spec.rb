@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::AppSubmission do
   before { Spaceship::Tunes.login }

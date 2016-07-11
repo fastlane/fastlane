@@ -35,7 +35,7 @@ module Fastlane
 
     # @return [String] The lane + name of the lane. If there is no platform, it will only be the lane name
     def pretty_name
-      [platform, name].reject(&:nil?).join(' ')
+      [platform, name].reject(&:nil?).join(" ")
     end
 
     class << self

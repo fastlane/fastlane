@@ -1,4 +1,4 @@
-require 'coveralls'
+require "coveralls"
 Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 # This module is only used to check the environment is currently a testing env
@@ -6,8 +6,8 @@ Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 module SpecHelper
 end
 
-require 'deliver'
-require 'webmock/rspec'
+require "deliver"
+require "webmock/rspec"
 
 ENV["DELIVER_USER"] = "DELIVERUSER"
 ENV["DELIVER_PASSWORD"] = "DELIVERPASS"
@@ -18,4 +18,4 @@ RSpec.configure do |config|
   end
 end
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")
