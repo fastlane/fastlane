@@ -1,14 +1,14 @@
 describe Match::Generator do
-  describe 'calling through to other tools ' do
-    it 'configures cert correctly for nested execution' do
-      require 'cert'
+  describe "calling through to other tools " do
+    it "configures cert correctly for nested execution" do
+      require "cert"
 
       config = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: true,
-        output_path: 'workspace/certs/development',
+        output_path: "workspace/certs/development",
         force: true,
-        username: 'username',
-        team_id: 'team_id'
+        username: "username",
+        team_id: "team_id"
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -22,28 +22,28 @@ describe Match::Generator do
       allow(fake_runner).to receive(:launch).and_return("fake_path")
 
       params = {
-        type: 'development',
-        workspace: 'workspace',
-        username: 'username',
-        team_id: 'team_id'
+        type: "development",
+        workspace: "workspace",
+        username: "username",
+        team_id: "team_id"
       }
-      Match::Generator.generate_certificate(params, 'development')
+      Match::Generator.generate_certificate(params, "development")
     end
 
-    it 'configures sigh correctly for nested execution' do
-      require 'sigh'
+    it "configures sigh correctly for nested execution" do
+      require "sigh"
 
       config = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
-        app_identifier: 'app_identifier',
+        app_identifier: "app_identifier",
         adhoc: false,
         development: true,
-        output_path: 'workspace/profiles/development',
-        username: 'username',
+        output_path: "workspace/profiles/development",
+        username: "username",
         force: true,
-        cert_id: 'fake_cert_id',
-        provisioning_name: 'match Development app_identifier',
+        cert_id: "fake_cert_id",
+        provisioning_name: "match Development app_identifier",
         ignore_profiles_with_different_name: true,
-        team_id: 'team_id'
+        team_id: "team_id"
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -55,13 +55,13 @@ describe Match::Generator do
       allow(Sigh::Manager).to receive(:start).and_return("fake_path")
 
       params = {
-        app_identifier: 'app_identifier',
+        app_identifier: "app_identifier",
         prov_type: :development,
-        workspace: 'workspace',
-        username: 'username',
-        team_id: 'team_id'
+        workspace: "workspace",
+        username: "username",
+        team_id: "team_id"
       }
-      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id')
+      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: "fake_cert_id")
     end
   end
 end

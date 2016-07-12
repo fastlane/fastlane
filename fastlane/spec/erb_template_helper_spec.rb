@@ -3,12 +3,12 @@ describe Fastlane do
     describe ".load_template" do
       it "raises an error if file does not exist" do
         expect do
-          Fastlane::ErbTemplateHelper.load('invalid_name')
+          Fastlane::ErbTemplateHelper.load("invalid_name")
         end.to raise_exception("Could not find Template at path './/lib/assets/invalid_name.erb'")
       end
 
       it "should load file if exists" do
-        f = Fastlane::ErbTemplateHelper.load('s3_html_template')
+        f = Fastlane::ErbTemplateHelper.load("s3_html_template")
         expect(f).not_to be_empty
       end
     end

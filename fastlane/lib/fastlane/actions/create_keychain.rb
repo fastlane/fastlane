@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Fastlane
   module Actions
@@ -53,11 +53,11 @@ module Fastlane
                                        description: "Password for the keychain",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :default_keychain,
-                                       description: 'Set the default keychain',
+                                       description: "Set the default keychain",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :unlock,
-                                       description: 'Unlock keychain after create',
+                                       description: "Unlock keychain after create",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :timeout,
@@ -65,15 +65,15 @@ module Fastlane
                                        is_string: false,
                                        default_value: 300),
           FastlaneCore::ConfigItem.new(key: :lock_when_sleeps,
-                                       description: 'Lock keychain when the system sleeps',
+                                       description: "Lock keychain when the system sleeps",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :lock_after_timeout,
-                                       description: 'Lock keychain after timeout interval',
+                                       description: "Lock keychain after timeout interval",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
-                                       description: 'Add keychain to search list',
+                                       description: "Add keychain to search list",
                                        is_string: false,
                                        default_value: true)
         ]

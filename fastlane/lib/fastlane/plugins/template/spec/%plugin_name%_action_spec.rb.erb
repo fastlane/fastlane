@@ -1,6 +1,6 @@
 describe Fastlane::Actions::<%= plugin_name.fastlane_class %>Action do
-  describe '#run' do
-    it 'prints a message' do
+  describe "#run" do
+    it "prints a message" do
       expect(Fastlane::UI).to receive(:message).with("The <%= plugin_name %> plugin is working!")
 
       Fastlane::Actions::<%= plugin_name.fastlane_class %>Action.run(nil)

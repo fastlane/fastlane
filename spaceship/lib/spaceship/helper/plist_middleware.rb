@@ -1,9 +1,9 @@
-require 'faraday_middleware/response_middleware'
+require "faraday_middleware/response_middleware"
 
 module FaradayMiddleware
   class PlistMiddleware < ResponseMiddleware
     dependency do
-      require 'plist' unless defined?(::Plist)
+      require "plist" unless defined?(::Plist)
     end
 
     define_parser do |body|

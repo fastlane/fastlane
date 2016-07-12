@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Fastlane
   module Actions
@@ -11,11 +11,11 @@ module Fastlane
           return paths if Helper.is_test?
 
           if (paths || []).count == 0
-            Actions.sh('git reset --hard HEAD')
+            Actions.sh("git reset --hard HEAD")
 
-            clean_options = ['q', 'f', 'd']
-            clean_options << 'x' if params[:disregard_gitignore]
-            clean_command = 'git clean' + ' -' + clean_options.join
+            clean_options = ["q", "f", "d"]
+            clean_options << "x" if params[:disregard_gitignore]
+            clean_command = "git clean" + " -" + clean_options.join
 
             # we want to make sure that we have an array of patterns, and no nil values
             unless params[:exclude].kind_of?(Enumerable)
@@ -23,11 +23,11 @@ module Fastlane
             end
 
             # attach our exclude patterns to the command
-            clean_command += ' ' + params[:exclude].map { |exclude| '-e ' + exclude.shellescape }.join(' ') unless params[:exclude].count == 0
+            clean_command += " " + params[:exclude].map { |exclude| "-e " + exclude.shellescape }.join(" ") unless params[:exclude].count == 0
 
             Actions.sh(clean_command) unless params[:skip_clean]
 
-            UI.success('Git repo was reset and cleaned back to a pristine state.')
+            UI.success("Git repo was reset and cleaned back to a pristine state.")
           else
             paths.each do |path|
               UI.important("Couldn't find file at path '#{path}'") unless File.exist?(path)
@@ -50,7 +50,7 @@ module Fastlane
           "Untracked files like `.env` will also be deleted, unless `:skip_clean` is true.",
           "It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:",
           "You have called the ensure_git_status_clean action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run."
-        ].join(' ')
+        ].join(" ")
       end
 
       def self.available_options
@@ -88,7 +88,7 @@ module Fastlane
       end
 
       def self.author
-        'lmirosevic'
+        "lmirosevic"
       end
 
       def self.is_supported?(platform)

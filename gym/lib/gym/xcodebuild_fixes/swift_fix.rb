@@ -2,7 +2,7 @@
 # from http://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
-require 'zip'
+require "zip"
 
 module Gym
   class XcodebuildFixes
@@ -10,7 +10,7 @@ module Gym
       # Determine whether it is a Swift project and, eventually, include all required libraries to copy from Xcode's toolchain directory.
       # Since there's no "xcodebuild" target to do just that, it is done post-build when exporting an archived build.
       def swift_library_fix
-        require 'fileutils'
+        require "fileutils"
 
         return if check_for_swift PackageCommandGenerator
 

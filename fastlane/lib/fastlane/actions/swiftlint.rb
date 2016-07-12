@@ -6,8 +6,8 @@ module Fastlane
           UI.user_error!("You have to install swiftlint using `brew install swiftlint`")
         end
 
-        version = Gem::Version.new(Helper.test? ? '0.0.0' : `swiftlint version`.chomp)
-        if params[:mode] == :autocorrect and version < Gem::Version.new('0.5.0') and !Helper.test?
+        version = Gem::Version.new(Helper.test? ? "0.0.0" : `swiftlint version`.chomp)
+        if params[:mode] == :autocorrect and version < Gem::Version.new("0.5.0") and !Helper.test?
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
@@ -16,7 +16,7 @@ module Fastlane
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
 
         if params[:files]
-          if version < Gem::Version.new('0.5.1') and !Helper.test?
+          if version < Gem::Version.new("0.5.1") and !Helper.test?
             UI.user_error!("Your version of swiftlint (#{version}) does not support list of files as input.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           end
 
@@ -53,18 +53,18 @@ module Fastlane
                                        default_value: :lint,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :output_file,
-                                       description: 'Path to output SwiftLint result',
+                                       description: "Path to output SwiftLint result",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :config_file,
-                                       description: 'Custom configuration file of SwiftLint',
+                                       description: "Custom configuration file of SwiftLint",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :strict,
-                                       description: 'Fail on warnings? (true/false)',
+                                       description: "Fail on warnings? (true/false)",
                                        default_value: false,
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :files,
-                                       description: 'List of files to process',
+                                       description: "List of files to process",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :ignore_exit_status,
@@ -92,11 +92,11 @@ module Fastlane
 
       def self.handle_swiftlint_error(ignore_exit_status, exit_status)
         if ignore_exit_status
-          failure_suffix = 'which would normally fail the build.'
-          secondary_message = 'fastlane will continue because the `ignore_exit_status` option was used! 🙈'
+          failure_suffix = "which would normally fail the build."
+          secondary_message = "fastlane will continue because the `ignore_exit_status` option was used! 🙈"
         else
-          failure_suffix = 'which represents a failure.'
-          secondary_message = 'If you want fastlane to continue anyway, use the `ignore_exit_status` option. 🙈'
+          failure_suffix = "which represents a failure."
+          secondary_message = "If you want fastlane to continue anyway, use the `ignore_exit_status` option. 🙈"
         end
 
         UI.important("")

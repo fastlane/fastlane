@@ -1,4 +1,4 @@
-require 'fileutils'
+require "fileutils"
 
 module Fastlane
   # Enable tab auto completion
@@ -13,7 +13,7 @@ module Fastlane
       FileUtils.mkdir_p fastlane_conf_dir
 
       # then copy all of the completions files into it from the gem
-      completion_script_path = File.join(Fastlane::Helper.gem_path('fastlane'), 'lib', 'assets', 'completions')
+      completion_script_path = File.join(Fastlane::Helper.gem_path("fastlane"), "lib", "assets", "completions")
       FileUtils.cp_r completion_script_path, fastlane_conf_dir
 
       UI.success "Copied! To use auto complete for fastlane, add the following line to your favorite rc file (e.g. ~/.bashrc)"

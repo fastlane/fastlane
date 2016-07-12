@@ -5,7 +5,7 @@ module Fastlane
         if params[:path].kind_of?(String)
           paths = params[:path].shellescape
         else
-          paths = params[:path].map(&:shellescape).join(' ')
+          paths = params[:path].map(&:shellescape).join(" ")
         end
 
         result = Actions.sh("git commit -m #{params[:message].shellescape} #{paths}")

@@ -1,16 +1,16 @@
-require 'json'
-require 'scan/version'
-require 'scan/manager'
-require 'scan/options'
-require 'scan/runner'
-require 'scan/detect_values'
-require 'scan/report_collector'
-require 'scan/test_command_generator'
-require 'scan/test_result_parser'
-require 'scan/error_handler'
-require 'scan/slack_poster'
+require "json"
+require "scan/version"
+require "scan/manager"
+require "scan/options"
+require "scan/runner"
+require "scan/detect_values"
+require "scan/report_collector"
+require "scan/test_command_generator"
+require "scan/test_result_parser"
+require "scan/error_handler"
+require "scan/slack_poster"
 
-require 'fastlane_core'
+require "fastlane_core"
 
 module Scan
   class << self

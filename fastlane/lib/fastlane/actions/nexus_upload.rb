@@ -10,7 +10,7 @@ module Fastlane
         command += upload_options(params)
         command << upload_url(params)
 
-        Fastlane::Actions.sh(command.join(' '), log: params[:verbose])
+        Fastlane::Actions.sh(command.join(" "), log: params[:verbose])
       end
 
       def self.upload_url(params)
@@ -23,7 +23,7 @@ module Fastlane
 
       def self.upload_options(params)
         file_path = File.expand_path(params[:file]).shellescape
-        file_extension = file_path.split('.').last.shellescape
+        file_extension = file_path.split(".").last.shellescape
 
         options = []
         options << "-F p=zip"

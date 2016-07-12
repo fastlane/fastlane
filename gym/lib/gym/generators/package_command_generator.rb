@@ -3,11 +3,11 @@
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
-require 'shellwords'
+require "shellwords"
 
 # The concrete implementations
-require 'gym/generators/package_command_generator_legacy'
-require 'gym/generators/package_command_generator_xcode7'
+require "gym/generators/package_command_generator_legacy"
+require "gym/generators/package_command_generator_xcode7"
 
 module Gym
   class PackageCommandGenerator

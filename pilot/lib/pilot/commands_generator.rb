@@ -85,7 +85,7 @@ module Pilot
         c.syntax = "pilot add"
         c.description = "Adds new external tester(s) to a specific app (if given). This will also add an existing tester to an app."
         c.action do |args, options|
-          handle_multiple('add_tester', args, options)
+          handle_multiple("add_tester", args, options)
         end
       end
 
@@ -102,7 +102,7 @@ module Pilot
         c.syntax = "pilot find"
         c.description = "Find tester(s) (internal or external) by their email address"
         c.action do |args, options|
-          handle_multiple('find_tester', args, options)
+          handle_multiple("find_tester", args, options)
         end
       end
 
@@ -110,7 +110,7 @@ module Pilot
         c.syntax = "pilot remove"
         c.description = "Remove external tester(s) by their email address"
         c.action do |args, options|
-          handle_multiple('remove_tester', args, options)
+          handle_multiple("remove_tester", args, options)
         end
       end
 

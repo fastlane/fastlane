@@ -1,27 +1,27 @@
-require 'colored'
-require 'ostruct'
+require "colored"
+require "ostruct"
 
 describe Pilot::TesterManager do
   describe "prints tester lists" do
     let(:global_testers) do
       [
         OpenStruct.new(
-          first_name: 'First',
-          last_name: 'Last',
-          email: 'my@email.addr',
+          first_name: "First",
+          last_name: "Last",
+          email: "my@email.addr",
           devices: ["d"],
-          full_version: '1.0 (21)',
-          pretty_install_date: '2016-01-01',
-          something_else: 'blah'
+          full_version: "1.0 (21)",
+          pretty_install_date: "2016-01-01",
+          something_else: "blah"
         ),
         OpenStruct.new(
-          first_name: 'Fabricio',
-          last_name: 'Devtoolio',
-          email: 'fabric-devtools@gmail.com',
+          first_name: "Fabricio",
+          last_name: "Devtoolio",
+          email: "fabric-devtools@gmail.com",
           devices: ["d", "d2"],
-          full_version: '1.1 (22)',
-          pretty_install_date: '2016-02-02',
-          something_else: 'blah'
+          full_version: "1.1 (22)",
+          pretty_install_date: "2016-02-02",
+          something_else: "blah"
         )
       ]
     end
@@ -29,16 +29,16 @@ describe Pilot::TesterManager do
     let(:app_context_testers) do
       [
         OpenStruct.new(
-          first_name: 'First',
-          last_name: 'Last',
-          email: 'my@email.addr',
-          something_else: 'blah'
+          first_name: "First",
+          last_name: "Last",
+          email: "my@email.addr",
+          something_else: "blah"
         ),
         OpenStruct.new(
-          first_name: 'Fabricio',
-          last_name: 'Devtoolio',
-          email: 'fabric-devtools@gmail.com',
-          something_else: 'blah'
+          first_name: "Fabricio",
+          last_name: "Devtoolio",
+          email: "fabric-devtools@gmail.com",
+          something_else: "blah"
         )
       ]
     end
@@ -98,7 +98,7 @@ describe Pilot::TesterManager do
                                                    headings: headings,
                                                        rows: rows)
 
-        tester_manager.list_testers(app_identifier: 'com.whatever')
+        tester_manager.list_testers(app_identifier: "com.whatever")
       end
     end
   end

@@ -11,10 +11,10 @@ module Spaceship
       attr_accessor :url
 
       attr_mapping(
-        'assetToken' => :asset_token,
-        'timeStemp' => :time_stamp,
-        'url' => :url,
-        'name' => :name
+        "assetToken" => :asset_token,
+        "timeStemp" => :time_stamp,
+        "url" => :url,
+        "name" => :name
       )
 
       class << self

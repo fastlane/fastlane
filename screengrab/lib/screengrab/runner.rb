@@ -2,9 +2,9 @@
 module Screengrab
   class Runner
     NEEDED_PERMISSIONS = [
-      'android.permission.READ_EXTERNAL_STORAGE',
-      'android.permission.WRITE_EXTERNAL_STORAGE',
-      'android.permission.CHANGE_CONFIGURATION'
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.CHANGE_CONFIGURATION"
     ].freeze
 
     attr_accessor :number_of_retries
@@ -23,12 +23,12 @@ module Screengrab
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)
       tests_apk_path = @config.fetch(:tests_apk_path, ask: false)
-      discovered_apk_paths = Dir[File.join('**', '*.apk')]
+      discovered_apk_paths = Dir[File.join("**", "*.apk")]
 
       apk_paths_provided = app_apk_path && !app_apk_path.empty? && tests_apk_path && !tests_apk_path.empty?
 
       unless apk_paths_provided || discovered_apk_paths.any?
-        UI.error 'No APK paths were provided and no APKs could be found'
+        UI.error "No APK paths were provided and no APKs could be found"
         UI.error "Please provide APK paths with 'app_apk_path' and 'tests_apk_path' and make sure you have assembled APKs prior to running this command."
         return
       end
@@ -42,8 +42,8 @@ module Screengrab
       end
 
       if (test_classes_to_use.nil? || test_classes_to_use.empty?) && (test_packages_to_use.nil? || test_packages_to_use.empty?)
-        UI.important 'Limiting the test classes run by `screengrab` to just those that generate screenshots can make runs faster.'
-        UI.important 'Consider using the :use_tests_in_classes or :use_tests_in_packages option, and organize your tests accordingly.'
+        UI.important "Limiting the test classes run by `screengrab` to just those that generate screenshots can make runs faster."
+        UI.important "Consider using the :use_tests_in_classes or :use_tests_in_packages option, and organize your tests accordingly."
       end
 
       device_type_dir_name = "#{@config[:device_type]}Screenshots"
@@ -81,10 +81,10 @@ module Screengrab
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
       # devices.reject! { |d| d.include?("List of devices attached") || d.include?("* daemon") || d.include?("unauthorized") || d.include?("offline") }
       devices.reject! do |device|
-        ['unauthorized', 'offline', '* daemon', 'List of devices attached'].any? { |status| device.include? status }
+        ["unauthorized", "offline", "* daemon", "List of devices attached"].any? { |status| device.include? status }
       end
 
-      UI.user_error! 'There are no connected and authorized devices or emulators' if devices.empty?
+      UI.user_error! "There are no connected and authorized devices or emulators" if devices.empty?
 
       devices.select! { |d| d.include?(@config[:specific_device]) } if @config[:specific_device]
 
@@ -104,12 +104,12 @@ module Screengrab
 
     def select_app_apk(discovered_apk_paths)
       UI.important "To not be asked about this value, you can specify it using 'app_apk_path'"
-      UI.select('Select your debug app APK', discovered_apk_paths)
+      UI.select("Select your debug app APK", discovered_apk_paths)
     end
 
     def select_tests_apk(discovered_apk_paths)
       UI.important "To not be asked about this value, you can specify it using 'tests_apk_path'"
-      UI.select('Select your debug tests APK', discovered_apk_paths)
+      UI.select("Select your debug tests APK", discovered_apk_paths)
     end
 
     def clear_local_previous_screenshots(device_type_dir_name)
@@ -118,7 +118,7 @@ module Screengrab
 
         # We'll clear the temporary directory where screenshots wind up after being pulled from
         # the device as well, in case those got stranded on a previous run/failure
-        ['screenshots', device_type_dir_name].each do |dir_name|
+        ["screenshots", device_type_dir_name].each do |dir_name|
           files = screenshot_file_names_in(@config[:output_directory], dir_name)
           File.delete(*files)
         end
@@ -126,14 +126,14 @@ module Screengrab
     end
 
     def screenshot_file_names_in(output_directory, device_type)
-      Dir.glob(File.join(output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
+      Dir.glob(File.join(output_directory, "**", device_type, "*.png"), File::FNM_CASEFOLD)
     end
 
     def determine_external_screenshots_path(device_serial)
       device_ext_storage = @executor.execute(command: "adb -s #{device_serial} shell echo \\$EXTERNAL_STORAGE",
                                              print_all: true,
                                              print_command: true)
-      File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
+      File.join(device_ext_storage, @config[:app_package_name], "screengrab")
     end
 
     def determine_internal_screenshots_path
@@ -141,7 +141,7 @@ module Screengrab
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
-      UI.message 'Cleaning screenshots on device'
+      UI.message "Cleaning screenshots on device"
 
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(device_serial, device_path) do |path|
@@ -158,7 +158,7 @@ module Screengrab
         return
       end
 
-      UI.message 'Validating app APK'
+      UI.message "Validating app APK"
       apk_permissions = @executor.execute(command: "#{@android_env.aapt_path} dump permissions #{app_apk_path}",
                                           print_all: true,
                                           print_command: true)
@@ -171,13 +171,13 @@ module Screengrab
     end
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
-      UI.message 'Installing app APK'
+      UI.message "Installing app APK"
       apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{app_apk_path}",
                         print_all: true,
                         print_command: true)
       UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
-      UI.message 'Installing tests APK'
+      UI.message "Installing tests APK"
       apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{tests_apk_path}",
                         print_all: true,
                         print_command: true)
@@ -185,7 +185,7 @@ module Screengrab
     end
 
     def grant_permissions(device_serial)
-      UI.message 'Granting the permission necessary to change locales on the device'
+      UI.message "Granting the permission necessary to change locales on the device"
       @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.CHANGE_CONFIGURATION",
                         print_all: true,
                         print_command: true)
@@ -195,7 +195,7 @@ module Screengrab
                                              print_command: true).to_i
 
       if device_api_version >= 23
-        UI.message 'Granting the permissions necessary to access device external storage'
+        UI.message "Granting the permissions necessary to access device external storage"
         @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
                           print_all: true,
                           print_command: true)
@@ -262,10 +262,10 @@ module Screengrab
     def move_pulled_screenshots(device_type_dir_name)
       # Glob pattern that finds the pulled screenshots directory for each locale
       # (Matches: fastlane/metadata/android/en-US/images/screenshots)
-      screenshots_dir_pattern = File.join(@config[:output_directory], '**', "screenshots")
+      screenshots_dir_pattern = File.join(@config[:output_directory], "**", "screenshots")
 
       Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
-        src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)
+        src_screenshots = Dir.glob(File.join(screenshots_dir, "*.png"), File::FNM_CASEFOLD)
 
         # We move the screenshots by replacing the last segment of the screenshots directory path with
         # the device_type specific name
@@ -285,7 +285,7 @@ module Screengrab
     def if_device_path_exists(device_serial, device_path)
       return if @executor.execute(command: "adb -s #{device_serial} shell ls #{device_path}",
                                   print_all: false,
-                                  print_command: false).include?('No such file')
+                                  print_command: false).include?("No such file")
 
       yield device_path
     end

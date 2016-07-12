@@ -1,4 +1,4 @@
-require 'deliver/setup'
+require "deliver/setup"
 
 describe Deliver do
   describe Deliver::Setup do

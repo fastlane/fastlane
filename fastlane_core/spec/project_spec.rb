@@ -1,6 +1,6 @@
 describe FastlaneCore do
   describe FastlaneCore::Project do
-    describe 'project and workspace detection' do
+    describe "project and workspace detection" do
       def within_a_temp_dir
         Dir.mktmpdir do |dir|
           FileUtils.cd(dir) do
@@ -16,32 +16,32 @@ describe FastlaneCore do
         ]
       end
 
-      it 'raises if both project and workspace are specified' do
+      it "raises if both project and workspace are specified" do
         expect do
-          config = FastlaneCore::Configuration.new(options, { project: 'yup', workspace: 'yeah' })
+          config = FastlaneCore::Configuration.new(options, { project: "yup", workspace: "yeah" })
           FastlaneCore::Project.detect_projects(config)
         end.to raise_error
       end
 
-      it 'keeps the specified project' do
-        config = FastlaneCore::Configuration.new(options, { project: 'yup' })
+      it "keeps the specified project" do
+        config = FastlaneCore::Configuration.new(options, { project: "yup" })
         FastlaneCore::Project.detect_projects(config)
 
-        expect(config[:project]).to eq('yup')
+        expect(config[:project]).to eq("yup")
         expect(config[:workspace]).to be_nil
       end
 
-      it 'keeps the specified workspace' do
-        config = FastlaneCore::Configuration.new(options, { workspace: 'yeah' })
+      it "keeps the specified workspace" do
+        config = FastlaneCore::Configuration.new(options, { workspace: "yeah" })
         FastlaneCore::Project.detect_projects(config)
 
         expect(config[:project]).to be_nil
-        expect(config[:workspace]).to eq('yeah')
+        expect(config[:workspace]).to eq("yeah")
       end
 
-      it 'picks the only workspace file present' do
+      it "picks the only workspace file present" do
         within_a_temp_dir do |dir|
-          workspace = './Something.xcworkspace'
+          workspace = "./Something.xcworkspace"
           FileUtils.mkdir_p(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
@@ -51,9 +51,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'picks the only project file present' do
+      it "picks the only project file present" do
         within_a_temp_dir do |dir|
-          project = './Something.xcodeproj'
+          project = "./Something.xcodeproj"
           FileUtils.mkdir_p(project)
 
           config = FastlaneCore::Configuration.new(options, {})
@@ -63,9 +63,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'prompts to select among multiple workspace files' do
+      it "prompts to select among multiple workspace files" do
         within_a_temp_dir do |dir|
-          workspaces = ['./Something.xcworkspace', './SomethingElse.xcworkspace']
+          workspaces = ["./Something.xcworkspace", "./SomethingElse.xcworkspace"]
           FileUtils.mkdir_p(workspaces)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
@@ -78,9 +78,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'prompts to select among multiple project files' do
+      it "prompts to select among multiple project files" do
         within_a_temp_dir do |dir|
-          projects = ['./Something.xcodeproj', './SomethingElse.xcodeproj']
+          projects = ["./Something.xcodeproj", "./SomethingElse.xcodeproj"]
           FileUtils.mkdir_p(projects)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
@@ -93,9 +93,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'asks the user to specify a project when none are found' do
+      it "asks the user to specify a project when none are found" do
         within_a_temp_dir do |dir|
-          project = './subdir/Something.xcodeproj'
+          project = "./subdir/Something.xcodeproj"
           FileUtils.mkdir_p(project)
 
           expect(FastlaneCore::Project).to receive(:ask).and_return(project)
@@ -107,9 +107,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'asks the user to specify a workspace when none are found' do
+      it "asks the user to specify a workspace when none are found" do
         within_a_temp_dir do |dir|
-          workspace = './subdir/Something.xcworkspace'
+          workspace = "./subdir/Something.xcworkspace"
           FileUtils.mkdir_p(workspace)
 
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
@@ -121,9 +121,9 @@ describe FastlaneCore do
         end
       end
 
-      it 'explains when a provided path is not found' do
+      it "explains when a provided path is not found" do
         within_a_temp_dir do |dir|
-          workspace = './subdir/Something.xcworkspace'
+          workspace = "./subdir/Something.xcworkspace"
           FileUtils.mkdir_p(workspace)
 
           expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
@@ -137,13 +137,13 @@ describe FastlaneCore do
         end
       end
 
-      it 'explains when a provided path is not valid' do
+      it "explains when a provided path is not valid" do
         within_a_temp_dir do |dir|
-          workspace = './subdir/Something.xcworkspace'
+          workspace = "./subdir/Something.xcworkspace"
           FileUtils.mkdir_p(workspace)
-          FileUtils.mkdir_p('other-directory')
+          FileUtils.mkdir_p("other-directory")
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
+          expect(FastlaneCore::Project).to receive(:ask).and_return("other-directory")
           expect(FastlaneCore::UI).to receive(:error).with(/Path must end with/)
           expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
 
@@ -278,21 +278,21 @@ describe FastlaneCore do
 
     describe "Project.xcode_list_timeout" do
       before do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = nil
+        ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = nil
       end
       it "returns default value" do
         expect(FastlaneCore::Project.xcode_list_timeout).to eq(10)
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = '5'
+        ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = "5"
         expect(FastlaneCore::Project.xcode_list_timeout).to eq(5)
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = ''
+        ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = ""
         expect(FastlaneCore::Project.xcode_list_timeout).to eq(0)
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = 'hiho'
+        ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = "hiho"
         expect(FastlaneCore::Project.xcode_list_timeout).to eq(0)
       end
     end

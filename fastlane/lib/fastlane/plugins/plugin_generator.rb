@@ -10,7 +10,7 @@ module Fastlane
   class PluginGenerator
     def initialize(ui:             PluginGeneratorUI.new,
                    info_collector: PluginInfoCollector.new(ui),
-                   template_root:  File.join(File.dirname(__FILE__), 'template'),
+                   template_root:  File.join(File.dirname(__FILE__), "template"),
                    dest_root:      FileUtils.pwd)
       @ui = ui
       @info_collector = info_collector
@@ -46,7 +46,7 @@ module Fastlane
     end
 
     def derive_dest_path(template_path, plugin_info)
-      relative_template_path = template_path.gsub(@template_root, '')
+      relative_template_path = template_path.gsub(@template_root, "")
       replaced_path = replace_path_variables(relative_template_path, plugin_info)
 
       File.join(@dest_root, plugin_info.gem_name, replaced_path)
@@ -55,7 +55,7 @@ module Fastlane
     def copy_file(template_path, dest_path, plugin_info)
       contents = File.read(template_path)
 
-      if dest_path.end_with?('.erb')
+      if dest_path.end_with?(".erb")
         contents = ERB.new(contents).result(plugin_info.get_binding)
         dest_path = dest_path[0...-4] # Remove the .erb suffix
       end

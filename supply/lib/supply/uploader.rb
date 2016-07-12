@@ -11,7 +11,7 @@ module Supply
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
 
         all_languages.each do |language|
-          next if language.start_with?('.') # e.g. . or .. or hidden folders
+          next if language.start_with?(".") # e.g. . or .. or hidden folders
           UI.message("Preparing to upload for language '#{language}'...")
 
           listing = client.listing_for_language(language)
@@ -50,7 +50,7 @@ module Supply
       path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
       if File.exist?(path)
         UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
+        apk_listing = ApkListing.new(File.read(path, encoding: "UTF-8"), language, apk_version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -58,12 +58,12 @@ module Supply
     def upload_metadata(language, listing)
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(metadata_path, language, "#{key}.txt")
-        listing.send("#{key}=".to_sym, File.read(path, encoding: 'UTF-8')) if File.exist?(path)
+        listing.send("#{key}=".to_sym, File.read(path, encoding: "UTF-8")) if File.exist?(path)
       end
       begin
         listing.save
       rescue Encoding::InvalidByteSequenceError => ex
-        message = (ex.message || '').capitalize
+        message = (ex.message || "").capitalize
         UI.user_error!("Metadata must be UTF-8 encoded. #{message}")
       end
     end
@@ -130,7 +130,7 @@ module Supply
 
         if metadata_path
           all_languages.each do |language|
-            next if language.start_with?('.') # e.g. . or .. or hidden folders
+            next if language.start_with?(".") # e.g. . or .. or hidden folders
             upload_changelog(language, apk_version_code)
           end
         end
@@ -166,7 +166,7 @@ module Supply
     # more than one of either of them.
     def upload_obbs(apk_path, apk_version_code)
       expansion_paths = find_obbs(apk_path)
-      ['main', 'patch'].each do |type|
+      ["main", "patch"].each do |type|
         if expansion_paths[type]
           upload_obb(expansion_paths[type], type, apk_version_code)
         end
@@ -178,7 +178,7 @@ module Supply
     # E.g.
     # { 'main' => 'path/to/main.obb', 'patch' => 'path/to/patch.obb' }
     def find_obbs(apk_path)
-      search = File.join(File.dirname(apk_path), '*.obb')
+      search = File.join(File.dirname(apk_path), "*.obb")
       paths = Dir.glob(search, File::FNM_CASEFOLD)
       expansion_paths = {}
       paths.each do |path|
@@ -203,10 +203,10 @@ module Supply
 
     def obb_expansion_file_type(obb_file_path)
       filename = File.basename(obb_file_path, ".obb")
-      if filename.include?('main')
-        'main'
-      elsif filename.include?('patch')
-        'patch'
+      if filename.include?("main")
+        "main"
+      elsif filename.include?("patch")
+        "patch"
       end
     end
   end

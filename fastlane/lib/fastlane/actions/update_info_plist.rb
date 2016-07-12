@@ -5,7 +5,7 @@ module Fastlane
 
     class UpdateInfoPlistAction < Action
       def self.run(params)
-        require 'xcodeproj'
+        require "xcodeproj"
 
         # Check if parameters are set
         if params[:app_identifier] or params[:display_name] or params[:block]
@@ -37,8 +37,8 @@ module Fastlane
           plist = Xcodeproj::Plist.read_from_path(info_plist_path)
 
           # Update plist values
-          plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
-          plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
+          plist["CFBundleIdentifier"] = params[:app_identifier] if params[:app_identifier]
+          plist["CFBundleDisplayName"] = params[:display_name] if params[:display_name]
           params[:block].call(plist) if params[:block]
 
           # Write changes to file
@@ -61,7 +61,7 @@ module Fastlane
       end
 
       def self.description
-        'Update a Info.plist file with bundle identifier and display name'
+        "Update a Info.plist file with bundle identifier and display name"
       end
 
       def self.available_options
@@ -87,24 +87,24 @@ module Fastlane
                                        description: "Scheme of info plist",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       env_name: 'FL_UPDATE_PLIST_APP_IDENTIFIER',
-                                       description: 'The App Identifier of your app',
-                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'],
+                                       env_name: "FL_UPDATE_PLIST_APP_IDENTIFIER",
+                                       description: "The App Identifier of your app",
+                                       default_value: ENV["PRODUCE_APP_IDENTIFIER"],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :display_name,
-                                       env_name: 'FL_UPDATE_PLIST_DISPLAY_NAME',
-                                       description: 'The Display Name of your app',
+                                       env_name: "FL_UPDATE_PLIST_DISPLAY_NAME",
+                                       description: "The Display Name of your app",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :block,
                                        is_string: false,
-                                       description: 'A block to process plist with custom logic',
+                                       description: "A block to process plist with custom logic",
                                        optional: true)
 
         ]
       end
 
       def self.author
-        'tobiasstrebitzer'
+        "tobiasstrebitzer"
       end
     end
   end

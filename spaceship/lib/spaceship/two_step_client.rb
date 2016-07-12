@@ -57,7 +57,7 @@ module Spaceship
       r = request(:post) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode"
         req.headers["Accept"] = "application/json"
-        req.headers['Content-Type'] = 'application/json'
+        req.headers["Content-Type"] = "application/json"
         req.headers["scnt"] = @scnt
         req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "securityCode" => { "code" => code.to_s } }.to_json
@@ -87,7 +87,7 @@ module Spaceship
       return if yaml_text.to_s.length == 0
       puts "Loading session from environment variable" if $verbose
 
-      file = Tempfile.new('cookie.yml')
+      file = Tempfile.new("cookie.yml")
       file.write(yaml_text.gsub("\\n", "\n"))
       file.close
 
@@ -126,7 +126,7 @@ module Spaceship
         req.headers["scnt"] = @scnt
         req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "code" => code.to_s }.to_json
-        req.headers['Content-Type'] = 'application/json'
+        req.headers["Content-Type"] = "application/json"
       end
 
       begin

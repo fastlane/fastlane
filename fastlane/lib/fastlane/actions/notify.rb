@@ -2,11 +2,11 @@ module Fastlane
   module Actions
     class NotifyAction < Action
       def self.run(params)
-        require 'terminal-notifier'
+        require "terminal-notifier"
         UI.important("It's recommended to use the new 'notification' method instead of 'notify'")
 
-        text = params.join(' ')
-        TerminalNotifier.notify(text, title: 'fastlane')
+        text = params.join(" ")
+        TerminalNotifier.notify(text, title: "fastlane")
       end
 
       def self.description

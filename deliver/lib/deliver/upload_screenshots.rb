@@ -59,7 +59,7 @@ module Deliver
 
     def collect_screenshots_for_languages(path)
       screenshots = []
-      extensions = '{png,jpg,jpeg}'
+      extensions = "{png,jpg,jpeg}"
 
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)

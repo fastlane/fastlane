@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class UploadSymbolsToCrashlyticsAction < Action
       def self.run(params)
-        require 'tmpdir'
+        require "tmpdir"
 
         find_binary_path(params)
         find_api_token(params)
@@ -130,7 +130,7 @@ module Fastlane
                                        description: "The platform of the app (ios, tvos, mac)",
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         available = ['ios', 'tvos', 'mac']
+                                         available = ["ios", "tvos", "mac"]
                                          UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end)
         ]

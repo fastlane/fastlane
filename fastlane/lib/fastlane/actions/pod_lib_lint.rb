@@ -28,7 +28,7 @@ module Fastlane
         command << "--private" if params[:private]
         command << "--quick" if params[:quick]
 
-        result = Actions.sh(command.join(' '))
+        result = Actions.sh(command.join(" "))
         UI.success("Pod lib lint Successfully ⬆️ ")
         return result
       end

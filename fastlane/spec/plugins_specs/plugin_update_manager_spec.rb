@@ -9,8 +9,8 @@ describe Fastlane::PluginUpdateManager do
     end
 
     it "prints out a table if updates are avaiable" do
-      plugin_name = 'something'
-      Fastlane::PluginUpdateManager.server_results[plugin_name] = Gem::Version.new('1.1.0')
+      plugin_name = "something"
+      Fastlane::PluginUpdateManager.server_results[plugin_name] = Gem::Version.new("1.1.0")
       allow(Fastlane::PluginUpdateManager).to receive(:plugin_references).and_return({
         plugin_name => {
           version_number: "0.1.1"

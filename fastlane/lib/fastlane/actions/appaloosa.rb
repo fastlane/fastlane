@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class AppaloosaAction < Action
-      APPALOOSA_SERVER = 'https://www.appaloosa-store.com/api/v2'.freeze
+      APPALOOSA_SERVER = "https://www.appaloosa-store.com/api/v2".freeze
       def self.run(params)
         api_key = params[:api_token]
         store_id = params[:store_id]
@@ -19,20 +19,20 @@ module Fastlane
         get_s3_url(api_key, store_id, key_s3)
       end
 
-      def self.upload_on_s3(file, api_key, store_id, group_ids = '')
-        file_name = file.split('/').last
+      def self.upload_on_s3(file, api_key, store_id, group_ids = "")
+        file_name = file.split("/").last
         uri = URI("#{APPALOOSA_SERVER}/upload_services/presign_form")
         params = { file: file_name, store_id: store_id, group_ids: group_ids }
         uri.query = URI.encode_www_form(params)
         presign_form_response = Net::HTTP.get_response(uri)
         json_res = JSON.parse(presign_form_response.body)
-        return if error_detected json_res['errors']
-        s3_sign = json_res['s3_sign']
-        path = json_res['path']
+        return if error_detected json_res["errors"]
+        s3_sign = json_res["s3_sign"]
+        path = json_res["path"]
         uri = URI.parse(Base64.decode64(s3_sign))
-        File.open(file, 'rb') do |f|
+        File.open(file, "rb") do |f|
           Net::HTTP.start(uri.host) do |http|
-            http.send_request('PUT', uri.request_uri, f.read, 'content-type' => '')
+            http.send_request("PUT", uri.request_uri, f.read, "content-type" => "")
           end
         end
         path
@@ -47,8 +47,8 @@ module Fastlane
           UI.user_error!("ERROR: A problem occurred with your API token and your store id. Please try again.")
         end
         json_res = JSON.parse(url_for_download_response.body)
-        return if error_detected(json_res['errors'])
-        json_res['binary_url']
+        return if error_detected(json_res["errors"])
+        json_res["binary_url"]
       end
 
       def self.remove_extra_screenshots_file(screenshots_env)
@@ -81,14 +81,14 @@ module Fastlane
       end
 
       def self.get_screenshots(screenshots_path, locale, device)
-        get_env_value('screenshots').nil? ? locale = '' : locale.concat('/')
-        device.nil? ? device = '' : device.concat('-')
+        get_env_value("screenshots").nil? ? locale = "" : locale.concat("/")
+        device.nil? ? device = "" : device.concat("-")
         !screenshots_path.strip.empty? ? screenshots_list(screenshots_path, locale, device) : nil
       end
 
       def self.screenshots_list(path, locale, device)
         return warning_detected("screenshots folder not found") unless Dir.exist?("#{path}/#{locale}")
-        list = Dir.entries("#{path}/#{locale}") - ['.', '..']
+        list = Dir.entries("#{path}/#{locale}") - [".", ".."]
         list.map do |screen|
           next if screen.match(device).nil?
           "#{path}/#{locale}#{screen}" unless Dir.exist?("#{path}/#{locale}#{screen}")
@@ -100,7 +100,7 @@ module Fastlane
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/mobile_application_updates/upload")
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        req = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
+        req = Net::HTTP::Post.new(uri.path, { "Content-Type" => "application/json" })
         req.body = { store_id: store_id,
                      api_key: api_key,
                      mobile_application_update: {
@@ -112,11 +112,11 @@ module Fastlane
                        screenshot4: screenshots[3],
                        screenshot5: screenshots[4],
                        group_ids: group_ids,
-                       provider: 'fastlane'
+                       provider: "fastlane"
                      } }.to_json
         uoa_response = http.request(req)
         json_res = JSON.parse(uoa_response.body)
-        if json_res['errors']
+        if json_res["errors"]
           UI.error "App: #{json_res['errors']}"
         else
           UI.success "Binary processing: Check your app': #{json_res['link']}"
@@ -127,12 +127,12 @@ module Fastlane
         if screenshots.nil?
           screens = %w(screenshot1 screenshot2 screenshot3 screenshot4 screenshot5)
           screenshots = screens.map do |_k, _v|
-            ''
+            ""
           end
         else
           missings = 5 - screenshots.count
           (1..missings).map do |_i|
-            screenshots << ''
+            screenshots << ""
           end
         end
         screenshots
@@ -162,7 +162,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Upload your app to Appaloosa Store'
+        "Upload your app to Appaloosa Store"
       end
 
       def self.details
@@ -177,45 +177,45 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :binary,
-                                       env_name: 'FL_APPALOOSA_BINARY',
-                                       description: 'Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action',
+                                       env_name: "FL_APPALOOSA_BINARY",
+                                       description: "Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa || apk file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: 'FL_APPALOOSA_API_TOKEN',
+                                       env_name: "FL_APPALOOSA_API_TOKEN",
                                        description: "Your API token"),
           FastlaneCore::ConfigItem.new(key: :store_id,
-                                       env_name: 'FL_APPALOOSA_STORE_ID',
+                                       env_name: "FL_APPALOOSA_STORE_ID",
                                        description: "Your Store id"),
           FastlaneCore::ConfigItem.new(key: :group_ids,
-                                       env_name: 'FL_APPALOOSA_GROUPS',
-                                       description: 'Your app is limited to special users? Give us the group ids',
-                                       default_value: '',
+                                       env_name: "FL_APPALOOSA_GROUPS",
+                                       description: "Your app is limited to special users? Give us the group ids",
+                                       default_value: "",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :screenshots,
-                                       env_name: 'FL_APPALOOSA_SCREENSHOTS',
-                                       description: 'Add some screenshots application to your store or hit [enter]',
+                                       env_name: "FL_APPALOOSA_SCREENSHOTS",
+                                       description: "Add some screenshots application to your store or hit [enter]",
                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]),
           FastlaneCore::ConfigItem.new(key: :locale,
-                                       env_name: 'FL_APPALOOSA_LOCALE',
-                                       description: 'Select the folder locale for yours screenshots',
-                                       default_value: 'en-US',
+                                       env_name: "FL_APPALOOSA_LOCALE",
+                                       description: "Select the folder locale for yours screenshots",
+                                       default_value: "en-US",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :device,
-                                       env_name: 'FL_APPALOOSA_DEVICE',
-                                       description: 'Select the device format for yours screenshots',
+                                       env_name: "FL_APPALOOSA_DEVICE",
+                                       description: "Select the device format for yours screenshots",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :description,
-                                       env_name: 'FL_APPALOOSA_DESCRIPTION',
-                                       description: 'Your app description',
+                                       env_name: "FL_APPALOOSA_DESCRIPTION",
+                                       description: "Your app description",
                                        optional: true)
         ]
       end
 
       def self.authors
-        ['Appaloosa']
+        ["Appaloosa"]
       end
 
       def self.is_supported?(platform)

@@ -8,7 +8,7 @@ module Snapshot
     end
 
     def flatten(path)
-      Dir.glob([path, '/**/*.png'].join('/')).each do |file|
+      Dir.glob([path, "/**/*.png"].join("/")).each do |file|
         UI.verbose("Removing alpha channel from '#{file}'")
         `sips -s format bmp '#{file}' &> /dev/null` # &> /dev/null because there is warning because of the extension
         `sips -s format png '#{file}'`

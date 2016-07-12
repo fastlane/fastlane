@@ -85,12 +85,12 @@ module Spaceship
             setter = "#{dest}=".to_sym
 
             define_method(getter) do
-              raw_data.get(*source.split('.'))
+              raw_data.get(*source.split("."))
             end
 
             define_method(setter) do |value|
               self.raw_data ||= DataHash.new({})
-              raw_data.set(source.split('.'), value)
+              raw_data.set(source.split("."), value)
             end
           end
         end

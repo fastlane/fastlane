@@ -14,7 +14,7 @@ describe Fastlane do
           download(url: '#{url}')
         end").runner.execute(:test)
 
-        correct = { 'status' => 'ok' }
+        correct = { "status" => "ok" }
         expect(result).to eq(correct)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DOWNLOAD_CONTENT]).to eq(correct)
       end

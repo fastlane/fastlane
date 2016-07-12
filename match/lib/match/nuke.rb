@@ -14,7 +14,7 @@ module Match
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
 
       had_app_identifier = self.params[:app_identifier]
-      self.params[:app_identifier] = '' # we don't really need a value here
+      self.params[:app_identifier] = "" # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier, :workspace],
                                              title: "Summary for match nuke #{Match::VERSION}")
@@ -88,7 +88,7 @@ module Match
           title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
           rows: self.profiles.collect do |p|
-            status = p.status == 'Active' ? p.status.green : p.status.red
+            status = p.status == "Active" ? p.status.green : p.status.red
 
             [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
           end

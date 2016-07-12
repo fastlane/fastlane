@@ -43,7 +43,7 @@ module Scan
       if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
-          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
+          lookup_device = device.to_s.strip.tr("()", "") # Remove parenthesis
 
           found = FastlaneCore::Simulator.all.detect do |d|
             (d.name + " " + d.ios_version).include? lookup_device
@@ -86,7 +86,7 @@ module Scan
       if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
-          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
+          lookup_device = device.to_s.strip.tr("()", "") # Remove parenthesis
 
           found = FastlaneCore::SimulatorTV.all.detect do |d|
             (d.name + " " + d.tvos_version).include? lookup_device

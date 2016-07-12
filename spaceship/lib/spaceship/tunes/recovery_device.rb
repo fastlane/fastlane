@@ -49,14 +49,14 @@ module Spaceship
       attr_accessor :update_date
 
       attr_mapping(
-        'id' => :device_id,
-        'name' => :name,
-        'trusted' => :trusted,
-        'status' => :status,
-        'imageLocation3x' => :device_image,
-        'modelName' => :model_name,
-        'lastTwoDigits' => :last_two_digits,
-        'updateDate' => :update_date
+        "id" => :device_id,
+        "name" => :name,
+        "trusted" => :trusted,
+        "status" => :status,
+        "imageLocation3x" => :device_image,
+        "modelName" => :model_name,
+        "lastTwoDigits" => :last_two_digits,
+        "updateDate" => :update_date
       )
 
       class << self

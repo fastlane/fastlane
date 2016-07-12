@@ -1,4 +1,4 @@
-require 'credentials_manager'
+require "credentials_manager"
 
 module Fastlane
   module Actions
@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.run(params)
-        require 'spaceship'
+        require "spaceship"
 
         devices = params[:devices]
         devices_file = params[:devices_file]
@@ -26,10 +26,10 @@ module Fastlane
             Spaceship::Device.create!(name: k, udid: v)
           end
         elsif devices_file
-          require 'csv'
+          require "csv"
 
           devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
-          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
+          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ["Device ID", "Device Name"]
 
           UI.message("Fetching list of currently registered devices...")
           existing_devices = Spaceship::Device.all

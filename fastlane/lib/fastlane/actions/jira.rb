@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class JiraAction < Action
       def self.run(params)
-        Actions.verify_gem!('jira-ruby')
-        require 'jira'
+        Actions.verify_gem!("jira-ruby")
+        require "jira"
 
         site         = params[:url]
         context_path = ""
@@ -24,7 +24,7 @@ module Fastlane
         client = JIRA::Client.new(options)
         issue = client.Issue.find(ticket_id)
         comment = issue.comments.build
-        comment.save({ 'body' => comment_text })
+        comment.save({ "body" => comment_text })
       end
 
       #####################################################

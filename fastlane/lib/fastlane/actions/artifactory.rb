@@ -2,9 +2,9 @@ module Fastlane
   module Actions
     class ArtifactoryAction < Action
       def self.run(params)
-        Actions.verify_gem!('artifactory')
+        Actions.verify_gem!("artifactory")
 
-        require 'artifactory'
+        require "artifactory"
         file_path = File.absolute_path(params[:file])
         if File.exist? file_path
           client = connect_to_artifactory(params)
@@ -36,7 +36,7 @@ module Fastlane
       end
 
       def self.description
-        'This action uploads an artifact to artifactory'
+        "This action uploads an artifact to artifactory"
       end
 
       def self.is_supported?(platform)

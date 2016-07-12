@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::DUClient, :du do
   before { Spaceship::Tunes.login }
@@ -23,7 +23,7 @@ describe Spaceship::DUClient, :du do
       du_upload_large_image_success
 
       data = subject.upload_large_icon(version, correct_jpg_image, contentProviderId, ssoTokenForImage)
-      expect(data['token']).to eq('Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg')
+      expect(data["token"]).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
     end
 
     it "handles failed upload request using #upload_watch_icon" do
@@ -44,9 +44,9 @@ describe Spaceship::DUClient, :du do
       du_upload_geojson_success
 
       data = subject.upload_geojson(version, valid_geojson, contentProviderId, ssoTokenForImage)
-      expect(data['token']).to eq('Purple1/v4/45/50/9d/45509d39-6a5d-7f55-f919-0fbc7436be61/pr_source.geojson')
-      expect(data['dsId']).to eq(1_206_675_732)
-      expect(data['type']).to eq('SMGameCenterAvatarImageType.SOURCE')
+      expect(data["token"]).to eq("Purple1/v4/45/50/9d/45509d39-6a5d-7f55-f919-0fbc7436be61/pr_source.geojson")
+      expect(data["dsId"]).to eq(1_206_675_732)
+      expect(data["type"]).to eq("SMGameCenterAvatarImageType.SOURCE")
     end
 
     it "handles failed upload request" do

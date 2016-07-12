@@ -1,7 +1,7 @@
 module Fastlane
   class DocsGenerator
     def self.run(ff, output_path = nil)
-      output_path ||= File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
+      output_path ||= File.join(Fastlane::FastlaneFolder.path || ".", "README.md")
 
       output = ["fastlane documentation"]
       output << "================"
@@ -49,9 +49,9 @@ module Fastlane
 
     def self.formatted_platform(pl)
       pl = pl.to_s
-      return "iOS" if pl == 'ios'
-      return "Mac" if pl == 'mac'
-      return "Android" if pl == 'android'
+      return "iOS" if pl == "ios"
+      return "Mac" if pl == "mac"
+      return "Android" if pl == "android"
 
       return pl
     end
@@ -60,7 +60,7 @@ module Fastlane
     # @param lane [Fastlane::Lane]
     # @param description [String]
     def self.render(platform, lane, description)
-      full_name = [platform, lane].reject(&:nil?).join(' ')
+      full_name = [platform, lane].reject(&:nil?).join(" ")
 
       output = []
       output << "### #{full_name}"

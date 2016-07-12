@@ -46,15 +46,15 @@ module Spaceship
       attr_accessor :latest_installed_version_number
 
       attr_mapping(
-        'testerId' => :tester_id,
-        'emailAddress.value' => :email,
-        'firstName.value' => :first_name,
-        'lastName.value' => :last_name,
-        'devices' => :devices,
-        'latestInstalledAppAdamId' => :latest_install_app_id,
-        'latestInstalledDate' => :latest_install_date,
-        'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number
+        "testerId" => :tester_id,
+        "emailAddress.value" => :email,
+        "firstName.value" => :first_name,
+        "lastName.value" => :last_name,
+        "devices" => :devices,
+        "latestInstalledAppAdamId" => :latest_install_app_id,
+        "latestInstalledDate" => :latest_install_date,
+        "latestInstalledVersion" => :latest_installed_version_number,
+        "latestInstalledShortVersion" => :latest_installed_build_number
       )
 
       class << self

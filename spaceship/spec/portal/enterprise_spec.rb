@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::ProvisioningProfile do
   describe "Enterprise Profiles" do
@@ -22,8 +22,8 @@ describe Spaceship::ProvisioningProfile do
     describe "Create a new In House Profile" do
       it "uses the correct type for the create request" do
         cert = Spaceship::Certificate::InHouse.all.first
-        result = Spaceship::ProvisioningProfile::InHouse.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: cert)
-        expect(result.raw_data['provisioningProfileId']).to eq('W2MY88F6GE')
+        result = Spaceship::ProvisioningProfile::InHouse.create!(name: "Delete Me", bundle_id: "net.sunapps.1", certificate: cert)
+        expect(result.raw_data["provisioningProfileId"]).to eq("W2MY88F6GE")
       end
     end
   end

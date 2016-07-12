@@ -3,7 +3,7 @@ describe Fastlane do
     describe "get_github_release" do
       before do
         stub_request(:get, "https://api.github.com/repos/fastlane/fastlane/releases").
-          with(headers: { 'Host' => 'api.github.com:443' }).
+          with(headers: { "Host" => "api.github.com:443" }).
           to_return(status: 200, body: File.read("./spec/fixtures/requests/github_releases.json"), headers: {})
       end
 
@@ -12,9 +12,9 @@ describe Fastlane do
           get_github_release(url: 'fastlane/fastlane', version: '1.8.0')
         end").runner.execute(:test)
 
-        expect(result['author']['login']).to eq("KrauseFx")
-        expect(result['name']).to eq("1.8.0 Switch Lanes & Pass Parameters")
-        expect(result['tag_name']).to eq('1.8.0')
+        expect(result["author"]["login"]).to eq("KrauseFx")
+        expect(result["name"]).to eq("1.8.0 Switch Lanes & Pass Parameters")
+        expect(result["tag_name"]).to eq("1.8.0")
       end
 
       it "returns nil if release can't be found" do

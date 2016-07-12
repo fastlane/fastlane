@@ -1,4 +1,4 @@
-require 'shellwords'
+require "shellwords"
 
 module Sigh
   # Resigns an existing ipa file
@@ -28,7 +28,7 @@ module Sigh
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements}" if entitlements
-      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
+      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(" ")
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
       short_version = "--short-version #{short_version}" if short_version
@@ -49,7 +49,7 @@ module Sigh
         verbose,
         bundle_id,
         ipa.shellescape
-      ].join(' ')
+      ].join(" ")
 
       puts command.magenta
       puts `#{command}`
@@ -64,9 +64,9 @@ module Sigh
     end
 
     def get_inputs(options, args)
-      ipa = args.first || find_ipa || ask('Path to ipa file: ')
+      ipa = args.first || find_ipa || ask("Path to ipa file: ")
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask("Path to provisioning file: ")
       entitlements = options.entitlements || nil
       version = options.version_number || nil
       display_name = options.display_name || nil
@@ -82,15 +82,15 @@ module Sigh
     end
 
     def find_resign_path
-      File.join(Helper.gem_path('sigh'), 'lib', 'assets', 'resign.sh')
+      File.join(Helper.gem_path("sigh"), "lib", "assets", "resign.sh")
     end
 
     def find_ipa
-      Dir[File.join(Dir.pwd, '*.ipa')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, "*.ipa")].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
     def find_provisioning_profile
-      Dir[File.join(Dir.pwd, '*.mobileprovision')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, "*.mobileprovision")].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
     def find_signing_identity(signing_identity)
@@ -115,15 +115,15 @@ module Sigh
     end
 
     def validate_resign_path(resign_path)
-      UI.user_error!('Could not find resign.sh file. Please try re-installing the gem') unless File.exist?(resign_path)
+      UI.user_error!("Could not find resign.sh file. Please try re-installing the gem") unless File.exist?(resign_path)
     end
 
     def validate_ipa_file(ipa)
-      UI.user_error!("ipa file could not be found or is not an ipa file (#{ipa})") unless File.exist?(ipa) && ipa.end_with?('.ipa')
+      UI.user_error!("ipa file could not be found or is not an ipa file (#{ipa})") unless File.exist?(ipa) && ipa.end_with?(".ipa")
     end
 
     def validate_provisioning_file(provisioning_profile)
-      unless File.exist?(provisioning_profile) && provisioning_profile.end_with?('.mobileprovision')
+      unless File.exist?(provisioning_profile) && provisioning_profile.end_with?(".mobileprovision")
         UI.user_error!("Provisioning profile file could not be found or is not a .mobileprovision file (#{provisioning_profile})")
       end
     end
@@ -134,7 +134,7 @@ module Sigh
 
     def ask_for_signing_identity
       print_available_identities
-      ask('Signing Identity: ')
+      ask("Signing Identity: ")
     end
 
     # Hash of available signing identities

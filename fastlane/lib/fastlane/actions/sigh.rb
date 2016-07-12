@@ -9,11 +9,11 @@ module Fastlane
 
     class SighAction < Action
       def self.run(values)
-        require 'sigh'
-        require 'credentials_manager/appfile_config'
+        require "sigh"
+        require "credentials_manager/appfile_config"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("sigh") unless Helper.is_test?
 
           Sigh.config = values # we already have the finished config
 
@@ -28,7 +28,7 @@ module Fastlane
 
           return ENV["SIGH_UDID"] # return the UDID of the new profile
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("sigh", Sigh::VERSION)
         end
       end
 
@@ -56,7 +56,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'sigh'
+        require "sigh"
         Sigh::Options.available_options
       end
 

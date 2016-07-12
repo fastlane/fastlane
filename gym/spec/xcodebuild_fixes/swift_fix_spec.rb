@@ -1,6 +1,6 @@
-require 'gym/xcodebuild_fixes/swift_fix'
-require 'gym/xcodebuild_fixes/watchkit_fix'
-require 'gym/xcodebuild_fixes/package_application_fix'
+require "gym/xcodebuild_fixes/swift_fix"
+require "gym/xcodebuild_fixes/watchkit_fix"
+require "gym/xcodebuild_fixes/package_application_fix"
 
 describe Gym do
   describe Gym::XcodebuildFixes do
@@ -13,13 +13,13 @@ describe Gym do
       end
     end
 
-    let (:ipa_with_swift) { 'spec/fixtures/xcodebuild_fixes/with_swift_twice.ipa' }
-    let (:ipa_without_swift) { 'spec/fixtures/xcodebuild_fixes/with_no_swift.ipa' }
-    let (:default_swift_libs) { 'Payload/Client.app/Frameworks/libswift.*.dylib' }
-    let (:all_existing_libs) { 'libswift.*.dylib' }
-    let (:non_existing_libs) { 'XXX.*.dylib' }
-    let (:pcg_with_swift) { FakePackageCommandGenerator.new(ipa_with_swift, 'Payload/Client.app') }
-    let (:pcg_without_swift) { FakePackageCommandGenerator.new(ipa_without_swift, 'Payload/Client.app') }
+    let (:ipa_with_swift) { "spec/fixtures/xcodebuild_fixes/with_swift_twice.ipa" }
+    let (:ipa_without_swift) { "spec/fixtures/xcodebuild_fixes/with_no_swift.ipa" }
+    let (:default_swift_libs) { "Payload/Client.app/Frameworks/libswift.*.dylib" }
+    let (:all_existing_libs) { "libswift.*.dylib" }
+    let (:non_existing_libs) { "XXX.*.dylib" }
+    let (:pcg_with_swift) { FakePackageCommandGenerator.new(ipa_with_swift, "Payload/Client.app") }
+    let (:pcg_without_swift) { FakePackageCommandGenerator.new(ipa_without_swift, "Payload/Client.app") }
 
     it "finds default swift libs properly" do
       expect(Gym::XcodebuildFixes.zip_entries_matching(ipa_with_swift, /#{default_swift_libs}/).count).to eq(10)
@@ -35,7 +35,7 @@ describe Gym do
     end
 
     it "can find directories in zips" do
-      dir = 'Payload/Client.app/Frameworks/'
+      dir = "Payload/Client.app/Frameworks/"
       expect(Gym::XcodebuildFixes.zip_entries_matching(ipa_without_swift, /#{dir}/).count).to eq(1)
     end
 

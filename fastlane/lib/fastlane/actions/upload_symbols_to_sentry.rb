@@ -7,8 +7,8 @@ module Fastlane
         UI.important("Github: https://github.com/getsentry/fastlane-plugin-sentry")
         UI.important("Installation: fastlane add_plugin sentry")
 
-        Actions.verify_gem!('rest-client')
-        require 'rest-client'
+        Actions.verify_gem!("rest-client")
+        require "rest-client"
 
         # Params - API
         host = params[:api_host]
@@ -35,7 +35,7 @@ module Fastlane
         url = "#{host}/projects/#{org}/#{project}/files/dsyms/"
 
         if has_api_key
-          resource = RestClient::Resource.new(url, api_key, '')
+          resource = RestClient::Resource.new(url, api_key, "")
         else
           resource = RestClient::Resource.new(url, headers: { Authorization: "Bearer #{auth_token}" })
         end
@@ -54,12 +54,12 @@ module Fastlane
 
       def self.upload_dsym(resource, dsym)
         UI.message "Uploading... #{dsym}"
-        resource.post(file: File.new(dsym, 'rb')) unless Helper.test?
-        UI.success 'dSYM successfully uploaded to Sentry!'
+        resource.post(file: File.new(dsym, "rb")) unless Helper.test?
+        UI.success "dSYM successfully uploaded to Sentry!"
 
         dsym
       rescue
-        UI.user_error! 'Error while trying to upload dSYM to Sentry'
+        UI.user_error! "Error while trying to upload dSYM to Sentry"
       end
 
       #####################################################

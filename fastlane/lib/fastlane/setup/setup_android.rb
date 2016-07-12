@@ -6,35 +6,35 @@ module Fastlane
         return
       end
 
-      response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
+      response = agree("Do you have everything commited in version control? If not please do so now! (y/n)".yellow, true)
       return unless response
 
       FastlaneFolder.create_folder! unless Helper.is_test?
-      FileUtils.mkdir(File.join(folder, 'actions')) unless File.directory?(File.join(folder, 'actions'))
+      FileUtils.mkdir(File.join(folder, "actions")) unless File.directory?(File.join(folder, "actions"))
       generate_appfile
       generate_fastfile
       show_analytics
 
       init_supply
 
-      UI.success('Successfully finished setting up fastlane')
+      UI.success("Successfully finished setting up fastlane")
     end
 
     def generate_appfile
-      UI.message('------------------------------')
-      UI.success('To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.')
+      UI.message("------------------------------")
+      UI.success("To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.")
 
-      package_name = ask('Package Name (com.krausefx.app): '.yellow)
+      package_name = ask("Package Name (com.krausefx.app): ".yellow)
       puts ""
       puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
       puts "Feel free to just click Enter to skip not provide certain things"
       puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/fastlane/tree/master/supply#setup".yellow
-      json_key_file = ask('Path to the json secret file: '.yellow)
+      json_key_file = ask("Path to the json secret file: ".yellow)
 
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplateAndroid")
-      template.gsub!('[[JSON_KEY_FILE]]', json_key_file)
-      template.gsub!('[[PACKAGE_NAME]]', package_name)
-      path = File.join(folder, 'Appfile')
+      template.gsub!("[[JSON_KEY_FILE]]", json_key_file)
+      template.gsub!("[[PACKAGE_NAME]]", package_name)
+      path = File.join(folder, "Appfile")
       File.write(path, template)
       UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
     end
@@ -42,9 +42,9 @@ module Fastlane
     def generate_fastfile
       template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplateAndroid")
 
-      template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
+      template.gsub!("[[FASTLANE_VERSION]]", Fastlane::VERSION)
 
-      path = File.join(folder, 'Fastfile')
+      path = File.join(folder, "Fastfile")
       File.write(path, template)
       UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
     end
@@ -56,8 +56,8 @@ module Fastlane
       UI.message("This will download your existing metadata and screenshots into the `fastlane` folder")
       if agree(question + " (y/n) ", true)
         begin
-          require 'supply'
-          require 'supply/setup'
+          require "supply"
+          require "supply/setup"
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, {})
           Supply::Setup.new.perform_download
         rescue => ex

@@ -27,12 +27,12 @@ require "pry"
 require "credentials_manager"
 
 def docs
-  url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
+  url = "https://github.com/fastlane/fastlane/tree/master/spaceship/docs"
   `open '#{url}'`
   url
 end
 
-username = ARGV[1] if ARGV[0] == '-u'
+username = ARGV[1] if ARGV[0] == "-u"
 username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 username ||= ask("Username: ")
 

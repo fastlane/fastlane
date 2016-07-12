@@ -21,16 +21,16 @@ module Spaceship
       attr_accessor :language
 
       attr_mapping(
-        'videoAssetToken' => :video_asset_token,
-        'pictureAssetToken' => :picture_asset_token,
-        'descriptionXML' => :descriptionXML,
-        'previewFrameTimeCode' => :preview_frame_time_code,
-        'isPortrait' => :is_portrait,
-        'videoUrl' => :video_url,
-        'previewImageUrl' => :preview_image_url,
-        'fullSizedPreviewImageUrl' => :full_sized_preview_image_url,
-        'contentType' => :content_type,
-        'videoStatus' => :video_status
+        "videoAssetToken" => :video_asset_token,
+        "pictureAssetToken" => :picture_asset_token,
+        "descriptionXML" => :descriptionXML,
+        "previewFrameTimeCode" => :preview_frame_time_code,
+        "isPortrait" => :is_portrait,
+        "videoUrl" => :video_url,
+        "previewImageUrl" => :preview_image_url,
+        "fullSizedPreviewImageUrl" => :full_sized_preview_image_url,
+        "contentType" => :content_type,
+        "videoStatus" => :video_status
       )
 
       class << self

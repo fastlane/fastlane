@@ -7,11 +7,11 @@ module Fastlane
         begin
           path = File.expand_path(params[:plist_path])
           plist = Plist.parse_xml(path)
-          plist['developmentAppKey'] = params[:development_app_key] unless params[:development_app_key].nil?
-          plist['developmentAppSecret'] = params[:development_app_secret] unless params[:development_app_secret].nil?
-          plist['productionAppKey'] = params[:production_app_key] unless params[:production_app_key].nil?
-          plist['productionAppSecret'] = params[:production_app_secret] unless params[:production_app_secret].nil?
-          plist['detectProvisioningMode'] = params[:detect_provisioning_mode] unless params[:detect_provisioning_mode].nil?
+          plist["developmentAppKey"] = params[:development_app_key] unless params[:development_app_key].nil?
+          plist["developmentAppSecret"] = params[:development_app_secret] unless params[:development_app_secret].nil?
+          plist["productionAppKey"] = params[:production_app_key] unless params[:production_app_key].nil?
+          plist["productionAppSecret"] = params[:production_app_secret] unless params[:production_app_secret].nil?
+          plist["detectProvisioningMode"] = params[:detect_provisioning_mode] unless params[:detect_provisioning_mode].nil?
           new_plist = plist.to_plist
           File.write(path, new_plist)
         rescue => ex

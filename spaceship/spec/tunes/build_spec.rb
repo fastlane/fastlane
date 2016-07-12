@@ -1,10 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Tunes::Build do
   before { Spaceship::Tunes.login }
   subject { Spaceship::Tunes.client }
-  let(:username) { 'spaceship@krausefx.com' }
-  let(:password) { 'so_secret' }
+  let(:username) { "spaceship@krausefx.com" }
+  let(:password) { "so_secret" }
 
   describe "properly parses the build from the train" do
     let(:app) { Spaceship::Application.all.first }
@@ -23,9 +23,9 @@ describe Spaceship::Tunes::Build do
       expect(build.id).to eq(5_577_102)
       expect(build.build_version).to eq("10")
       expect(build.train_version).to eq("1.0")
-      expect(build.icon_url).to eq('https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png')
-      expect(build.app_name).to eq('Updated by fastlane')
-      expect(build.platform).to eq('ios')
+      expect(build.icon_url).to eq("https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png")
+      expect(build.app_name).to eq("Updated by fastlane")
+      expect(build.platform).to eq("ios")
       expect(build.internal_expiry_date).to eq(1_445_737_214_000)
       expect(build.external_expiry_date).to eq(0)
       expect(build.internal_testing_enabled).to eq(true)

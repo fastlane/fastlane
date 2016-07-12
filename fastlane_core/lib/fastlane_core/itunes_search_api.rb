@@ -1,4 +1,4 @@
-require 'open-uri'
+require "open-uri"
 
 module FastlaneCore
   # A wrapper around the Apple iTunes Search API to access app information like
@@ -32,14 +32,14 @@ module FastlaneCore
     # @param id (int) The AppleID of the given app. This usually consists of 9 digits.
     # @return (String) the Bundle identifier of the app
     def self.fetch_bundle_identifier(id)
-      self.fetch(id)['bundleId']
+      self.fetch(id)["bundleId"]
     end
 
     def self.fetch_url(url)
       response = JSON.parse(open(url).read)
-      return nil if response['resultCount'] == 0
+      return nil if response["resultCount"] == 0
 
-      return response['results'].first
+      return response["results"].first
     rescue
       UI.error("Could not find object '#{url}' using the iTunes API")
       nil

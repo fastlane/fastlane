@@ -11,17 +11,17 @@ module Fastlane
 
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
-      return unless (path || '').length > 0
+      return unless (path || "").length > 0
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
       content = File.read(path)
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
+      if content.tr!("“”‘’‛", %(""'''))
         UI.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
-                'To avoid issues in the future, you should not use ' \
-                'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.'
+                "To avoid issues in the future, you should not use " \
+                "TextEdit for editing it. If you are not using TextEdit, " \
+                "you should turn off smart quotes in your editor of choice."
       end
 
       parse(content, @path)
@@ -36,7 +36,7 @@ module Fastlane
 
       Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         # create nice path that we want to print in case of some problem
-        relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+        relative_path = path.nil? ? "(eval)" : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
 
         begin
           # We have to use #get_binding method, because some test files defines method called `path` (for example SwitcherFastfile)
@@ -150,7 +150,7 @@ module Fastlane
 
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
-      UI.crash!('No key given') unless key
+      UI.crash!("No key given") unless key
 
       return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
       return true if self.runner.lanes[key.to_sym].kind_of? Hash
@@ -184,7 +184,7 @@ module Fastlane
 
       path = path.dup.gsub("~", Dir.home)
       unless Pathname.new(path).absolute? # unless an absolute path
-        path = File.join(File.expand_path('..', @path), path)
+        path = File.join(File.expand_path("..", @path), path)
       end
 
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
@@ -193,18 +193,18 @@ module Fastlane
       parse(File.read(path), path)
 
       # Check if we can also import local actions which are in the same directory as the Fastfile
-      actions_path = File.join(File.expand_path("..", path), 'actions')
+      actions_path = File.join(File.expand_path("..", path), "actions")
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
     end
 
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    def import_from_git(url: nil, branch: "HEAD", path: "fastlane/Fastfile")
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
-      Actions.execute_action('import_from_git') do
-        require 'tmpdir'
+      Actions.execute_action("import_from_git") do
+        require "tmpdir"
 
         collector.did_launch_action(:import_from_git)
 
@@ -215,7 +215,7 @@ module Fastlane
         clone_folder = File.join(tmp_path, repo_name)
 
         branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
+        branch_option = "--branch #{branch}" if branch != "HEAD"
 
         clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
@@ -252,7 +252,7 @@ module Fastlane
     def say(value)
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
-      Actions.execute_action('say') do
+      Actions.execute_action("say") do
         collector.did_launch_action(:say)
         Fastlane::Actions::SayAction.run([value])
       end

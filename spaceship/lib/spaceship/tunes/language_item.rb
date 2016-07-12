@@ -13,16 +13,16 @@ module Spaceship
       end
 
       def [](key)
-        get_lang(key)[identifier]['value']
+        get_lang(key)[identifier]["value"]
       end
 
       def []=(key, value)
-        get_lang(key)[identifier]['value'] = value
+        get_lang(key)[identifier]["value"] = value
       end
 
       def get_lang(lang)
         result = self.original_array.find do |current|
-          current['language'] == lang or current['localeCode'] == lang # Apple being consistent
+          current["language"] == lang or current["localeCode"] == lang # Apple being consistent
         end
         return result if result
 
@@ -31,7 +31,7 @@ module Spaceship
 
       # @return (Array) An array containing all languages that are already available
       def keys
-        self.original_array.collect { |l| l.fetch('language') }
+        self.original_array.collect { |l| l.fetch("language") }
       end
 
       # @return (Array) An array containing all languages that are already available

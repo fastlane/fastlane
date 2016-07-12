@@ -64,11 +64,11 @@ module Fastlane
 
     # Checks if the gem name is still free on RubyGems
     def gem_name_taken?(name)
-      require 'open-uri'
-      require 'json'
+      require "open-uri"
+      require "json"
       url = "https://rubygems.org/api/v1/gems/#{name}.json"
       response = JSON.parse(open(url).read)
-      return !!response['version']
+      return !!response["version"]
     rescue
       false
     end
@@ -78,10 +78,10 @@ module Fastlane
     def fix_plugin_name(name)
       name = name.to_s.downcase
       fixes = {
-        /[\- ]/ => '_', # dashes and spaces become underscores
-        /[^a-z0-9_]/ => '', # anything other than lower case letters, numbers and underscores is removed
-        /fastlane[_]?/ => '', # 'fastlane' or 'fastlane_' is removed
-        /plugin[_]?/ => '' # 'plugin' or 'plugin_' is removed
+        /[\- ]/ => "_", # dashes and spaces become underscores
+        /[^a-z0-9_]/ => "", # anything other than lower case letters, numbers and underscores is removed
+        /fastlane[_]?/ => "", # 'fastlane' or 'fastlane_' is removed
+        /plugin[_]?/ => "" # 'plugin' or 'plugin_' is removed
       }
       fixes.each do |regex, replacement|
         name = name.gsub(regex, replacement)
@@ -94,7 +94,7 @@ module Fastlane
     #
 
     def detect_author
-      git_name = Helper.backticks('git config --get user.name', print: $verbose).strip
+      git_name = Helper.backticks("git config --get user.name", print: $verbose).strip
       return git_name.empty? ? nil : git_name
     end
 
@@ -105,7 +105,7 @@ module Fastlane
         author = @ui.input("\nWhat is the plugin author's name?")
         break if author_valid?(author)
 
-        @ui.message('An author name is required.')
+        @ui.message("An author name is required.")
       end
 
       author
@@ -120,7 +120,7 @@ module Fastlane
     #
 
     def detect_email
-      git_email = Helper.backticks('git config --get user.email', print: $verbose).strip
+      git_email = Helper.backticks("git config --get user.email", print: $verbose).strip
       return git_email.empty? ? nil : git_email
     end
 
@@ -138,7 +138,7 @@ module Fastlane
         summary = @ui.input("\nPlease enter a short summary of this fastlane plugin:")
         break if summary_valid?(summary)
 
-        @ui.message('A summary is required.')
+        @ui.message("A summary is required.")
       end
 
       summary

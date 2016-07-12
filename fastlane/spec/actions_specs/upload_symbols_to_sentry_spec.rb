@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "sentry" do
       it "fails with no API key or auth token" do
-        dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
+        dsym_path_1 = "./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip"
 
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -15,7 +15,7 @@ describe Fastlane do
       end
 
       it "fails with API key and auth token" do
-        dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
+        dsym_path_1 = "./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip"
 
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -30,7 +30,7 @@ describe Fastlane do
       end
 
       it "returns uploaded dSYM path using API key" do
-        dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
+        dsym_path_1 = "./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           upload_symbols_to_sentry(
@@ -44,7 +44,7 @@ describe Fastlane do
       end
 
       it "returns uploaded dSYM path using auth token" do
-        dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
+        dsym_path_1 = "./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           upload_symbols_to_sentry(
@@ -58,8 +58,8 @@ describe Fastlane do
       end
 
       it "returns uploaded dSYM paths" do
-        dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
-        dsym_path_2 = './fastlane/spec/fixtures/dSYM/This_doesnt_exist_but_doesnt_need_to.dSYM.zip'
+        dsym_path_1 = "./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip"
+        dsym_path_2 = "./fastlane/spec/fixtures/dSYM/This_doesnt_exist_but_doesnt_need_to.dSYM.zip"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           upload_symbols_to_sentry(

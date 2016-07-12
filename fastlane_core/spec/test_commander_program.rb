@@ -15,8 +15,8 @@ class TestCommanderProgram
     # to be testing.
     FastlaneCore::CommanderGenerator.new.generate(config_items)
 
-    program :version, '1.0'
-    program :description, 'Testing'
+    program :version, "1.0"
+    program :description, "Testing"
 
     command :test do |c|
       c.action do |args, options|

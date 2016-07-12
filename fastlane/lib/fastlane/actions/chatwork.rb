@@ -5,27 +5,27 @@ module Fastlane
 
     class ChatworkAction < Action
       def self.run(options)
-        require 'net/http'
-        require 'uri'
+        require "net/http"
+        require "uri"
 
-        emoticon = (options[:success] ? '(dance)' : ';(')
+        emoticon = (options[:success] ? "(dance)" : ";(")
 
         uri = URI.parse("https://api.chatwork.com/v1/rooms/#{options[:roomid]}/messages")
         https = Net::HTTP.new(uri.host, uri.port)
         https.use_ssl = true
 
         req = Net::HTTP::Post.new(uri.request_uri)
-        req['X-ChatWorkToken'] = options[:api_token]
+        req["X-ChatWorkToken"] = options[:api_token]
         req.set_form_data({
-          'body' => "[info][title]Notification from fastlane[/title]#{emoticon} #{options[:message]}[/info]"
+          "body" => "[info][title]Notification from fastlane[/title]#{emoticon} #{options[:message]}[/info]"
         })
 
         response = https.request(req)
         case response.code.to_i
         when 200..299
-          UI.success('Successfully sent notification to ChatWork right now 📢')
+          UI.success("Successfully sent notification to ChatWork right now 📢")
         else
-          require 'json'
+          require "json"
           json = JSON.parse(response.body)
           UI.user_error!("HTTP Error: #{response.code} #{json['errors']}")
         end

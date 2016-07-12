@@ -17,7 +17,7 @@ module Fastlane
           user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
         end
 
-        user_input = user_input.casecmp('y').zero? if params[:boolean]
+        user_input = user_input.casecmp("y").zero? if params[:boolean]
         return user_input
       end
 
@@ -44,7 +44,7 @@ module Fastlane
                                        default_value: "Please enter a text: "),
           FastlaneCore::ConfigItem.new(key: :ci_input,
                                        description: "The default text that will be used when being executed on a CI service",
-                                       default_value: ''),
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :boolean,
                                        description: "Is that a boolean question (yes/no)? This will add (y/n) at the end",
                                        default_value: false,

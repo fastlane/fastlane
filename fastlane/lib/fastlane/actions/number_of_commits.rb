@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class NumberOfCommitsAction < Action
       def self.is_git?
-        Actions.sh 'git rev-parse HEAD'
+        Actions.sh "git rev-parse HEAD"
         return true
       rescue
         return false
@@ -10,7 +10,7 @@ module Fastlane
 
       def self.run(params)
         if is_git?
-          command = 'git rev-list HEAD --count'
+          command = "git rev-list HEAD --count"
         else
           UI.user_error!("Not in a git repository.")
         end

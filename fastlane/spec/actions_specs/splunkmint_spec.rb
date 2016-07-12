@@ -11,11 +11,11 @@ describe Fastlane do
       end
 
       it "raises an error if no dsym source has been found" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
 
         expect do
-          ENV['DSYM_OUTPUT_PATH'] = nil
-          ENV['DSYM_ZIP_PATH'] = nil
+          ENV["DSYM_OUTPUT_PATH"] = nil
+          ENV["DSYM_ZIP_PATH"] = nil
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
@@ -24,9 +24,9 @@ describe Fastlane do
       end
 
       it "raises an error if no dsym source has been found in SharedValues::DSYM_OUTPUT_PATH" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = file_path
-        ENV['DSYM_ZIP_PATH'] = nil
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
         expect do
@@ -35,9 +35,9 @@ describe Fastlane do
       end
 
       it "raises an error if no dsym source has been found in SharedValues::DSYM_ZIP_PATH" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = file_path
-        ENV['DSYM_OUTPUT_PATH'] = nil
+        ENV["DSYM_OUTPUT_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
 
         expect do
@@ -46,9 +46,9 @@ describe Fastlane do
       end
 
       it "raises an error if no dsym source has been found in ENV['DSYM_OUTPUT_PATH']" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
-        ENV['DSYM_OUTPUT_PATH'] = file_path
-        ENV['DSYM_ZIP_PATH'] = nil
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
+        ENV["DSYM_OUTPUT_PATH"] = file_path
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
@@ -58,9 +58,9 @@ describe Fastlane do
       end
 
       it "raises an error if no dsym source has been found in ENV['DSYM_ZIP_PATH']" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
-        ENV['DSYM_ZIP_PATH'] = file_path
-        ENV['DSYM_OUTPUT_PATH'] = nil
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
+        ENV["DSYM_ZIP_PATH"] = file_path
+        ENV["DSYM_OUTPUT_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
@@ -81,7 +81,7 @@ describe Fastlane do
       end
 
       it "raises an error if file does not exist" do
-        file_path = File.expand_path('/tmp/wwxfile.dsym.zip')
+        file_path = File.expand_path("/tmp/wwxfile.dsym.zip")
 
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -93,8 +93,8 @@ describe Fastlane do
       end
 
       it "raises an error if file could not be read from any source" do
-        ENV['DSYM_OUTPUT_PATH'] = nil
-        ENV['DSYM_ZIP_PATH'] = nil
+        ENV["DSYM_OUTPUT_PATH"] = nil
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
@@ -107,12 +107,12 @@ describe Fastlane do
       end
 
       it "mandatory options are used correctly" do
-        ENV['DSYM_OUTPUT_PATH'] = nil
-        ENV['DSYM_ZIP_PATH'] = nil
+        ENV["DSYM_OUTPUT_PATH"] = nil
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        file_path = "/tmp/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
           splunkmint(dsym: '/tmp/file.dSYM.zip',
@@ -126,20 +126,20 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("-F file=@/tmp/file.dSYM.zip")
-        expect(result).to include('--verbose')
+        expect(result).to include("--verbose")
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
-        expect(result).to include('-x http://server:30')
-        expect(result).to include('--proxy-user admin:admin')
+        expect(result).to include("-x http://server:30")
+        expect(result).to include("--proxy-user admin:admin")
       end
 
       it "optional options are used correctly" do
-        ENV['DSYM_OUTPUT_PATH'] = nil
-        ENV['DSYM_ZIP_PATH'] = nil
+        ENV["DSYM_OUTPUT_PATH"] = nil
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        file_path = "/tmp/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
           splunkmint(dsym: '/tmp/file.dSYM.zip',
@@ -149,20 +149,20 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("-F file=@/tmp/file.dSYM.zip")
-        expect(result).to include('--verbose')
+        expect(result).to include("--verbose")
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
-        expect(result).not_to include('-x')
-        expect(result).not_to include('--proxy-user')
+        expect(result).not_to include("-x")
+        expect(result).not_to include("--proxy-user")
       end
 
       it "show progres bar option is used" do
-        ENV['DSYM_OUTPUT_PATH'] = nil
-        ENV['DSYM_ZIP_PATH'] = nil
+        ENV["DSYM_OUTPUT_PATH"] = nil
+        ENV["DSYM_ZIP_PATH"] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        file_path = "/tmp/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
           splunkmint(dsym: '/tmp/file.dSYM.zip',
@@ -173,12 +173,12 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("-F file=@/tmp/file.dSYM.zip")
-        expect(result).to include('--verbose')
+        expect(result).to include("--verbose")
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
-        expect(result).to include('--progress-bar -o /dev/null --no-buffer')
-        expect(result).not_to include('-x')
-        expect(result).not_to include('--proxy-user')
+        expect(result).to include("--progress-bar -o /dev/null --no-buffer")
+        expect(result).not_to include("-x")
+        expect(result).not_to include("--proxy-user")
       end
     end
   end

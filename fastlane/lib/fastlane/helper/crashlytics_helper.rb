@@ -8,7 +8,7 @@ module Fastlane
           end
 
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
-          submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
+          submit_binary = Dir[File.join(params[:crashlytics_path], "**", "submit")].last
           submit_binary ||= "Crashlytics.framework/submit" if Helper.test?
           UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
 
@@ -28,8 +28,8 @@ module Fastlane
 
         def generate_android_command(params)
           # We have to generate an empty XML file to make the crashlytics CLI happy :)
-          require 'tempfile'
-          xml = Tempfile.new('xml')
+          require "tempfile"
+          xml = Tempfile.new("xml")
           xml.write('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>')
           xml.close
 
@@ -61,7 +61,7 @@ module Fastlane
           return jar_path if File.exist?(jar_path)
 
           url = "https://ssl-download-crashlytics-com.s3.amazonaws.com/android/ant/crashlytics.zip"
-          require 'net/http'
+          require "net/http"
 
           FileUtils.mkdir_p(containing)
 
@@ -85,7 +85,7 @@ module Fastlane
         end
 
         def write_to_tempfile(value, tempfilename)
-          require 'tempfile'
+          require "tempfile"
 
           Tempfile.new(tempfilename).tap do |t|
             t.write(value)

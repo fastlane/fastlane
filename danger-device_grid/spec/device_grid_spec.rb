@@ -1,4 +1,4 @@
-require File.expand_path('../spec_helper', __FILE__)
+require File.expand_path("../spec_helper", __FILE__)
 
 module Danger
   class Dangerfile
@@ -19,15 +19,15 @@ module Danger
   end
 
   describe Danger::DangerDeviceGrid do
-    it 'should be a plugin' do
+    it "should be a plugin" do
       expect(Danger::DangerDeviceGrid.new(nil)).to be_a Danger::Plugin
     end
 
     it "works" do
       public_key = "1461233806"
       dg = Danger::DangerDeviceGrid.new(Danger::Dangerfile::DSL::Plugin.new)
-      dg.run(languages: ['en', 'de'],
-             devices: ['iphone4s'],
+      dg.run(languages: ["en", "de"],
+             devices: ["iphone4s"],
              public_key: public_key)
 
       correct = File.read("spec/fixtures/device_grid_results.html").gsub("[[version]]", Fastlane::VERSION)

@@ -1,7 +1,7 @@
-require 'excon'
-require 'digest'
+require "excon"
+require "digest"
 
-require 'fastlane_core/update_checker/changelog'
+require "fastlane_core/update_checker/changelog"
 
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
@@ -50,16 +50,16 @@ module FastlaneCore
     def self.show_update_message(gem_name, current_version)
       available = server_results[gem_name]
       puts ""
-      puts '#######################################################################'.green
+      puts "#######################################################################".green
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
       puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
       if Random.rand(5) == 1
-        puts '#######################################################################'.green
+        puts "#######################################################################".green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
-      puts '#######################################################################'.green
+      puts "#######################################################################".green
       Changelog.show_changes(gem_name, current_version) unless ENV["FASTLANE_HIDE_CHANGELOG"]
     end
 
@@ -135,8 +135,8 @@ module FastlaneCore
     def self.android_app_identifier_arg?(gem_name, arg)
       return arg == "--package_name" ||
              arg == "--app_package_name" ||
-             (arg == '-p' && gem_name == 'supply') ||
-             (arg == '-a' && gem_name == 'screengrab')
+             (arg == "-p" && gem_name == "supply") ||
+             (arg == "-a" && gem_name == "screengrab")
     end
 
     # To not count the same projects multiple time for the number of launches
@@ -145,7 +145,7 @@ module FastlaneCore
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def self.p_hash(args, gem_name)
       return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
-      require 'credentials_manager'
+      require "credentials_manager"
 
       # check if this is an android project first because some of the same params exist for iOS and Android tools
       value = android_app_identifier(args, gem_name) || ios_app_identifier(args)

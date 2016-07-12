@@ -12,19 +12,19 @@ module Fastlane
       end
 
       def self.run(options)
-        require 'net/http'
-        require 'net/http/post/multipart'
-        require 'uri'
-        require 'json'
+        require "net/http"
+        require "net/http/post/multipart"
+        require "uri"
+        require "json"
 
         params = {
           platform: options[:platform]
         }
 
         if options[:path]
-          params[:file] = UploadIO.new(options[:path], 'application/zip')
+          params[:file] = UploadIO.new(options[:path], "application/zip")
         else
-          UI.user_error!('url parameter is required if no file path is specified') if options[:url].nil?
+          UI.user_error!("url parameter is required if no file path is specified") if options[:url].nil?
           params[:url] = options[:url]
         end
 
@@ -37,7 +37,7 @@ module Fastlane
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
-        if params[:platform] == 'ios'
+        if params[:platform] == "ios"
           UI.message "Uploading ipa to appetize... this might take a while"
         else
           UI.message "Uploading apk to appetize... this might take a while"
@@ -60,7 +60,7 @@ module Fastlane
 
       def self.create_request(uri, params)
         if params[:url]
-          req = Net::HTTP::Post.new(uri.request_uri, initheader: { 'Content-Type' => 'application/json' })
+          req = Net::HTTP::Post.new(uri.request_uri, initheader: { "Content-Type" => "application/json" })
           req.body = JSON.generate(params)
         else
           req = Net::HTTP::Post::Multipart.new(uri.path, params)
@@ -72,9 +72,9 @@ module Fastlane
 
       def self.parse_response(response)
         body = JSON.parse(response.body)
-        app_url = body['appURL']
-        manage_url = body['manageURL']
-        public_key = body['publicKey']
+        app_url = body["appURL"]
+        manage_url = body["manageURL"]
+        public_key = body["publicKey"]
 
         Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
         Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
@@ -108,7 +108,7 @@ module Fastlane
                                        env_name: "APPETIZE_PLATFORM",
                                        description: "Platform. Either `ios` or `android`. Default is `ios`",
                                        is_string: true,
-                                       default_value: 'ios'),
+                                       default_value: "ios"),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "APPETIZE_FILE_PATH",
                                        description: "Path to zipped build on the local filesystem. Either this or `url` must be specified",
@@ -134,9 +134,9 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created'],
-          ['APPETIZE_APP_URL', 'a page to test and share your app.'],
-          ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
+          ["APPETIZE_PUBLIC_KEY", "a public identifier for your app. Use this to update your app after it has been initially created"],
+          ["APPETIZE_APP_URL", "a page to test and share your app."],
+          ["APPETIZE_MANAGE_URL", "a page to manage your app."]
         ]
       end
 

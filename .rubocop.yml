@@ -95,7 +95,8 @@ Style/GuardClause:
 
 # We allow both " and '
 Style/StringLiterals:
-  Enabled: false
+  EnforcedStyle: double_quotes
+  Enabled: true
 
 # something = if something_else
 # that's confusing

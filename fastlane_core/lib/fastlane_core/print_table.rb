@@ -5,7 +5,7 @@ module FastlaneCore
       # You can pass an array to `hide_keys` if you don't want certain elements to show up (symbols or strings)
       # You can pass an array to `mask_keys` if you want to mask certain elements (symbols or strings)
       def print_values(config: nil, title: nil, hide_keys: [], mask_keys: [])
-        require 'terminal-table'
+        require "terminal-table"
 
         options = {}
         unless config.nil?
@@ -15,7 +15,7 @@ module FastlaneCore
             options = config
           end
         end
-        rows = self.collect_rows(options: options, hide_keys: hide_keys.map(&:to_s), mask_keys: mask_keys.map(&:to_s), prefix: '')
+        rows = self.collect_rows(options: options, hide_keys: hide_keys.map(&:to_s), mask_keys: mask_keys.map(&:to_s), prefix: "")
 
         params = {}
         params[:rows] = limit_row_size(rows)
@@ -29,7 +29,7 @@ module FastlaneCore
       end
 
       def limit_row_size(rows, max_length = 100)
-        require 'fastlane_core/string_filters'
+        require "fastlane_core/string_filters"
 
         max_key_length = rows.map { |e| e[0].length }.max || 0
         max_allowed_value_length = max_length - max_key_length - 7
@@ -40,7 +40,7 @@ module FastlaneCore
         end
       end
 
-      def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********')
+      def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: "", mask: "********")
         rows = []
 
         options.each do |key, value|

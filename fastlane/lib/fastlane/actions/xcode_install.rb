@@ -9,7 +9,7 @@ module Fastlane
         ENV["XCODE_INSTALL_USER"] = params[:username]
         ENV["XCODE_INSTALL_TEAM_ID"] = params[:team_id]
 
-        require 'xcode/install'
+        require "xcode/install"
         installer = XcodeInstall::Installer.new
 
         if installer.installed?(params[:version])
@@ -65,7 +65,7 @@ module Fastlane
 
       def self.output
         [
-          ['XCODE_INSTALL_CUSTOM_VALUE', 'A description of what this value contains']
+          ["XCODE_INSTALL_CUSTOM_VALUE", "A description of what this value contains"]
         ]
       end
 

@@ -11,8 +11,8 @@ module Spaceship
       attr_accessor :pricing_info
 
       attr_mapping(
-        'tierStem' => :tier_stem,
-        'tierName' => :tier_name
+        "tierStem" => :tier_stem,
+        "tierName" => :tier_name
       )
 
       class << self
@@ -20,7 +20,7 @@ module Spaceship
         # This is used to create a new object based on the server response.
         def factory(attrs)
           obj = self.new(attrs)
-          obj.unfold_pricing_info(attrs['pricingInfo'])
+          obj.unfold_pricing_info(attrs["pricingInfo"])
 
           return obj
         end
@@ -58,14 +58,14 @@ module Spaceship
       attr_accessor :f_wholesale_price
 
       attr_mapping(
-        'country' => :country,
-        'countryCode' => :country_code,
-        'currencySymbol' => :currency_symbol,
-        'currencyCode' => :currency_code,
-        'wholesalePrice' => :wholesale_price,
-        'retailPrice' => :retail_price,
-        'fRetailPrice' => :f_retail_price,
-        'fWholesalePrice' => :f_wholesale_price
+        "country" => :country,
+        "countryCode" => :country_code,
+        "currencySymbol" => :currency_symbol,
+        "currencyCode" => :currency_code,
+        "wholesalePrice" => :wholesale_price,
+        "retailPrice" => :retail_price,
+        "fRetailPrice" => :f_retail_price,
+        "fWholesalePrice" => :f_wholesale_price
       )
 
       class << self

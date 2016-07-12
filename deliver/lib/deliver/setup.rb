@@ -1,8 +1,8 @@
 module Deliver
   class Setup
     def run(options)
-      containing = (File.directory?("fastlane") ? 'fastlane' : '.')
-      file_path = File.join(containing, 'Deliverfile')
+      containing = (File.directory?("fastlane") ? "fastlane" : ".")
+      file_path = File.join(containing, "Deliverfile")
       data = generate_deliver_file(containing, options)
       setup_deliver(file_path, data, containing, options)
     end
@@ -14,8 +14,8 @@ module Deliver
         download_screenshots(deliver_path, options)
 
         # Add a README to the screenshots folder
-        FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
-        File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
+        FileUtils.mkdir_p File.join(deliver_path, "screenshots") # just in case the fetching didn't work
+        File.write(File.join(deliver_path, "screenshots", "README.txt"), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
       end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
@@ -25,10 +25,10 @@ module Deliver
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
-      generate_metadata_files(v, File.join(deliver_path, 'metadata'))
+      generate_metadata_files(v, File.join(deliver_path, "metadata"))
 
       # Generate the final Deliverfile here
-      gem_path = Helper.gem_path('deliver')
+      gem_path = Helper.gem_path("deliver")
       deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
       deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
       deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
@@ -48,7 +48,7 @@ module Deliver
           end
 
           resulting_path = File.join(path, language, "#{key}.txt")
-          FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+          FileUtils.mkdir_p(File.expand_path("..", resulting_path))
           File.write(resulting_path, content)
           UI.message("Writing to '#{resulting_path}'")
         end
@@ -71,7 +71,7 @@ module Deliver
     end
 
     def download_screenshots(deliver_path, options)
-      path = File.join(deliver_path, 'screenshots')
+      path = File.join(deliver_path, "screenshots")
       FileUtils.mkdir_p(path)
       Deliver::DownloadScreenshots.run(options, path)
     end

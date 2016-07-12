@@ -6,7 +6,7 @@ describe Fastlane do
           reset_git_repo(force: true, files: ['.'])
         end").runner.execute(:test)
 
-        expect(paths).to eq(['.'])
+        expect(paths).to eq(["."])
       end
 
       it "works as expected inside a Fastfile" do

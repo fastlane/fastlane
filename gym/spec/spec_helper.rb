@@ -1,12 +1,12 @@
 require "coveralls"
 Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-require 'webmock'
+require "webmock"
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
 
-require 'gym'
+require "gym"
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")

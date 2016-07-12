@@ -7,10 +7,10 @@ module Fastlane
 
     class GymAction < Action
       def self.run(values)
-        require 'gym'
+        require "gym"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("gym") unless Helper.is_test?
 
           if values[:provisioning_profile_path].to_s.length == 0
             sigh_path = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
@@ -30,7 +30,7 @@ module Fastlane
 
           return absolute_ipa_path
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('gym', Gym::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("gym", Gym::VERSION)
         end
       end
 
@@ -51,7 +51,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'gym'
+        require "gym"
         Gym::Options.available_options
       end
 

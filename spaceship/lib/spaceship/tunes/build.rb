@@ -87,29 +87,29 @@ module Spaceship
       attr_accessor :crash_count
 
       attr_mapping(
-        'uploadDate' => :upload_date,
-        'iconUrl' => :icon_url,
-        'buildVersion' => :build_version,
-        'trainVersion' => :train_version,
-        'appName' => :app_name,
-        'platform' => :platform,
-        'id' => :id,
-        'valid' => :valid,
-        'processing' => :processing,
-        'processingState' => :processing_state,
+        "uploadDate" => :upload_date,
+        "iconUrl" => :icon_url,
+        "buildVersion" => :build_version,
+        "trainVersion" => :train_version,
+        "appName" => :app_name,
+        "platform" => :platform,
+        "id" => :id,
+        "valid" => :valid,
+        "processing" => :processing,
+        "processingState" => :processing_state,
 
-        'installCount' => :install_count,
-        'internalInstallCount' => :internal_install_count,
-        'externalInstallCount' => :external_install_count,
-        'sessionCount' => :session_count,
-        'crashCount' => :crash_count,
-        'internalExpiry' => :internal_expiry_date,
-        'externalExpiry' => :external_expiry_date,
-        'watchKitEnabled' => :watch_kit_enabled,
-        'readyToInstall' => :ready_to_install,
-        'internalTesting.value' => :internal_testing_enabled,
-        'externalTesting.value' => :external_testing_enabled,
-        'buildTestInformationTO.externalStatus' => :external_testing_status
+        "installCount" => :install_count,
+        "internalInstallCount" => :internal_install_count,
+        "externalInstallCount" => :external_install_count,
+        "sessionCount" => :session_count,
+        "crashCount" => :crash_count,
+        "internalExpiry" => :internal_expiry_date,
+        "externalExpiry" => :external_expiry_date,
+        "watchKitEnabled" => :watch_kit_enabled,
+        "readyToInstall" => :ready_to_install,
+        "internalTesting.value" => :internal_testing_enabled,
+        "externalTesting.value" => :external_testing_enabled,
+        "buildTestInformationTO.externalStatus" => :external_testing_status
       )
 
       class << self
@@ -131,7 +131,7 @@ module Spaceship
         response = client.build_details(app_id: self.apple_id,
                                          train: self.train_version,
                                   build_number: self.build_version)
-        response['apple_id'] = self.apple_id
+        response["apple_id"] = self.apple_id
         BuildDetails.factory(response)
       end
 

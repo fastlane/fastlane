@@ -4,15 +4,15 @@ module Fastlane
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction < Action
       def self.run(params)
-        require 'xcodeproj'
-        require 'pathname'
-        require 'set'
-        require 'shellwords'
+        require "xcodeproj"
+        require "pathname"
+        require "set"
+        require "shellwords"
 
-        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
+        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join(".", params[:xcodeproj])) : nil
 
         # find the repo root path
-        repo_path = Actions.sh('git rev-parse --show-toplevel').strip
+        repo_path = Actions.sh("git rev-parse --show-toplevel").strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
@@ -20,7 +20,7 @@ module Fastlane
           UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
         else
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, "**/*.xcodeproj"))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -36,22 +36,22 @@ module Fastlane
         end
 
         # find the pbxproj path, relative to git directory
-        pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
+        pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, "project.pbxproj"))
         pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
         # rubocop:disable Style/MultilineBlockChain
         project = Xcodeproj::Project.open(xcodeproj_path)
         info_plist_files = project.objects.select do |object|
-          object.isa == 'XCBuildConfiguration'
+          object.isa == "XCBuildConfiguration"
         end.map(&:to_hash).map do |object_hash|
-          object_hash['buildSettings']
+          object_hash["buildSettings"]
         end.select do |build_settings|
-          build_settings.key?('INFOPLIST_FILE')
+          build_settings.key?("INFOPLIST_FILE")
         end.map do |build_settings|
-          build_settings['INFOPLIST_FILE']
+          build_settings["INFOPLIST_FILE"]
         end.uniq.map do |info_plist_path|
-          Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
+          Pathname.new(File.expand_path(File.join(xcodeproj_path, "..", info_plist_path))).relative_path_from(repo_pathname).to_s
         end
         # rubocop:enable Style/MultilineBlockChain
 
@@ -62,7 +62,7 @@ module Fastlane
         expected_changed_files.flatten!.uniq!
 
         # get the list of files that have actually changed in our git workdir
-        git_dirty_files = Actions.sh('git diff --name-only HEAD').split("\n") + Actions.sh('git ls-files --other --exclude-standard').split("\n")
+        git_dirty_files = Actions.sh("git diff --name-only HEAD").split("\n") + Actions.sh("git ls-files --other --exclude-standard").split("\n")
 
         # little user hint
         UI.user_error!("No file changes picked up. Make sure you run the `increment_build_number` action first.") if git_dirty_files.empty?
@@ -84,7 +84,7 @@ module Fastlane
         end
 
         if params[:settings]
-          expected_changed_files << 'Settings.bundle/Root.plist'
+          expected_changed_files << "Settings.bundle/Root.plist"
         end
 
         # get the absolute paths to the files

@@ -18,15 +18,15 @@ module Fastlane
     end
 
     def require_path
-      gem_name.tr('-', '/')
+      gem_name.tr("-", "/")
     end
 
     def actions_path
-      File.join(require_path, 'actions')
+      File.join(require_path, "actions")
     end
 
     def helper_path
-      File.join(require_path, 'helper')
+      File.join(require_path, "helper")
     end
 
     # Used to expose a local binding for use in ERB templating

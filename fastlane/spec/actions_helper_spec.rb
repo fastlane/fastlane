@@ -27,7 +27,7 @@ describe Fastlane do
     it "#action_class_ref" do
       expect(Fastlane::Actions.action_class_ref("gym")).to eq(Fastlane::Actions::GymAction)
       expect(Fastlane::Actions.action_class_ref(:cocoapods)).to eq(Fastlane::Actions::CocoapodsAction)
-      expect(Fastlane::Actions.action_class_ref('notExistentObv')).to eq(nil)
+      expect(Fastlane::Actions.action_class_ref("notExistentObv")).to eq(nil)
     end
 
     it "#load_default_actions" do

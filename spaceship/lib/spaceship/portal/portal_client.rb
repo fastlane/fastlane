@@ -20,7 +20,7 @@ module Spaceship
       landing_url = "https://developer.apple.com/account/"
       logger.info("GET: " + landing_url)
       headers = @client.get(landing_url).headers
-      results = headers['location'].match(/.*appIdKey=(\h+)/)
+      results = headers["location"].match(/.*appIdKey=(\h+)/)
       if (results || []).length > 1
         api_key = results[1]
         FileUtils.mkdir_p(File.dirname(cache_path))
@@ -49,10 +49,10 @@ module Spaceship
     def teams
       return @teams if @teams
       req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
-      @teams = parse_response(req, 'teams').sort_by do |team|
+      @teams = parse_response(req, "teams").sort_by do |team|
         [
-          team['name'],
-          team['teamId']
+          team["name"],
+          team["teamId"]
         ]
       end
     end
@@ -64,7 +64,7 @@ module Spaceship
       if teams.count > 1
         puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
       end
-      @current_team_id ||= teams[0]['teamId']
+      @current_team_id ||= teams[0]["teamId"]
     end
 
     # Shows a team selection for the user in the terminal. This should not be
@@ -81,21 +81,21 @@ module Spaceship
     # @return (Hash) Fetches all information of the currently used team
     def team_information
       teams.find do |t|
-        t['teamId'] == team_id
+        t["teamId"] == team_id
       end
     end
 
     # Is the current session from an Enterprise In House account?
     def in_house?
       return @in_house unless @in_house.nil?
-      @in_house = (team_information['type'] == 'In-House')
+      @in_house = (team_information["type"] == "In-House")
     end
 
     def platform_slug(mac)
       if mac
-        'mac'
+        "mac"
       else
-        'ios'
+        "ios"
       end
     end
     private :platform_slug
@@ -110,9 +110,9 @@ module Spaceship
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
-          sort: 'name=asc'
+          sort: "name=asc"
         })
-        parse_response(r, 'appIds')
+        parse_response(r, "appIds")
       end
     end
 
@@ -121,7 +121,7 @@ module Spaceship
         teamId: team_id,
         appIdId: app.app_id
       })
-      parse_response(r, 'appId')
+      parse_response(r, "appId")
     end
 
     def update_service_for_app(app, service)
@@ -136,7 +136,7 @@ module Spaceship
     end
 
     def associate_groups_with_app(app, groups)
-      request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
+      request(:post, "account/ios/identifiers/assignApplicationGroupToAppId.action", {
         teamId: team_id,
         appIdId: app.app_id,
         displayId: app.app_id,
@@ -150,16 +150,16 @@ module Spaceship
       ident_params = case type.to_sym
                      when :explicit
                        {
-                         type: 'explicit',
+                         type: "explicit",
                          explicitIdentifier: bundle_id,
                          appIdentifierString: bundle_id,
-                         push: 'on',
-                         inAppPurchase: 'on',
-                         gameCenter: 'on'
+                         push: "on",
+                         inAppPurchase: "on",
+                         gameCenter: "on"
                        }
                      when :wildcard
                        {
-                         type: 'wildcard',
+                         type: "wildcard",
                          wildcardIdentifier: bundle_id,
                          appIdentifierString: bundle_id
                        }
@@ -175,7 +175,7 @@ module Spaceship
       ensure_csrf
 
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
-      parse_response(r, 'appId')
+      parse_response(r, "appId")
     end
 
     def delete_app!(app_id, mac: false)
@@ -192,27 +192,27 @@ module Spaceship
 
     def app_groups
       paging do |page_number|
-        r = request(:post, 'account/ios/identifiers/listApplicationGroups.action', {
+        r = request(:post, "account/ios/identifiers/listApplicationGroups.action", {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
-          sort: 'name=asc'
+          sort: "name=asc"
         })
-        parse_response(r, 'applicationGroupList')
+        parse_response(r, "applicationGroupList")
       end
     end
 
     def create_app_group!(name, group_id)
-      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
+      r = request(:post, "account/ios/identifiers/addApplicationGroup.action", {
         name: name,
         identifier: group_id,
         teamId: team_id
       })
-      parse_response(r, 'applicationGroup')
+      parse_response(r, "applicationGroup")
     end
 
     def delete_app_group!(app_group_id)
-      r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
+      r = request(:post, "account/ios/identifiers/deleteApplicationGroup.action", {
         teamId: team_id,
         applicationGroup: app_group_id
       })
@@ -229,22 +229,22 @@ module Spaceship
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
-          sort: 'name=asc'
+          sort: "name=asc"
         })
-        parse_response(r, 'devices')
+        parse_response(r, "devices")
       end
     end
 
     def devices_by_class(device_class)
       paging do |page_number|
-        r = request(:post, 'account/ios/device/listDevices.action', {
+        r = request(:post, "account/ios/device/listDevices.action", {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
-          sort: 'name=asc',
+          sort: "name=asc",
           deviceClasses: device_class
         })
-        parse_response(r, 'devices')
+        parse_response(r, "devices")
       end
     end
 
@@ -258,7 +258,7 @@ module Spaceship
         }
       end
 
-      parse_response(req, 'device')
+      parse_response(req, "device")
     end
 
     #####################################################
@@ -269,25 +269,25 @@ module Spaceship
       paging do |page_number|
         r = request(:post, "account/#{platform_slug(mac)}/certificate/listCertRequests.action", {
           teamId: team_id,
-          types: types.join(','),
+          types: types.join(","),
           pageNumber: page_number,
           pageSize: page_size,
-          sort: 'certRequestStatusCode=asc'
+          sort: "certRequestStatusCode=asc"
         })
-        parse_response(r, 'certRequests')
+        parse_response(r, "certRequests")
       end
     end
 
     def create_certificate!(type, csr, app_id = nil)
       ensure_csrf
 
-      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      r = request(:post, "account/ios/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
         csrContent: csr,
         appIdId: app_id # optional
       })
-      parse_response(r, 'certRequest')
+      parse_response(r, "certRequest")
     end
 
     def download_certificate(certificate_id, type, mac: false)
@@ -312,7 +312,7 @@ module Spaceship
         certificateId: certificate_id,
         type: type
       })
-      parse_response(r, 'certRequests')
+      parse_response(r, "certRequests")
     end
 
     #####################################################
@@ -329,7 +329,7 @@ module Spaceship
         }
       end
 
-      parse_response(req, 'provisioningProfiles')
+      parse_response(req, "provisioningProfiles")
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
@@ -346,7 +346,7 @@ module Spaceship
       params[:subPlatform] = sub_platform if sub_platform
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", params)
-      parse_response(r, 'provisioningProfile')
+      parse_response(r, "provisioningProfile")
     end
 
     def download_provisioning_profile(profile_id, mac: false)
@@ -379,11 +379,11 @@ module Spaceship
         provisioningProfileName: name,
         appIdId: app_id,
         distributionType: distribution_method,
-        certificateIds: certificate_ids.join(','),
+        certificateIds: certificate_ids.join(","),
         deviceIds: device_ids
       })
 
-      parse_response(r, 'provisioningProfile')
+      parse_response(r, "provisioningProfile")
     end
 
     private

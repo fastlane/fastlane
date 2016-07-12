@@ -35,13 +35,13 @@ module Spaceship
       attr_accessor :app_icon_preview_url
 
       attr_mapping(
-        'adamId' => :apple_id,
-        'name' => :name,
-        'vendorId' => :vendor_id,
-        'bundleId' => :bundle_id,
-        'lastModifiedDate' => :last_modified,
-        'issuesCount' => :issues_count,
-        'iconUrl' => :app_icon_preview_url
+        "adamId" => :apple_id,
+        "name" => :name,
+        "vendorId" => :vendor_id,
+        "bundleId" => :bundle_id,
+        "lastModifiedDate" => :last_modified,
+        "issuesCount" => :issues_count,
+        "iconUrl" => :app_icon_preview_url
       )
 
       class << self
@@ -125,7 +125,7 @@ module Spaceship
       # note that as ITC now supports multiple app types, this might break
       # if your app supports more than one
       def platform
-        Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])['platformString']
+        Spaceship::Tunes::AppVersionCommon.find_platform(raw_data["versionSets"])["platformString"]
       end
 
       def details
@@ -375,8 +375,8 @@ module Spaceship
       # private to module
       def ensure_not_a_bundle
         # we only support applications
-        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
-        raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
+        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data["versionSets"])
+        raise "We do not support BUNDLE types right now" if platform["type"] == "BUNDLE"
       end
     end
   end

@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Unlock keychain Integration" do
       it "works with path and password and existing keychain" do
-        keychain_path = Tempfile.new('foo').path
+        keychain_path = Tempfile.new("foo").path
 
         result = Fastlane::FastFile.new.parse("lane :test do
           unlock_keychain ({
@@ -19,7 +19,7 @@ describe Fastlane do
       end
 
       it "doesn't add keychain to search list" do
-        keychain_path = Tempfile.new('foo').path
+        keychain_path = Tempfile.new("foo").path
 
         result = Fastlane::FastFile.new.parse("lane :test do
           unlock_keychain ({
@@ -35,7 +35,7 @@ describe Fastlane do
       end
 
       it "replace keychain in search list" do
-        keychain_path = Tempfile.new('foo').path
+        keychain_path = Tempfile.new("foo").path
 
         result = Fastlane::FastFile.new.parse("lane :test do
           unlock_keychain ({
@@ -52,7 +52,7 @@ describe Fastlane do
       end
 
       it "set default keychain" do
-        keychain_path = Tempfile.new('foo').path
+        keychain_path = Tempfile.new("foo").path
 
         result = Fastlane::FastFile.new.parse("lane :test do
           unlock_keychain ({

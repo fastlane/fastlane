@@ -1,6 +1,6 @@
 require "fastlane_core"
 require "pilot/tester_util"
-require 'terminal-table'
+require "terminal-table"
 
 module Pilot
   class TesterManager < Manager
@@ -169,7 +169,7 @@ module Pilot
 
       if groups && groups.length > 0
         group_names = groups.map { |group| group["name"]["value"] }
-        rows << ["Groups", group_names.join(', ')]
+        rows << ["Groups", group_names.join(", ")]
       end
 
       if tester.latest_install_date

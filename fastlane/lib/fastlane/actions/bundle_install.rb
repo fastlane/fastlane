@@ -5,7 +5,7 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         if gemfile_exists?(params)
-          cmd = ['bundle install']
+          cmd = ["bundle install"]
 
           cmd << "--binstubs #{params[:binstubs]}" if params[:binstubs]
           cmd << "--clean" if params[:clean]
@@ -26,7 +26,7 @@ module Fastlane
           cmd << "--without #{params[:without]}" if params[:without]
           cmd << "--with #{params[:with]}" if params[:with]
 
-          return sh(cmd.join(' '))
+          return sh(cmd.join(" "))
         else
           UI.message("No Gemfile found")
         end
@@ -35,7 +35,7 @@ module Fastlane
       # rubocop:enable Metrics/PerceivedComplexity
 
       def self.gemfile_exists?(params)
-        possible_gemfiles = ['Gemfile', 'gemfile']
+        possible_gemfiles = ["Gemfile", "gemfile"]
         possible_gemfiles.insert(0, params[:gemfile]) if params[:gemfile]
         possible_gemfiles.each do |gemfile|
           gemfile = File.absolute_path(gemfile)
@@ -46,7 +46,7 @@ module Fastlane
       end
 
       def self.description
-        'This action runs `bundle install` (if available)'
+        "This action runs `bundle install` (if available)"
       end
 
       def self.is_supported?(platform)

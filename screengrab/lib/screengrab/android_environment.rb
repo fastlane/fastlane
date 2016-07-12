@@ -31,14 +31,14 @@ module Screengrab
     def find_platform_tools(android_home)
       return nil unless android_home
 
-      platform_tools_path = File.join(android_home, 'platform-tools')
+      platform_tools_path = File.join(android_home, "platform-tools")
       File.directory?(platform_tools_path) ? platform_tools_path : nil
     end
 
     def find_build_tools(android_home, build_tools_version)
       return nil unless android_home
 
-      build_tools_dir = File.join(android_home, 'build-tools')
+      build_tools_dir = File.join(android_home, "build-tools")
 
       return nil unless build_tools_dir && File.directory?(build_tools_dir)
 
@@ -51,7 +51,7 @@ module Screengrab
 
     def select_build_tools_version(build_tools_dir)
       # Collect the sub-directories of the build_tools_dir, rejecting any that start with '.' to remove . and ..
-      dir_names = Dir.entries(build_tools_dir).select { |e| !e.start_with?('.') && File.directory?(File.join(build_tools_dir, e)) }
+      dir_names = Dir.entries(build_tools_dir).select { |e| !e.start_with?(".") && File.directory?(File.join(build_tools_dir, e)) }
 
       # Collect a sorted array of Version objects from the directory names, handling the possibility that some
       # entries may not be valid version names
@@ -68,16 +68,16 @@ module Screengrab
     end
 
     def find_adb(platform_tools_path)
-      return FastlaneCore::CommandExecutor.which('adb') unless platform_tools_path
+      return FastlaneCore::CommandExecutor.which("adb") unless platform_tools_path
 
-      adb_path = File.join(platform_tools_path, 'adb')
+      adb_path = File.join(platform_tools_path, "adb")
       return executable_command?(adb_path) ? adb_path : nil
     end
 
     def find_aapt(build_tools_path)
-      return FastlaneCore::CommandExecutor.which('aapt') unless build_tools_path
+      return FastlaneCore::CommandExecutor.which("aapt") unless build_tools_path
 
-      aapt_path = File.join(build_tools_path, 'aapt')
+      aapt_path = File.join(build_tools_path, "aapt")
       return executable_command?(aapt_path) ? aapt_path : nil
     end
 

@@ -6,28 +6,28 @@ module Fastlane
 
     class GetBuildNumberRepositoryAction < Action
       def self.is_svn?
-        Actions.sh 'svn info'
+        Actions.sh "svn info"
         return true
       rescue
         return false
       end
 
       def self.is_git?
-        Actions.sh 'git rev-parse HEAD'
+        Actions.sh "git rev-parse HEAD"
         return true
       rescue
         return false
       end
 
       def self.is_git_svn?
-        Actions.sh 'git svn info'
+        Actions.sh "git svn info"
         return true
       rescue
         return false
       end
 
       def self.is_hg?
-        Actions.sh 'hg status'
+        Actions.sh "hg status"
         return true
       rescue
         return false
@@ -42,11 +42,11 @@ module Fastlane
           return 'git svn info | grep Revision | egrep -o "[0-9]+"'
         elsif is_git?
           UI.message "Detected repo: git"
-          return 'git rev-parse --short HEAD'
+          return "git rev-parse --short HEAD"
         elsif is_hg?
           UI.message "Detected repo: hg"
           if use_hg_revision_number
-            return 'hg parent --template {rev}'
+            return "hg parent --template {rev}"
           else
             return 'hg parent --template "{node|short}"'
           end
@@ -82,7 +82,7 @@ module Fastlane
 
       def self.output
         [
-          ['BUILD_NUMBER_REPOSITORY', 'The build number from the current repository']
+          ["BUILD_NUMBER_REPOSITORY", "The build number from the current repository"]
         ]
       end
 

@@ -10,7 +10,7 @@ module Fastlane
 
         commands += ["git fetch --tags"]
 
-        Actions.sh(commands.join(' '))
+        Actions.sh(commands.join(" "))
       end
 
       def self.description

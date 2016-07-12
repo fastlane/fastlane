@@ -1,4 +1,4 @@
-require 'fastlane/erb_template_helper'
+require "fastlane/erb_template_helper"
 
 module Fastlane
   module Actions
@@ -8,8 +8,8 @@ module Fastlane
       end
 
       def self.run(options)
-        Actions.verify_gem!('rest-client')
-        require 'rest-client'
+        Actions.verify_gem!("rest-client")
+        require "rest-client"
         handle_params_transition(options)
         mailgunit(options)
       end

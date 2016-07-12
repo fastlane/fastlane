@@ -7,39 +7,39 @@ module Fastlane
     class SlatherAction < Action
       # https://github.com/SlatherOrg/slather/blob/cbc5099cd25beb43fd978b7a3e5428f02230122d/lib/slather/command/coverage_command.rb#L24
       ARGS_MAP = {
-          travis: '--travis',
-          circleci: '--circleci',
-          jenkins: '--jenkins',
-          buildkite: '--buildkite',
-          teamcity: '--teamcity',
+          travis: "--travis",
+          circleci: "--circleci",
+          jenkins: "--jenkins",
+          buildkite: "--buildkite",
+          teamcity: "--teamcity",
 
-          coveralls: '--coveralls',
-          simple_output: '--simple-output',
-          gutter_json: '--gutter-json',
-          cobertura_xml: '--cobertura-xml',
-          html: '--html',
-          show: '--show',
+          coveralls: "--coveralls",
+          simple_output: "--simple-output",
+          gutter_json: "--gutter-json",
+          cobertura_xml: "--cobertura-xml",
+          html: "--html",
+          show: "--show",
 
-          build_directory: '--build-directory',
-          source_directory: '--source-directory',
-          output_directory: '--output-directory',
-          ignore: '--ignore',
-          verbose: '--verbose',
+          build_directory: "--build-directory",
+          source_directory: "--source-directory",
+          output_directory: "--output-directory",
+          ignore: "--ignore",
+          verbose: "--verbose",
 
-          input_format: '--input-format',
-          scheme: '--scheme',
-          workspace: '--workspace',
-          binary_file: '--binary-file',
-          binary_basename: '--binary-basename',
-          source_files: '--source-files',
-          decimals: '--decimals'
+          input_format: "--input-format",
+          scheme: "--scheme",
+          workspace: "--workspace",
+          binary_file: "--binary-file",
+          binary_basename: "--binary-basename",
+          source_files: "--source-files",
+          decimals: "--decimals"
       }.freeze
 
       def self.run(params)
         # This will fail if using Bundler. Skip the check rather than needing to
         # require bundler
         unless params[:use_bundle_exec]
-          Actions.verify_gem!('slather')
+          Actions.verify_gem!("slather")
         end
 
         validate_params!(params)
@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.has_config_file
-        File.file?('.slather.yml')
+        File.file?(".slather.yml")
       end
 
       def self.validate_params!(params)

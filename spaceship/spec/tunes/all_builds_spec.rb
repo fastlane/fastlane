@@ -1,10 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Tunes::Application do
   before { Spaceship::Tunes.login }
   subject { Spaceship::Tunes.client }
-  let(:username) { 'spaceship@krausefx.com' }
-  let(:password) { 'so_secret' }
+  let(:username) { "spaceship@krausefx.com" }
+  let(:password) { "so_secret" }
 
   describe "All Builds" do
     let(:app) { Spaceship::Application.all.first }

@@ -121,7 +121,7 @@ module Pilot
         #  build trains right away, and if we don't do this check, we will
         #  get break out of this loop and then generate an error later when we
         #  have a nil build
-        if FastlaneCore::Feature.enabled?('PILOT_WAIT_FOR_NEW_BUILD_TRAINS_ON_ITUNES_CONNECT') && app.build_trains.count == 0
+        if FastlaneCore::Feature.enabled?("PILOT_WAIT_FOR_NEW_BUILD_TRAINS_ON_ITUNES_CONNECT") && app.build_trains.count == 0
           UI.message("New application; waiting for build train to appear on iTunes Connect")
         else
           builds = app.all_processing_builds
@@ -172,7 +172,7 @@ module Pilot
       end
 
       # Submit for beta testing
-      type = options[:distribute_external] ? 'external' : 'internal'
+      type = options[:distribute_external] ? "external" : "internal"
       uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
       return true
     end

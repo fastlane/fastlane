@@ -5,4 +5,4 @@ Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 module SpecHelper
 end
 
-require 'scan'
+require "scan"

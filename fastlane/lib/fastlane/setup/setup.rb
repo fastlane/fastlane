@@ -40,5 +40,5 @@ module Fastlane
   end
 end
 
-require 'fastlane/setup/setup_ios'
-require 'fastlane/setup/setup_android'
+require "fastlane/setup/setup_ios"
+require "fastlane/setup/setup_android"

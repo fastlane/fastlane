@@ -2,25 +2,25 @@ module Fastlane
   module Actions
     class MatchAction < Action
       def self.run(params)
-        require 'match'
+        require "match"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('match') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("match") unless Helper.is_test?
 
           params.load_configuration_file("Matchfile")
           Match::Runner.new.run(params)
 
           define_profile_type(params)
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("match", Match::VERSION)
         end
       end
 
       def self.define_profile_type(values)
         profile_type = "app-store"
-        profile_type = "ad-hoc" if values[:type] == 'adhoc'
-        profile_type = "development" if values[:type] == 'development'
-        profile_type = "enterprise" if values[:type] == 'enterprise'
+        profile_type = "ad-hoc" if values[:type] == "adhoc"
+        profile_type = "development" if values[:type] == "development"
+        profile_type = "enterprise" if values[:type] == "enterprise"
 
         UI.message("Setting Provisioning Profile type to '#{profile_type}'")
 
@@ -40,7 +40,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'match'
+        require "match"
         Match::Options.available_options
       end
 

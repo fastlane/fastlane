@@ -47,7 +47,7 @@ module Gym
         c.syntax = "gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = (File.directory?("fastlane") ? "fastlane" : ".")
           path = File.join(containing, Gym.gymfile_name)
           UI.user_error! "Gymfile already exists" if File.exist?(path)
           template = File.read("#{Helper.gem_path('gym')}/lib/assets/GymfileTemplate")

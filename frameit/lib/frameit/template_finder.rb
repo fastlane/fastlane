@@ -18,8 +18,8 @@ module Frameit
     # Example: iPad-Pro-Space-Gray-vertical.png
     class Type2Transform < FilenameTransform
       def transform(color, orientation)
-        fixed_color = color == 'SpaceGray' ? "Space-Gray" : "Silver"
-        fixed_orientation = orientation == 'Horz' ? 'horizontal' : 'vertical'
+        fixed_color = color == "SpaceGray" ? "Space-Gray" : "Silver"
+        fixed_orientation = orientation == "Horz" ? "horizontal" : "vertical"
         "#{@device_name}-#{fixed_color}-#{fixed_orientation}"
       end
     end
@@ -28,9 +28,9 @@ module Frameit
     # Note that 'vertical' is implied
     class Type3Transform < FilenameTransform
       def transform(color, orientation)
-        fixed_color = color == 'SpaceGray' ? "Space-Gray" : "Silver"
+        fixed_color = color == "SpaceGray" ? "Space-Gray" : "Silver"
         filename = "#{@device_name}-#{fixed_color}"
-        if orientation == 'Horz'
+        if orientation == "Horz"
           "#{filename}-horizontal"
         else
           filename
@@ -39,11 +39,11 @@ module Frameit
     end
 
     DEVICE_TO_TRANSFORM_TYPE = {
-      'iPhone-SE' => Type3Transform.new('iPhone-SE'),
-      'iPad-Pro' => Type2Transform.new('iPad-Pro'),
-      'iPad-mini' => Type2Transform.new('iPad-mini'),
-      'iPhone-6s' => Type2Transform.new('iPhone-6s'),
-      'iPhone-6s-Plus' => Type2Transform.new('iPhone-6s-Plus')
+      "iPhone-SE" => Type3Transform.new("iPhone-SE"),
+      "iPad-Pro" => Type2Transform.new("iPad-Pro"),
+      "iPad-mini" => Type2Transform.new("iPad-mini"),
+      "iPhone-6s" => Type2Transform.new("iPhone-6s"),
+      "iPhone-6s-Plus" => Type2Transform.new("iPhone-6s-Plus")
     }
 
     # This will detect the screen size and choose the correct template
@@ -57,7 +57,7 @@ module Frameit
       transformer ||= Type1Transform.new(screenshot.device_name)
       filename = transformer.transform(screenshot.color, screenshot.orientation_name)
 
-      templates_path = [ENV['HOME'], FrameConverter::FRAME_PATH].join('/')
+      templates_path = [ENV["HOME"], FrameConverter::FRAME_PATH].join("/")
       templates = Dir["../**/#{filename}.{png,jpg}"] # local directory
       templates += Dir["#{templates_path}/**/#{filename}.{png,jpg}"] # ~/.frameit folder
 
@@ -67,7 +67,7 @@ module Frameit
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35
           UI.important "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'"
           UI.error "Looked for: '#{filename}.png'"
-        elsif screenshot.device_name == 'iPhone-SE'
+        elsif screenshot.device_name == "iPhone-SE"
           UI.error "By default frameit uses the iPhone SE for screenshots"
           UI.error "Unable to find a frame #{filename}.png"
           UI.error "You can download iPhone-SE templates from '#{FrameConverter::DOWNLOAD_URL}'"

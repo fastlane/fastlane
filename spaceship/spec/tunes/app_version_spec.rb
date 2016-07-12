@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
@@ -18,18 +18,18 @@ describe Spaceship::AppVersion, all: true do
       expect(version.is_live?).to eq(false)
       expect(version.copyright).to eq("2015 SunApps GmbH")
       expect(version.version_id).to eq(812_106_519)
-      expect(version.raw_status).to eq('readyForSale')
+      expect(version.raw_status).to eq("readyForSale")
       expect(version.can_reject_version).to eq(false)
       expect(version.can_prepare_for_upload).to eq(false)
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
       expect(version.can_beta_test).to eq(true)
-      expect(version.version).to eq('0.9.13')
+      expect(version.version).to eq("0.9.13")
       expect(version.supports_apple_watch).to eq(false)
-      expect(version.large_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/0x0ss.jpg')
-      expect(version.large_app_icon.original_file_name).to eq('AppIconFull.png')
-      expect(version.watch_app_icon.url).to eq('https://is1-ssl.mzstatic.com/image/thumb//0x0ss.jpg')
-      expect(version.watch_app_icon.original_file_name).to eq('OriginalName.png')
+      expect(version.large_app_icon.url).to eq("https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/pr_source.png/0x0ss.jpg")
+      expect(version.large_app_icon.original_file_name).to eq("AppIconFull.png")
+      expect(version.watch_app_icon.url).to eq("https://is1-ssl.mzstatic.com/image/thumb//0x0ss.jpg")
+      expect(version.watch_app_icon.original_file_name).to eq("OriginalName.png")
       expect(version.transit_app_file).to eq(nil)
       expect(version.platform).to eq("ios")
     end
@@ -37,14 +37,14 @@ describe Spaceship::AppVersion, all: true do
     it "parses the localized values correctly" do
       version = app.edit_version
 
-      expect(version.description['English']).to eq('Super Description here')
-      expect(version.description['German']).to eq('My title')
-      expect(version.keywords['English']).to eq('Some random titles')
-      expect(version.keywords['German']).to eq('More random stuff')
-      expect(version.support_url['German']).to eq('http://url.com')
-      expect(version.marketing_url['English']).to eq('https://sunapps.net')
-      expect(version.release_notes['German']).to eq('Wow, News')
-      expect(version.release_notes['English']).to eq('Also News')
+      expect(version.description["English"]).to eq("Super Description here")
+      expect(version.description["German"]).to eq("My title")
+      expect(version.keywords["English"]).to eq("Some random titles")
+      expect(version.keywords["German"]).to eq("More random stuff")
+      expect(version.support_url["German"]).to eq("http://url.com")
+      expect(version.marketing_url["English"]).to eq("https://sunapps.net")
+      expect(version.release_notes["German"]).to eq("Wow, News")
+      expect(version.release_notes["English"]).to eq("Also News")
 
       expect(version.description.keys).to eq(version.description.languages)
       expect(version.description.keys).to eq(["German", "English"])
@@ -53,14 +53,14 @@ describe Spaceship::AppVersion, all: true do
     it "parses the review information correctly" do
       version = app.edit_version
 
-      expect(version.review_first_name).to eq('Felix')
-      expect(version.review_last_name).to eq('Krause')
-      expect(version.review_phone_number).to eq('+4123123123')
-      expect(version.review_email).to eq('felix@sunapps.net')
-      expect(version.review_demo_user).to eq('MyUser@gmail.com')
+      expect(version.review_first_name).to eq("Felix")
+      expect(version.review_last_name).to eq("Krause")
+      expect(version.review_phone_number).to eq("+4123123123")
+      expect(version.review_email).to eq("felix@sunapps.net")
+      expect(version.review_demo_user).to eq("MyUser@gmail.com")
       expect(version.review_user_needed).to eq(true)
-      expect(version.review_demo_password).to eq('SuchPass')
-      expect(version.review_notes).to eq('Such Notes here')
+      expect(version.review_demo_password).to eq("SuchPass")
+      expect(version.review_notes).to eq("Such Notes here")
     end
 
     describe "supports setting of the app rating" do
@@ -68,47 +68,47 @@ describe Spaceship::AppVersion, all: true do
         @v = app.edit_version
 
         @v.update_rating({
-          'CARTOON_FANTASY_VIOLENCE' => 1,
-          'MATURE_SUGGESTIVE' => 2,
-          'GAMBLING' => 0,
-          'UNRESTRICTED_WEB_ACCESS' => 1,
-          'GAMBLING_CONTESTS' => 0
+          "CARTOON_FANTASY_VIOLENCE" => 1,
+          "MATURE_SUGGESTIVE" => 2,
+          "GAMBLING" => 0,
+          "UNRESTRICTED_WEB_ACCESS" => 1,
+          "GAMBLING_CONTESTS" => 0
         })
       end
 
       it "increquent_mild" do
-        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
-          a['name'].include?('CARTOON_FANTASY_VIOLENCE')
+        val = @v.raw_data["ratings"]["nonBooleanDescriptors"].find do |a|
+          a["name"].include?("CARTOON_FANTASY_VIOLENCE")
         end
-        expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
+        expect(val["level"]).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
       end
 
       it "increquent_mild" do
-        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
-          a['name'].include?('CARTOON_FANTASY_VIOLENCE')
+        val = @v.raw_data["ratings"]["nonBooleanDescriptors"].find do |a|
+          a["name"].include?("CARTOON_FANTASY_VIOLENCE")
         end
-        expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
+        expect(val["level"]).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
       end
 
       it "none" do
-        val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
-          a['name'].include?('GAMBLING')
+        val = @v.raw_data["ratings"]["nonBooleanDescriptors"].find do |a|
+          a["name"].include?("GAMBLING")
         end
-        expect(val['level']).to eq("ITC.apps.ratings.level.NONE")
+        expect(val["level"]).to eq("ITC.apps.ratings.level.NONE")
       end
 
       it "boolean true" do
-        val = @v.raw_data['ratings']['booleanDescriptors'].find do |a|
-          a['name'].include?('UNRESTRICTED_WEB_ACCESS')
+        val = @v.raw_data["ratings"]["booleanDescriptors"].find do |a|
+          a["name"].include?("UNRESTRICTED_WEB_ACCESS")
         end
-        expect(val['level']).to eq("ITC.apps.ratings.level.YES")
+        expect(val["level"]).to eq("ITC.apps.ratings.level.YES")
       end
 
       it "boolean false" do
-        val = @v.raw_data['ratings']['booleanDescriptors'].find do |a|
-          a['name'].include?('GAMBLING_CONTESTS')
+        val = @v.raw_data["ratings"]["booleanDescriptors"].find do |a|
+          a["name"].include?("GAMBLING_CONTESTS")
         end
-        expect(val['level']).to eq("ITC.apps.ratings.level.NO")
+        expect(val["level"]).to eq("ITC.apps.ratings.level.NO")
       end
     end
 
@@ -130,9 +130,9 @@ describe Spaceship::AppVersion, all: true do
         build = version.candidate_builds.first
 
         version.select_build(build)
-        expect(version.raw_data['preReleaseBuildVersionString']['value']).to eq("9")
-        expect(version.raw_data['preReleaseBuildTrainVersionString']).to eq("1.1")
-        expect(version.raw_data['preReleaseBuildUploadDate']).to eq(1_443_150_586_000)
+        expect(version.raw_data["preReleaseBuildVersionString"]["value"]).to eq("9")
+        expect(version.raw_data["preReleaseBuildTrainVersionString"]).to eq("1.1")
+        expect(version.raw_data["preReleaseBuildUploadDate"]).to eq(1_443_150_586_000)
       end
     end
 
@@ -140,11 +140,11 @@ describe Spaceship::AppVersion, all: true do
       it "allows release the edit version" do
         version = app.edit_version
 
-        version.raw_status = 'pendingDeveloperRelease'
+        version.raw_status = "pendingDeveloperRelease"
 
         status = version.release!
         # Note right now we don't really update the raw_data after the release
-        expect(version.raw_status).to eq('pendingDeveloperRelease')
+        expect(version.raw_status).to eq("pendingDeveloperRelease")
       end
     end
 
@@ -167,7 +167,7 @@ describe Spaceship::AppVersion, all: true do
       end
 
       it "parses readyForSale" do
-        expect(Spaceship::Tunes::AppStatus.get_from_string('prepareForUpload')).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
+        expect(Spaceship::Tunes::AppStatus.get_from_string("prepareForUpload")).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
       end
     end
 
@@ -176,19 +176,19 @@ describe Spaceship::AppVersion, all: true do
         v = app.live_version
 
         # This app only has screenshots in the English version
-        expect(v.screenshots['German']).to eq([])
+        expect(v.screenshots["German"]).to eq([])
 
         s1 = v.screenshots["English"].first
-        expect(s1.device_type).to eq('iphone4')
-        expect(s1.url).to eq('https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/0x0ss.jpg')
+        expect(s1.device_type).to eq("iphone4")
+        expect(s1.url).to eq("https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/0x0ss.jpg")
         expect(s1.sort_order).to eq(1)
-        expect(s1.original_file_name).to eq('b6a876130fa48da21db6622f08b815b4.png')
+        expect(s1.original_file_name).to eq("b6a876130fa48da21db6622f08b815b4.png")
         expect(s1.language).to eq("English")
 
         expect(v.screenshots["English"].count).to eq(8)
 
         # 2 iPhone 6 Plus Screenshots
-        expect(v.screenshots["English"].count { |s| s.device_type == 'iphone6Plus' }).to eq(2)
+        expect(v.screenshots["English"].count { |s| s.device_type == "iphone6Plus" }).to eq(2)
       end
     end
 
@@ -315,26 +315,26 @@ describe Spaceship::AppVersion, all: true do
 
       it "cannot add a trailer to iphone35" do
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", 'iphone35')
+          version.upload_trailer!(ipad_trailer_path, "English", "iphone35")
         end.to raise_error "No app trailer supported for iphone35"
       end
 
       it "requires timestamp with a specific format" do
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "00:01.000")
+          version.upload_trailer!(ipad_trailer_path, "English", "ipad", "00:01.000")
         end.to raise_error "Invalid timestamp 00:01.000"
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "01.000")
+          version.upload_trailer!(ipad_trailer_path, "English", "ipad", "01.000")
         end.to raise_error "Invalid timestamp 01.000"
       end
 
       it "can add a new trailer" do
         # remove existing
-        version.upload_trailer!(nil, "English", 'ipad')
+        version.upload_trailer!(nil, "English", "ipad")
 
         count = ipad_trailers.count
         expect(count).to eq(0)
-        version.upload_trailer!(ipad_trailer_path, "English", 'ipad')
+        version.upload_trailer!(ipad_trailer_path, "English", "ipad")
         count_after = ipad_trailers.count
         expect(count_after).to eq(count + 1)
         expect(count_after).to eq(count + 1)
@@ -356,7 +356,7 @@ describe Spaceship::AppVersion, all: true do
 
         count = ipad_trailers.count
         expect(count).to eq(1)
-        version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "06.12")
+        version.upload_trailer!(ipad_trailer_path, "English", "ipad", "06.12")
         count_after = ipad_trailers.count
         expect(count_after).to eq(count)
         trailer = ipad_trailers[0]
@@ -374,20 +374,20 @@ describe Spaceship::AppVersion, all: true do
 
       it "can add a new trailer given a valid externally provided preview screenshot" do
         # remove existing
-        version.upload_trailer!(nil, "English", 'ipad')
+        version.upload_trailer!(nil, "English", "ipad")
 
         expect do
-          version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_invalid_trailer_preview_path)
+          version.upload_trailer!(ipad_trailer_path, "English", "ipad", "12.34", ipad_external_invalid_trailer_preview_path)
         end.to raise_error "Invalid portrait screenshot resolution for device ipad. Should be [768, 1024]"
       end
 
       it "can add a new trailer given a valid externally provided preview screenshot" do
         # remove existing
-        version.upload_trailer!(nil, "English", 'ipad')
+        version.upload_trailer!(nil, "English", "ipad")
 
         count = ipad_trailers.count
         expect(count).to eq(0)
-        version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_valid_trailer_preview_path)
+        version.upload_trailer!(ipad_trailer_path, "English", "ipad", "12.34", ipad_external_valid_trailer_preview_path)
         count_after = ipad_trailers.count
         expect(count_after).to eq(count + 1)
         trailer = ipad_trailers[0]
@@ -407,7 +407,7 @@ describe Spaceship::AppVersion, all: true do
       it "remove the video trailer" do
         count = ipad_trailers.count
         expect(count).to eq(1)
-        version.upload_trailer!(nil, "English", 'ipad')
+        version.upload_trailer!(nil, "English", "ipad")
         count_after = ipad_trailers.count
         expect(count_after).to eq(count - 1)
       end
@@ -452,19 +452,19 @@ describe Spaceship::AppVersion, all: true do
       describe "Parameter checks" do
         it "prevents from using negative sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, -1, "English", "iphone4")
           end.to raise_error "sort_order must be positive"
         end
 
         it "prevents from using sort_order 0" do
           expect do
-            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 0, "English", "iphone4")
           end.to raise_error "sort_order must be positive"
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 6, "English", "iphone4")
           end.to raise_error "sort_order must not be > 5"
         end
 
@@ -477,13 +477,13 @@ describe Spaceship::AppVersion, all: true do
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", "iphone4")
           end.to raise_error "NotALanguage isn't an activated language"
         end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "English_CA", "iphone4")
           end.to raise_error "English_CA isn't an activated language"
         end
 
@@ -503,7 +503,7 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 3, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 3, "English", "iphone4")
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
@@ -511,29 +511,29 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 2, "English", "iphone4")
           expect(version.screenshots["English"].count).to eq(count)
         end
 
         it "can remove existing screenshot" do
           count = version.screenshots["English"].count
-          version.upload_screenshot!(nil, 2, "English", 'iphone4')
+          version.upload_screenshot!(nil, 2, "English", "iphone4")
           expect(version.screenshots["English"].count).to eq(count - 1)
         end
 
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
-            version.upload_screenshot!(nil, 3, "English", 'iphone4')
+            version.upload_screenshot!(nil, 3, "English", "iphone4")
           end.to raise_error "cannot remove screenshot with non existing sort_order"
         end
       end
     end
 
     it "allows modifications of localized values" do
-      new_title = 'New Title'
+      new_title = "New Title"
       version.description["English"] = new_title
-      lang = version.languages.find { |a| a['language'] == "English" }
-      expect(lang['description']['value']).to eq(new_title)
+      lang = version.languages.find { |a| a["language"] == "English" }
+      expect(lang["description"]["value"]).to eq(new_title)
     end
 
     describe "Pushing the changes back to the server" do
@@ -546,13 +546,13 @@ describe Spaceship::AppVersion, all: true do
 
       it "works with valid update data" do
         itc_stub_valid_update
-        expect(client).to receive(:update_app_version!).with('898536088', 812_106_519, version.raw_data)
+        expect(client).to receive(:update_app_version!).with("898536088", 812_106_519, version.raw_data)
         version.save!
       end
     end
 
     describe "update_app_version! retry mechanism" do
-      let(:update_success_data) { JSON.parse(itc_read_fixture_file('update_app_version_success.json'))['data'] }
+      let(:update_success_data) { JSON.parse(itc_read_fixture_file("update_app_version_success.json"))["data"] }
 
       def setup_handle_itc_response_failure(nb_failures)
         @times_called = 0
@@ -606,17 +606,17 @@ describe Spaceship::AppVersion, all: true do
 
         expect(promocodes.effective_date).to eq(1_457_864_552_300)
         expect(promocodes.expiration_date).to eq(1_460_283_752_300)
-        expect(promocodes.username).to eq('joe@wewanttoknow.com')
+        expect(promocodes.username).to eq("joe@wewanttoknow.com")
 
         expect(promocodes.codes.count).to eq(1)
-        expect(promocodes.codes[0]).to eq('6J49JFRPTXXXX')
+        expect(promocodes.codes[0]).to eq("6J49JFRPTXXXX")
         expect(promocodes.version.app_id).to eq(816_549_081)
-        expect(promocodes.version.app_name).to eq('DragonBox Numbers')
-        expect(promocodes.version.version).to eq('1.5.0')
-        expect(promocodes.version.platform).to eq('ios')
+        expect(promocodes.version.app_name).to eq("DragonBox Numbers")
+        expect(promocodes.version.version).to eq("1.5.0")
+        expect(promocodes.version.platform).to eq("ios")
         expect(promocodes.version.number_of_codes).to eq(3)
         expect(promocodes.version.maximum_number_of_codes).to eq(100)
-        expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+        expect(promocodes.version.contract_file_name).to eq("promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html")
       end
     end
   end

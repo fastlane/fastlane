@@ -22,9 +22,9 @@ module Frameit
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
     def fetch_value(path)
-      specific = @data['data'].find { |a| path.include? a['filter'] }
+      specific = @data["data"].find { |a| path.include? a["filter"] }
 
-      default = @data['default']
+      default = @data["default"]
 
       values = default.fastlane_deep_merge(specific || {})
 
@@ -44,11 +44,11 @@ module Frameit
             change_paths_to_absolutes!(current) if current.kind_of? Hash # recursive call
           end
         else
-          if ['font', 'background'].include? key
+          if ["font", "background"].include? key
             # Change the paths to relative ones
             # `replace`: to change the content of the string, so it's actually stored
             if @path # where is the config file. We don't have a config file in tests
-              containing_folder = File.expand_path('..', @path)
+              containing_folder = File.expand_path("..", @path)
               value.replace File.join(containing_folder, value)
             end
           end
@@ -62,30 +62,30 @@ module Frameit
         if value.kind_of?(Hash)
           validate_values(value) # recursive call
         else
-          if key == 'font'
+          if key == "font"
             UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
           end
 
-          if key == 'fonts'
+          if key == "fonts"
             UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
 
             value.each do |current|
-              UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
-              UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
-              UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of? Array
+              UI.user_error!("You must specify a font path") if current.fetch("font", "").length == 0
+              UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch("font"))
+              UI.user_error!("`supported` must be an array") unless current.fetch("supported", []).kind_of? Array
             end
           end
 
-          if key == 'background'
+          if key == "background"
             UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist? value
           end
 
-          if key == 'color'
+          if key == "color"
             UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
           end
 
-          if key == 'padding'
-            unless value.kind_of?(Integer) || value.split('x').length == 2
+          if key == "padding"
+            unless value.kind_of?(Integer) || value.split("x").length == 2
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB'")
             end
           end

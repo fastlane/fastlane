@@ -22,7 +22,7 @@ module FastlaneCore
       #   "UUID"=>"1752e382-53bd-4910-a393-aaa7de0005ad",
       #   "Version"=>1}
       def parse(path)
-        require 'plist'
+        require "plist"
 
         plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
         if (plist || []).count > 5

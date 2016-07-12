@@ -7,9 +7,9 @@ module Fastlane
 
     class OnesignalAction < Action
       def self.run(params)
-        require 'net/http'
-        require 'uri'
-        require 'base64'
+        require "net/http"
+        require "uri"
+        require "base64"
 
         UI.message("Parameter App name: #{params[:app_name]}")
         auth_token = params[:auth_token]
@@ -18,7 +18,7 @@ module Fastlane
         android_token = params[:android_token]
 
         payload = {}
-        payload['name'] = app_name
+        payload["name"] = app_name
 
         unless params[:apns_p12].nil?
           data = File.read(params[:apns_p12])
@@ -33,8 +33,8 @@ module Fastlane
 
         # here's the actual lifting - POST to OneSignal
 
-        json_headers = { 'Content-Type' => 'application/json', 'Authorization' => "Basic #{auth_token}" }
-        uri = URI.parse('https://onesignal.com/api/v1/apps')
+        json_headers = { "Content-Type" => "application/json", "Authorization" => "Basic #{auth_token}" }
+        uri = URI.parse("https://onesignal.com/api/v1/apps")
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         response = http.post(uri.path, payload.to_json, json_headers)
@@ -104,14 +104,14 @@ module Fastlane
                                        env_name: "APNS_ENV",
                                        description: "APNS environment",
                                        optional: true,
-                                       default_value: 'production')
+                                       default_value: "production")
         ]
       end
 
       def self.output
         [
-          ['ONE_SIGNAL_APP_ID', 'The OneSignal app ID of the newly created app'],
-          ['ONE_SIGNAL_APP_AUTH_KEY', 'The auth token for the newly created OneSignal app']
+          ["ONE_SIGNAL_APP_ID", "The OneSignal app ID of the newly created app"],
+          ["ONE_SIGNAL_APP_AUTH_KEY", "The auth token for the newly created OneSignal app"]
         ]
       end
 

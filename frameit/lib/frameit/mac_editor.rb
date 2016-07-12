@@ -3,15 +3,15 @@ module Frameit
   class MacEditor < Editor
     def prepare_image
       image = super
-      image.resize("#{offset['width']}x") if offset['width']
+      image.resize("#{offset['width']}x") if offset["width"]
     end
 
     def put_device_into_background(background)
-      self.top_space_above_device = offset['titleHeight'] # needed for centering the title
+      self.top_space_above_device = offset["titleHeight"] # needed for centering the title
 
       @image = background.composite(image, "png") do |c|
         c.compose "Over"
-        c.geometry offset['offset']
+        c.geometry offset["offset"]
       end
 
       return image
@@ -26,7 +26,7 @@ module Frameit
     end
 
     def generate_background
-      MiniMagick::Image.open(fetch_config['background']) # no resizing on the Mac
+      MiniMagick::Image.open(fetch_config["background"]) # no resizing on the Mac
     end
   end
 end

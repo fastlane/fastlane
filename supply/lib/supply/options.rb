@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require "fastlane_core"
+require "credentials_manager"
 
 module Supply
   class Options
@@ -15,7 +15,7 @@ module Supply
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
                                      description: "The Track to upload the Application to: #{valid_tracks.join(', ')}",
-                                     default_value: 'production',
+                                     default_value: "production",
                                      verify_block: proc do |value|
                                        available = valid_tracks
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
@@ -23,7 +23,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the rollout",
-                                     default_value: '1.0',
+                                     default_value: "1.0",
                                      verify_block: proc do |value|
                                        available = %w(0.005 0.01 0.05 0.1 0.2 0.5 1.0)
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
@@ -38,7 +38,7 @@ module Supply
                                      env_name: "SUPPLY_KEY",
                                      short_option: "-k",
                                      conflicting_options: [:json_key],
-                                     deprecated: 'Use --json_key instead',
+                                     deprecated: "Use --json_key instead",
                                      description: "The p12 File used to authenticate with Google",
                                      default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
                                      verify_block: proc do |value|
@@ -48,7 +48,7 @@ module Supply
                                      env_name: "SUPPLY_ISSUER",
                                      short_option: "-i",
                                      conflicting_options: [:json_key],
-                                     deprecated: 'Use --json_key instead',
+                                     deprecated: "Use --json_key instead",
                                      description: "The issuer of the p12 file (email address of the service account)",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:issuer),
                                      verify_block: proc do |value|
@@ -73,7 +73,7 @@ module Supply
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find apk file at path '#{value}'" unless File.exist?(value)
-                                       UI.user_error! "apk file is not an apk" unless value.end_with?('.apk')
+                                       UI.user_error! "apk file is not an apk" unless value.end_with?(".apk")
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
@@ -86,7 +86,7 @@ module Supply
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
                                        value.each do |path|
                                          UI.user_error! "Could not find apk file at path '#{path}'" unless File.exist?(path)
-                                         UI.user_error! "file at path '#{path}' is not an apk" unless path.end_with?('.apk')
+                                         UI.user_error! "file at path '#{path}' is not an apk" unless path.end_with?(".apk")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,

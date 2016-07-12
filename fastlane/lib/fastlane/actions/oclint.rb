@@ -22,7 +22,7 @@ module Fastlane
         if File.file?(compile_commands_dir)
           compile_commands_dir = File.dirname(compile_commands_dir)
         else
-          compile_commands = File.join(compile_commands_dir, 'compile_commands.json')
+          compile_commands = File.join(compile_commands_dir, "compile_commands.json")
         end
 
         if params[:select_reqex]
@@ -34,26 +34,26 @@ module Fastlane
         exclude_regex = params[:exclude_regex]
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
-          file = compile_command['file']
-          File.exist?(file) ? file : File.join(compile_command['directory'], file)
+          file = compile_command["file"]
+          File.exist?(file) ? file : File.join(compile_command["directory"], file)
         end
 
         files.uniq!
         files.select! do |file|
-          file_ruby = file.gsub('\ ', ' ')
+          file_ruby = file.gsub('\ ', " ")
           File.exist?(file_ruby) and
             (!select_regex or file_ruby =~ select_regex) and
             (!exclude_regex or !(file_ruby =~ exclude_regex))
         end
 
         command_prefix = [
-          'cd',
-          File.expand_path('.').shellescape,
-          '&&'
-        ].join(' ')
+          "cd",
+          File.expand_path(".").shellescape,
+          "&&"
+        ].join(" ")
 
         report_type = params[:report_type]
-        report_path = params[:report_path] ? params[:report_path] : 'oclint_report.' + report_type
+        report_path = params[:report_path] ? params[:report_path] : "oclint_report." + report_type
 
         oclint_args = ["-report-type=#{report_type}", "-o=#{report_path}"]
 
@@ -83,7 +83,7 @@ module Fastlane
           oclint_path,
           oclint_args,
           '"' + files.join('" "') + '"'
-        ].join(' ')
+        ].join(" ")
 
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)
 
@@ -101,38 +101,38 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :oclint_path,
-                                       env_name: 'FL_OCLINT_PATH',
-                                       description: 'The path to oclint binary',
-                                       default_value: 'oclint',
+                                       env_name: "FL_OCLINT_PATH",
+                                       description: "The path to oclint binary",
+                                       default_value: "oclint",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :compile_commands,
-                                       env_name: 'FL_OCLINT_COMPILE_COMMANDS',
+                                       env_name: "FL_OCLINT_COMPILE_COMMANDS",
                                        description: 'The json compilation database, use xctool reporter \'json-compilation-database\'',
-                                       default_value: 'compile_commands.json',
+                                       default_value: "compile_commands.json",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :select_reqex, # select_reqex is deprecated, remove as soon as possible
-                                       env_name: 'FL_OCLINT_SELECT_REQEX',
-                                       description: 'Select all files matching this reqex',
+                                       env_name: "FL_OCLINT_SELECT_REQEX",
+                                       description: "Select all files matching this reqex",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :select_regex,
-                                       env_name: 'FL_OCLINT_SELECT_REGEX',
-                                       description: 'Select all files matching this regex',
+                                       env_name: "FL_OCLINT_SELECT_REGEX",
+                                       description: "Select all files matching this regex",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :exclude_regex,
-                                       env_name: 'FL_OCLINT_EXCLUDE_REGEX',
-                                       description: 'Exclude all files matching this regex',
+                                       env_name: "FL_OCLINT_EXCLUDE_REGEX",
+                                       description: "Exclude all files matching this regex",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :report_type,
-                                       env_name: 'FL_OCLINT_REPORT_TYPE',
-                                       description: 'The type of the report (default: html)',
-                                       default_value: 'html',
+                                       env_name: "FL_OCLINT_REPORT_TYPE",
+                                       description: "The type of the report (default: html)",
+                                       default_value: "html",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :report_path,
-                                       env_name: 'FL_OCLINT_REPORT_PATH',
-                                       description: 'The reports file path',
+                                       env_name: "FL_OCLINT_REPORT_PATH",
+                                       description: "The reports file path",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :list_enabled_rules,
                                        env_name: "FL_OCLINT_LIST_ENABLED_RULES",
@@ -140,37 +140,37 @@ module Fastlane
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :rc,
-                                       env_name: 'FL_OCLINT_RC',
-                                       description: 'Override the default behavior of rules',
+                                       env_name: "FL_OCLINT_RC",
+                                       description: "Override the default behavior of rules",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :thresholds,
-                                       env_name: 'FL_OCLINT_THRESHOLDS',
-                                       description: 'List of rule thresholds to override the default behavior of rules',
+                                       env_name: "FL_OCLINT_THRESHOLDS",
+                                       description: "List of rule thresholds to override the default behavior of rules",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :enable_rules,
-                                       env_name: 'FL_OCLINT_ENABLE_RULES',
-                                       description: 'List of rules to pick explicitly',
+                                       env_name: "FL_OCLINT_ENABLE_RULES",
+                                       description: "List of rules to pick explicitly",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :disable_rules,
-                                       env_name: 'FL_OCLINT_DISABLE_RULES',
-                                       description: 'List of rules to disable',
+                                       env_name: "FL_OCLINT_DISABLE_RULES",
+                                       description: "List of rules to disable",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_1,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_1',
-                                       description: 'The max allowed number of priority 1 violations',
+                                       env_name: "FL_OCLINT_MAX_PRIOTITY_1",
+                                       description: "The max allowed number of priority 1 violations",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_2,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_2',
-                                       description: 'The max allowed number of priority 2 violations',
+                                       env_name: "FL_OCLINT_MAX_PRIOTITY_2",
+                                       description: "The max allowed number of priority 2 violations",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_3,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_3',
-                                       description: 'The max allowed number of priority 3 violations',
+                                       env_name: "FL_OCLINT_MAX_PRIOTITY_3",
+                                       description: "The max allowed number of priority 3 violations",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :enable_clang_static_analyzer,
@@ -193,12 +193,12 @@ module Fastlane
 
       def self.output
         [
-          ['FL_OCLINT_REPORT_PATH', 'The reports file path']
+          ["FL_OCLINT_REPORT_PATH", "The reports file path"]
         ]
       end
 
       def self.author
-        'HeEAaD'
+        "HeEAaD"
       end
 
       def self.is_supported?(platform)

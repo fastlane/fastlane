@@ -1,7 +1,7 @@
 # This code overwrites the methods from the colored gem
 # via https://github.com/defunkt/colored/blob/master/lib/colored.rb
 
-require 'colored'
+require "colored"
 
 class String
   Colored::COLORS.keys.each do |color|

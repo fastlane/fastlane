@@ -8,10 +8,10 @@ module Fastlane
       attr_accessor :version_value
 
       def initialize(path = nil)
-        version_var_name = 'version'
+        version_var_name = "version"
         @version_regex = /^(?<begin>[^#]*#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?)(?<end>['"])/i
 
-        return unless (path || '').length > 0
+        return unless (path || "").length > 0
         UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)
 
         @path = File.expand_path(path)
@@ -33,12 +33,12 @@ module Fastlane
         patch = version_match[:patch].to_i || 0
 
         case bump_type
-        when 'patch'
+        when "patch"
           patch += 1
-        when 'minor'
+        when "minor"
           minor += 1
           patch = 0
-        when 'major'
+        when "major"
           major += 1
           minor = 0
           patch = 0

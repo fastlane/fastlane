@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Add Git Tag Integration" do
-      require 'shellwords'
+      require "shellwords"
 
       build_number = 1337
 
@@ -19,7 +19,7 @@ describe Fastlane do
 
       it "allows you to specify grouping and build number" do
         specified_build_number = 42
-        grouping = 'grouping'
+        grouping = "grouping"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
@@ -32,7 +32,7 @@ describe Fastlane do
       end
 
       it "allows you to specify a prefix" do
-        prefix = '16309-'
+        prefix = "16309-"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
@@ -44,7 +44,7 @@ describe Fastlane do
       end
 
       it "allows you to specify your own tag" do
-        tag = '2.0.0'
+        tag = "2.0.0"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
@@ -56,7 +56,7 @@ describe Fastlane do
       end
 
       it "specified tag overrides generate tag" do
-        tag = '2.0.0'
+        tag = "2.0.0"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
@@ -71,7 +71,7 @@ describe Fastlane do
       end
 
       it "allows you to specify your own message" do
-        tag = '2.0.0'
+        tag = "2.0.0"
         message = "message"
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -85,7 +85,7 @@ describe Fastlane do
       end
 
       it "properly shell escapes its message" do
-        tag = '2.0.0'
+        tag = "2.0.0"
         message = "message with 'quotes' (and parens)"
         escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
 

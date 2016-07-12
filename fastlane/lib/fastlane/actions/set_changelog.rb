@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SetChangelogAction < Action
       def self.run(params)
-        require 'spaceship'
+        require "spaceship"
 
         Spaceship::Tunes.login(params[:username])
         app = Spaceship::Application.find(params[:app_identifier])

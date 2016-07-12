@@ -1,22 +1,22 @@
-require 'snapshot/version'
-require 'snapshot/runner'
-require 'snapshot/reports_generator'
-require 'snapshot/detect_values'
-require 'snapshot/screenshot_flatten'
-require 'snapshot/screenshot_rotate'
-require 'snapshot/dependency_checker'
-require 'snapshot/latest_ios_version'
-require 'snapshot/test_command_generator'
-require 'snapshot/error_handler'
-require 'snapshot/collector'
-require 'snapshot/options'
-require 'snapshot/update'
-require 'snapshot/fixes/simulator_zoom_fix'
-require 'snapshot/fixes/hardware_keyboard_fix'
+require "snapshot/version"
+require "snapshot/runner"
+require "snapshot/reports_generator"
+require "snapshot/detect_values"
+require "snapshot/screenshot_flatten"
+require "snapshot/screenshot_rotate"
+require "snapshot/dependency_checker"
+require "snapshot/latest_ios_version"
+require "snapshot/test_command_generator"
+require "snapshot/error_handler"
+require "snapshot/collector"
+require "snapshot/options"
+require "snapshot/update"
+require "snapshot/fixes/simulator_zoom_fix"
+require "snapshot/fixes/hardware_keyboard_fix"
 
-require 'fastlane_core'
+require "fastlane_core"
 
-require 'open3'
+require "open3"
 
 module Snapshot
   # Use this to just setup the configuration attribute and set it later somewhere else

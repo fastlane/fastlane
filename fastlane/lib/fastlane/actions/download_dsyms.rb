@@ -6,8 +6,8 @@ module Fastlane
 
     class DownloadDsymsAction < Action
       def self.run(params)
-        require 'spaceship'
-        require 'net/http'
+        require "spaceship"
+        require "net/http"
 
         UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
@@ -140,7 +140,7 @@ module Fastlane
 
       def self.output
         [
-          ['DSYM_PATHS', 'An array to all the zipped dSYM files']
+          ["DSYM_PATHS", "An array to all the zipped dSYM files"]
         ]
       end
 

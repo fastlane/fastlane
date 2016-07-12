@@ -11,15 +11,15 @@ describe Fastlane do
       EOS
     end
 
-    let(:api_token) { 'mysecrettoken' }
-    let(:url) { 'https://example.com/app.zip' }
-    let(:http) { double('http') }
-    let(:request) { double('request') }
-    let(:response) { double('response') }
+    let(:api_token) { "mysecrettoken" }
+    let(:url) { "https://example.com/app.zip" }
+    let(:http) { double("http") }
+    let(:request) { double("request") }
+    let(:response) { double("response") }
     let(:params) do
       { token: api_token,
        url: url,
-       platform: 'ios' }
+       platform: "ios" }
     end
 
     before do
@@ -65,9 +65,9 @@ describe Fastlane do
         end.not_to raise_error
 
         expect(http).not_to receive(:request).with(JSON.generate(params))
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_PUBLIC_KEY]).to eql('sKdfjL')
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql('https://appetize.io/app/sKdfjL')
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql('https://appetize.io/manage/private_Djksfj')
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_PUBLIC_KEY]).to eql("sKdfjL")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql("https://appetize.io/app/sKdfjL")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql("https://appetize.io/manage/private_Djksfj")
       end
     end
   end

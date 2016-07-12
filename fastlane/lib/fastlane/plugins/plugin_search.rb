@@ -1,6 +1,6 @@
 module Fastlane
   class PluginSearch
-    require 'word_wrap'
+    require "word_wrap"
 
     def self.print_plugins(search_query: nil)
       if search_query

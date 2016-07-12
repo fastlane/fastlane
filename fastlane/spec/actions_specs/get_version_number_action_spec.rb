@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Get Version Number Integration" do
-      require 'shellwords'
+      require "shellwords"
 
       it "gets the correct version number for 'TargetA'" do
         result = Fastlane::FastFile.new.parse("lane :test do

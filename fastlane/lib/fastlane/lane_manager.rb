@@ -49,7 +49,7 @@ module Fastlane
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
-        UI.important 'Variable Dump:'.yellow
+        UI.important "Variable Dump:".yellow
         UI.message Actions.lane_context
         UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
@@ -76,12 +76,12 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
 
       if error
-        UI.error 'fastlane finished with errors'
+        UI.error "fastlane finished with errors"
         raise error
       elsif duration > 5
         UI.success "fastlane.tools just saved you #{duration} minutes! 🎉"
       else
-        UI.success 'fastlane.tools finished successfully 🎉'
+        UI.success "fastlane.tools finished successfully 🎉"
       end
     end
 
@@ -89,7 +89,7 @@ module Fastlane
     def self.print_table(actions)
       return if actions.count == 0
 
-      require 'terminal-table'
+      require "terminal-table"
 
       rows = []
       actions.each_with_index do |current, i|
@@ -123,7 +123,7 @@ module Fastlane
 
       table = Terminal::Table.new(
         title: "Available lanes to run",
-        headings: ['Number', 'Lane Name', 'Description'],
+        headings: ["Number", "Lane Name", "Description"],
         rows: rows
       )
 
@@ -137,8 +137,8 @@ module Fastlane
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
         UI.important "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
-        platform = selection.split(' ')[0]
-        lane_name = selection.split(' ')[1]
+        platform = selection.split(" ")[0]
+        lane_name = selection.split(" ")[1]
 
         unless lane_name # no specific platform, just a root lane
           lane_name = platform
@@ -153,13 +153,13 @@ module Fastlane
 
     def self.load_dot_env(env)
       return if Dir.glob("**/*.env*", File::FNM_DOTMATCH).count == 0
-      require 'dotenv'
+      require "dotenv"
 
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", '.env.default')
+      env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env")
+      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.default")
       Dotenv.load(env_file, env_default_file)
 
       # Loads .env file for the environment passed in through options

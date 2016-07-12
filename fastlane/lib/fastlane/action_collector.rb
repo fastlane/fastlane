@@ -40,7 +40,7 @@ module Fastlane
       if name.to_s.include?(PluginManager.plugin_prefix)
         # That's an action from a plugin, we need to fetch its version number
         begin
-          plugin_name = name.split("/").first.gsub(PluginManager.plugin_prefix, '')
+          plugin_name = name.split("/").first.gsub(PluginManager.plugin_prefix, "")
           return Fastlane.const_get(plugin_name.fastlane_class)::VERSION
         rescue => ex
           UI.verbose(ex)

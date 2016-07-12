@@ -1,7 +1,7 @@
-require 'pty'
-require 'open3'
-require 'fileutils'
-require 'shellwords'
+require "pty"
+require "open3"
+require "fileutils"
+require "shellwords"
 
 module Gym
   class Runner

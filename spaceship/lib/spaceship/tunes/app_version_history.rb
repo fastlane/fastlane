@@ -16,9 +16,9 @@ module Spaceship
       attr_reader :items
 
       attr_mapping({
-        'versionString' => :version_string,
-        'versionId' => :version_id,
-        'items' => :items
+        "versionString" => :version_string,
+        "versionId" => :version_id,
+        "items" => :items
       })
 
       class << self
@@ -38,7 +38,7 @@ module Spaceship
       # Private methods
       def setup
         # Properly parse the AppStatus
-        items = raw_data['items']
+        items = raw_data["items"]
         @items = map_items(items) if items
       end
 
@@ -51,7 +51,7 @@ module Spaceship
       end
 
       def fetch_items
-        items = client.version_states_history(application.apple_id, application.platform, version_id)['items']
+        items = client.version_states_history(application.apple_id, application.platform, version_id)["items"]
         map_items(items)
       end
     end

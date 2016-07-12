@@ -1,5 +1,5 @@
-require 'spaceship'
-require 'babosa'
+require "spaceship"
+require "babosa"
 
 module Produce
   class Group
@@ -18,7 +18,7 @@ module Produce
         if options.group_name
           group_name = valid_name_for(options.group_name)
         else
-          group_name = group_identifier.split(".").map(&:capitalize).reverse.join(' ')
+          group_name = group_identifier.split(".").map(&:capitalize).reverse.join(" ")
           group_name = valid_name_for(group_name)
         end
 
@@ -89,7 +89,7 @@ module Produce
 
     def valid_name_for(input)
       latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinazed.gsub(/[^0-9A-Za-z\d\s]/, "") # remove non-valid characters
     end
   end
 end

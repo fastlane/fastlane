@@ -1,7 +1,7 @@
-require 'pty'
-require 'shellwords'
-require 'fileutils'
-require 'credentials_manager/account_manager'
+require "pty"
+require "shellwords"
+require "fileutils"
+require "credentials_manager/account_manager"
 
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
@@ -144,7 +144,7 @@ module FastlaneCore
         "-t 'Signiant'",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
-      ].compact.join(' ')
+      ].compact.join(" ")
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "")
@@ -156,7 +156,7 @@ module FastlaneCore
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
-      ].compact.join(' ')
+      ].compact.join(" ")
     end
 
     def handle_error(password)
@@ -165,7 +165,7 @@ module FastlaneCore
         UI.error([
           "Password contains special characters, which may not be handled properly by iTMSTransporter.",
           "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
-        ].join(' '))
+        ].join(" "))
       end
       # rubocop:enable Style/CaseEquality
       UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
@@ -196,46 +196,46 @@ module FastlaneCore
       [
         Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
+        "-XX:NewSize=2m",
+        "-Xms32m",
+        "-Xmx1024m",
+        "-Xms1024m",
+        "-Djava.awt.headless=true",
+        "-Dsun.net.http.retryPost=false",
         "-classpath #{Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
-        '-m upload',
+        "com.apple.transporter.Application",
+        "-m upload",
         "-u #{username.shellescape}",
         "-p #{password.shellescape}",
         "-f #{source.shellescape}",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        '-t Signiant',
-        '-k 100000',
+        "-t Signiant",
+        "-k 100000",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+        "2>&1" # cause stderr to be written to stdout
+      ].compact.join(" ") # compact gets rid of the possibly nil ENV value
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "")
       [
         Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
+        "-XX:NewSize=2m",
+        "-Xms32m",
+        "-Xmx1024m",
+        "-Xms1024m",
+        "-Djava.awt.headless=true",
+        "-Dsun.net.http.retryPost=false",
         "-classpath #{Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
-        '-m lookupMetadata',
+        "com.apple.transporter.Application",
+        "-m lookupMetadata",
         "-u #{username.shellescape}",
         "-p #{password.shellescape}",
         "-apple_id #{apple_id.shellescape}",
         "-destination #{destination.shellescape}",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ')
+        "2>&1" # cause stderr to be written to stdout
+      ].compact.join(" ")
     end
 
     def handle_error(password)
@@ -283,8 +283,8 @@ module FastlaneCore
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the better direct Java invocation strategy for those versions.
-      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
-      use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
+      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?("6.")
+      use_shell_script ||= Feature.enabled?("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
 
       # First, see if we have an application specific password
       data = CredentialsManager::AccountManager.new(user: user,
@@ -315,7 +315,7 @@ module FastlaneCore
 
       UI.message("Going to download app metadata from iTunes Connect")
       command = @transporter_executor.build_download_command(@user, @password, app_id, dir, @provider_short_name)
-      UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir, @provider_short_name))
+      UI.verbose(@transporter_executor.build_download_command(@user, "YourPassword", app_id, dir, @provider_short_name))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
@@ -351,7 +351,7 @@ module FastlaneCore
       UI.success("This might take a few minutes. Please don't interrupt the script.")
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name)
-      UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
+      UI.verbose(@transporter_executor.build_upload_command(@user, "YourPassword", actual_dir, @provider_short_name))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)

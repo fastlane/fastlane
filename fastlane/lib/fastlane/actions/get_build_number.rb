@@ -1,26 +1,26 @@
 module Fastlane
   module Actions
     class GetBuildNumberAction < Action
-      require 'shellwords'
+      require "shellwords"
 
       def self.run(params)
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], "..") : "."
 
         command_prefix = [
-          'cd',
+          "cd",
           File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+          "&&"
+        ].join(" ")
 
         command = [
           command_prefix,
-          'agvtool',
-          'what-version',
-          '-terse'
-        ].join(' ')
+          "agvtool",
+          "what-version",
+          "-terse"
+        ].join(" ")
 
         if Helper.test?
           Actions.lane_context[SharedValues::BUILD_NUMBER] = command
@@ -32,7 +32,7 @@ module Fastlane
         end
         return build_number
       rescue => ex
-        UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
+        UI.error("Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html")
         raise ex
       end
 
@@ -49,7 +49,7 @@ module Fastlane
           "This action will return the current build number set on your project.",
           "You first have to set up your Xcode project, if you haven't done it already:",
           "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
-        ].join(' ')
+        ].join(" ")
       end
 
       def self.available_options
@@ -67,7 +67,7 @@ module Fastlane
 
       def self.output
         [
-          ['BUILD_NUMBER', 'The build number']
+          ["BUILD_NUMBER", "The build number"]
         ]
       end
 

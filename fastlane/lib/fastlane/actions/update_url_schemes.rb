@@ -1,4 +1,4 @@
-require 'plist'
+require "plist"
 
 module Fastlane
   module Actions
@@ -8,19 +8,19 @@ module Fastlane
         url_schemes = params[:url_schemes]
 
         hash = Plist.parse_xml(path)
-        hash['CFBundleURLTypes'].first['CFBundleURLSchemes'] = url_schemes
+        hash["CFBundleURLTypes"].first["CFBundleURLSchemes"] = url_schemes
         File.write(path, hash.to_plist)
       end
 
       def self.description
-        'Updates the URL schemes in the given Info.plist'
+        "Updates the URL schemes in the given Info.plist"
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
             key: :path,
-            env_name: 'FL_UPDATE_URL_SCHEMES_PATH',
+            env_name: "FL_UPDATE_URL_SCHEMES_PATH",
             description: 'The Plist file\'s path',
             is_string: true,
             optional: false,
@@ -32,7 +32,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :url_schemes,
             env_name: "FL_UPDATE_URL_SCHEMES_SCHEMES",
-            description: 'The new URL schemes',
+            description: "The new URL schemes",
             is_string: false,
             optional: false,
             verify_block: proc do |url_schemes|
@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.authors
-        ['kmikael']
+        ["kmikael"]
       end
 
       def self.is_supported?(platform)

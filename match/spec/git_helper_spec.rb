@@ -31,7 +31,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
+        expect(File.exist?(File.join(result, "README.md"))).to eq(false)
       end
 
       it "clones the repo" do
@@ -53,7 +53,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, "README.md"))).to eq(true)
       end
 
       it "clones the repo (not shallow)" do
@@ -75,7 +75,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, "README.md"))).to eq(true)
       end
 
       it "checks out a branch" do
@@ -135,7 +135,7 @@ describe Match do
         result = Match::GitHelper.clone(git_url, shallow_clone, branch: git_branch)
 
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, "README.md"))).to eq(true)
       end
 
       after(:each) do

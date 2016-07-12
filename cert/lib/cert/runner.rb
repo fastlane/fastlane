@@ -1,4 +1,4 @@
-require 'fileutils'
+require "fileutils"
 
 module Cert
   class Runner

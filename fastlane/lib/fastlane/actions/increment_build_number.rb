@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class IncrementBuildNumberAction < Action
-      require 'shellwords'
+      require "shellwords"
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
@@ -16,26 +16,26 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], "..") : "."
 
         command_prefix = [
-          'cd',
+          "cd",
           File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+          "&&"
+        ].join(" ")
 
         command_suffix = [
-          '&&',
-          'cd',
-          '-'
-        ].join(' ')
+          "&&",
+          "cd",
+          "-"
+        ].join(" ")
 
         command = [
           command_prefix,
-          'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : 'next-version -all',
+          "agvtool",
+          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : "next-version -all",
           command_suffix
-        ].join(' ')
+        ].join(" ")
 
         if Helper.test?
           Actions.lane_context[SharedValues::BUILD_NUMBER] = command
@@ -48,7 +48,7 @@ module Fastlane
           Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
       rescue => ex
-        UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
+        UI.error("Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html")
         raise ex
       end
 
@@ -76,7 +76,7 @@ module Fastlane
 
       def self.output
         [
-          ['BUILD_NUMBER', 'The new build number']
+          ["BUILD_NUMBER", "The new build number"]
         ]
       end
 

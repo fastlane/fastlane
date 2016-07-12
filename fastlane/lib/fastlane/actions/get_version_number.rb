@@ -1,26 +1,26 @@
 module Fastlane
   module Actions
     class GetVersionNumberAction < Action
-      require 'shellwords'
+      require "shellwords"
 
       def self.run(params)
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
+        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], "..") : "."
 
         command_prefix = [
-          'cd',
+          "cd",
           File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+          "&&"
+        ].join(" ")
 
         command = [
           command_prefix,
-          'agvtool',
-          'what-marketing-version',
-          '-terse'
-        ].join(' ')
+          "agvtool",
+          "what-marketing-version",
+          "-terse"
+        ].join(" ")
 
         line = ""
         scheme = params[:scheme] || ""
@@ -77,13 +77,13 @@ module Fastlane
           end
         end
 
-        version_number = line.partition('=').last
+        version_number = line.partition("=").last
         return version_number if Helper.is_test?
 
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
       rescue => ex
-        UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
+        UI.error("Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html")
         raise ex
       end
 
@@ -100,7 +100,7 @@ module Fastlane
           "This action will return the current version number set on your project.",
           "You first have to set up your Xcode project, if you haven't done it already:",
           "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
-        ].join(' ')
+        ].join(" ")
       end
 
       def self.available_options
@@ -130,7 +130,7 @@ module Fastlane
 
       def self.output
         [
-          ['VERSION_NUMBER', 'The version number']
+          ["VERSION_NUMBER", "The version number"]
         ]
       end
 

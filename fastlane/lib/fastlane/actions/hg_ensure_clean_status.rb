@@ -9,10 +9,10 @@ module Fastlane
         repo_clean = `hg status`.empty?
 
         if repo_clean
-          UI.success('Mercurial status is clean, all good! 😎')
+          UI.success("Mercurial status is clean, all good! 😎")
           Actions.lane_context[SharedValues::HG_REPO_WAS_CLEAN_ON_START] = true
         else
-          UI.user_error!('Mercurial repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.')
+          UI.user_error!("Mercurial repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.")
         end
       end
 
@@ -22,7 +22,7 @@ module Fastlane
 
       def self.output
         [
-          ['HG_REPO_WAS_CLEAN_ON_START', 'Stores the fact that the hg repo was clean at some point']
+          ["HG_REPO_WAS_CLEAN_ON_START", "Stores the fact that the hg repo was clean at some point"]
         ]
       end
 

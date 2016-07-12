@@ -55,7 +55,7 @@ describe Fastlane do
                     --binary-file you
                     --binary-basename YourApp
                     --source-files \\*.swift
-                    --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
+                    --decimals 2 foo.xcodeproj".gsub(/\s+/, " ")
         expect(result).to eq(expected)
       end
 
@@ -105,7 +105,7 @@ describe Fastlane do
                     --scheme Foo
                     --workspace foo.xcworkspace
                     --binary-file you
-                    --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, ' ')
+                    --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, " ")
         expect(result).to eq(expected)
       end
 
@@ -118,7 +118,7 @@ describe Fastlane do
       end
 
       it "does not require project if .slather.yml is found" do
-        File.write('../.slather.yml', '')
+        File.write("../.slather.yml", "")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           slather
@@ -157,7 +157,7 @@ describe Fastlane do
                     --ignore nothing\\ to\\ ignore
                     --input-format bah
                     --scheme Foo\\ App
-                    foo\\ bar.xcodeproj".gsub(/\s+/, ' ')
+                    foo\\ bar.xcodeproj".gsub(/\s+/, " ")
 
         expect(result).to eq(expected)
       end
@@ -174,7 +174,7 @@ describe Fastlane do
       end
 
       after(:each) do
-        File.delete('../.slather.yml') if File.exist? '../.slather.yml'
+        File.delete("../.slather.yml") if File.exist? "../.slather.yml"
       end
     end
   end

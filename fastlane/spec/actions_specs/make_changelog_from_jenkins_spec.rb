@@ -2,16 +2,16 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "make_jenkins_changelog" do
       before do
-        ENV['BUILD_URL'] = "https://jenkinsurl.com/JOB/"
+        ENV["BUILD_URL"] = "https://jenkinsurl.com/JOB/"
       end
 
       after do
-        ENV['BUILD_URL'] = nil
+        ENV["BUILD_URL"] = nil
       end
 
       it "returns the fallback if it wasn't able to communicate with the server" do
         stub_request(:get, "https://jenkinsurl.com/JOB/api/json\?wrapper\=changes\&xpath\=//changeSet//comment").
-          with(headers: { 'Host' => 'jenkinsurl.com' }).
+          with(headers: { "Host" => "jenkinsurl.com" }).
           to_timeout
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -23,7 +23,7 @@ describe Fastlane do
 
       it "correctly parses the data if it was able to retrieve it and does not include the commit body" do
         stub_request(:get, "https://jenkinsurl.com/JOB/api/json\?wrapper\=changes\&xpath\=//changeSet//comment").
-          with(headers: { 'Host' => 'jenkinsurl.com' }).
+          with(headers: { "Host" => "jenkinsurl.com" }).
           to_return(status: 200, body: File.read("./spec/fixtures/requests/make_jenkins_changelog.json"), headers: {})
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -35,7 +35,7 @@ describe Fastlane do
 
       it "correctly parses the data if it was able to retrieve it and include commit body" do
         stub_request(:get, "https://jenkinsurl.com/JOB/api/json\?wrapper\=changes\&xpath\=//changeSet//comment").
-          with(headers: { 'Host' => 'jenkinsurl.com' }).
+          with(headers: { "Host" => "jenkinsurl.com" }).
           to_return(status: 200, body: File.read("./spec/fixtures/requests/make_jenkins_changelog.json"), headers: {})
 
         result = Fastlane::FastFile.new.parse("lane :test do

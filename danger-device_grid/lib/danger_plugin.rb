@@ -1,1 +1,1 @@
-require 'device_grid/plugin'
+require "device_grid/plugin"

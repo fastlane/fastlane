@@ -1,10 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Tunes::BuildTrain do
   before { Spaceship::Tunes.login }
   subject { Spaceship::Tunes.client }
-  let(:username) { 'spaceship@krausefx.com' }
-  let(:password) { 'so_secret' }
+  let(:username) { "spaceship@krausefx.com" }
+  let(:password) { "so_secret" }
 
   describe "properly parses the train" do
     let(:app) { Spaceship::Application.all.first }
@@ -42,9 +42,9 @@ describe Spaceship::Tunes::BuildTrain do
       end
 
       it "lets the user fetch the builds using the version as a key" do
-        train = app.build_trains['1.0']
-        expect(train.version_string).to eq('1.0')
-        expect(train.platform).to eq('ios')
+        train = app.build_trains["1.0"]
+        expect(train.version_string).to eq("1.0")
+        expect(train.platform).to eq("ios")
         expect(train.internal_testing_enabled).to eq(true)
         expect(train.external_testing_enabled).to eq(false)
         expect(train.builds.count).to eq(1)
@@ -65,19 +65,19 @@ describe Spaceship::Tunes::BuildTrain do
       end
 
       it "properly extracted the processing builds from a train" do
-        train = app.build_trains['1.0']
+        train = app.build_trains["1.0"]
         expect(train.processing_builds.count).to eq(0)
       end
     end
 
     describe "#update_testing_status" do
       it "just works (tm)" do
-        train1 = app.build_trains['1.0']
-        train2 = app.build_trains['1.1']
+        train1 = app.build_trains["1.0"]
+        train2 = app.build_trains["1.1"]
         expect(train1.internal_testing_enabled).to eq(true)
         expect(train2.internal_testing_enabled).to eq(false)
 
-        train2.update_testing_status!(true, 'internal')
+        train2.update_testing_status!(true, "internal")
 
         expect(train2.internal_testing_enabled).to eq(true)
       end

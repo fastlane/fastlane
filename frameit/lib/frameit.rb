@@ -1,19 +1,19 @@
-require 'mini_magick'
-require 'frameit/version'
-require 'frameit/frame_converter'
-require 'frameit/device_types'
-require 'frameit/runner'
-require 'frameit/screenshot'
-require 'frameit/config_parser'
-require 'frameit/offsets'
-require 'frameit/editor'
-require 'frameit/template_finder'
-require 'frameit/strings_parser'
-require 'frameit/mac_editor'
-require 'frameit/dependency_checker'
-require 'frameit/options'
+require "mini_magick"
+require "frameit/version"
+require "frameit/frame_converter"
+require "frameit/device_types"
+require "frameit/runner"
+require "frameit/screenshot"
+require "frameit/config_parser"
+require "frameit/offsets"
+require "frameit/editor"
+require "frameit/template_finder"
+require "frameit/strings_parser"
+require "frameit/mac_editor"
+require "frameit/dependency_checker"
+require "frameit/options"
 
-require 'fastlane_core'
+require "fastlane_core"
 
 module Frameit
   class << self

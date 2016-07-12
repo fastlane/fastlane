@@ -46,11 +46,11 @@ describe Fastlane do
         it "hides sensitive parameters" do
           with_verbose(true) do
             expect(UI).to receive(:verbose) do |message|
-              expect(message).to_not include('PEANUTS')
-              expect(message).to_not include('MAJOR_KEY')
+              expect(message).to_not include("PEANUTS")
+              expect(message).to_not include("MAJOR_KEY")
 
-              expect(message).to include('[[BUILD_SECRET]]')
-              expect(message).to include('[[API_TOKEN')
+              expect(message).to include("[[BUILD_SECRET]]")
+              expect(message).to include("[[API_TOKEN")
             end
 
             Fastlane::FastFile.new.parse('lane :test do
@@ -93,11 +93,11 @@ describe Fastlane do
           it "hides sensitive parameters" do
             with_verbose(true) do
               expect(UI).to receive(:verbose) do |message|
-                expect(message).to_not include('PEANUTS')
-                expect(message).to_not include('MAJOR_KEY')
+                expect(message).to_not include("PEANUTS")
+                expect(message).to_not include("MAJOR_KEY")
 
-                expect(message).to include('[[BUILD_SECRET]]')
-                expect(message).to include('[[API_TOKEN')
+                expect(message).to include("[[BUILD_SECRET]]")
+                expect(message).to include("[[API_TOKEN")
               end
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({

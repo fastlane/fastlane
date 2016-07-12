@@ -1,5 +1,5 @@
-require 'plist'
-require 'sigh/runner'
+require "plist"
+require "sigh/runner"
 
 module Sigh
   class Manager
@@ -30,7 +30,7 @@ module Sigh
     end
 
     def self.download_all
-      require 'sigh/download_all'
+      require "sigh/download_all"
       DownloadAll.new.download_all
     end
 

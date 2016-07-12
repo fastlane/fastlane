@@ -1,4 +1,4 @@
-require 'fastimage'
+require "fastimage"
 require "English"
 
 module Spaceship
@@ -9,13 +9,13 @@ module Spaceship
     # @param path (String) the path to the file
     def content_type(path)
       path = path.downcase
-      return 'image/jpeg' if path.end_with?('.jpg')
-      return 'image/jpeg' if path.end_with?('.jpeg')
-      return 'image/png' if path.end_with?('.png')
-      return 'application/json' if path.end_with?('.geojson')
-      return 'video/quicktime' if path.end_with?('.mov')
-      return 'video/mp4' if path.end_with?('.m4v')
-      return 'video/mp4' if path.end_with?('.mp4')
+      return "image/jpeg" if path.end_with?(".jpg")
+      return "image/jpeg" if path.end_with?(".jpeg")
+      return "image/png" if path.end_with?(".png")
+      return "application/json" if path.end_with?(".geojson")
+      return "video/quicktime" if path.end_with?(".mov")
+      return "video/mp4" if path.end_with?(".m4v")
+      return "video/mp4" if path.end_with?(".mp4")
       raise "Unknown content-type for file #{path}"
     end
 
@@ -43,8 +43,8 @@ module Spaceship
     # @return the path to the TempFile containing the generated screenshot
     def grab_video_preview(video_path, timestamp, dimensions)
       width, height = dimensions
-      require 'tempfile'
-      tmp = Tempfile.new(['video_preview', ".jpg"])
+      require "tempfile"
+      tmp = Tempfile.new(["video_preview", ".jpg"])
       file = tmp.path
       command = "ffmpeg -y -i \"#{video_path}\" -s #{width}x#{height} -ss \"#{timestamp}\" -vframes 1 \"#{file}\" 2>&1 >/dev/null"
       # puts "COMMAND: #{command}"

@@ -66,7 +66,7 @@ describe Fastlane do
 
       context "the `ignore_exit_status` option" do
         context "by default" do
-          it 'should raise if swiftlint completes with a non-zero exit status' do
+          it "should raise if swiftlint completes with a non-zero exit status" do
             allow(FastlaneCore::UI).to receive(:important)
             expect(FastlaneCore::UI).to receive(:important).with(/If you want fastlane to continue anyway/)
             # This is simulating the exception raised if the return code is non-zero
@@ -82,7 +82,7 @@ describe Fastlane do
         end
 
         context "when enabled" do
-          it 'should not raise if swiftlint completes with a non-zero exit status' do
+          it "should not raise if swiftlint completes with a non-zero exit status" do
             allow(FastlaneCore::UI).to receive(:important)
             expect(FastlaneCore::UI).to receive(:important).with(/fastlane will continue/)
             # This is simulating the exception raised if the return code is non-zero
@@ -96,7 +96,7 @@ describe Fastlane do
         end
 
         context "when disabled" do
-          it 'should raise if swiftlint completes with a non-zero exit status' do
+          it "should raise if swiftlint completes with a non-zero exit status" do
             allow(FastlaneCore::UI).to receive(:important)
             expect(FastlaneCore::UI).to receive(:important).with(/If you want fastlane to continue anyway/)
             # This is simulating the exception raised if the return code is non-zero

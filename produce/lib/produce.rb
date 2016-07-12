@@ -1,12 +1,12 @@
-require 'json'
-require 'produce/version'
-require 'produce/manager'
-require 'produce/options'
-require 'produce/developer_center'
-require 'produce/itunes_connect'
-require 'produce/available_default_languages'
+require "json"
+require "produce/version"
+require "produce/manager"
+require "produce/options"
+require "produce/developer_center"
+require "produce/itunes_connect"
+require "produce/available_default_languages"
 
-require 'fastlane_core'
+require "fastlane_core"
 
 module Produce
   class << self
@@ -16,6 +16,6 @@ module Produce
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
-  ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
+  ENV["FASTLANE_TEAM_ID"] ||= ENV["PRODUCE_TEAM_ID"]
+  ENV["DELIVER_USER"] ||= ENV["PRODUCE_USERNAME"]
 end

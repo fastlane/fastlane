@@ -16,8 +16,8 @@ module Snapshot
       end
 
       all_runtimes = `xcrun simctl list runtimes`.lines.map { |s| s.slice(/(.*?) \(/, 1) }.compact
-      tv_versions = filter_runtimes(all_runtimes, 'tvOS')
-      watch_versions = filter_runtimes(all_runtimes, 'watchOS')
+      tv_versions = filter_runtimes(all_runtimes, "tvOS")
+      watch_versions = filter_runtimes(all_runtimes, "watchOS")
 
       all_device_types = `xcrun simctl list devicetypes`.scan(/(.*)\s\((.*)\)/)
       # == Device Types ==
@@ -26,10 +26,10 @@ module Snapshot
       # iPhone 5s (com.apple.CoreSimulator.SimDeviceType.iPhone-5s)
       # iPhone 6 (com.apple.CoreSimulator.SimDeviceType.iPhone-6)
       all_device_types.each do |device_type|
-        if device_type.join(' ').include?("Watch")
-          create(device_type, watch_versions, 'watchOS')
-        elsif device_type.join(' ').include?("TV")
-          create(device_type, tv_versions, 'tvOS')
+        if device_type.join(" ").include?("Watch")
+          create(device_type, watch_versions, "watchOS")
+        elsif device_type.join(" ").include?("TV")
+          create(device_type, tv_versions, "tvOS")
         else
           create(device_type, ios_versions)
         end
@@ -38,19 +38,19 @@ module Snapshot
       make_phone_watch_pair
     end
 
-    def self.create(device_type, os_versions, os_name = 'iOS')
+    def self.create(device_type, os_versions, os_name = "iOS")
       os_versions.each do |os_version|
         puts "Creating #{device_type} for #{os_name} version #{os_version}"
         `xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{os_version}`
       end
     end
 
-    def self.filter_runtimes(all_runtimes, os = 'iOS')
-      all_runtimes.select { |r| r[/^#{os}/] }.map { |r| r.split(' ')[1] }
+    def self.filter_runtimes(all_runtimes, os = "iOS")
+      all_runtimes.select { |r| r[/^#{os}/] }.map { |r| r.split(" ")[1] }
     end
 
     def self.devices
-      all_devices = Helper.backticks('xcrun simctl list devices', print: $verbose)
+      all_devices = Helper.backticks("xcrun simctl list devices", print: $verbose)
       # == Devices ==
       # -- iOS 9.0 --
       #   iPhone 4s (32246EBC-33B0-47F9-B7BB-5C23C550DF29) (Shutdown)
@@ -71,8 +71,8 @@ module Snapshot
       watches = []
       devices.each do |device|
         full_line, name, id = device
-        phones << id if name.start_with?('iPhone 6') && device_line_usable?(full_line)
-        watches << id if name.end_with?('mm') && device_line_usable?(full_line)
+        phones << id if name.start_with?("iPhone 6") && device_line_usable?(full_line)
+        watches << id if name.end_with?("mm") && device_line_usable?(full_line)
       end
 
       if phones.any? && watches.any?

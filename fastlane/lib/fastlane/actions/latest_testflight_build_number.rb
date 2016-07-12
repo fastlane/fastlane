@@ -1,4 +1,4 @@
-require 'credentials_manager'
+require "credentials_manager"
 
 module Fastlane
   module Actions
@@ -8,7 +8,7 @@ module Fastlane
 
     class LatestTestflightBuildNumberAction < Action
       def self.run(params)
-        require 'spaceship'
+        require "spaceship"
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship::Tunes.login(credentials.user, credentials.password)
@@ -82,7 +82,7 @@ module Fastlane
 
       def self.output
         [
-          ['LATEST_TESTFLIGHT_BUILD_NUMBER', 'The latest build number of the latest version of the app uploaded to TestFlight']
+          ["LATEST_TESTFLIGHT_BUILD_NUMBER", "The latest build number of the latest version of the app uploaded to TestFlight"]
         ]
       end
 

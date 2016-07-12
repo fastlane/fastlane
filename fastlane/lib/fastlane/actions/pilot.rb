@@ -2,11 +2,11 @@ module Fastlane
   module Actions
     class PilotAction < Action
       def self.run(values)
-        require 'pilot'
-        require 'pilot/options'
+        require "pilot"
+        require "pilot/options"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pilot') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("pilot") unless Helper.is_test?
 
           changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
           values[:changelog] ||= changelog if changelog
@@ -17,7 +17,7 @@ module Fastlane
 
           Pilot::BuildManager.new.upload(values) # we already have the finished config
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('pilot', Pilot::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("pilot", Pilot::VERSION)
         end
       end
 

@@ -11,18 +11,18 @@ module Fastlane
     end
 
     class DeploygateAction < Action
-      DEPLOYGATE_URL_BASE = 'https://deploygate.com'
+      DEPLOYGATE_URL_BASE = "https://deploygate.com"
 
       def self.is_supported?(platform)
         platform == :ios
       end
 
       def self.run(options)
-        require 'shenzhen'
-        require 'shenzhen/plugins/deploygate'
+        require "shenzhen"
+        require "shenzhen/plugins/deploygate"
 
         # Available options: https://deploygate.com/docs/api
-        UI.success('Starting with ipa upload to DeployGate... this could take some time ⏳')
+        UI.success("Starting with ipa upload to DeployGate... this could take some time ⏳")
 
         client = Shenzhen::Plugins::DeployGate::Client.new(
           options[:api_token],
@@ -47,18 +47,18 @@ module Fastlane
       end
 
       def self.parse_response(response)
-        if response.body && response.body.key?('error')
+        if response.body && response.body.key?("error")
 
-          if response.body['error']
+          if response.body["error"]
             UI.error("Error uploading to DeployGate: #{response.body['message']}")
             help_message(response)
             return
           else
-            res = response.body['results']
-            url = DEPLOYGATE_URL_BASE + res['path']
+            res = response.body["results"]
+            url = DEPLOYGATE_URL_BASE + res["path"]
 
             Actions.lane_context[SharedValues::DEPLOYGATE_URL] = url
-            Actions.lane_context[SharedValues::DEPLOYGATE_REVISION] = res['revision']
+            Actions.lane_context[SharedValues::DEPLOYGATE_REVISION] = res["revision"]
             Actions.lane_context[SharedValues::DEPLOYGATE_APP_INFO] = res
           end
         else
@@ -71,13 +71,13 @@ module Fastlane
 
       def self.help_message(response)
         message =
-          case response.body['message']
-          when 'you are not authenticated'
-            'Invalid API Token specified.'
-          when 'application create error: permit'
-            'Access denied: May be trying to upload to wrong user or updating app you join as a tester?'
-          when 'application create error: limit'
-            'Plan limit: You have reached to the limit of current plan or your plan was expired.'
+          case response.body["message"]
+          when "you are not authenticated"
+            "Invalid API Token specified."
+          when "application create error: permit"
+            "Access denied: May be trying to upload to wrong user or updating app you join as a tester?"
+          when "application create error: limit"
+            "Plan limit: You have reached to the limit of current plan or your plan was expired."
           end
         UI.error(message) if message
       end
@@ -125,9 +125,9 @@ module Fastlane
 
       def self.output
         [
-          ['DEPLOYGATE_URL', 'URL of the newly uploaded build'],
-          ['DEPLOYGATE_REVISION', 'auto incremented revision number'],
-          ['DEPLOYGATE_APP_INFO', 'Contains app revision, bundle identifier, etc.']
+          ["DEPLOYGATE_URL", "URL of the newly uploaded build"],
+          ["DEPLOYGATE_REVISION", "auto incremented revision number"],
+          ["DEPLOYGATE_APP_INFO", "Contains app revision, bundle identifier, etc."]
         ]
       end
 

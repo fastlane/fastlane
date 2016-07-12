@@ -31,7 +31,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec danger")
-        expect(ENV['DANGER_GITHUB_API_TOKEN']).to eq("1234")
+        expect(ENV["DANGER_GITHUB_API_TOKEN"]).to eq("1234")
       end
     end
   end

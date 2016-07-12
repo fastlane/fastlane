@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Spaceship::Client do
   class TestClient < Spaceship::Client
@@ -33,7 +33,7 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
-  describe 'retry' do
+  describe "retry" do
     { "Timeout" => Faraday::Error::TimeoutError.new,
       "Connection failed" => Faraday::Error::ConnectionFailed.new("Connection Failed"),
       "EPIPE" => Errno::EPIPE }.each do |name, exception|
@@ -82,12 +82,12 @@ describe Spaceship::Client do
     end
 
     describe "retry when user and password not fetched from CredentialManager" do
-      let(:the_user) { 'u' }
-      let(:the_password) { 'p' }
+      let(:the_user) { "u" }
+      let(:the_password) { "p" }
 
       it "is able to retry and login successfully" do
         def subject.send_login_request(user, password)
-          can_login = (user == 'u' && password == 'p')
+          can_login = (user == "u" && password == "p")
           raise Spaceship::Client::UnauthorizedAccessError.new, "Faked" unless can_login
           true
         end

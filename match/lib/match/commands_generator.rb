@@ -1,4 +1,4 @@
-require 'commander'
+require "commander"
 
 HighLine.track_eof = false
 
@@ -8,10 +8,10 @@ module Match
     UI = FastlaneCore::UI
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('match')
+      FastlaneCore::UpdateChecker.start_looking_for_update("match")
       self.new.run
     ensure
-      FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
+      FastlaneCore::UpdateChecker.show_update_status("match", Match::VERSION)
     end
 
     # rubocop:disable Metrics/MethodLength
@@ -19,17 +19,17 @@ module Match
     def run
       program :version, Match::VERSION
       program :description, Match::DESCRIPTION
-      program :help, 'Author', 'Felix Krause <match@krausefx.com>'
-      program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/match'
+      program :help, "Author", "Felix Krause <match@krausefx.com>"
+      program :help, "Website", "https://fastlane.tools"
+      program :help, "GitHub", "https://github.com/fastlane/match"
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
+      global_option("--verbose") { $verbose = true }
 
       FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'match'
+        c.syntax = "match"
         c.description = Match::DESCRIPTION
 
         c.action do |args, options|
@@ -58,10 +58,10 @@ module Match
       end
 
       command :init do |c|
-        c.syntax = 'match init'
-        c.description = 'Create the Matchfile for you'
+        c.syntax = "match init"
+        c.description = "Create the Matchfile for you"
         c.action do |args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = (File.directory?("fastlane") ? "fastlane" : ".")
           path = File.join(containing, "Matchfile")
 
           if File.exist?(path)
@@ -74,8 +74,8 @@ module Match
       end
 
       command :change_password do |c|
-        c.syntax = 'match change_password'
-        c.description = 'Re-encrypt all files with a different password'
+        c.syntax = "match change_password"
+        c.description = "Re-encrypt all files with a different password"
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")

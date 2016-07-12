@@ -1,10 +1,10 @@
-require 'spaceship'
+require "spaceship"
 
 module Produce
   class ItunesConnect
     def run
       @full_bundle_identifier = app_identifier
-      @full_bundle_identifier.gsub!('*', Produce.config[:bundle_identifier_suffix].to_s) if wildcard_bundle?
+      @full_bundle_identifier.gsub!("*", Produce.config[:bundle_identifier_suffix].to_s) if wildcard_bundle?
 
       Spaceship::Tunes.login(Produce.config[:username], nil)
       Spaceship::Tunes.client.select_team
@@ -20,7 +20,7 @@ module Produce
       else
         UI.success "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect"
 
-        Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
+        Produce.config[:bundle_identifier_suffix] = "" unless wildcard_bundle?
 
         Spaceship::Tunes::Application.create!(name: Produce.config[:app_name],
                                               primary_language: language,

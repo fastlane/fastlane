@@ -1,4 +1,4 @@
-require 'spaceship'
+require "spaceship"
 
 module WatchBuild
   class Runner
@@ -54,7 +54,7 @@ module WatchBuild
     end
 
     def notification(build, minutes)
-      require 'terminal-notifier'
+      require "terminal-notifier"
 
       if build.nil?
         UI.message "Application build is still processing"

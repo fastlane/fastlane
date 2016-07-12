@@ -8,22 +8,22 @@ module Fastlane
       INSTALLR_API = "https://www.installrapp.com/apps.json"
 
       def self.run(params)
-        UI.success('Upload to Installr has been started. This may take some time.')
+        UI.success("Upload to Installr has been started. This may take some time.")
 
         response = self.upload_build(params)
 
         case response.status
         when 200...300
           Actions.lane_context[SharedValues::INSTALLR_BUILD_INFORMATION] = response.body
-          UI.success('Build successfully uploaded to Installr!')
+          UI.success("Build successfully uploaded to Installr!")
         else
           UI.user_error!("Error when trying to upload build file to Installr: #{response.body}")
         end
       end
 
       def self.upload_build(params)
-        require 'faraday'
-        require 'faraday_middleware'
+        require "faraday"
+        require "faraday_middleware"
 
         url = INSTALLR_API
         connection = Faraday.new(url) do |builder|
@@ -35,7 +35,7 @@ module Fastlane
         end
 
         options = {}
-        options[:qqfile] = Faraday::UploadIO.new(params[:ipa], 'application/octet-stream')
+        options[:qqfile] = Faraday::UploadIO.new(params[:ipa], "application/octet-stream")
 
         if params[:notes]
           options[:releaseNotes] = params[:notes]
@@ -50,7 +50,7 @@ module Fastlane
         end
 
         post_request = connection.post do |req|
-          req.headers['X-InstallrAppToken'] = params[:api_token]
+          req.headers["X-InstallrAppToken"] = params[:api_token]
           req.body = options
         end
 
@@ -98,7 +98,7 @@ module Fastlane
 
       def self.output
         [
-          ['INSTALLR_BUILD_INFORMATION', 'Contains release info like :appData. See http://help.installrapp.com/api/']
+          ["INSTALLR_BUILD_INFORMATION", "Contains release info like :appData. See http://help.installrapp.com/api/"]
         ]
       end
 

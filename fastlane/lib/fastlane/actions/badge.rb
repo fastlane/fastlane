@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class BadgeAction < Action
       def self.run(params)
-        Actions.verify_gem!('badge')
-        require 'badge'
+        Actions.verify_gem!("badge")
+        require "badge"
         options = {
           dark: params[:dark],
           custom: params[:custom],
@@ -78,7 +78,7 @@ module Fastlane
                                        description: "Sets the root path to look for AppIcons",
                                        optional: true,
                                        is_string: true,
-                                       default_value: '.',
+                                       default_value: ".",
                                        verify_block: proc do |value|
                                          UI.user_error!("path needs to be a valid directory") if Dir[value].empty?
                                        end),

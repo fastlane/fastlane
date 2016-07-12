@@ -1,17 +1,17 @@
-require 'json'
-require 'gym/version'
-require 'gym/manager'
-require 'gym/generators/build_command_generator'
-require 'gym/generators/package_command_generator'
-require 'gym/runner'
-require 'gym/error_handler'
-require 'gym/options'
-require 'gym/detect_values'
-require 'gym/xcode'
+require "json"
+require "gym/version"
+require "gym/manager"
+require "gym/generators/build_command_generator"
+require "gym/generators/package_command_generator"
+require "gym/runner"
+require "gym/error_handler"
+require "gym/options"
+require "gym/detect_values"
+require "gym/xcode"
 
-require 'fastlane_core'
-require 'terminal-table'
-require 'shellwords'
+require "fastlane_core"
+require "terminal-table"
+require "shellwords"
 
 module Gym
   class << self
@@ -33,11 +33,11 @@ module Gym
 
     def init_libs
       # Import all the fixes
-      require 'gym/xcodebuild_fixes/swift_fix'
-      require 'gym/xcodebuild_fixes/watchkit_fix'
-      require 'gym/xcodebuild_fixes/watchkit2_fix'
-      require 'gym/xcodebuild_fixes/generic_archive_fix'
-      require 'gym/xcodebuild_fixes/package_application_fix'
+      require "gym/xcodebuild_fixes/swift_fix"
+      require "gym/xcodebuild_fixes/watchkit_fix"
+      require "gym/xcodebuild_fixes/watchkit2_fix"
+      require "gym/xcodebuild_fixes/generic_archive_fix"
+      require "gym/xcodebuild_fixes/package_application_fix"
     end
   end
 

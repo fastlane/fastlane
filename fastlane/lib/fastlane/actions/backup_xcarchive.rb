@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class BackupXcarchiveAction < Action
-      require 'fileutils'
+      require "fileutils"
 
       def self.run(params)
         # Get params
@@ -61,43 +61,43 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :xcarchive,
-                                       description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
+                                       description: "Path to your xcarchive file. Optional if you use the `xcodebuild` action",
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
                                        optional: false,
-                                       env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
+                                       env_name: "BACKUP_XCARCHIVE_ARCHIVE",
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find xcarchive file at path '#{value}'") if !Helper.test? && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :destination,
-                                       description: 'Where your archive will be placed',
+                                       description: "Where your archive will be placed",
                                        optional: false,
-                                       env_name: 'BACKUP_XCARCHIVE_DESTINATION',
+                                       env_name: "BACKUP_XCARCHIVE_DESTINATION",
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find the destination folder at '#{value}'") if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
-                                       description: 'Enable compression of the archive. Default value `true`',
+                                       description: "Enable compression of the archive. Default value `true`",
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
-                                       env_name: 'BACKUP_XCARCHIVE_ZIP'),
+                                       env_name: "BACKUP_XCARCHIVE_ZIP"),
           FastlaneCore::ConfigItem.new(key: :versioned,
-                                       description: 'Create a versioned (date and app version) subfolder where to put the archive. Default value `true`',
+                                       description: "Create a versioned (date and app version) subfolder where to put the archive. Default value `true`",
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
-                                       env_name: 'BACKUP_XCARCHIVE_VERSIONED')
+                                       env_name: "BACKUP_XCARCHIVE_VERSIONED")
         ]
       end
 
       def self.output
         [
-          ['BACKUP_XCARCHIVE_FILE', 'Path to your saved xcarchive (compressed) file']
+          ["BACKUP_XCARCHIVE_FILE", "Path to your saved xcarchive (compressed) file"]
         ]
       end
 
       def self.author
-        ['dral3x']
+        ["dral3x"]
       end
 
       def self.is_supported?(platform)

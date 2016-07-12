@@ -13,8 +13,8 @@ module Fastlane
       def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
 
-        require 'shenzhen'
-        require 'shenzhen/plugins/hockeyapp'
+        require "shenzhen"
+        require "shenzhen/plugins/hockeyapp"
 
         build_file = [
           options[:ipa],
@@ -29,7 +29,7 @@ module Fastlane
             UI.user_error!("You have to provide a build file")
           end
 
-          dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
+          dsym_path = options[:ipa].to_s.gsub("ipa", "app.dSYM.zip")
           if options[:ipa]
             if File.exist?(dsym_path)
               dsym_filename = dsym_path
@@ -42,7 +42,7 @@ module Fastlane
 
         UI.user_error!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
-        UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
+        UI.success("Starting with ipa upload to HockeyApp... this could take some time.")
 
         client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
 
@@ -58,13 +58,13 @@ module Fastlane
         response = client.upload_build(ipa_filename, values)
         case response.status
         when 200...300
-          url = response.body['public_url']
+          url = response.body["public_url"]
 
           Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
 
           UI.message("Public Download URL: #{url}") if url
-          UI.success('Build successfully uploaded to HockeyApp!')
+          UI.success("Build successfully uploaded to HockeyApp!")
         else
           if response.body.to_s.include?("App could not be created")
             UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
@@ -184,8 +184,8 @@ module Fastlane
 
       def self.output
         [
-          ['HOCKEY_DOWNLOAD_LINK', 'The newly generated download link for this build'],
-          ['HOCKEY_BUILD_INFORMATION', 'contains all keys/values from the HockeyApp API, like :title, :bundle_identifier']
+          ["HOCKEY_DOWNLOAD_LINK", "The newly generated download link for this build"],
+          ["HOCKEY_BUILD_INFORMATION", "contains all keys/values from the HockeyApp API, like :title, :bundle_identifier"]
         ]
       end
 

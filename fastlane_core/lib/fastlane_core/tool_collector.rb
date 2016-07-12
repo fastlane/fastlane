@@ -1,6 +1,6 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://fastlane-enhancer.herokuapp.com"
+    HOST_URL = ENV["FASTLANE_ENHANCER_URL"] || "https://fastlane-enhancer.herokuapp.com"
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -61,8 +61,8 @@ module FastlaneCore
         show_message
       end
 
-      require 'excon'
-      url = HOST_URL + '/did_launch?'
+      require "excon"
+      url = HOST_URL + "/did_launch?"
       url += URI.encode_www_form(
         versions: versions.to_json,
         steps: launches.to_json,
@@ -126,9 +126,9 @@ module FastlaneCore
     end
 
     def did_show_message?
-      path = File.join(File.expand_path('~'), '.did_show_opt_info')
+      path = File.join(File.expand_path("~"), ".did_show_opt_info")
       did_show = File.exist?(path)
-      File.write(path, '1') unless did_show
+      File.write(path, "1") unless did_show
       did_show
     end
 
@@ -153,8 +153,8 @@ module FastlaneCore
         if Kernel.const_defined?(module_name)
           tool_module = Kernel.const_get(module_name)
 
-          if tool_module.const_defined?('VERSION')
-            return tool_module.const_get('VERSION')
+          if tool_module.const_defined?("VERSION")
+            return tool_module.const_get("VERSION")
           end
         end
       rescue LoadError

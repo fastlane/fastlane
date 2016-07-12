@@ -1,4 +1,4 @@
-require 'fastlane'
+require "fastlane"
 
 module Danger
   # A danger plugin: https://github.com/danger/danger

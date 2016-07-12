@@ -7,10 +7,10 @@ module Fastlane
     class SnapshotAction < Action
       def self.run(params)
         return nil unless Helper.mac?
-        require 'snapshot'
+        require "snapshot"
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
+          FastlaneCore::UpdateChecker.start_looking_for_update("snapshot") unless Helper.is_test?
 
           Snapshot.config = params
           Snapshot::DependencyChecker.check_simulators
@@ -20,7 +20,7 @@ module Fastlane
 
           true
         ensure
-          FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
+          FastlaneCore::UpdateChecker.show_update_status("snapshot", Snapshot::VERSION)
         end
       end
 
@@ -30,7 +30,7 @@ module Fastlane
 
       def self.available_options
         return [] unless Helper.mac?
-        require 'snapshot'
+        require "snapshot"
         Snapshot::Options.available_options
       end
 

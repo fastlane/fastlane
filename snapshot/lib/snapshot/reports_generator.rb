@@ -1,5 +1,5 @@
-require 'erb'
-require 'fastimage'
+require "erb"
+require "fastimage"
 
 module Snapshot
   class ReportsGenerator
@@ -12,7 +12,7 @@ module Snapshot
 
       Dir[File.join(screens_path, "*")].sort.each do |language_folder|
         language = File.basename(language_folder)
-        Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
+        Dir[File.join(language_folder, "*.png")].sort.each do |screenshot|
           available_devices.each do |key_name, output_name|
             next unless File.basename(screenshot).include?(key_name)
 
@@ -20,7 +20,7 @@ module Snapshot
             @data[language] ||= {}
             @data[language][output_name] ||= []
 
-            resulting_path = File.join('.', language, File.basename(screenshot))
+            resulting_path = File.join(".", language, File.basename(screenshot))
             @data[language][output_name] << resulting_path
             break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
           end
@@ -41,10 +41,10 @@ module Snapshot
     private
 
     def lib_path
-      if !Helper.is_test? and Gem::Specification.find_all_by_name('snapshot').any?
-        return [Gem::Specification.find_by_name('snapshot').gem_dir, 'lib'].join('/')
+      if !Helper.is_test? and Gem::Specification.find_all_by_name("snapshot").any?
+        return [Gem::Specification.find_by_name("snapshot").gem_dir, "lib"].join("/")
       else
-        return './lib'
+        return "./lib"
       end
     end
 
@@ -52,15 +52,15 @@ module Snapshot
       # The order IS important, since those names are used to check for include?
       # and the iPhone 6 is inlucded in the iPhone 6 Plus
       {
-        'iPhone6sPlus' => "5.5-Inch",
-        'iPhone6Plus' => "5.5-Inch",
-        'iPhone6s' => "4.7-Inch",
-        'iPhone6' => "4.7-Inch",
-        'iPhone5' => "4-Inch",
-        'iPhone4' => "3.5-Inch",
-        'iPadPro' => "iPad Pro",
-        'iPad' => "iPad",
-        'Mac' => "Mac"
+        "iPhone6sPlus" => "5.5-Inch",
+        "iPhone6Plus" => "5.5-Inch",
+        "iPhone6s" => "4.7-Inch",
+        "iPhone6" => "4.7-Inch",
+        "iPhone5" => "4-Inch",
+        "iPhone4" => "3.5-Inch",
+        "iPadPro" => "iPad Pro",
+        "iPad" => "iPad",
+        "Mac" => "Mac"
       }
     end
   end

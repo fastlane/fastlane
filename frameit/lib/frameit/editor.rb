@@ -17,7 +17,7 @@ module Frameit
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
-        width = offset['width']
+        width = offset["width"]
         image.resize width # resize the image to fit the frame
         put_into_frame # put it in the frame
       end
@@ -36,7 +36,7 @@ module Frameit
     private
 
     def store_result
-      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+      output_path = screenshot.path.gsub(".png", "_framed.png").gsub(".PNG", "_framed.png")
       image.format "png"
       image.write output_path
       UI.success "Added frame: '#{File.expand_path(output_path)}'"
@@ -46,16 +46,16 @@ module Frameit
     def put_into_frame
       @image = frame.composite(image, "png") do |c|
         c.compose "Over"
-        c.geometry offset['offset']
+        c.geometry offset["offset"]
       end
     end
 
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot)
+      @offset_information = fetch_config["offset"] || Offsets.image_offset(screenshot)
 
-      if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
+      if @offset_information and (@offset_information["offset"] or @offset_information["offset"])
         return @offset_information
       end
       UI.user_error! "Could not find offset_information for '#{screenshot}'"
@@ -71,16 +71,16 @@ module Frameit
     # we need to modify the offset information by a certain factor
     def modify_offset(multiplicator)
       # Format: "+133+50"
-      hash = offset['offset']
+      hash = offset["offset"]
       x = hash.split("+")[1].to_f * multiplicator
       y = hash.split("+")[2].to_f * multiplicator
       new_offset = "+#{x.round}+#{y.round}"
-      @offset_information['offset'] = new_offset
+      @offset_information["offset"] = new_offset
     end
 
     # Do we add a background and title as well?
     def should_add_title?
-      return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
+      return (fetch_config["background"] and (fetch_config["title"] or fetch_config["keyword"]))
     end
 
     # more complex mode: background, frame and title
@@ -98,7 +98,7 @@ module Frameit
 
       self.top_space_above_device = vertical_frame_padding
 
-      if fetch_config['title']
+      if fetch_config["title"]
         background = put_title_into_background(background)
       end
 
@@ -109,18 +109,18 @@ module Frameit
 
     # Horizontal adding around the frames
     def horizontal_frame_padding
-      padding = fetch_config['padding']
+      padding = fetch_config["padding"]
       unless padding.kind_of?(Integer)
-        padding = padding.split('x')[0].to_i
+        padding = padding.split("x")[0].to_i
       end
       return scale_padding(padding)
     end
 
     # Vertical adding around the frames
     def vertical_frame_padding
-      padding = fetch_config['padding']
+      padding = fetch_config["padding"]
       unless padding.kind_of?(Integer)
-        padding = padding.split('x')[1].to_i
+        padding = padding.split("x")[1].to_i
       end
       return scale_padding(padding)
     end
@@ -133,7 +133,7 @@ module Frameit
 
     # Returns a correctly sized background image
     def generate_background
-      background = MiniMagick::Image.open(fetch_config['background'])
+      background = MiniMagick::Image.open(fetch_config["background"])
 
       if background.height != screenshot.size[1]
         background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}!" # `!` says it should ignore the ratio
@@ -142,7 +142,7 @@ module Frameit
     end
 
     def put_device_into_background(background)
-      show_complete_frame = fetch_config['show_complete_frame']
+      show_complete_frame = fetch_config["show_complete_frame"]
       if show_complete_frame
         max_height = background.height - top_space_above_device
         image.resize "x#{max_height}>"
@@ -160,7 +160,7 @@ module Frameit
 
     # Resize the frame as it's too low quality by default
     def resize_frame!
-      multiplicator = (screenshot.size[0].to_f / offset['width'].to_f) # by how much do we have to change this?
+      multiplicator = (screenshot.size[0].to_f / offset["width"].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
       frame.resize "#{new_frame_width.round}x" # resize it to the calculated witdth
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
@@ -231,7 +231,7 @@ module Frameit
       results = {}
       words.each do |key|
         # Create empty background
-        empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
+        empty_path = File.join(Helper.gem_path("frameit"), "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
         title_image.combine_options do |i|
@@ -247,7 +247,7 @@ module Frameit
         text.gsub! '\n', "\n"
         text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
 
-        interline_spacing = fetch_config['interline_spacing']
+        interline_spacing = fetch_config["interline_spacing"]
 
         # Add the actual title
         title_image.combine_options do |i|
@@ -256,7 +256,7 @@ module Frameit
           i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
           i.interline_spacing interline_spacing if interline_spacing
-          i.fill fetch_config[key.to_s]['color']
+          i.fill fetch_config[key.to_s]["color"]
         end
         title_image.trim # remove white space
 
@@ -290,7 +290,7 @@ module Frameit
       end
 
       # No string files, fallback to Framefile config
-      result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
+      result = fetch_config[type.to_s]["text"] if fetch_config[type.to_s]
       UI.verbose("Falling back to default text as there was nothing specified in the .strings file")
 
       if type == :title and !result
@@ -303,14 +303,14 @@ module Frameit
 
     # The font we want to use
     def font(key)
-      single_font = fetch_config[key.to_s]['font']
+      single_font = fetch_config[key.to_s]["font"]
       return single_font if single_font
 
-      fonts = fetch_config[key.to_s]['fonts']
+      fonts = fetch_config[key.to_s]["fonts"]
       if fonts
         fonts.each do |font|
-          if font['supported']
-            font['supported'].each do |language|
+          if font["supported"]
+            font["supported"].each do |language|
               if screenshot.path.include? language
                 return font["font"]
               end

@@ -1,18 +1,18 @@
-require 'simplecov'
-require 'coveralls'
+require "simplecov"
+require "coveralls"
 Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-require 'spaceship'
-require 'plist'
+require "spaceship"
+require "plist"
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
 
-require 'client_stubbing'
-require 'portal/portal_stubbing'
-require 'tunes/tunes_stubbing'
-require 'du/du_stubbing'
+require "client_stubbing"
+require "portal/portal_stubbing"
+require "tunes/tunes_stubbing"
+require "du/du_stubbing"
 
 ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"

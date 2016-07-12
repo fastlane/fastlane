@@ -2,7 +2,7 @@ module Match
   # Generate missing resources
   class Generator
     def self.generate_certificate(params, cert_type)
-      require 'cert'
+      require "cert"
       output_path = File.join(params[:workspace], "certs", cert_type.to_s)
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
@@ -34,7 +34,7 @@ module Match
 
     # @return (String) The UUID of the newly generated profile
     def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil)
-      require 'sigh'
+      require "sigh"
 
       prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"] && !params[:type] == "development"
 

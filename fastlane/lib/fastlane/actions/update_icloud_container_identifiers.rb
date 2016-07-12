@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class UpdateIcloudContainerIdentifiersAction < Action
-      require 'plist'
+      require "plist"
 
       def self.run(params)
         entitlements_file = params[:entitlements_file]
@@ -16,12 +16,12 @@ module Fastlane
         UI.error "Entitlements file at '#{entitlements_file}' cannot be parsed." unless result
 
         # get iCloud container field
-        icloud_container_key = 'com.apple.developer.icloud-container-identifiers'
+        icloud_container_key = "com.apple.developer.icloud-container-identifiers"
         icloud_container_value = result[icloud_container_key]
         UI.error "No existing iCloud container field specified. Please specify an iCloud container in the entitlements file." unless icloud_container_value
 
         # get uniquity container field
-        ubiquity_container_key = 'com.apple.developer.ubiquity-container-identifiers'
+        ubiquity_container_key = "com.apple.developer.ubiquity-container-identifiers"
         ubiquity_container_value = result[ubiquity_container_key]
         UI.error "No existing ubiquity container field specified. Please specify an ubiquity container in the entitlements file." unless ubiquity_container_value
 
@@ -65,7 +65,7 @@ module Fastlane
       end
 
       def self.output
-        ['UPDATE_ICLOUD_CONTAINER_IDENTIFIERS', 'The new iCloud Container Identifiers']
+        ["UPDATE_ICLOUD_CONTAINER_IDENTIFIERS", "The new iCloud Container Identifiers"]
       end
 
       def self.authors

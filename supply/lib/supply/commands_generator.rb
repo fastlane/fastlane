@@ -20,18 +20,18 @@ module Supply
     def run
       program :version, Supply::VERSION
       program :description, Supply::DESCRIPTION
-      program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
-      program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/supply'
+      program :help, "Author", "Felix Krause <supply@krausefx.com>"
+      program :help, "Website", "https://fastlane.tools"
+      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/supply"
       program :help_formatter, :compact
 
       always_trace!
 
-      global_option('--verbose') { $verbose = true }
+      global_option("--verbose") { $verbose = true }
 
       command :run do |c|
-        c.syntax = 'supply'
-        c.description = 'Run a deploy process'
+        c.syntax = "supply"
+        c.description = "Run a deploy process"
         c.action do |args, options|
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_supplyfile
@@ -41,10 +41,10 @@ module Supply
       end
 
       command :init do |c|
-        c.syntax = 'supply init'
-        c.description = 'Sets up supply for you'
+        c.syntax = "supply init"
+        c.description = "Sets up supply for you"
         c.action do |args, options|
-          require 'supply/setup'
+          require "supply/setup"
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_supplyfile
 
@@ -58,7 +58,7 @@ module Supply
     end
 
     def load_supplyfile
-      Supply.config.load_configuration_file('Supplyfile')
+      Supply.config.load_configuration_file("Supplyfile")
     end
   end
 end

@@ -5,10 +5,10 @@ module Fastlane
         verify_sonar_runner_binary
 
         command_prefix = [
-          'cd',
-          File.expand_path('.').shellescape,
-          '&&'
-        ].join(' ')
+          "cd",
+          File.expand_path(".").shellescape,
+          "&&"
+        ].join(" ")
 
         sonar_runner_args = []
         sonar_runner_args << "-Dproject.settings=\"#{params[:project_configuration_path]}\"" if params[:project_configuration_path]
@@ -22,9 +22,9 @@ module Fastlane
 
         command = [
           command_prefix,
-          'sonar-runner',
+          "sonar-runner",
           sonar_runner_args
-        ].join(' ')
+        ].join(" ")
 
         Action.sh command
       end

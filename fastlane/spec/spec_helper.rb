@@ -1,4 +1,4 @@
-require 'coveralls'
+require "coveralls"
 
 Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
@@ -6,11 +6,11 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 
-require 'shellwords'
+require "shellwords"
 
-require 'fastlane'
+require "fastlane"
 
-require 'webmock/rspec'
+require "webmock/rspec"
 
 Fastlane.load_actions
 UI = FastlaneCore::UI
@@ -19,15 +19,15 @@ UI = FastlaneCore::UI
 module SpecHelper
 end
 
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!(allow: "coveralls.io")
 
 RSpec.configure do |config|
   config.before(:each) do
     Fastlane::Actions.clear_lane_context
 
-    ENV.delete 'DELIVER_SCREENSHOTS_PATH'
-    ENV.delete 'DELIVER_SKIP_BINARY'
-    ENV.delete 'DELIVER_VERSION'
+    ENV.delete "DELIVER_SCREENSHOTS_PATH"
+    ENV.delete "DELIVER_SKIP_BINARY"
+    ENV.delete "DELIVER_VERSION"
   end
 
   config.after(:each) do
@@ -46,6 +46,6 @@ end
 
 def stub_plugin_exists_on_rubygems(plugin_name, exists)
   stub_request(:get, "https://rubygems.org/api/v1/gems/fastlane-plugin-#{plugin_name}.json").
-    with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
+    with(headers: { "Accept" => "*/*", "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3", "User-Agent" => "Ruby" }).
     to_return(status: 200, body: (exists ? { version: "1.0" }.to_json : nil), headers: {})
 end

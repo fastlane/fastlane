@@ -1,14 +1,14 @@
-require 'open3'
-require 'fileutils'
+require "open3"
+require "fileutils"
 
-require 'fastlane_core'
+require "fastlane_core"
 
-require 'screengrab/version'
-require 'screengrab/runner'
-require 'screengrab/detect_values'
-require 'screengrab/dependency_checker'
-require 'screengrab/options'
-require 'screengrab/android_environment'
+require "screengrab/version"
+require "screengrab/runner"
+require "screengrab/detect_values"
+require "screengrab/dependency_checker"
+require "screengrab/options"
+require "screengrab/android_environment"
 
 module Screengrab
   # Use this to just setup the configuration attribute and set it later somewhere else

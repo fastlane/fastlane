@@ -10,7 +10,7 @@ module Fastlane
     attr_accessor :lanes
 
     def full_lane_name
-      [current_platform, current_lane].reject(&:nil?).join(' ')
+      [current_platform, current_lane].reject(&:nil?).join(" ")
     end
 
     # This will take care of executing **one** lane. That's when the user triggers a lane from the CLI for example
@@ -59,7 +59,7 @@ module Fastlane
       rescue => ex
         Dir.chdir(path_to_use) do
           # Provide error block exception without colour code
-          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
+          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ""))
 
           error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
           error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
@@ -78,7 +78,7 @@ module Fastlane
         next if filter_platform && filter_platform.to_s != platform.to_s # skip actions that don't match
 
         platform_lanes.each do |lane_name, lane|
-          all << [platform, lane_name].reject(&:nil?).join(' ') unless lane.is_private
+          all << [platform, lane_name].reject(&:nil?).join(" ") unless lane.is_private
         end
       end
       all
@@ -88,7 +88,7 @@ module Fastlane
     # It's also used when an action is called from another action
     def trigger_action_by_name(method_sym, custom_dir, *arguments)
       method_str = method_sym.to_s
-      method_str.delete!('?') # as a `?` could be at the end of the method name
+      method_str.delete!("?") # as a `?` could be at the end of the method name
 
       # First, check if there is a predefined method in the actions folder
       class_ref = Actions.action_class_ref(method_str)
@@ -167,7 +167,7 @@ module Fastlane
     end
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
+      custom_dir ||= ".."
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
