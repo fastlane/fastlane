@@ -1,10 +1,39 @@
 *.gem
-Gemfile.lock
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/test/tmp/
+/test/version_tmp/
+/tmp/
+fastlane-plugin-xcake/Gemfile.lock
+
+## Specific to RubyMotion:
+.dat*
+.repl_history
+build/
 
 ## Documentation cache and generated files:
 /.yardoc/
 /_yardoc/
 /doc/
 /rdoc/
-fastlane/README.md
-fastlane/report.xml
+
+## Environment normalisation:
+/.bundle/
+/vendor/bundle
+/lib/bundler/man/
+
+# for a library or gem, you might want to ignore these files since the code is
+# intended to run in multiple environments; otherwise, check them in:
+# Gemfile.lock
+# .ruby-version
+# .ruby-gemset
+
+# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+.rvmrc
+
+# Mac file metadata files
+.DS_Store
