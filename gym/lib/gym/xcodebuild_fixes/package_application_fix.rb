@@ -16,7 +16,7 @@ module Gym
 
           path = File.join(Helper.gem_path("gym"), "lib/assets/package_application_patches/PackageApplication_MD5")
           expected_md5_hashes = File.read(path).split("\n")
-          
+
           # If that location changes, search it using xcrun --sdk iphoneos -f PackageApplication
           package_application_path = "#{Xcode.xcode_path}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication"
 
