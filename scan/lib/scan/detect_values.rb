@@ -122,6 +122,14 @@ module Scan
       end
     end
 
+    def self.xcode_version
+      `xcodebuild -version`.match(/Xcode (.*)/)[1]
+    end
+
+    def self.min_xcode8?
+      xcode_version.split(".").first.to_i >= 8
+    end
+
     # Is it an iOS, a tvOS or a MacOS device?
     def self.detect_destination
       if Scan.config[:destination]
@@ -138,7 +146,7 @@ module Scan
       elsif Scan.project.tvos?
         Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
       else
-        Scan.config[:destination] = ["platform=macOS"]
+        Scan.config[:destination] = min_xcode8 ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
   end
