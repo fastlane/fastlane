@@ -138,7 +138,7 @@ module Scan
       elsif Scan.project.tvos?
         Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
       else
-        Scan.config[:destination] = ["platform=OS X"]
+        Scan.config[:destination] = ["platform=macOS"]
       end
     end
   end

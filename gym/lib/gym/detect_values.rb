@@ -60,7 +60,7 @@ module Gym
     def self.detect_platform
       return if Gym.config[:destination]
       platform = if Gym.project.mac?
-                   "OS X"
+                   "macOS"
                  elsif Gym.project.tvos?
                    "tvOS"
                  else

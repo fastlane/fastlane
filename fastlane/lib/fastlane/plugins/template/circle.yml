@@ -4,6 +4,6 @@ test:
 machine:
   ruby:
     version: 2.2.4
-# Enable xcode below if you need OS X
+# Enable xcode below if you need macOS
 #   xcode:
 #     version: "7.3"

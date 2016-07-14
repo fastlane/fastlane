@@ -39,7 +39,7 @@ As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) v
 
 WatchBuild is a simple standalone tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect.
 
-Once the build is ready to be pushed to TestFlight or for review, you get a OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
+Once the build is ready to be pushed to TestFlight or for review, you get a macOS notification. You can even directly click on the notification to open the build on iTunes Connect.
 
 ### Why use WatchBuild?
 

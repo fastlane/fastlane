@@ -166,6 +166,7 @@ module FastlaneCore
     def mac?
       # Some projects have different values... we have to look for all of them
       return true if build_settings(key: "PLATFORM_NAME") == "macosx"
+      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "macOS"
       return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "OS X"
       false
     end
