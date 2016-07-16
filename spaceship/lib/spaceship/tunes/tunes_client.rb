@@ -565,13 +565,8 @@ module Spaceship
                                   feedback_email: nil,
                                   platform: 'ios')
       url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
-      r = request(:get) do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
 
-      build_info = r.body['data']
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       build_info["details"].each do |current|
         current["whatsNew"]["value"] = whats_new if whats_new
         current["description"]["value"] = description if description
@@ -615,7 +610,7 @@ module Spaceship
       # Now fill in the values provided by the user
 
       # First the localised values:
-      build_info['testInfo']['details'].each do |current|
+      build_info['details'].each do |current|
         current['whatsNew']['value'] = changelog if changelog
         current['description']['value'] = description if description
         current['feedbackEmail']['value'] = feedback_email if feedback_email
@@ -623,21 +618,18 @@ module Spaceship
         current['privacyPolicyUrl']['value'] = privacy_policy_url if privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
-      build_info['significantChange'] ||= {}
-      build_info['significantChange']['value'] = significant_change
-      build_info['testInfo']['reviewFirstName']['value'] = first_name if first_name
-      build_info['testInfo']['reviewLastName']['value'] = last_name if last_name
-      build_info['testInfo']['reviewPhone']['value'] = phone_number if phone_number
-      build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
-      build_info['testInfo']['reviewAccountRequired']['value'] = (review_user_name.to_s + review_password.to_s).length > 0
-      build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
-      build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
-      build_info['testInfo']['reviewNotes']['value'] = review_notes if review_notes
+
+      review_info = {
+        "significantChange" => {
+          "value" => significant_change
+        },
+        "buildTestInformationTO" => build_info
+      }
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/review/submit"
 
-        req.body = build_info.to_json
+        req.body = review_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
@@ -653,8 +645,9 @@ module Spaceship
     # rubocop:enable Metrics/ParameterLists
 
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
+      url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
       r = request(:get) do |req|
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url url
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
