@@ -111,7 +111,7 @@ module Snapshot
                                      short_option: "-l",
                                      env_name: "SNAPSHOT_BUILDLOG_PATH",
                                      description: "The directory where to store the build log",
-                                     default_value: "~/Library/Logs/snapshot"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/snapshot"),
         FastlaneCore::ConfigItem.new(key: :clean,
                                      short_option: "-c",
                                      env_name: "SNAPSHOT_CLEAN",
