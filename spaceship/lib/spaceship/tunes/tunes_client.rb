@@ -604,7 +604,11 @@ module Spaceship
                                             review_user_name: nil,
                                             review_password: nil,
                                             review_notes: nil,
-                                            encryption: false)
+                                            encryption: false,
+                                            encryption_updated: false,
+                                            is_exempt: false,
+                                            proprietary: false,
+                                            third_party: false)
 
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       # Now fill in the values provided by the user
@@ -623,7 +627,24 @@ module Spaceship
         "significantChange" => {
           "value" => significant_change
         },
-        "buildTestInformationTO" => build_info
+        "buildTestInformationTO" => build_info,
+        "exportComplianceTO" => {
+          "usesEncryption" => {
+            "value" => encryption
+          },
+          "encryptionUpdated" => {
+            "value" => encryption_updated
+          },
+          "isExempt" => {
+            "value" => is_exempt
+          },
+          "containsProprietaryCryptography" => {
+            "value" => proprietary
+          },
+          "containsThirdPartyCryptography" => {
+            "value" => third_party
+          }
+        }
       }
 
       r = request(:post) do |req| # same URL, but a POST request
@@ -633,14 +654,6 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
-
-      encryption_info = r.body['data']
-      update_encryption_compliance(app_id: app_id,
-                                   train: train,
-                                   build_number: build_number,
-                                   platform: platform,
-                                   encryption_info: encryption_info,
-                                   encryption: encryption)
     end
     # rubocop:enable Metrics/ParameterLists
 
@@ -653,26 +666,6 @@ module Spaceship
       handle_itc_response(r.body)
 
       r.body['data']
-    end
-
-    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, platform: 'ios', encryption_info: nil, encryption: nil, is_exempt: true, proprietary: false, third_party: false)
-      return unless encryption_info['exportComplianceRequired']
-      # only sometimes this is required
-
-      encryption_info['usesEncryption']['value'] = encryption
-      encryption_info['encryptionUpdated'] ||= {}
-      encryption_info['encryptionUpdated']['value'] = encryption
-      encryption_info['isExempt']['value'] = is_exempt
-      encryption_info['containsProprietaryCryptography']['value'] = proprietary
-      encryption_info['containsThirdPartyCryptography']['value'] = third_party
-
-      r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/complete"
-        req.body = encryption_info.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      handle_itc_response(r.body)
     end
 
     #####################################################
