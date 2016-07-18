@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Boris Bügling']
   spec.email         = ['boris@icculus.org']
   spec.summary       = %q{Danger plugin for the fastlane device grid.}
-  spec.homepage      = 'https://github.com/fastlane/fastlane/device_grid'
+  spec.homepage      = 'https://github.com/fastlane/fastlane/tree/master/danger-device_grid'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
