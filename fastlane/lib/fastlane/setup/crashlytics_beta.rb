@@ -74,10 +74,11 @@ module Fastlane
     def lane_template(api_key, build_secret, scheme)
       %{
   lane :beta do
-    gym(scheme: '#{scheme}')
+    # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
+    gym(scheme: '#{scheme}', export_method: 'development')
     crashlytics(api_token: '#{api_key}',
              build_secret: '#{build_secret}',
-            notifications: false
+            notifications: true
               )
   end
       }
@@ -89,10 +90,11 @@ fastlane_version "#{Fastlane::VERSION}"
 default_platform :ios
 platform :ios do
   lane :beta do
-    gym(scheme: '#{scheme}')
+    # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
+    gym(scheme: '#{scheme}', export_method: 'development')
     crashlytics(api_token: '#{api_key}',
              build_secret: '#{build_secret}',
-            notifications: false
+            notifications: true
             )
   end
 end
