@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.description
-        "Shows a Mac OS X notification"
+        "Shows a macOS notification"
       end
 
       def self.author

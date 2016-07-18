@@ -7,7 +7,7 @@ HexColors
 HexColors is drop in category for HexColor Support for NSColor and UIColor. Support for HexColors with prefixed # and without.
 
 #RELEASE 2.3.0
-Attention the API has changed! 
+Attention the API has changed!
 
 #Example iOS
 ``` objective-c
@@ -21,7 +21,7 @@ UIColor *secondColorWithHex = [UIColor colorWithHexString:@"ff8942"];
 UIColor *shortColorWithHex = [UIColor colorWithHexString:@"fff"];
 ```
 
-#Example Mac OS X
+#Example macOS
 ``` objective-c
 // with hash
 NSColor *colorWithHex = [NSColor colorWithHexString:@"#ff8942"];
@@ -44,7 +44,7 @@ HexColors requires [iOS 5.0](http://developer.apple.com/library/ios/#releasenote
 ##Credits
 HexColors was created by [Marius Landwehr](https://github.com/mRs-) because of the pain recalculating Hex values to RGB.
 
-HexColors was ported to Mac OS X by [holgersindbaek](https://github.com/holgersindbaek).
+HexColors was ported to macOS by [holgersindbaek](https://github.com/holgersindbaek).
 
 ##Creator
 [Marius Landwehr](https://github.com/mRs-) [@mariusLAN](https://twitter.com/mariusLAN)
