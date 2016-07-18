@@ -3,11 +3,12 @@ module Scan
     SUPPORTED = %w(html junit json-compilation-database)
 
     # Intialize with values from Scan.config matching these param names
-    def initialize(open_report, output_types, output_directory, use_clang_report_name)
+    def initialize(open_report, output_types, output_directory, use_clang_report_name, custom_report_extension)
       @open_report = open_report
       @output_types = output_types
       @output_directory = output_directory
       @use_clang_report_name = use_clang_report_name
+      @custom_report_extension = custom_report_extension
     end
 
     def parse_raw_file(path)
@@ -56,8 +57,8 @@ module Scan
     def determine_output_file_name(type)
       if @use_clang_report_name && type == "json-compilation-database"
         "compile_commands.json"
-      elsif type == "junit"
-        "report.xml"
+      elsif @custom_report_extension !=nil
+         "report.#{@custom_report_extension}"
       else
         "report.#{type}"
       end
