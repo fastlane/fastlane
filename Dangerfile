@@ -1,21 +1,21 @@
 # We generally try to avoid big PRs
-warn("Big PR") if lines_of_code > 500
+warn("Big PR") if git.lines_of_code > 500
 
 # Show a warning for PRs that are Work In Progress
-if (pr_body.to_s + pr_title.to_s).include?("WIP")
+if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")
 end
 
 # Contributors should always provide a changelog when submitting a PR
-if pr_body.length < 5
+if github.pr_body.length < 5
   warn("Please provide a changelog summary in the Pull Request description @#{pr_author}")
 end
 
 # We want contributors to create an issue first before submitting a PR
 # Exceptions are version bumps
-if !pr_title.downcase.include?('version bump') &&
-   !pr_body.include?("https://github.com/fastlane/fastlane/issues/") &&
-   pr_body.match(/#\d+/).nil?
+if !github.pr_title.downcase.include?('version bump') &&
+   !github.pr_body.include?("https://github.com/fastlane/fastlane/issues/") &&
+   github.pr_body.match(/#\d+/).nil?
   warn("Before submitting a Pull Request, please create an issue on GitHub to discuss the change. Please add a link to the issue in the PR body.")
 end
 
