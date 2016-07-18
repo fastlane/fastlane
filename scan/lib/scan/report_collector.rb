@@ -57,8 +57,8 @@ module Scan
     def determine_output_file_name(type)
       if @use_clang_report_name && type == "json-compilation-database"
         "compile_commands.json"
-      elsif @custom_report_extension !=nil
-         "report.#{@custom_report_extension}"
+      elsif @custom_report_extension != nil
+        "report.#{@custom_report_extension}"
       else
         "report.#{type}"
       end
