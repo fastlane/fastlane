@@ -56,6 +56,8 @@ module Scan
     def determine_output_file_name(type)
       if @use_clang_report_name && type == "json-compilation-database"
         "compile_commands.json"
+      elsif type == "junit"
+        "report.xml"
       else
         "report.#{type}"
       end
