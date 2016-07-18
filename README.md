@@ -43,7 +43,7 @@ Then to deploy a new 'beta' version of your app just run
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
-:hatching_chick: | Over 150 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for iOS, Mac, and Android apps
 :octocat: | Full Git and Mercurial support
 
