@@ -1959,7 +1959,7 @@ Post a message to a **group chat**.
 ```
 
 ### Notification
-Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
+Display a notification using the macOS notification center. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
 ```ruby
   notification(subtitle: "Finished Building", message: "Ready to upload...")

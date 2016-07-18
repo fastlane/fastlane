@@ -122,7 +122,11 @@ module Scan
       end
     end
 
-    # Is it an iOS, a tvOS or a MacOS device?
+    def self.min_xcode8?
+      Helper.xcode_version.split(".").first.to_i >= 8
+    end
+
+    # Is it an iOS, a tvOS or a macOS device?
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
@@ -138,7 +142,7 @@ module Scan
       elsif Scan.project.tvos?
         Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
       else
-        Scan.config[:destination] = ["platform=OS X"]
+        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
   end

@@ -110,7 +110,7 @@ Provide the path to an `ipa` file to upload and submit your app for review:
 deliver --ipa "App.ipa" --submit_for_review
 ```
 
-or you can specify path to `pkg` file for Mac OS X apps:
+or you can specify path to `pkg` file for macOS apps:
 
 ```
 deliver --pkg "MacApp.pkg"
@@ -149,7 +149,7 @@ A detailed description about how your credentials are handled is available in a 
 
 ### How does this thing even work? Is magic involved? 🎩###
 
-Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
+Your password will be stored in the macOS keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 
 Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data.
 
