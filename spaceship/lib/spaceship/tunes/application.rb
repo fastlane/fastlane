@@ -144,14 +144,6 @@ module Spaceship
         platforms
       end
 
-      def types
-        types = []
-        version_sets.each do |version_set|
-          types << version_set.type
-        end
-        types
-      end
-
       def type
         if self.version_sets.nil?
           raise 'The application has no version sets and Spaceship does not know what to do here.'
