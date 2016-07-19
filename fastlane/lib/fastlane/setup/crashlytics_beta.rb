@@ -5,7 +5,11 @@ module Fastlane
       config = {}
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
-      keys = keys_from_project(project)
+
+      parser = Fastlane::CrashlyticsBetaProjectParser.new(project)
+      keys = parser.keys_from_project
+
+      #keys = keys_from_project(project)
 
       if FastlaneFolder.setup?
         UI.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
@@ -24,21 +28,13 @@ module Fastlane
     end
 
     def keys_from_project(project)
-      require 'xcodeproj'
       target_name = project.default_build_settings(key: 'TARGETNAME')
-      path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
-      UI.crash!("No project available at path #{path}") unless File.exist?(path)
-      xcode_project = Xcodeproj::Project.open(path)
-      target = xcode_project.targets.find { |t| t.name == target_name }
-      UI.crash!("Unable to locate a target by the name of #{target_name}") if target.nil?
-      scripts = target.build_phases.select { |t| t.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase }
-      crash_script = scripts.find { |s| includes_run_script?(s.shell_script) }
-      UI.user_error!("Unable to find Crashlytics Run Script Build Phase") if crash_script.nil?
-      script_array = crash_script.shell_script.split('\n').find { |l| includes_run_script?(l) }.split(' ')
-      if script_array.count == 3 && api_key_valid?(script_array[1]) && build_secret_valid?(script_array[2])
+      project_file_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
+      helper = Fastlane::CrashlyticsProjectParser.new(target_name, project_file_path)
+      if helper.values_found?
         {
-          api_key: script_array[1],
-          build_secret: script_array[2]
+          api_key: helper.api_key,
+          build_secret: helper.build_secret
         }
       else
         UI.important('fastlane was unable to detect your Fabric API Key and Build Secret. 🔑')
@@ -57,18 +53,6 @@ module Fastlane
         end
         keys
       end
-    end
-
-    def api_key_valid?(key)
-      key.to_s.length == 40
-    end
-
-    def build_secret_valid?(secret)
-      secret.to_s.length == 64
-    end
-
-    def includes_run_script?(string)
-      string.include?('Fabric/run') || string.include?('Crashlytics/run') || string.include?('Fabric.framework/run') || string.include?('Crashlytics.framework/run')
     end
 
     def lane_template(api_key, build_secret, scheme)

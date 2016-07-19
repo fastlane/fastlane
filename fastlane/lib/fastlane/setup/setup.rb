@@ -42,3 +42,4 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
+require 'fastlane/setup/crashlytics_project_parser'
