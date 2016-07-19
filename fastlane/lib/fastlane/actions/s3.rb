@@ -327,8 +327,7 @@ module Fastlane
                                        env_name: "S3_ACL",
                                        description: "Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read ",
                                        optional: true,
-                                       default_value: "public_read"
-                                      )
+                                       default_value: "public_read")
         ]
       end
 

@@ -5,7 +5,7 @@ describe Fastlane do
         let(:expected_command) { "#{File.expand_path('README.md')} tasks -p ." }
 
         it "prints the command and the command's output by default" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true, error_callback: nil).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -16,7 +16,7 @@ describe Fastlane do
         end
 
         it "suppresses the command text and prints the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true, error_callback: nil).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -28,7 +28,7 @@ describe Fastlane do
         end
 
         it "prints the command text and suppresses the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: false).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: false, error_callback: nil).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -40,7 +40,7 @@ describe Fastlane do
         end
 
         it "suppresses the command text and suppresses the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: false).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: false, error_callback: nil).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -78,6 +78,16 @@ describe Fastlane do
         end").runner.execute(:build)
 
         expect(result).to eq("ANDROID_SERIAL=abc123 #{gradle_path.shellescape} assembleWorldDominationRelease -p . -PversionCode=200")
+      end
+
+      it "correctly escapes multiple properties and types" do
+        notes_key = 'Release Notes' # this value is interesting because it contains a space in the key
+        notes_result = 'World Domination Achieved!' # this value is interesting because it contains multiple spaces
+        result = Fastlane::FastFile.new.parse("lane :build do
+          gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200, '#{notes_key}' => '#{notes_result}'}, gradle_path: './fastlane/README.md')
+        end").runner.execute(:build)
+
+        expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200 -P#{notes_key.shellescape}=#{notes_result.shellescape}")
       end
 
       it "correctly uses the serial" do

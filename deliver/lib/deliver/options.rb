@@ -78,10 +78,11 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
-                                     description: "Skip the HTML file verification",
+                                     description: "Skip the HTML report file verification",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
+                                     env_name: "DELIVER_SUBMIT_FOR_REVIEW",
                                      description: "Submit the new version for Review after uploading everything",
                                      is_string: false,
                                      default_value: false),
@@ -135,6 +136,20 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value
                                      end),
+        FastlaneCore::ConfigItem.new(key: :dev_portal_team_id,
+                                     short_option: "-s",
+                                     env_name: "DELIVER_DEV_PORTAL_TEAM_ID",
+                                     description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
+                                     optional: true,
+                                     is_string: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :itc_provider,
+                                     env_name: "DELIVER_ITC_PROVIDER",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     optional: true),
 
         # App Metadata
         # Non Localised

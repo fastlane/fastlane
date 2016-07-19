@@ -2,11 +2,9 @@
 
 - [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started. 
 - [Actions.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) for all the built-in integrations
-- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
-- [Code signing guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md) to show you how to do code signing right.
+- [Code signing guide](Codesigning) How to get started with code signing and resolve common issues
 - [FAQs](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/FAQs.md) for frequently asked questions
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips.
-- [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
 - [Platforms.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
 - [Appfile.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md) describes the `Appfile`
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
@@ -14,9 +12,20 @@
 - [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
 - [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
 
+### Plugins
+
+- [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) Getting started with using and building fastlane plugins
+- [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) A list of all available fastlane plugins
+- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) for help when plugins don't work
+
+### CI Systems
+
+- [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
+- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
+
 ## Fastfile
 
-The Fastfile is used to configure `fastlane`. Open it in your favourite text editor, using Ruby syntax highlighting.
+The Fastfile is used to configure [fastlane](https://fastlane.tools). Open it in your favourite text editor, using Ruby syntax highlighting.
 
 Defining lanes is easy. 
 
@@ -79,11 +88,11 @@ From then on, you can just start using your action in your `Fastfile`.
 
 If you think your extension can be used by other developers as well, let me know, and we can bundle it with `fastlane`.
 
-To call another action from within your action, use the following code:
+To call another action from within your action, just use the same code you would use in a `Fastfile`:
 
 ```ruby
-  Actions::DeliverAction.run(text: "Please input your password:", 
-                              key: 123)
+other_action.deliver(text: "Please input your password:", 
+                      key: 123)
 ```
 
 In general, think twice before you do this, most of the times, these action should be separate. Only call actions from within action if it makes sense.

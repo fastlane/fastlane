@@ -7,7 +7,7 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Match::VERSION}")
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs])
+      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
       # Verify the App ID (as we don't want 'match' to fail at a later point)
@@ -25,7 +25,7 @@ module Match
       # Done
       if self.changes_to_commit and !params[:readonly]
         message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:workspace], message, params[:git_url])
+        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
       end
 
       TablePrinter.print_summary(params, uuid)

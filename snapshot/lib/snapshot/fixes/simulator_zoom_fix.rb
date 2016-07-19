@@ -7,8 +7,6 @@ module Snapshot
 
     class SimulatorZoomFix
       def self.patch
-        Snapshot.kill_simulator # First we need to kill the simulator
-
         UI.message "Patching '#{config_path}' to scale simulator to 100%"
 
         FastlaneCore::Simulator.all.each do |simulator|

@@ -4,6 +4,7 @@ module Fastlane
       USED_ENV_NAMES = [
         "BACKUP_XCARCHIVE_DESTINATION",
         "DERIVED_DATA_PATH",
+        "FL_CARTHAGE_DERIVED_DATA",
         "GYM_BUILD_PATH",
         "GYM_CODE_SIGNING_IDENTITY",
         "GYM_DERIVED_DATA_PATH",
@@ -65,6 +66,7 @@ module Fastlane
           ENV['XCODE_DERIVED_DATA_PATH'] = derived_data_path
           ENV['GYM_DERIVED_DATA_PATH'] = derived_data_path
           ENV['SCAN_DERIVED_DATA_PATH'] = derived_data_path
+          ENV['FL_CARTHAGE_DERIVED_DATA'] = derived_data_path
         end
 
         # Set result bundle
@@ -88,7 +90,7 @@ module Fastlane
           "- Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'",
           "- Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'",
           "- Sets output directory to './output' (gym, scan and backup_xcarchive).",
-          "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data).",
+          "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage).",
           "- Produce result bundle (gym and scan)."
         ].join("\n")
       end

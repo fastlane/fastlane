@@ -35,5 +35,32 @@ describe FastlaneCore do
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.1.pre1')).to eq(true)
       end
     end
+
+    describe "#p_hash?" do
+      let (:package_name) { 'com.test.app' }
+
+      def android_hash_of(value)
+        hash_of("android_project_#{value}")
+      end
+
+      def hash_of(value)
+        Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt")
+      end
+
+      it "chooses the correct param for package name for supply" do
+        args = ["--skip_upload_screenshots", "-a", "beta", "-p", package_name]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq(android_hash_of(package_name))
+      end
+
+      it "chooses the correct param for package name for screengrab" do
+        args = ["--skip_open_summary", "-a", package_name, "-p", "com.test.app.test"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq(android_hash_of(package_name))
+      end
+
+      it "chooses the correct param for package name for gym" do
+        args = ["--clean", "-a", package_name, "-p", "test.xcodeproj"]
+        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq(hash_of(package_name))
+      end
+    end
   end
 end

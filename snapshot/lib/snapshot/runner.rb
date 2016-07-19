@@ -49,7 +49,7 @@ module Snapshot
 
       print_results(results)
 
-      raise self.collected_errors.join('; ') if self.collected_errors.count > 0
+      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -111,6 +111,7 @@ module Snapshot
     end
 
     # Returns true if it succeded
+    # rubocop:disable Metrics/AbcSize
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -123,11 +124,13 @@ module Snapshot
       File.write(File.join(prefix, "locale.txt"), locale || "")
       File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
-      Fixes::SimulatorZoomFix.patch
-      Fixes::HardwareKeyboardFix.patch
-
+      # Kill and shutdown all currently running simulators so that the following settings
+      # changes will be picked up when they are started again.
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
       `xcrun simctl shutdown booted &> /dev/null`
+
+      Fixes::SimulatorZoomFix.patch
+      Fixes::HardwareKeyboardFix.patch
 
       if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
         erase_simulator(device_type)
@@ -141,6 +144,8 @@ module Snapshot
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
+
+      open_simulator_for_device(device_type)
 
       command = TestCommandGenerator.generate(device_type: device_type)
 
@@ -184,6 +189,14 @@ module Snapshot
       dir_name = locale || language
 
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
+    end
+    # rubocop:enable Metrics/AbcSize
+
+    def open_simulator_for_device(device)
+      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+
+      UI.message("Explicitly opening simulator for device: #{device}")
+      `open -a Simulator --args -CurrentDeviceUDID #{TestCommandGenerator.device_udid(device)}`
     end
 
     def uninstall_app(device_type)

@@ -1,27 +1,32 @@
-
+# kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
+# It's better to be more explicit about the type
 Style/BracesAroundHashParameters:
   Enabled: false
 
+# specs sometimes have useless assignments, which is fine
 Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
+# We could potentially enable the 2 below:
 Style/IndentHash:
   Enabled: false
 
-Style/RaiseArgs:
-  EnforcedStyle: exploded
+Style/AlignHash:
+  Enabled: false
 
+# HoundCI doesn't like this rule
+Style/DotPosition:
+  Enabled: false
+
+# We allow !! as it's an easy way to convert ot boolean
 Style/DoubleNegation:
   Enabled: false
 
+# Sometimes we allow a rescue block that doesn't contain code
 Lint/HandleExceptions:
   Enabled: false
 
@@ -33,32 +38,22 @@ Lint/UnusedBlockArgument:
 Style/GlobalVars:
   Enabled: false
 
-Style/FileName:
+# We want to allow class Fastlane::Class
+Style/ClassAndModuleChildren:
   Enabled: false
 
 # $? Exit
 Style/SpecialGlobalVars:
   Enabled: false
 
-Style/RaiseArgs:
-  Enabled: false
-
 Metrics/AbcSize:
-  Max: 63
+  Max: 60
   Exclude:
     - '**/lib/*/options.rb'
-
-# Both string notations are okay
-Style/StringLiterals:
-  Enabled: false
 
 # The %w might be confusing for new users
 Style/WordArray:
   MinSize: 19
-
-# Not a good thing
-Style/RedundantSelf:
-  Enabled: false
 
 # raise and fail are both okay
 Style/SignalException:
@@ -70,10 +65,6 @@ Style/RedundantReturn:
 
 # Having if in the same line might not always be good
 Style/IfUnlessModifier:
-  Enabled: false
-
-# That looks wrong
-Style/AlignHash:
   Enabled: false
 
 # and and or is okay
@@ -98,16 +89,22 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 18
 
-Style/DotPosition:
-  Enabled: false
-
+# Sometimes it's easier to read without guards
 Style/GuardClause:
   Enabled: false
 
+# We allow both " and '
+Style/StringLiterals:
+  Enabled: false
 
+# something = if something_else
+# that's confusing
+Style/ConditionalAssignment:
+  Enabled: false
 
-# Split
-
+# Better to have too much self than missing a self
+Style/RedundantSelf:
+  Enabled: false
 
 # e.g.
 # def self.is_supported?(platform)
@@ -120,8 +117,13 @@ Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - '**/spec/**/*'
 
+# This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
 Style/PredicateName:
+  Enabled: false
+
+# We allow the $
+Style/PerlBackrefs:
   Enabled: false
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
@@ -134,7 +136,6 @@ Metrics/MethodLength:
     - '**/lib/fastlane/actions/*.rb'
     - '**/bin/fastlane'
     - '**/lib/*/options.rb'
-    - '**/bin/sigh'
   Max: 60
 
 AllCops:
@@ -142,146 +143,13 @@ AllCops:
     - '**/fastlane/Fastfile'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
+    - './vendor/**/*'
 
-##################
-# TODO
-##################
-
-# Offense count: 7
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 320
-
-# Offense count: 4
-Metrics/CyclomaticComplexity:
-  Max: 17
-
-# Offense count: 489
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 372
-
-# Offense count: 5
-# Configuration parameters: CountKeywordArgs.
-Metrics/ParameterLists:
-  Max: 17
-
-# Offense count: 3
-Metrics/PerceivedComplexity:
-  Max: 18
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Alias:
-  Enabled: false
-
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
-  Enabled: false
-
-# Offense count: 22
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/ClassAndModuleChildren:
-  Enabled: false
-
-# Offense count: 19
+# We're not there yet
 Style/Documentation:
   Enabled: false
 
-# Offense count: 112
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/DotPosition:
-  Enabled: false
-
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 74
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
-
-# Offense count: 10
-# Cop supports --auto-correct.
-Style/NumericLiterals:
-  MinDigits: 14
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Enabled: false
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
-
-# Offense count: 77
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Enabled: false
-
-# Offense count: 38
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SignalException:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-Style/SpaceInsideBlockBraces:
-  Enabled: false
-
-# Offense count: 291
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/SpaceInsideParens:
-  Enabled: false
-
-# Offense count: 881
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/StringLiterals:
-  Enabled: false
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 19
-
 # Added after upgrade to 0.38.0
-
 Style/MutableConstant:
   Enabled: false
 
@@ -289,11 +157,6 @@ Style/MutableConstant:
 Style/ZeroLengthPredicate:
   Enabled: false
 
-Style/ConditionalAssignment:
-  Enabled: false
-
-Style/SpaceAroundKeyword:
-  Enabled: false
-
+# Adds complexity
 Style/IfInsideElse:
   Enabled: false

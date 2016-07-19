@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    # Adds a git tag to the current commit
+    # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
         local_branch = params[:local_branch]
@@ -14,9 +14,11 @@ module Fastlane
           'git',
           'push',
           params[:remote],
-          "#{local_branch}:#{remote_branch}",
-          '--tags'
+          "#{local_branch}:#{remote_branch}"
         ]
+
+        # optionally add the tags component
+        command << '--tags' if params[:tags]
 
         # optionally add the force component
         command << '--force' if params[:force]
@@ -48,6 +50,11 @@ module Fastlane
                                        description: "Force push to remote. Defaults to false",
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :tags,
+                                       env_name: "FL_PUSH_GIT_TAGS",
+                                       description: "Wether tags are pushed to remote. Defaults to true",
+                                       is_string: false,
+                                       default_value: true),
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to. Defaults to `origin`",

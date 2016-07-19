@@ -37,7 +37,9 @@ pem
 
 Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server?
 
-`pem` does all that for, just by running `pem`.
+`pem` does all that for, just by simply running `pem`.
+
+`pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
 
 To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/fastlane/tree/master/sigh).
 
@@ -55,7 +57,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
@@ -138,7 +140,7 @@ Run `pem --help` to get a list of available environment variables.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

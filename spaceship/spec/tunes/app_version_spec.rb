@@ -150,11 +150,11 @@ describe Spaceship::AppVersion, all: true do
 
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/deliverable')
+        expect(app.live_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/deliverable")
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/904332168/ios/versioninfo/')
+        expect(app.edit_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/")
       end
     end
 
@@ -604,13 +604,13 @@ describe Spaceship::AppVersion, all: true do
       it "fetches remaining promocodes" do
         promocodes = version.generate_promocodes!(1)
 
-        expect(promocodes.effective_date).to eq(1457864552300)
-        expect(promocodes.expiration_date).to eq(1460283752300)
+        expect(promocodes.effective_date).to eq(1_457_864_552_300)
+        expect(promocodes.expiration_date).to eq(1_460_283_752_300)
         expect(promocodes.username).to eq('joe@wewanttoknow.com')
 
         expect(promocodes.codes.count).to eq(1)
         expect(promocodes.codes[0]).to eq('6J49JFRPTXXXX')
-        expect(promocodes.version.app_id).to eq(816549081)
+        expect(promocodes.version.app_id).to eq(816_549_081)
         expect(promocodes.version.app_name).to eq('DragonBox Numbers')
         expect(promocodes.version.version).to eq('1.5.0')
         expect(promocodes.version.platform).to eq('ios')

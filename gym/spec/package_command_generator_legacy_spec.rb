@@ -39,6 +39,22 @@ describe Gym do
                            ])
     end
 
+    it "works with spaces in path name" do
+      options = { project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      allow(Gym::XcodebuildFixes).to receive(:patch_package_application).and_return("/tmp/path with spaces")
+
+      result = Gym::PackageCommandGeneratorLegacy.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun /tmp/path\\ with\\ spaces -v",
+                             "''",
+                             "-o '#{Gym::PackageCommandGeneratorLegacy.ipa_path}'",
+                             "exportFormat ipa",
+                             ""
+                           ])
+    end
+
     it "supports passing a path to a provisioning profile" do
       # Profile Installation
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with("./spec/fixtures/dummy.mobileprovision")

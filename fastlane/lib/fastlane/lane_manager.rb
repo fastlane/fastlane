@@ -9,7 +9,7 @@ module Fastlane
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -44,10 +44,14 @@ module Fastlane
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
-      rescue => ex
+      rescue Exception => ex # rubocop:disable Lint/RescueException
+        # We also catch Exception, since the implemented action might send a SystemExit signal
+        # (or similar). We still want to catch that, since we want properly finish running fastlane
+        # Tested with `xcake`, which throws a `Xcake::Informative` object
+
         UI.important 'Variable Dump:'.yellow
         UI.message Actions.lane_context
-        UI.error ex.to_s
+        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -68,6 +72,8 @@ module Fastlane
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
+
+      Fastlane::PluginUpdateManager.show_update_status
 
       if error
         UI.error 'fastlane finished with errors'
@@ -103,14 +109,14 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a
+      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end
 
       rows = []
       available.each_with_index do |lane, index|
-        rows << [index + 1, lane.last.pretty_name, lane.last.description.first]
+        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]

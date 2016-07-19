@@ -44,24 +44,27 @@ module FastlaneCore
 
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
-            stdin.each do |l|
-              line = l.strip # strip so that \n gets removed
-              output << line
+            begin
+              stdin.each do |l|
+                line = l.strip # strip so that \n gets removed
+                output << line
 
-              next unless print_all
+                next unless print_all
 
-              # Prefix the current line with a string
-              prefix.each do |element|
-                line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                # Prefix the current line with a string
+                prefix.each do |element|
+                  line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                end
+
+                UI.command_output(line)
               end
-
-              UI.command_output(line)
+            rescue Errno::EIO
+              # This is expected on some linux systems, that indicates that the subcommand finished
+              # and we kept trying to read, ignore it
+            ensure
+              Process.wait(pid)
             end
-            Process.wait(pid)
           end
-        rescue Errno::EIO
-          # This is expected on some linux systems, that indicates that the subcommand finished
-          # and we kept trying to read, ignore it
         rescue => ex
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)

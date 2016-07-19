@@ -35,13 +35,12 @@ Pilot
 
 ###### The best way to manage your TestFlight testers and builds from your terminal
 
-This tool allows you to manage all important features of Apple TestFlight using your terminal.
+Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 
-- Upload new builds and distribute them to all testers
-- List all available builds
-- Add and remove beta testers
-- Get information about testers, like the registered devices
-- Export and import all your testers
+- Upload & distribute builds
+- Add & remove testers
+- Retrieve information about testers & devices
+- Import/export all available testers
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
@@ -57,7 +56,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # Installation
 
@@ -229,7 +228,7 @@ pilot import -c ~/Desktop/testers.csv
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

@@ -7,6 +7,7 @@ module Snapshot
         parts << "xcodebuild"
         parts += options
         parts += destination(device_type)
+        parts += build_settings
         parts += actions
         parts += suffix
         parts += pipe
@@ -37,6 +38,13 @@ module Snapshot
         options << "-derivedDataPath '#{derived_data_path}'"
 
         options
+      end
+
+      def build_settings
+        build_settings = []
+        build_settings << "FASTLANE_SNAPSHOT=YES"
+
+        build_settings
       end
 
       def actions

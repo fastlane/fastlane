@@ -98,14 +98,6 @@ module Fastlane
           headings: ['Key', 'Description', 'Env Var', 'Default'],
           rows: options
         )
-        required_count = action.available_options.count do |o|
-          o.kind_of?(FastlaneCore::ConfigItem) && o.optional == false
-        end
-
-        if required_count > 0
-          puts "#{required_count} of the available parameters are required".magenta
-          puts "They are marked with an asterisk *".magenta
-        end
       else
         puts "No available options".yellow
       end
@@ -134,7 +126,7 @@ module Fastlane
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      action_symbols = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of? Class }
       action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 
@@ -163,14 +155,13 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           if current.kind_of? FastlaneCore::ConfigItem
-            key_name = (current.optional ? "  " : "* ") + current.key.to_s
-            rows << [key_name.yellow, current.description, current.env_name, current.default_value]
+            rows << [current.key.to_s.yellow, current.description, current.env_name, current.default_value]
           elsif current.kind_of? Array
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
-            rows.last << nil while fill_all and rows.last.count < 3 # to have a nice border in the table
+            rows.last << nil while fill_all && rows.last.count < 4 # to have a nice border in the table
           end
         end
       end

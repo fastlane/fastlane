@@ -13,16 +13,15 @@ module Pilot
       tester_manager = Pilot::TesterManager.new
       imported_tester_count = 0
 
-      is_first = true
       CSV.foreach(file, "r") do |row|
-        if is_first
-          is_first = false
-          next
-        end
-
         first_name, last_name, email = row
 
         unless email
+          UI.error("No email found in row: #{row}")
+          next
+        end
+
+        unless email.index("@")
           UI.error("No email found in row: #{row}")
           next
         end

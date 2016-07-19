@@ -88,7 +88,7 @@ module Gym
           standard_output = read_standard_output output
           print standard_output if standard_output
           print "There was an error exporting your application"
-          print "Unfortunately the new Xcode export API is unstable and causes problems on some project"
+          print "Unfortunately the new Xcode export API is unstable and causes problems on some projects"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
         UI.user_error!("Error packaging up the application")

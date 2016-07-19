@@ -17,12 +17,15 @@ module Fastlane
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
+        lanes = ff.runner.lanes[platform]
+
+        if lanes.nil? || lanes.empty? || lanes.all? { |_, lane| lane.is_private }
+          next
+        end
+
         output << "## #{formatted_platform(platform)}" if platform
 
-        value = ff.runner.lanes[platform]
-        next unless value
-
-        value.each do |lane_name, lane|
+        lanes.each do |lane_name, lane|
           next if lane.is_private
           output << render(platform, lane_name, lane.description.join("\n\n"))
         end

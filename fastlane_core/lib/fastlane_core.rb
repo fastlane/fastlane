@@ -1,5 +1,11 @@
 require 'json'
+
+# Ruby monkey-patches - should be before almost all else
+require 'fastlane_core/core_ext/string'
+
 require 'fastlane_core/version'
+require 'fastlane_core/feature/feature'
+require 'fastlane_core/features'
 require 'fastlane_core/helper'
 require 'fastlane_core/xcodebuild_list_output_parser'
 require 'fastlane_core/configuration/configuration'
@@ -17,8 +23,8 @@ require 'fastlane_core/ipa_upload_package_builder'
 require 'fastlane_core/print_table'
 require 'fastlane_core/project'
 require 'fastlane_core/device_manager'
-require 'fastlane_core/crash_reporting/crash_reporting'
 require 'fastlane_core/ui/ui'
+require 'fastlane_core/tool_collector'
 
 # Third Party code
 require 'colored'

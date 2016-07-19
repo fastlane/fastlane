@@ -55,14 +55,15 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"    # One of: build, bootstrap, update, archive. (default: bootstrap)
-  use_ssh: false,         # Use SSH for downloading GitHub repositories.
-  use_submodules: false,  # Add dependencies as Git submodules.
-  use_binaries: true,     # Check out dependency repositories even when prebuilt frameworks exist
-  no_build: false,        # When bootstrapping Carthage do not build
-  no_skip_current: false, # Don't skip building the current project (only for frameworks)
-  verbose: false,         # Print xcodebuild output inline
-  platform: "all"         # Define which platform to build for
+  command: "bootstrap"     # One of: build, bootstrap, update, archive. (default: bootstrap)
+  use_ssh: false,          # Use SSH for downloading GitHub repositories.
+  use_submodules: false,   # Add dependencies as Git submodules.
+  use_binaries: true,      # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,         # When bootstrapping Carthage do not build
+  no_skip_current: false,  # Don't skip building the current project (only for frameworks)
+  verbose: false,          # Print xcodebuild output inline
+  platform: "all",         # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
+  configuration: "Release" # Build configuration to use when building
 )
 ```
 
@@ -106,7 +107,7 @@ gradle(
 )
 ```
 
-In case of an `assemble` task, the signed apk path is accessible in: `Actions.lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
+In case of an `assemble` task, the signed apk path is accessible in: `lane_context[Actions::SharedValues::GRADLE_APK_OUTPUT_PATH]`
 
 
 You can pass [gradle properties](https://docs.gradle.org/current/userguide/build_environment.html):
@@ -296,19 +297,20 @@ This will make sure to use the correct Xcode for later actions.
 xcode_install(version: "7.1")
 ```
 
+### xcversion
+
+Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version).
+
+```ruby
+xcversion version: "7.1" # Selects Xcode 7.1.0
+xcversion version: "~> 7.1.0" # Selects the latest installed version from the 7.1.x set
+```
+
 ### [xcode_select](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcode-select.1.html)
-Use this command if you are supporting multiple versions of Xcode
+Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
 
 ```ruby
 xcode_select "/Applications/Xcode6.1.app"
-```
-
-### [Xcake](https://github.com/jcampbell05/xcake/)
-
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake` before building your app.
-
-```ruby
-xcake
 ```
 
 ### [resign](https://github.com/fastlane/fastlane/tree/master/sigh#resign)
@@ -794,8 +796,19 @@ appium(
 ### [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
 
 ```ruby
-pilot(username: "felix@krausefx.com",
-      app_identifier: "com.krausefx.app")
+pilot
+```
+
+#### Options
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
+
+```ruby
+pilot(
+  username: "felix@krausefx.com",
+  app_identifier: "com.krausefx.app",
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
+)
 ```
 
 More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/fastlane/tree/master/pilot).
@@ -807,7 +820,11 @@ deliver
 
 To upload a new build to TestFlight use `pilot` instead.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
+#### Options
+
+If you don't want a PDF report for App Store builds, append `:force` to the command. This is useful when running `fastlane` on your Continuous Integration server: `deliver(force: true)`
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
 
 Other options
 
@@ -815,12 +832,13 @@ Other options
 deliver(
   force: true, # Set to true to skip PDF verification
   email: "itunes@connect.com" # different Apple ID than the dev portal
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
 )
 ```
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
-**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
+**Note:** There is an action named `appstore` which is a convenience alias to `deliver`.
 
 ### TestFlight
 
@@ -886,7 +904,7 @@ See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/F
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
 crashlytics(
-  crashlytics_path: './Crashlytics.framework', # path to your 'Crashlytics.framework'
+  crashlytics_path: './Pods/Crashlytics/', # path to your Crashlytics submit binary.
   api_token: '...',
   build_secret: '...',
   ipa_path: './app.ipa'
@@ -922,6 +940,19 @@ _not_
 
 The following environment variables may be used in place of parameters: `CRASHLYTICS_API_TOKEN`, `CRASHLYTICS_BUILD_SECRET`, and `CRASHLYTICS_FRAMEWORK_PATH`.
 
+### Apteligent
+
+Uploads dSYM.zip file to [Apteligent](https://apteligent.com) for crash symbolication.
+
+```ruby
+apteligent(
+  app_id: '...',
+  api_key: '...'
+)
+```
+
+If you use `gym` the `dsym` parameter is optional.
+
 ### `download_dsyms`
 
 This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled.
@@ -948,14 +979,14 @@ This action allows you to upload symbolication files to Sentry.
 
 ```ruby
 upload_symbols_to_sentry(
-  api_key: '...',
+  auth_token: '...',
   org_slug: '...',
   project_slug: '...',
   dsym_path: './App.dSYM.zip'
 )
 ```
 
-The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
+The following environment variables may be used in place of parameters: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
 ### AWS S3 Distribution
@@ -1093,6 +1124,7 @@ nexus_upload(
   repo_group_id: "com.fastlane",
   repo_project_name: "ipa",
   repo_project_version: "1.13",
+  repo_classifier: "dSYM", # Optional
   endpoint: "http://localhost:8081",
   username: "admin",
   password: "admin123"
@@ -1101,14 +1133,30 @@ nexus_upload(
 
 ### [Appetize.io](https://appetize.io/)
 
-Upload your zipped app to Appetize.io
+Upload your zipped app to Appetize.io to stream your app in the browser.
 
 ```ruby
 appetize(
-  api_token: 'yourapitoken',
-  url: 'https://example.com/your/zipped/app.zip',
-  private_key: 'yourprivatekey'
+  path: './MyApp.zip',
+  api_token: 'yourapitoken', # get it from https://appetize.io/docs#request-api-token
+  public_key: 'your_public_key' # get it from https://appetize.io/dashboard
 )
+```
+
+If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
+
+#### `device_grid` for your Pull Requests
+
+![../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png](../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png)
+
+Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) to get a grid of devices every time you submit a pull request. The app will be uploaded to [appetize.io](https://appetize.io/) so you can stream and try them right in your browser.
+
+[Open the Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)
+
+From within your app, you can check it is currently running on [Appetize.io](https://appetize.io/) using
+
+```objective-c
+[[NSUserDefaults standardUserDefaults] objectForKey:@"isAppetize"]
 ```
 
 ### [Appaloosa](https://www.appaloosa-store.com)
@@ -1341,6 +1389,17 @@ badge(shield: "Version-0.0.3-blue", no_badge: true)
 
 **Note** If you want to reset the badge back to default you can use `sh "git checkout -- <path>/Assets.xcassets/"`
 
+### update_urban_airship_configuration
+
+Easily update the AirshipConfig.plist for different deployment targets.
+
+```ruby
+update_urban_airship_configuration(
+  plist_path: "AirshipConfig.plist",
+  production_app_key: "PRODKEY",
+  production_app_secret: "PRODSECRET"
+)
+```
 
 ## Developer Portal
 
@@ -1628,11 +1687,11 @@ Alternatively, you can specify your own tag. Note that if you do specify a tag, 
 
 ```ruby
 add_git_tag(
-  tag: 'my_custom_tag',
+  tag: 'my_custom_tag'
 )
 ```
 
-[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
+[Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile#L105) uses `fastlane` to automatically commit the version bump, add a new git tag and push everything back to `master`.
 
 ### git_pull
 
@@ -1641,7 +1700,7 @@ Executes a simple `git pull --tags` command
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
-Tags will be pushed as well.
+Tags will be pushed as well by default, except when setting the option 'tags' to false.
 
 ```ruby
 push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
@@ -1650,7 +1709,8 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true               # optional, default: false
+  force: true,              # optional, default: false
+  tags: false               # optional, default: true
 )
 ```
 
@@ -1720,9 +1780,7 @@ import_from_git(
 Get information about the last git commit, returns the commit hash, the abbreviated commit hash, the author and the git message.
 
 ```ruby
-commit = last_git_commit_message
-crashlytics(notes: commit[:message])
-puts commit[:author]
+crashlytics(notes: last_git_commit_message)
 ```
 
 ### create_pull_request
@@ -1964,6 +2022,19 @@ flock(
 To obtain the token, create a new
 [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)
 in your Flock admin panel.
+
+### [JIRA](https://www.atlassian.com/software/jira)
+Leave a comment on a JIRA ticket.
+
+```ruby
+jira(
+  url: "https://bugs.yourdomain.com",
+  username: "Your username",
+  password: "Your password",
+  ticket_id: "Ticket ID, i.e. IOS-123",
+  comment_text: "Text to post as a comment"
+)
+```
 
 ## Other
 
@@ -2371,7 +2442,13 @@ fastlane_version "1.50.0"
 Install an Xcode plugin for the current user
 
 ```ruby
-install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+install_xcode_plugin(url: 'https://example.com/clubmate/plugin.zip')
+```
+
+You can also let `fastlane` pick the latest version of a plugin automatically, if it is hosted on GitHub
+
+```ruby
+install_xcode_plugin(github: 'https://github.com/contentful/ContentfulXcodePlugin')
 ```
 
 ### opt_out_usage
@@ -2503,4 +2580,33 @@ To run [danger](https://github.com/danger/danger) add this to your `Fastfile`
 lane :danger do
   danger
 end
+```
+
+### pod_lib_lint
+
+Execute pod lib lint command
+
+```ruby
+pod_lib_lint
+
+# Allow ouput detail in console
+pod_lib_lint(verbose: true)
+
+# Allow warnings during pod lint
+pod_lib_lint(allow_warnings: true)
+
+# If the podspec has a dependency on another private pod, then you will have to supply the sources
+pod_lib_lint(sources: ['https://github.com/MyGithubPage/Specs', 'https://github.com/CocoaPods/Specs'])
+```
+
+### set_pod_key
+
+Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys).
+
+```ruby
+set_pod_key(
+  key: 'APIToken',
+  value: '1234',
+  project: 'MyProject'
+)
 ```

@@ -19,7 +19,10 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
+      collector = FastlaneCore::ToolCollector.new
+
       begin
+        collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
         abort "#{e}. Use --help for more information"
@@ -36,9 +39,14 @@ module Commander
         OptionParser::MissingArgument => e
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+        collector.did_raise_error(@program[:name])
+        show_github_issues(e.message)
         display_user_error!(e, e.message)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
+        collector.did_crash(@program[:name])
         handle_unknown_error!(e)
+      ensure
+        collector.did_finish
       end
     end
 
@@ -52,9 +60,14 @@ module Commander
 
       if error_info
         error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
+
+        show_github_issues(error_info)
+
         display_user_error!(e, error_info)
       else
-        FastlaneCore::CrashReporting.handle_crash(e)
+        # Pass the error instead of a message so that the inspector can do extra work to simplify the query
+        show_github_issues(e)
+
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
         reraise_formatted!(e, e.message)
@@ -71,6 +84,24 @@ module Commander
 
     def reraise_formatted!(e, message)
       raise e, "[!] #{message}".red, e.backtrace
+    end
+
+    def show_github_issues(message_or_error)
+      return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
+      return if FastlaneCore::Helper.test?
+
+      require 'gh_inspector'
+      require 'fastlane_core/ui/github_issue_inspector_reporter'
+
+      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
+      delegate = Fastlane::InspectorReporter.new
+      if message_or_error.kind_of?(String)
+        inspector.search_query(message_or_error, delegate)
+      else
+        inspector.search_exception(message_or_error, delegate)
+      end
+    rescue => ex
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
     end
   end
 end
