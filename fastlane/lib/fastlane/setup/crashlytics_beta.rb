@@ -6,10 +6,7 @@ module Fastlane
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
 
-      parser = Fastlane::CrashlyticsBetaProjectParser.new(project)
-      keys = parser.keys_from_project
-
-      #keys = keys_from_project(project)
+      keys = keys_from_project(project)
 
       if FastlaneFolder.setup?
         UI.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
