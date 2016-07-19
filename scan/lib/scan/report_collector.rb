@@ -3,7 +3,7 @@ module Scan
     SUPPORTED = %w(html junit json-compilation-database)
 
     # Intialize with values from Scan.config matching these param names
-    def initialize(open_report, output_types, output_directory, use_clang_report_name, custom_report_extension)
+    def initialize(open_report, output_types, output_directory, use_clang_report_name, custom_report_extension = nil)
       @open_report = open_report
       @output_types = output_types
       @output_directory = output_directory
