@@ -13,10 +13,6 @@ describe Spaceship::Client do
     def send_login_request(_user, _password)
       true
     end
-
-    def try_log_response(method, url, response)
-      log_response(method, url, response)
-    end
   end
 
   class TestResponse
@@ -116,7 +112,7 @@ describe Spaceship::Client do
   describe "#log_response" do
     it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
-      expect(subject.try_log_response(:get, TestClient.hostname, response)).to be_truthy
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
   end
 end
