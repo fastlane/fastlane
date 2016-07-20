@@ -13,6 +13,7 @@ module Fastlane
         cmd << ["-am #{message.shellescape}"]
         cmd << '--force' if options[:force]
         cmd << "'#{tag}'"
+        cmd << options[:commit].to_s if options[:commit]
 
         UI.message "Adding git tag '#{tag}' 🎯."
         Actions.sh(cmd.join(' '))
@@ -44,6 +45,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",
                                        description: "The tag message. Defaults to the tag's name",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :commit,
+                                       env_name: "FL_GIT_TAG_COMMIT",
+                                       description: "The commit or object where the tag will be set. Defaults to the current HEAD",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_GIT_TAG_FORCE",
