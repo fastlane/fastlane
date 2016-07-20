@@ -78,7 +78,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',
                                        description: 'The app Identifier you want to set',
-                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'])
+                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
         ]
       end
 
