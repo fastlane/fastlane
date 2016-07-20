@@ -164,7 +164,7 @@ module Gym
         return if Gym.config[:provisioning_profile_path].to_s.length == 0
 
         UI.error "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning"
       end
     end
   end
