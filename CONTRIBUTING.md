@@ -76,7 +76,7 @@ Pull requests are always welcome :smile:
 
 PRs should reference an open GitHub issue (preferably those marked with the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label). Referring to the issue in the description of your PR is required and is really helpful for establishing the context needed for review.
 
-If you're considering contibuting new functionality, please open a new issue explaining the functionality desired first so that we can discuss as a community. We'll add the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label if we believe this to be a meaningful contribution that will benefit other fastlane users and you go ahead with the pull request. :raised_hands:
+If you're considering contributing new functionality, please open a new issue explaining the functionality desired first so that we can discuss as a community. We'll add the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label if we believe this to be a meaningful contribution that will benefit other fastlane users and you go ahead with the pull request. :raised_hands:
 
 **Pro tip:** GitHub will automatically turn references to issue numbers in the form `#1234` into a link to the issue/PR with that number within the same repo.
 
@@ -87,7 +87,7 @@ If you're considering contibuting new functionality, please open a new issue exp
 
 To submit the changes to the fastlane repo, you have to do the following:
 
-- Run `git push upstream master`. 
+- Run `git push upstream master`.
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
 ## What Do All These Labels Mean?
