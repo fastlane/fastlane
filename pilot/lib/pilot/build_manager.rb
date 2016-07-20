@@ -68,13 +68,13 @@ module Pilot
         build.update_build_information!(whats_new: options[:changelog])
         UI.success "Successfully set the changelog for build"
       end
-      
+
       # Then, set the description (if necessary)
       if options[:app_description].to_s.length > 0
         build.update_build_information!(description: options[:app_description])
         UI.success "Successfully set the description for the app"
       end
-      
+
       # Then, set the feedback email (if necessary)
       if options[:feedback_email].to_s.length > 0
         build.update_build_information!(feedback_email: options[:feedback_email])
