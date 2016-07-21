@@ -1,6 +1,7 @@
 describe Fastlane::CrashlyticsBetaCommandLineHandler do
   describe 'creates a CrashlyticsBetaInfo from Options' do
     it 'Adds all the fields' do
+      # Use a double so that we can detect both missing calls and unexpected calls
       options = double("fake_options")
 
       expect(options).to receive(:api_key).and_return('my_api_key')
@@ -33,7 +34,9 @@ describe Fastlane::CrashlyticsBetaCommandLineHandler do
 
   describe 'applies options to a command' do
     it 'applies options' do
+      # Use a double so that we can detect both missing calls and unexpected calls
       command = double("fake_command")
+
       expect(command).to receive(:option).with('--api_key STRING', String, kind_of(String))
       expect(command).to receive(:option).with('--build_secret STRING', String, kind_of(String))
       expect(command).to receive(:option).with('--emails ARRAY', Array, kind_of(String))

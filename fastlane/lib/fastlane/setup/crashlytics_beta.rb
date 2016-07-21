@@ -11,7 +11,7 @@ module Fastlane
       project = FastlaneCore::Project.new(config)
 
       # TODO rename this method
-      keys_from_project(project)
+      detect_missing_values(project)
 
       if FastlaneFolder.setup?
         UI.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
@@ -29,29 +29,36 @@ module Fastlane
       UI.success('Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀')
     end
 
-    def keys_from_project(project)
-      target_name = project.default_build_settings(key: 'TARGETNAME')
-      project_file_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
-      helper = Fastlane::CrashlyticsProjectParser.new(target_name, project_file_path)
-      if helper.values_found?
-        @beta_info.api_key = helper.api_key unless @beta_info.api_key
-        @beta_info.build_secret = helper.build_secret unless @beta_info.build_secret
-      else
-        UI.important('fastlane was unable to detect your Fabric API Key and Build Secret. 🔑')
-        UI.important('Navigate to https://www.fabric.io/settings/organizations, select the appropriate organization,')
-        UI.important('and copy the API Key and Build Secret.')
+    def detect_missing_values(project)
 
-        loop do
-          @beta_info.api_key = UI.input('API Key:')
-          break if api_key_valid?(keys[:api_key])
-          UI.important "Invalid API Key, Please Try Again!"
-        end
-        loop do
-          @beta_info.build_secret = UI.input('Build Secret:')
-          break if build_secret_valid?(keys[:build_secret])
-          UI.important "Invalid Build Secret, Please Try Again!"
+      if @beta_info.api_key.nil? || @beta_info.build_secret.nil?
+        target_name = project.default_build_settings(key: 'TARGETNAME')
+        project_file_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
+
+        project_parser = Fastlane::CrashlyticsProjectParser.new(target_name, project_file_path)
+
+        if project_parser.values_found?
+          @beta_info.api_key = project_parser.api_key unless @beta_info.api_key
+          @beta_info.build_secret = project_parser.build_secret unless @beta_info.build_secret
         end
       end
+
+      # else
+      #   UI.important('fastlane was unable to detect your Fabric API Key and Build Secret. 🔑')
+      #   UI.important('Navigate to https://www.fabric.io/settings/organizations, select the appropriate organization,')
+      #   UI.important('and copy the API Key and Build Secret.')
+
+      #   loop do
+      #     @beta_info.api_key = UI.input('API Key:')
+      #     break if api_key_valid?(keys[:api_key])
+      #     UI.important "Invalid API Key, Please Try Again!"
+      #   end
+      #   loop do
+      #     @beta_info.build_secret = UI.input('Build Secret:')
+      #     break if build_secret_valid?(keys[:build_secret])
+      #     UI.important "Invalid Build Secret, Please Try Again!"
+      #   end
+      # end
     end
 
     def lane_template(scheme)

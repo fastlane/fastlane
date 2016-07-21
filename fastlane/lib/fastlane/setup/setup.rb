@@ -42,6 +42,8 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
+require 'fastlane/setup/crashlytics_beta'
 require 'fastlane/setup/crashlytics_project_parser'
 require 'fastlane/setup/crashlytics_beta_info'
+require 'fastlane/setup/crashlytics_beta_info_collector'
 require 'fastlane/setup/crashlytics_beta_command_line_handler'
