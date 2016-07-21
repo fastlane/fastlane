@@ -59,7 +59,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info.build_secret).to eq(valid_build_secret)
     end
 
-    it 'prompts with invalid values provided and a project parsed with no values' do
+    it 'prompts for user input with invalid values provided and a project parsed with no values' do
       expect(project_parser).to receive(:parse).and_return(nil)
 
       info = Fastlane::CrashlyticsBetaInfo.new
@@ -75,7 +75,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info.build_secret).to eq(valid_build_secret)
     end
 
-    it 'prompts with invalid build_secret provided and with an error in project parsing' do
+    it 'prompts for user input with invalid build_secret provided and with an error in project parsing' do
       expect(project_parser).to receive(:parse).and_raise("your error message here")
 
       info = Fastlane::CrashlyticsBetaInfo.new
@@ -92,7 +92,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info.build_secret).to eq(valid_build_secret)
     end
 
-    it 'continues to prompt with invalid build_secret provided and with an error in project parsing' do
+    it 'continues to prompt for user input with invalid build_secret provided and with an error in project parsing' do
       expect(project_parser).to receive(:parse).and_raise("your error message here")
 
       info = Fastlane::CrashlyticsBetaInfo.new
