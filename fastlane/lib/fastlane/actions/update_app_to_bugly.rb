@@ -27,6 +27,10 @@ module Fastlane
           title = " -F \"title=#{params[:title]}\" "
           UI.message "title:#{title}"
         end
+        if (not "#{params[:desc]}".nil? and not "#{params[:desc]}".empty?)
+          desc = " -F \"description=#{params[:desc]}\" "
+          UI.message "desc:#{desc}"
+        end
         if (not "#{params[:users]}".nil? and not "#{params[:users]}".empty?)
           users = " -F \"users=#{params[:users]}\" "
           UI.message "users:#{users}"
@@ -35,11 +39,11 @@ module Fastlane
           password = " -F \"password=#{params[:password]}\" "
           UI.message "password:#{password}"
         end
-        if (not "#{params[:download_limit]}".nil? and "#{params[:download_limit]}".to_i() != 1000 and "#{params[:download_limit]}".to_i() > 0)
+        if (not "#{params[:download_limit]}".nil? and "#{params[:download_limit]}".to_i() > 0)
           download_limit = " -F \"download_limit=#{params[:download_limit]}\" "
           UI.message "download_limit:#{download_limit}"
         end
-        cmd = "curl --insecure -X \"PUT\" -F \"file=@#{params[:file_path]}\" -F \"exp_id=#{params[:exp_id]}\"" + "#{title}" + "#{secret}" + "#{users}" + "#{password}" + "#{download_limit}" + "https://api.bugly.qq.com/beta/apiv1/exp?app_key=#{params[:app_key]} -o #{json_file}"
+        cmd = "curl --insecure -X \"PUT\" -F \"file=@#{params[:file_path]}\" -F \"exp_id=#{params[:exp_id]}\"" + "#{title}" + "#{desc}" + "#{secret}" + "#{users}" + "#{password}" + "#{download_limit}" + "https://api.bugly.qq.com/beta/apiv1/exp?app_key=#{params[:app_key]} -o #{json_file}"
         result = sh(cmd)
         obj = JSON.parse(File.read(json_file))
         ret = obj["rtcode"]  
@@ -99,9 +103,9 @@ module Fastlane
                                        is_string: true, # true: verifies the input is a string, false: every kind of value
                                        default_value: ""
                                       ), # the default value if the user didn't provide one
-          FastlaneCore::ConfigItem.new(key: :description,
-                                       env_name: "FL_UPLOAD_APP_TO_BUGLY_DESCRIPTION",
-                                       description: "description for UploadAppToBuglyAction",
+          FastlaneCore::ConfigItem.new(key: :desc,
+                                       env_name: "FL_UPLOAD_APP_TO_BUGLY_DESC",
+                                       description: "desc for UploadAppToBuglyAction",
                                        is_string: true, # true: verifies the input is a string, false: every kind of value
                                        default_value: "description"
                                        ), # the default value if the user didn't provide one
@@ -127,7 +131,7 @@ module Fastlane
                                        env_name: "FL_UPLOAD_APP_TO_BUGLY_DESCRIPTION",
                                        description: "download_limit for UploadAppToBuglyAction",
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 1000
+                                       default_value: 10000
                                        )
         ]
       end
