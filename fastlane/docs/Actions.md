@@ -2611,3 +2611,44 @@ set_pod_key(
   project: 'MyProject'
 )
 ```
+
+### upload_app_to_bugly
+
+upload your app to [bugly](http://beta.qq.com/).
+
+```ruby
+  lane :upload do
+    upload_app_to_bugly(
+      file_path:"file_path",
+      app_key:"app_key",
+      app_id:"app_id",
+      pid:"pid",
+      title:"title",
+      desc:"description",
+      secret:"secret",
+      users:"users",
+      password:"password",
+      download_limit:"download_limit"
+    )
+  end
+```
+
+### update_app_to_bugly
+
+update your  exp on [bugly](http://beta.qq.com/).
+
+```ruby
+  lane :update do 
+    update_app_to_bugly(
+      file_path:"file_path",
+      app_key:"app_key",
+      exp_id:"exp_id",
+      title:"title",
+      desc:"description",
+      secret:"secret",
+      users:"users",
+      password:"password",
+      download_limit:"download_limit"
+    )
+  end
+```
