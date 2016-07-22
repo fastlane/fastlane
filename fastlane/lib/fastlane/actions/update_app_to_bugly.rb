@@ -13,7 +13,6 @@ module Fastlane
     class UpdateAppToBuglyAction < Action
       def self.run(params)
         require 'json'
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
         UI.message "file path: #{params[:file_path]}"
         result_file = File.new('update_app_to_bugly_result.json', 'w+')
         result_file.close
@@ -145,7 +144,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ['sexiong306']
+        ["sexiong306"]
       end
 
       def self.is_supported?(platform)

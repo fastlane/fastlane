@@ -145,7 +145,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ['sexiong306']
+        ["sexiong306"]
       end
 
       def self.is_supported?(platform)
