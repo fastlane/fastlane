@@ -8,7 +8,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     let(:valid_api_key) { '0123456789012345678901234567890123456789' }
     let(:valid_build_secret) { '0123456789012345678901234567890123456789012345678901234567890123' }
     let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
-    let(:valid_emails) { [ 'email@domain.com' ] }
+    let(:valid_emails) { ['email@domain.com'] }
 
     it 'does not parse or prompt with valid api_key and build_secret and crashlytics_path' do
       info.api_key = valid_api_key
@@ -32,7 +32,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'parses project with invalid api_key provided and does not need to prompt the user' do
-      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      expect(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
@@ -57,7 +57,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'parses project with invalid build_secret provided' do
-      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      expect(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
@@ -82,7 +82,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'parses project with invalid crashlytics_path provided' do
-      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      expect(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
@@ -107,7 +107,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'fetches email with invalid emails provided' do
-      allow(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      allow(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       expect(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
@@ -219,7 +219,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'prompts for user input with invalid emails provided' do
-      allow(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      allow(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       expect(email_fetcher).to receive(:fetch).and_return(nil)
 
@@ -239,7 +239,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'continues to prompt for user input with invalid emails provided' do
-      allow(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+      allow(project_parser).to receive(:parse).and_return({ api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path })
 
       expect(email_fetcher).to receive(:fetch).and_return(nil)
 

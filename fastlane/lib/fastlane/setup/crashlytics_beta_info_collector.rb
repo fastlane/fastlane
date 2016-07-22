@@ -1,6 +1,5 @@
 module Fastlane
-	class CrashlyticsBetaInfoCollector
-
+  class CrashlyticsBetaInfoCollector
     def initialize(project_parser, user_email_fetcher) # other collaborators?
       @project_parser = project_parser
       @user_email_fetcher = user_email_fetcher
@@ -9,22 +8,7 @@ module Fastlane
 
     # @param info CrashlyticsBetaInfo to supplement with needed info that is collected
     def collect_info_into(info)
-      needs_parsing = false
-
-      if info.crashlytics_path && !info.crashlytics_path_valid?
-        UI.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
-        needs_parsing = true
-      end
-
-      if info.api_key && !info.api_key_valid?
-        UI.message "The api_key you provided (#{info.api_key}) is not valid."
-        needs_parsing = true
-      end
-
-      if info.build_secret && !info.build_secret_valid?
-        UI.message "The build_secret you provided (#{info.build_secret}) is not valid."
-        needs_parsing = true
-      end
+      needs_parsing = needs_parsing?(info)
 
       if needs_parsing || !info.api_key || !info.build_secret || !info.crashlytics_path || !info.emails
         UI.message "\nfastlane will now try to discover Beta by Crashlytics info from your project."
@@ -103,9 +87,9 @@ module Fastlane
       end
 
       if info_hash
-        info.api_key = info_hash[:api_key] if !info.api_key_valid?
-        info.build_secret = info_hash[:build_secret] if !info.build_secret_valid?
-        info.crashlytics_path = info_hash[:crashlytics_path] if !info.crashlytics_path_valid?
+        info.api_key = info_hash[:api_key] unless info.api_key_valid?
+        info.build_secret = info_hash[:build_secret] unless info.build_secret_valid?
+        info.crashlytics_path = info_hash[:crashlytics_path] unless info.crashlytics_path_valid?
       end
     end
 
@@ -113,5 +97,26 @@ module Fastlane
       email = @user_email_fetcher.fetch
       info.emails = [email] if !info.emails && email
     end
-	end
+
+    def needs_parsing?(info)
+      needs_parsing = false
+
+      if info.crashlytics_path && !info.crashlytics_path_valid?
+        UI.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
+        needs_parsing = true
+      end
+
+      if info.api_key && !info.api_key_valid?
+        UI.message "The api_key you provided (#{info.api_key}) is not valid."
+        needs_parsing = true
+      end
+
+      if info.build_secret && !info.build_secret_valid?
+        UI.message "The build_secret you provided (#{info.build_secret}) is not valid."
+        needs_parsing = true
+      end
+
+      needs_parsing
+    end
+  end
 end

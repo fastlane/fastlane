@@ -46,6 +46,7 @@ module Fastlane
         crashlytics_path_arg = "\n         crashlytics_path: '#{@beta_info.crashlytics_path}',"
       end
 
+# rubocop:disable Style/IndentationConsistency
 %{  #
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
   #
@@ -59,6 +60,7 @@ module Fastlane
                     notes: 'Distributed with fastlane 🚀',
             notifications: true)
   end}
+      # rubocop:enable Style/IndentationConsistency
     end
 
     def expanded_paths_equal?(path1, path2)

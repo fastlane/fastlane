@@ -72,6 +72,12 @@ describe Fastlane::CrashlyticsBetaInfo do
 
         expect(beta_info.emails_valid?).to be(false)
       end
+
+      it 'finds a list of valid emails to be valid' do
+        beta_info.emails = ['email@domain.com', 'another_email@domain.com']
+
+        expect(beta_info.emails_valid?).to be(true)
+      end
     end
   end
 end

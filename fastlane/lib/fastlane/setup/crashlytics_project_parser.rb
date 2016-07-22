@@ -9,19 +9,19 @@ module Fastlane
     end
 
     def parse
-      # TODO decide how to handle errors
+      # TODO: decide how to handle errors
       UI.crash!("No project available at path #{@project_file_path}") unless File.exist?(@project_file_path)
 
       xcode_project = Xcodeproj::Project.open(@project_file_path)
       target = xcode_project.targets.find { |t| t.name == @target_name }
 
-      # TODO decide how to handle errors
+      # TODO: decide how to handle errors
       UI.crash!("Unable to locate a target by the name of #{@target_name}") if target.nil?
 
       scripts = target.build_phases.select { |t| t.class == Xcodeproj::Project::Object::PBXShellScriptBuildPhase }
       crash_script = scripts.find { |s| includes_run_script?(s.shell_script) }
 
-      # TODO decide how to handle errors
+      # TODO: decide how to handle errors
       UI.user_error!("Unable to find Crashlytics Run Script Build Phase") if crash_script.nil?
 
       script_array = crash_script.shell_script.split('\n').find { |line| includes_run_script?(line) }.split(' ')

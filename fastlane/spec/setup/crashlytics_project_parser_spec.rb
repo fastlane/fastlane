@@ -36,5 +36,4 @@ describe Fastlane::CrashlyticsProjectParser do
       expect(parser.parse).to be_nil
     end
   end
-
 end
