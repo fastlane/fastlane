@@ -6,13 +6,16 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
     let(:valid_api_key) { '0123456789012345678901234567890123456789' }
     let(:valid_build_secret) { '0123456789012345678901234567890123456789012345678901234567890123' }
+    let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
 
-    it 'does not parse or prompt with valid api_key and build_secret' do
+    it 'does not parse or prompt with valid api_key and build_secret and crashlytics_path' do
       info.api_key = valid_api_key
       info.build_secret = valid_build_secret
+      info.crashlytics_path = valid_crashlytics_path
 
       expect(info).not_to receive(:api_key=)
       expect(info).not_to receive(:build_secret=)
+      expect(info).not_to receive(:crashlytics_path=)
 
       expect(UI).not_to receive(:ask)
 
@@ -20,15 +23,58 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
     end
 
     it 'parses project with invalid api_key provided and does not need to prompt the user' do
-      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret})
+      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
 
       info.api_key = 'invalid'
       info.build_secret = valid_build_secret
+      info.crashlytics_path = valid_crashlytics_path
 
       expect(info).to receive(:api_key=).and_call_original
+      expect(info).not_to receive(:build_secret=)
+      expect(info).not_to receive(:crashlytics_path=)
+
+      expect(UI).not_to receive(:ask)
+
+      collector.collect_info_into(info)
+
+      expect(info.api_key).to eq(valid_api_key)
+      expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
+    end
+
+    it 'parses project with invalid build_secret provided' do
+      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+
+      info.api_key = valid_api_key
+      info.build_secret = 'invalid'
+      info.crashlytics_path = valid_crashlytics_path
+
+      expect(info).to receive(:build_secret=).and_call_original
+      expect(info).not_to receive(:api_key=)
+      expect(info).not_to receive(:crashlytics_path=)
+
+      expect(UI).not_to receive(:ask)
+
+      collector.collect_info_into(info)
+
+      expect(info.api_key).to eq(valid_api_key)
+      expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
+    end
+
+    it 'parses project with invalid crashlytics_path provided' do
+      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret, crashlytics_path: valid_crashlytics_path})
+
+      info.api_key = valid_api_key
+      info.build_secret = valid_build_secret
+      info.crashlytics_path = 'invalid_crashlytics_path'
+
+      expect(info).to receive(:crashlytics_path=).and_call_original
+      expect(info).not_to receive(:api_key=)
       expect(info).not_to receive(:build_secret=)
 
       expect(UI).not_to receive(:ask)
@@ -37,23 +83,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
-    end
-
-    it 'parses project with invalid build_secret provided' do
-      expect(project_parser).to receive(:parse).and_return({api_key: valid_api_key, build_secret: valid_build_secret})
-
-      info.api_key = valid_api_key
-      info.build_secret = 'invalid'
-
-      expect(info).to receive(:build_secret=).and_call_original
-      expect(info).not_to receive(:api_key=)
-
-      expect(UI).not_to receive(:ask)
-
-      collector.collect_info_into(info)
-
-      expect(info.api_key).to eq(valid_api_key)
-      expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
     end
 
     it 'prompts for user input with invalid values provided and a project parsed with no values' do
@@ -61,6 +91,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       info.api_key = 'invalid'
       info.build_secret = valid_build_secret
+      info.crashlytics_path = valid_crashlytics_path
 
       expect(UI).to receive(:ask).with(/API Key/).and_return(valid_api_key)
 
@@ -68,6 +99,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
     end
 
     it 'prompts for user input with invalid build_secret provided and with an error in project parsing' do
@@ -75,6 +107,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       info.api_key = valid_api_key
       info.build_secret = 'invalid'
+      info.crashlytics_path = valid_crashlytics_path
 
       allow(UI).to receive(:important)
       expect(UI).to receive(:important).with("your error message here")
@@ -84,6 +117,25 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
+    end
+
+    it 'prompts for user input with invalid crashlytics_path provided and with an error in project parsing' do
+      expect(project_parser).to receive(:parse).and_raise("your error message here")
+
+      info.api_key = valid_api_key
+      info.build_secret = valid_build_secret
+      info.crashlytics_path = 'invalid_crashlytics_path'
+
+      allow(UI).to receive(:important)
+      expect(UI).to receive(:important).with("your error message here")
+      expect(UI).to receive(:ask).with(/Crashlytics.framework/).and_return(valid_crashlytics_path)
+
+      collector.collect_info_into(info)
+
+      expect(info.api_key).to eq(valid_api_key)
+      expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
     end
 
     it 'continues to prompt for user input with invalid build_secret provided and with an error in project parsing' do
@@ -91,6 +143,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       info.api_key = valid_api_key
       info.build_secret = 'invalid'
+      info.crashlytics_path = valid_crashlytics_path
 
       allow(UI).to receive(:important)
       expect(UI).to receive(:important).with("your error message here")
@@ -101,6 +154,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
+      expect(info.crashlytics_path).to eq(valid_crashlytics_path)
     end
   end
 end

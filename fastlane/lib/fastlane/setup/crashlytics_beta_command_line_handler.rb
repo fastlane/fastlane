@@ -2,6 +2,7 @@ module Fastlane
   class CrashlyticsBetaCommandLineHandler
     def self.info_from_options(options)
       beta_info = CrashlyticsBetaInfo.new
+      beta_info.crashlytics_path = options.crashlytics_path
       beta_info.api_key = options.api_key
       beta_info.build_secret = options.build_secret
       beta_info.emails = options.emails
@@ -12,6 +13,7 @@ module Fastlane
     end
 
     def self.apply_options(command)
+      command.option '--crashlytics_path STRING', String, 'Path to Crashlytics.framework'
       command.option '--api_key STRING', String, 'Crashlytics API key'
       command.option '--build_secret STRING', String, 'Crashlytics build secret'
       command.option '--emails ARRAY', Array, 'List of emails to invite'

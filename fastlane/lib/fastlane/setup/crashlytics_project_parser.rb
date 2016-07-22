@@ -28,6 +28,9 @@ module Fastlane
 
       if script_array.count == 3
         {
+          # The run script build phase probably refers to Fabric.framework/run, but the submit binary
+          # only lives in the Crashlytics.framework, so we'll substitute and try to resolve it that way.
+          crashlytics_path: File.dirname(script_array[0].gsub("Fabric.framework", "Crashlytics.framework")),
           api_key: script_array[1],
           build_secret: script_array[2]
         }

@@ -10,6 +10,11 @@ module Fastlane
     def collect_info_into(info)
       needs_parsing = false
 
+      if info.crashlytics_path && !info.crashlytics_path_valid?
+        UI.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
+        needs_parsing = true
+      end
+
       if info.api_key && !info.api_key_valid?
         UI.message "The api_key you provided (#{info.api_key}) is not valid."
         needs_parsing = true
@@ -20,9 +25,14 @@ module Fastlane
         needs_parsing = true
       end
 
-      if needs_parsing || !info.api_key || !info.build_secret
-        UI.message "\nfastlane will now check your project for Beta by Crashlytics info."
+      if needs_parsing || !info.api_key || !info.build_secret || !info.crashlytics_path
+        UI.message "\nfastlane will now try to discover Beta by Crashlytics info from your project."
         parse_project_info_into(info)
+      end
+
+      if !info.crashlytics_path || !info.crashlytics_path_valid?
+        UI.important "fastlane couldn't determine the Crashlytics submit binary path from your project 🔍"
+        prompt_for_crashlytics_path(info)
       end
 
       if !info.api_key || !info.api_key_valid?
@@ -37,7 +47,7 @@ module Fastlane
         prompt_for_build_secret(info)
       end
 
-      UI.success "\nFabric API Key and Build Secret found 🔑"
+      UI.success "\nBeta by Crashlytics info found 🔑"
     end
 
     def show_fabric_org_help
@@ -50,7 +60,7 @@ module Fastlane
       loop do
         info.api_key = UI.ask("\nPlease provide your Fabric organization's API Key:").strip
         break if info.api_key_valid?
-        UI.message "The API Key you provided was invalid (must be 40 characters)"
+        UI.message "The API Key you provided was invalid (must be 40 characters)."
       end
     end
 
@@ -58,7 +68,15 @@ module Fastlane
       loop do
         info.build_secret = UI.ask("\nPlease provide your Fabric organization's Build Secret:").strip
         break if info.build_secret_valid?
-        UI.message "The Build Secret you provided was invalid (must be 64 characters)"
+        UI.message "The Build Secret you provided was invalid (must be 64 characters)."
+      end
+    end
+
+    def prompt_for_crashlytics_path(info)
+      loop do
+        info.crashlytics_path = UI.ask("\nPlease provide the path to Crashlytics.framework:").strip
+        break if info.crashlytics_path_valid?
+        UI.message "A submit binary could not be found at the framework path you provided."
       end
     end
 
@@ -72,6 +90,7 @@ module Fastlane
       if info_hash
         info.api_key = info_hash[:api_key] if !info.api_key_valid?
         info.build_secret = info_hash[:build_secret] if !info.build_secret_valid?
+        info.crashlytics_path = info_hash[:crashlytics_path] if !info.crashlytics_path_valid?
       end
     end
 	end

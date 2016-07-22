@@ -22,7 +22,9 @@ module Fastlane
       if FastlaneFolder.setup?
         UI.message ""
         UI.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
+        UI.message ""
         puts lane_template(scheme).cyan
+        UI.message ""
       else
         fastfile = fastfile_template(scheme)
         FileUtils.mkdir_p('fastlane')
@@ -34,35 +36,45 @@ module Fastlane
       UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics. 🎯')
       UI.success('After submitting your beta, visit https://fabric.io/_/beta to add release notes and notify testers.')
       UI.success('You can edit your Fastfile to distribute and notify testers automatically.')
-      UI.success('Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀')
+      UI.success('')
     end
 
     def lane_template(scheme)
-      %{
+      discovered_crashlytics_path = Fastlane::Helper::CrashlyticsHelper.discover_default_crashlytics_path
+
+      unless expanded_paths_equal?(@beta_info.crashlytics_path, discovered_crashlytics_path)
+        crashlytics_path_arg = "\n         crashlytics_path: '#{@beta_info.crashlytics_path}',"
+      end
+
+%{  #
+  # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
+  #
   lane :beta do
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: '#{scheme}', export_method: 'development')
     crashlytics(api_token: '#{@beta_info.api_key}',
-             build_secret: '#{@beta_info.build_secret}',
-            notifications: true
-              )
-  end
-      }
+             build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
+                   emails: ['#{@beta_info.emails.join("', '")}'],
+                 # groups: ['group_alias_1', 'group_alias_2']
+                    notes: 'Distributed with fastlane 🚀',
+            notifications: true)
+  end}
+    end
+
+    def expanded_paths_equal?(path1, path2)
+      return nil if path1.nil? || path2.nil?
+
+      File.expand_path(path1) == File.expand_path(path2)
     end
 
     def fastfile_template(scheme)
       <<-eos
 fastlane_version "#{Fastlane::VERSION}"
+
 default_platform :ios
+
 platform :ios do
-  lane :beta do
-    # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
-    gym(scheme: '#{scheme}', export_method: 'development')
-    crashlytics(api_token: '#{@beta_info.api_key}',
-             build_secret: '#{@beta_info.build_secret}',
-            notifications: true
-            )
-  end
+#{lane_template(scheme)}
 end
 eos
     end
