@@ -18,5 +18,9 @@ module Fastlane
     def crashlytics_path_valid?
       !crashlytics_path.nil? && File.exist?(crashlytics_path) && File.exist?(File.join(crashlytics_path, 'submit'))
     end
+
+    def emails_valid?
+      !emails.nil? && emails.any? { |email| !email.nil? && !email.empty? }
+    end
   end
 end

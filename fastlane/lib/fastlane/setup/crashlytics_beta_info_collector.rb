@@ -1,8 +1,9 @@
 module Fastlane
 	class CrashlyticsBetaInfoCollector
 
-    def initialize(project_parser) # other collaborators?
+    def initialize(project_parser, user_email_fetcher) # other collaborators?
       @project_parser = project_parser
+      @user_email_fetcher = user_email_fetcher
       @shown_fabric_org_help = false
     end
 
@@ -25,9 +26,10 @@ module Fastlane
         needs_parsing = true
       end
 
-      if needs_parsing || !info.api_key || !info.build_secret || !info.crashlytics_path
+      if needs_parsing || !info.api_key || !info.build_secret || !info.crashlytics_path || !info.emails
         UI.message "\nfastlane will now try to discover Beta by Crashlytics info from your project."
         parse_project_info_into(info)
+        fetch_email_into(info)
       end
 
       if !info.crashlytics_path || !info.crashlytics_path_valid?
@@ -45,6 +47,11 @@ module Fastlane
         UI.important "fastlane couldn't find your Fabric organization's Build Secret from your project 🔍"
         show_fabric_org_help unless @shown_fabric_org_help
         prompt_for_build_secret(info)
+      end
+
+      if !info.emails || !info.emails_valid?
+        UI.important "fastlane couldn't find your email address 🔍"
+        prompt_for_email(info)
       end
 
       UI.success "\nBeta by Crashlytics info found 🔑"
@@ -80,6 +87,14 @@ module Fastlane
       end
     end
 
+    def prompt_for_email(info)
+      loop do
+        info.emails = [UI.ask("\nPlease enter an email address to distribute the beta to:").strip]
+        break if info.emails_valid?
+        UI.message "You must provide an email address."
+      end
+    end
+
     def parse_project_info_into(info)
       begin
         info_hash = @project_parser.parse
@@ -92,6 +107,11 @@ module Fastlane
         info.build_secret = info_hash[:build_secret] if !info.build_secret_valid?
         info.crashlytics_path = info_hash[:crashlytics_path] if !info.crashlytics_path_valid?
       end
+    end
+
+    def fetch_email_into(info)
+      email = @user_email_fetcher.fetch
+      info.emails = [email] if !info.emails && email
     end
 	end
 end
