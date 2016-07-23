@@ -64,7 +64,7 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def device_udid(device)
+      def device(device_type)
         # we now fetch the device's udid. Why? Because we might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
@@ -73,18 +73,27 @@ module Snapshot
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
 
-        device_udid = nil
-        FastlaneCore::Simulator.all.each do |sim|
-          device_udid = sim.udid if sim.name.strip == device.strip and sim.ios_version == Snapshot.config[:ios_version]
+        device = nil
+        FastlaneCore::DeviceManager.all("iOS").each do |d|
+          version_correct = d.ios_version.include? Snapshot.config[:ios_version]
+          device = d if d.name.strip == device_type.strip and version_correct
         end
 
-        return device_udid
+        return device
       end
 
-      def destination(device)
-        value = "platform=iOS Simulator,id=#{device_udid(device)},OS=#{Snapshot.config[:ios_version]}"
+      def destination(device_type)
+        device = device(device_type)
 
-        return ["-destination '#{value}'"]
+        destination = "platform=iOS"
+
+        if device.is_simulator
+          destination += " Simulator,id=#{device.udid},OS=#{Snapshot.config[:ios_version]}"
+        else
+          destination += ",id=#{device.udid}"
+        end
+
+        return ["-destination '#{destination}'"]
       end
 
       def xcodebuild_log_path
