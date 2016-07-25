@@ -1,16 +1,17 @@
 module Fastlane
   class CrashlyticsBeta
-    def initialize(beta_info)
+    def initialize(beta_info, ui)
       @beta_info = beta_info
+      @ui = ui
     end
 
     def run
       setup = Setup.new
 
-      UI.message 'This command will generate a fastlane configuration for distributing your app with Beta by Crashlytics'
-      UI.message 'so that you can get your testers new builds with a single command!'
+      @ui.message 'This command will generate a fastlane configuration for distributing your app with Beta by Crashlytics'
+      @ui.message 'so that you can get your testers new builds with a single command!'
 
-      UI.message ''
+      @ui.message ''
 
       if setup.is_android?
         UI.user_error!('Sorry, Beta by Crashlytics configuration is currently only available for iOS projects!')
@@ -18,12 +19,12 @@ module Fastlane
         UI.user_error!('Please run Beta by Crashlytics configuration from your iOS project folder.')
       end
 
-      return unless UI.confirm('Ready to get started?')
+      return unless @ui.confirm('Ready to get started?')
 
-      UI.message 'fastlane will attempt to detect your project settings in this directory'
+      @ui.message "\nAttempting to detect your project settings in this directory...".cyan
       config = {}
       FastlaneCore::Project.detect_projects(config)
-      project = FastlaneCore::Project.new(config)
+      project = FastlaneCore::Project.new(config, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       scheme = project.schemes.first
 
       target_name = project.default_build_settings(key: 'TARGETNAME')
@@ -31,27 +32,26 @@ module Fastlane
 
       project_parser = CrashlyticsProjectParser.new(target_name, project_file_path)
 
-      info_collector = CrashlyticsBetaInfoCollector.new(project_parser, CrashlyticsBetaUserEmailFetcher.new)
+      info_collector = CrashlyticsBetaInfoCollector.new(project_parser,
+                                                        CrashlyticsBetaUserEmailFetcher.new,
+                                                        @ui)
       info_collector.collect_info_into(@beta_info)
 
       if FastlaneFolder.setup?
-        UI.message ""
-        UI.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
-        UI.message ""
+        @ui.message ""
+        @ui.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
+        @ui.message ""
         puts lane_template(scheme).cyan
-        UI.message ""
+        @ui.message ""
       else
         fastfile = fastfile_template(scheme)
         FileUtils.mkdir_p('fastlane')
         File.write('fastlane/Fastfile', fastfile)
-        UI.success('A Fastfile has been generated for you at ./fastlane/Fastfile 🚀')
+        @ui.success('A Fastfile has been generated for you at ./fastlane/Fastfile 🚀')
       end
-      UI.message ""
-      UI.header('Next Steps')
-      UI.success('Run `fastlane beta` to build and upload to Beta by Crashlytics. 🎯')
-      UI.success('After submitting your beta, visit https://fabric.io/_/beta to add release notes and notify testers.')
-      UI.success('You can edit your Fastfile to distribute and notify testers automatically.')
-      UI.success('')
+      @ui.header('Next Steps')
+      @ui.success('Run the following command to build and upload to Beta by Crashlytics. 🎯')
+      @ui.message("\n    fastlane beta")
     end
 
     def lane_template(scheme)
@@ -70,8 +70,8 @@ module Fastlane
     gym(scheme: '#{scheme}', export_method: 'development')
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
-                   emails: ['#{@beta_info.emails.join("', '")}'],
-                 # groups: ['group_alias_1', 'group_alias_2']
+                   emails: ['#{@beta_info.emails.join("', '")}'], # You can list more emails here
+                 # groups: ['group_alias_1', 'group_alias_2'], # You can define groups on the web and reference them here
                     notes: 'Distributed with fastlane 🚀',
             notifications: true)
   end}

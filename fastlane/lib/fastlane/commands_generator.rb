@@ -64,7 +64,7 @@ module Fastlane
         c.action do |args, options|
           if args[0] == 'beta' && FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
-            Fastlane::CrashlyticsBeta.new(beta_info).run
+            Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
             Fastlane::Setup.new.run
           end
