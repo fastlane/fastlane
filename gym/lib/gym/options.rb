@@ -168,7 +168,6 @@ module Gym
                                        UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_name,
-                                     short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_NAME",
                                      description: "The name of the provisioning profile (optional)",
                                      optional: true),
