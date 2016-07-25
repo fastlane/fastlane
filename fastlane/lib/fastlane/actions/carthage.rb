@@ -5,6 +5,11 @@ module Fastlane
         cmd = ["carthage"]
 
         cmd << params[:command]
+
+        if params[:command] == "update" && params[:dependencies].count > 0
+          cmd.concat params[:dependencies]
+        end
+
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
@@ -38,6 +43,13 @@ module Fastlane
                                        default_value: 'bootstrap',
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :dependencies,
+                                       description: "Carthage dependencies to update",
+                                       default_value: [],
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass an array of carthage dependencies") unless value.kind_of?(Array)
                                        end),
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
@@ -117,7 +129,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton"]
       end
     end
   end
