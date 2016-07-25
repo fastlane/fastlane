@@ -2,13 +2,18 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
   describe 'collect info into CrashlyticsBetaInfo' do
     let(:project_parser) { double('fake_project_parser') }
     let(:email_fetcher) { double('fake_email_fetcher') }
-    let(:collector) { Fastlane::CrashlyticsBetaInfoCollector.new(project_parser, email_fetcher) }
+    let(:ui) { double('fake_ui') }
+    let(:collector) { Fastlane::CrashlyticsBetaInfoCollector.new(project_parser, email_fetcher, ui) }
     let(:info) { Fastlane::CrashlyticsBetaInfo.new }
 
     let(:valid_api_key) { '0123456789012345678901234567890123456789' }
     let(:valid_build_secret) { '0123456789012345678901234567890123456789012345678901234567890123' }
     let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
     let(:valid_emails) { ['email@domain.com'] }
+
+    before(:each) do
+      allow(ui).to receive(:message)
+    end
 
     it 'does not parse or prompt with valid api_key and build_secret and crashlytics_path' do
       info.api_key = valid_api_key
@@ -21,7 +26,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
 
-      expect(UI).not_to receive(:ask)
+      expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
 
@@ -46,7 +51,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
 
-      expect(UI).not_to receive(:ask)
+      expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
 
@@ -71,7 +76,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
 
-      expect(UI).not_to receive(:ask)
+      expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
 
@@ -96,7 +101,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:build_secret=)
       expect(info).not_to receive(:emails=)
 
-      expect(UI).not_to receive(:ask)
+      expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
 
@@ -121,7 +126,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:build_secret=)
       expect(info).to receive(:emails=).and_call_original
 
-      expect(UI).not_to receive(:ask)
+      expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
 
@@ -141,7 +146,8 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = valid_emails
 
-      expect(UI).to receive(:ask).with(/API Key/).and_return(valid_api_key)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:ask).with(/API Key/).and_return(valid_api_key)
 
       collector.collect_info_into(info)
 
@@ -161,9 +167,9 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = valid_emails
 
-      allow(UI).to receive(:important)
-      expect(UI).to receive(:important).with("your error message here")
-      expect(UI).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:important).with("your error message here")
+      expect(ui).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
 
       collector.collect_info_into(info)
 
@@ -183,9 +189,9 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = 'invalid_crashlytics_path'
       info.emails = valid_emails
 
-      allow(UI).to receive(:important)
-      expect(UI).to receive(:important).with("your error message here")
-      expect(UI).to receive(:ask).with(/Crashlytics.framework/).and_return(valid_crashlytics_path)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:important).with("your error message here")
+      expect(ui).to receive(:ask).with(/Crashlytics.framework/).and_return(valid_crashlytics_path)
 
       collector.collect_info_into(info)
 
@@ -205,10 +211,10 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = valid_emails
 
-      allow(UI).to receive(:important)
-      expect(UI).to receive(:important).with("your error message here")
-      expect(UI).to receive(:ask).with(/Build Secret/).and_return('still not valid')
-      expect(UI).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:important).with("your error message here")
+      expect(ui).to receive(:ask).with(/Build Secret/).and_return('still not valid')
+      expect(ui).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
 
       collector.collect_info_into(info)
 
@@ -228,7 +234,8 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = nil
 
-      expect(UI).to receive(:ask).with(/email/).and_return(valid_emails.first)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:ask).with(/email/).and_return(valid_emails.first)
 
       collector.collect_info_into(info)
 
@@ -248,8 +255,9 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = nil
 
-      expect(UI).to receive(:ask).with(/email/).and_return('')
-      expect(UI).to receive(:ask).with(/email/).and_return(valid_emails.first)
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:ask).with(/email/).and_return('')
+      expect(ui).to receive(:ask).with(/email/).and_return(valid_emails.first)
 
       collector.collect_info_into(info)
 
