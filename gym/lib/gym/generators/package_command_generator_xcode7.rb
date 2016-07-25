@@ -27,6 +27,11 @@ module Gym
         options << "-exportOptionsPlist '#{config_path}'"
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "-exportPath '#{temporary_output_path}'"
+        
+        provisioning_profile_name = Gym.config[:provisioning_profile_name].to_s 
+        if provisioning_profile_name.length > 0
+          options << "-exportProvisioningProfile '#{provisioning_profile_name}'"
+        end
 
         options
       end
