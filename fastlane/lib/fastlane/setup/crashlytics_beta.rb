@@ -68,12 +68,20 @@ module Fastlane
   lane :beta do
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: '#{scheme}', export_method: 'development')
+
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
                    emails: ['#{@beta_info.emails.join("', '")}'], # You can list more emails here
                  # groups: ['group_alias_1', 'group_alias_2'], # You can define groups on the web and reference them here
                     notes: 'Distributed with fastlane 🚀',
-            notifications: true)
+            notifications: true) # Should this distribution notify your testers via email?
+
+    # You can notify your team in chat that a beta build has been uploaded
+    # slack(
+    #   slack_url: "https://hooks.slack.com/services/YOUR/TEAM/INFO"
+    #   channel: "beta-releases",
+    #   message: "Successfully uploaded a beta release - see it at https://fabric.io/_/beta"
+    # )
   end}
       # rubocop:enable Style/IndentationConsistency
     end
