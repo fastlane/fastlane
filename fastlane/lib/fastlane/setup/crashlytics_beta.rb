@@ -5,7 +5,22 @@ module Fastlane
     end
 
     def run
-      UI.user_error!('Beta by Crashlytics configuration is currently only available for iOS projects.') unless Setup.new.is_ios?
+      setup = Setup.new
+
+      UI.message 'This command will generate a fastlane configuration for distributing your app with Beta by Crashlytics'
+      UI.message 'so that you can get your testers new builds with a single command!'
+
+      UI.message ''
+
+      if setup.is_android?
+        UI.user_error!('Sorry, Beta by Crashlytics configuration is currently only available for iOS projects!')
+      elsif !setup.is_ios?
+        UI.user_error!('Please run Beta by Crashlytics configuration from your iOS project folder.')
+      end
+
+      return unless UI.confirm('Ready to get started?')
+
+      UI.message 'fastlane will attempt to detect your project settings in this directory'
       config = {}
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
@@ -14,9 +29,9 @@ module Fastlane
       target_name = project.default_build_settings(key: 'TARGETNAME')
       project_file_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
 
-      project_parser = Fastlane::CrashlyticsProjectParser.new(target_name, project_file_path)
+      project_parser = CrashlyticsProjectParser.new(target_name, project_file_path)
 
-      info_collector = Fastlane::CrashlyticsBetaInfoCollector.new(project_parser)
+      info_collector = CrashlyticsBetaInfoCollector.new(project_parser, CrashlyticsBetaUserEmailFetcher.new)
       info_collector.collect_info_into(@beta_info)
 
       if FastlaneFolder.setup?
