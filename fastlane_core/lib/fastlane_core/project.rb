@@ -73,12 +73,12 @@ module FastlaneCore
     # Gets rid of annoying plugin info warnings.
     attr_accessor :xcodebuild_suppress_stderr
 
-    def initialize(options)
+    def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
       self.options = options
       self.path = File.expand_path(options[:workspace] || options[:project])
       self.is_workspace = (options[:workspace].to_s.length > 0)
-      self.xcodebuild_list_silent = options[:xcodebuild_list_silent]
-      self.xcodebuild_suppress_stderr = options[:xcodebuild_suppress_stderr]
+      self.xcodebuild_list_silent = xcodebuild_list_silent
+      self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
       if !path or !File.directory?(path)
         UI.user_error!("Could not find project at path '#{path}'")
