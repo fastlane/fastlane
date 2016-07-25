@@ -22,5 +22,9 @@ module Fastlane
     def emails_valid?
       !emails.nil? && emails.any? { |email| !email.nil? && !email.empty? }
     end
+
+    def complete?
+      api_key && build_secret && crashlytics_path && emails
+    end
   end
 end

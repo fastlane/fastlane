@@ -10,12 +10,58 @@ module Fastlane
     def collect_info_into(info)
       needs_parsing = needs_parsing?(info)
 
-      if needs_parsing || !info.api_key || !info.build_secret || !info.crashlytics_path || !info.emails
+      if needs_parsing || !info.complete?
         UI.message "\nfastlane will now try to discover Beta by Crashlytics info from your project."
         parse_project_info_into(info)
         fetch_email_into(info)
       end
 
+      prompt_for_missing_values(info)
+
+      UI.success "\nBeta by Crashlytics info found 🔑"
+    end
+
+    def needs_parsing?(info)
+      needs_parsing = false
+
+      if info.crashlytics_path && !info.crashlytics_path_valid?
+        UI.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
+        needs_parsing = true
+      end
+
+      if info.api_key && !info.api_key_valid?
+        UI.message "The api_key you provided (#{info.api_key}) is not valid."
+        needs_parsing = true
+      end
+
+      if info.build_secret && !info.build_secret_valid?
+        UI.message "The build_secret you provided (#{info.build_secret}) is not valid."
+        needs_parsing = true
+      end
+
+      needs_parsing
+    end
+
+    def parse_project_info_into(info)
+      begin
+        info_hash = @project_parser.parse
+      rescue => ex
+        UI.important ex.message
+      end
+
+      if info_hash
+        info.api_key = info_hash[:api_key] unless info.api_key_valid?
+        info.build_secret = info_hash[:build_secret] unless info.build_secret_valid?
+        info.crashlytics_path = info_hash[:crashlytics_path] unless info.crashlytics_path_valid?
+      end
+    end
+
+    def fetch_email_into(info)
+      email = @user_email_fetcher.fetch
+      info.emails = [email] if !info.emails && email
+    end
+
+    def prompt_for_missing_values(info)
       if !info.crashlytics_path || !info.crashlytics_path_valid?
         UI.important "fastlane couldn't determine the Crashlytics submit binary path from your project 🔍"
         prompt_for_crashlytics_path(info)
@@ -37,8 +83,6 @@ module Fastlane
         UI.important "fastlane couldn't find your email address 🔍"
         prompt_for_email(info)
       end
-
-      UI.success "\nBeta by Crashlytics info found 🔑"
     end
 
     def show_fabric_org_help
@@ -77,46 +121,6 @@ module Fastlane
         break if info.emails_valid?
         UI.message "You must provide an email address."
       end
-    end
-
-    def parse_project_info_into(info)
-      begin
-        info_hash = @project_parser.parse
-      rescue => ex
-        UI.important ex.message
-      end
-
-      if info_hash
-        info.api_key = info_hash[:api_key] unless info.api_key_valid?
-        info.build_secret = info_hash[:build_secret] unless info.build_secret_valid?
-        info.crashlytics_path = info_hash[:crashlytics_path] unless info.crashlytics_path_valid?
-      end
-    end
-
-    def fetch_email_into(info)
-      email = @user_email_fetcher.fetch
-      info.emails = [email] if !info.emails && email
-    end
-
-    def needs_parsing?(info)
-      needs_parsing = false
-
-      if info.crashlytics_path && !info.crashlytics_path_valid?
-        UI.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
-        needs_parsing = true
-      end
-
-      if info.api_key && !info.api_key_valid?
-        UI.message "The api_key you provided (#{info.api_key}) is not valid."
-        needs_parsing = true
-      end
-
-      if info.build_secret && !info.build_secret_valid?
-        UI.message "The build_secret you provided (#{info.build_secret}) is not valid."
-        needs_parsing = true
-      end
-
-      needs_parsing
     end
   end
 end
