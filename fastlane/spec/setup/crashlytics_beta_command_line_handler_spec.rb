@@ -8,7 +8,7 @@ describe Fastlane::CrashlyticsBetaCommandLineHandler do
       expect(options).to receive(:api_key).and_return('my_api_key')
       expect(options).to receive(:build_secret).and_return('my_build_secret')
       expect(options).to receive(:emails).and_return(['test@test.com', 'test2@test.com'])
-      expect(options).to receive(:scheme).and_return('myScheme')
+      expect(options).to receive(:scheme).at_least(:once).and_return('myScheme')
       expect(options).to receive(:export_method).and_return('development')
 
       beta_info = Fastlane::CrashlyticsBetaCommandLineHandler.info_from_options(options)
@@ -17,7 +17,7 @@ describe Fastlane::CrashlyticsBetaCommandLineHandler do
       expect(beta_info.api_key).to eq('my_api_key')
       expect(beta_info.build_secret).to eq('my_build_secret')
       expect(beta_info.emails).to eq(['test@test.com', 'test2@test.com'])
-      expect(beta_info.scheme).to eq('myScheme')
+      expect(beta_info.schemes).to eq(['myScheme'])
       expect(beta_info.export_method).to eq('development')
     end
 
@@ -30,7 +30,7 @@ describe Fastlane::CrashlyticsBetaCommandLineHandler do
       expect(beta_info.api_key).to be_nil
       expect(beta_info.build_secret).to be_nil
       expect(beta_info.emails).to be_nil
-      expect(beta_info.scheme).to be_nil
+      expect(beta_info.schemes).to be_nil
       expect(beta_info.export_method).to be_nil
     end
   end

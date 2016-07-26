@@ -22,17 +22,7 @@ module Fastlane
       return unless @ui.confirm('Ready to get started?')
 
       @ui.message "\nAttempting to detect your project settings in this directory...".cyan
-      config = {}
-      FastlaneCore::Project.detect_projects(config)
-      project = FastlaneCore::Project.new(config, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-      scheme = project.schemes.first
-
-      target_name = project.default_build_settings(key: 'TARGETNAME')
-      project_file_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
-
-      project_parser = CrashlyticsProjectParser.new(target_name, project_file_path)
-
-      info_collector = CrashlyticsBetaInfoCollector.new(project_parser,
+      info_collector = CrashlyticsBetaInfoCollector.new(CrashlyticsProjectParser.new,
                                                         CrashlyticsBetaUserEmailFetcher.new,
                                                         @ui)
       info_collector.collect_info_into(@beta_info)
@@ -41,10 +31,10 @@ module Fastlane
         @ui.message ""
         @ui.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
         @ui.message ""
-        puts lane_template(scheme).cyan
+        puts lane_template.cyan
         @ui.message ""
       else
-        fastfile = fastfile_template(scheme)
+        fastfile = fastfile_template
         FileUtils.mkdir_p('fastlane')
         File.write('fastlane/Fastfile', fastfile)
         @ui.success('A Fastfile has been generated for you at ./fastlane/Fastfile 🚀')
@@ -52,9 +42,10 @@ module Fastlane
       @ui.header('Next Steps')
       @ui.success('Run the following command to build and upload to Beta by Crashlytics. 🎯')
       @ui.message("\n    fastlane beta")
+      @ui.message ""
     end
 
-    def lane_template(scheme)
+    def lane_template
       discovered_crashlytics_path = Fastlane::Helper::CrashlyticsHelper.discover_default_crashlytics_path
 
       unless expanded_paths_equal?(@beta_info.crashlytics_path, discovered_crashlytics_path)
@@ -67,7 +58,7 @@ module Fastlane
   #
   lane :beta do
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
-    gym(scheme: '#{scheme}', export_method: 'development')
+    gym(scheme: '#{@beta_info.schemes.first}', export_method: 'development')
 
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
@@ -92,14 +83,14 @@ module Fastlane
       File.expand_path(path1) == File.expand_path(path2)
     end
 
-    def fastfile_template(scheme)
+    def fastfile_template
       <<-eos
 fastlane_version "#{Fastlane::VERSION}"
 
 default_platform :ios
 
 platform :ios do
-#{lane_template(scheme)}
+#{lane_template}
 end
 eos
     end

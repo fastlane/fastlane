@@ -1,7 +1,7 @@
 describe Fastlane::CrashlyticsBetaInfo do
-  describe 'data validation' do
-    let(:beta_info) { Fastlane::CrashlyticsBetaInfo.new }
+  let(:beta_info) { Fastlane::CrashlyticsBetaInfo.new }
 
+  describe 'data validation' do
     describe 'crashlytics_path' do
       it 'finds a nil crashlytics_path to be invalid' do
         expect(beta_info.crashlytics_path_valid?).to be(false)
@@ -77,6 +77,31 @@ describe Fastlane::CrashlyticsBetaInfo do
         beta_info.emails = ['email@domain.com', 'another_email@domain.com']
 
         expect(beta_info.emails_valid?).to be(true)
+      end
+    end
+
+    describe 'schemes' do
+      it 'finds a nil schemes to be invalid' do
+        expect(beta_info.schemes_valid?).to be(false)
+      end
+
+      it 'finds an empty schemes to be invalid' do
+        beta_info.schemes = ['']
+        expect(beta_info.schemes_valid?).to be(false)
+      end
+
+      it 'finds a named schemes to be valid' do
+        beta_info.schemes = ['whatever']
+        expect(beta_info.schemes_valid?).to be(true)
+      end
+    end
+  end
+
+  describe 'assignment' do
+    describe 'schemes' do
+      it 'removes nil schemes from the array on assignment' do
+        beta_info.schemes = [nil, 'whatever', nil]
+        expect(beta_info.schemes).to eq(['whatever'])
       end
     end
   end

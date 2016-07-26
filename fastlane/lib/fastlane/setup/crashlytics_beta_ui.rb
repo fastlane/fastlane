@@ -8,6 +8,17 @@ module Fastlane
       puts text
     end
 
+    def header(text)
+      i = text.length + 8
+      success("-" * i)
+      success("--- " + text + " ---")
+      success("-" * i)
+    end
+
+    def important(text)
+      puts text.yellow
+    end
+
     def input(text)
       UI.input(text)
     end
@@ -20,15 +31,9 @@ module Fastlane
       UI.ask(text)
     end
 
-    def header(text)
-      i = text.length + 8
-      success("-" * i)
-      success("--- " + text + " ---")
-      success("-" * i)
-    end
-
-    def important(text)
-      puts text.yellow
+    def choose(text, options)
+      message(text)
+      Kernel.choose(*options)
     end
   end
 end

@@ -53,6 +53,7 @@ module Fastlane
         info.api_key = info_hash[:api_key] unless info.api_key_valid?
         info.build_secret = info_hash[:build_secret] unless info.build_secret_valid?
         info.crashlytics_path = info_hash[:crashlytics_path] unless info.crashlytics_path_valid?
+        info.schemes = info_hash[:schemes] unless info.schemes_valid?
       end
     end
 
@@ -82,6 +83,14 @@ module Fastlane
       if !info.emails || !info.emails_valid?
         @ui.important "Your email address couldn't be discovered from your project 🔍"
         prompt_for_email(info)
+      end
+
+      if !info.schemes || info.schemes.empty?
+        @ui.important "Your scheme couldn't be discovered from your project 🔍"
+        prompt_for_schemes(info)
+      elsif info.schemes.size > 1
+        @ui.important "Multiple schemes were discovered from your project 🔍"
+        prompt_for_schemes(info)
       end
     end
 
@@ -120,6 +129,19 @@ module Fastlane
         info.emails = [@ui.ask("\nPlease enter an email address to distribute the beta to:").strip]
         break if info.emails_valid?
         @ui.message "You must provide an email address."
+      end
+    end
+
+    def prompt_for_schemes(info)
+      current_schemes = info.schemes
+      if current_schemes.nil? || current_schemes.empty?
+        loop do
+          info.schemes = [@ui.ask("\nPlease enter the name of the scheme you would like to use:").strip]
+          break if info.schemes_valid?
+          @ui.message "You must provide a scheme name."
+        end
+      else
+        info.schemes = [@ui.choose("\nWhich scheme would you like to use?", current_schemes)]
       end
     end
   end

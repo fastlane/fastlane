@@ -4,7 +4,7 @@ module Fastlane
     attr_accessor :api_key
     attr_accessor :build_secret
     attr_accessor :emails
-    attr_accessor :scheme
+    attr_accessor :schemes
     attr_accessor :export_method
 
     def api_key_valid?
@@ -23,8 +23,21 @@ module Fastlane
       !emails.nil? && emails.any? { |email| !email.nil? && !email.empty? }
     end
 
+    def schemes_valid?
+      !schemes.nil? && schemes.size == 1 && !schemes.first.empty?
+    end
+
+    def export_method_valid?
+      !export_method.nil? && !export_method.empty? # TODO: && is one of a few valid values
+    end
+
     def complete?
-      api_key && build_secret && crashlytics_path && emails
+      api_key && build_secret && crashlytics_path && emails && schemes # && export_method
+    end
+
+    def schemes=(schemes)
+      return if schemes.nil?
+      @schemes = schemes.compact
     end
   end
 end
