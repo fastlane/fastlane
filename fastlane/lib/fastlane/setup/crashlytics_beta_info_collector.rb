@@ -10,9 +10,7 @@ module Fastlane
 
     # @param info CrashlyticsBetaInfo to supplement with needed info that is collected
     def collect_info_into(info)
-      needs_parsing = needs_parsing?(info)
-
-      if needs_parsing || !info.complete?
+      if user_provided_invalid_values?(info) || !info.has_all_detectable_values?
         @ui.message "\nTrying to discover Beta by Crashlytics info from your project...".cyan
         parse_project_info_into(info)
         fetch_email_into(info)
@@ -21,25 +19,35 @@ module Fastlane
       prompt_for_missing_values(info)
     end
 
-    def needs_parsing?(info)
-      needs_parsing = false
+    def user_provided_invalid_values?(info)
+      invalid = false
 
       if info.crashlytics_path && !info.crashlytics_path_valid?
         @ui.message "The crashlytics_path you provided (#{info.crashlytics_path}) is not valid."
-        needs_parsing = true
+        invalid = true
       end
 
       if info.api_key && !info.api_key_valid?
         @ui.message "The api_key you provided (#{info.api_key}) is not valid."
-        needs_parsing = true
+        invalid = true
       end
 
       if info.build_secret && !info.build_secret_valid?
         @ui.message "The build_secret you provided (#{info.build_secret}) is not valid."
-        needs_parsing = true
+        invalid = true
       end
 
-      needs_parsing
+      if info.emails && !info.emails_valid?
+        @ui.message "The email you provided (#{info.emails.first}) is not valid."
+        invalid = true
+      end
+
+      if info.schemes && !info.schemes_valid?
+        @ui.message "The scheme you provided (#{info.schemes.first}) is not valid."
+        invalid = true
+      end
+
+      invalid
     end
 
     def parse_project_info_into(info)
@@ -59,7 +67,7 @@ module Fastlane
 
     def fetch_email_into(info)
       email = @user_email_fetcher.fetch
-      info.emails = [email] if !info.emails && email
+      info.emails = [email] if !info.emails_valid? && email
     end
 
     def prompt_for_missing_values(info)
@@ -92,6 +100,9 @@ module Fastlane
         @ui.important "Multiple schemes were discovered from your project 🔍"
         prompt_for_schemes(info)
       end
+
+      info.export_method = 'development' unless info.export_method
+      prompt_for_export_method(info) unless info.export_method_valid?
     end
 
     def show_fabric_org_help
@@ -143,6 +154,11 @@ module Fastlane
       else
         info.schemes = [@ui.choose("\nWhich scheme would you like to use?", current_schemes)]
       end
+    end
+
+    def prompt_for_export_method(info)
+      @ui.important "The export method you entered was not valid."
+      info.export_method = @ui.choose("\nWhich export method would you like to use?", CrashlyticsBetaInfo::EXPORT_METHODS)
     end
   end
 end

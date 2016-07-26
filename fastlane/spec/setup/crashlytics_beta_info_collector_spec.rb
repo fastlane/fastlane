@@ -125,6 +125,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).to receive(:emails=).and_call_original
       expect(info).not_to receive(:schemes=)
 
+      allow(ui).to receive(:important)
       expect(ui).not_to receive(:ask)
 
       collector.collect_info_into(info)
@@ -231,6 +232,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       schemes = ['SchemeName', 'second_scheme']
       parse_results = valid_project_parser_result.merge({ schemes: schemes })
       allow(project_parser).to receive(:parse).and_return(parse_results)
+      allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
       info.schemes = schemes
 
@@ -245,6 +247,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     it 'prompts the user for a scheme name when none are known' do
       parse_results = valid_project_parser_result.merge({ schemes: [] })
       allow(project_parser).to receive(:parse).and_return(parse_results)
+      allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
       info.schemes = []
 
@@ -259,6 +262,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     it 'continues to prompt the user for a scheme name when an invalid one is given' do
       parse_results = valid_project_parser_result.merge({ schemes: [] })
       allow(project_parser).to receive(:parse).and_return(parse_results)
+      allow(email_fetcher).to receive(:fetch).and_return(valid_emails.first)
 
       info.schemes = []
 

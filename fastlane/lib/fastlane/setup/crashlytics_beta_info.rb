@@ -1,11 +1,21 @@
 module Fastlane
   class CrashlyticsBetaInfo
+    EXPORT_METHODS = %w(app-store ad-hoc package enterprise development developer-id).freeze
+
     attr_accessor :crashlytics_path
     attr_accessor :api_key
     attr_accessor :build_secret
     attr_accessor :emails
     attr_accessor :schemes
     attr_accessor :export_method
+
+    def schemes=(schemes)
+      @schemes = (schemes || []).compact
+    end
+
+    def emails=(emails)
+      @emails = (emails || []).compact
+    end
 
     def api_key_valid?
       !api_key.nil? && api_key.to_s.length == 40
@@ -20,7 +30,7 @@ module Fastlane
     end
 
     def emails_valid?
-      !emails.nil? && emails.any? { |email| !email.nil? && !email.empty? }
+      !emails.nil? && emails.any? { |email| !email.empty? }
     end
 
     def schemes_valid?
@@ -28,16 +38,11 @@ module Fastlane
     end
 
     def export_method_valid?
-      !export_method.nil? && !export_method.empty? # TODO: && is one of a few valid values
+      !export_method.nil? && !export_method.empty? && EXPORT_METHODS.include?(export_method)
     end
 
-    def complete?
-      api_key && build_secret && crashlytics_path && emails && schemes # && export_method
-    end
-
-    def schemes=(schemes)
-      return if schemes.nil?
-      @schemes = schemes.compact
+    def has_all_detectable_values?
+      api_key && build_secret && crashlytics_path && emails && schemes
     end
   end
 end

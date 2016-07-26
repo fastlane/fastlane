@@ -58,7 +58,7 @@ module Fastlane
   #
   lane :beta do
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
-    gym(scheme: '#{@beta_info.schemes.first}', export_method: 'development')
+    gym(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
 
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}

@@ -46,6 +46,10 @@ describe Fastlane::CrashlyticsProjectParser do
       project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project_two_skeems.xcodeproj'
       parser = Fastlane::CrashlyticsProjectParser.new({ project: project_path })
       values = parser.parse
+
+      expect(values[:crashlytics_path]).to eq('./Crashlytics.framework')
+      expect(values[:api_key]).to eq('0123456789012345678901234567890123456789')
+      expect(values[:build_secret]).to eq('0123456789012345678901234567890123456789012345678901234567890123')
       expect(values[:schemes]).to eq(['beta_test_2', 'beta_test_2_second'])
     end
   end

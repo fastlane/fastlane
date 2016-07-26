@@ -67,12 +67,6 @@ describe Fastlane::CrashlyticsBetaInfo do
         expect(beta_info.emails_valid?).to be(false)
       end
 
-      it 'finds a nil email string to be invalid' do
-        beta_info.emails = [nil]
-
-        expect(beta_info.emails_valid?).to be(false)
-      end
-
       it 'finds a list of valid emails to be valid' do
         beta_info.emails = ['email@domain.com', 'another_email@domain.com']
 
@@ -102,6 +96,13 @@ describe Fastlane::CrashlyticsBetaInfo do
       it 'removes nil schemes from the array on assignment' do
         beta_info.schemes = [nil, 'whatever', nil]
         expect(beta_info.schemes).to eq(['whatever'])
+      end
+    end
+
+    describe 'emails' do
+      it 'removes nil emails from the array on assignment' do
+        beta_info.emails = [nil, 'a@a.com', nil]
+        expect(beta_info.emails).to eq(['a@a.com'])
       end
     end
   end

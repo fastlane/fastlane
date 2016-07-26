@@ -6,7 +6,7 @@ module Fastlane
       beta_info.api_key = options.api_key
       beta_info.build_secret = options.build_secret
       beta_info.emails = options.emails
-      beta_info.schemes = [options.scheme] if options.scheme
+      beta_info.schemes = [options.scheme]
       beta_info.export_method = options.export_method
 
       beta_info

@@ -29,8 +29,8 @@ describe Fastlane::CrashlyticsBetaCommandLineHandler do
       expect(beta_info.crashlytics_path).to be_nil
       expect(beta_info.api_key).to be_nil
       expect(beta_info.build_secret).to be_nil
-      expect(beta_info.emails).to be_nil
-      expect(beta_info.schemes).to be_nil
+      expect(beta_info.emails).to eq([])
+      expect(beta_info.schemes).to eq([])
       expect(beta_info.export_method).to be_nil
     end
   end
