@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "9D1A01111A620EE342D7BF81CBC07EB5E590E462",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : 0,
+    "9D1A01111A620EE342D7BF81CBC07EB5E590E462" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "A86E70DB-E6FA-4982-BACC-D541C39F75C0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : "",
+    "9D1A01111A620EE342D7BF81CBC07EB5E590E462" : "fastlane\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "crashlytics_beta_project_two_skeems",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "fastlane\/spec\/fixtures\/xcodeproj\/crashlytics_beta_project_two_skeems.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:fastlane\/countdown.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:fastlane\/fastlane",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9D1A01111A620EE342D7BF81CBC07EB5E590E462"
+    }
+  ]
+}
