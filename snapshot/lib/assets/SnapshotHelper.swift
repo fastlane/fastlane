@@ -21,8 +21,8 @@ func setupSnapshot(app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
-    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
+func snapshot(name: String, section: String = "", waitForLoadingIndicator: Bool = true) {
+    Snapshot.snapshot(name, section: section, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
 public class Snapshot: NSObject {
@@ -89,12 +89,13 @@ public class Snapshot: NSObject {
         }
     }
 
-    public class func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
+    public class func snapshot(name: String, section: String = "", waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot
+        // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot
+        print("snapshot: \(name), section: \(section)")
 
         sleep(1) // Waiting for the animation to be finished (kind of)
         XCUIDevice.sharedDevice().orientation = .Unknown

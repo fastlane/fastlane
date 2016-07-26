@@ -21,19 +21,19 @@ class ExampleUITests: XCTestCase {
     
     func testExample()
     {
-        snapshot("0Launch")
+        snapshot("0Launch", section: "First View")
         let tabBar = XCUIApplication().tabBars
         let secondButton = tabBar.buttons.elementBoundByIndex(1)
 
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft
-        snapshot("1LandscapeLeft")
+        snapshot("1LandscapeLeft", section: "First View")
         
         secondButton.tap()
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeRight
-        snapshot("2LandscapeRight")
+        snapshot("2LandscapeRight", section: "Second View")
 
         secondButton.tap()
         XCUIDevice().orientation = UIDeviceOrientation.Portrait
-        snapshot("3Portrait")
+        snapshot("3Portrait", section: "Second View")
     }
 }

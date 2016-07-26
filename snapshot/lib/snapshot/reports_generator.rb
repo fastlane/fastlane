@@ -6,31 +6,12 @@ module Snapshot
     def generate
       UI.message "Generating HTML Report"
 
-      screens_path = Snapshot.config[:output_directory]
-
-      @data = {}
-
-      Dir[File.join(screens_path, "*")].sort.each do |language_folder|
-        language = File.basename(language_folder)
-        Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
-          available_devices.each do |key_name, output_name|
-            next unless File.basename(screenshot).include?(key_name)
-
-            # This screenshot is from this device
-            @data[language] ||= {}
-            @data[language][output_name] ||= []
-
-            resulting_path = File.join('.', language, File.basename(screenshot))
-            @data[language][output_name] << resulting_path
-            break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
-          end
-        end
-      end
+      generate_data
 
       html_path = File.join(lib_path, "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
-      export_path = "#{screens_path}/screenshots.html"
+      export_path = File.join(Snapshot.config[:output_directory], "screenshots.html")
       File.write(export_path, html)
 
       export_path = File.expand_path(export_path)
@@ -46,6 +27,47 @@ module Snapshot
       else
         return './lib'
       end
+    end
+
+    def generate_data
+      screens_path = File.join(Snapshot.config[:output_directory], "screenshots")
+
+      @data = {}
+
+      Dir[File.join(screens_path, "*")].sort.select { |f| File.directory? f }.each do |language_folder|
+        language = File.basename(language_folder)
+        @data[language] ||= {}
+
+        Dir[File.join(language_folder, "*")].sort.select { |f| File.directory? f }.each do |device_folder|
+          device = File.basename(device_folder)
+          @data[language][device] ||= {}
+
+          Dir[File.join(device_folder, "*"), device_folder].sort.select { |f| File.directory? f }.each do |section_folder|
+            section = section_folder == device_folder ? "$undefined" : File.basename(section_folder)
+
+            screenshots = Dir[File.join(section_folder, '*.png')].sort
+            screenshots.each do |screenshot|
+              @data[language][device][section] ||= []
+              if section_folder == device_folder || section == "$undefined"
+                resulting_path = File.join('.', "screenshots", language, device, File.basename(screenshot))
+              else
+                resulting_path = File.join('.', "screenshots", language, device, section, File.basename(screenshot))
+              end
+              @data[language][device][section] << resulting_path
+            end
+          end
+        end
+      end
+    end
+
+    # returns the output name for a device
+    # if the output name could not be found, it returns the input parameter "device"
+    def device_output_name(device)
+      available_devices.each do |key_name, output_name|
+        next unless device.include?(key_name)
+        return output_name
+      end
+      return device
     end
 
     def available_devices
