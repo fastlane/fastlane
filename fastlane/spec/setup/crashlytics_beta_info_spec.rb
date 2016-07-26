@@ -89,6 +89,27 @@ describe Fastlane::CrashlyticsBetaInfo do
         expect(beta_info.schemes_valid?).to be(true)
       end
     end
+
+    describe 'export_method' do
+      it 'finds a nil export_method to be invalid' do
+        expect(beta_info.export_method_valid?).to be(false)
+      end
+
+      it 'finds an empty export_method to be invalid' do
+        beta_info.export_method = ''
+        expect(beta_info.export_method_valid?).to be(false)
+      end
+
+      it 'finds an incorrect export_method to be invalid' do
+        beta_info.export_method = 'rando'
+        expect(beta_info.export_method_valid?).to be(false)
+      end
+
+      it 'finds a specific export_method to be valid' do
+        beta_info.export_method = 'ad-hoc'
+        expect(beta_info.export_method_valid?).to be(true)
+      end
+    end
   end
 
   describe 'assignment' do

@@ -11,6 +11,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
     let(:valid_emails) { ['email@domain.com'] }
     let(:valid_schemes) { ['SchemeName'] }
+    let(:valid_export_method) { 'development' }
     let(:valid_project_parser_result) do
       {
         api_key: valid_api_key,
@@ -28,6 +29,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = valid_crashlytics_path
       info.emails = valid_emails
       info.schemes = valid_schemes
+      info.export_method = valid_export_method
     end
 
     def validate_info
@@ -36,6 +38,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info.crashlytics_path).to eq(valid_crashlytics_path)
       expect(info.emails).to eq(valid_emails)
       expect(info.schemes).to eq(valid_schemes)
+      expect(info.export_method).to eq(valid_export_method)
     end
 
     it 'does not parse or prompt with valid api_key and build_secret and crashlytics_path' do
@@ -44,6 +47,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
       expect(info).not_to receive(:schemes=)
+      expect(info).not_to receive(:export_method=)
 
       expect(ui).not_to receive(:ask)
 
@@ -269,6 +273,42 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       allow(ui).to receive(:important)
       expect(ui).to receive(:ask).with(/scheme/).and_return('')
       expect(ui).to receive(:ask).with(/scheme/).and_return('SchemeName')
+
+      collector.collect_info_into(info)
+
+      validate_info
+    end
+
+    it 'does not prompt the user when a valid export method is provided' do
+      expect(info).not_to receive(:api_key=)
+      expect(info).not_to receive(:build_secret=)
+      expect(info).not_to receive(:crashlytics_path=)
+      expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:schemes=)
+      expect(info).not_to receive(:export_method=)
+
+      expect(ui).not_to receive(:choose)
+
+      collector.collect_info_into(info)
+
+      validate_info
+    end
+
+    it 'prompts the user to choose a export method when an invalid one is provided' do
+      info.export_method = 'rando'
+
+      allow(ui).to receive(:important)
+      expect(ui).to receive(:choose).with(/export method/, Fastlane::CrashlyticsBetaInfo::EXPORT_METHODS).and_return(valid_export_method)
+
+      collector.collect_info_into(info)
+
+      validate_info
+    end
+
+    it 'has a default value of development for export method when none is provided' do
+      info.export_method = nil
+
+      expect(ui).not_to receive(:choose)
 
       collector.collect_info_into(info)
 
