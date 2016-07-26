@@ -55,6 +55,14 @@ module Fastlane
         end
         # rubocop:enable Style/MultilineBlockChain
 
+        # Removes .plist files that matched the given expression in the 'ignore' parameter
+        ignore_expression = params[:ignore]
+        if ignore_expression
+          info_plist_files.select! do |info_plist_file|
+            ! info_plist_file.match(ignore_expression)
+          end
+        end
+
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = []
         expected_changed_files << pbxproj_path
@@ -139,6 +147,11 @@ module Fastlane
                                        description: "Include Settings.bundle/Root.plist with version bump",
                                        optional: true,
                                        default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :ignore,
+                                       description: "A regular expression used to filter matched plist files to be modified",
+                                       optional: true,
+                                       default_value: nil,
                                        is_string: false)
         ]
       end
