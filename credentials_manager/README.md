@@ -23,7 +23,7 @@ password has been deleted.
 
 ## Storing in the keychain
 
-By default, your Apple credentials are stored in the OS X Keychain.
+By default, your Apple credentials are stored in the macOS Keychain.
 
 Your password is only stored locally on your computer.
 

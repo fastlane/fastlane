@@ -89,7 +89,7 @@ fastlane appstore
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
-:hatching_chick: | Over 150 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for both iOS, Mac OS and Android apps
 :octocat: | Full git and mercurial support
 
@@ -114,7 +114,7 @@ If you experience slow launch times of fastlane, try running
 
 to clean up outdated gems.
 
-System Requirements: `fastlane` requires Mac OS X or Linux with Ruby 2.0.0 or above.
+System Requirements: `fastlane` requires macOS or Linux with Ruby 2.0.0 or above.
 
 
 If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.

@@ -36,7 +36,7 @@ frameit
 
 ###### Quickly put your screenshots into the right device frames
 
-`frameit` allows you to put a gorgeous device frame around your iOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails. 
+`frameit` allows you to put a gorgeous device frame around your iOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
@@ -199,7 +199,7 @@ Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to uploa
 
 ### Mac
 
-With `frameit` 2.0 it's possible to also frame Mac OS X Application screenshots. You have to provide the following:
+With `frameit` 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
 
 - The `offset` information so `frameit` knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac

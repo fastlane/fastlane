@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         UI.message("You shouldn't use update_project_code_signing")
         UI.message("Have you considered using the recommended way to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md")
+        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
 
         path = params[:path]
         path = File.join(path, "project.pbxproj")

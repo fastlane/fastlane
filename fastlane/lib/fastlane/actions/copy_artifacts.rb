@@ -5,8 +5,11 @@ module Fastlane
   module Actions
     class CopyArtifactsAction < Action
       def self.run(params)
+        # expand the path to make sure we can deal with relative paths
+        target_path = File.expand_path(params[:target_path])
+
         # we want to make sure that our target folder exist already
-        FileUtils.mkdir_p(params[:target_path])
+        FileUtils.mkdir_p(target_path)
 
         # Ensure that artifacts is an array
         artifacts_to_search = [params[:artifacts]].flatten
@@ -17,7 +20,7 @@ module Fastlane
         # Lastly, we shell escape everything in case they contain incompatible symbols (e.g. spaces)
         artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten.map(&:shellescape)
 
-        UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{params[:target_path]}")
+        UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{target_path}")
         UI.verbose(params[:keep_original] ? "Keeping original files" : "Not keeping original files")
 
         if params[:fail_on_missing]
@@ -29,9 +32,9 @@ module Fastlane
         end
 
         if params[:keep_original]
-          FileUtils.cp_r(artifacts, params[:target_path], remove_destination: true)
+          FileUtils.cp_r(artifacts, target_path, remove_destination: true)
         else
-          FileUtils.mv(artifacts, params[:target_path], force: true)
+          FileUtils.mv(artifacts, target_path, force: true)
         end
 
         UI.success('Build artifacts successfully copied!')

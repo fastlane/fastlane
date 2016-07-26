@@ -121,7 +121,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :open_report,
                                      short_option: "-g",
                                      env_name: "SCAN_OPEN_REPORT",
-                                     description: "Don't open the HTML report when tests are completed",
+                                     description: "Should the HTML report be opened when tests are completed",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :configuration,

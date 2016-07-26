@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.description
-        "Display a Mac OS X notification with custom message and title"
+        "Display a macOS notification with custom message and title"
       end
 
       def self.author

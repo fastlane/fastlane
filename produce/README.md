@@ -108,7 +108,7 @@ If you want to enable Application Services for an App ID (HomeKit and HealthKit 
 
     produce enable_services --homekit --healthkit
 
-If you want to disable Application Servies for an App ID (iCloud in this case):
+If you want to disable Application Services for an App ID (iCloud in this case):
 
     produce disable_services --icloud
 

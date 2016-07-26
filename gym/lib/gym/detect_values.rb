@@ -56,11 +56,15 @@ module Gym
       Gym.project.select_scheme
     end
 
+    def self.min_xcode8?
+      Helper.xcode_version.split(".").first.to_i >= 8
+    end
+
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
       platform = if Gym.project.mac?
-                   "OS X"
+                   min_xcode8? ? "macOS" : "OS X"
                  elsif Gym.project.tvos?
                    "tvOS"
                  else

@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'slack-notifier', '~> 1.3' # Slack notifications
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.1' # prettify xcodebuild output
-  spec.add_dependency 'terminal-notifier', '~> 1.6.2' # Mac OS X notifications
+  spec.add_dependency 'terminal-notifier', '~> 1.6.2' # macOS notifications
   spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
   spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'cert', '>= 1.4.1', '< 2.0.0'
   spec.add_dependency 'sigh', '>= 1.8.0', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.1.2', '< 2.0.0'
-  spec.add_dependency 'gym', '>= 1.6.3', '< 2.0.0'
+  spec.add_dependency 'gym', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.9.1', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.7.0', '< 1.0.0'
   spec.add_dependency 'scan', '>= 0.8.0', '< 1.0.0'

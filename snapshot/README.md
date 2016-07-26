@@ -35,7 +35,7 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
-'snapshot' generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)). 
+'snapshot' generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -323,7 +323,7 @@ launch_arguments([
 
 The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different approach:
 
-When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occured during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
+When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occurred during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
 
 When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
 

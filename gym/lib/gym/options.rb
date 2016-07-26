@@ -165,7 +165,7 @@ module Gym
                                      optional: true,
                                      deprecated: 'Use target specific provisioning profiles instead',
                                      verify_block: proc do |value|
-                                       UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
