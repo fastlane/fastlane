@@ -333,6 +333,16 @@ describe Fastlane do
         end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
       end
 
+      it "sets the toolchain to Swift_2_3" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              toolchain: 'com.apple.dt.toolchain.Swift_2_3'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --toolchain com.apple.dt.toolchain.Swift_2_3")
+      end
+
       it "use custom derived data" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(

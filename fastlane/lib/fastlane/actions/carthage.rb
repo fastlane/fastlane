@@ -19,6 +19,7 @@ module Fastlane
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
+        cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
 
         Actions.sh(cmd.join(' '))
       end
@@ -118,7 +119,11 @@ module Fastlane
                                          if value.chomp(' ').empty?
                                            UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
                                          end
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :toolchain,
+                                       env_name: "FL_CARTHAGE_TOOLCHAIN",
+                                       description: "Define which xcodebuild toolchain to use when building",
+                                       optional: true)
         ]
       end
 
