@@ -91,8 +91,10 @@ module Scan
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
+      xcode_select_path = `xcode-select -p`.strip
+      
       UI.message("Explicitly opening simulator for device: #{device.name}")
-      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
+      `open -a #{xcode_select_path}/Applications/Simulator.app --args -CurrentDeviceUDID #{device.udid}`
     end
   end
 end
