@@ -344,6 +344,30 @@ describe Fastlane do
           eq("carthage bootstrap --derived-data ../derived\\ data")
       end
 
+      it "updates with a single dependency" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'update',
+              dependencies: ['TestDependency']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage update TestDependency")
+      end
+
+      it "updates with multiple dependencies" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'update',
+              dependencies: ['TestDependency1', 'TestDependency2']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage update TestDependency1 TestDependency2")
+      end
+
       it "works with no parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
