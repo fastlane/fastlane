@@ -35,7 +35,9 @@ module Fastlane
         %w(all iOS Mac tvOS watchOS)
       end
 
+      # rubocop:disable Metrics/AbcSize
       def self.available_options
+        # rubocop:enable Metrics/AbcSize
         [
           FastlaneCore::ConfigItem.new(key: :command,
                                        env_name: "FL_CARTHAGE_COMMAND",
