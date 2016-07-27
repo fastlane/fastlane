@@ -181,10 +181,10 @@ module Fastlane
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :strategy,
                                        env_name: "FL_HOCKEY_STRATEGY",
-                                       description: "Strategy: \"add\" = to add the build as a new build  even if it has the same build number (default); \"replace\" = to replace a build with the same build number",
+                                       description: "Strategy: 'add' = to add the build as a new build even if it has the same build number (default); 'replace' = to replace a build with the same build number",
                                        default_value: "add",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ["add", "replace"].include?(value)
+                                         UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
                                        end)
         ]
       end
