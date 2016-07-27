@@ -92,7 +92,7 @@ module Scan
       `killall Simulator &> /dev/null`
 
       xcode_select_path = `xcode-select -p`.strip
-      
+
       UI.message("Explicitly opening simulator for device: #{device.name}")
       `open -a #{xcode_select_path}/Applications/Simulator.app --args -CurrentDeviceUDID #{device.udid}`
     end
