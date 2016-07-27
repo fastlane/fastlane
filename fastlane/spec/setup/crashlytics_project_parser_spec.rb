@@ -18,7 +18,11 @@ describe Fastlane::CrashlyticsProjectParser do
 
     it 'fails if target_name is invalid' do
       project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project.xcodeproj'
-      project = FastlaneCore::Project.new({ project: project_path })
+      project = FastlaneCore::Project.new(
+        { project: project_path },
+        xcodebuild_list_silent: true,
+        xcodebuild_suppress_stderr: true
+      )
       expect(project).to receive(:default_build_settings).and_return('invalid_target_name')
       expect(FastlaneCore::Project).to receive(:new).and_return(project)
 

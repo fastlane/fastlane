@@ -10,11 +10,11 @@ module Fastlane
     attr_accessor :export_method
 
     def schemes=(schemes)
-      @schemes = (schemes || []).compact
+      @schemes = schemes ? schemes.compact : nil
     end
 
     def emails=(emails)
-      @emails = (emails || []).compact
+      @emails = emails ? emails.compact : nil
     end
 
     def api_key_valid?
