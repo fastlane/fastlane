@@ -89,7 +89,7 @@ module Scan
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
           found = FastlaneCore::SimulatorTV.all.detect do |d|
-            (d.name + " " + d.tvos_version).include? lookup_device
+            (d.name + " " + d.os_version).include? lookup_device
           end
 
           if found
