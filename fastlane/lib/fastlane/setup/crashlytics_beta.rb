@@ -19,8 +19,6 @@ module Fastlane
         UI.user_error!('Please run Beta by Crashlytics configuration from your iOS project folder.')
       end
 
-      return unless @ui.confirm('Ready to get started?')
-
       @ui.message "\nAttempting to detect your project settings in this directory...".cyan
       info_collector = CrashlyticsBetaInfoCollector.new(CrashlyticsProjectParser.new,
                                                         CrashlyticsBetaUserEmailFetcher.new,
@@ -64,7 +62,7 @@ module Fastlane
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
                    emails: ['#{@beta_info.emails.join("', '")}'], # You can list more emails here
                  # groups: ['group_alias_1', 'group_alias_2'], # You can define groups on the web and reference them here
-                    notes: 'Distributed with fastlane 🚀',
+                    notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action!
             notifications: true) # Should this distribution notify your testers via email?
 
     # You can notify your team in chat that a beta build has been uploaded
