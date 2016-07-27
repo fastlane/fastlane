@@ -97,7 +97,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          value.split(',').each do |platform|
-                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? platform
+                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.map(&:downcase).include?(platform.downcase)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :configuration,
