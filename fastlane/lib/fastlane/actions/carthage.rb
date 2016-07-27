@@ -35,9 +35,7 @@ module Fastlane
         %w(all iOS Mac tvOS watchOS)
       end
 
-      # rubocop:disable Metrics/AbcSize
       def self.available_options
-        # rubocop:enable Metrics/AbcSize
         [
           FastlaneCore::ConfigItem.new(key: :command,
                                        env_name: "FL_CARTHAGE_COMMAND",
@@ -50,9 +48,7 @@ module Fastlane
                                        description: "Carthage dependencies to update",
                                        default_value: [],
                                        is_string: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass an array of carthage dependencies") unless value.kind_of?(Array)
-                                       end),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
