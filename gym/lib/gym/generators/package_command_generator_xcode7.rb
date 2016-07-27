@@ -29,6 +29,7 @@ module Gym
 
         provisioning_profile_name = Gym.config[:provisioning_profile_name].to_s
         if provisioning_profile_name.length > 0
+          options << "-exportFormat ipa"
           options << "-exportProvisioningProfile '#{provisioning_profile_name}'"
         else
           options << "-exportOptionsPlist '#{config_path}'"
