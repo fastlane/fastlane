@@ -263,6 +263,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --platform iOS")
       end
 
+      it "sets the platform to (downcase) ios" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'ios'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform ios")
+      end
+
       it "sets the platform to Mac" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
