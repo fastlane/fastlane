@@ -88,6 +88,7 @@ describe Fastlane do
         expect(values[:mandatory]).to eq(0.to_s)
         expect(values[:notes_type]).to eq(1.to_s)
         expect(values[:upload_dsym_only]).to eq(false)
+        expect(values[:strategy]).to eq("add")
       end
 
       it "can use a generated changelog as release notes" do
@@ -184,6 +185,41 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(values[:owner_id]).to eq('123')
+      end
+
+      it "has the correct default strategy value" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+          })
+        end").runner.execute(:test)
+
+        expect(values[:strategy]).to eq("add")
+      end
+
+      it "can change the strategy" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            strategy: 'replace'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:strategy]).to eq("replace")
+      end
+
+      it "raises an error if supplied dsym file was not found" do
+        expect do
+          values = Fastlane::FastFile.new.parse("lane :test do
+            hockey({
+              api_token: 'xxx',
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              strategy: 'wrongvalue'
+            })
+          end").runner.execute(:test)
+        end.to raise_error("Invalid value 'wrongvalue' for key 'strategy'. Allowed values are 'add', 'replace'.")
       end
     end
   end
