@@ -110,7 +110,6 @@ module Gym
     def verify_archive
       # from https://github.com/fastlane/gym/issues/115
       if (Dir[BuildCommandGenerator.archive_path + "/*"]).count == 0
-        print "Nothing found at: " + BuildCommandGenerator.archive_path + "/*"
         ErrorHandler.handle_empty_archive
       end
     end
