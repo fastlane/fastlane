@@ -29,12 +29,12 @@ describe Scan do
                               })
     end
 
-    it "use user specified report file type" do
-      commands = Scan::ReportCollector.new(false, "junit", "/tmp", false, "xml").generate_commands(path)
+    it "use user specified report file name" do
+      commands = Scan::ReportCollector.new(false, "junit", "/tmp", false, "custom.xml").generate_commands(path)
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-                                 "/tmp/report.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/report.xml' &> /dev/null "
+                                 "/tmp/custom.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/custom.xml' &> /dev/null "
                              })
     end
   end

@@ -178,8 +178,8 @@ module Scan
                                     description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                     is_string: false,
                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :custom_report_extension,
-                                    description: "Sets custom file extension for report file",
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                    description: "Sets custom full report file name",
                                     optional: true,
                                     is_string: true)
       ]
