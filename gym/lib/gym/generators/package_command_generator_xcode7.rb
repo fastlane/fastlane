@@ -24,9 +24,6 @@ module Gym
       def options
         options = []
 
-        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
-        options << "-exportPath '#{temporary_output_path}'"
-
         provisioning_profile_name = Gym.config[:provisioning_profile_name].to_s
         if provisioning_profile_name.length > 0
           options << "-exportFormat ipa"
@@ -34,6 +31,9 @@ module Gym
         else
           options << "-exportOptionsPlist '#{config_path}'"
         end
+
+        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
+        options << "-exportPath '#{temporary_output_path}'"
 
         options
       end
