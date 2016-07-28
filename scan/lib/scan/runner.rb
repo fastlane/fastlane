@@ -101,7 +101,6 @@ module Scan
       end
 
       `open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}`
-
     end
   end
 end
