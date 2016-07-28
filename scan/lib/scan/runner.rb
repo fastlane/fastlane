@@ -91,8 +91,16 @@ module Scan
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
-      UI.message("Explicitly opening simulator for device: #{device.name}")
-      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
+      # As a second level of feature switching, see if we want to try the xcode-select variant
+      if ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'] == '2'
+        simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
+        UI.message("Explicitly opening simulator at #{simulator_path} for device: #{device.name}")
+      else
+        simulator_path = 'Simulator'
+        UI.message("Explicitly opening simulator for device: #{device.name}")
+      end
+
+      `open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}`
     end
   end
 end
