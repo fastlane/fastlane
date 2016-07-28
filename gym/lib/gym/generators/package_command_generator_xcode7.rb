@@ -64,7 +64,6 @@ module Gym
             Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
             FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
           else
-            print "Could not find IPA at " + temporary_output_path
             ErrorHandler.handle_empty_archive unless path
           end
         end
