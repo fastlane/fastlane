@@ -51,7 +51,8 @@ module Fastlane
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
-            uri = URI.parse("https://#{api_host}/v2/user/#{channel}/message")
+            escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
+            uri = URI.parse("https://#{api_host}/v2/user/#{escaped_channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
 
