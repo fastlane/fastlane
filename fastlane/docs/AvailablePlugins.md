@@ -48,3 +48,4 @@ You can find more information about how to start using plugins in [Plugins.md](h
 [tunes](https://github.com/neonichu/fastlane-tunes) | Play music using fastlane, because you can. | 218
 [ya_tu_sabes](https://github.com/neonichu/fastlane-plugin-ya_tu_sabes) | Ya tu sabes. | 211
 [download_file](https://github.com/maxoly/fastlane-plugin-download_file) | This action downloads a file from an HTTP/HTTPS url (e.g. ZIP file) and puts it in a destination path | 171
+[localization](https://github.com/vmalyi/fastlane-plugin-localization) | Export/import app localizations with help of xcodebuild -exportLocalizations/-importLocalizations tool  | 2
