@@ -1233,6 +1233,24 @@ testfairy(
 )
 ```
 
+### [Balto](http://www.balto.io/)
+
+Upload your build to Balto platform to distribute the build to beta testers.
+
+You can manage your builds on [projects page](https://www.balto.io/webapp/#!/project).
+
+```ruby
+balto(
+  user_token: '...',
+  project_token: '...',
+  ipa: './ipa_file.ipa'
+)
+```
+
+Additionally you can specify `release_note`, `ready_for_review` (Only me or the project members).
+
+More information about the available options can be found in the [Balto Docs](http://balto.helpscoutdocs.com/).
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
