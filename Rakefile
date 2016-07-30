@@ -8,7 +8,7 @@ RAILS = %w(boarding refresher enhancer)
 desc 'Setup the fastlane development environment'
 task :bootstrap do
   system('gem install bundler') unless system('which bundle')
-  Rake::Task[:clone].invoke
+  # Rake::Task[:clone].invoke
   Rake::Task[:install].invoke
 
   box 'You are up and running'
