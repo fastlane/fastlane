@@ -3,7 +3,7 @@ module Fastlane
     class GitTagExistsAction < Action
       def self.run(params)
         result = Actions.sh("git rev-parse -q --verify \"refs/tags/#{params[:tag]}\" || true", log: false).chomp
-        result.empty? ? nil : result
+        !result.empty?
       end
 
       #####################################################
