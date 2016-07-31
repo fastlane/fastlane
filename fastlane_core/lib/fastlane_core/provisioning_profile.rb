@@ -28,7 +28,7 @@ module FastlaneCore
         if (plist || []).count > 5
           plist
         else
-          Helper.log.error("Error parsing provisioning profile at path '#{path}'".red)
+          UI.error("Error parsing provisioning profile at path '#{path}'")
           nil
         end
       end
@@ -50,7 +50,7 @@ module FastlaneCore
 
       # Installs a provisioning profile for Xcode to use
       def install(path)
-        Helper.log.info "Installing provisioning profile..."
+        UI.message("Installing provisioning profile...")
         profile_filename = uuid(path) + ".mobileprovision"
         destination = File.join(profiles_path, profile_filename)
 
@@ -58,7 +58,7 @@ module FastlaneCore
           # copy to Xcode provisioning profile directory
           FileUtils.copy(path, destination)
           unless File.exist?(destination)
-            raise "Failed installation of provisioning profile at location: '#{destination}'".red
+            UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
           end
         end
 

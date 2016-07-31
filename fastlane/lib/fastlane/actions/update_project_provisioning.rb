@@ -1,3 +1,4 @@
+# coding: utf-8
 # rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
@@ -8,14 +9,14 @@ module Fastlane
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md")
+        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
 
         # validate folder
         project_file_path = File.join(folder, "project.pbxproj")
-        raise "Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!".red unless File.exist?(project_file_path)
+        UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
         # download certificate
         unless File.exist?(params[:certificate])
@@ -31,7 +32,7 @@ module Fastlane
         profile = File.read(params[:profile])
         p7 = OpenSSL::PKCS7.new(profile)
         store = OpenSSL::X509::Store.new
-        raise "Could not find valid certificate at '#{params[:certificate]}'" unless File.size(params[:certificate]) > 0
+        UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
         p7.verify([cert], store)
@@ -73,7 +74,7 @@ module Fastlane
       end
 
       def self.description
-        "Update projects code signing settings from your profisioning profile"
+        "Update projects code signing settings from your provisioning profile"
       end
 
       def self.details
@@ -94,14 +95,14 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Path to xcode project is invalid".red unless File.exist?(value)
+                                         UI.user_error!("Path to xcode project is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :profile,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
                                        description: "Path to provisioning profile (.mobileprovision)",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
                                        verify_block: proc do |value|
-                                         raise "Path to provisioning profile is invalid".red unless File.exist?(value)
+                                         UI.user_error!("Path to provisioning profile is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :target_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",

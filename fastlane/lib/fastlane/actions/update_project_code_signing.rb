@@ -6,12 +6,12 @@ module Fastlane
     class UpdateProjectCodeSigningAction < Action
       def self.run(params)
         UI.message("You shouldn't use update_project_code_signing")
-        UI.message("Have you considered using the recommended way to do code sining?")
-        UI.message("https://github.com/fastlane/fastlane/blob/master/docs/CodeSigning.md")
+        UI.message("Have you considered using the recommended way to do code signing?")
+        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
 
         path = params[:path]
         path = File.join(path, "project.pbxproj")
-        raise "Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!".red unless File.exist?(path)
+        UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
         UI.message("Updating provisioning profile UDID (#{params[:udid]}) for the given project '#{path}'")
 
@@ -35,7 +35,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
                                        verify_block: proc do |value|
-                                         raise "Path is invalid".red unless File.exist?(value)
+                                         UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_PROJECT_SIGNING_UDID",

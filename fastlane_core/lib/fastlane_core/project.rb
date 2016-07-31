@@ -5,7 +5,7 @@ module FastlaneCore
       # Project discovery
       def detect_projects(config)
         if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
-          raise "You can only pass either a workspace or a project path, not both".red
+          UI.user_error!("You can only pass either a workspace or a project path, not both")
         end
 
         return if config[:project].to_s.length > 0
@@ -48,10 +48,10 @@ module FastlaneCore
               config[:project] = path
               break
             else
-              Helper.log.error "Path must end with either .xcworkspace or .xcodeproj"
+              UI.error("Path must end with either .xcworkspace or .xcodeproj")
             end
           else
-            Helper.log.error "Couldn't find project at path '#{File.expand_path(path)}'".red
+            UI.error("Couldn't find project at path '#{File.expand_path(path)}'")
           end
         end
       end
@@ -66,13 +66,22 @@ module FastlaneCore
     # The config object containing the scheme, configuration, etc.
     attr_accessor :options
 
-    def initialize(options)
+    # Should the output of xcodebuild commands be silenced?
+    attr_accessor :xcodebuild_list_silent
+
+    # Should we redirect stderr to /dev/null for xcodebuild commands?
+    # Gets rid of annoying plugin info warnings.
+    attr_accessor :xcodebuild_suppress_stderr
+
+    def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
       self.options = options
       self.path = File.expand_path(options[:workspace] || options[:project])
       self.is_workspace = (options[:workspace].to_s.length > 0)
+      self.xcodebuild_list_silent = xcodebuild_list_silent
+      self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
       if !path or !File.directory?(path)
-        raise "Could not find project at path '#{path}'".red
+        UI.user_error!("Could not find project at path '#{path}'")
       end
     end
 
@@ -95,12 +104,11 @@ module FastlaneCore
 
     # Let the user select a scheme
     # Use a scheme containing the preferred_to_include string when multiple schemes were found
-    # rubocop:disable Metrics/AbcSize
     def select_scheme(preferred_to_include: nil)
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless schemes.include?(options[:scheme].to_s)
-          Helper.log.error "Couldn't find specified scheme '#{options[:scheme]}'.".red
+          UI.error("Couldn't find specified scheme '#{options[:scheme]}'.")
           options[:scheme] = nil
         end
       end
@@ -118,24 +126,23 @@ module FastlaneCore
         if preferred_to_include and preferred.count == 1
           options[:scheme] = preferred.last
         elsif automated_scheme_selection? && schemes.include?(project_name)
-          Helper.log.info "Using scheme matching project name (#{project_name}).".yellow
+          UI.important("Using scheme matching project name (#{project_name}).")
           options[:scheme] = project_name
         elsif Helper.is_ci?
-          Helper.log.error "Multiple schemes found but you haven't specified one.".red
-          Helper.log.error "Since this is a CI, please pass one using the `scheme` option".red
-          raise "Multiple schemes found".red
+          UI.error("Multiple schemes found but you haven't specified one.")
+          UI.error("Since this is a CI, please pass one using the `scheme` option")
+          UI.user_error!("Multiple schemes found")
         else
           puts "Select Scheme: "
           options[:scheme] = choose(*schemes)
         end
       else
-        Helper.log.error "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace".red
-        Helper.log.error "Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use".red
+        UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
+        UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
 
-        raise "No Schemes found".red
+        UI.user_error!("No Schemes found")
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     # Get all available configurations in an array
     def configurations
@@ -168,6 +175,7 @@ module FastlaneCore
     def mac?
       # Some projects have different values... we have to look for all of them
       return true if build_settings(key: "PLATFORM_NAME") == "macosx"
+      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "macOS"
       return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "OS X"
       false
     end
@@ -184,9 +192,9 @@ module FastlaneCore
 
     def xcodebuild_parameters
       proj = []
-      proj << "-workspace '#{options[:workspace]}'" if options[:workspace]
-      proj << "-scheme '#{options[:scheme]}'" if options[:scheme]
-      proj << "-project '#{options[:project]}'" if options[:project]
+      proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
+      proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
+      proj << "-project #{options[:project].shellescape}" if options[:project]
 
       return proj
     end
@@ -195,13 +203,19 @@ module FastlaneCore
     # @!group Raw Access
     #####################################################
 
+    def build_xcodebuild_showbuildsettings_command
+      # We also need to pass the workspace and scheme to this command
+      command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      command += " 2> /dev/null" if xcodebuild_suppress_stderr
+      command
+    end
+
     # Get the build settings for our project
     # this is used to properly get the DerivedData folder
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
     def build_settings(key: nil, optional: true)
       unless @build_settings
-        # We also need to pass the workspace and scheme to this command
-        command = "xcrun xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+        command = build_xcodebuild_showbuildsettings_command
         @build_settings = Helper.backticks(command, print: false)
       end
 
@@ -211,8 +225,8 @@ module FastlaneCore
       rescue => ex
         return nil if optional # an optional value, we really don't care if something goes wrong
 
-        Helper.log.error caller.join("\n\t")
-        Helper.log.error "Could not fetch #{key} from project file: #{ex}"
+        UI.error(caller.join("\n\t"))
+        UI.error("Could not fetch #{key} from project file: #{ex}")
       end
 
       nil
@@ -222,6 +236,15 @@ module FastlaneCore
     def default_build_settings(key: nil, optional: true)
       options[:scheme] = schemes.first if is_workspace
       build_settings(key: key, optional: optional)
+    end
+
+    def build_xcodebuild_list_command
+      # Unfortunately since we pass the workspace we also get all the
+      # schemes generated by CocoaPods
+      options = xcodebuild_parameters.delete_if { |a| a.to_s.include? "scheme" }
+      command = "xcodebuild -list #{options.join(' ')}"
+      command += " 2> /dev/null" if xcodebuild_suppress_stderr
+      command
     end
 
     def raw_info(silent: false)
@@ -255,23 +278,19 @@ module FastlaneCore
 
       return @raw if @raw
 
-      # Unfortunately since we pass the workspace we also get all the
-      # schemes generated by CocoaPods
-
-      options = xcodebuild_parameters.delete_if { |a| a.to_s.include? "scheme" }
-      command = "xcrun xcodebuild -list #{options.join(' ')}"
-      Helper.log.info command.yellow unless silent
+      command = build_xcodebuild_list_command
+      UI.important(command) unless silent
 
       # xcode >= 6 might hang here if the user schemes are missing
       begin
         timeout = FastlaneCore::Project.xcode_list_timeout
         @raw = FastlaneCore::Project.run_command(command, timeout: timeout)
       rescue Timeout::Error
-        raise "xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
-          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT".red
+        UI.user_error!("xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
+          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
       end
 
-      raise "Error parsing xcode file using `#{command}`".red if @raw.length == 0
+      UI.user_error!("Error parsing xcode file using `#{command}`") if @raw.length == 0
 
       return @raw
     end
@@ -295,7 +314,7 @@ module FastlaneCore
 
     def parsed_info
       unless @parsed_info
-        @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info)
+        @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info(silent: xcodebuild_list_silent))
       end
       @parsed_info
     end

@@ -2,7 +2,7 @@ module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
     def self.installed?(path)
-      raise "Could not find file '#{path}'".red unless File.exist?(path)
+      UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies
       finger_print = sha1_fingerprint(path)
@@ -48,7 +48,8 @@ module FastlaneCore
 
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}'", print: $verbose)
+      keychain = wwdr_keychain
+      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: $verbose)
       return response.include?("attributes:")
     end
 
@@ -56,9 +57,26 @@ module FastlaneCore
       Dir.chdir('/tmp') do
         url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
         filename = File.basename(url)
-        `curl -O #{url} && security import #{filename} -k login.keychain`
+        keychain = wwdr_keychain
+        keychain = "-k #{keychain.shellescape}" unless keychain.empty?
+        Helper.backticks("curl -O #{url} && security import #{filename} #{keychain}", print: $verbose)
         UI.user_error!("Could not install WWDR certificate") unless $?.success?
       end
+    end
+
+    def self.wwdr_keychain
+      priority = [
+        "security list-keychains -d user",
+        "security default-keychain -d user"
+      ]
+      priority.each do |command|
+        keychains = Helper.backticks(command, print: $verbose).split("\n")
+        unless keychains.empty?
+          # Select first keychain name from returned keychains list
+          return keychains[0].strip.tr('"', '')
+        end
+      end
+      return ""
     end
 
     def self.sha1_fingerprint(path)
@@ -68,8 +86,8 @@ module FastlaneCore
         result.delete!(':')
         return result
       rescue
-        Helper.log.info result
-        raise "Error parsing certificate '#{path}'"
+        UI.message(result)
+        UI.user_error!("Error parsing certificate '#{path}'")
       end
     end
   end

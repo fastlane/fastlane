@@ -4,7 +4,7 @@ module Frameit
     attr_accessor :path # path to the screenshot
     attr_accessor :size # size in px array of 2 elements: height and width
     attr_accessor :screen_size # deliver screen size type, is unique per device type, used in device_name
-    attr_accessor :color # the color to use for the frame
+    attr_accessor :color # the color to use for the frame (from Frameit::Color)
 
     # path: Path to screenshot
     # color: Color to use for the frame
@@ -26,7 +26,7 @@ module Frameit
       when sizes::IOS_47
         return 'iPhone-6s'
       when sizes::IOS_40
-        return 'iPhone_5s'
+        return Frameit.config[:use_legacy_iphone5s] ? 'iPhone_5s' : 'iPhone-SE'
       when sizes::IOS_35
         return 'iPhone_4'
       when sizes::IOS_IPAD

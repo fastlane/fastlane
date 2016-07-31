@@ -3,8 +3,7 @@ module Spaceship
     # Represents a build train of builds from iTunes Connect
     # A build train is all builds for a given version number with different build numbers
     class BuildTrain < TunesBase
-      # @return (Spaceship::Tunes::Application) A reference to the application
-      #   this train is for
+      # @return (Spaceship::Tunes::Application) A reference to the application this train is for
       attr_accessor :application
 
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
@@ -22,9 +21,13 @@ module Spaceship
       # @return (Bool) Is internal beta testing enabled for this train? Only one train can have enabled testing.
       attr_reader :internal_testing_enabled
 
-      # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
+      # @return (Array) An array of all processing builds that are inside this train (Spaceship::Tunes::Build)
+      # Does not include invalid builds.
       #  I never got this to work to properly try and debug this
       attr_reader :processing_builds
+
+      # @return (Array) An array of all invalid builds that are inside this train
+      attr_reader :invalid_builds
 
       attr_mapping(
         'versionString' => :version_string,
@@ -66,6 +69,12 @@ module Spaceship
           Tunes::Build.factory(attrs)
         end
 
+        @invalid_builds = @builds.select do |build|
+          build.processing_state == 'processingFailed' || build.processing_state == 'invalidBinary'
+        end
+
+        # This step may not be necessary anymore - it seems as if every processing build will be caught by the
+        # @builds.each below, but not every processing build makes it to buildsInProcessing, so this is redundant
         @processing_builds = (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
           attrs[:build_train] = self
           Tunes::Build.factory(attrs)
@@ -73,7 +82,24 @@ module Spaceship
 
         # since buildsInProcessing appears empty, fallback to also including processing state from @builds
         @builds.each do |build|
-          @processing_builds << build if build.processing == true && build.valid == true
+          # What combination of attributes constitutes which state is pretty complicated. The table below summarizes
+          # what I've observed, but there's no reason to believe there aren't more states I just haven't seen yet.
+          # The column headers are qualitative states of a given build, and the first column is the observed attributes
+          # of that build.
+          # NOTE: Some of the builds in the build_trains.json fixture do not follow these rules. I don't know if that is
+          # because those examples are older, and the iTC API has changed, or if their format is still a possibility.
+          # The second part of the OR clause in the line below exists so that those suspicious examples continue to be
+          # accepted for unit tests.
+          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+          # |                     | just after upload | normal processing | invalid binary  | processing failed  | success |
+          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+          # |  build.processing = | true              | true              | true            | true               | false   |
+          # |       build.valid = | false             | true              | false           | true               | true    |
+          # | .processing_state = | "processing"      | "processing"      | "invalidBinary" | "processingFailed" | nil     |
+          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+          if build.processing_state == 'processing' || (build.processing && build.processing_state != 'invalidBinary' && build.processing_state != 'processingFailed')
+            @processing_builds << build
+          end
         end
       end
 
@@ -98,9 +124,9 @@ module Spaceship
 
             # also update the builds
             train['builds'].delete_if do |b|
-              return true if b[testing_key].nil?
-
-              if build && b["buildVersion"] == build.build_version
+              if b[testing_key].nil?
+                true
+              elsif build && b["buildVersion"] == build.build_version
                 b[testing_key]['value'] = new_value
                 false
               elsif b[testing_key]['value'] == true

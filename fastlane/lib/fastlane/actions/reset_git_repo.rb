@@ -36,7 +36,7 @@ module Fastlane
             UI.success("Git cleaned up #{paths.count} files.")
           end
         else
-          raise 'This is a destructive and potentially dangerous action. To protect from data loss, please add the `ensure_git_status_clean` action to the beginning of your lane, or if you\'re absolutely sure of what you\'re doing then call this action with the :force option.'.red
+          UI.user_error!('This is a destructive and potentially dangerous action. To protect from data loss, please add the `ensure_git_status_clean` action to the beginning of your lane, or if you\'re absolutely sure of what you\'re doing then call this action with the :force option.')
         end
       end
 
@@ -61,7 +61,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "Please pass an array only" unless value.kind_of? Array
+                                         UI.user_error!("Please pass an array only") unless value.kind_of? Array
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_RESET_GIT_FORCE",

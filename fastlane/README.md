@@ -89,7 +89,7 @@ fastlane appstore
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
-:hatching_chick: | Over 150 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for both iOS, Mac OS and Android apps
 :octocat: | Full git and mercurial support
 
@@ -114,7 +114,7 @@ If you experience slow launch times of fastlane, try running
 
 to clean up outdated gems.
 
-System Requirements: `fastlane` requires Mac OS X or Linux with Ruby 2.0.0 or above.
+System Requirements: `fastlane` requires macOS or Linux with Ruby 2.0.0 or above.
 
 
 If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
@@ -172,8 +172,6 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 `fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer).
 
 You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
-
-You can optionally submit crash reports, run `fastlane enable_crash_reporting` to get started. This makes resolving issues much easier and helps improve fastlane. [More information](https://github.com/fastlane/fastlane/releases/tag/1.33.3)
 
 ## Credentials
 A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/fastlane/tree/master/credentials_manager).

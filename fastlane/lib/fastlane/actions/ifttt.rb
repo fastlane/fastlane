@@ -59,7 +59,8 @@ module Fastlane
                                        env_name: "IFTTT_VALUE3",
                                        description: "Extra data sent with the event",
                                        optional: true,
-                                       is_string: true)]
+                                       is_string: true)
+        ]
       end
 
       def self.is_supported?(platform)

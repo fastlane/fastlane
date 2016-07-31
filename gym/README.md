@@ -49,11 +49,11 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>gym</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>gym</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # What's gym?
 
-`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` file :muscle:
+`gym` builds and packages iOS and macOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file :muscle:
 
 `gym` is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
@@ -180,7 +180,12 @@ export_options(
 
 For the list of available options run `xcodebuild -help`.
 
-# Automating the whole process
+## Setup code signing
+
+- [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
+- [Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+
+## Automating the whole process
 
 `gym` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
@@ -254,7 +259,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

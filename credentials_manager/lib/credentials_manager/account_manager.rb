@@ -3,7 +3,11 @@ require 'highline/import' # to hide the entered password
 
 module CredentialsManager
   class AccountManager
-    def initialize(user: nil, password: nil)
+    # @param prefix [String] Very optional, is used for the
+    #   iTunes Transporter which uses application specofic passwords
+    def initialize(user: nil, password: nil, prefix: nil)
+      @prefix = prefix || "deliver"
+
       @user = user
       @password = password
     end
@@ -16,9 +20,12 @@ module CredentialsManager
       return @user
     end
 
+    def fetch_password_from_env
+      ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+    end
+
     def password(ask_if_missing: true)
-      @password ||= ENV["FASTLANE_PASSWORD"]
-      @password ||= ENV["DELIVER_PASSWORD"]
+      @password ||= fetch_password_from_env
       unless @password
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
@@ -32,6 +39,13 @@ module CredentialsManager
     # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
       puts "The login credentials for '#{user}' seem to be wrong".red
+
+      if fetch_password_from_env
+        puts "The password was taken from the environment variable"
+        puts "Please make sure it is correct"
+        return false
+      end
+
       if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts "Removing Keychain entry for user '#{user}'...".yellow
         remove_from_keychain
@@ -50,12 +64,16 @@ module CredentialsManager
       @password = nil
     end
 
+    def server_name
+      "#{@prefix}.#{user}"
+    end
+
     private
 
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
       puts "The login information you enter will be stored in your Mac OS Keychain".green
-      puts "You can also pass the password using the `FASTLANE_PASSWORD` env variable".green
+      puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
       puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
       puts "-------------------------------------------------------------------------------------".green
 
@@ -79,10 +97,6 @@ module CredentialsManager
         puts "Could not store password in keychain".red
         return false
       end
-    end
-
-    def server_name
-      "deliver.#{user}"
     end
   end
 end

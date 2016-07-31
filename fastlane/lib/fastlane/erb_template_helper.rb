@@ -8,7 +8,7 @@ module Fastlane
 
     def self.load_from_path(template_filepath)
       unless File.exist?(template_filepath)
-        raise "Could not find Template at path '#{template_filepath}'".red
+        UI.user_error!("Could not find Template at path '#{template_filepath}'")
       end
       File.read(template_filepath)
     end
@@ -16,7 +16,6 @@ module Fastlane
     def self.render(template, template_vars_hash)
       Fastlane::ErbalT.new(template_vars_hash).render(template)
     end
-
   end
   class ErbalT < OpenStruct
     def render(template)

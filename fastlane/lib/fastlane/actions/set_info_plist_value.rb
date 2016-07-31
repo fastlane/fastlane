@@ -34,13 +34,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
+                                       is_string: false,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SET_INFO_PLIST_PATH",
                                        description: "Path to plist file you want to update",
                                        optional: false,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find plist file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find plist file at path '#{value}'") unless File.exist?(value)
                                        end)
         ]
       end

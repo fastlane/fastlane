@@ -5,8 +5,6 @@ module Snapshot
 
     class HardwareKeyboardFix
       def self.patch
-        Snapshot.kill_simulator # First we need to kill the simulator
-
         UI.verbose "Patching simulator to work with secure text fields"
 
         Helper.backticks("defaults write com.apple.iphonesimulator ConnectHardwareKeyboard 0", print: $verbose)

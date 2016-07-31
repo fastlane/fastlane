@@ -1,14 +1,13 @@
 module Fastlane
   module Actions
     class LcovAction < Action
-
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
 
       def self.run(options)
         unless Helper.test?
-          raise 'lcov not installed, please install using `brew install lcov`'.red if `which lcov`.length == 0
+          UI.user_error!("lcov not installed, please install using `brew install lcov`") if `which lcov`.length == 0
         end
         gen_cov(options)
       end
@@ -84,7 +83,6 @@ module Fastlane
       def self.exclude_dirs
         ["/Applications/*", "/Frameworks/*"]
       end
-
     end
   end
 end

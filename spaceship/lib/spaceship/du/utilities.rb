@@ -10,6 +10,7 @@ module Spaceship
     def content_type(path)
       path = path.downcase
       return 'image/jpeg' if path.end_with?('.jpg')
+      return 'image/jpeg' if path.end_with?('.jpeg')
       return 'image/png' if path.end_with?('.png')
       return 'application/json' if path.end_with?('.geojson')
       return 'video/quicktime' if path.end_with?('.mov')
@@ -70,6 +71,11 @@ module Spaceship
       [res[1].to_i, res[2].to_i]
     end
 
-    module_function :content_type, :grab_video_preview, :portrait?, :resolution, :video_resolution
+    # @return (String) md5 checksum of given file
+    def md5digest(file_path)
+      Digest::MD5.hexdigest(File.read(file_path))
+    end
+
+    module_function :content_type, :grab_video_preview, :portrait?, :resolution, :video_resolution, :md5digest
   end
 end

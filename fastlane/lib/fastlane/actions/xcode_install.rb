@@ -9,7 +9,6 @@ module Fastlane
         ENV["XCODE_INSTALL_USER"] = params[:username]
         ENV["XCODE_INSTALL_TEAM_ID"] = params[:team_id]
 
-        Actions.verify_gem!('xcode-install')
         require 'xcode/install'
         installer = XcodeInstall::Installer.new
 
@@ -20,7 +19,7 @@ module Fastlane
         end
 
         xcode = installer.installed_versions.find { |x| x.version == params[:version] }
-        raise "Could not find Xcode with version '#{params[:version]}'" unless xcode
+        UI.user_error!("Could not find Xcode with version '#{params[:version]}'") unless xcode
         UI.message("Using Xcode #{params[:version]} on path '#{xcode.path}'")
         xcode.approve_license
 

@@ -13,8 +13,7 @@ module Deliver
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
                                 :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category
-                               ]
+                                :secondary_first_sub_category, :secondary_second_sub_category]
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
@@ -172,6 +171,7 @@ module Deliver
       v.review_email = info[:email_address] if info[:email_address]
       v.review_demo_user = info[:demo_user] if info[:demo_user]
       v.review_demo_password = info[:demo_password] if info[:demo_password]
+      v.review_user_needed = (v.review_demo_user.to_s + v.review_demo_password.to_s).length > 0
       v.review_notes = info[:notes] if info[:notes]
     end
 

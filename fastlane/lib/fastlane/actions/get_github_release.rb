@@ -15,7 +15,10 @@ module Fastlane
 
         headers = { 'User-Agent' => 'fastlane-get_github_release' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
-        response = Excon.get("#{server_url}/repos/#{params[:url]}/releases", headers: headers)
+
+        # To still get the data when a repo has been moved
+        middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower]
+        response = Excon.get("#{server_url}/repos/#{params[:url]}/releases", headers: headers, middlewares: middlewares)
 
         case response[:status]
         when 404
@@ -110,8 +113,8 @@ module Fastlane
                                        env_name: "FL_GET_GITHUB_RELEASE_URL",
                                        description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
                                        verify_block: proc do |value|
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.include? "github.com"
-                                         raise "Please only pass the path, e.g. 'KrauseFx/fastlane'".red if value.split('/').count != 2
+                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
                                        env_name: "FL_GITHUB_RELEASE_SERVER_URL",
@@ -119,7 +122,7 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please include the protocol in the server url, e.g. https://your.github.server".red unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server") unless value.include? "//"
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_GET_GITHUB_RELEASE_VERSION",

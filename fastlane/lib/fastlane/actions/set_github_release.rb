@@ -52,7 +52,7 @@ module Fastlane
             get_response = self.call_releases_endpoint("get", server_url, repo_name, "/releases/#{release_id}", api_token, nil)
             if get_response[:status] != 200
               UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
-              raise "Failed to fetch the newly created release, but it *has been created* successfully.".red
+              UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
             end
 
             get_body = JSON.parse(get_response.body)
@@ -67,10 +67,10 @@ module Fastlane
           UI.error("Release on tag #{params[:tag_name]} already exists!")
         when 404
           UI.error(response.body)
-          raise "Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).".red
+          UI.user_error!("Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).")
         when 401
           UI.error(response.body)
-          raise "You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.".red
+          UI.user_error!("You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.")
         else
           if response[:status] != 200
             UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
@@ -90,7 +90,7 @@ module Fastlane
         absolute_path = File.absolute_path(asset_path)
 
         # check that the asset even exists
-        raise "Asset #{absolute_path} doesn't exist" unless File.exist?(absolute_path)
+        UI.user_error!("Asset #{absolute_path} doesn't exist") unless File.exist?(absolute_path)
 
         name = File.basename(absolute_path)
         response = nil
@@ -124,7 +124,7 @@ module Fastlane
           UI.success("Successfully uploaded #{name}.")
         else
           UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
-          raise "Failed to upload asset #{name} to GitHub."
+          UI.user_error!("Failed to upload asset #{name} to GitHub.")
         end
       end
 
@@ -136,7 +136,7 @@ module Fastlane
         when "get"
           response = Excon.get(url, headers: headers, body: body)
         else
-          raise "Unsupported method #{method}"
+          UI.user_error!("Unsupported method #{method}")
         end
         return response
       end
@@ -175,8 +175,8 @@ module Fastlane
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
                                        description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.include? "github.com"
-                                         raise "Please only pass the path, e.g. 'fastlane/fastlane'".red if value.split('/').count != 2
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
                                        env_name: "FL_GITHUB_RELEASE_SERVER_URL",
@@ -184,7 +184,7 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please include the protocol in the server url, e.g. https://your.github.server/api/v3".red unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
@@ -230,7 +230,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         raise "upload_assets must be an Array of paths to assets" unless value.kind_of? Array
+                                         UI.user_error!("upload_assets must be an Array of paths to assets") unless value.kind_of? Array
                                        end)
         ]
       end

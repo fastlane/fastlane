@@ -30,14 +30,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '~> 3.1' # needed for parsing provisioning profiles
   spec.add_dependency 'terminal-table', '~> 1.4.5' # options summary
-  spec.add_dependency 'sentry-raven', '~> 0.15' # Optional crash reporting
+  spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
 
-  spec.add_dependency 'credentials_manager', '>= 0.11.0', '< 1.0.0' # fastlane password manager
+  spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # fastlane password manager
 
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'

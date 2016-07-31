@@ -11,6 +11,7 @@ require 'gym/xcode'
 
 require 'fastlane_core'
 require 'terminal-table'
+require 'shellwords'
 
 module Gym
   class << self
@@ -35,6 +36,7 @@ module Gym
       require 'gym/xcodebuild_fixes/swift_fix'
       require 'gym/xcodebuild_fixes/watchkit_fix'
       require 'gym/xcodebuild_fixes/watchkit2_fix'
+      require 'gym/xcodebuild_fixes/generic_archive_fix'
       require 'gym/xcodebuild_fixes/package_application_fix'
     end
   end

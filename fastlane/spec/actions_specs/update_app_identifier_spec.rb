@@ -97,7 +97,7 @@ describe Fastlane do
                 app_identifier: '#{app_identifier}'
               })
             end").runner.execute(:test)
-          end.to raise_error("Xcodeproj doesn't have configuration with info plist #{plist_path}.".red)
+          end.to raise_error("Xcodeproj doesn't have configuration with info plist #{plist_path}.")
         end
 
         it "should raise an exception when PRODUCT_BUNDLE_IDENTIFIER in info plist but not project" do
@@ -112,13 +112,13 @@ describe Fastlane do
           create_plist_with_identifier("$(#{identifier_key})")
           expect do
             Fastlane::FastFile.new.parse("lane :test do
-            update_app_identifier ({
+            update_app_identifier({
               xcodeproj: '#{xcodeproj}',
               plist_path: '#{plist_path}',
               app_identifier: '#{app_identifier}'
             })
             end").runner.execute(:test)
-          end.to raise_error("Info plist uses $(#{identifier_key}), but xcodeproj does not".red)
+          end.to raise_error("Info plist uses $(#{identifier_key}), but xcodeproj does not")
         end
       end
 

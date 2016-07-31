@@ -1,4 +1,5 @@
 # rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/AbcSize
 require "commander"
 require "pilot/options"
 require "fastlane_core"
@@ -36,10 +37,10 @@ module Pilot
           mgr.public_send(action, config)
         rescue => ex
           failures.push(address)
-          Helper.log.info "[#{address}]: #{ex}".red
+          UI.message("[#{address}]: #{ex}")
         end
       end
-      raise "Some operations failed: #{failures}".red unless failures.empty?
+      UI.user_error!("Some operations failed: #{failures}") unless failures.empty?
     end
 
     def run
@@ -58,6 +59,16 @@ module Pilot
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.upload(config)
+        end
+      end
+
+      command :distribute do |c|
+        c.syntax = "pilot distribute"
+        c.description = "Distribute a previously uploaded binary to Apple TestFlight"
+        c.action do |args, options|
+          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config[:distribute_external] = true
+          Pilot::BuildManager.new.distribute(config)
         end
       end
 

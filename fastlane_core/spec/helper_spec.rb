@@ -11,6 +11,11 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
+      it "returns true when building in Jenkins Slave" do
+        stub_const('ENV', { 'JENKINS_HOME' => '/fake/jenkins/home' })
+        expect(FastlaneCore::Helper.is_ci?).to be true
+      end
+
       it "returns true when building in Travis CI" do
         stub_const('ENV', { 'TRAVIS' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
@@ -18,6 +23,11 @@ describe FastlaneCore do
 
       it "returns true when building in gitlab-ci" do
         stub_const('ENV', { 'GITLAB_CI' => true })
+        expect(FastlaneCore::Helper.is_ci?).to be true
+      end
+
+      it "returns true when building in Xcode Server" do
+        stub_const('ENV', { 'XCS' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
     end
@@ -32,7 +42,7 @@ describe FastlaneCore do
         end
 
         it "#transporter_path" do
-          expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/\.\./Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter})
+          expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter})
         end
 
         it "#xcode_version" do

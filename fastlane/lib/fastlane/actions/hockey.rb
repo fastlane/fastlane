@@ -16,23 +16,31 @@ module Fastlane
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
+        build_file = [
+          options[:ipa],
+          options[:apk]
+        ].detect { |e| !e.to_s.empty? }
+
         if options[:dsym]
           dsym_filename = options[:dsym]
         else
-          if options[:ipa].to_s.length == 0
-            UI.user_error!("You have to provide an ipa file")
+
+          if build_file.nil?
+            UI.user_error!("You have to provide a build file")
           end
 
-          dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
-          if File.exist?(dsym_path)
-            dsym_filename = dsym_path
-          else
-            UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
-            dsym_filename = nil
+          dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
+          if options[:ipa]
+            if File.exist?(dsym_path)
+              dsym_filename = dsym_path
+            else
+              UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
+              dsym_filename = nil
+            end
           end
         end
 
-        raise "Symbols on path '#{File.expand_path(dsym_filename)}' not found".red if dsym_filename && !File.exist?(dsym_filename)
+        UI.user_error!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
         UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
 
@@ -44,7 +52,7 @@ module Fastlane
 
         return values if Helper.test?
 
-        ipa_filename = options[:ipa]
+        ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
         response = client.upload_build(ipa_filename, values)
@@ -59,9 +67,9 @@ module Fastlane
           UI.success('Build successfully uploaded to HockeyApp!')
         else
           if response.body.to_s.include?("App could not be created")
-            raise "Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400"
+            UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
           else
-            raise "Error when trying to upload ipa to HockeyApp: #{response.body}".red
+            UI.user_error!("Error when trying to upload ipa to HockeyApp: #{response.body}")
           end
         end
       end
@@ -72,11 +80,23 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: "FL_HOCKEY_APK",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:ipa],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'apk' and '#{value.key}' options in one run")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
-                                         raise "No API token for Hockey given, pass using `api_token: 'token'`".red unless value and !value.empty?
+                                         UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
@@ -84,7 +104,11 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:apk],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'ipa' and '#{value.key}' options in one run")
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
@@ -100,23 +124,23 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
-                                       description: "Notify testers? 1 for yes",
+                                       description: "Notify testers? \"1\" for yes",
                                        default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
-                                       description: "Download status: 1 = No user can download; 2 = Available for download",
+                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
-                                      description: "Notes type for your :notes, 0 = Textile, 1 = Markdown (default)",
+                                      description: "Notes type for your :notes, \"0\" = Textile, \"1\" = Markdown (default)",
                                       default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :release_type,
                                       env_name: "FL_HOCKEY_RELEASE_TYPE",
-                                      description: "Release type of the app: 0 = Beta (default), 1 = Store, 2 = Alpha, 3 = Enterprise",
+                                      description: "Release type of the app: \"0\" = Beta (default), \"1\" = Store, \"2\" = Alpha, \"3\" = Enterprise",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :mandatory,
                                       env_name: "FL_HOCKEY_MANDATORY",
-                                      description: "Set to 1 to make this update mandatory",
+                                      description: "Set to \"1\" to make this update mandatory",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :teams,
                                       env_name: "FL_HOCKEY_TEAMS",
@@ -154,7 +178,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :owner_id,
                                       env_name: "FL_HOCKEY_OWNER_ID",
                                       description: "ID for the owner of the app",
-                                      optional: true)
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :strategy,
+                                       env_name: "FL_HOCKEY_STRATEGY",
+                                       description: "Strategy: 'add' = to add the build as a new build even if it has the same build number (default); 'replace' = to replace a build with the same build number",
+                                       default_value: "add",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
+                                       end)
         ]
       end
 
@@ -166,7 +197,7 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        ["KrauseFx", "modzelewski"]
       end
 
       def self.is_supported?(platform)

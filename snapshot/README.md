@@ -35,6 +35,8 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
+'snapshot' generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
+
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
 It's hard to get everything right!
@@ -81,7 +83,7 @@ Please check out the [MigrationGuide to 1.0](/snapshot/MigrationGuide.md) :+1:
 
 -------
 
-<h5 align="center"><code>snapshot</code> is part of <a href="https://fastlane.tools">fastlane</a>: connect all deployment tools into one streamlined workflow.</h5>
+<h5 align="center"><code>snapshot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
@@ -321,7 +323,7 @@ launch_arguments([
 
 The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different approach:
 
-When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occured during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
+When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occurred during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
 
 When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
 
@@ -329,7 +331,7 @@ When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the s
 
 In the test output, the Swift `snapshot` function will print out something like this
 
-  snapshot: [some random text here]
+> snapshot: [some random text here]
 
 `snapshot` finds all these entries using a regex. The number of `snapshot` outputs in the terminal and the number of `snapshot` events in the plist file should be the same. Knowing that, `snapshot` automatically matches these 2 lists to identify the name of each of these screenshots. They are then copied over to the output directory and separated by language and device.
 
@@ -346,7 +348,7 @@ Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/rada
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
 - [`PEM`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles

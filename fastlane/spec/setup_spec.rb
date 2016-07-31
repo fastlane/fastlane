@@ -58,11 +58,10 @@ describe Fastlane do
           allow(project).to receive(:path).and_return("./path")
 
           expect(setup.run).to eq(true)
-          expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
+          expect(setup.tools).to eq({ snapshot: false, cocoapods: true, carthage: false })
 
           content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
           expect(content).to include "# update_fastlane"
-          expect(content).to include "# opt_out_usage"
           expect(content).to include "deliver"
           expect(content).to include "scan"
           expect(content).to include "gym(scheme: \"MyScheme\")"

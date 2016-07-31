@@ -5,8 +5,16 @@ module Fastlane
     def self.git_log_between(pretty_format, from, to, merge_commit_filtering)
       command = 'git log'
       command << " --pretty=\"#{pretty_format}\" #{from.shellescape}...#{to.shellescape}"
-      command << " --no-merges" if merge_commit_filtering == :exclude_merges
-      command << " --merges" if merge_commit_filtering == :only_include_merges
+      command << git_log_merge_commit_filtering_option(merge_commit_filtering)
+      Actions.sh(command, log: false).chomp
+    rescue
+      nil
+    end
+
+    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering)
+      command = 'git log'
+      command << " --pretty=\"#{pretty_format}\" -n #{commit_count}"
+      command << git_log_merge_commit_filtering_option(merge_commit_filtering)
       Actions.sh(command, log: false).chomp
     rescue
       nil
@@ -42,10 +50,11 @@ module Fastlane
       nil
     end
 
+    # @deprecated Use <tt>git_author_email</tt> instead
     # Get the author email of the last git commit
     # <b>DEPRECATED:</b> Use <tt>git_author_email</tt> instead.
     def self.git_author
-      UI.important('`git_author` is deprecated. Please use `git_author_email` instead.')
+      UI.deprecated('`git_author` is deprecated. Please use `git_author_email` instead.')
       git_author_email
     end
 
@@ -78,6 +87,18 @@ module Fastlane
       nil
     rescue
       nil
+    end
+
+    private_class_method
+    def self.git_log_merge_commit_filtering_option(merge_commit_filtering)
+      case merge_commit_filtering
+      when :exclude_merges
+        " --no-merges"
+      when :only_include_merges
+        " --merges"
+      else
+        ""
+      end
     end
   end
 end

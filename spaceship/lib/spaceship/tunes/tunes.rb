@@ -16,13 +16,16 @@ require 'spaceship/tunes/app_screenshot'
 require 'spaceship/tunes/language_converter'
 require 'spaceship/tunes/build'
 require 'spaceship/tunes/build_details'
-require 'spaceship/tunes/processing_build'
 require 'spaceship/tunes/build_train'
 require 'spaceship/tunes/device_type'
 require 'spaceship/tunes/app_trailer'
 require 'spaceship/tunes/tester'
 require 'spaceship/tunes/app_details'
 require 'spaceship/tunes/pricing_tier'
+require 'spaceship/tunes/recovery_device'
+
+require 'spaceship/tunes/app_version_promocodes'
+require 'spaceship/tunes/app_version_generated_promocodes'
 
 # File Uploads
 require 'spaceship/du/utilities'

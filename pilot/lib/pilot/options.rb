@@ -26,8 +26,8 @@ module Pilot
                                      description: "Path to the ipa file to upload",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       raise "Could not find ipa file at path '#{value}'" unless File.exist? value
-                                       raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
+                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
+                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
@@ -38,6 +38,12 @@ module Pilot
                                      short_option: "-s",
                                      env_name: "PILOT_SKIP_SUBMISSION",
                                      description: "Skip the distributing action of pilot and only upload the ipa file",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_waiting_for_build_processing,
+                                     short_option: "-z",
+                                     env_name: "PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING",
+                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :apple_id,
@@ -67,7 +73,7 @@ module Pilot
                                      description: "The tester's email",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       raise "Please pass a valid email address" unless value.include? "@"
+                                       UI.user_error!("Please pass a valid email address") unless value.include? "@"
                                      end),
         FastlaneCore::ConfigItem.new(key: :testers_file_path,
                                      short_option: "-c",
@@ -82,7 +88,7 @@ module Pilot
                                      default_value: 30,
                                      type: Integer,
                                      verify_block: proc do |value|
-                                       raise "Please enter a valid positive number of seconds" unless value.to_i > 0
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-q",
@@ -102,8 +108,20 @@ module Pilot
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value
-                                     end)
-
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :dev_portal_team_id,
+                                     env_name: "PILOT_DEV_PORTAL_TEAM_ID",
+                                     description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
+                                     optional: true,
+                                     is_string: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :itc_provider,
+                                     env_name: "PILOT_ITC_PROVIDER",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     optional: true)
       ]
     end
   end

@@ -17,7 +17,7 @@ def itc_stub_login
   # Actual login
   stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
     with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
-    to_return(status: 200, body: '{}')
+    to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
 
   # Failed login attempts
   stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
@@ -167,16 +167,17 @@ def itc_stub_testers
 end
 
 def itc_stub_testflight
+  # Test information
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/testInformation").
+    to_return(status: 200, body: itc_read_fixture_file('testflight_build_info.json'), headers: { 'Content-Type' => 'application/json' })
+
   # Reject review
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/reject").
     with(body: "{}").
     to_return(status: 200, body: "{}", headers: { 'Content-Type' => 'application/json' })
 
-  # Prepare submission
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/submit/start").
-    to_return(status: 200, body: itc_read_fixture_file('testflight_submission_start.json'), headers: { 'Content-Type' => 'application/json' })
-  # First step of submission
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/submit/start").
+  # Submission
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/review/submit").
     to_return(status: 200, body: itc_read_fixture_file('testflight_submission_submit.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
@@ -226,6 +227,24 @@ def itc_stub_release_to_store
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_promocodes
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/versions").
+    to_return(status: 200, body: itc_read_fixture_file("promocodes.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_generate_promocodes
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/versions/812106519").
+    to_return(status: 200, body: itc_read_fixture_file("promocodes_generated.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_promocodes_history
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/history").
+    to_return(status: 200, body: itc_read_fixture_file("promocodes_history.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
@@ -241,5 +260,8 @@ RSpec.configure do |config|
     itc_stub_candiate_builds
     itc_stub_pricing_tiers
     itc_stub_release_to_store
+    itc_stub_promocodes
+    itc_stub_generate_promocodes
+    itc_stub_promocodes_history
   end
 end

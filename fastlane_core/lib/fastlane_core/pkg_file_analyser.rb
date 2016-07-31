@@ -17,7 +17,7 @@ module FastlaneCore
 
     def self.fetch_distribution_xml_file(path)
       Dir.mktmpdir do |dir|
-        Helper.backticks("xar -C #{dir} -xf #{path}")
+        Helper.backticks("xar -C #{dir.shellescape} -xf #{path.shellescape}")
 
         Dir.foreach(dir) do |file|
           next unless file.include? 'Distribution'
@@ -30,8 +30,8 @@ module FastlaneCore
               return xml
             end
           rescue => ex
-            Helper.log.error ex
-            Helper.log.error "Error parsing *.pkg distribution xml #{File.join(dir, file)}".red
+            UI.error(ex)
+            UI.error("Error parsing *.pkg distribution xml #{File.join(dir, file)}")
           end
         end
 

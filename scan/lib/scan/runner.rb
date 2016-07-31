@@ -10,6 +10,13 @@ module Scan
     end
 
     def test_app
+      # We call this method, to be sure that all other simulators are killed
+      # And a correct one is freshly launched. Switching between multiple simulator
+      # in case the user specified multiple targets works with no issues
+      # This way it's okay to just call it for the first simulator we're using for
+      # the first test run
+      open_simulator_for_device(Scan.devices.first) if Scan.devices
+
       command = TestCommandGenerator.generate
       prefix_hash = [
         {
@@ -46,7 +53,9 @@ module Scan
 
       report_collector = ReportCollector.new(Scan.config[:open_report],
                                              Scan.config[:output_types],
-                                             Scan.config[:output_directory])
+                                             Scan.config[:output_directory],
+                                             Scan.config[:use_clang_report_name],
+                                             Scan.config[:custom_report_file_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
                                                types: 'junit',
@@ -75,6 +84,24 @@ module Scan
 
       UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
       UI.user_error!("Tests failed") unless result[:failures] == 0
+    end
+
+    def open_simulator_for_device(device)
+      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+
+      UI.message("Killing all running simulators")
+      `killall Simulator &> /dev/null`
+
+      # As a second level of feature switching, see if we want to try the xcode-select variant
+      if ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'] == '2'
+        simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
+        UI.message("Explicitly opening simulator at #{simulator_path} for device: #{device.name}")
+      else
+        simulator_path = 'Simulator'
+        UI.message("Explicitly opening simulator for device: #{device.name}")
+      end
+
+      `open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}`
     end
   end
 end

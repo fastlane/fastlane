@@ -24,10 +24,17 @@ module Fastlane
           '&&'
         ].join(' ')
 
+        command_suffix = [
+          '&&',
+          'cd',
+          '-'
+        ].join(' ')
+
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number]}" : 'next-version -all'
+          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : 'next-version -all',
+          command_suffix
         ].join(' ')
 
         if Helper.test?
@@ -61,8 +68,8 @@ module Fastlane
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         raise "Please pass the path to the project, not the workspace".red if value.end_with? ".xcworkspace"
-                                         raise "Could not find Xcode project".red if !File.exist?(value) and !Helper.is_test?
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
                                        end)
         ]
       end

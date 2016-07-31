@@ -43,6 +43,14 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.77.3/)
       end
 
+      it "automatically removes new lines from the version number" do
+        Fastlane::FastFile.new.parse("lane :test do
+          increment_version_number(version_number: '1.77.3\n', bump_type: 'major')
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to end_with("&& agvtool new-marketing-version 1.77.3")
+      end
+
       it "returns the new version as return value" do
         result = Fastlane::FastFile.new.parse("lane :test do
           increment_version_number(bump_type: 'major')
@@ -56,7 +64,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(xcodeproj: '/nothere')
           end").runner.execute(:test)
-        end.to raise_error("Could not find Xcode project".red)
+        end.to raise_error("Could not find Xcode project")
       end
 
       it "raises an exception when use passes workspace" do
@@ -64,7 +72,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
-        end.to raise_error("Please pass the path to the project, not the workspace".red)
+        end.to raise_error("Please pass the path to the project, not the workspace")
       end
     end
   end

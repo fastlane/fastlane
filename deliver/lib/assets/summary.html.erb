@@ -138,7 +138,7 @@
           <div class="app-keyword">
               <div class="cat-headline">Keywords</div>
               <ul class="app-keyword-list">
-                <% @options[:keywords][language].split(" ").each do |keyword| %>
+                <% split_keywords(@options[:keywords][language]).each do |keyword| %>
                   <li><%= keyword %></li>
                 <% end %>
               </ul>
@@ -181,7 +181,7 @@
               <div class="app-screenshot-row">
 
               <% screenshots.each_with_index do |screenshot, index| %>
-                <a href="<%= screenshot.path %>" target="_blank"><img class="app-screenshot" src="<%= screenshot.path %>" title="Screenshot #<%=index%> for <%=language%>"></a>
+                <a href="<%= URI.escape(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= URI.escape(screenshot.path) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
               <% end %>
               </div>
             <% end %>

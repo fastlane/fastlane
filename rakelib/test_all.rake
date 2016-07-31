@@ -40,11 +40,23 @@ end
 
 def bundle_install
   if ENV['CI']
-    cache_path = File.expand_path("/tmp/vendor/bundle")
-    path = " --path='#{cache_path}'"
+    cache_path = File.expand_path("~/.fastlane_bundle")
+    path = " --path=#{cache_path}"
   end
 
   sh "bundle check#{path} || bundle install#{path} --jobs=4 --retry=3"
+end
+
+task :bundle_install_all do
+  puts "Fetching dependencies in the root"
+  bundle_install
+
+  for_each_gem do |repo|
+    Dir.chdir(repo) do
+      puts "Fetching dependencies for #{repo}"
+      bundle_install
+    end
+  end
 end
 
 def get_line_from_file(line_number, file)
@@ -66,7 +78,6 @@ task :test_all do
   repos_with_exceptions = []
   rspec_log_file = "rspec_logs.json"
 
-  bundle_install
   for_each_gem do |repo|
     box "Testing #{repo}"
     Dir.chdir(repo) do
@@ -75,8 +86,17 @@ task :test_all do
         # From https://github.com/bundler/bundler/issues/1424#issuecomment-2123080
         # Since we nest bundle exec in bundle exec
         Bundler.with_clean_env do
-          bundle_install
-          sh "bundle exec rspec --format documentation --format j --out #{rspec_log_file}"
+          rspec_command_parts = [
+            "bundle exec rspec",
+            "--format documentation",
+            "--format j --out #{rspec_log_file}"
+          ]
+          if ENV['CIRCLECI']
+            output_file = File.join(ENV['CIRCLE_TEST_REPORTS'], 'rspec', "#{repo}-junit.xml")
+            rspec_command_parts << "--format RspecJunitFormatter --out #{output_file}"
+          end
+
+          sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
         end
       rescue => ex
@@ -90,6 +110,20 @@ task :test_all do
       end
     end
   end
+
+  # require 'coveralls'
+  # require 'simplecov'
+  # SimpleCov.command_name('Unit Tests')
+  # r = {}
+  # for_each_gem do |repo|
+  #   begin
+  #     puts "Loading coverage data of #{repo}"
+  #     data = JSON.parse(File.read(File.join(repo, "coverage", ".resultset.json")))
+  #     r = SimpleCov::Result.from_hash(data).original_result.merge_resultset(r)
+  #   rescue => ex
+  #     puts "No test results found for #{repo} => #{ex}"
+  #   end
+  # end
 
   failed_tests_by_gem = {}
   example_count = 0
@@ -125,10 +159,14 @@ task :test_all do
   end
 
   if exceptions.empty?
+    # r.delete_if { |path, coverage| path.to_s.match(/spec/) }
+    # Only upload coverage results if tests are successful
+    # Coveralls::SimpleCov::Formatter.new.format(SimpleCov::Result.new(r))
+
     puts "Success 🚀".green
   else
     box "Exceptions 💣"
     puts "\n" + exceptions.map(&:red).join("\n")
-    raise "All tests did not complete successfully".red
+    raise "All tests did not complete successfully. Search for '[[FAILURE]]' in the build logs.".red
   end
 end

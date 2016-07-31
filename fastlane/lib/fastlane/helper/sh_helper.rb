@@ -4,19 +4,28 @@ module Fastlane
     # This method will output the string and execute it
     # Just an alias for sh_no_action
     # When running this in tests, it will return the actual command instead of executing it
-    # @param log [boolean] should fastlane print out the executed command
-    def self.sh(command, log: true)
-      sh_no_action(command, log: log)
+    # @param log [Boolean] should fastlane print out the executed command
+    # @param error_callback [Block] a callback invoked with the command ouptut if there is a non-zero exit status
+    def self.sh(command, log: true, error_callback: nil)
+      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    def self.sh_no_action(command, log: true)
+    def self.sh_no_action(command, log: true, error_callback: nil)
+      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
+    end
+
+    # @param command [String] The command to be executed
+    # @param print_command [Boolean] Should we print the command that's being executed
+    # @param print_command_output [Boolean] Should we print the command output during execution
+    # @param error_callback [Block] A block that's called if the command exits with a non-zero status
+    def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
       command = command.join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
-      UI.command(command) if log
+      UI.command(command) if print_command
 
       result = ''
       if Helper.test?
@@ -26,7 +35,7 @@ module Fastlane
         IO.popen(command, err: [:child, :out]) do |io|
           io.sync = true
           io.each do |line|
-            UI.command_output(line.strip) if log
+            UI.command_output(line.strip) if print_command_output
             result << line
           end
           io.close
@@ -34,14 +43,15 @@ module Fastlane
         end
 
         if exit_status != 0
-          # this will also append the output to the exception
-          if log
-            message = "Exit status of command '#{command}' was #{exit_status} instead of 0."
-            message += "\n#{result}"
-          else
-            message = "Shell command exited with exit status #{exit_status} instead of 0."
-          end
-          UI.crash!(message)
+          message = if print_command
+                      "Exit status of command '#{command}' was #{exit_status} instead of 0."
+                    else
+                      "Shell command exited with exit status #{exit_status} instead of 0."
+                    end
+          message += "\n#{result}" if print_command_output
+
+          error_callback.call(result) if error_callback
+          UI.user_error!(message)
         end
       end
 

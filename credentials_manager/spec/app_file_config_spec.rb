@@ -203,5 +203,19 @@ describe CredentialsManager do
         ENV.delete("DELIVER_USER")
       end
     end
+
+    describe "'smart quotes' handling" do
+      it "still gets the needed information from the Appfile" do
+        config = CredentialsManager::AppfileConfig.new('spec/fixtures/Appfile_smart_quotes')
+
+        expect(config.data[:apple_id]).to eq('appfile@krausefx.com')
+        expect(config.data[:app_identifier]).to eq('such.app')
+      end
+    end
+  end
+
+  after(:each) do
+    ENV.delete("FASTLANE_USER")
+    ENV.delete("DELIVER_USER")
   end
 end

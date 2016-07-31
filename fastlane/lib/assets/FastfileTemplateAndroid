@@ -1,15 +1,10 @@
 # Customise this file, documentation can be found here:
-# https://github.com/fastlane/fastlane/tree/master/docs
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
 # All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
 # can also be listed using the `fastlane actions` command
 
 # Change the syntax highlighting to Ruby
 # All lines starting with a # are ignored when running `fastlane`
-
-# By default, fastlane will send which actions are used
-# No personal data is shared, more information on https://github.com/fastlane/enhancer
-# Uncomment the following line to opt out
-# opt_out_usage
 
 # If you want to automatically update fastlane if a new version is available:
 # update_fastlane
@@ -49,7 +44,7 @@ platform :android do
 
   after_all do |lane|
     # This block is called, only if the executed lane was successful
-    
+
     # slack(
     #   message: "Successfully deployed new App Update."
     # )
@@ -64,5 +59,8 @@ platform :android do
 end
 
 
-# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/docs/Platforms.md
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
 # All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
+
+# fastlane reports which actions are used
+# No personal data is sent or shared. Learn more at https://github.com/fastlane/enhancer

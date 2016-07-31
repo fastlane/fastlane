@@ -1,5 +1,10 @@
 module Deliver
   class HtmlGenerator
+    # Splits keywords supporting:
+    # * separated by commas (with optional whitespace)
+    # * separated by newlines
+    KEYWORD_SPLITTER = /(?:,\s?|\r?\n)/
+
     def run(options, screenshots)
       begin
         html_path = self.render(options, screenshots, '.')
@@ -44,6 +49,12 @@ module Deliver
       File.write(export_path, html)
 
       return export_path
+    end
+
+    # Splits a string of keywords separated by comma or newlines into a presentable list
+    # @param keywords (String)
+    def split_keywords(keywords)
+      keywords.split(KEYWORD_SPLITTER)
     end
   end
 end

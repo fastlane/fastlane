@@ -9,11 +9,21 @@ module Fastlane
       def self.run(params)
         oclint_path = params[:oclint_path]
         if `which #{oclint_path}`.to_s.empty? and !Helper.test?
-          raise "You have to install oclint or provide path to oclint binary. Fore more details: ".red + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
+          UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
         compile_commands = params[:compile_commands]
-        raise "Could not find json compilation database at path '#{compile_commands}'".red unless File.exist?(compile_commands)
+        compile_commands_dir = params[:compile_commands]
+        UI.user_error!("Could not find json compilation database at path '#{compile_commands}'") unless File.exist?(compile_commands)
+
+        # We'll attempt to sort things out so that we support receiving either a path to a
+        # 'compile_commands.json' file (as our option asks for), or a path to a directory
+        # *containing* a 'compile_commands.json' file (as oclint actually wants)
+        if File.file?(compile_commands_dir)
+          compile_commands_dir = File.dirname(compile_commands_dir)
+        else
+          compile_commands = File.join(compile_commands_dir, 'compile_commands.json')
+        end
 
         if params[:select_reqex]
           UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
@@ -23,7 +33,11 @@ module Fastlane
         select_regex = params[:select_regex] if params[:select_regex] # Overwrite deprecated select_reqex
         exclude_regex = params[:exclude_regex]
 
-        files = JSON.parse(File.read(compile_commands)).map { |compile_command| compile_command['file'] }
+        files = JSON.parse(File.read(compile_commands)).map do |compile_command|
+          file = compile_command['file']
+          File.exist?(file) ? file : File.join(compile_command['directory'], file)
+        end
+
         files.uniq!
         files.select! do |file|
           file_ruby = file.gsub('\ ', ' ')
@@ -62,6 +76,7 @@ module Fastlane
         oclint_args << "-enable-clang-static-analyzer" if params[:enable_clang_static_analyzer]
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
+        oclint_args << "-p #{compile_commands_dir.shellescape}"
 
         command = [
           command_prefix,

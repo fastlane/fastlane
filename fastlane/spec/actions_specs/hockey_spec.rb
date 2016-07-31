@@ -1,25 +1,40 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Hockey Integration" do
-      it "raises an error if no ipa file was given" do
+      it "raises an error if no build file was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             hockey({
               api_token: 'xxx'
             })
           end").runner.execute(:test)
-        end.to raise_error("You have to provide an ipa file")
+        end.to raise_error("You have to provide a build file")
       end
 
-      it "raises an error if given ipa file was not found" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            hockey({
-              api_token: 'xxx',
-              ipa: './notHere.ipa'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("Couldn't find ipa file at path './notHere.ipa'".red)
+      describe "iOS" do
+        it "raises an error if given ipa file was not found" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              hockey({
+                api_token: 'xxx',
+                ipa: './notHere.ipa'
+              })
+            end").runner.execute(:test)
+          end.to raise_error("Couldn't find ipa file at path './notHere.ipa'")
+        end
+      end
+
+      describe "Android" do
+        it "raises an error if given apk file was not found" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              hockey({
+                api_token: 'xxx',
+                apk: './notHere.ipa'
+              })
+            end").runner.execute(:test)
+          end.to raise_error("Couldn't find apk file at path './notHere.ipa'")
+        end
       end
 
       it "raises an error if supplied dsym file was not found" do
@@ -31,14 +46,26 @@ describe Fastlane do
               dsym: './notHere.dSYM.zip'
             })
           end").runner.execute(:test)
-        end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found".red)
+        end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found")
+      end
+
+      it "raises an error if both ipa and apk provided" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            hockey({
+              api_token: 'xxx',
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            })
+          end").runner.execute(:test)
+        end.to raise_error("You can't use 'ipa' and 'apk' options in one run")
       end
 
       it "works with valid parameters" do
         Fastlane::FastFile.new.parse("lane :test do
           hockey({
             api_token: 'xxx',
-            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
           })
         end").runner.execute(:test)
       end
@@ -61,6 +88,7 @@ describe Fastlane do
         expect(values[:mandatory]).to eq(0.to_s)
         expect(values[:notes_type]).to eq(1.to_s)
         expect(values[:upload_dsym_only]).to eq(false)
+        expect(values[:strategy]).to eq("add")
       end
 
       it "can use a generated changelog as release notes" do
@@ -157,6 +185,41 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(values[:owner_id]).to eq('123')
+      end
+
+      it "has the correct default strategy value" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+          })
+        end").runner.execute(:test)
+
+        expect(values[:strategy]).to eq("add")
+      end
+
+      it "can change the strategy" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          hockey({
+            api_token: 'xxx',
+            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+            strategy: 'replace'
+          })
+        end").runner.execute(:test)
+
+        expect(values[:strategy]).to eq("replace")
+      end
+
+      it "raises an error if supplied dsym file was not found" do
+        expect do
+          values = Fastlane::FastFile.new.parse("lane :test do
+            hockey({
+              api_token: 'xxx',
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              strategy: 'wrongvalue'
+            })
+          end").runner.execute(:test)
+        end.to raise_error("Invalid value 'wrongvalue' for key 'strategy'. Allowed values are 'add', 'replace'.")
       end
     end
   end

@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.36.5', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '>= 0.20.0', '< 1.0.0' # iTunes Connect communication
+  spec.add_dependency 'fastlane_core', '>= 0.46.2', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'spaceship', '>= 0.29.0', '< 1.0.0' # iTunes Connect communication
   spec.add_dependency 'credentials_manager', '>= 0.3.0'
 
   spec.add_dependency 'terminal-table', '~> 1.4.5' # User's information
@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', "~> 3.1.0"
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', "~> 0.8.7.4"
   spec.add_development_dependency 'webmock', "~> 1.19.0"

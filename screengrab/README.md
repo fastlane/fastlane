@@ -35,6 +35,8 @@ screengrab
 
 ###### Automated localized screenshots of your Android app on every device
 
+`screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using ([`supply`](https://github.com/fastlane/fastlane/tree/master/supply).
+
 <img src="assets/running-screengrab.gif" width="640">
 
 ### Why should I automate this process?
@@ -53,7 +55,7 @@ sudo gem install screengrab
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:0.3.0'
+androidTestCompile 'tools.fastlane:screengrab:0.3.2'
 ```
 
 ##### Configuring your Manifest Permissions
@@ -152,7 +154,7 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload screenshots, metadata and your app to the Play Store
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).

@@ -21,19 +21,12 @@ def adp_stub_multiple_teams
     to_return(status: 200, body: adp_read_fixture_file('listTeams_multiple.action.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
-# Let the stubbing begin
 def adp_stub_login
-  stub_request(:get, "https://developer.apple.com/membercenter/index.action").
+  # Most stuff is stubbed in tunes_stubbing (since it's shared)
+
+  stub_request(:get, "https://developer.apple.com/account/").
     to_return(status: 200, body: nil,
     headers: { 'Location' => "https://idmsa.apple.com/IDMSWebAuth/login?&appIdKey=aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa&path=%2F%2Fmembercenter%2Findex.action" })
-
-  stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
-    with(body: { "accountPassword" => "so_secret", "appIdKey" => "aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa", "appleId" => "spaceship@krausefx.com" }).
-    to_return(status: 302, body: "", headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
-
-  stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
-    with(body: { "accountPassword" => "bad-password", "appIdKey" => "aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa", "appleId" => "bad-username" }).
-    to_return(status: 200, body: "Your Apple ID or password was entered incorrectly", headers: {})
 
   stub_request(:post, 'https://developerservices2.apple.com/services/QH65B2/listTeams.action').
     to_return(status: 200, body: adp_read_fixture_file('listTeams.action.json'), headers: { 'Content-Type' => 'application/json' })
@@ -74,6 +67,11 @@ def adp_stub_provisioning
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").
     with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
     to_return(status: 200, body: adp_read_fixture_file('deleteProvisioningProfile.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  # tvOS Profiles
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+    with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "C8DL7464RQ", "deviceIds" => "EEEEEEEEEE", "distributionType" => "limited", "provisioningProfileName" => "Delete Me", "subPlatform" => "tvOS", "teamId" => "XXXXXXXXXX" }).
+    to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
 def adp_stub_devices

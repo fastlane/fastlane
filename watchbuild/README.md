@@ -39,7 +39,7 @@ As the [#iosprocessingtime](https://twitter.com/search?q=%23iosprocessingtime) v
 
 WatchBuild is a simple standalone tool that shows a notification once your newly uploaded build was successfully processed by iTunes Connect.
 
-Once the build is ready to be pushed to TestFlight or for review, you get a OS X notification. You can even directly click on the notification to open the build on iTunes Connect.
+Once the build is ready to be pushed to TestFlight or for review, you get a macOS notification. You can even directly click on the notification to open the build on iTunes Connect.
 
 ### Why use WatchBuild?
 
@@ -88,7 +88,7 @@ For a list of available parameters and commands run
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): Connect all deployment tools into one streamlined workflow
+- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

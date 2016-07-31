@@ -20,7 +20,7 @@ module Fastlane
       elsif platform == :android
         SetupAndroid.new.run
       else
-        raise "Couldn't find platform '#{platform}'"
+        UI.user_error!("Couldn't find platform '#{platform}'")
       end
     end
 
@@ -36,10 +36,16 @@ module Fastlane
       UI.message("fastlane will send the number of errors for each action to")
       UI.message("https://github.com/fastlane/enhancer to detect integration issues")
       UI.message("No sensitive/private information will be uploaded")
-      UI.message("You can disable this by adding `opt_out_usage` to your Fastfile")
     end
   end
 end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
+require 'fastlane/setup/crashlytics_beta_ui'
+require 'fastlane/setup/crashlytics_beta'
+require 'fastlane/setup/crashlytics_project_parser'
+require 'fastlane/setup/crashlytics_beta_info'
+require 'fastlane/setup/crashlytics_beta_info_collector'
+require 'fastlane/setup/crashlytics_beta_command_line_handler'
+require 'fastlane/setup/crashlytics_beta_user_email_fetcher'

@@ -41,8 +41,7 @@ module Fastlane
                                        optional: true,
                                        description: "The path to your `adb` binary",
                                        is_string: true,
-                                       default_value: "adb"
-                                      )
+                                       default_value: "adb")
         ]
       end
 

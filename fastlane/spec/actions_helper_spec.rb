@@ -13,7 +13,7 @@ describe Fastlane do
       it "stores the action properly when an exeception occurred" do
         expect do
           Fastlane::Actions.execute_action(step_name) do
-            raise "Some error"
+            UI.user_error!("Some error")
           end
         end.to raise_error "Some error"
 
@@ -22,6 +22,12 @@ describe Fastlane do
         expect(result[:error]).to include "Some error"
         expect(result[:error]).to include "actions_helper.rb"
       end
+    end
+
+    it "#action_class_ref" do
+      expect(Fastlane::Actions.action_class_ref("gym")).to eq(Fastlane::Actions::GymAction)
+      expect(Fastlane::Actions.action_class_ref(:cocoapods)).to eq(Fastlane::Actions::CocoapodsAction)
+      expect(Fastlane::Actions.action_class_ref('notExistentObv')).to eq(nil)
     end
 
     it "#load_default_actions" do

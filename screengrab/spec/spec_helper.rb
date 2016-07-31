@@ -1,9 +1,8 @@
 require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 require 'screengrab'
 require 'webmock'
-require 'pry'
 require 'active_support/core_ext/string/strip'
 
 # This module is only used to check the environment is currently a testing env

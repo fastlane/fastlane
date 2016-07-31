@@ -23,13 +23,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastlane_core', '>= 0.36.1', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-  spec.add_dependency 'mini_magick', '~> 4.0.2' # To open, edit and export PSD files
+  spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
   spec.add_dependency 'deliver', '> 0.3' # To determine the device type based on a screenshot file
 
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'

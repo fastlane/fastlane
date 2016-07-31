@@ -25,7 +25,7 @@ module Fastlane
     #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
       start = Time.now # before the raise block, since `start` is required in the ensure block
-      raise 'No block given'.red unless block_given?
+      UI.crash!("No block given") unless block_given?
 
       error = nil
       exc = nil
@@ -61,6 +61,19 @@ module Fastlane
     end
     # rubocop:enable Style/AccessorMethodName
 
+    # Returns the class ref to the action based on the action name
+    # Returns nil if the action is not aailable
+    def self.action_class_ref(action_name)
+      class_name = action_name.to_s.fastlane_class + 'Action'
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError
+        return nil
+      end
+      return class_ref
+    end
+
     def self.load_default_actions
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
         require file
@@ -75,7 +88,7 @@ module Fastlane
     end
 
     def self.load_external_actions(path)
-      raise 'You need to pass a valid path' unless File.exist?(path)
+      UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
       Dir[File.expand_path('*.rb', path)].each do |file|
         require file
@@ -87,7 +100,7 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            UI.success "Successfully loaded custom action '#{file}'."
+            UI.success "Successfully loaded custom action '#{file}'." if $verbose
           else
             UI.error "Could not find method 'run' in class #{class_name}."
             UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
@@ -100,6 +113,10 @@ module Fastlane
           UI.user_error!("Action '#{file_name}' is damaged!")
         end
       end
+    end
+
+    def self.formerly_bundled_actions
+      ["xcake"]
     end
   end
 end

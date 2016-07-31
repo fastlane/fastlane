@@ -55,7 +55,7 @@ module Fastlane
       def self.run(params)
         unless Helper.test?
           UI.message("Install using `brew install homebrew/boneyard/appledoc`")
-          raise "appledoc not installed".red if `which appledoc`.length == 0
+          UI.user_error!("appledoc not installed") if `which appledoc`.length == 0
         end
 
         params_hash = params.values
@@ -77,7 +77,7 @@ module Fastlane
 
       def self.params_hash_to_cli_args(params)
         # Remove nil and false value params
-        params = params.delete_if { |_, v| v.nil? || v == false}
+        params = params.delete_if { |_, v| v.nil? || v == false }
 
         cli_args = []
         params.each do |key, value|

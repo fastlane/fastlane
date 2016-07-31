@@ -1,8 +1,8 @@
 module Fastlane
   # Guides the new user through creating a new action
   module NewAction
-    def self.run
-      name = fetch_name
+    def self.run(new_action_name: nil)
+      name = new_action_name && check_action_name_from_args(new_action_name) ? new_action_name : fetch_name
       generate_action(name)
     end
 
@@ -11,7 +11,7 @@ module Fastlane
       puts "examples: 'testflight', 'upload_to_s3'".green
       name = ask('Name of your action: ')
       until name_valid?(name)
-        puts 'Name invalid!'
+        puts "Name is invalid. Please ensure the name is all lowercase, free of spaces and without special characters! Try again."
         name = ask('Name of your action: ')
       end
       name
@@ -31,8 +31,16 @@ module Fastlane
       UI.success "Created new action file '#{path}'. Edit it to implement your custom action."
     end
 
+    def self.check_action_name_from_args(new_action_name)
+      if name_valid?(new_action_name)
+        new_action_name
+      else
+        puts "Name is invalid. Please ensure the name is all lowercase, free of spaces and without special characters! Try again."
+      end
+    end
+
     def self.name_valid?(name)
-      name == name.downcase && name.length > 0 && !name.include?('.')
+      name =~ /^[a-z0-9_]+$/
     end
     private_class_method :name_valid?
   end

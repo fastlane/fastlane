@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-  spec.add_dependency 'fastlane_core', '>= 0.36.1', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.43.3', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'xcpretty', '>= 0.2.1' # beautiful Xcode output
   spec.add_dependency 'plist', '~> 3.1.0' # parsing the Xcode output plist
 
@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'coveralls'

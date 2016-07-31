@@ -16,6 +16,7 @@ module Gym
       FileUtils.mkdir_p(Gym.config[:output_directory])
 
       if Gym.project.ios? || Gym.project.tvos?
+        fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
         package_app
         fix_package
         compress_and_move_dsym
@@ -72,6 +73,11 @@ module Gym
       end
     end
 
+    def fix_generic_archive
+      return if ENV["GYM_USE_GENERIC_ARCHIVE_FIX"].nil?
+      Gym::XcodebuildFixes.generic_archive_fix
+    end
+
     def fix_package
       return unless Gym.config[:use_legacy_build_api]
       Gym::XcodebuildFixes.swift_library_fix
@@ -96,7 +102,7 @@ module Gym
                                               end)
 
       mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
-      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer."
+      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer." unless Gym.config[:archive_path].nil?
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
 

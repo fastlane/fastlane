@@ -22,5 +22,8 @@ Fastfile:
 
 ### Environment
 
-fastlane version (fastlane -v):
-Do you use bundler, rbenv or rvm?
+fastlane version (run `fastlane -v`):
+
+Do you use bundler to execute fastlane (i.e. `bundle exec fastlane`)?
+
+Do you use a Ruby environment manager (e.g. `chruby`, `rbenv`, `rvm`)?

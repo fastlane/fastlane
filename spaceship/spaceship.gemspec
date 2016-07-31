@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Spaceship::VERSION
   spec.authors       = ["Felix Krause", "Stefan Natchev"]
   spec.email         = ["spaceship@krausefx.com", "stefan@natchev.com"]
-  spec.summary       = 'Because you would rather spend your time building stuff than fighting provisioning'
-  spec.description   = 'Because you would rather spend your time building stuff than fighting provisioning'
+  spec.summary       = Spaceship::DESCRIPTION
+  spec.description   = Spaceship::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
@@ -38,11 +38,15 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'fastlane', ">= 1.15.0" # yes, we use fastlane to test fastlane
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'diff_matcher'
+  spec.add_development_dependency 'multi_json'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.21.0'
   spec.add_development_dependency 'rubocop', '~> 0.38.0'

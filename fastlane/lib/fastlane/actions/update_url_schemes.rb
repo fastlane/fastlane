@@ -25,7 +25,7 @@ module Fastlane
             is_string: true,
             optional: false,
             verify_block: proc do |path|
-              raise "Could not find plist at path '#{path}'".red unless File.exist?(path)
+              UI.user_error!("Could not find plist at path '#{path}'") unless File.exist?(path)
             end
           ),
 
@@ -36,11 +36,11 @@ module Fastlane
             is_string: false,
             optional: false,
             verify_block: proc do |url_schemes|
-              string = "The URL schemes must be an array of strings, got '#{url_schemes}'.".red
-              raise string unless url_schemes.kind_of?(Array)
+              string = "The URL schemes must be an array of strings, got '#{url_schemes}'."
+              UI.user_error!(string) unless url_schemes.kind_of?(Array)
 
               url_schemes.each do |url_scheme|
-                raise string unless url_scheme.kind_of?(String)
+                UI.user_error!(string) unless url_scheme.kind_of?(String)
               end
             end
           )

@@ -1,7 +1,6 @@
 require 'rspec/core/rake_task'
 
-RSpec::Core::RakeTask.new(:spec)
-
 --require spec_helper
+
 --color
 --format d

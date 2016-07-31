@@ -30,333 +30,342 @@ describe FastlaneCore do
           FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
             key: :cert_name,
        env_name: "asdf",
-    description: "Set the profile name.")], {})
-        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well".red
+    description: "Set the profile name."
+          )], {})
+        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well"
       end
 
-      it "raises an error if a a key was used twice" do
-        expect do
-          FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
-            key: :cert_name,
-       env_name: "asdf"),
-                                              FastlaneCore::ConfigItem.new(
-                                                key: :cert_name,
-                                           env_name: "asdf")], {})
-        end.to raise_error "Multiple entries for configuration key 'cert_name' found!"
+      describe "config conflicts" do
+        it "raises an error if a key was used twice" do
+          expect do
+            FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
+              key: :cert_name,
+         env_name: "asdf"
+            ),
+                                                FastlaneCore::ConfigItem.new(
+                                                  key: :cert_name,
+                                             env_name: "asdf"
+                                                )], {})
+          end.to raise_error "Multiple entries for configuration key 'cert_name' found!"
+        end
+
+        it "raises an error if a short_option was used twice" do
+          conflicting_options = [
+            FastlaneCore::ConfigItem.new(key: :foo,
+                                         short_option: "-f",
+                                         description: "foo"),
+            FastlaneCore::ConfigItem.new(key: :bar,
+                                         short_option: "-f",
+                                         description: "bar")
+          ]
+
+          expect do
+            FastlaneCore::Configuration.create(conflicting_options, {})
+          end.to raise_error "Multiple entries for short_option '-f' found!"
+        end
+
+        it "raises an error for unresolved conflict between options" do
+          conflicting_options = [
+            FastlaneCore::ConfigItem.new(key: :foo,
+                                         conflicting_options: [:bar, :oof]),
+            FastlaneCore::ConfigItem.new(key: :bar),
+            FastlaneCore::ConfigItem.new(key: :oof)
+          ]
+
+          values = {
+              foo: "",
+              bar: ""
+          }
+
+          expect do
+            FastlaneCore::Configuration.create(conflicting_options, values)
+          end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+        end
+
+        it "calls custom conflict handler when conflict happens between two options" do
+          conflicting_options = [
+            FastlaneCore::ConfigItem.new(key: :foo,
+                                         conflicting_options: [:bar, :oof],
+                                         conflict_block: proc do |value|
+                                           UI.user_error!("You can't use option '#{value.key}' along with 'foo'")
+                                         end),
+            FastlaneCore::ConfigItem.new(key: :bar),
+            FastlaneCore::ConfigItem.new(key: :oof,
+                                         conflict_block: proc do |value|
+                                           UI.user_error!("You can't use option '#{value.key}' along with 'oof'")
+                                         end)
+          ]
+
+          values = {
+              foo: "",
+              bar: ""
+          }
+
+          expect do
+            FastlaneCore::Configuration.create(conflicting_options, values)
+          end.to raise_error "You can't use option 'bar' along with 'foo'"
+        end
       end
 
-      it "raises an error if a a short_option was used twice" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       description: "foo"),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-f",
-                                       description: "bar")
-        ]
+      describe "data_type" do
+        it "sets the data type correctly if `is_string` is not set but type is specified" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array)
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, {})
-        end.to raise_error "Multiple entries for short_option '-f' found!"
+          expect(config_item.data_type).to eq(Array)
+        end
+
+        it "sets the data type correctly if `is_string` is set but the type is specified" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     is_string: true,
+                                                     type: Array)
+
+          expect(config_item.data_type).to eq(Array)
+        end
+
+        it "sets the data type correctly if `is_string` is set but the type is not specified" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     is_string: true)
+
+          expect(config_item.data_type).to eq(String)
+        end
       end
 
-      it "raises an error for unresolved conflict between options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof]),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o")
-        ]
+      describe "arrays" do
+        it "returns Array default values correctly" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array,
+                                                     optional: true,
+                                                     default_value: ['5', '4', '3', '2', '1'])
+          config = FastlaneCore::Configuration.create([config_item], {})
 
-        values = {
-            foo: "",
-            bar: ""
-        }
+          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+        end
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+        it "returns Array input values correctly" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array)
+          config = FastlaneCore::Configuration.create([config_item], { foo: ['5', '4', '3', '2', '1'] })
+
+          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+        end
+
+        it "returns Array environment variable values correctly" do
+          ENV["FOO"] = '5,4,3,2,1'
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     env_name: 'FOO',
+                                                     type: Array)
+          config = FastlaneCore::Configuration.create([config_item], {})
+
+          expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
+          ENV.delete("FOO")
+        end
       end
 
-      it "calls custom conflict handler when conflict happens between two options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof],
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'"
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o",
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'"
-                                       end)
-        ]
+      describe "auto_convert_value" do
+        it "auto converts string values to Integers" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Integer)
 
-        values = {
-            foo: "",
-            bar: ""
-        }
+          value = config_item.auto_convert_value('987')
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "You can't use option '-b' along with '-f'"
+          expect(value).to eq(987)
+        end
+
+        it "auto converts string values to Floats" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Float)
+
+          value = config_item.auto_convert_value('9.91')
+
+          expect(value).to eq(9.91)
+        end
+
+        it "auto converts nil to nil when type is not specified" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo')
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
+        end
+
+        it "auto converts nil to nil when type is Integer" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Integer)
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
+        end
+
+        it "auto converts nil to nil when type is Float" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Float)
+
+          value = config_item.auto_convert_value(nil)
+
+          expect(value).to eq(nil)
+        end
+
+        it "auto converts booleans as strings to booleans" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :true_value, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :true_value2, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :false_value, is_string: false),
+            FastlaneCore::ConfigItem.new(key: :false_value2, is_string: false)
+          ]
+
+          config = FastlaneCore::Configuration.create(c, {
+            true_value: "true",
+            true_value2: "YES",
+            false_value: "false",
+            false_value2: "NO"
+          })
+
+          expect(config[:true_value]).to eq(true)
+          expect(config[:true_value2]).to eq(true)
+          expect(config[:false_value]).to eq(false)
+          expect(config[:false_value2]).to eq(false)
+        end
+
+        it "auto converts strings to integers" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :int_value,
+                                         type: Integer)
+          ]
+          config = FastlaneCore::Configuration.create(c, {
+            int_value: "10"
+          })
+
+          expect(config[:int_value]).to eq(10)
+        end
+
+        it "auto converts '0' to the integer 0" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :int_value,
+                                         type: Integer)
+          ]
+          config = FastlaneCore::Configuration.create(c, {
+            int_value: "0"
+          })
+
+          expect(config[:int_value]).to eq(0)
+        end
       end
 
-      it "raises an error for unresolved conflict between options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof]),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o")
-        ]
+      describe "validation" do
+        it "raises an exception if the data type is not as expected" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Float)
 
-        values = {
-            foo: "",
-            bar: ""
-        }
+          expect do
+            config_item.valid?('ABC')
+          end.to raise_error
+        end
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+        it "verifies the default value as well" do
+          c = FastlaneCore::ConfigItem.new(key: :output,
+                                    env_name: "SIGH_OUTPUT_PATH",
+                                 description: "Directory in which the profile should be stored",
+                               default_value: "notExistent",
+                                verify_block: proc do |value|
+                                  UI.user_error!("Could not find output directory '#{value}'")
+                                end)
+          expect do
+            @config = FastlaneCore::Configuration.create([c], {})
+          end.to raise_error "Invalid default value for output, doesn't match verify_block"
+        end
       end
 
-      it "calls custom conflict handler when conflict happens between two options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof],
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o",
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
-                                       end)
-        ]
+      describe "deprecation", focus: true do
+        it "deprecated changes the description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     deprecated: 'replaced by bar')
+          expect(config_item.description).to eq("[DEPRECATED!] replaced by bar - foo")
+        end
 
-        values = {
-            foo: "",
-            bar: ""
-        }
+        it "deprecated makes it optional" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     deprecated: 'replaced by bar')
+          expect(config_item.optional).to eq(true)
+        end
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "You can't use option '-b' along with '-f'".red
+        it "raises an exception if a deprecated option is not optional" do
+          expect do
+            config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                       description: 'foo',
+                                                       optional: false,
+                                                       deprecated: 'replaced by bar')
+          end.to raise_error
+        end
+
+        it "doesn't display a deprecation message when loading a config if a deprecated option doesn't have a value" do
+          c = FastlaneCore::ConfigItem.new(key: :foo,
+                                           description: 'foo',
+                                           deprecated: 'replaced by bar')
+          values = {
+            foo: "something"
+          }
+          expect(FastlaneCore::UI).to receive(:deprecated).with("Using deprecated option: '--foo' (replaced by bar)")
+          config = FastlaneCore::Configuration.create([c], values)
+        end
+
+        it "displays a deprecation message when loading a config if a deprecated option has a value" do
+          c = FastlaneCore::ConfigItem.new(key: :foo,
+                                           description: 'foo',
+                                           deprecated: 'replaced by bar')
+
+          expect(FastlaneCore::UI).not_to receive(:deprecated)
+          config = FastlaneCore::Configuration.create([c], {})
+        end
       end
 
-      it "raises an error for unresolved conflict between options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof]),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o")
-        ]
+      describe "misc features" do
+        it "makes it non optional by default" do
+          c = FastlaneCore::ConfigItem.new(key: :test,
+                                 default_value: '123')
+          expect(c.optional).to eq(false)
+        end
 
-        values = {
-            foo: "",
-            bar: ""
-        }
+        it "supports options without 'env_name'" do
+          c = FastlaneCore::ConfigItem.new(key: :test,
+                                 default_value: '123')
+          config = FastlaneCore::Configuration.create([c], {})
+          expect(config.values[:test]).to eq('123')
+        end
 
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
-      end
+        it "takes the values frmo the environment if available" do
+          c = FastlaneCore::ConfigItem.new(key: :test,
+                                      env_name: "FL_TEST")
+          config = FastlaneCore::Configuration.create([c], {})
+          ENV["FL_TEST"] = "123value"
+          expect(config.values[:test]).to eq('123value')
+          ENV.delete("FL_TEST")
+        end
 
-      it "calls custom conflict handler when conflict happens between two options" do
-        conflicting_options = [
-          FastlaneCore::ConfigItem.new(key: :foo,
-                                       short_option: "-f",
-                                       conflicting_options: [:bar, :oof],
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-f'".red
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :bar,
-                                       short_option: "-b"),
-          FastlaneCore::ConfigItem.new(key: :oof,
-                                       short_option: "-o",
-                                       conflict_block: proc do |value|
-                                         raise "You can't use option '#{value.short_option}' along with '-o'".red
-                                       end)
-        ]
-
-        values = {
-            foo: "",
-            bar: ""
-        }
-
-        expect do
-          FastlaneCore::Configuration.create(conflicting_options, values)
-        end.to raise_error "You can't use option '-b' along with '-f'".red
-      end
-
-      it "sets the data type correctly if `is_string` is not set but type is specified" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Array)
-
-        expect(config_item.data_type).to eq(Array)
-      end
-
-      it "sets the data type correctly if `is_string` is set but the type is specified" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   is_string: true,
-                                                   type: Array)
-
-        expect(config_item.data_type).to eq(Array)
-      end
-
-      it "sets the data type correctly if `is_string` is set but the type is not specified" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   is_string: true)
-
-        expect(config_item.data_type).to eq(String)
-      end
-
-      it "returns Array default values correctly" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Array,
-                                                   optional: true,
-                                                   default_value: ['5', '4', '3', '2', '1'])
-        config = FastlaneCore::Configuration.create([config_item], {})
-
-        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
-      end
-
-      it "returns Array input values correctly" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Array)
-        config = FastlaneCore::Configuration.create([config_item], { foo: ['5', '4', '3', '2', '1'] })
-
-        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
-      end
-
-      it "returns Array environment variable values correctly" do
-        ENV["FOO"] = '5,4,3,2,1'
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   env_name: 'FOO',
-                                                   type: Array)
-        config = FastlaneCore::Configuration.create([config_item], {})
-
-        expect(config[:foo]).to eq(['5', '4', '3', '2', '1'])
-        ENV.delete("FOO")
-      end
-
-      it "auto converts string values to Integers" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Integer)
-
-        value = config_item.auto_convert_value('987')
-
-        expect(value).to eq(987)
-      end
-
-      it "auto converts string values to Floats" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Float)
-
-        value = config_item.auto_convert_value('9.91')
-
-        expect(value).to eq(9.91)
-      end
-
-      it "raises an exception if the data type is not as expected" do
-        config_item = FastlaneCore::ConfigItem.new(key: :foo,
-                                                   short_option: '-f',
-                                                   description: 'foo',
-                                                   type: Float)
-
-        expect do
-          config_item.valid?('ABC')
-        end.to raise_error
-      end
-
-      it "verifies the default value as well" do
-        c = FastlaneCore::ConfigItem.new(key: :output,
-                                  env_name: "SIGH_OUTPUT_PATH",
-                               description: "Directory in which the profile should be stored",
-                             default_value: "notExistent",
-                              verify_block: proc do |value|
-                                raise "Could not find output directory '#{value}'"
-                              end)
-        expect do
-          @config = FastlaneCore::Configuration.create([c], {})
-        end.to raise_error "Invalid default value for output, doesn't match verify_block"
-      end
-
-      it "supports options without 'env_name'" do
-        c = FastlaneCore::ConfigItem.new(key: :test,
-                               default_value: '123')
-        config = FastlaneCore::Configuration.create([c], {})
-        expect(config.values[:test]).to eq('123')
-      end
-
-      it "takes the values frmo the environment if available" do
-        c = FastlaneCore::ConfigItem.new(key: :test,
-                                    env_name: "FL_TEST")
-        config = FastlaneCore::Configuration.create([c], {})
-        ENV["FL_TEST"] = "123value"
-        expect(config.values[:test]).to eq('123value')
-        ENV.delete("FL_TEST")
-      end
-
-      it "supports modifying the value after taken from the environment" do
-        c = FastlaneCore::ConfigItem.new(key: :test,
-                                    env_name: "FL_TEST")
-        config = FastlaneCore::Configuration.create([c], {})
-        ENV["FL_TEST"] = "123value"
-        config.values[:test].gsub!("123", "456")
-        expect(config.values[:test]).to eq('456value')
-        ENV.delete("FL_TEST")
-      end
-
-      it "auto converts booleans as strings to booleans" do
-        c = [
-          FastlaneCore::ConfigItem.new(key: :true_value),
-          FastlaneCore::ConfigItem.new(key: :true_value2),
-          FastlaneCore::ConfigItem.new(key: :false_value),
-          FastlaneCore::ConfigItem.new(key: :false_value2)
-        ]
-        config = FastlaneCore::Configuration.create(c, {
-          true_value: "true",
-          true_value2: "YES",
-          false_value: "false",
-          false_value2: "NO"
-        })
-
-        expect(config[:true_value]).to eq(true)
-        expect(config[:true_value2]).to eq(true)
-        expect(config[:false_value]).to eq(false)
-        expect(config[:false_value2]).to eq(false)
+        it "supports modifying the value after taken from the environment" do
+          c = FastlaneCore::ConfigItem.new(key: :test,
+                                      env_name: "FL_TEST")
+          config = FastlaneCore::Configuration.create([c], {})
+          ENV["FL_TEST"] = "123value"
+          config.values[:test].gsub!("123", "456")
+          expect(config.values[:test]).to eq('456value')
+          ENV.delete("FL_TEST")
+        end
       end
 
       describe "Automatically removes the --verbose flag" do
@@ -388,19 +397,29 @@ describe FastlaneCore do
                                  description: "Directory in which the profile should be stored",
                                default_value: ".",
                                 verify_block: proc do |value|
-                                  raise "Could not find output directory '#{value}'" unless File.exist?(value)
+                                  UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
+                                end),
+            FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
+                                short_option: "-k",
+                                    env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
+                                 description: "Interval in seconds to wait for iTunes Connect processing",
+                               default_value: 30,
+                                        type: Integer,
+                                verify_block: proc do |value|
+                                  UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
                                 end)
           ]
           @values = {
             cert_name: "asdf",
-            output: ".."
+            output: "..",
+            wait_processing_interval: 10
           }
           @config = FastlaneCore::Configuration.create(@options, @values)
         end
 
         describe "#keys" do
           it "returns all available keys" do
-            expect(@config.all_keys).to eq([:cert_name, :output])
+            expect(@config.all_keys).to eq([:cert_name, :output, :wait_processing_interval])
           end
         end
 
@@ -409,6 +428,7 @@ describe FastlaneCore do
             values = @config.values
             expect(values[:output]).to eq('..')
             expect(values[:cert_name]).to eq('asdf')
+            expect(values[:wait_processing_interval]).to eq(10)
           end
 
           it "returns the default values" do
@@ -416,6 +436,7 @@ describe FastlaneCore do
             values = @config.values
             expect(values[:cert_name]).to eq('production_default')
             expect(values[:output]).to eq('.')
+            expect(values[:wait_processing_interval]).to eq(30)
           end
         end
 
@@ -429,7 +450,7 @@ describe FastlaneCore do
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output"
+            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output, wait_processing_interval"
           end
 
           it "returns the value for the given key if given" do
@@ -450,13 +471,16 @@ describe FastlaneCore do
           it "throws an error if the key doesn't exist" do
             expect do
               @config.set(:non_existing, "value")
-            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output")
+            end.to raise_error("Could not find option 'non_existing' in the list of available options: cert_name, output, wait_processing_interval")
           end
 
           it "throws an error if it's invalid" do
             expect do
               @config.set(:output, 132)
             end.to raise_error("'output' value must be a String! Found Fixnum instead.")
+            expect do
+              @config.set(:wait_processing_interval, -1)
+            end.to raise_error("Please enter a valid positive number of seconds")
           end
 
           it "allows valid updates" do

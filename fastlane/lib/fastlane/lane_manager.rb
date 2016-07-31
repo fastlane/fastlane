@@ -5,11 +5,11 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      raise 'lane must be a string' unless lane.kind_of?(String) or lane.nil?
-      raise 'platform must be a string' unless platform.kind_of?(String) or platform.nil?
-      raise 'parameters must be a hash' unless parameters.kind_of?(Hash) or parameters.nil?
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -44,10 +44,14 @@ module Fastlane
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
-      rescue => ex
+      rescue Exception => ex # rubocop:disable Lint/RescueException
+        # We also catch Exception, since the implemented action might send a SystemExit signal
+        # (or similar). We still want to catch that, since we want properly finish running fastlane
+        # Tested with `xcake`, which throws a `Xcake::Informative` object
+
         UI.important 'Variable Dump:'.yellow
         UI.message Actions.lane_context
-        UI.error ex.to_s
+        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -68,6 +72,8 @@ module Fastlane
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
+
+      Fastlane::PluginUpdateManager.show_update_status
 
       if error
         UI.error 'fastlane finished with errors'
@@ -103,30 +109,45 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      loop do
-        UI.error "You must provide a lane to drive. Available lanes:"
-        available = ff.runner.available_lanes(platform)
+      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      if available.empty?
+        UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
+      end
 
-        available.each_with_index do |lane, index|
-          UI.message "#{index + 1}) #{lane}"
+      rows = []
+      available.each_with_index do |lane, index|
+        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
+      end
+
+      rows << [0, "cancel", "No selection, exit fastlane!"]
+
+      table = Terminal::Table.new(
+        title: "Available lanes to run",
+        headings: ['Number', 'Lane Name', 'Description'],
+        rows: rows
+      )
+
+      UI.message "Welcome to fastlane! Here's what your app is setup to do:"
+
+      puts table
+
+      i = UI.input "Which number would you like run?"
+
+      i = i.to_i - 1
+      if i >= 0 && available[i]
+        selection = available[i].last.pretty_name
+        UI.important "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
+        platform = selection.split(' ')[0]
+        lane_name = selection.split(' ')[1]
+
+        unless lane_name # no specific platform, just a root lane
+          lane_name = platform
+          platform = nil
         end
 
-        i = $stdin.gets.strip.to_i - 1
-        if i >= 0 and available[i]
-          selection = available[i]
-          UI.important "Driving the lane #{selection}. Next time launch fastlane using `fastlane #{selection}`"
-          platform = selection.split(' ')[0]
-          lane_name = selection.split(' ')[1]
-
-          unless lane_name # no specific platform, just a root lane
-            lane_name = platform
-            platform = nil
-          end
-
-          return platform, lane_name # yeah
-        end
-
-        UI.error "Invalid input. Please enter the number of the lane you want to use"
+        return platform, lane_name # yeah
+      else
+        UI.user_error! "Run `fastlane` the next time you need to build, test or release your app 🚀"
       end
     end
 

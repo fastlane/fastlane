@@ -5,7 +5,7 @@ module Fastlane
     class InstallOnDeviceAction < Action
       def self.run(params)
         unless Helper.test?
-          raise "ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions".red if `which ios-deploy`.length == 0
+          UI.user_error!("ios-deploy not installed, see https://github.com/phonegap/ios-deploy for instructions") if `which ios-deploy`.length == 0
         end
         taxi_cmd = [
           "ios-deploy",
@@ -35,22 +35,19 @@ module Fastlane
                                        env_name: "FL_IOD_EXTRA",
                                        description: "Extra Commandline arguments passed to ios-deploy",
                                        optional: true,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :device_id,
                                        short_option: "-d",
                                        env_name: "FL_IOD_DEVICE_ID",
                                        description: "id of the device / if not set defaults to first found device",
                                        optional: true,
-                                       is_string: true
-                                      ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_wifi,
                                        short_option: "-w",
                                        env_name: "FL_IOD_WIFI",
                                        description: "Do not search for devices via WiFi",
                                        optional: true,
-                                       is_string: false
-                                      ),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        short_option: "-i",
                                        env_name: "FL_IOD_IPA",
@@ -60,11 +57,10 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].first,
                                        verify_block: proc do |value|
                                          unless Helper.test?
-                                           raise "Could not find ipa file at path '#{value}'" unless File.exist? value
-                                           raise "'#{value}' doesn't seem to be an ipa file" unless value.end_with? ".ipa"
+                                           UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
+                                           UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                          end
-                                       end
-                                      )
+                                       end)
         ]
       end
 

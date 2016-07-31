@@ -28,6 +28,7 @@ describe Fastlane do
              "-apiKey api_token",
              "-apiSecret build_secret",
              "-uploadDist '/",
+             "-betaDistributionReleaseNotesFilePath '/",
              "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
              "-betaDistributionGroupAliases 'testgroup'",
              "-betaDistributionNotifications true"].each do |to_be|
@@ -39,6 +40,30 @@ describe Fastlane do
             # "-betaDistributionReleaseNotesFilePath '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/changelog20151005-29563-1o3uf3m'",
             expect(command.join(" ")).to include("-betaDistributionReleaseNotesFilePath")
             expect(command.join(" ")).to include("-androidManifest")
+          end
+        end
+
+        it "hides sensitive parameters" do
+          with_verbose(true) do
+            expect(UI).to receive(:verbose) do |message|
+              expect(message).to_not include('PEANUTS')
+              expect(message).to_not include('MAJOR_KEY')
+
+              expect(message).to include('[[BUILD_SECRET]]')
+              expect(message).to include('[[API_TOKEN')
+            end
+
+            Fastlane::FastFile.new.parse('lane :test do
+            crashlytics(
+              crashlytics_path: "./fastlane/spec/fixtures/fastfiles/Fastfile1",
+              api_token: "PEANUTS",
+              build_secret: "MAJOR_KEY",
+              apk_path: "./fastlane/spec/fixtures/fastfiles/Fastfile2",
+              emails: ["email1@krausefx.com", "email2@krausefx.com"],
+              groups: "testgroup",
+              notes: "Such notes, very release"
+              )
+            end').runner.execute(:test)
           end
         end
       end
@@ -65,6 +90,26 @@ describe Fastlane do
                                   ])
           end
 
+          it "hides sensitive parameters" do
+            with_verbose(true) do
+              expect(UI).to receive(:verbose) do |message|
+                expect(message).to_not include('PEANUTS')
+                expect(message).to_not include('MAJOR_KEY')
+
+                expect(message).to include('[[BUILD_SECRET]]')
+                expect(message).to include('[[API_TOKEN')
+              end
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'MAJOR_KEY',
+                  build_secret: 'PEANUTS',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end
+          end
+
           it "works automatically stores the notes in a file if given" do
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
@@ -81,8 +126,7 @@ describe Fastlane do
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
              "-notifications YES",
-             "-debug NO"
-            ].each do |to_be|
+             "-debug NO"].each do |to_be|
               expect(command).to include(to_be)
             end
           end
@@ -227,8 +271,8 @@ describe Fastlane do
         end
 
         describe "Invalid Parameters" do
-          # If this test fails, there might be a Crashlytics.framework somewhere in the .. directory
           it "raises an error if no crashlytics path was given" do
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -262,7 +306,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`".red)
+            end.to raise_error("No API token for Crashlytics given, pass using `api_token: 'token'`")
           end
 
           it "raises an error if no build secret was given" do
@@ -274,7 +318,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`".red)
+            end.to raise_error("No build secret for Crashlytics given, pass using `build_secret: 'secret'`")
           end
 
           it "raises an error if no ipa path was given" do
@@ -286,7 +330,7 @@ describe Fastlane do
                   build_secret: 'wadus'
                 })
               end").runner.execute(:test)
-            end.to raise_error("You have to either pass an ipa or an apk file to the Crashlytics action".red)
+            end.to raise_error("You have to either pass an ipa or an apk file to the Crashlytics action")
           end
 
           it "raises an error if the given ipa path was not found" do
@@ -299,7 +343,7 @@ describe Fastlane do
                   ipa_path: './fastlane/wadus'
                 })
               end").runner.execute(:test)
-            end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'".red)
+            end.to raise_error("Couldn't find ipa file at path './fastlane/wadus'")
           end
         end
       end

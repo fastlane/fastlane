@@ -2,46 +2,12 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
-  # rubocop:disable Metrics/ModuleLength
   module Helper
-    # Logging happens using this method
+    # This method is deprecated, use the `UI` class
+    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
     def self.log
-      $stdout.sync = true
-
-      if is_test?
-        @log ||= Logger.new(nil) # don't show any logs when running tests
-      else
-        @log ||= Logger.new($stdout)
-      end
-
-      @log.formatter = proc do |severity, datetime, progname, msg|
-        string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
-        string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
-        second = "#{msg}\n"
-
-        if severity == "DEBUG"
-          string = string.magenta
-        elsif severity == "INFO"
-          string = string.white
-        elsif severity == "WARN"
-          string = string.yellow
-        elsif severity == "ERROR"
-          string = string.red
-        elsif severity == "FATAL"
-          string = string.red.bold
-        end
-
-        [string, second].join("")
-      end
-
-      @log
-    end
-
-    # This method can be used to add nice lines around the actual log
-    # Use this to log more important things
-    # The logs will be green automatically
-    def self.log_alert(text)
-      UI.header(text)
+      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.current.log
     end
 
     # Runs a given command using backticks (`)
@@ -55,13 +21,13 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined?SpecHelper
+      defined? SpecHelper
     end
 
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -118,29 +84,55 @@ module FastlaneCore
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
-        Helper.log.error ex
-        Helper.log.error "Error detecting currently used Xcode installation".red
+        UI.error(ex)
+        UI.error("Error detecting currently used Xcode installation")
       end
       @xcode_version
     end
 
+    def self.transporter_java_executable_path
+      return File.join(self.transporter_java_path, 'bin', 'java')
+    end
+
+    def self.transporter_java_ext_dir
+      return File.join(self.transporter_java_path, 'lib', 'ext')
+    end
+
+    def self.transporter_java_jar_path
+      return File.join(self.itms_path, 'lib', 'itmstransporter-launcher.jar')
+    end
+
+    def self.transporter_user_dir
+      return File.join(self.itms_path, 'bin')
+    end
+
+    def self.transporter_java_path
+      return File.join(self.itms_path, 'java')
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+    end
+
+    # @return the full path to the iTMSTransporter executable
+    def self.itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
       return '' unless self.is_mac? # so tests work on Linx too
 
       [
-        "../Applications/Application Loader.app/Contents/MacOS/itms/bin/iTMSTransporter",
-        "../Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter"
+        "../Applications/Application Loader.app/Contents/MacOS/itms",
+        "../Applications/Application Loader.app/Contents/itms"
       ].each do |path|
-        result = File.join(self.xcode_path, path)
+        result = File.expand_path(File.join(self.xcode_path, path))
         return result if File.exist?(result)
       end
-      raise "Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.".red
+      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
     # Path to the installed gem to load resources (e.g. resign.sh)
@@ -152,5 +144,4 @@ module FastlaneCore
       end
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end

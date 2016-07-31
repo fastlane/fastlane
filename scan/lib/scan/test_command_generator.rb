@@ -23,7 +23,7 @@ module Scan
       def project_path_array
         proj = Scan.project.xcodebuild_parameters
         return proj if proj.count > 0
-        raise "No project/workspace found"
+        UI.user_error!("No project/workspace found")
       end
 
       def options
@@ -33,10 +33,11 @@ module Scan
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-destination '#{config[:destination]}'" # generated in `detect_values`
+        options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << "-enableCodeCoverage YES" if config[:code_coverage]
+        options << "-enableAddressSanitizer YES" if config[:address_sanitizer]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
@@ -63,9 +64,11 @@ module Scan
         # During building we just show the output in the terminal
         # Check out the ReportCollector class for more xcpretty things
         formatter = []
-        if ENV.key?("TRAVIS")
+        if Scan.config[:formatter]
+          formatter << "-f `#{Scan.config[:formatter]}`"
+        elsif ENV.key?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
-          Helper.log.info "Automatically switched to Travis formatter".green
+          UI.success("Automatically switched to Travis formatter")
         end
 
         if Helper.colors_disabled?
@@ -90,6 +93,14 @@ module Scan
         FileUtils.mkdir_p(containing)
 
         return File.join(containing, file_name)
+      end
+
+      # Generate destination parameters
+      def destination
+        unless Scan.cache[:destination]
+          Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
+        end
+        Scan.cache[:destination]
       end
 
       # The path to set the Derived Data to

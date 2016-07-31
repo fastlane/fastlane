@@ -53,7 +53,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          raise "gcovr not installed".red if `which gcovr`.length == 0
+          UI.user_error!("gcovr not installed") if `which gcovr`.length == 0
         end
 
         # The args we will build with

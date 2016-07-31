@@ -1,0 +1,23 @@
+{
+  "data": {
+    "effectiveDate": 1457864552300,
+    "expirationDate": 1460283752300,
+    "username": "joe@wewanttoknow.com",
+    "version": {
+      "id": 816549081,
+      "appName": "DragonBox Numbers",
+      "version": "1.5.0",
+      "platform": "ios",
+      "numberOfCodes": 3,
+      "maximumNumberOfCodes": 100,
+      "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+    },
+    "codes": ["6J49JFRPTXXXX"]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

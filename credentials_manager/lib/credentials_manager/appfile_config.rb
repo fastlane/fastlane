@@ -1,7 +1,6 @@
 module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)
   class AppfileConfig
-
     def self.try_fetch_value(key)
       begin
         return self.new.data[key]
@@ -33,10 +32,10 @@ module CredentialsManager
 
           # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
           if content.tr!('“”‘’‛', %(""'''))
-            Helper.log.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
-                        'To avoid issues in the future, you should not use ' \
-                        'TextEdit for editing it. If you are not using TextEdit, ' \
-                        'you should turn off smart quotes in your editor of choice.'.red
+            puts "Your #{File.basename(path)} has had smart quotes sanitised. " \
+                 'To avoid issues in the future, you should not use ' \
+                 'TextEdit for editing it. If you are not using TextEdit, ' \
+                 'you should turn off smart quotes in your editor of choice.'.red
           end
 
           # rubocop:disable Lint/Eval

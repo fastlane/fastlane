@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         path = params[:path]
         path = File.join(path, "project.pbxproj")
-        raise "Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!".red unless File.exist?(path)
+        UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
         UI.message("Updating development team (#{params[:teamid]}) for the given project '#{path}'")
 
@@ -31,12 +31,12 @@ module Fastlane
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
                                        verify_block: proc do |value|
-                                         raise "Path is invalid".red unless File.exist?(value)
+                                         UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :teamid,
                                        env_name: "FL_PROJECT_TEAM_ID",
                                        description: "The Team ID  you want to use",
-                                       default_value: ENV["TEAM_ID"])
+                                       default_value: ENV["TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
         ]
       end
 

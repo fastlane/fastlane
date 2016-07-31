@@ -24,7 +24,15 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             increment_build_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
-        end.to raise_error("Please pass the path to the project, not the workspace".red)
+        end.to raise_error("Please pass the path to the project, not the workspace")
+      end
+
+      it "properly removes new lines of the build number" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          increment_build_number(build_number: '24\n', xcodeproj: '.xcproject')
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all 24 \&\& cd \-/)
       end
     end
   end

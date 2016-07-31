@@ -14,7 +14,8 @@ module FastlaneCore
         next if option.description.to_s.empty? # "private" options
 
         short_switch = option.short_option
-        validate_short_switch(used_switches, short_switch)
+        key = option.key
+        validate_short_switch(used_switches, short_switch, key)
 
         type = option.data_type
 
@@ -55,7 +56,7 @@ module FastlaneCore
         # Passing a nil value to global_option has been shown to create problems with
         # option parsing!
         #
-        # See: https://github.com/fastlane/fastlane/tree/master/fastlane_core
+        # See: https://github.com/fastlane/fastlane_core/pull/89
         #
         # If we don't have a data type for this option, we tell it to act like a String.
         # This allows us to get a reasonable value for boolean options that can be
@@ -67,13 +68,13 @@ module FastlaneCore
       end
     end
 
-    def validate_short_switch(used_switches, short_switch)
+    def validate_short_switch(used_switches, short_switch, key)
       return if short_switch.nil?
 
-      raise "Short option #{short_switch} already taken for key #{option.key}".red if used_switches.include?(short_switch)
-      raise "-v is already used for the version (key #{option.key})".red if short_switch == "-v"
-      raise "-h is already used for the help screen (key #{option.key})".red if short_switch == "-h"
-      raise "-t is already used for the trace screen (key #{option.key})".red if short_switch == "-t"
+      UI.user_error!("Short option #{short_switch} already taken for key #{key}") if used_switches.include?(short_switch)
+      UI.user_error!("-v is already used for the version (key #{key})") if short_switch == "-v"
+      UI.user_error!("-h is already used for the help screen (key #{key})") if short_switch == "-h"
+      UI.user_error!("-t is already used for the trace screen (key #{key})") if short_switch == "-t"
 
       used_switches << short_switch
     end
