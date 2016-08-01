@@ -234,7 +234,7 @@ module Screengrab
       # exists before the pull. Work around this by ensuring that the destination directory always exists.
       #
       # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
-      unless File.exist?(@config[:output_directory])
+      unless File.directory?(@config[:output_directory])
         UI.verbose("Creating output directory: #{@config[:output_directory]}")
         FileUtils.mkdir_p(@config[:output_directory])
       end
