@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitTagExistsAction < Action
       def self.run(params)
-        result = Actions.sh("git rev-parse -q --verify \"refs/tags/#{params[:tag]}\" || true", log: false).chomp
+        result = Actions.sh("git rev-parse -q --verify refs/tags/#{params[:tag].shellescape} || true", log: false).chomp
         !result.empty?
       end
 

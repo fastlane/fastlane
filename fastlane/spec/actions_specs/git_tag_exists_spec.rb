@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "git_tag_exists" do
       it "executes the correct git command" do
-        allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify \"refs/tags/1.2.0\" || true", { log: false }).and_return("")
+        allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify refs/tags/1.2.0 || true", { log: false }).and_return("")
         result = Fastlane::FastFile.new.parse("lane :test do
           git_tag_exists(tag: '1.2.0')
         end").runner.execute(:test)
@@ -10,7 +10,7 @@ describe Fastlane do
 
       context("when the tag exists") do
         before do
-          allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify \"refs/tags/1.2.0\" || true", { log: false }).and_return("41215512353215321")
+          allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify refs/tags/1.2.0 || true", { log: false }).and_return("41215512353215321")
         end
 
         it "returns true" do
@@ -24,7 +24,7 @@ describe Fastlane do
 
       context("when the tag doesn't exist") do
         before do
-          allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify \"refs/tags/1.2.0\" || true", { log: false }).and_return("")
+          allow(Fastlane::Actions).to receive(:sh).with("git rev-parse -q --verify refs/tags/1.2.0 || true", { log: false }).and_return("")
         end
 
         it "returns true" do
