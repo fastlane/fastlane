@@ -328,7 +328,7 @@ resign(
 )
 ```
 
-You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.
+You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisioning profile strings or a hash that associates provisioning profile values to bundle identifier keys.
 
 ```ruby
 resign(
@@ -1742,7 +1742,7 @@ reset_git_repo
 reset_git_repo(force: true) # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
 reset_git_repo(skip_clean: true) # If you want 'git clean' to be skipped, thus NOT deleting untracked files like '.env'. Optional, defaults to false.
 
-# You can also specify a list of files that should be resetted.
+# You can also specify a list of files that should be reset.
 reset_git_repo(
   force: true,
   files: [
@@ -1873,7 +1873,7 @@ slack(
     'Built by' => 'Jenkins',
   },
   default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`.
-  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existings fields that were created using the `payload` property for instance.
+  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
     thumb_url: 'http://example.com/path/to/thumb.png',
     fields: [{
       title: 'My Field',
@@ -2084,7 +2084,7 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ### setup_jenkins
 
-This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will work only if the Fastlane was executed on a CI system.
+This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system.
 
 ```ruby
 setup_jenkins
