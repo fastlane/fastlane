@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'fastlane_core', '>= 0.36.1', '< 1.0.0' # all shared code and dependencies
   spec.add_dependency 'plist', '~> 3.1' # for reading the provisioning profile
-  spec.add_dependency 'spaceship', '>= 0.22.0', '< 1.0.0' # communication with Apple
+  spec.add_dependency 'spaceship', '>= 0.29.1', '< 1.0.0' # communication with Apple
 
   # Development only
   spec.add_development_dependency 'bundler'
