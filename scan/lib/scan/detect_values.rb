@@ -40,8 +40,8 @@ module Scan
       default_path = File.expand_path("..", default_path)
       puts "----"
       puts default_path
-      default_path = Dir.glob("#{default_path}/Debug-iphonesimulator").last
       puts Dir.glob("#{default_path}/Debug-iphonesimulator")
+      default_path = Dir.glob("#{default_path}/Debug-iphonesimulator").last
       puts "----"
       if default_path.to_s.length > 0 && File.directory?(default_path)
         UI.verbose("Detected derived data path '#{default_path}'")
