@@ -12,10 +12,10 @@ module Fastlane
           FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
 
           Scan::Manager.new.work(values)
-          Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path] unless values[:derived_data_path].to_s.empty?
 
           true
         ensure
+          Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path] unless values[:derived_data_path].to_s.empty?
           FastlaneCore::UpdateChecker.show_update_status('scan', Scan::VERSION)
         end
       end
