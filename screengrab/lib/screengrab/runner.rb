@@ -230,20 +230,24 @@ module Screengrab
 
       UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
 
-      device_screenshots_paths.each do |device_path|
-        if_device_path_exists(device_serial, device_path) do |path|
-          @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
-                            print_all: false,
-                            print_command: true)
+      # Make a temp directory into which to pull the screenshots before they are moved to their final location.
+      # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
+      Dir.mktmpdir do |tempdir|
+        device_screenshots_paths.each do |device_path|
+          if_device_path_exists(device_serial, device_path) do |path|
+            @executor.execute(command: "adb -s #{device_serial} pull #{path} #{tempdir}",
+                              print_all: false,
+                              print_command: true)
+          end
         end
-      end
 
-      # The SDK can't 100% determine what kind of device it is running on relative to the categories that
-      # supply and Google Play care about (phone, 7" tablet, TV, etc.).
-      #
-      # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
-      # user provided device_type option value to match the directory structure that supply expects
-      move_pulled_screenshots(device_type_dir_name)
+        # The SDK can't 100% determine what kind of device it is running on relative to the categories that
+        # supply and Google Play care about (phone, 7" tablet, TV, etc.).
+        #
+        # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
+        # user provided device_type option value to match the directory structure that supply expects
+        move_pulled_screenshots(tempdir, device_type_dir_name)
+      end
 
       ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
@@ -259,23 +263,34 @@ module Screengrab
       ending_screenshot_count - starting_screenshot_count
     end
 
-    def move_pulled_screenshots(device_type_dir_name)
+    def move_pulled_screenshots(pull_dir, device_type_dir_name)
       # Glob pattern that finds the pulled screenshots directory for each locale
-      # (Matches: fastlane/metadata/android/en-US/images/screenshots)
-      screenshots_dir_pattern = File.join(@config[:output_directory], '**', "screenshots")
+      # Possible matches:
+      #   [pull_dir]/en-US/images/screenshots
+      #   [pull_dir]/screengrab/en-US/images/screenshots
+      screenshots_dir_pattern = File.join(pull_dir, '**', "screenshots")
 
       Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
         src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)
 
-        # We move the screenshots by replacing the last segment of the screenshots directory path with
-        # the device_type specific name
+        # The :output_directory is the final location for the screenshots, so we begin by replacing
+        # the temp directory portion of the path, with the output directory
+        dest_dir = screenshots_dir.gsub(pull_dir, @config[:output_directory])
+
+        # Different versions of adb are inconsistent about whether they will pull down the containing
+        # directory for the screenshots, so we'll try to remove that path from the directory name when
+        # creating the destination path.
+        # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
+        dest_dir = dest_dir.gsub('screengrab/', '')
+
+        # We then replace the last segment of the screenshots directory path with the device_type
+        # specific name, as expected by supply
         #
         # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
-        dest_dir = File.join(File.dirname(screenshots_dir), device_type_dir_name)
+        dest_dir = File.join(File.dirname(dest_dir), device_type_dir_name)
 
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)
-        FileUtils.rm_r(screenshots_dir)
         UI.success "Screenshots copied to #{dest_dir}"
       end
     end
