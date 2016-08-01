@@ -37,7 +37,7 @@ module Scan
       # but in 'Debug-iphonesimulator'
       default_path = File.expand_path("..", default_path)
       default_path = Dir.glob("#{default_path}/Debug-iphonesimulator").last
-      if File.directory?(default_path)
+      if default_path.to_s.length > 0 && File.directory?(default_path)
         UI.verbose("Detected derived data path '#{default_path}'")
         Scan.config[:derived_data_path] = default_path
       end
