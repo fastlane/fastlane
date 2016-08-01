@@ -230,6 +230,15 @@ module Screengrab
 
       UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
 
+      # adb creates a different directory structure depending on whether or not the destination directory
+      # exists before the pull. Work around this by ensuring that the destination directory always exists.
+      #
+      # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
+      unless File.exist?(@config[:output_directory])
+        UI.verbose("Creating output directory: #{@config[:output_directory]}")
+        FileUtils.mkdir_p(@config[:output_directory])
+      end
+
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(device_serial, device_path) do |path|
           @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
