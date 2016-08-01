@@ -23,7 +23,7 @@ module Danger
       # To use the local fastlane instead of bundle
       prefix_command = "./bin/" if FastlaneCore::Helper.test?
 
-      deep_link_matches = pr_body.match(/:link:\s(.*)/) # :link: emoji
+      deep_link_matches = github.pr_body.match(/:link:\s(.*)/) # :link: emoji
       deep_link = deep_link_matches[1] if deep_link_matches
 
       markdown("<table>")
