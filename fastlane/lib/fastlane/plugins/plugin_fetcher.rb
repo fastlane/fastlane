@@ -8,7 +8,8 @@ module Fastlane
     def self.fetch_gems(search_query: nil)
       require 'json'
       require 'open-uri'
-      url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}"
+      url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}#{search_query}"
+      UI.verbose("RubyGems API Request: #{url}")
       results = JSON.parse(open(url).read)
 
       plugins = results.collect do |current|
