@@ -27,7 +27,7 @@ module Fastlane
 
       def self.output
         [
-          "Outputs the hash of the given tag if exists otherwise outputs nil"
+          "Outputs the boolean value whether the tag exists or not"
         ]
       end
 
