@@ -15,8 +15,7 @@ module Fastlane
       end
 
       def self.details
-        [
-        ].join("\n")
+        nil
       end
 
       def self.available_options
