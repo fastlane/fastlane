@@ -9,6 +9,7 @@ module Snapshot
     # All the errors we experience while running snapshot
     attr_accessor :collected_errors
 
+    # rubocop:disable Metrics/AbcSize
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
@@ -61,6 +62,7 @@ module Snapshot
         FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     # This is its own method so that it can re-try if the tests fail randomly
     # @return true/false depending on if the tests succeded
