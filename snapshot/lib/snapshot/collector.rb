@@ -74,7 +74,7 @@ module Snapshot
 
     def self.check_activity(activity, to_store)
       # We now check if it's the rotation gesture, because that's the only thing we care about
-      if activity["Title"] == "Set device orientation to Unknown"
+      if activity["Title"] == "Set device orientation to Unknown" || activity["Title"] == "Get number of matches for: Children matching type Browser"
         if activity["Attachments"]
           to_store << activity["Attachments"].last["FileName"]
         else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually

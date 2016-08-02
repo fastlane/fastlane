@@ -64,7 +64,7 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def device_udid(device)
+      def find_device(device_name, os_version)
         # we now fetch the device's udid. Why? Because we might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
@@ -73,16 +73,23 @@ module Snapshot
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
 
-        device_udid = nil
-        FastlaneCore::Simulator.all.each do |sim|
-          device_udid = sim.udid if sim.name.strip == device.strip and sim.ios_version == Snapshot.config[:ios_version]
+        FastlaneCore::DeviceManager.simulators.each do |sim|
+          return sim if sim.name.strip == device_name.strip and sim.os_version == os_version
         end
 
-        return device_udid
+        nil
       end
 
-      def destination(device)
-        value = "platform=iOS Simulator,id=#{device_udid(device)},OS=#{Snapshot.config[:ios_version]}"
+      def destination(device_name)
+        os = device_name.match(/^Apple TV/) ? "tvOS" : "iOS"
+        os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
+
+        device = find_device(device_name, os_version)
+        if device.nil?
+          UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
+          return
+        end
+        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
 
         return ["-destination '#{value}'"]
       end
