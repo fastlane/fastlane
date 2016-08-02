@@ -32,15 +32,17 @@ module Snapshot
       self.collected_errors = []
       results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
-      Snapshot.config[:devices].each do |device|
+      Snapshot.config[:devices].each_with_index do |device, device_index|
         launch_arguments_set.each do |launch_arguments|
-          Snapshot.config[:languages].each do |language|
+          Snapshot.config[:languages].each_with_index do |language, language_index|
             locale = nil
             if language.kind_of?(Array)
               locale = language[1]
               language = language[0]
             end
             results[device] ||= {}
+
+            UI.message("snapshot run #{device_index * Snapshot.config[:languages].count + language_index + 1} of #{Snapshot.config[:languages].count * Snapshot.config[:devices].count}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
           end
