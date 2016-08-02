@@ -1597,7 +1597,9 @@ git_branch
 Checks whether the given tag exists in the repo
 
 ```ruby
-git_tag_exists(tag: "1.1.0")
+if git_tag_exists(tag: "1.1.0")
+  UI.message("Found it 🚀")
+end
 ```
 
 
