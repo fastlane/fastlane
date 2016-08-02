@@ -9,6 +9,8 @@ describe Scan do
     # to generate the right testing command
     derived_data_path = @project.build_settings(key: "BUILT_PRODUCTS_DIR")
     FileUtils.mkdir_p(File.join(File.expand_path("..", derived_data_path), "Debug-iphonesimulator"))
+
+    Scan.config = Scan.config # to trigger the derived_data detection again
   end
 
   before(:each) do
