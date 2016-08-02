@@ -40,7 +40,7 @@ module Commander
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
-        show_github_issues(e.message)
+        show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         collector.did_crash(@program[:name])
