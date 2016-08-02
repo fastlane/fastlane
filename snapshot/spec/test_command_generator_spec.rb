@@ -17,7 +17,8 @@ describe Snapshot do
 
         it "uses the default parameters" do
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-          command = Snapshot::TestCommandGenerator.generate(device_type: "Something")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          id = command.join('').match(/id=(.+?),/)[1]
           ios = command.join('').match(/OS=(\d+.\d+)/)[1]
           expect(command).to eq(
             [
@@ -26,7 +27,7 @@ describe Snapshot do
               "-scheme ExampleUITests",
               "-project ./example/Example.xcodeproj",
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
-              "-destination 'platform=iOS Simulator,id=,OS=#{ios}'",
+              "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
@@ -43,7 +44,7 @@ describe Snapshot do
 
         it 'uses the fixed derivedDataPath if given' do
           expect(Dir).not_to receive(:mktmpdir)
-          command = Snapshot::TestCommandGenerator.generate(device_type: "Something")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
       end
