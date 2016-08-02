@@ -37,6 +37,18 @@ describe FastlaneCore do
       FastlaneCore::Simulator.launch(device)
     end
 
+    it "does not launch Simulator.app for a non-simulator device" do
+      device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
+                                                       udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: false)
+
+      expect(FastlaneCore::Helper).not_to receive(:backticks)
+
+      FastlaneCore::Simulator.launch(device)
+    end
+
     it "raises an error if xcrun CLI prints garbage" do
       response = "response"
       expect(response).to receive(:read).and_return("💩")
