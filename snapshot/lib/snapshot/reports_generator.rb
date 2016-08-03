@@ -59,6 +59,8 @@ module Snapshot
         'iPhone5' => "4-Inch",
         'iPhone4' => "3.5-Inch",
         'iPadPro' => "iPad Pro",
+        'iPhone' => 'iPhone',
+        'iPod' => 'iPod',
         'iPad' => "iPad",
         'Mac' => "Mac"
       }

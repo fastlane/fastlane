@@ -35,10 +35,10 @@ module Snapshot
                                      type: Array,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       available = FastlaneCore::Simulator.all
+                                       available = FastlaneCore::DeviceManager.all("iOS")
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
-                                           UI.user_error!("Device '#{current}' not in list of available simulators '#{available.join(', ')}'")
+                                           UI.user_error!("Device '#{current}' not in list of available devices '#{available.join(', ')}'")
                                          end
                                        end
                                      end),
