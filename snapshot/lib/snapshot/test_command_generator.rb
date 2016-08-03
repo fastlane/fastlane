@@ -72,7 +72,7 @@ module Snapshot
         #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
-        FastlaneCore::Simulator.all.detect do |sim|
+        FastlaneCore::Simulator.all.find do |sim|
           sim.name.strip == device_name.strip && sim.ios_version == Snapshot.config[:ios_version]
         end
       end
