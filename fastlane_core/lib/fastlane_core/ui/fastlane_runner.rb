@@ -2,6 +2,16 @@ module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
+    unless Object.const_defined?("Faraday")
+      module Faraday
+        class SSLError < StandardError
+          # We create this empty error class if we didn't require Faraday
+          # so that we can use it in the rescue block below
+          # even if we didn't require Faraday or didn't use it
+        end
+      end
+    end
+
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
     def run!
       require_program :version, :description
