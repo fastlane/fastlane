@@ -198,19 +198,11 @@ module Snapshot
     end
     # rubocop:enable Metrics/AbcSize
 
-    def open_simulator_for_device(device)
+    def open_simulator_for_device(device_name)
       return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
 
-      # As a second level of feature switching, see if we want to try the xcode-select variant
-      if ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'] == '2'
-        simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
-        UI.message("Explicitly opening simulator at #{simulator_path} for device: #{device}")
-      else
-        simulator_path = 'Simulator'
-        UI.message("Explicitly opening simulator for device: #{device}")
-      end
-
-      `open -a #{simulator_path} --args -CurrentDeviceUDID #{TestCommandGenerator.device_udid(device)}`
+      device = TestCommandGenerator.find_device(device_name)
+      FastlaneCore::Simulator.launch(device) if device
     end
 
     def uninstall_app(device_type)
