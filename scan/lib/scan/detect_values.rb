@@ -35,7 +35,7 @@ module Scan
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
       # We need to go one folder up, since tests don't run inside 'Release-iphoneos'
       # but in 'Debug-iphonesimulator'
-      default_path = File.join(File.expand_path("..", default_path), "Debug-iphonesimulator")
+      default_path = File.join(File.dirname(default_path), "Debug-iphonesimulator")
       UI.verbose("Detected derived data path '#{default_path}'")
       Scan.config[:derived_data_path] = default_path
     end
