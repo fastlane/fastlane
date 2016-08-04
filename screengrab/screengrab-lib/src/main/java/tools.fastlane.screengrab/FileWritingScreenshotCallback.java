@@ -24,15 +24,13 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     private static final String SCREENGRAB_DIR_NAME = "screengrab";
 
     private final Context appContext;
-    private final String screenshotName;
 
-    public FileWritingScreenshotCallback(Context appContext, String screenshotName) {
+    public FileWritingScreenshotCallback(Context appContext) {
         this.appContext = appContext;
-        this.screenshotName = screenshotName;
     }
 
     @Override
-    public void screenshotCaptured(Bitmap bitmap) {
+    public void screenshotCaptured(String screenshotName, Bitmap bitmap) {
         try {
             File screenshotDirectory = getFilesDirectory(appContext, Locale.getDefault());
             String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;

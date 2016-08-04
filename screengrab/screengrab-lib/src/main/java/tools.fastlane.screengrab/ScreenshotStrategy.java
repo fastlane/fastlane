@@ -1,5 +1,5 @@
 package tools.fastlane.screengrab;
 
 public interface ScreenshotStrategy {
-    void takeScreenshot(ScreenshotCallback screenshotCallback);
+    void takeScreenshot(String screenshotName, ScreenshotCallback screenshotCallback);
 }

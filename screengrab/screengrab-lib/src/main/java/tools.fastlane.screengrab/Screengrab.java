@@ -40,20 +40,24 @@ public class Screengrab {
     }
 
     public static void screenshot(String screenshotName) {
-        screenshot(defaultScreenshotStrategy, screenshotName);
+        screenshot(screenshotName, defaultScreenshotStrategy);
     }
 
-    public static void screenshot(ScreenshotStrategy strategy, String screenshotName) {
+    public static void screenshot(String screenshotName, ScreenshotStrategy strategy) {
+        Context appContext = InstrumentationRegistry.getInstrumentation()
+                .getTargetContext()
+                .getApplicationContext();
+
+        screenshot(screenshotName, strategy, new FileWritingScreenshotCallback(appContext));
+    }
+
+    public static void screenshot(String screenshotName, ScreenshotStrategy strategy, ScreenshotCallback callback) {
         if (!TAG_PATTERN.matcher(screenshotName).matches()) {
             throw new IllegalArgumentException("Tag may only contain the letters a-z, A-Z, the " +
                     "numbers 0-9, underscores, and hyphens");
         }
 
-        final Context appContext = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext()
-                .getApplicationContext();
-
-        strategy.takeScreenshot(new FileWritingScreenshotCallback(appContext, screenshotName));
+        strategy.takeScreenshot(screenshotName, callback);
     }
 
     private Screengrab() {

@@ -19,14 +19,16 @@ import java.util.concurrent.CountDownLatch;
 
 public class DecorViewScreenshotStrategy implements ScreenshotStrategy {
     @Override
-    public void takeScreenshot(final ScreenshotCallback callback) {
-        Espresso.onView(ViewMatchers.isRoot()).perform(new ScreenshotViewAction(callback));
+    public void takeScreenshot(String screenshotName, ScreenshotCallback callback) {
+        Espresso.onView(ViewMatchers.isRoot()).perform(new ScreenshotViewAction(screenshotName, callback));
     }
 
     static class ScreenshotViewAction implements ViewAction {
+        private final String screenshotName;
         private final ScreenshotCallback callback;
 
-        public ScreenshotViewAction(ScreenshotCallback callback) {
+        public ScreenshotViewAction(String screenshotName, ScreenshotCallback callback) {
+            this.screenshotName = screenshotName;
             this.callback = callback;
         }
 
@@ -49,7 +51,7 @@ public class DecorViewScreenshotStrategy implements ScreenshotStrategy {
             }
 
             try {
-                callback.screenshotCaptured(takeScreenshot(activity));
+                callback.screenshotCaptured(screenshotName, takeScreenshot(activity));
             } catch (Exception e) {
                 throw new RuntimeException("Unable to capture screenshot.", e);
             }
