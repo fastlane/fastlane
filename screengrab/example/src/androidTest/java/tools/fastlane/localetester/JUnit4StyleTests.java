@@ -1,7 +1,5 @@
 package tools.fastlane.localetester;
 
-import android.support.test.espresso.assertion.ViewAssertions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.ClassRule;
@@ -30,7 +28,7 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeScreenshot() {
-        onView(withId(R.id.greeting)).check(matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.greeting)).check(matches(isDisplayed()));
 
         Screengrab.screenshot("beforeFabClick");
 
@@ -43,14 +41,12 @@ public class JUnit4StyleTests {
     public void testTakeMoreScreenshots() {
         onView(withId(R.id.nav_button)).perform(click());
 
+        Screengrab.screenshot("anotherActivity");
+
         onView(withId(R.id.show_dialog_button)).perform(click());
 
         Screengrab.screenshot("anotherActivity-dialog");
 
         onView(withText(android.R.string.ok)).perform(click());
-
-        Screengrab.screenshot("anotherActivity");
-
-        onView(withId(R.id.hello)).check(matches(isDisplayed()));
     }
 }

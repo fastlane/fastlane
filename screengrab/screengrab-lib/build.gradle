@@ -25,7 +25,7 @@ android {
     defaultConfig {
         versionCode versionCodeInt
         versionName versionNameString
-        minSdkVersion 18
+        minSdkVersion 8
     }
     buildTypes {
         release {
