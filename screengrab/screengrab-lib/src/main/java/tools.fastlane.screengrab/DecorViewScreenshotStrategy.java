@@ -17,6 +17,25 @@ import org.hamcrest.Matcher;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * <p>Screenshot strategy that captures the contents of a Window's decor view.</p>
+ *
+ * <p>Advantages compared to {@link UiAutomatorScreenshotStrategy}:</p>
+ *
+ * <ul>
+ *     <li>Works down to API level 8</li>
+ *     <li>Uses Espresso for action synchronization internally, so requires less matching
+ *         setup in your tests</li>
+ * </ul>
+ *
+ * Known limitations:
+ * <ul>
+ *     <li>Does not work on Android N</li>
+ *     <li>Does not correctly capture depth/shadows in Material UI</li>
+ *     <li>Does not correctly capture multi-window situations (dialogs, etc.)</li>
+ *     <li>Does not correctly capture specialized surface views (Google Maps, video players, etc.)</li>
+ * </ul>
+ */
 public class DecorViewScreenshotStrategy implements ScreenshotStrategy {
     @Override
     public void takeScreenshot(String screenshotName, ScreenshotCallback callback) {

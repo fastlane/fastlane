@@ -15,6 +15,10 @@ import java.util.Locale;
 
 import tools.fastlane.screengrab.file.Chmod;
 
+/**
+ * Default {@link ScreenshotCallback} implementation that stores the captured Bitmap on the file
+ * system in the structure that the Screengrab command-line utility expects.
+ */
 public class FileWritingScreenshotCallback implements ScreenshotCallback {
     private static final String TAG = "Screengrab";
 
@@ -30,7 +34,7 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     }
 
     @Override
-    public void screenshotCaptured(String screenshotName, Bitmap bitmap) {
+    public void screenshotCaptured(String screenshotName, Bitmap screenshot) {
         try {
             File screenshotDirectory = getFilesDirectory(appContext, Locale.getDefault());
             String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;
@@ -39,10 +43,10 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             OutputStream fos = null;
             try {
                 fos = new BufferedOutputStream(new FileOutputStream(screenshotFile));
-                bitmap.compress(Bitmap.CompressFormat.PNG, FULL_QUALITY, fos);
+                screenshot.compress(Bitmap.CompressFormat.PNG, FULL_QUALITY, fos);
                 Chmod.chmodPlusR(screenshotFile);
             } finally {
-                bitmap.recycle();
+                screenshot.recycle();
                 if (fos != null) {
                     fos.close();
                 }
