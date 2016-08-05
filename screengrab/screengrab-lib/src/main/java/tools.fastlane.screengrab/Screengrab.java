@@ -34,7 +34,9 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 
 import org.hamcrest.Matcher;
 
@@ -43,7 +45,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
@@ -113,31 +118,31 @@ public class Screengrab {
     }
 
     private static void takeScreenshot(final Activity activity, File file) throws IOException {
-        View view = activity.getWindow().getDecorView();
-        final Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
 
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            // On main thread already, Just Do It™.
-            drawDecorViewToBitmap(activity, bitmap);
-        } else {
-            // On a background thread, post to main.
-            final CountDownLatch latch = new CountDownLatch(1);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        drawDecorViewToBitmap(activity, bitmap);
-                    } finally {
-                        latch.countDown();
-                    }
-                }
-            });
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                String msg = "Unable to get screenshot " + file.getAbsolutePath();
-                Log.e(TAG, msg, e);
-                throw new RuntimeException(msg, e);
+        // Check if storage is available
+        if (!isExternalStorageWritable()) {
+            Log.d(TAG, "External storage is not available.");
+            return;
+        }
+
+        // Get a bitmap from the activity root view. When the drawing cache is enabled,
+        // the next call to getDrawingCache() will draw the view in a bitmap.
+        View rootView = activity.getWindow().getDecorView().getRootView();
+        rootView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+        rootView.setDrawingCacheEnabled(false);
+
+        // Add the SurfaceView bit (see getAllTextureViews() below)
+        List<TextureView> tilingViews = getAllTextureViews(rootView);
+        if (tilingViews.size() > 0) {
+            Canvas canvas = new Canvas(bitmap);
+            for (TextureView TextureView : tilingViews) {
+                Bitmap b = TextureView.getBitmap(TextureView.getWidth(), TextureView.getHeight());
+                int[] location = new int[2];
+                TextureView.getLocationInWindow(location);
+                int[] location2 = new int[2];
+                TextureView.getLocationOnScreen(location2);
+                canvas.drawBitmap(b, location[0], location[1], null);
             }
         }
 
@@ -152,6 +157,36 @@ public class Screengrab {
                 fos.close();
             }
         }
+    }
+
+    /*
+     * Utils
+     */
+
+    public static boolean isExternalStorageWritable() {
+        // Checks if external storage is available for read and write
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    /*
+     * The classic way of taking a screenshot (above) doesn't work with TextureView, this fixes it:
+     * http://stackoverflow.com/questions/19704060/screen-capture-textureview-is-black-using-drawingcache
+     */
+
+    public static List<TextureView> getAllTextureViews(View view)
+    {
+        List<TextureView> tilingViews = new ArrayList<TextureView>();
+        if (view instanceof TextureView) {
+            tilingViews.add((TextureView)view);
+        }  else if(view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup)view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                tilingViews.addAll(getAllTextureViews(viewGroup.getChildAt(i)));
+            }
+        }
+
+        return tilingViews;
     }
 
     private static void drawDecorViewToBitmap(Activity activity, Bitmap bitmap) {
