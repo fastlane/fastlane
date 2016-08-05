@@ -83,11 +83,11 @@ module Scan
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
       unless tests_exit_status == 0
-        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}", show_github_issues: false)
+        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
       unless result[:failures] == 0
-        UI.user_error!("Tests failed", show_github_issues: false)
+        UI.user_error!("Tests failed")
       end
     end
 
