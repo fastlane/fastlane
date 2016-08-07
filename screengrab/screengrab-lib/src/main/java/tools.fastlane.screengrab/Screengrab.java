@@ -74,7 +74,6 @@ public class Screengrab {
                 .getApplicationContext();
 
         screenshot(screenshotName, strategy, new FileWritingScreenshotCallback(appContext));
-        new HashMap();
     }
 
     /**
