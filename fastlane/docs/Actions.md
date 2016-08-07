@@ -2550,7 +2550,7 @@ Compress a file or directory
 ```ruby
 zip(path: "MyApp.app")
 
-zip(path: "MyApp.app", output_name: "Latest.app.zip")
+zip(path: "MyApp.app", output_path: "Latest.app.zip")
 ```
 
 ### ifttt
