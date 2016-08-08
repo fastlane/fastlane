@@ -61,6 +61,19 @@ module Fastlane
     end
     # rubocop:enable Style/AccessorMethodName
 
+    # Returns the class ref to the action based on the action name
+    # Returns nil if the action is not aailable
+    def self.action_class_ref(action_name)
+      class_name = action_name.to_s.fastlane_class + 'Action'
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError
+        return nil
+      end
+      return class_ref
+    end
+
     def self.load_default_actions
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
         require file
@@ -100,6 +113,10 @@ module Fastlane
           UI.user_error!("Action '#{file_name}' is damaged!")
         end
       end
+    end
+
+    def self.formerly_bundled_actions
+      ["xcake"]
     end
   end
 end

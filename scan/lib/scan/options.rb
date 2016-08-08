@@ -121,7 +121,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :open_report,
                                      short_option: "-g",
                                      env_name: "SCAN_OPEN_REPORT",
-                                     description: "Don't open the HTML report when tests are completed",
+                                     description: "Should the HTML report be opened when tests are completed",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :configuration,
@@ -173,7 +173,15 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
                                     description: "Only post on Slack if the tests fail",
                                     is_string: false,
-                                    default_value: false)
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
+                                    is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                    description: "Sets custom full report file name",
+                                    optional: true,
+                                    is_string: true)
       ]
     end
   end

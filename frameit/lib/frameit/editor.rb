@@ -245,6 +245,9 @@ module Frameit
         UI.verbose("Adding text '#{text}'")
 
         text.gsub! '\n', "\n"
+        text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
+
+        interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
         title_image.combine_options do |i|
@@ -252,6 +255,7 @@ module Frameit
           i.gravity "Center"
           i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
+          i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
         title_image.trim # remove white space

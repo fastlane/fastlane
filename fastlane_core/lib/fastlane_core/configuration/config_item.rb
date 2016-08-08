@@ -87,14 +87,14 @@ module FastlaneCore
 
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
-      # Weird because of https://stackoverflow.com/questions/9537895/using-a-class-object-in-case-statement
-      case
-      when data_type == Array
+      return nil if value.nil?
+
+      if data_type == Array
         return value.split(',') if value.kind_of?(String)
-      when data_type == Integer
-        return value.to_i unless value.nil?
-      when data_type == Float
-        return value.to_f unless value.nil?
+      elsif data_type == Integer
+        return value.to_i if value.to_i.to_s == value.to_s
+      elsif data_type == Float
+        return value.to_f if value.to_f.to_s == value.to_s
       else
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here

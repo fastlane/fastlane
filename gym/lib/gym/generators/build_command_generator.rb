@@ -57,7 +57,7 @@ module Gym
 
       def suffix
         suffix = []
-        suffix << "CODE_SIGN_IDENTITY='#{Gym.config[:codesigning_identity]}'" if Gym.config[:codesigning_identity]
+        suffix << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
         suffix
       end
 

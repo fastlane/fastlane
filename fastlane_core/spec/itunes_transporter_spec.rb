@@ -3,7 +3,7 @@ require 'credentials_manager'
 
 describe FastlaneCore do
   describe FastlaneCore::ItunesTransporter do
-    def shell_upload_command(team_id = nil)
+    def shell_upload_command(provider_short_name = nil)
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
@@ -12,11 +12,11 @@ describe FastlaneCore do
         "-f '/tmp/my.app.id.itmsp'",
         "-t 'Signiant'",
         "-k 100000",
-        ("-itc_provider #{team_id}" if team_id)
+        ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end
 
-    def shell_download_command(team_id = nil)
+    def shell_download_command(provider_short_name = nil)
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
@@ -24,11 +24,11 @@ describe FastlaneCore do
         "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
         "-apple_id my.app.id",
         "-destination '/tmp'",
-        ("-itc_provider #{team_id}" if team_id)
+        ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end
 
-    def java_upload_command(team_id = nil)
+    def java_upload_command(provider_short_name = nil)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -46,12 +46,12 @@ describe FastlaneCore do
         "-f /tmp/my.app.id.itmsp",
         "-t Signiant",
         "-k 100000",
-        ("-itc_provider #{team_id}" if team_id),
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
       ].compact.join(' ')
     end
 
-    def java_download_command(team_id = nil)
+    def java_download_command(provider_short_name = nil)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -68,7 +68,7 @@ describe FastlaneCore do
         "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
         '-apple_id my.app.id',
         '-destination /tmp',
-        ("-itc_provider #{team_id}" if team_id),
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
       ].compact.join(' ')
     end
@@ -92,7 +92,7 @@ describe FastlaneCore do
         end
       end
 
-      describe "use_shell_script is false with a dev portal team ID set" do
+      describe "use_shell_script is false with a itc_provider short name set" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false, 'abcd1234')
@@ -108,7 +108,7 @@ describe FastlaneCore do
         end
       end
 
-      describe "use_shell_script is true with a dev portal team ID set" do
+      describe "use_shell_script is true with a itc_provider short name set" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')

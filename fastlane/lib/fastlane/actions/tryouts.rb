@@ -5,7 +5,6 @@ module Fastlane
       TRYOUTS_BUILD_INFORMATION = :TRYOUTS_BUILD_INFORMATION
     end
     class TryoutsAction < Action
-
       TRYOUTS_API_BUILD_RELEASE_TEMPLATE = "https://api.tryouts.io/v1/applications/%s/releases/"
 
       def self.run(params)

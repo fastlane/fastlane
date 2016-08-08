@@ -1,6 +1,6 @@
 require 'coveralls'
 
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
 unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
@@ -42,4 +42,10 @@ def with_verbose(verbose)
   yield if block_given?
 ensure
   $verbose = orig_verbose
+end
+
+def stub_plugin_exists_on_rubygems(plugin_name, exists)
+  stub_request(:get, "https://rubygems.org/api/v1/gems/fastlane-plugin-#{plugin_name}.json").
+    with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
+    to_return(status: 200, body: (exists ? { version: "1.0" }.to_json : nil), headers: {})
 end

@@ -38,6 +38,10 @@ match
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
+`match` is the implementation of the https://codesigning.guide concept. `match` creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. `match` also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams"
+
+[More information on how to get started with codesigning](/fastlane/docs/Codesigning)
+
 -------
 <p align="center">
     <a href="#why-match">Why?</a> &bull;
@@ -130,7 +134,7 @@ username "user@fastlane.tools"
 
 #### Important: Use one git branch per team
 
-`match` also supports storing certificates of multiple teams in one repo, by using separate git branches. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you. 
+`match` also supports storing certificates of multiple teams in one repo, by using separate git branches. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you.
 
 ```ruby
 match(git_branch: "team1", username: "user@team1.com")
@@ -267,9 +271,7 @@ match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 
 ### Setup Xcode project
 
-To make sure Xcode is using the right provisioning profile for each target, don't use the `Automatic` feature for the profile selection.
-
-Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode). The `Fix Issue` button can revoke your existing certificates, which will invalidate your provisioning profiles.
+[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
@@ -291,6 +293,8 @@ This is useful when installing your application on your device using the Develop
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
+[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+
 ### Continuous Integration
 
 #### Repo access
@@ -301,7 +305,7 @@ Some repo hosts might allow you to use the same deploy key for different repos, 
 There are a few ways around this:
 
 1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
-2. Some CIs allow you to upload your signing credientials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
+2. Some CIs allow you to upload your signing credentials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
 
 Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.
 

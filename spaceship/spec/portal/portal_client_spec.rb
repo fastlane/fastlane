@@ -189,7 +189,8 @@ describe Spaceship::Client do
           %w(certRequestId name statusString dateRequestedString dateRequested
              dateCreated expirationDate expirationDateString ownerType ownerName
              ownerId canDownload canRevoke certificateId certificateStatusCode
-             certRequestStatusCode certificateTypeDisplayId serialNum typeString))
+             certRequestStatusCode certificateTypeDisplayId serialNum typeString)
+        )
       end
     end
 

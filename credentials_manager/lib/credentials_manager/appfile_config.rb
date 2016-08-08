@@ -1,7 +1,6 @@
 module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)
   class AppfileConfig
-
     def self.try_fetch_value(key)
       begin
         return self.new.data[key]

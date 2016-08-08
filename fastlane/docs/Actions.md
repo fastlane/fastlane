@@ -55,15 +55,17 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"     # One of: build, bootstrap, update, archive. (default: bootstrap)
-  use_ssh: false,          # Use SSH for downloading GitHub repositories.
-  use_submodules: false,   # Add dependencies as Git submodules.
-  use_binaries: true,      # Check out dependency repositories even when prebuilt frameworks exist
-  no_build: false,         # When bootstrapping Carthage do not build
-  no_skip_current: false,  # Don't skip building the current project (only for frameworks)
-  verbose: false,          # Print xcodebuild output inline
-  platform: "all",         # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
-  configuration: "Release" # Build configuration to use when building
+  command: "bootstrap"                            # One of: build, bootstrap, update, archive. (default: bootstrap)
+  dependencies: ['Alamofire', 'Notice'],          # Specify which dependencies to update (only for the update command)
+  use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
+  use_submodules: false,                          # Add dependencies as Git submodules.
+  use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,                                # When bootstrapping Carthage do not build
+  no_skip_current: false,                         # Don't skip building the current project (only for frameworks)
+  verbose: false,                                 # Print xcodebuild output inline
+  platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
+  configuration: "Release",                       # Build configuration to use when building
+  toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
 )
 ```
 
@@ -208,7 +210,7 @@ clear_derived_data
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md).
+You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
 
 ```ruby
 ipa(
@@ -240,7 +242,7 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md) before using this action.
+You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning) before using this action.
 
 Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
@@ -313,14 +315,6 @@ Select and build with the Xcode installed at the provided path. Use the `xcversi
 xcode_select "/Applications/Xcode6.1.app"
 ```
 
-### [Xcake](https://github.com/jcampbell05/xcake/)
-
-If you use [Xcake](https://github.com/jcampbell05/xcake/) you can use the `xcake` integration to run `xcake make` before building your app.
-
-```ruby
-xcake
-```
-
 ### [resign](https://github.com/fastlane/fastlane/tree/master/sigh#resign)
 This will resign an ipa with another signing identity and provisioning profile.
 
@@ -334,7 +328,7 @@ resign(
 )
 ```
 
-You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.
+You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisioning profile strings or a hash that associates provisioning profile values to bundle identifier keys.
 
 ```ruby
 resign(
@@ -430,7 +424,7 @@ import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV
 
 **Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead.
 
-Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md).
+Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -804,8 +798,19 @@ appium(
 ### [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
 
 ```ruby
-pilot(username: "felix@krausefx.com",
-      app_identifier: "com.krausefx.app")
+pilot
+```
+
+#### Options
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
+
+```ruby
+pilot(
+  username: "felix@krausefx.com",
+  app_identifier: "com.krausefx.app",
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
+)
 ```
 
 More information about the available options `fastlane action pilot` and a more detailed description on the [pilot project page](https://github.com/fastlane/fastlane/tree/master/pilot).
@@ -817,7 +822,11 @@ deliver
 
 To upload a new build to TestFlight use `pilot` instead.
 
-If you don't want a PDF report for App Store builds, append ```:force``` to the command. This is useful when running ```fastlane``` on your Continuous Integration server: `deliver(force: true)`
+#### Options
+
+If you don't want a PDF report for App Store builds, append `:force` to the command. This is useful when running `fastlane` on your Continuous Integration server: `deliver(force: true)`
+
+If your account is on multiple teams and you need to tell the `iTMSTransporter` which "provider" to use, you can set the `itc_provider` option to pass this info.
 
 Other options
 
@@ -825,12 +834,13 @@ Other options
 deliver(
   force: true, # Set to true to skip PDF verification
   email: "itunes@connect.com" # different Apple ID than the dev portal
+  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
 )
 ```
 
 See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile) automated the building and distributing of a beta version over TestFlight in their [Fastfile](https://github.com/fastlane/examples/blob/master/ProductHunt/Fastfile).
 
-**Note:** There is an action named `appstore` which is a convenince alias to `deliver`.
+**Note:** There is an action named `appstore` which is a convenience alias to `deliver`.
 
 ### TestFlight
 
@@ -971,14 +981,14 @@ This action allows you to upload symbolication files to Sentry.
 
 ```ruby
 upload_symbols_to_sentry(
-  api_key: '...',
+  auth_token: '...',
   org_slug: '...',
   project_slug: '...',
   dsym_path: './App.dSYM.zip'
 )
 ```
 
-The following environment variables may be used in place of parameters: `SENTRY_API_KEY`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
+The following environment variables may be used in place of parameters: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`, and `SENTRY_DSYM_PATH`.
 
 
 ### AWS S3 Distribution
@@ -1390,7 +1400,7 @@ update_urban_airship_configuration(
   plist_path: "AirshipConfig.plist",
   production_app_key: "PRODKEY",
   production_app_secret: "PRODSECRET"
-)  
+)
 ```
 
 ## Developer Portal
@@ -1692,7 +1702,7 @@ Executes a simple `git pull --tags` command
 ### push_to_git_remote
 Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
 
-Tags will be pushed as well.
+Tags will be pushed as well by default, except when setting the option 'tags' to false.
 
 ```ruby
 push_to_git_remote # simple version. pushes 'master' branch to 'origin' remote
@@ -1701,7 +1711,8 @@ push_to_git_remote(
   remote: 'origin',         # optional, default: 'origin'
   local_branch: 'develop',  # optional, aliased by 'branch', default: 'master'
   remote_branch: 'develop', # optional, default is set to local_branch
-  force: true               # optional, default: false
+  force: true,              # optional, default: false
+  tags: false               # optional, default: true
 )
 ```
 
@@ -1731,7 +1742,7 @@ reset_git_repo
 reset_git_repo(force: true) # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
 reset_git_repo(skip_clean: true) # If you want 'git clean' to be skipped, thus NOT deleting untracked files like '.env'. Optional, defaults to false.
 
-# You can also specify a list of files that should be resetted.
+# You can also specify a list of files that should be reset.
 reset_git_repo(
   force: true,
   files: [
@@ -1766,14 +1777,13 @@ import_from_git(
 )
 ```
 
-### last_git_commit_message (was: last_git_commit)
+### last_git_commit
 
 Get information about the last git commit, returns the commit hash, the abbreviated commit hash, the author and the git message.
 
 ```ruby
-commit = last_git_commit_message
+commit = last_git_commit
 crashlytics(notes: commit[:message])
-puts commit[:author]
 ```
 
 ### create_pull_request
@@ -1863,7 +1873,7 @@ slack(
     'Built by' => 'Jenkins',
   },
   default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`.
-  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existings fields that were created using the `payload` property for instance.
+  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
     thumb_url: 'http://example.com/path/to/thumb.png',
     fields: [{
       title: 'My Field',
@@ -1951,7 +1961,7 @@ Post a message to a **group chat**.
 ```
 
 ### Notification
-Display a notification using the OS X notification centre. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
+Display a notification using the macOS notification center. Uses [terminal-notifier](https://github.com/alloy/terminal-notifier).
 
 ```ruby
   notification(subtitle: "Finished Building", message: "Ready to upload...")
@@ -2074,7 +2084,7 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ### setup_jenkins
 
-This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will work only if the Fastlane was executed on a CI system.
+This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system.
 
 ```ruby
 setup_jenkins
@@ -2435,7 +2445,13 @@ fastlane_version "1.50.0"
 Install an Xcode plugin for the current user
 
 ```ruby
-install_xcode_plugin(url: 'https://github.com/contentful/ContentfulXcodePlugin/releases/download/0.5/ContentfulPlugin.xcplugin.zip')
+install_xcode_plugin(url: 'https://example.com/clubmate/plugin.zip')
+```
+
+You can also let `fastlane` pick the latest version of a plugin automatically, if it is hosted on GitHub
+
+```ruby
+install_xcode_plugin(github: 'https://github.com/contentful/ContentfulXcodePlugin')
 ```
 
 ### opt_out_usage

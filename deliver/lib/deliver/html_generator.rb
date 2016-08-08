@@ -24,7 +24,7 @@ module Deliver
       if okay
         UI.success("HTML file confirmed...") # print this to give feedback to the user immediately
       else
-        UI.user_error!("Did not upload the metadata, because the HTML file was rejected by the user")
+        UI.user_error!("Did not upload the metadata, because the HTML file was rejected by the user", show_github_issues: false)
       end
     end
 

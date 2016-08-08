@@ -16,7 +16,8 @@ module Fastlane
           UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
-            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog').path
+            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
+          ).path
         end
 
         if params[:ipa_path]
@@ -45,13 +46,15 @@ module Fastlane
           command.join(" "),
           print_command: false,
           print_command_output: false,
-          error_callback: error_callback)
+          error_callback: error_callback
+        )
 
         return command if Helper.test?
 
         UI.verbose sanitizer.call(result) if $verbose
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
+        UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
       end
 
       def self.description

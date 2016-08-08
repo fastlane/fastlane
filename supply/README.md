@@ -36,6 +36,8 @@ supply
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
+`supply` uploads app metadata, screenshots and binaries to Google Play. You can also select tracks for builds and promote builds to production.
+
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 

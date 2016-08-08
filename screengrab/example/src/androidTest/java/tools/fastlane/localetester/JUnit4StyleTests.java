@@ -16,6 +16,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(JUnit4.class)
 public class JUnit4StyleTests {
@@ -27,21 +28,25 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeScreenshot() {
+        onView(withId(R.id.greeting)).check(matches(isDisplayed()));
+
         Screengrab.screenshot("beforeFabClick");
 
-        onView(withId(tools.fastlane.localetester.R.id.fab)).perform(click());
+        onView(withId(R.id.fab)).perform(click());
 
         Screengrab.screenshot("afterFabClick");
     }
 
     @Test
     public void testTakeMoreScreenshots() {
-        Screengrab.screenshot("mainActivity");
-
-        onView(withId(tools.fastlane.localetester.R.id.nav_button)).perform(click());
+        onView(withId(R.id.nav_button)).perform(click());
 
         Screengrab.screenshot("anotherActivity");
 
-        onView(withId(R.id.hello)).check(matches(isDisplayed()));
+        onView(withId(R.id.show_dialog_button)).perform(click());
+
+        Screengrab.screenshot("anotherActivity-dialog");
+
+        onView(withText(android.R.string.ok)).perform(click());
     }
 }

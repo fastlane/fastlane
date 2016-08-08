@@ -55,8 +55,8 @@ describe Scan do
       expect(result).to start_with([
                                      "set -o pipefail &&",
                                      "env NSUnbufferedIO=YES xcodebuild",
-                                     "-scheme 'app'",
-                                     "-project './examples/standard/app.xcodeproj'",
+                                     "-scheme app",
+                                     "-project ./examples/standard/app.xcodeproj",
                                      "-sdk '9.0'",
                                      "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
                                      "DEBUG=1 BUNDLE_NAME=Example\\ App",
@@ -86,8 +86,8 @@ describe Scan do
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme 'app'",
-                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-scheme app",
+                                       "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
                                        :build,
                                        :test
@@ -96,7 +96,7 @@ describe Scan do
 
       it "#project_path_array" do
         result = Scan::TestCommandGenerator.project_path_array
-        expect(result).to eq(["-scheme 'app'", "-project './examples/standard/app.xcodeproj'"])
+        expect(result).to eq(["-scheme app", "-project ./examples/standard/app.xcodeproj"])
       end
 
       it "#build_path" do
@@ -131,8 +131,8 @@ describe Scan do
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme 'app'",
-                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-scheme app",
+                                       "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
                                        "-derivedDataPath '/tmp/my/derived_data'",
                                        :build,
@@ -152,8 +152,8 @@ describe Scan do
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme 'app'",
-                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-scheme app",
+                                       "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
                                        "-resultBundlePath './fastlane/test_output/app.test_result'",
                                        :build,
@@ -167,15 +167,15 @@ describe Scan do
         options = { project: "./examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
           "platform=iOS Simulator,name=iPad Air 2,OS=9.2"
-        ]}
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme 'app'",
-                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-scheme app",
+                                       "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        :build,
@@ -187,15 +187,15 @@ describe Scan do
         options = { project: "./examples/standard/app.xcodeproj", devices: [
           "iPhone 6s (9.3)",
           "iPad Air (9.3)"
-        ]}
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme 'app'",
-                                       "-project './examples/standard/app.xcodeproj'",
+                                       "-scheme app",
+                                       "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=70E1E92F-A292-4980-BC3C-7770C5EEFCFD' " \
                                        "-destination 'platform=iOS Simulator,id=DD134998-177F-47DA-99FA-D549D9305476'",
                                        :build,
@@ -208,7 +208,7 @@ describe Scan do
           options = { project: "./examples/standard/app.xcodeproj", device: [
             "iPhone 6s (9.3)",
             "iPad Air (9.3)"
-          ]}
+          ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         end.to raise_error("'device' value must be a String! Found Array instead.")
       end

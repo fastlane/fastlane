@@ -8,8 +8,15 @@ module Fastlane
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
         message = options[:message] || "#{tag} (fastlane)"
 
+        cmd = ['git tag']
+
+        cmd << ["-am #{message.shellescape}"]
+        cmd << '--force' if options[:force]
+        cmd << "'#{tag}'"
+        cmd << options[:commit].to_s if options[:commit]
+
         UI.message "Adding git tag '#{tag}' 🎯."
-        Actions.sh("git tag -am #{message.shellescape} '#{tag}'")
+        Actions.sh(cmd.join(' '))
       end
 
       def self.description
@@ -38,12 +45,22 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",
                                        description: "The tag message. Defaults to the tag's name",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :commit,
+                                       env_name: "FL_GIT_TAG_COMMIT",
+                                       description: "The commit or object where the tag will be set. Defaults to the current HEAD",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :force,
+                                       env_name: "FL_GIT_TAG_FORCE",
+                                       description: "Force adding the tag",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 
-      def self.author
-        "lmirosevic"
+      def self.authors
+        ["lmirosevic", "maschall"]
       end
 
       def self.is_supported?(platform)

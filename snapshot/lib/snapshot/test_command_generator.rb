@@ -7,6 +7,7 @@ module Snapshot
         parts << "xcodebuild"
         parts += options
         parts += destination(device_type)
+        parts += build_settings
         parts += actions
         parts += suffix
         parts += pipe
@@ -39,6 +40,13 @@ module Snapshot
         options
       end
 
+      def build_settings
+        build_settings = []
+        build_settings << "FASTLANE_SNAPSHOT=YES"
+
+        build_settings
+      end
+
       def actions
         actions = []
         actions << :clean if Snapshot.config[:clean]
@@ -56,21 +64,23 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def device_udid(device)
-        # we now fetch the device's udid. Why? Because we might get this error message
+      def find_device(device_name)
+        # We might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
         # This happens when you have multiple simulators for a given device type / iOS combination
         #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
-
-        device_udid = nil
-        FastlaneCore::Simulator.all.each do |sim|
-          device_udid = sim.udid if sim.name.strip == device.strip and sim.ios_version == Snapshot.config[:ios_version]
+        FastlaneCore::Simulator.all.find do |sim|
+          sim.name.strip == device_name.strip && sim.ios_version == Snapshot.config[:ios_version]
         end
+      end
 
-        return device_udid
+      def device_udid(device_name)
+        device = find_device(device_name)
+
+        device ? device.udid : nil
       end
 
       def destination(device)

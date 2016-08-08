@@ -85,7 +85,7 @@ module Fastlane
             columns << key
             columns << case value
                        when Hash
-                         value.map {|k, v| "#{k}: #{v}"}.join("\n")
+                         value.map { |k, v| "#{k}: #{v}" }.join("\n")
                        when Array
                          value.join("\n")
                        else

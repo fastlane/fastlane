@@ -98,6 +98,37 @@ describe Fastlane do
 
         expect(result).to eq("git tag -am #{escaped_message} \'#{tag}\'")
       end
+
+      it "allows you to force the tag creation" do
+        tag = '2.0.0'
+        message = "message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}',
+            force: true
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am message --force \'#{tag}\'")
+      end
+
+      it "allows you to specify the commit where to add the tag" do
+        tag = '2.0.0'
+        commit = 'beta_tag'
+        message = "message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}',
+            commit: '#{commit}'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am #{message} \'#{tag}\' #{commit}")
+      end
     end
   end
 end
