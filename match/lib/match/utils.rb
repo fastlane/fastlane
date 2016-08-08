@@ -7,9 +7,14 @@ module Match
       #
       # So, if the passed value can't be resolved as a file in Library/Keychains, just use it as-is
       # as the keychain path.
-      keychain_paths = [File.join(Dir.home, 'Library', 'Keychains', keychain), keychain]
+      #
+      # We need to expand each path because File.exist? won't handle directories including ~ properly
+      keychain_paths = [
+        File.join(Dir.home, 'Library', 'Keychains', keychain),
+        keychain
+      ].map { |path| File.expand_path(path) }
 
-      keychain_path = keychain_paths.detect { |path| File.exist?(path) }
+      keychain_path = keychain_paths.find { |path| File.exist?(path) }
 
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
 
