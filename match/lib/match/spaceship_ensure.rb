@@ -23,9 +23,9 @@ module Match
         Spaceship.select_team
       rescue
         UI.error("No team is available on the Developer Portal")
-        UI.error("for the user '#{user}'")
+        UI.error("for the user #{user}")
         UI.error("Make sure to use the same user and team every time you run 'match' for this")
-        UI.error("⚠️ you must accept an invitation to a team to be available")
+        UI.error("⚠️ you must accept an invitation to a team for it to be available")
         UI.user_error!("To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html")
       end
     end
