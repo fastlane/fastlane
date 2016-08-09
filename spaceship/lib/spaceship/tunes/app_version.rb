@@ -358,6 +358,7 @@ module Spaceship
         raise "sort_order must not be > 5" if sort_order > 5
         # this will also check both language and device parameters
         device_lang_screenshots = screenshots_data_for_language_and_device(language, device)["value"]
+
         existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
           upload_file = UploadFile.from_path screenshot_path
@@ -372,6 +373,15 @@ module Spaceship
                   "originalFileName" => upload_file.file_name
               }
           }
+
+          # We disable "scaling" for this device type / language combination
+          # We only set this, if we actually successfully uploaded a new screenshot
+          # for this device / language combination
+          # if this value is not set, iTC will fallback to another device type for screenshots
+          language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
+          device_language_details = language_details.find { |display_family| display_family['name'] == device }
+          device_language_details["scaled"]["value"] = false
+
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
           else # add
@@ -528,9 +538,12 @@ module Spaceship
         # IDEA: better error for non existing language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
-        devices_details = lang_details[data_field]["value"]
-        raise "Unexpected state: missing device details for #{device}" unless devices_details.key? device
-        devices_details[device]
+        display_families = lang_details["displayFamilies"]["value"]
+        device_details = display_families.find { |display_family| display_family['name'] == device }
+        raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
+        return device_details[data_field]
+      rescue => ex
+        raise "iTunes Connect error: #{ex}"
       end
 
       def setup_screenshots
@@ -544,13 +557,12 @@ module Spaceship
 
       # generates the nested data structure to represent screenshots
       def setup_screenshots_for(row)
-        displayFamilies = row.fetch("displayFamilies", {}).fetch("value", nil)
-        return [] unless displayFamilies
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        displayFamilies.each do |display_family|
-
+        display_families.each do |display_family|
           # {
           #   "name": "iphone6Plus",
           #   "scaled": {
