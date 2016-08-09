@@ -186,6 +186,16 @@ module FastlaneCore
       def clear_cache
         @devices = nil
       end
+
+      def launch(device)
+        return unless device.is_simulator
+
+        simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
+
+        UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
+
+        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: $verbose)
+      end
     end
   end
 

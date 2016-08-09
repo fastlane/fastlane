@@ -16,6 +16,7 @@ module Fastlane
 
         version = params[:version]
         build_number = params[:build_number]
+        platform = params[:platform]
 
         message = []
         message << "Looking for dSYM files for #{params[:app_identifier]}"
@@ -33,11 +34,11 @@ module Fastlane
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
 
-        app.all_build_train_numbers.each do |train_number|
+        app.all_build_train_numbers(platform: platform).each do |train_number|
           if version && version != train_number
             next
           end
-          app.all_builds_for_train(train: train_number).each do |build|
+          app.all_builds_for_train(train: train_number, platform: platform).each do |build|
             if build_number && build.build_version != build_number
               next
             end
@@ -125,6 +126,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value
                                        end),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-p",
+                                       env_name: "DOWNLOAD_DSYMS_PLATFORM",
+                                       description: "The app platform for dSYMs you wish to download",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",

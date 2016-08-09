@@ -82,8 +82,13 @@ module Scan
 
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
-      UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
-      UI.user_error!("Tests failed") unless result[:failures] == 0
+      unless tests_exit_status == 0
+        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}", show_github_issues: false)
+      end
+
+      unless result[:failures] == 0
+        UI.user_error!("Tests failed", show_github_issues: false)
+      end
     end
 
     def open_simulator_for_device(device)
@@ -92,16 +97,7 @@ module Scan
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
-      # As a second level of feature switching, see if we want to try the xcode-select variant
-      if ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'] == '2'
-        simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
-        UI.message("Explicitly opening simulator at #{simulator_path} for device: #{device.name}")
-      else
-        simulator_path = 'Simulator'
-        UI.message("Explicitly opening simulator for device: #{device.name}")
-      end
-
-      `open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}`
+      FastlaneCore::Simulator.launch(device)
     end
   end
 end

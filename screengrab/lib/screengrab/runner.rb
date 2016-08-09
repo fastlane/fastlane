@@ -220,7 +220,7 @@ module Screengrab
                                         print_all: true,
                                         print_command: true)
 
-        UI.user_error! "Tests failed" if test_output.include?("FAILURES!!!")
+        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
       end
     end
 
@@ -303,6 +303,9 @@ module Screengrab
                                   print_command: false).include?('No such file')
 
       yield device_path
+    rescue
+      # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
+      # We can safely ignore that and treat it as if it returned 'No such file'
     end
 
     def open_screenshots_summary(device_type_dir_name)

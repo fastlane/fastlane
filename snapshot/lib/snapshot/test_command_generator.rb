@@ -65,7 +65,7 @@ module Snapshot
       end
 
       def find_device(device_name, os_version)
-        # we now fetch the device's udid. Why? Because we might get this error message
+        # We might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
         # This happens when you have multiple simulators for a given device type / iOS combination
@@ -73,11 +73,15 @@ module Snapshot
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
 
-        FastlaneCore::DeviceManager.simulators.each do |sim|
-          return sim if sim.name.strip == device_name.strip and sim.os_version == os_version
+        FastlaneCore::DeviceManager.simulators.find do |sim|
+          sim.name.strip == device_name.strip and sim.os_version == os_version
         end
+      end
 
-        nil
+      def device_udid(device_name, os_version = Snapshot.config[:ios_version])
+        device = find_device(device_name, os_version)
+
+        device ? device.udid : nil
       end
 
       def destination(device_name)
