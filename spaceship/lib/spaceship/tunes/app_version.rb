@@ -634,18 +634,13 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          trailers = display_family.fetch("trailer", {}).fetch("value")
-          next if trailers.nil?
-
-          trailers.each do |trailer|
-            trailer_data = trailer["value"]
-            next if trailer_data.nil?
-            data = {
-                device_type: display_family['name'],
-                language: row["language"]
-            }.merge(trailer_data)
-            result << Tunes::AppTrailer.factory(data)
-          end
+          trailer_data = display_family.fetch("trailer", {}).fetch("value")
+          next if trailer_data.nil?
+          data = {
+            device_type: display_family['name'],
+            language: row["language"]
+          }.merge(trailer_data)
+          result << Tunes::AppTrailer.factory(data)
         end
 
         return result
