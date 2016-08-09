@@ -258,6 +258,25 @@ gym
 ...
 ```
 
+##### Registering new devices
+
+By using `match`, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use `match` in combination with the [`register_devices`](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#register_devices) action.
+
+```ruby
+lane :beta do
+  register_devices(devices_file: "./devices.txt")
+  match(type: "adhoc", force: true)
+end
+```
+
+By using the `force` parameter in `match`, it will automatically re-generate the current provisioning profile to include all registered devices. 
+
+If you're not using `fastlane`, you can also use the `force` option from the command line:
+
+```
+match adhoc --force
+```
+
 ##### Multiple Targets
 
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
