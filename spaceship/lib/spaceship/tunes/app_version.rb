@@ -535,6 +535,7 @@ module Spaceship
 
       def setup_screenshots
         @screenshots = {}
+
         raw_data_details.each do |row|
           # Now that's one language right here
           @screenshots[row['language']] = setup_screenshots_for(row)
@@ -543,16 +544,59 @@ module Spaceship
 
       # generates the nested data structure to represent screenshots
       def setup_screenshots_for(row)
-        screenshots = row.fetch("screenshots", {}).fetch("value", nil)
-        return [] unless screenshots
+        displayFamilies = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless displayFamilies
 
         result = []
 
-        screenshots.each do |device_type, value|
-          value["value"].each do |screenshot|
+        displayFamilies.each do |display_family|
+
+          # {
+          #   "name": "iphone6Plus",
+          #   "scaled": {
+          #     "value": false,
+          #     "isEditable": false,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "screenshots": {
+          #     "value": [{
+          #       "value": {
+          #         "assetToken": "Purple62/v4/08/0a/04/080a0430-c2cc-2577-f491-9e0a09c58ffe/mzl.pbcpzqyg.jpg",
+          #         "sortOrder": 1,
+          #         "type": null,
+          #         "originalFileName": "ios-414-1.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }, {
+          #       "value": {
+          #         "assetToken": "Purple71/v4/de/81/aa/de81aa10-64f6-332e-c974-9ee46adab675/mzl.cshkjvwl.jpg",
+          #         "sortOrder": 2,
+          #         "type": null,
+          #         "originalFileName": "ios-414-2.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }],
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "trailer": {
+          #     "value": null,
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   }
+          # }
+
+          display_family.fetch("screenshots", {}).fetch("value", []).each do |screenshot|
             screenshot_data = screenshot["value"]
             data = {
-                device_type: device_type,
+                device_type: display_family['name'],
                 language: row["language"]
             }.merge(screenshot_data)
             result << Tunes::AppScreenshot.factory(data)
@@ -572,19 +616,24 @@ module Spaceship
 
       # generates the nested data structure to represent trailers
       def setup_trailers_for(row)
-        trailers = row.fetch("appTrailers", {}).fetch("value", nil)
-        return [] unless trailers
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        trailers.each do |device_type, value|
-          trailer_data = value["value"]
-          next if trailer_data.nil?
-          data = {
-              device_type: device_type,
-              language: row["language"]
-          }.merge(trailer_data)
-          result << Tunes::AppTrailer.factory(data)
+        display_families.each do |display_family|
+          trailers = display_family.fetch("trailer", {}).fetch("value")
+          next if trailers.nil?
+
+          trailers.each do |trailer|
+            trailer_data = trailer["value"]
+            next if trailer_data.nil?
+            data = {
+                device_type: display_family['name'],
+                language: row["language"]
+            }.merge(trailer_data)
+            result << Tunes::AppTrailer.factory(data)
+          end
         end
 
         return result
