@@ -265,16 +265,16 @@ By using `match`, you'll save a lot of time every time you add new device to you
 ```ruby
 lane :beta do
   register_devices(devices_file: "./devices.txt")
-  match(type: "adhoc", force: true)
+  match(type: "adhoc", force_for_new_devices: true)
 end
 ```
 
-By using the `force` parameter in `match`, it will automatically re-generate the current provisioning profile to include all registered devices. 
+By using the `force_for_new_devices` parameter, `match` will check if the device count has changed since the last time you ran `match`, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
 
-If you're not using `fastlane`, you can also use the `force` option from the command line:
+If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
 
 ```
-match adhoc --force
+match adhoc --force_for_new_devices
 ```
 
 ##### Multiple Targets
