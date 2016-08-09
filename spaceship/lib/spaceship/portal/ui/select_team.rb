@@ -32,9 +32,15 @@ module Spaceship
       #   ]
 
       def select_team
-        teams = client.teams
-
-        raise "Your account is in no teams" if teams.count == 0
+        begin
+          teams = client.teams
+          raise "Your account is in no teams" if teams.count == 0
+        rescue
+          puts "No teams available on the Developer Portal"
+          puts "⚠️ you must accept an invitation to a team for it to be available"
+          puts "To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html"
+          return
+        end
 
         team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
         team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
