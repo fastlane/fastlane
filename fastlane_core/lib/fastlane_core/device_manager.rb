@@ -31,7 +31,14 @@ module FastlaneCore
           else
             # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)
             # iPad Air 2 (4F3B8059-03FD-4D72-99C0-6E9BBEE2A9CE) (Shutdown) (unavailable, device type profile not found)
-            match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+            if line.include?("inch)")
+              # For Xcode 8, where sometimes we have the # of inches in ()
+              # iPad Pro (12.9 inch) (CEF11EB3-79DF-43CB-896A-0F33916C8BDE) (Shutdown)
+              match = line.match(/\s+([^\(]+ \(.*inch\)) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+            else
+              match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+            end
+
             if match && !match[4] && (os_type == requested_os_type || requested_os_type == "")
               @devices << Device.new(name: match[1], os_version: os_version, udid: match[2], state: match[3], is_simulator: true)
             end
