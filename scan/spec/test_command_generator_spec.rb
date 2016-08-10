@@ -4,6 +4,7 @@ describe Scan do
     config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
     @project = FastlaneCore::Project.new(config)
   end
+
   before(:each) do
     @valid_simulators = "== Devices ==
 -- iOS 9.3 --
@@ -59,6 +60,7 @@ describe Scan do
                                      "-project ./examples/standard/app.xcodeproj",
                                      "-sdk '9.0'",
                                      "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
+                                     "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                      "DEBUG=1 BUNDLE_NAME=Example\\ App",
                                      :build,
                                      :test
@@ -89,6 +91,7 @@ describe Scan do
                                        "-scheme app",
                                        "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
                                        :test
                                      ])
@@ -155,6 +158,7 @@ describe Scan do
                                        "-scheme app",
                                        "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=F48E1168-110C-4EC6-805C-6B03A03CAC2D'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        "-resultBundlePath './fastlane/test_output/app.test_result'",
                                        :build,
                                        :test
@@ -178,6 +182,7 @@ describe Scan do
                                        "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
                                        :test
                                      ])
@@ -198,6 +203,7 @@ describe Scan do
                                        "-project ./examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=70E1E92F-A292-4980-BC3C-7770C5EEFCFD' " \
                                        "-destination 'platform=iOS Simulator,id=DD134998-177F-47DA-99FA-D549D9305476'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
                                        :test
                                      ])

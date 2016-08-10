@@ -24,7 +24,20 @@ module Scan
       default_device_tvos if Scan.project.tvos?
       detect_destination
 
+      default_derived_data
+
       return config
+    end
+
+    def self.default_derived_data
+      return unless Scan.config[:derived_data_path].to_s.empty?
+      default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
+      # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
+      # We need to go one folder up, since tests don't run inside 'Release-iphoneos'
+      # but in 'Debug-iphonesimulator'
+      default_path = File.join(File.dirname(default_path), "Debug-iphonesimulator")
+      UI.verbose("Detected derived data path '#{default_path}'")
+      Scan.config[:derived_data_path] = default_path
     end
 
     def self.filter_simulators(simulators, deployment_target)
