@@ -3,7 +3,7 @@ require 'open3'
 describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
     before(:all) do
-      @simctl_output = File.read('./spec/fixtures/DeviceManagerSimctlOutput')
+      @simctl_output = File.read('./spec/fixtures/DeviceManagerSimctlOutputXcode7')
       @system_profiler_output = File.read('./spec/fixtures/DeviceManagerSystem_profilerOutput')
       @instruments_output = File.read('./spec/fixtures/DeviceManagerInstrumentsOutput')
 
@@ -20,38 +20,81 @@ describe FastlaneCore do
       end.to raise_error("xcrun simctl not working.")
     end
 
-    it "properly parses the simctl output and generates Device objects for iOS simulator" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@simctl_output)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+    describe "properly parses the simctl output and generates Device objects for iOS simulator" do
+      it "Xcode 7" do
+        response = "response"
+        expect(response).to receive(:read).and_return(@simctl_output)
+        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
-      devices = FastlaneCore::Simulator.all
-      expect(devices.count).to eq(4)
+        devices = FastlaneCore::Simulator.all
+        expect(devices.count).to eq(6)
 
-      expect(devices[0]).to have_attributes(
-        name: "iPhone 4s", os_version: "8.1",
-        udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13",
-        state: "Shutdown",
-        is_simulator: true
-      )
-      expect(devices[1]).to have_attributes(
-        name: "iPhone 5", os_version: "8.1",
-        udid: "0D80C781-8702-4156-855E-A9B737FF92D3",
-        state: "Booted",
-        is_simulator: true
-      )
-      expect(devices[2]).to have_attributes(
-        name: "iPhone 6s Plus", os_version: "9.1",
-        udid: "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0",
-        state: "Shutdown",
-        is_simulator: true
-      )
-      expect(devices[3]).to have_attributes(
-        name: "iPad Air 2", os_version: "9.1",
-        udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA",
-        state: "Shutdown",
-        is_simulator: true
-      )
+        expect(devices[0]).to have_attributes(
+          name: "iPhone 4s", os_version: "8.1",
+          udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[1]).to have_attributes(
+          name: "iPhone 5", os_version: "8.1",
+          udid: "0D80C781-8702-4156-855E-A9B737FF92D3",
+          state: "Booted",
+          is_simulator: true
+        )
+        expect(devices[2]).to have_attributes(
+          name: "iPhone 6s Plus", os_version: "9.1",
+          udid: "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[3]).to have_attributes(
+          name: "iPad Air", os_version: "9.1",
+          udid: "B61CB41D-354B-4991-992A-80AFFF1062E6",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[4]).to have_attributes(
+          name: "iPad Air 2", os_version: "9.1",
+          udid: "57836FE1-5443-4433-B164-A6C9EADAB3F9",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[5]).to have_attributes(
+          name: "iPad Pro", os_version: "9.1",
+          udid: "B1DDED8D-E449-461A-94A5-4146A1F58B20",
+          state: "Shutdown",
+          is_simulator: true
+        )
+      end
+
+      it "Xcode 8" do
+        response = "response"
+        simctl_output = File.read('./spec/fixtures/DeviceManagerSimctlOutputXcode8')
+        expect(response).to receive(:read).and_return(simctl_output)
+        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+
+        devices = FastlaneCore::Simulator.all
+        expect(devices.count).to eq(12)
+
+        expect(devices[-3]).to have_attributes(
+          name: "iPad Air 2", os_version: "10.0",
+          udid: "0FDEB396-0582-438A-B09E-8F8F889DB632",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-2]).to have_attributes(
+          name: "iPad Pro (9.7 inch)", os_version: "10.0",
+          udid: "C03658EC-1362-4D8D-A40A-45B1D7D5405E",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-1]).to have_attributes(
+          name: "iPad Pro (12.9 inch)", os_version: "10.0",
+          udid: "CEF11EB3-79DF-43CB-896A-0F33916C8BDE",
+          state: "Shutdown",
+          is_simulator: true
+        )
+      end
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS simulator" do
@@ -98,7 +141,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.simulators
-      expect(devices.count).to eq(7)
+      expect(devices.count).to eq(9)
 
       expect(devices[0]).to have_attributes(
         name: "iPhone 4s", os_version: "8.1",
@@ -119,24 +162,24 @@ describe FastlaneCore do
         is_simulator: true
       )
       expect(devices[3]).to have_attributes(
-        name: "iPad Air 2", os_version: "9.1",
-        udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA",
+        name: "iPad Air", os_version: "9.1",
+        udid: "B61CB41D-354B-4991-992A-80AFFF1062E6",
         state: "Shutdown",
         is_simulator: true
       )
-      expect(devices[4]).to have_attributes(
+      expect(devices[6]).to have_attributes(
         name: "Apple TV 1080p", os_version: "9.0",
         udid: "D239A51B-A61C-4B60-B4D6-B7EC16595128",
         state: "Shutdown",
         is_simulator: true
       )
-      expect(devices[5]).to have_attributes(
+      expect(devices[7]).to have_attributes(
         name: "Apple Watch - 38mm", os_version: "2.0",
         udid: "FE0C82A5-CDD2-4062-A62C-21278EEE32BB",
         state: "Shutdown",
         is_simulator: true
       )
-      expect(devices[6]).to have_attributes(
+      expect(devices[8]).to have_attributes(
         name: "Apple Watch - 38mm", os_version: "2.0",
         udid: "66D1BF17-3003-465F-A165-E6E3A565E5EB",
         state: "Booted",
@@ -194,7 +237,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.all('iOS')
-      expect(devices.count).to eq(5)
+      expect(devices.count).to eq(7)
 
       expect(devices[0]).to have_attributes(
         name: "Matthew's iPhone", os_version: "9.3",
@@ -221,8 +264,8 @@ describe FastlaneCore do
         is_simulator: true
       )
       expect(devices[4]).to have_attributes(
-        name: "iPad Air 2", os_version: "9.1",
-        udid: "961A7DF9-F442-4CA5-B28E-D96288D39DCA",
+        name: "iPad Air", os_version: "9.1",
+        udid: "B61CB41D-354B-4991-992A-80AFFF1062E6",
         state: "Shutdown",
         is_simulator: true
       )
