@@ -389,41 +389,7 @@
                                     "errorKeys": null
                                 },
                                 "screenshots": {
-                                    "value": [
-                                        {
-                                            "value": {
-                                                "assetToken": "Purple62/v4/7c/af/f0/7caff088-9a3a-d995-1068-cf340d2b730d/pr_source.png",
-                                                "sortOrder": 1,
-                                                "type": null,
-                                                "originalFileName": "ftl_d8433580948ea61f843af6e2d7b70604_e35f7fbaeb7bb503322577d6e29849c7.png"
-                                            },
-                                            "isEditable": true,
-                                            "isRequired": false,
-                                            "errorKeys": null
-                                        },
-                                        {
-                                            "value": {
-                                                "assetToken": "Purple62/v4/35/31/67/35316766-d86d-33e0-4575-0f0a2e3aead7/pr_source.png",
-                                                "sortOrder": 2,
-                                                "type": null,
-                                                "originalFileName": "ftl_508e2d3c987236446aad0a21f559896a_74864972ea234d70bb17422c2fc67c0a.png"
-                                            },
-                                            "isEditable": true,
-                                            "isRequired": false,
-                                            "errorKeys": null
-                                        },
-                                        {
-                                            "value": {
-                                                "assetToken": "Purple71/v4/71/32/6b/71326b3a-86e8-cc98-af56-61bf764a0413/pr_source.png",
-                                                "sortOrder": 3,
-                                                "type": null,
-                                                "originalFileName": "ftl_5873b0ba2e445032f69bb4c8dc4755e0_0fe430dd899005e052161ff93bcd775b.png"
-                                            },
-                                            "isEditable": true,
-                                            "isRequired": false,
-                                            "errorKeys": null
-                                        }
-                                    ],
+                                    "value": [],
                                     "isEditable": true,
                                     "isRequired": false,
                                     "errorKeys": null
