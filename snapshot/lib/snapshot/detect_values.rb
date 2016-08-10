@@ -24,9 +24,16 @@ module Snapshot
 
         # We only care about a subset of the simulators
         FastlaneCore::Simulator.all.each do |sim|
-          next if sim.name.include?("iPad") and !sim.name.include?("Retina") # we only need one iPad
-          next if sim.name.include?("6s") # same screen resolution
-          next if sim.name.include?("5s") # same screen resolution
+          # Filter iPads, we only want the "iPad Pro" and "iPad Air"
+          # Full list: ["iPad 2", "iPad Retina", "iPad Air", "iPad Air 2", "iPad Pro"]
+          next if sim.name.include?("iPad 2")
+          next if sim.name.include?("iPad Retina")
+          next if sim.name.include?("iPad Air 2")
+
+          # Filter iPhones
+          # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
+          next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
+          next if sim.name.include?("5s") # same screen resolution as iPhone 5
           next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name
