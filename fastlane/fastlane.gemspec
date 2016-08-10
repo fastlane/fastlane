@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pem', '>= 1.3.2', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.4.1', '< 2.0.0'
   spec.add_dependency 'sigh', '>= 1.9.0', '< 2.0.0'
-  spec.add_dependency 'produce', '>= 1.1.3', '< 2.0.0'
+  spec.add_dependency 'produce', '>= 1.2.0', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.10.0', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.7.0', '< 1.0.0'
