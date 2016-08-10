@@ -16,7 +16,7 @@ module Fastlane
           end
 
           FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
-          
+
           Scan::Manager.new.work(values)
 
           return true
