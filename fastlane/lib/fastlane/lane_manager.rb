@@ -94,6 +94,7 @@ module Fastlane
       rows = []
       actions.each_with_index do |current, i|
         name = current[:name][0..60]
+        name = name.red unless current[:error].to_s.empty?
         rows << [i + 1, name, current[:time].to_i]
       end
 
