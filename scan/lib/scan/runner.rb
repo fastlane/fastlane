@@ -54,7 +54,8 @@ module Scan
       report_collector = ReportCollector.new(Scan.config[:open_report],
                                              Scan.config[:output_types],
                                              Scan.config[:output_directory],
-                                             Scan.config[:use_clang_report_name])
+                                             Scan.config[:use_clang_report_name],
+                                             Scan.config[:custom_report_file_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
                                                types: 'junit',
@@ -81,8 +82,13 @@ module Scan
 
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
-      UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
-      UI.user_error!("Tests failed") unless result[:failures] == 0
+      unless tests_exit_status == 0
+        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}", show_github_issues: false)
+      end
+
+      unless result[:failures] == 0
+        UI.user_error!("Tests failed", show_github_issues: false)
+      end
     end
 
     def open_simulator_for_device(device)
@@ -91,8 +97,7 @@ module Scan
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
-      UI.message("Explicitly opening simulator for device: #{device.name}")
-      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
+      FastlaneCore::Simulator.launch(device)
     end
   end
 end

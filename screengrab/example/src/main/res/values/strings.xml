@@ -4,4 +4,5 @@
     <string name="hello">Hello</string>
     <string name="title_activity_another">AnotherActivity</string>
     <string name="navigate">Navigate</string>
+    <string name="show_dialog">Show Dialog</string>
 </resources>

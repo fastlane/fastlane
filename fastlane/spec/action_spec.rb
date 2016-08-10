@@ -7,6 +7,13 @@ describe Fastlane do
       end
     end
 
+    describe "Easy access to the lane context" do
+      it "redirects to the correct class and method" do
+        Fastlane::Actions.lane_context[:something] = 1
+        expect(Fastlane::Action.lane_context).to eq({ something: 1 })
+      end
+    end
+
     describe "Call another action from an action" do
       it "allows the user to call it using `other_action.rocket`" do
         Fastlane::Actions.load_external_actions("spec/fixtures/actions")

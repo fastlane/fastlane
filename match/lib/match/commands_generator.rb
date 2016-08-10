@@ -34,7 +34,7 @@ module Match
 
         c.action do |args, options|
           if args.count > 0
-            FastlaneCore::UI.user_error!("Please run `match [type]`, allowed values: development, adhoc or appstore")
+            FastlaneCore::UI.user_error!("Please run `match [type]`, allowed values: development, adhoc or appstore", show_github_issues: false)
           end
 
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -65,7 +65,7 @@ module Match
           path = File.join(containing, "Matchfile")
 
           if File.exist?(path)
-            FastlaneCore::UI.user_error!("You already got a Matchfile in this directory")
+            FastlaneCore::UI.user_error!("You already got a Matchfile in this directory", show_github_issues: false)
             return 0
           end
 
@@ -100,7 +100,7 @@ module Match
         c.syntax = "match nuke"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
         c.action do |args, options|
-          FastlaneCore::UI.user_error!("Please run `match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
+          FastlaneCore::UI.user_error!("Please run `match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.", show_github_issues: false)
         end
       end
 
