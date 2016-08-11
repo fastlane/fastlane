@@ -24,10 +24,13 @@ module Fastlane
                                        description: "The tag name that should be checked")
         ]
       end
+      
+      def self.return_value
+        "Boolean value whether the tag exists or not"
+      end
 
       def self.output
         [
-          "Outputs the boolean value whether the tag exists or not"
         ]
       end
 
