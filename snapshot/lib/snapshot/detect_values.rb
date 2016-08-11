@@ -23,10 +23,25 @@ module Snapshot
         config[:devices] = []
 
         # We only care about a subset of the simulators
-        FastlaneCore::Simulator.all.each do |sim|
-          next if sim.name.include?("iPad") and !sim.name.include?("Retina") # we only need one iPad
-          next if sim.name.include?("6s") # same screen resolution
-          next if sim.name.include?("5s") # same screen resolution
+        all_simulators = FastlaneCore::Simulator.all
+        all_simulators.each do |sim|
+          # Filter iPads, we only want the following simulators
+          # Xcode 7:
+          #   ["iPad Pro", "iPad Air"]
+          # Xcode 8:
+          #   ["iPad Pro (9.7 Inch)", "iPad Pro (12.9 Inch)"]
+          #
+          # Full list: ["iPad 2", "iPad Retina", "iPad Air", "iPad Air 2", "iPad Pro"]
+          next if sim.name.include?("iPad 2")
+          next if sim.name.include?("iPad Retina")
+          next if sim.name.include?("iPad Air 2")
+          # In Xcode 8, we only need iPad Pro 9.7 inch, not the iPad Air
+          next if all_simulators.any? { |a| a.name.include?("9.7 inch") } && sim.name.include?("iPad Air")
+
+          # Filter iPhones
+          # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
+          next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
+          next if sim.name.include?("5s") # same screen resolution as iPhone 5
           next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name
