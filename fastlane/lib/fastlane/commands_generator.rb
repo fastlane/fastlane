@@ -23,8 +23,6 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Fastlane::VERSION
       program :description, [
@@ -265,8 +263,5 @@ module Fastlane
       UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
       UI.important("This command will be removed in one of the next releases")
     end
-
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
   end
 end

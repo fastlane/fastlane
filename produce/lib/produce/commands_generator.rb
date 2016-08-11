@@ -13,8 +13,6 @@ module Produce
       FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Produce::VERSION
       program :description, 'CLI for \'produce\''
@@ -126,7 +124,5 @@ module Produce
 
       run!
     end
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
   end
 end
