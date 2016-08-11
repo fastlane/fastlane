@@ -59,7 +59,7 @@ module Fastlane
         ignore_expression = params[:ignore]
         if ignore_expression
           info_plist_files.select! do |info_plist_file|
-            ! info_plist_file.match(ignore_expression)
+            !info_plist_file.match(ignore_expression)
           end
         end
 
