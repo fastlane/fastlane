@@ -50,7 +50,7 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "https://stackoverflow.com/a/17031697/445598"
         end
-        UI.user_error!("Error building the application - see the log above", show_github_issues: false)
+        UI.user_error!("Error building the application - see the log above")
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -91,7 +91,7 @@ module Gym
           print "Unfortunately the new Xcode export API is unstable and causes problems on some projects"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
-        UI.user_error!("Error packaging up the application", show_github_issues: false)
+        UI.user_error!("Error packaging up the application")
       end
 
       def handle_empty_archive
