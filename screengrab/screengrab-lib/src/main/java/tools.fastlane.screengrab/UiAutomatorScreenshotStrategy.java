@@ -7,7 +7,7 @@ import android.support.test.InstrumentationRegistry;
 
 /**
  * <p>Screenshot strategy that delegates to UiAutomation for screenshot capture. <b>Requires
- * API level >= 18</b></p>
+ * API level &gt;= 18</b></p>
  *
  * <p>Advantages compared to {@link DecorViewScreenshotStrategy}:</p>
  *
@@ -19,7 +19,7 @@ import android.support.test.InstrumentationRegistry;
  *
  * Caveats compared to {@link DecorViewScreenshotStrategy}:
  * <ul>
- *     <li>Requires a device running API level >= 18</li>
+ *     <li>Requires a device running API level &gt;= 18</li>
  *     <li>
  *         Is less internally synchronized with Espresso, so you will want to
  *         use Espresso matchers to ensure that the proper UI elements are
