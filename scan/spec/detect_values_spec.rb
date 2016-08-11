@@ -8,7 +8,7 @@ describe Scan do
 
     it "fetches the path from the Xcode config" do
       derived_data = Scan.config[:derived_data_path]
-      expect(derived_data).to match(%r{/.*Xcode/DerivedData/app-.*/Build/Products/Debug-iphonesimulator})
+      expect(derived_data).to match(%r{/.*Xcode/DerivedData/app-\w*$})
     end
   end
 end
