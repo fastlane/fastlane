@@ -21,7 +21,7 @@ module Fastlane
         end
       end
 
-      def  self.move_issue(issue_id, transition_name)
+      def self.move_issue(issue_id, transition_name)
         # Find Issue
         issue = @client.Issue.find(issue_id)
         unless issue
@@ -44,7 +44,7 @@ module Fastlane
       #####################################################
       # @!group Documentation
       #####################################################
-      
+
       def self.description
         'Move jira issues to ready for test'
       end
@@ -56,36 +56,35 @@ module Fastlane
                                        description: "An array of Issues identifiers",
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("List of issues is empty, pass using `issue_ids: ['TESTISSUES-24']`") if value.size == 0
-                                       end
-                                       ),
+                                         UI.user_error!("List of issues is empty, pass using `issue_ids: ['TESTISSUES-24']`") if value.size.zero?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :jira_username,
                                        env_name: "FL_JIRA_USERNAME",
                                        description: "Jira username",
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Jira username") if value.to_s.length == 0
+                                         UI.user_error!("No Jira username") if value.to_s.length.zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :jira_password,
                                        env_name: "FL_JIRA_PASSWORD",
                                        description: "Jira password",
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Jira password") if value.to_s.length == 0
+                                         UI.user_error!("No Jira password") if value.to_s.length.zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :jira_host,
                                        env_name: "FL_JIRA_HOST",
                                        description: "Jira host url",
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Jira host url") if value.to_s.length == 0
+                                         UI.user_error!("No Jira host url") if value.to_s.length.zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :jira_transition_name,
                                        env_name: "FL_JIRA_TRANSITION_NAME",
                                        description: "Transition name",
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No Jira Transition name, pass using `jira_transition_name: 'Close Issue'`") if value.to_s.length == 0
+                                         UI.user_error!("No Jira Transition name, pass using `jira_transition_name: 'Close Issue'`") if value.to_s.length.zero?
                                        end)
         ]
       end
@@ -97,7 +96,6 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
-
     end
   end
 end
