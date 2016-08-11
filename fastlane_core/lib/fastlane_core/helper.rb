@@ -66,6 +66,11 @@ module FastlaneCore
       !!ENV["ITERM_SESSION_ID"]
     end
 
+    # Logs base directory
+    def self.buildlog_path
+      return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
+    end
+
     # All Xcode Related things
     #
 
