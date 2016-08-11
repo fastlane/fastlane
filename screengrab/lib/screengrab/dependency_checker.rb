@@ -25,7 +25,7 @@ module Screengrab
         UI.error 'Please ensure that the Android SDK is installed and the platform-tools directory is present and on your PATH'
       end
 
-      UI.user_error! 'adb command not found'
+      UI.user_error!('adb command not found')
     end
 
     def self.check_aapt(android_env)

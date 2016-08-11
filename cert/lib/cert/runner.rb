@@ -7,7 +7,7 @@ module Cert
 
       installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"])
       UI.message "Verifying the certificate is properly installed locally..."
-      UI.user_error!("Could not find the newly generated certificate installed") unless installed
+      UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
       UI.success "Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}"
       return ENV["CER_FILE_PATH"]
     end
@@ -137,7 +137,7 @@ module Cert
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
         if ex.to_s.include?("You already have a current")
-          UI.user_error!("Could not create another certificate, reached the maximum number of available certificates.")
+          UI.user_error!("Could not create another certificate, reached the maximum number of available certificates.", show_github_issues: true)
         end
 
         raise ex
