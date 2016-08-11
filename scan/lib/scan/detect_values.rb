@@ -52,11 +52,16 @@ module Scan
     def self.default_device_ios
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       found_devices = []
+      xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
 
       if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
-          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
+          lookup_device = device.to_s.strip
+          has_version = lookup_device.include?(xcode_target) || lookup_device.include?('(')
+          lookup_device = lookup_device.tr('()', '') # Remove parenthesis
+          # Default to Xcode target version if no device version is specified.
+          lookup_device = lookup_device + " " + xcode_target unless has_version
 
           found = FastlaneCore::Simulator.all.detect do |d|
             (d.name + " " + d.ios_version).include? lookup_device
@@ -78,7 +83,6 @@ module Scan
       end
 
       sims = FastlaneCore::Simulator.all
-      xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
       sims = filter_simulators(sims, xcode_target)
 
       # An iPhone 5s is reasonable small and useful for tests
