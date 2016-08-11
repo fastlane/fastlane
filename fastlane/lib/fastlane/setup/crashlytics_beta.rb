@@ -51,7 +51,7 @@ module Fastlane
       end
 
       groups = @beta_info.groups if @beta_info.groups_valid?
-      if !groups
+      unless groups
         groups = ['group_alias_1', 'group_alias_2']
       end
 
