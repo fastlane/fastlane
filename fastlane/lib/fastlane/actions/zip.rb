@@ -34,8 +34,8 @@ module Fastlane
                                          UI.user_error!("Couldn't find file/folder at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :output_path,
-                                       env_name: "FL_ZIP_OUTPUT_PATH",
-                                       description: "The path of the resulting zip file",
+                                       env_name: "FL_ZIP_OUTPUT_NAME",
+                                       description: "The name of the resulting zip file",
                                        optional: true)
         ]
       end
