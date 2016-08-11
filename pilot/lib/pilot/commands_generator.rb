@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/MethodLength
-# rubocop:disable Metrics/AbcSize
 require "commander"
 require "pilot/options"
 require "fastlane_core"
@@ -138,5 +136,3 @@ module Pilot
     end
   end
 end
-# rubocop:enable Metrics/MethodLength
-# rubocop:enable Metrics/AbcSize

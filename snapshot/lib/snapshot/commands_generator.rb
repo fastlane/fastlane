@@ -13,7 +13,6 @@ module Snapshot
       FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Snapshot::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'

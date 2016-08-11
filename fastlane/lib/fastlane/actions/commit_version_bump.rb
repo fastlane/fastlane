@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
@@ -153,4 +152,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

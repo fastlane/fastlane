@@ -117,7 +117,6 @@ module Sigh
     end
 
     # Certificate to use based on the current distribution mode
-    # rubocop:disable Metrics/AbcSize
     def certificate_to_use
       if profile_type == Spaceship.provisioning_profile.Development
         certificates = Spaceship.certificate.development.all
@@ -170,7 +169,6 @@ module Sigh
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
       return certificates.first
     end
-    # rubocop:enable Metrics/AbcSize
 
     # Downloads and stores the provisioning profile
     def download_profile(profile)
