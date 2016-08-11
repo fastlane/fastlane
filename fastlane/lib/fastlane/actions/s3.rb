@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
 
@@ -351,4 +350,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

@@ -37,7 +37,6 @@ module PEM
         UI.message "Successfully logged in"
       end
 
-      # rubocop:disable Metrics/AbcSize
       def create_certificate
         UI.important "Creating a new push certificate for app '#{PEM.config[:app_identifier]}'."
 
@@ -81,7 +80,6 @@ module PEM
         UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
         return x509_cert_path
       end
-      # rubocop:enable Metrics/AbcSize
 
       def certificate
         if PEM.config[:development]

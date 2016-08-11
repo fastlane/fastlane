@@ -126,9 +126,7 @@ module Spaceship
       send_shared_login_request(user, password)
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Metrics/AbcSize
     def handle_itc_response(raw)
       return unless raw
       return unless raw.kind_of? Hash
@@ -186,9 +184,7 @@ module Spaceship
 
       return data
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
-    # rubocop:enable Metrics/AbcSize
 
     #####################################################
     # @!group Applications
