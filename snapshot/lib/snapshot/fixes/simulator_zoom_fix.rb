@@ -9,7 +9,7 @@ module Snapshot
       def self.patch
         UI.message "Patching '#{config_path}' to scale simulator to 100%"
 
-        FastlaneCore::Simulator.all.each do |simulator|
+        FastlaneCore::DeviceManager.simulators.each do |simulator|
           simulator_name = simulator.name.tr("\s", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 

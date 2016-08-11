@@ -94,13 +94,22 @@ public class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear()
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot
+        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
 
         sleep(1) // Waiting for the animation to be finished (kind of)
-        XCUIDevice.sharedDevice().orientation = .Unknown
+
+        #if os(tvOS)
+            XCUIApplication().childrenMatchingType(.Browser).count
+        #else
+            XCUIDevice.sharedDevice().orientation = .Unknown
+        #endif
     }
 
     class func waitForLoadingIndicatorToDisappear() {
+        #if os(tvOS)
+            return;
+        #endif
+
         let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
 
         while (0..<query.count).map({ query.elementBoundByIndex($0) }).contains({ $0.isLoadingIndicator }) {

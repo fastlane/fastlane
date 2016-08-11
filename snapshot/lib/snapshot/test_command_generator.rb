@@ -64,7 +64,7 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def find_device(device_name)
+      def find_device(device_name, os_version)
         # We might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
@@ -72,19 +72,28 @@ module Snapshot
         #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
-        FastlaneCore::Simulator.all.find do |sim|
-          sim.name.strip == device_name.strip && sim.ios_version == Snapshot.config[:ios_version]
+
+        FastlaneCore::DeviceManager.simulators.find do |sim|
+          sim.name.strip == device_name.strip and sim.os_version == os_version
         end
       end
 
-      def device_udid(device_name)
-        device = find_device(device_name)
+      def device_udid(device_name, os_version = Snapshot.config[:ios_version])
+        device = find_device(device_name, os_version)
 
         device ? device.udid : nil
       end
 
-      def destination(device)
-        value = "platform=iOS Simulator,id=#{device_udid(device)},OS=#{Snapshot.config[:ios_version]}"
+      def destination(device_name)
+        os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
+        os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
+
+        device = find_device(device_name, os_version)
+        if device.nil?
+          UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
+          return
+        end
+        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
 
         return ["-destination '#{value}'"]
       end
