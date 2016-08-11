@@ -1592,6 +1592,17 @@ git_branch
 ```
 
 
+### git_tag_exists
+
+Checks whether the given tag exists in the repo
+
+```ruby
+if git_tag_exists(tag: "1.1.0")
+  UI.message("Found it 🚀")
+end
+```
+
+
 ### git_add
 
 To simply add one file before commit use
