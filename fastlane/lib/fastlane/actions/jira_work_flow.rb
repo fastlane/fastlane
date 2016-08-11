@@ -1,59 +1,50 @@
 module Fastlane
   module Actions
     class JiraWorkFlowAction < Action
-      
       def self.run(params)
-
         # Dependency checking
         Actions.verify_gem!('jira-ruby')
         require 'jira-ruby'
-
         # Initialize client
         options = {
-          :username     => params[:jira_username],
-          :password     => params[:jira_password],
-          :site         => params[:jira_host],
-          :context_path => '',
-          :auth_type    => :basic
+          username: params[:jira_username],
+          password: params[:jira_password],
+          site: params[:jira_host],
+          context_path: '',
+          auth_type: :basic
         }
         @client = JIRA::Client.new(options)
-
         UI.message("Jira issues #{params[:issue_ids]}")
-
         # Authorization
         params[:issue_ids].each do |issue_id|
           move_issue(issue_id, params[:jira_transition_name])
         end
-
       end
 
       def  self.move_issue(issue_id, transition_name)
-
         # Find Issue
         issue = @client.Issue.find(issue_id)
-        if !issue
+        unless issue
           UI.message("Issue #{issue_id} not found")
           return
         end
-
         # Find Transition
         transitions = @client.Transition.all(issue: issue)
-        transition = transitions.find{ |elem| elem.name == transition_name }
-        if !transition
+        transition = transitions.find { |elem| elem.name == transition_name }
+        unless transition
           UI.message("Cant move issue #{issue_id} to #{transition_name}")
           return
         end
-
         # Perform Transition
         new_transition = issue.transitions.build
-        new_transition.save!("transition" => {"id" => transition.id})
+        new_transition.save!("transition" => { "id" => transition.id })
         UI.message("Moved the issue #{issue_id} to #{transition_name}")
-
       end
 
       #####################################################
       # @!group Documentation
       #####################################################
+      
       def self.description
         'Move jira issues to ready for test'
       end
