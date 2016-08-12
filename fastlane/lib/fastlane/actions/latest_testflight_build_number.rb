@@ -82,7 +82,7 @@ module Fastlane
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
                                        default_value: 1,
-                                       is_string: false)
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
                                        description: "Your team ID if you're in multiple teams",
