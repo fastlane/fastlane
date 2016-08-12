@@ -32,6 +32,7 @@ module Fastlane
     end
 
     def choose(text, options)
+      return options[0] unless UI.interactive?
       message(text)
       Kernel.choose(*options)
     end
