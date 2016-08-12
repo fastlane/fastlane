@@ -65,9 +65,9 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
-      
-      private
-      
+
+      private_class_method
+
       def self.test_summary_filenames(derived_data_path)
         Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
       end
