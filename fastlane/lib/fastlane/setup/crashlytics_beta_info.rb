@@ -6,6 +6,7 @@ module Fastlane
     attr_accessor :api_key
     attr_accessor :build_secret
     attr_accessor :emails
+    attr_accessor :groups
     attr_accessor :schemes
     attr_accessor :export_method
 
@@ -15,6 +16,10 @@ module Fastlane
 
     def emails=(emails)
       @emails = emails ? emails.compact : nil
+    end
+
+    def groups=(groups)
+      @groups = groups ? groups.compact : nil
     end
 
     def api_key_valid?
@@ -31,6 +36,10 @@ module Fastlane
 
     def emails_valid?
       !emails.nil? && emails.any? { |email| !email.empty? }
+    end
+
+    def groups_valid?
+      !groups.nil? && groups.any? { |groups| !groups.empty? }
     end
 
     def schemes_valid?
