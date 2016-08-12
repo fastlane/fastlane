@@ -86,7 +86,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
                                        description: "Your team ID if you're in multiple teams",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        optional: true)
         ]
       end
