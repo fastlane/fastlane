@@ -10,6 +10,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     let(:valid_build_secret) { '0123456789012345678901234567890123456789012345678901234567890123' }
     let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
     let(:valid_emails) { ['email@domain.com'] }
+    let(:valid_groups) { ['group1', 'group2'] }
     let(:valid_schemes) { ['SchemeName'] }
     let(:valid_export_method) { 'development' }
     let(:valid_project_parser_result) do
@@ -28,6 +29,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.build_secret = valid_build_secret
       info.crashlytics_path = valid_crashlytics_path
       info.emails = valid_emails
+      info.groups = valid_groups
       info.schemes = valid_schemes
       info.export_method = valid_export_method
     end
@@ -37,6 +39,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info.build_secret).to eq(valid_build_secret)
       expect(info.crashlytics_path).to eq(valid_crashlytics_path)
       expect(info.emails).to eq(valid_emails)
+      expect(info.groups).to eq(valid_groups)
       expect(info.schemes).to eq(valid_schemes)
       expect(info.export_method).to eq(valid_export_method)
     end
@@ -46,6 +49,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:build_secret=)
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
       expect(info).not_to receive(:export_method=)
 
@@ -67,6 +71,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:build_secret=)
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
       expect(ui).not_to receive(:ask)
@@ -87,6 +92,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:api_key=)
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
       expect(ui).not_to receive(:ask)
@@ -107,6 +113,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:api_key=)
       expect(info).not_to receive(:build_secret=)
       expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
       expect(ui).not_to receive(:ask)
@@ -127,6 +134,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:api_key=)
       expect(info).not_to receive(:build_secret=)
       expect(info).to receive(:emails=).and_call_original
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
       allow(ui).to receive(:important)
@@ -284,6 +292,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:build_secret=)
       expect(info).not_to receive(:crashlytics_path=)
       expect(info).not_to receive(:emails=)
+      expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
       expect(info).not_to receive(:export_method=)
 

@@ -50,6 +50,11 @@ module Fastlane
         crashlytics_path_arg = "\n         crashlytics_path: '#{@beta_info.crashlytics_path}',"
       end
 
+      groups = @beta_info.groups if @beta_info.groups_valid?
+      unless groups
+        groups = ['group_alias_1', 'group_alias_2']
+      end
+
 # rubocop:disable Style/IndentationConsistency
 %{  #
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
@@ -61,7 +66,7 @@ module Fastlane
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
                    emails: ['#{@beta_info.emails.join("', '")}'], # You can list more emails here
-                 # groups: ['group_alias_1', 'group_alias_2'], # You can define groups on the web and reference them here
+                 # groups: ['#{groups.join("', '")}'], # You can define groups on the web and reference them here
                     notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action!
             notifications: true) # Should this distribution notify your testers via email?
 
