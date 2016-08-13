@@ -10,14 +10,15 @@ module Fastlane
         require 'scan'
 
         begin
+          destination = values[:destination] # save destination value which can be later overridden
           Scan.config = values # we set this here to auto-detect missing values, which we need later on
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = Dir["#{values[:derived_data_path]}/**/Logs/Test/*TestSummaries.plist"]
-            Scan.config[:destination] = nil # we have to do this, as otherwise a warning is shown to the user to not set this value
           end
 
           FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
 
+          values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
 
           return true
