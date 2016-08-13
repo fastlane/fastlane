@@ -40,6 +40,16 @@ module Fastlane
         ]
       end
 
+      def self.example_code
+        [
+          "zip",
+          "zip(
+            path: './to_compress',
+            output_path: 'compressed.zip'
+          )"
+        ]
+      end
+
       def self.output
         []
       end
