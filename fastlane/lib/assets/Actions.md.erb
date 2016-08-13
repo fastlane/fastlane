@@ -1,0 +1,68 @@
+# Actions
+
+There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
+
+To get the most up-to-date information from the command line on your current version you can also run:
+
+```sh
+fastlane actions: List all available fastlane actions
+fastlane action [action_name]:
+```
+
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
+<%- @categories.each do |category, actions| %>
+- [<%= category %>](#<%= category.gsub(" ", "-") %>)
+<% end %>
+
+
+
+<%- @categories.each do |category, actions| %>
+## <%= category %>
+  <%- actions.each do |action| -%>
+
+### <%= action.action_name %>
+
+<%= action.description %>
+
+> <%= action.details.gsub("\n", " ") unless action.details.to_s.empty? %>
+
+     | <%= action.action_name %>
+-----|----
+Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
+Author | @<%= Array(action.author || action.authors).join(", @") %>
+<%- unless action.return_value.to_s.empty? -%>
+Returns | <%= action.return_value %>
+<%- end -%>
+
+<% if (action.example_code || []).count > 0 %>
+
+##### Example<%= (action.example_code.count > 1) ? "s" : "" %>
+<% action.example_code.each do |current_sample| %>
+```ruby
+<%= current_sample.gsub("          ", "") %>
+```
+<% end %>
+<% end %>
+
+<% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
+<details>
+  <summary>Parameters (Click to expand)</summary>
+
+Key | Description
+----|------------
+<%- (action.available_options || []).each do |config_item| -%>
+  <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
+  `<%= config_item.key %>` | <%= config_item.description %>
+<%- end %>
+</details>
+<% end %>
+
+
+
+  <%- end %>
+<%- end %>

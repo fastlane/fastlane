@@ -59,6 +59,11 @@ module Fastlane
       UI.crash!("Implementing `is_supported?` for all actions is mandatory. Please update #{self}")
     end
 
+    # Returns an array of string of sample usage of this action
+    def self.example_code
+      nil
+    end
+
     # Is printed out in the Steps: output in the terminal
     # Return nil if you don't want any logging in the terminal/JUnit Report
     def self.step_text
