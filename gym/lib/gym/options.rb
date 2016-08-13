@@ -195,6 +195,12 @@ module Gym
                                      env_name: "SUPPRESS_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     short_option: "-np",
+                                     env_name: "DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting for build output",
+                                     optional: true,
                                      is_string: false)
       ]
     end
