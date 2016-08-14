@@ -49,15 +49,16 @@ module Scan
     end
 
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
-      %r{
-        \s # a whitespace character
-        (?= # followed by — using lookahead
-        \( # open parenthesis
-        [\d\.]+ # our version — one or more digits or full stops
-        \) # close parenthesis
-        $ # end of line
-        ) # end of lookahead
-      }
+      # %r{
+      #   \s # a whitespace character
+      #   (?= # followed by — using lookahead
+      #   \( # open parenthesis
+      #   [\d\.]+ # our version — one or more digits or full stops
+      #   \) # close parenthesis
+      #   $ # end of line
+      #   ) # end of lookahead
+      # }
+      /\s(?=\([\d\.]+\)$)/
     end
 
     def self.default_device_ios
