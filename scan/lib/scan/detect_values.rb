@@ -81,11 +81,13 @@ module Scan
       )
 
       matches = lambda do
-        devices.inject(
+        set_of_simulators = devices.inject(
           Set.new # of simulators
-        ) { |set, device_string|
+        ) do |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
-
+          
+          selector = lambda { |sim| pieces.count > 0 && sim.name == pieces.first }
+          
           set + (
             if pieces.count == 0
               [] # empty array
@@ -94,10 +96,12 @@ module Scan
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               filter_simulators(simulators, pieces[1].tr('()', ''))
             end
-          ).select { |sim|
-            pieces.count > 0 && sim.name == pieces.first
-          }.tap { |array| UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty? }
-        }.to_a
+          ).select(&selector).tap do |array|
+            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+          end
+        end
+        
+        set_of_simulators.to_a
       end
 
       default = lambda do
