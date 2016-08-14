@@ -199,9 +199,17 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      short_option: "-np",
                                      env_name: "DISABLE_XCPRETTY",
-                                     description: "Disable xcpretty formatting for build output",
+                                     description: "Disable xcpretty formatting of build output",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_formatter,
+                                     short_option: "-pf",
+                                     env_name: "XCPRETTY_FORMATTER",
+                                     description: "A custom xcpretty formatter to use",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end)
       ]
     end
   end
