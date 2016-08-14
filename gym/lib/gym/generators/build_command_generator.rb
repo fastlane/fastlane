@@ -67,20 +67,20 @@ module Gym
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
-          pipe << " --test" if Gym.config[:xcpretty_format_test]?
+          pipe << " --test" if Gym.config[:xcpretty_format_test]
           pipe << " --no-color" if Helper.colors_disabled?
           pipe << " --formatter " if formatter?
           pipe << formatter if formatter?
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]
-          if report_output_junit
+          if report_output_junit?
             pipe << " --report junit --output "
             pipe << report_output_junit
-          elsif report_output_html
+          elsif report_output_html?
             pipe << " --report html --output "
             pipe << report_output_html
-          elsif report_output_json
+          elsif report_output_json?
             pipe << " --report json-compilation-database --output "
             pipe << report_output_json
           end
