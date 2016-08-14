@@ -112,7 +112,7 @@ module Scan
 
       # grab the first unempty evaluated array
       Scan.devices = [matches, default].lazy.flat_map { |x|
-        arr = x.call()
+        arr = x.call
         arr unless arr.empty?
       }.first
     end
