@@ -78,8 +78,6 @@ PRs should reference an open GitHub issue (preferably those marked with the [hel
 
 If you're considering contributing new functionality, please open a new issue explaining the functionality desired first so that we can discuss as a community. We'll add the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label if we believe this to be a meaningful contribution that will benefit other fastlane users and you go ahead with the pull request. :raised_hands:
 
-**Pro tip:** GitHub will automatically turn references to issue numbers in the form `#1234` into a link to the issue/PR with that number within the same repo.
-
 - Adding automated tests that cover your changes and/or new functionality is important!
     - `fastlane` has a lot of moving parts and receives contributions from many developers. The best way to ensure that your contributions keep working is to ensure that there will be failing tests if something accidentally gets broken.
     - You can run the tests by executing `bundle install` and then `bundle exec rspec`.
