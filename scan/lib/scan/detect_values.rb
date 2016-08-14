@@ -51,9 +51,9 @@ module Scan
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
       # %r{
       #   \s # a whitespace character
-      #   (?= # followed by — using lookahead
+      #   (?= # followed by -- using lookahead
       #   \( # open parenthesis
-      #   [\d\.]+ # our version — one or more digits or full stops
+      #   [\d\.]+ # our version -- one or more digits or full stops
       #   \) # close parenthesis
       #   $ # end of line
       #   ) # end of lookahead
@@ -91,7 +91,7 @@ module Scan
               [] # empty array
             elsif pieces.count == 1
               simulators
-            else # pieces.count == 2 — mathematically, because of the ‘end of line’ part of our regular expression
+            else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               filter_simulators(simulators, pieces[1].tr('()', ''))
             end
           ).select { |sim|
