@@ -111,10 +111,10 @@ module Scan
       end
 
       # grab the first unempty evaluated array
-      Scan.devices = [matches, default].lazy.flat_map { |x|
+      Scan.devices = [matches, default].lazy.map { |x|
         arr = x.call
         arr unless arr.empty?
-      }.first
+      }.reject(&:nil?).first
     end
 
     def self.min_xcode8?
