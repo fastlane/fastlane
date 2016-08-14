@@ -71,6 +71,7 @@ module Scan
 
     def self.default_device(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
       # Select only simulators that are greater than or equal to the version of our deployment target
       simulators = filter_simulators(
@@ -79,8 +80,6 @@ module Scan
       )
 
       matches = lambda do
-        devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
-
         devices.inject(
           Set.new # of simulators
         ) { |set, device_string|
