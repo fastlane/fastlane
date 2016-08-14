@@ -81,8 +81,8 @@ module Scan
       matches = lambda do
         devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
-        devices.reduce(
-          Set.new() # of simulators
+        devices.inject(
+          Set.new # of simulators
         ) { |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
 
