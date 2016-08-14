@@ -214,7 +214,31 @@ module Gym
                                      description: "A custom xcpretty formatter to use",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("Formatter file not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_junit,
+                                     short_option: "-rxml",
+                                     env_name: "XCPRETTY_REPORT_JUNIT",
+                                     description: "Have xcpretty create a JUnit-style XML report at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_html,
+                                     short_option: "-rhtm",
+                                     env_name: "XCPRETTY_REPORT_HTML",
+                                     description: "Have xcpretty create a simple HTML report at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_json,
+                                     short_option: "-rjson",
+                                     env_name: "XCPRETTY_REPORT_JSON",
+                                     description: "Have xcpretty create a JSON compilation database at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end)
       ]
     end
