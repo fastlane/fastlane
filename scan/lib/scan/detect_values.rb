@@ -62,7 +62,7 @@ module Scan
 
     def self.default_device_ios
       # An iPhone 5s is a reasonably small and useful default for tests
-      default_device('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s')
+      default_device('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
     end
 
     def self.default_device_tvos
