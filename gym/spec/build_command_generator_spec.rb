@@ -36,7 +36,8 @@ describe Gym do
                              "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
-                             "| tee #{log_path.shellescape} | xcpretty"
+                             "| tee #{log_path.shellescape}",
+                             " | xcpretty"
                            ])
     end
 
@@ -83,7 +84,8 @@ describe Gym do
                                "-destination 'generic/platform=iOS'",
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                :archive,
-                               "| tee #{log_path.shellescape} | xcpretty"
+                               "| tee #{log_path.shellescape}",
+                               " | xcpretty"
                              ])
       end
 
@@ -143,7 +145,8 @@ describe Gym do
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                "-derivedDataPath '/tmp/my/derived_data'",
                                :archive,
-                               "| tee #{log_path.shellescape} | xcpretty"
+                               "| tee #{log_path.shellescape}",
+                               " | xcpretty"
                              ])
       end
     end
@@ -165,7 +168,8 @@ describe Gym do
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                "-resultBundlePath './ExampleProductName.result'",
                                :archive,
-                               "| tee #{log_path.shellescape} | xcpretty"
+                               "| tee #{log_path.shellescape}",
+                               " | xcpretty"
                              ])
       end
     end
