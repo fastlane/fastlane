@@ -3,7 +3,7 @@
 To run fastlane on Circle as your CI, first create a `Gemfile` in the roof of your project with the following content
 
 ```ruby
-source "https://rubygems.org
+source "https://rubygems.org"
 
 gem "fastlane"
 ```
