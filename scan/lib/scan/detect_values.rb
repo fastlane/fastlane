@@ -117,49 +117,6 @@ module Scan
       }.first
     end
 
-    def self.default_device_tvos
-      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
-      found_devices = []
-
-      if devices.any?
-        # Optionally, we only do this if the user specified a custom device or an array of devices
-        devices.each do |device|
-          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
-
-          found = FastlaneCore::SimulatorTV.all.detect do |d|
-            (d.name + " " + d.os_version).include? lookup_device
-          end
-
-          if found
-            found_devices.push(found)
-          else
-            UI.error("Ignoring '#{device}', couldn't find matching simulator")
-          end
-        end
-
-        if found_devices.any?
-          Scan.devices = found_devices
-          return
-        else
-          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
-        end
-      end
-
-      sims = FastlaneCore::SimulatorTV.all
-      xcode_target = Scan.project.build_settings(key: "TVOS_DEPLOYMENT_TARGET")
-      sims = filter_simulators(sims, xcode_target)
-
-      # Apple TV 1080p is useful for tests
-      found = sims.detect { |d| d.name == "Apple TV 1080p" }
-      found ||= sims.first # anything is better than nothing
-
-      if found
-        Scan.devices = [found]
-      else
-        UI.user_error!("No TV simulators found on the local machine")
-      end
-    end
-
     def self.min_xcode8?
       Helper.xcode_version.split(".").first.to_i >= 8
     end
