@@ -86,7 +86,7 @@ module Scan
         ) { |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
 
-          set += (
+          set + (
             if pieces.count == 0
               [] # empty array
             elsif pieces.count == 1
