@@ -64,10 +64,10 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
-        if !Gym.config[:disable_xcpretty]
+        unless Gym.config[:disable_xcpretty]?
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
-          pipe << " --test" if Gym.config[:xcpretty_format_test]
+          pipe << " --test" if Gym.config[:xcpretty_format_test]?
           pipe << " --no-color" if Helper.colors_disabled?
           pipe << " --formatter " if formatter?
           pipe << formatter if formatter?
