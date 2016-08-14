@@ -67,7 +67,7 @@ module Gym
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
-          pipe << " --test" if Gym.config[:xcpretty_format_test]
+          pipe << " --test" if Gym.config[:xcpretty_test_format]
           pipe << " --no-color" if Helper.colors_disabled?
           pipe << " --formatter " if formatter?
           pipe << formatter if formatter?
