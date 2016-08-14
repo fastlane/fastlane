@@ -37,7 +37,7 @@ describe Gym do
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
                              "| tee #{log_path.shellescape}",
-                             " | xcpretty"
+                             "| xcpretty"
                            ])
     end
 
@@ -85,7 +85,7 @@ describe Gym do
                                "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               " | xcpretty"
+                               "| xcpretty"
                              ])
       end
 
@@ -146,7 +146,7 @@ describe Gym do
                                "-derivedDataPath '/tmp/my/derived_data'",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               " | xcpretty"
+                               "| xcpretty"
                              ])
       end
     end
@@ -169,7 +169,7 @@ describe Gym do
                                "-resultBundlePath './ExampleProductName.result'",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               " | xcpretty"
+                               "| xcpretty"
                              ])
       end
     end
