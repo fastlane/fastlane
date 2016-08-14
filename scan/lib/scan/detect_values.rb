@@ -93,8 +93,9 @@ module Scan
             else # pieces.count == 2 — mathematically, because of the ‘end of line’ part of our regular expression
               filter_simulators(simulators, pieces[1].tr('()', ''))
             end
-          ).select { |sim| sim.name == pieces.first }
-          .tap { |array| UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty? }
+          ).select { |sim|
+            pieces.count > 0 && sim.name == pieces.first
+          }.tap { |array| UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty? }
         }.to_a
       end
 
