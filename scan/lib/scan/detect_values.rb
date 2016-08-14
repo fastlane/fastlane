@@ -48,6 +48,18 @@ module Scan
       end
     end
 
+    def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
+      %r{
+        \s # a whitespace character
+        (?= # followed by — using lookahead
+        \( # open parenthesis
+        [\d\.]+ # our version — one or more digits or full stops
+        \) # close parenthesis
+        $ # end of line
+        ) # end of lookahead
+      }
+    end
+
     def self.default_device_ios
       # An iPhone 5s is a reasonably small and useful default for tests
       default_device('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s')
@@ -59,17 +71,6 @@ module Scan
 
     def self.default_device(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
-      def regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
-        %r{
-          \s # a whitespace character
-          (?= # followed by — using lookahead
-          \( # open parenthesis
-          [\d\.]+ # our version — one or more digits or full stops
-          \) # close parenthesis
-          $ # end of line
-          ) # end of lookahead
-        }
-      end
 
       # Select only simulators that are greater than or equal to the version of our deployment target
       simulators = filter_simulators(
