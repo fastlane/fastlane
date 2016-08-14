@@ -47,7 +47,7 @@ describe Gym do
       xcargs = xcargs_hash.map do |k, v|
         "#{k.to_s.shellescape}=#{v.shellescape}"
       end.join ' '
-      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example' disable_xcpretty: true }
+      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example', disable_xcpretty: true }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
