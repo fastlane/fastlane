@@ -74,13 +74,13 @@ module Gym
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]
-          if report_output_junit?
+          if report_output_junit
             pipe << " --report junit --output "
             pipe << report_output_junit
-          elsif report_output_html?
+          elsif report_output_html
             pipe << " --report html --output "
             pipe << report_output_html
-          elsif report_output_json?
+          elsif report_output_json
             pipe << " --report json-compilation-database --output "
             pipe << report_output_json
           end
