@@ -1,6 +1,6 @@
 # fastlane circle config
 
-To run fastlane on Circle as your CI, first create a `Gemfile` in the roof of your project with the following content
+To run fastlane on Circle as your CI, first create a `Gemfile` in the root of your project with the following content
 
 ```ruby
 source "https://rubygems.org"
