@@ -288,6 +288,17 @@ match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 
 `match` can even use the same one Git repository for all bundle identifiers.
 
+##### Multiple teams
+
+If you have multiple teams (always use the same team identifier)
+
+```ruby
+match(app_identifier: "tools.fastlane.app", team_id: "XYZ12345", type: "appstore")
+match(app_identifier: "tools.fastlane.app.today_widget", team_name: "ABCD" type: "appstore")
+```
+
+`match` will use the same one Git repository and create a folder for each teams
+
 ### Setup Xcode project
 
 [Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
