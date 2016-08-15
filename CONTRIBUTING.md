@@ -104,7 +104,7 @@ One of the best ways we can keep fastlane an approachable, stable, and dependabl
 
 ## Contributing New Actions
 
-Writing a custom action is an easy way to extend the capabilities of fastlane. Actions that make good candidates for inclusion in the fastlane codebase are **flexible** and apply to **many projects, teams, and development setups**. Before working to contribute your custom action to fastlane, consider whether it is likely to solve a problem that many developers have. If not, it can still provide value for your fastlane environment! Check out the documentation for creating [local action extensions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/README.md#extensions).
+There are different approaches to build your own `fastlane` actions. You can either build your own local actions, or provide your own fastlane plugin. For more information, check out [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md#readme).
 
 ## Developing
 
