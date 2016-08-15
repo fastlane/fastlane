@@ -85,9 +85,9 @@ module Scan
           Set.new # of simulators
         ) do |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
-          
-          selector = lambda { |sim| pieces.count > 0 && sim.name == pieces.first }
-          
+
+          selector = ->(sim) { pieces.count > 0 && sim.name == pieces.first }
+
           set + (
             if pieces.count == 0
               [] # empty array
@@ -100,7 +100,7 @@ module Scan
             UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
           end
         end
-        
+
         set_of_simulators.to_a
       end
 
