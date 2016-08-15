@@ -27,11 +27,8 @@ module Fastlane
       UI.confirm(text)
     end
 
-    def ask(text)
-      UI.ask(text)
-    end
-
     def choose(text, options)
+      return options[0] unless UI.interactive?
       message(text)
       Kernel.choose(*options)
     end

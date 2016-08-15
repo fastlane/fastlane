@@ -53,7 +53,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:schemes=)
       expect(info).not_to receive(:export_method=)
 
-      expect(ui).not_to receive(:ask)
+      expect(ui).not_to receive(:input)
 
       collector.collect_info_into(info)
 
@@ -74,7 +74,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
-      expect(ui).not_to receive(:ask)
+      expect(ui).not_to receive(:input)
 
       collector.collect_info_into(info)
 
@@ -95,7 +95,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
-      expect(ui).not_to receive(:ask)
+      expect(ui).not_to receive(:input)
 
       collector.collect_info_into(info)
 
@@ -116,7 +116,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:groups=)
       expect(info).not_to receive(:schemes=)
 
-      expect(ui).not_to receive(:ask)
+      expect(ui).not_to receive(:input)
 
       collector.collect_info_into(info)
 
@@ -138,7 +138,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(info).not_to receive(:schemes=)
 
       allow(ui).to receive(:important)
-      expect(ui).not_to receive(:ask)
+      expect(ui).not_to receive(:input)
 
       collector.collect_info_into(info)
 
@@ -153,7 +153,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.api_key = 'invalid'
 
       allow(ui).to receive(:important)
-      expect(ui).to receive(:ask).with(/API Key/).and_return(valid_api_key)
+      expect(ui).to receive(:input).with(/API Key/).and_return(valid_api_key)
 
       collector.collect_info_into(info)
 
@@ -169,7 +169,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       allow(ui).to receive(:important)
       expect(ui).to receive(:important).with("your error message here")
-      expect(ui).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
+      expect(ui).to receive(:input).with(/Build Secret/).and_return(valid_build_secret)
 
       collector.collect_info_into(info)
 
@@ -185,7 +185,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       allow(ui).to receive(:important)
       expect(ui).to receive(:important).with("your error message here")
-      expect(ui).to receive(:ask).with(/Crashlytics.framework/).and_return(valid_crashlytics_path)
+      expect(ui).to receive(:input).with(/Crashlytics.framework/).and_return(valid_crashlytics_path)
 
       collector.collect_info_into(info)
 
@@ -201,8 +201,8 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       allow(ui).to receive(:important)
       expect(ui).to receive(:important).with("your error message here")
-      expect(ui).to receive(:ask).with(/Build Secret/).and_return('still not valid')
-      expect(ui).to receive(:ask).with(/Build Secret/).and_return(valid_build_secret)
+      expect(ui).to receive(:input).with(/Build Secret/).and_return('still not valid')
+      expect(ui).to receive(:input).with(/Build Secret/).and_return(valid_build_secret)
 
       collector.collect_info_into(info)
 
@@ -217,7 +217,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.emails = nil
 
       allow(ui).to receive(:important)
-      expect(ui).to receive(:ask).with(/email/).and_return(valid_emails.first)
+      expect(ui).to receive(:input).with(/email/).and_return(valid_emails.first)
 
       collector.collect_info_into(info)
 
@@ -232,8 +232,8 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.emails = nil
 
       allow(ui).to receive(:important)
-      expect(ui).to receive(:ask).with(/email/).and_return('')
-      expect(ui).to receive(:ask).with(/email/).and_return(valid_emails.first)
+      expect(ui).to receive(:input).with(/email/).and_return('')
+      expect(ui).to receive(:input).with(/email/).and_return(valid_emails.first)
 
       collector.collect_info_into(info)
 
@@ -264,7 +264,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.schemes = []
 
       allow(ui).to receive(:important)
-      expect(ui).to receive(:ask).with(/scheme/).and_return('SchemeName')
+      expect(ui).to receive(:input).with(/scheme/).and_return('SchemeName')
 
       collector.collect_info_into(info)
 
@@ -279,8 +279,8 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.schemes = []
 
       allow(ui).to receive(:important)
-      expect(ui).to receive(:ask).with(/scheme/).and_return('')
-      expect(ui).to receive(:ask).with(/scheme/).and_return('SchemeName')
+      expect(ui).to receive(:input).with(/scheme/).and_return('')
+      expect(ui).to receive(:input).with(/scheme/).and_return('SchemeName')
 
       collector.collect_info_into(info)
 
