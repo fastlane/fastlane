@@ -39,12 +39,17 @@ module Scan
       Scan.config[:derived_data_path] = default_path
     end
 
-    def self.filter_simulators(simulators, deployment_target)
-      # Select only simulators that are greater than or equal to the version of our deployment target
+    def self.filter_simulators(simulators, operator = :greater_than_or_equal, deployment_target)
       deployment_target_version = Gem::Version.new(deployment_target)
       simulators.select do |s|
-        sim_version = Gem::Version.new(s.ios_version)
-        (sim_version >= deployment_target_version)
+        sim_version = Gem::Version.new(s.os_version)
+        if operator == :greater_than_or_equal
+          sim_version >= deployment_target_version
+        elsif operator == :equal
+          sim_version == deployment_target_version
+        else
+          false # fail gracefully, I guess?
+        end
       end
     end
 
@@ -74,11 +79,20 @@ module Scan
       require 'set'
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
-      # Select only simulators that are greater than or equal to the version of our deployment target
+      deployment_target_version = Scan.project.build_settings(key: deployment_target_key)
+
       simulators = filter_simulators(
-        FastlaneCore::DeviceManager.simulators(requested_os_type),
-        Scan.project.build_settings(key: deployment_target_key)
-      )
+        FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
+          UI.user_error!(
+            ['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' ')
+          ) if array.empty?
+        end,
+        :greater_than_or_equal,
+        deployment_target_version
+      ).tap do |sims|
+        UI.error("No simulators found that are greater than or equal to the version " +
+        "of deployment target (#{deployment_target_version})") if sims.empty?
+      end
 
       matches = lambda do
         set_of_simulators = devices.inject(
@@ -93,10 +107,20 @@ module Scan
               [] # empty array
             elsif pieces.count == 1
               simulators
+                .select(&selector)
+                .reverse # more efficient, because `simctl` prints higher versions first
+                .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+                .pop(1)
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
-              filter_simulators(simulators, pieces[1].tr('()', ''))
+              version = pieces[1].tr('()', '')
+              potential_emptiness_error = ->(sims) {
+                UI.error("No simulators found that are equal to the version " +
+                "of specifier (#{version}) and greater than or equal to the version " +
+                "of deployment target (#{deployment_target_version})") if sims.empty?
+              }
+              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
-          ).select(&selector).tap do |array|
+          ).tap do |array|
             UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
           end
         end
