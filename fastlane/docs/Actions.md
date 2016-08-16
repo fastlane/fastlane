@@ -2053,6 +2053,18 @@ jira(
 )
 ```
 
+Change Issue status (Perform transition).
+```ruby
+issues = ["JIRATEST-1532"]
+jira_work_flow(
+  issue_ids: issues,
+  jira_username: "admin",
+  jira_password: "qwerty",
+  jira_host: "https://jira.test.ru",
+  jira_transition_name: "Close Issue",
+)
+```
+
 ## Other
 
 ### update_fastlane
