@@ -82,26 +82,26 @@ describe Spaceship::Portal::App do
 
   describe '#create' do
     it 'creates an app id with an explicit bundle_id' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false) {
-        { 'isWildCard' => true }
+      expect(client).to receive(:create_app_by_platform!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', platform: 'ios') {
+        { 'isWildCard' => false }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
-      expect(app.is_wildcard).to eq(true)
+      expect(app.is_wildcard).to eq(false)
     end
 
     it 'creates an app id with a wildcard bundle_id' do
-      expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', mac: false) {
-        { 'isWildCard' => false }
+      expect(client).to receive(:create_app_by_platform!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', platform: 'ios') {
+        { 'isWildCard' => true }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.*', name: 'Development App')
-      expect(app.is_wildcard).to eq(false)
+      expect(app.is_wildcard).to eq(true)
     end
   end
 
   describe '#delete' do
     subject { Spaceship::Portal::App.find("net.sunapps.151") }
     it 'deletes the app by a given bundle_id' do
-      expect(client).to receive(:delete_app!).with('B7JBD8LHAA', mac: false)
+      expect(client).to receive(:delete_app_by_platform!).with('B7JBD8LHAA', platform: 'ios')
       app = subject.delete!
       expect(app.app_id).to eq('B7JBD8LHAA')
     end

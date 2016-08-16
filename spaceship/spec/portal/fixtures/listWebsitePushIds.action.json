@@ -1,0 +1,27 @@
+{
+  "creationTimestamp": "2016-03-11T06:38:31Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/listWebsitePushIds.action",
+  "responseId": "0d35cf9b-fe1e-4420-b94b-71dce02c2aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": 0,
+  "pageSize": 0,
+  "totalRecords": 1,
+  "httpResponseHeaders": null,
+  "websitePushIdList": [
+    {
+      "name": "Web App Name",
+      "prefix": "5A997XSHK2",
+      "identifier": "net.sunapps.11",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": true,
+      "websitePushId": "2UMR2S6PAB"
+    }
+  ]
+}

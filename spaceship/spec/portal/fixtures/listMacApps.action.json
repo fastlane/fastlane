@@ -1,0 +1,43 @@
+{
+    "creationTimestamp": "2016-03-11T06:49:53Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": null,
+    "requestUrl": "https://developer.apple.com:443/services-accoun/QH65B2/account/mac/identifiers/listAppIds.action",
+    "responseId": "0d35cf9b-fe1e-4420-b94b-71dce02c2aaa",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": false,
+    "pageNumber": 1,
+    "pageSize": 500,
+    "totalRecords": 1,
+    "httpResponseHeaders": null,
+    "appIds": [
+        {
+            "appIdId": "6QUP48D4SG",
+            "name": "test",
+            "appIdPlatform": "mac",
+            "prefix": "5A997XSHK2",
+            "identifier": "com.test.ctest",
+            "isWildCard": false,
+            "isDuplicate": false,
+            "features": {
+
+            },
+            "enabledFeatures": [
+
+            ],
+            "isDevPushEnabled": null,
+            "isProdPushEnabled": null,
+            "associatedApplicationGroupsCount": null,
+            "associatedCloudContainersCount": null,
+            "associatedIdentifiersCount": null,
+            "associatedApplicationGroups": null,
+            "associatedCloudContainers": null,
+            "associatedIdentifiers": null,
+            "canEdit": true,
+            "canDelete": true
+        }
+    ]
+}

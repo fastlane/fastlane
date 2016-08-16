@@ -1,0 +1,36 @@
+{
+  "creationTimestamp": "2016-03-11T06:52:01Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/cloudContainer/listCloudContainers.action",
+  "responseId": "0d35cf9b-fe1e-4420-b94b-71dce02c2aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": 0,
+  "pageSize": 500,
+  "totalRecords": 2,
+  "httpResponseHeaders": null,
+  "cloudContainerList": [
+    {
+      "name": "saSas",
+      "prefix": "5A997XSHK2",
+      "identifier": "iCloud.asdasdasdads",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": false,
+      "cloudContainer": "33HPFA8Z59"
+    },
+    {
+      "name": "tsdfsd",
+      "prefix": "5A997XSHK2",
+      "identifier": "iCloud.sdfsdfsdfsbvvcx",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": false,
+      "cloudContainer": "8Y723CS2XA"
+    }
+  ]
+}

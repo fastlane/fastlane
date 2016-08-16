@@ -1,0 +1,40 @@
+{
+  "creationTimestamp": "2016-03-11T06:56:11Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/listPassTypeIds.action",
+  "responseId": "0d35cf9b-fe1e-4420-b94b-71dce02c2aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": 0,
+  "pageSize": 500,
+  "totalRecords": 1,
+  "httpResponseHeaders": null,
+  "passTypeIdList": [
+    {
+      "name": "safsafd",
+      "prefix": "5A997XSHK2",
+      "identifier": "pass.sdfgsdfgsdfgsdfg",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": true,
+      "shoeboxId": "956ET55ZWF",
+      "passTypeId": "956ET55ZWF"
+    }
+  ],
+  "shoeboxIdList": [
+    {
+      "name": "safsafd",
+      "prefix": "X78HK5K5FR",
+      "identifier": "pass.sdfgsdfgsdfgsdfg",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": true,
+      "shoeboxId": "956ET55ZWF",
+      "passTypeId": "956ET55ZWF"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "creationTimestamp": "2016-03-11T06:54:16Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/listOMCs.action",
+  "responseId": "0d35cf9b-fe1e-4420-b94b-71dce02c2aaa",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": 0,
+  "pageSize": 500,
+  "totalRecords": 1,
+  "httpResponseHeaders": null,
+  "identifierList": [
+    {
+      "name": "test",
+      "prefix": "5A997XSHK2",
+      "identifier": "merchant.testt",
+      "status": "current",
+      "canEdit": true,
+      "canDelete": true,
+      "omcId": "G2T7D5SVWT"
+    }
+  ]
+}

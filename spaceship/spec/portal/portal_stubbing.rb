@@ -133,7 +133,7 @@ def adp_stub_certificates
   stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
     to_return(status: 200, body: adp_read_fixture_file('aps_development.cer'))
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
-    with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
+    with(body: { "appIdId" => "2HNR359G63", "specialIdentifierDisplayId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
     to_return(status: 200, body: adp_read_fixture_file('submitCertificateRequest.action.json'), headers: { 'Content-Type' => 'application/json' })
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action").
     with(body: { "certificateId" => "XC5PH8DAAA", "teamId" => "XXXXXXXXXX", "type" => "R58UK2EAAA" }).
@@ -144,6 +144,26 @@ def adp_stub_apps
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action').
     with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
     to_return(status: 200, body: adp_read_fixture_file('listApps.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listAppIds.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    to_return(status: 200, body: adp_read_fixture_file('listMacApps.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listWebsitePushIds.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/cloudContainer/listCloudContainers.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    to_return(status: 200, body: adp_read_fixture_file('listCloudContainers.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listOMCs.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    to_return(status: 200, body: adp_read_fixture_file('listOMCs.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listPassTypeIds.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    to_return(status: 200, body: adp_read_fixture_file('listPassTypeIds.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/getAppIdDetail.action").
     with(body: { appIdId: "B7JBD8LHAA", teamId: "XXXXXXXXXX" }).
