@@ -903,6 +903,25 @@ More information about the available options can be found in the [HockeyApp Docs
 
 See how [Artsy](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile) distributes new builds via Hockey in their [Fastfile](https://github.com/fastlane/examples/blob/master/Artsy/eidolon/Fastfile).
 
+### `latest_hockeyapp_version_number`
+
+Easily fetch the most recent HockeyApp version number for your app. Provides a way to have `increment_build_number` be based on the latest HockeyApp version.  It will use an API token defined in FL_HOCKEY_API_TOKEN if none is specified.
+
+```ruby
+latest_hockeyapp_version_number(
+  api_token: 'xxx',
+  app_name: "HockeyTest"
+)
+```
+
+can be used in combination with `increment_build_number`
+
+```ruby
+increment_build_number({
+  build_number: latest_hockeyapp_version_number(app_name: "HockeyTest") + 1
+})
+```
+
 ### [Crashlytics Beta](http://try.crashlytics.com/beta/)
 ```ruby
 crashlytics(

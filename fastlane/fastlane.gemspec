@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions
   spec.add_dependency 'word_wrap', '~> 1.0.0'  # to add line breaks for tables with long strings
+  spec.add_dependency 'hockeyapp', '>= 0.0.15' # official HockeyApp library
 
   spec.add_dependency 'fastlane_core', '>= 0.50.2', '< 1.0.0' # all shared code and dependencies
 
