@@ -1233,6 +1233,20 @@ testfairy(
 )
 ```
 
+### read_changelog
+
+Reads the content of a section from your project's `CHANGELOG.md` file. `CHANGELOG.md` should follow structure proposed by [Keep a CHANGELOG](http://keepachangelog.com/) project. 
+
+```ruby
+read_changelog(
+  changelog_path: './CHANGELOG.md',
+  section_identifier: '[Unreleased]',
+  excluded_markdown_elements: '["###"]'
+)
+```
+
+Use the output of this action with for example [pilot] to upload your change log to TestFlight or with [GitHub Releases] to create a new release on Github.
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
