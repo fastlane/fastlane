@@ -557,6 +557,8 @@ module Spaceship
 
       # generates the nested data structure to represent screenshots
       def setup_screenshots_for(row)
+        return [] if row.nil? || row["displayFamilies"].nil?
+
         display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
         return [] unless display_families
 
@@ -628,6 +630,8 @@ module Spaceship
 
       # generates the nested data structure to represent trailers
       def setup_trailers_for(row)
+        return [] if row.nil? || row["displayFamilies"].nil?
+
         display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
         return [] unless display_families
 
