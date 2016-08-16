@@ -1233,6 +1233,21 @@ testfairy(
 )
 ```
 
+### [TPA](http://tpa.io/)
+
+Upload your iOS and Android builds to [TPA](http://tpa.io/)
+
+You can find the Upload URL on your project page.
+
+```ruby
+tpa(
+  ipa: '/tmp/StickersApp.ipa',
+  mapping: '/tmp/StickersApp.dSym.zip',
+  upload_url: 'https://StickersApp.tpa.io/762705ee-bb77-47b6-accc-4335709c6303/upload',
+  publish: true
+)
+```
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
