@@ -1290,6 +1290,37 @@ You can also only receive the version number without modifying it
 version = get_version_number(xcodeproj: "Project.xcodeproj")
 ```
 
+### increment_version_number_in_plist
+
+```ruby
+increment_version_number_in_plist # Automatically increment patch version number.
+increment_version_number_in_plist(
+  bump_type: "patch" # Automatically increment patch version number
+)
+increment_version_number_in_plist(
+  bump_type: "minor" # Automatically increment minor version number
+)
+increment_version_number_in_plist(
+  bump_type: "major" # Automatically increment major version number
+)
+increment_version_number_in_plist(
+  version_number: '2.1.1' # Set a specific version number
+)
+
+increment_version_number_in_plist(
+  version_number: '2.1.1',                # specify specific version number (optional, omitting it increments patch version number)
+  xcodeproj: './path/to/MyApp.xcodeproj'  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory or you have a multiple xcodeproj's in the root directory)
+  target: 'TestTarget' # (optional)
+)
+```
+You can also only receive the version number from plist without modifying it
+
+```ruby
+version = get_version_number_from_plist(xcodeproj: "Project.xcodeproj", # optional
+                                        target: 'TestTarget', # optional
+                                        build_configuration_name: 'Release') # optional, must be specified if you have different Info.plist build settings for different build configurations
+```
+
 ### get_build_number_repository
 ```ruby
 get_build_number_repository
@@ -2221,6 +2252,16 @@ To increment the version number of your `.podspec` use
 version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")
 # or
 version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")
+```
+
+### get_info_plist_path
+
+Get a path to target's Info.plist
+```ruby
+get_info_plist_path(xcodeproj: 'Test.xcodeproj', # optional
+                       target: 'TestTarget', # optional
+     build_configuration_name: 'Release' # optional, must be specified if you have different Info.plist build settings for different build configurations
+                       )
 ```
 
 ### get_info_plist_value
