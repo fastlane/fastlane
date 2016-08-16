@@ -136,8 +136,7 @@ module Scan
             .select { |sim| sim.name == default_device_name }
             .reverse # more efficient, because `simctl` prints higher versions first
             .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-            .last
-            || simulators.first
+            .last || simulators.first
         )
       end
 
