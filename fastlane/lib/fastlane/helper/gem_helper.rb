@@ -22,5 +22,16 @@ module Fastlane
       end
       true
     end
+
+    # check a gem with requirement is installed
+    # does not 'require' the gem
+    def self.verify_gem(gem_name, requirement)
+      begin
+        Gem::Specification.find_by_name(gem_name, requirement)
+      rescue Gem::LoadError
+        false
+      end
+      true
+    end
   end
 end

@@ -96,6 +96,16 @@ describe Fastlane do
 
         expect(result).to eq("cd 'Project' && bundle exec pod install")
       end
+
+      it "adds Cocoapods version to command if version is set" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            version: '0.38.2'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod _0.38.2_ install")
+      end
     end
   end
 end
