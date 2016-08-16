@@ -2053,6 +2053,20 @@ jira(
 )
 ```
 
+### [JIRA Transition](https://www.atlassian.com/software/jira)
+Apply a JIRA transition to issues mentioned in the changelog.
+
+```ruby
+jira_transition(
+  url: "https://bugs.yourdomain.com",
+  username: "Your username",
+  password: "Your password",
+  project_key: "Project Key, i.e. IOS",
+  transition_id: "Transition ID, i.e. 730",  
+  comment: "Optional text to post as a comment"
+)
+```
+
 ## Other
 
 ### update_fastlane
