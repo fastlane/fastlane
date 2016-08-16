@@ -2627,3 +2627,35 @@ set_pod_key(
   project: 'MyProject'
 )
 ```
+
+### cordova_get_app_id
+
+Get a the application id from the cordova config file. You can use it
+as the app_identifier
+
+```ruby
+cordova_get_app_id
+# => "tools.fastlane.cordova"
+
+# path defaults to ./config.xml
+cordova_get_app_id(path: 'cordova/config.xml')
+
+# You can retreive platform specific ids
+# For iOS return the ios-CFBundleIdentifier value
+cordova_get_app_id(platform: :ios)
+
+# For android return the android-packageName value
+cordova_get_app_id(platform: :android)
+```
+
+### cordova_get_app_name
+
+Get a the application name from the cordova config file.
+
+```ruby
+cordova_get_app_name
+# => "Cordova App"
+
+# path defaults to ./config.xml
+cordova_get_app_name(path: 'cordova/config.xml')
+```
