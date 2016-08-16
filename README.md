@@ -51,7 +51,7 @@ Then to deploy a new 'beta' version of your app just run
 
 ## Installation
 
-    sudo gem install fastlane --verbose
+    sudo gem install fastlane --verbose --no-ri --no-rdoc
 
 Make sure you have the latest version of the Xcode command line tools installed:
 

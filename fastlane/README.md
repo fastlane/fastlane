@@ -102,7 +102,7 @@ fastlane appstore
 
 I recommend following the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started.
 
-    sudo gem install fastlane --verbose
+    sudo gem install fastlane --verbose --no-ri --no-rdoc
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
