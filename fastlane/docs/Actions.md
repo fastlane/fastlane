@@ -1233,6 +1233,20 @@ testfairy(
 )
 ```
 
+### [DISTRIBUTOR](https://wifidistribution.com)
+
+Upload your iOS build to [DISTRIBUTOR](https://wifidistribution.com)
+
+```ruby
+distributor(
+  api_token: "...",
+  app_id: "...",
+  ipa: "./build.ipa" # optional if you use gym
+)
+```
+
+For more information about the available options, check out the [DISTRIBUTOR Documentation](https://wifidistribution.com/docs) or the [Quick Start Tutorial](https://medium.com/@sebsn/how-to-upload-your-ios-apps-to-distributor-with-fastlane-c5b867fd9128#.2f4z2t8su).
+
 ## Modifying Project
 
 ### [increment_build_number](https://developer.apple.com/library/ios/qa/qa1827/_index.html)
