@@ -24,7 +24,14 @@ module Gym
       def options
         options = []
 
-        options << "-exportOptionsPlist '#{config_path}'"
+        provisioning_profile_name = Gym.config[:provisioning_profile_name].to_s
+        if provisioning_profile_name.length > 0
+          options << "-exportFormat ipa"
+          options << "-exportProvisioningProfile '#{provisioning_profile_name}'"
+        else
+          options << "-exportOptionsPlist '#{config_path}'"
+        end
+
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "-exportPath '#{temporary_output_path}'"
 
@@ -42,7 +49,8 @@ module Gym
 
       def ipa_path
         unless Gym.cache[:ipa_path]
-          path = Dir[File.join(temporary_output_path, "*.ipa")].last
+          possible_ipa_direct_path = temporary_output_path + ".ipa"
+          path = Dir[File.join(temporary_output_path, "*.ipa")].last || (possible_ipa_direct_path if File.exist?(possible_ipa_direct_path))
           # We need to process generic IPA
           if path
             # Try to find IPA file in the output directory, used when app thinning was not set
