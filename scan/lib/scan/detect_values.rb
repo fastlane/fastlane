@@ -130,13 +130,15 @@ module Scan
 
       default = lambda do
         UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+
         Array(
-          simulators.detect { |d| d.name == default_device_name } || simulators.first
-        ).tap do |array|
-          UI.user_error!(
-            ['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' ')
-          ) if array.empty?
-        end
+          simulators
+            .select { |sim| sim.name == default_device_name }
+            .reverse # more efficient, because `simctl` prints higher versions first
+            .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+            .last
+            || simulators.first
+        )
       end
 
       # grab the first unempty evaluated array
