@@ -29,7 +29,12 @@ module Gym
         path
       elsif Gym.project.mac?
         compress_and_move_dsym
-        copy_mac_app
+        app_path = copy_mac_app.shellescape
+        if Gym.config[:export_method] == "package"
+          app_path = make_mac_pkg(app_path)
+        end
+
+        app_path
       end
     end
 
@@ -166,6 +171,23 @@ module Gym
       UI.success "Successfully exported the .app file:"
       UI.message app_path
       app_path
+    end
+
+    # Make the .pkg from .app
+    def make_mac_pkg(app_path)
+      sign = Gym.config[:installer_codesigning_identity].shellescape
+      UI.crash!("Couldn't find Developer Installer Code Signing Identity") unless sign
+
+      app_name = Gym.project.app_name.shellescape
+      pkg_name = app_name << ".pkg"
+      pkg_path = File.join(Gym.config[:output_directory], pkg_name)
+
+      command = "productbuild --sign #{sign} --component #{app_path} /Applications #{pkg_path}"
+      Helper.backticks(command, print: !Gym.config[:silent])
+
+      UI.success "Successfully exported the .pkg file:"
+      UI.message pkg_path
+      pkg_path
     end
 
     # Move the manifest.plist if exists into the output directory
