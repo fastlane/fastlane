@@ -146,6 +146,7 @@ RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
+
 # List of plist keys used for reference to and from nested apps and extensions
 NESTED_APP_REFERENCE_KEYS=(":WKCompanionAppBundleIdentifier" ":NSExtension:NSExtensionAttributes:WKAppBundleIdentifier")
 
@@ -376,6 +377,9 @@ function resign {
         error "Expected file does not exist: '$APP_PATH/Info.plist'"
     fi
 
+    # Make a copy of old Info.plist, it will come handy later to extract some old values
+    cp -f "$APP_PATH/Info.plist" "$TEMP_DIR/oldInfo.plist"
+
     # Read in current values from the app
     local CURRENT_NAME=`PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist"`
     local CURRENT_BUNDLE_IDENTIFIER=`PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist"`
@@ -459,8 +463,11 @@ function resign {
         log "Profile team identifier is '$TEAM_IDENTIFIER'"
     fi
 
-    cp "$NEW_PROVISION" "$APP_PATH/embedded.mobileprovision"
+    # Make a copy of old embedded provisioning profile for futher use
+    cp -f "$APP_PATH/embedded.mobileprovision" "$TEMP_DIR/old-embedded.mobileprovision"
 
+    # Replace embedded provisioning profile with new file
+    cp -f "$NEW_PROVISION" "$APP_PATH/embedded.mobileprovision"
 
     #if the current bundle identifier is different from the new one in the provisioning profile, then change it.
     if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
@@ -572,23 +579,128 @@ function resign {
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
-        cp -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
-        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
+        PROFILE_ENTITLEMENTS="$TEMP_DIR/profileEntitlements"
+        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$PROFILE_ENTITLEMENTS"
         checkStatus
+
+        log "Extracting entitlements from the app"
+        APP_ENTITLEMENTS="$TEMP_DIR/appEntitlements"
+        /usr/bin/codesign -d --entitlements :"$APP_ENTITLEMENTS" "$APP_PATH"
+        checkStatus
+
+        echo "APP_ENTITLEMENTS:"
+        cat "$APP_ENTITLEMENTS"
+
+        log "Patching profile entitlements with values from app entitlements"
+        PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
+        # Start with using what comes in provisioning profile entitlements before patching
+        cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
+
+        # Get the old and new app identifier (prefix)
+        APP_ID_KEY="application-identifier"
+        # Extract just the identifier from the value
+        # Use the fact that we are after some identifer, which is always at the start of the string
+        OLD_APP_ID=$(PlistBuddy -c "Print $APP_ID_KEY" "$APP_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+        NEW_APP_ID=$(PlistBuddy -c "Print $APP_ID_KEY" "$PROFILE_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+
+        # Get the old and the new team ID
+        # Old team ID is not part of app entitlements, have to get it from old embedded provisioning profile
+        security cms -D -i "$TEMP_DIR/old-embedded.mobileprovision" > "$TEMP_DIR/old-embedded-profile.plist"
+        OLD_TEAM_ID=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/old-embedded-profile.plist")
+        # New team ID is part of profile entitlements
+        NEW_TEAM_ID=$(PlistBuddy -c "Print com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+
+        # List of rules for transferring entitlements from app to profile plist
+        # The format for each enty is "KEY[|ID_TYPE]"
+        # Where KEY is the plist key, e.g. "keychain-access-groups"
+        # and ID_TYPE is optional part separated by '|' that specifies what value to patch:
+        # TEAM_ID - patch the TeamIdentifierPrefix
+        # APP_ID - patch the AppIdentifierPrefix
+        # Patching means replacing old value from app entitlements with new value from provisioning profile
+        # For example, for KEY=keychain-access-groups the ID_TYPE=APP_ID
+        # Which means that old app ID prefix in keychain-access-groups will be replaced with new app ID prefix
+        # There can be only one ID_TYPE specified
+        # If entitlements use more than one ID type for single entitlement, then this way of resigning will not work
+        # instead an entitlements file must be provided explicitly
+        ENTITLEMENTS_TRANSFER_RULES=("com.apple.developer.associated-domains" \
+            "com.apple.developer.healthkit" \
+            "com.apple.developer.homekit" \
+            "com.apple.developer.icloud-container-identifiers" \
+            "com.apple.developer.icloud-services" \
+            "com.apple.developer.in-app-payments" \
+            "com.apple.developer.networking.vpn.api" \
+            "com.apple.developer.ubiquity-container-identifiers" \
+            "com.apple.developer.ubiquity-kvstore-identifier|TEAM_ID" \
+            "com.apple.external-accessory.wireless-configuration" \
+            "com.apple.security.application-groups" \
+            "inter-app-audio" \
+            "keychain-access-groups|APP_ID")
+
+        # Loop over all the entitlement keys that need to be transferred from app entitlements
+        for RULE in ${ENTITLEMENTS_TRANSFER_RULES[@]}; do
+            KEY=$(echo $RULE | cut -d'|' -f1)
+            ID_TYPE=$(echo $RULE | cut -d'|' -f2)
+
+            # Get the entry from app's entitlements
+            # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
+            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
+            if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
+                log "No value for '$KEY'"
+                continue
+            fi
+
+            log "App entitlements value for key '$KEY':"
+            log "$ENTITLEMENTS_VALUE"
+
+            # Remove the entry for current key from profisioning profile entitlements (if exists)
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+
+            # Add new entry to patched entitlements
+            plutil -insert "$KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
+
+            # Patch the ID value if specified
+            if [[ "$ID_TYPE" == "APP_ID" ]]; then
+                # Replace old value with new value in patched entitlements
+                log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
+                sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
+            elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
+                # Replace new team identifier with new value
+                log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
+                sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
+            else
+                continue
+            fi
+        done
+
+        # Replace old bundle ID with new bundle ID in patched entitlements
+        # Read old bundle ID from the old Info.plist which was saved for this purpose
+        OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
+        NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
+        log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
+        sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
+
         log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and entitlements from provisioning profile: $NEW_PROVISION"
-        cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        log "and patched entitlements:"
+        log "$(cat "$PATCHED_ENTITLEMENTS")"
+        cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     fi
 
     # Remove the temporary files if they were created before generating ipa
-    rm -f "$TEMP_DIR/newEntitlements"
+    rm -f "$PROFILE_ENTITLEMENTS"
+    rm -f "$APP_ENTITLEMENTS"
+    rm -f "$PATCHED_ENTITLEMENTS"
+    rm -f "$PATCHED_ENTITLEMENTS.bak"
+    rm -r "$TEMP_DIR/old-embedded-profile.plist"
     rm -f "$TEMP_DIR/profile.plist"
+    rm -f "$TEMP_DIR/old-embedded.mobileprovision"
+    rm -f "$TEMP_DIR/oldInfo.plist"
 }
 
 # Sign nested applications and app extensions
