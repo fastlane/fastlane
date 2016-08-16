@@ -150,7 +150,9 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 
 ![assets/snapshot.gif](assets/snapshot.gif)
 
-You can take a look at the example project to play around with it.
+You can try the `snapshot` [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
+
+To quick start your UI tests, you can use the UI Test recorder. You only have to interact with the simulator, and Xcode will generate the UI Test code for you. You can find the red record button on the bottom of the screen (more information in [this blog post](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 
 # Usage
 
