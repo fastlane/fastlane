@@ -50,23 +50,25 @@ module Fastlane
         crashlytics_path_arg = "\n         crashlytics_path: '#{@beta_info.crashlytics_path}',"
       end
 
-      groups = @beta_info.groups if @beta_info.groups_valid?
-      unless groups
-        groups = ['group_alias_1', 'group_alias_2']
-      end
+      beta_info_groups = @beta_info.groups_valid? ? "['#{@beta_info.groups.join("', '")}']" : "nil"
+      beta_info_emails = @beta_info.emails_valid? ? "['#{@beta_info.emails.join("', '")}']" : "nil"
 
 # rubocop:disable Style/IndentationConsistency
 %{  #
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
   #
-  lane :beta do
+  lane :beta do |values|
+
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
 
+    emails = values[:dry_run_email] ? values[:dry_run_email] : #{beta_info_emails} # You can list more emails here
+    groups = values[:dry_run_email] ? nil : #{beta_info_groups} # You can define groups on the web and reference them here
+
     crashlytics(api_token: '#{@beta_info.api_key}',
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
-                   emails: ['#{@beta_info.emails.join("', '")}'], # You can list more emails here
-                 # groups: ['#{groups.join("', '")}'], # You can define groups on the web and reference them here
+                   emails: emails,
+                   groups: groups,
                     notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action!
             notifications: true) # Should this distribution notify your testers via email?
 

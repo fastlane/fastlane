@@ -88,7 +88,7 @@ module Fastlane
         prompt_for_build_secret(info)
       end
 
-      if !info.emails || !info.emails_valid?
+      if (!info.emails || !info.emails_valid?) && !info.groups
         @ui.important "Your email address couldn't be discovered from your project 🔍"
         prompt_for_email(info)
       end
