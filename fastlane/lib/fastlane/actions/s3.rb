@@ -110,9 +110,8 @@ module Fastlane
         build_num = info['CFBundleVersion']
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
-        title = info['CFBundleName']        
+        title = info['CFBundleName']
         device_family = info['UIDeviceFamily']
-
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
@@ -147,9 +146,6 @@ module Fastlane
         else
           html_template = eth.load("s3_html_template")
         end
-        
-        print html_template_path
-        print html_template
 
         html_render = eth.render(html_template, {
           url: plist_url,

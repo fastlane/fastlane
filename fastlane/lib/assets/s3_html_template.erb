@@ -75,29 +75,31 @@
     <img src="https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane_medium.png" id="fastlaneLogo" />
   </body>
 
-    <script type='text/javascript'>
-      // Array of supported devices, 1 is iPhone, 2 is iPad
-      var deviceFamily = <%= device_family %>;
+  <script type='text/javascript'>
+    // Array of supported devices, 1 is iPhone, 2 is iPad
+    var deviceFamily = <%= device_family %>;
 
-      function isIphoneValid() {
-        return deviceFamily.indexOf(1) != -1;
-      }
+    function isIphoneValid() {
+      return deviceFamily.indexOf(1) != -1;
+    }
 
-      if (/iPhone|iPod/i.test(navigator.userAgent)) {
-        if (isIphoneValid()) {
-          document.getElementById("invalid-device").remove();
-        } else {
-          document.getElementById("ios").remove();
-          document.getElementById("invalid-device").innerHTML = "Please open this page on your iPad!";
-        }
-      } else if (/iPad/i.test(navigator.userAgent)) {
-        // iPhone only apps can still be installed on an iPad
-        document.getElementById("invalid-device").remove();
-      } else {
-        document.getElementById("ios").remove();
+    function showError(error) {
+      document.getElementById("ios").remove();
+      document.getElementById("invalid-device").innerHTML = error;
+    }
 
-        var validDeviceName = isIphoneValid() ? "iOS device" : "iPad";
-        document.getElementById("invalid-device").innerHTML = "Please open this page on your " + validDeviceName + "!";
-      }
-    </script>
+    function showInstallLink() {
+      document.getElementById("invalid-device").remove();
+    }
+
+    if (/iPhone|iPod/i.test(navigator.userAgent) && isIphoneValid() ) {
+      showInstallLink();
+    } else if (/iPad/i.test(navigator.userAgent)) {
+      // All apps (even "iPhone only") can be installed on iPads
+      showInstallLink()
+    } else {
+      var validDeviceName = isIphoneValid() ? "iOS device" : "iPad";
+      showError("Please open this page on your " + validDeviceName + "!");
+    }
+  </script>
 </html>
