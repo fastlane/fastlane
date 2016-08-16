@@ -34,12 +34,12 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.export_method = valid_export_method
     end
 
-    def validate_info
+    def validate_info(expected_emails: valid_emails, expected_groups: valid_groups)
       expect(info.api_key).to eq(valid_api_key)
       expect(info.build_secret).to eq(valid_build_secret)
       expect(info.crashlytics_path).to eq(valid_crashlytics_path)
-      expect(info.emails).to eq(valid_emails)
-      expect(info.groups).to eq(valid_groups)
+      expect(info.emails).to eq(expected_emails)
+      expect(info.groups).to eq(expected_groups)
       expect(info.schemes).to eq(valid_schemes)
       expect(info.export_method).to eq(valid_export_method)
     end
@@ -209,19 +209,34 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       validate_info
     end
 
-    it 'prompts for user input with invalid emails provided' do
+    it 'prompts for user input with invalid emails and no groups provided' do
       allow(project_parser).to receive(:parse).and_return(valid_project_parser_result)
 
       expect(email_fetcher).to receive(:fetch).and_return(nil)
 
       info.emails = nil
+      info.groups = nil
 
       allow(ui).to receive(:important)
       expect(ui).to receive(:input).with(/email/).and_return(valid_emails.first)
 
       collector.collect_info_into(info)
 
-      validate_info
+      validate_info(expected_groups: nil)
+    end
+
+    it 'does not prompt for user input with groups and invalid emails provided' do
+      allow(project_parser).to receive(:parse).and_return(valid_project_parser_result)
+
+      expect(email_fetcher).to receive(:fetch).and_return(nil)
+
+      info.emails = nil
+
+      expect(ui).not_to receive(:input)
+
+      collector.collect_info_into(info)
+
+      validate_info(expected_emails: nil)
     end
 
     it 'continues to prompt for user input with invalid emails provided' do
@@ -230,6 +245,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       expect(email_fetcher).to receive(:fetch).and_return(nil)
 
       info.emails = nil
+      info.groups = nil
 
       allow(ui).to receive(:important)
       expect(ui).to receive(:input).with(/email/).and_return('')
@@ -237,7 +253,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       collector.collect_info_into(info)
 
-      validate_info
+      validate_info(expected_groups: nil)
     end
 
     it 'has the user choose from a list when there are multiple schemes' do
