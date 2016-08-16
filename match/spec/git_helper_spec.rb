@@ -4,10 +4,11 @@ describe Match do
       it "works" do
         values = {
           app_identifier: "tools.fastlane.app",
-          type: "appstore"
+          type: "appstore",
+          platform: "ios"
         }
         result = Match::GitHelper.generate_commit_message(values)
-        expect(result).to eq("[fastlane] Updated tools.fastlane.app for appstore")
+        expect(result).to eq("[fastlane] Updated tools.fastlane.app for appstore and platform ios")
       end
     end
 

@@ -33,6 +33,15 @@ module Match
                                      env_name: "MATCH_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     env_name: "MATCH_PLATFORM",
+                                     description: "Which platform to create a certificate for",
+                                     is_string: true,
+                                     short_option: "-p",
+                                     default_value: 'ios',
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, tvOS, or mac") unless %('ios', 'tvOS', 'mac').include? value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "MATCH_USERNAME",

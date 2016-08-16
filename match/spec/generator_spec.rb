@@ -43,7 +43,8 @@ describe Match::Generator do
         cert_id: 'fake_cert_id',
         provisioning_name: 'match Development app_identifier',
         ignore_profiles_with_different_name: true,
-        team_id: 'team_id'
+        team_id: 'team_id',
+        platform: 'ios'
       })
 
       # This is the important part. We need to see the right configuration come through
