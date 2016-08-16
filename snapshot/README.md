@@ -53,22 +53,6 @@ More information about [creating perfect screenshots](https://krausefx.com/blog/
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
-### Note: New `snapshot` with UI Tests in Xcode 7
-
-Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you are now be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
-
-As a result, `snapshot` was completely rewritten from ground up without changing its public API.
-
-Please check out the [MigrationGuide to 1.0](/snapshot/MigrationGuide.md) :+1:
-
-**Why change to UI Tests?**
-
-- UI Automation is deprecated
-- UI Tests will evolve and support even more features in the future
-- UI Tests are much easier to debug
-- UI Tests are written in Swift or Objective C
-- UI Tests can be executed in a much cleaner and better way
-
 -------
 <p align="center">
     <a href="#features">Features</a> &bull;
