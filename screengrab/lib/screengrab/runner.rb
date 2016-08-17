@@ -312,7 +312,7 @@ module Screengrab
       unless @config[:skip_open_summary]
         UI.message "Opening screenshots summary"
         # MCF: this isn't OK on any platform except Mac
-        @executor.execute(command: "open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
+        @executor.execute(command: "open #{@config[:output_directory]}/screengrab/*/images/#{device_type_dir_name}/*.png",
                           print_all: false,
                           print_command: true)
       end
