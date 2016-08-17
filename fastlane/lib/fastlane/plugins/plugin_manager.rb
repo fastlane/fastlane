@@ -293,7 +293,8 @@ module Fastlane
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
 
-      print_plugin_information(self.plugin_references) unless self.plugin_references.empty?
+      # We want to avoid printing output other than the version number if we are running `fastlane -v`
+      print_plugin_information(self.plugin_references) unless self.plugin_references.empty? || ARGV.include?('-v')
     end
 
     # Prints a table all the plugins that were loaded
