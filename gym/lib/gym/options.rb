@@ -195,7 +195,45 @@ module Gym
                                      env_name: "SUPPRESS_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build output",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_test_format,
+                                     env_name: "XCPRETTY_TEST_FORMAT",
+                                     description: "Use the test (RSpec style) format for build output",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_formatter,
+                                     env_name: "XCPRETTY_FORMATTER",
+                                     description: "A custom xcpretty formatter to use",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Formatter file not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_junit,
+                                     env_name: "XCPRETTY_REPORT_JUNIT",
+                                     description: "Have xcpretty create a JUnit-style XML report at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_html,
+                                     env_name: "XCPRETTY_REPORT_HTML",
+                                     description: "Have xcpretty create a simple HTML report at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_json,
+                                     env_name: "XCPRETTY_REPORT_JSON",
+                                     description: "Have xcpretty create a JSON compilation database at the provided path",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end)
       ]
     end
   end
