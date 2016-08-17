@@ -39,112 +39,103 @@ module Scan
       Scan.config[:derived_data_path] = default_path
     end
 
-    def self.filter_simulators(simulators, operator = :greater_than_or_equal, deployment_target)
+    def self.filter_simulators(simulators, deployment_target)
+      # Filter out any simulators that are not the same major and minor version of our deployment target
       deployment_target_version = Gem::Version.new(deployment_target)
       simulators.select do |s|
-        sim_version = Gem::Version.new(s.os_version)
-        if operator == :greater_than_or_equal
-          sim_version >= deployment_target_version
-        elsif operator == :equal
-          sim_version == deployment_target_version
-        else
-          false # fail gracefully, I guess?
-        end
+        sim_version = Gem::Version.new(s.ios_version)
+        (sim_version >= deployment_target_version)
       end
-    end
-
-    def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
-      # %r{
-      #   \s # a whitespace character
-      #   (?= # followed by -- using lookahead
-      #   \( # open parenthesis
-      #   [\d\.]+ # our version -- one or more digits or full stops
-      #   \) # close parenthesis
-      #   $ # end of line
-      #   ) # end of lookahead
-      # }
-      /\s(?=\([\d\.]+\)$)/
     end
 
     def self.default_device_ios
-      # An iPhone 5s is a reasonably small and useful default for tests
-      default_device('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
-    end
-
-    def self.default_device_tvos
-      default_device('tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
-    end
-
-    def self.default_device(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
-      require 'set'
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      found_devices = []
+      xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
 
-      deployment_target_version = Scan.project.build_settings(key: deployment_target_key)
+      if devices.any?
+        # Optionally, we only do this if the user specified a custom device or an array of devices
+        devices.each do |device|
+          lookup_device = device.to_s.strip
+          has_version = lookup_device.include?(xcode_target) || lookup_device.include?('(')
+          lookup_device = lookup_device.tr('()', '') # Remove parenthesis
+          # Default to Xcode target version if no device version is specified.
+          lookup_device = lookup_device + " " + xcode_target unless has_version
 
-      simulators = filter_simulators(
-        FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
-          UI.user_error!(
-            ['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' ')
-          ) if array.empty?
-        end,
-        :greater_than_or_equal,
-        deployment_target_version
-      ).tap do |sims|
-        UI.error("No simulators found that are greater than or equal to the version " \
-        "of deployment target (#{deployment_target_version})") if sims.empty?
-      end
+          found = FastlaneCore::Simulator.all.detect do |d|
+            (d.name + " " + d.ios_version).include? lookup_device
+          end
 
-      matches = lambda do
-        set_of_simulators = devices.inject(
-          Set.new # of simulators
-        ) do |set, device_string|
-          pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
-
-          selector = ->(sim) { pieces.count > 0 && sim.name == pieces.first }
-
-          set + (
-            if pieces.count == 0
-              [] # empty array
-            elsif pieces.count == 1
-              simulators
-                .select(&selector)
-                .reverse # more efficient, because `simctl` prints higher versions first
-                .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-                .pop(1)
-            else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
-              version = pieces[1].tr('()', '')
-              potential_emptiness_error = lambda do |sims|
-                UI.error("No simulators found that are equal to the version " \
-                "of specifier (#{version}) and greater than or equal to the version " \
-                "of deployment target (#{deployment_target_version})") if sims.empty?
-              end
-              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
-            end
-          ).tap do |array|
-            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+          if found
+            found_devices.push(found)
+          else
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
           end
         end
 
-        set_of_simulators.to_a
+        if found_devices.any?
+          Scan.devices = found_devices
+          return
+        else
+          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+        end
       end
 
-      default = lambda do
-        UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+      sims = FastlaneCore::Simulator.all
+      sims = filter_simulators(sims, xcode_target)
 
-        Array(
-          simulators
-            .select { |sim| sim.name == default_device_name }
-            .reverse # more efficient, because `simctl` prints higher versions first
-            .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-            .last || simulators.first
-        )
+      # An iPhone 5s is reasonable small and useful for tests
+      found = sims.detect { |d| d.name == "iPhone 5s" }
+      found ||= sims.first # anything is better than nothing
+
+      if found
+        Scan.devices = [found]
+      else
+        UI.user_error!("No simulators found on local machine")
+      end
+    end
+
+    def self.default_device_tvos
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      found_devices = []
+
+      if devices.any?
+        # Optionally, we only do this if the user specified a custom device or an array of devices
+        devices.each do |device|
+          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
+
+          found = FastlaneCore::SimulatorTV.all.detect do |d|
+            (d.name + " " + d.os_version).include? lookup_device
+          end
+
+          if found
+            found_devices.push(found)
+          else
+            UI.error("Ignoring '#{device}', couldn't find matching simulator")
+          end
+        end
+
+        if found_devices.any?
+          Scan.devices = found_devices
+          return
+        else
+          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+        end
       end
 
-      # grab the first unempty evaluated array
-      Scan.devices = [matches, default].lazy.map { |x|
-        arr = x.call
-        arr unless arr.empty?
-      }.reject(&:nil?).first
+      sims = FastlaneCore::SimulatorTV.all
+      xcode_target = Scan.project.build_settings(key: "TVOS_DEPLOYMENT_TARGET")
+      sims = filter_simulators(sims, xcode_target)
+
+      # Apple TV 1080p is useful for tests
+      found = sims.detect { |d| d.name == "Apple TV 1080p" }
+      found ||= sims.first # anything is better than nothing
+
+      if found
+        Scan.devices = [found]
+      else
+        UI.user_error!("No TV simulators found on the local machine")
+      end
     end
 
     def self.min_xcode8?
