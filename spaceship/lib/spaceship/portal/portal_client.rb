@@ -151,8 +151,7 @@ module Spaceship
                      when :explicit
                        {
                          type: 'explicit',
-                         explicitIdentifier: bundle_id,
-                         appIdentifierString: bundle_id,
+                         identifier: bundle_id,
                          push: 'on',
                          inAppPurchase: 'on',
                          gameCenter: 'on'
@@ -160,13 +159,12 @@ module Spaceship
                      when :wildcard
                        {
                          type: 'wildcard',
-                         wildcardIdentifier: bundle_id,
-                         appIdentifierString: bundle_id
+                         identifier: bundle_id
                        }
                      end
 
       params = {
-        appIdName: name,
+        name: name,
         teamId: team_id
       }
 
