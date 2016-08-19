@@ -31,7 +31,7 @@ module Fastlane
 
         # Keychain
         if params[:unlock_keychain] && params[:keychain_path]
-          keychain_path = File.expand_path(params[:keychain_path])
+          keychain_path = params[:keychain_path]
           UI.message "Unlocking keychain: \"#{keychain_path}\"."
           Actions::UnlockKeychainAction.run(
             path: keychain_path,
