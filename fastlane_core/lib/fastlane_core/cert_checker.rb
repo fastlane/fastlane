@@ -33,7 +33,7 @@ module FastlaneCore
       available.split("\n").each do |current|
         next if current.include? "REVOKED"
         begin
-          (ids << current.match(/.*\) (.*) \".*/)[1])
+          (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
         rescue
           # the last line does not match
         end
