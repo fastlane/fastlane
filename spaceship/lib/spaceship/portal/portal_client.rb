@@ -171,7 +171,6 @@ module Spaceship
       params.merge!(ident_params)
 
       ensure_csrf
-
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
     end
@@ -384,19 +383,17 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    private
-
     def ensure_csrf
       if csrf_tokens.count == 0
         # If we directly create a new resource (e.g. app) without querying anything before
         # we don't have a valid csrf token, that's why we have to do at least one request
-        apps
+        Certificate::Production.all
 
         # Update 18th August 2016
         # For some reason, we have to query the resource twice to actually get a valid csrf_token
         # I couldn't find out why, the first response does have a valid Set-Cookie header
         # But it still needs this second request
-        apps
+        Certificate::Production.all
       end
     end
   end
