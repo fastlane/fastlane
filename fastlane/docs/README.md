@@ -21,6 +21,7 @@
 ### CI Systems
 
 - [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
+- [Circle.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Circle.md) for Circle CI specific help
 - [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
 
 ## Fastfile
