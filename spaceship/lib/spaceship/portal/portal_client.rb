@@ -383,18 +383,24 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    def ensure_csrf
-      if csrf_tokens.count == 0
-        # If we directly create a new resource (e.g. app) without querying anything before
-        # we don't have a valid csrf token, that's why we have to do at least one request
-        Certificate::Production.all
+    private
 
-        # Update 18th August 2016
-        # For some reason, we have to query the resource twice to actually get a valid csrf_token
-        # I couldn't find out why, the first response does have a valid Set-Cookie header
-        # But it still needs this second request
-        Certificate::Production.all
-      end
+    def ensure_csrf
+      # It's important we store this state here
+      # as we always want to request something at least once
+      return unless @requested_csrf_token.nil?
+
+      # If we directly create a new resource (e.g. app) without querying anything before
+      # we don't have a valid csrf token, that's why we have to do at least one request
+      Certificate::Production.all
+
+      # Update 18th August 2016
+      # For some reason, we have to query the resource twice to actually get a valid csrf_token
+      # I couldn't find out why, the first response does have a valid Set-Cookie header
+      # But it still needs this second request
+      Certificate::Production.all
+
+      @requested_csrf_token = true if csrf_tokens.count > 0
     end
   end
 end
