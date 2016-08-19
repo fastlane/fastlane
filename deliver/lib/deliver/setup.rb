@@ -15,7 +15,7 @@ module Deliver
 
         # Add a README to the screenshots folder
         FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
-        File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Helper.gem_path('deliver')}/lib/assets/ScreenshotsHelp"))
+        File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
@@ -28,8 +28,7 @@ module Deliver
       generate_metadata_files(v, File.join(deliver_path, 'metadata'))
 
       # Generate the final Deliverfile here
-      gem_path = Helper.gem_path('deliver')
-      deliver = File.read("#{gem_path}/lib/assets/DeliverfileDefault")
+      deliver = File.read("#{Deliver::ROOT}/lib/assets/DeliverfileDefault")
       deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
       deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
       return deliver
