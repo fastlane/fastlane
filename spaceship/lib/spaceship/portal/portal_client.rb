@@ -125,6 +125,8 @@ module Spaceship
     end
 
     def update_service_for_app(app, service)
+      ensure_csrf
+
       request(:post, service.service_uri, {
         teamId: team_id,
         displayId: app.app_id,
@@ -136,6 +138,8 @@ module Spaceship
     end
 
     def associate_groups_with_app(app, groups)
+      ensure_csrf
+
       request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
         teamId: team_id,
         appIdId: app.app_id,
@@ -246,6 +250,8 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id, mac: false)
+      ensure_csrf
+
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
         r.params = {
