@@ -370,6 +370,8 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
+      ensure_csrf
+
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id,
