@@ -2,7 +2,7 @@ require 'deliver/detect_values'
 
 describe Deliver::DetectValues do
   let(:value_detector) { Deliver::DetectValues.new }
-  
+
   describe :find_folders do
     describe 'when folders are not specified in options' do
       let(:options) { { screenshots_path: nil, metadata_path: nil } }
@@ -11,7 +11,7 @@ describe Deliver::DetectValues do
         before do
           allow(FastlaneCore::Helper).to receive(:fastlane_enabled?).and_return(true)
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
-          
+
           value_detector.find_folders(options)
         end
 
@@ -27,7 +27,7 @@ describe Deliver::DetectValues do
       describe 'running without fastlane' do
         before do
           allow(FastlaneCore::Helper).to receive(:fastlane_enabled?).and_return(false)
-          
+
           value_detector.find_folders(options)
         end
 
@@ -45,8 +45,8 @@ describe Deliver::DetectValues do
       let(:options) { { screenshots_path: './screenshots', metadata_path: './metadata' } }
 
       it 'keeps the specified screenshots folder' do
-          expect(options[:screenshots_path]).to eq('./screenshots')
-        end
+        expect(options[:screenshots_path]).to eq('./screenshots')
+      end
 
       it 'keeps the specified metadata folder' do
         expect(options[:metadata_path]).to eq('./metadata')
