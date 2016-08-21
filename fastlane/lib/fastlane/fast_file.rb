@@ -34,7 +34,7 @@ module Fastlane
     def parse(data, path = nil)
       @runner ||= Runner.new
 
-      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+      Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         # create nice path that we want to print in case of some problem
         relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
 

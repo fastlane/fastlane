@@ -25,7 +25,7 @@ module Fastlane
                                                         @ui)
       info_collector.collect_info_into(@beta_info)
 
-      if FastlaneFolder.setup?
+      if FastlaneCore::FastlaneFolder.setup?
         @ui.message ""
         @ui.header('Copy and paste the following lane into your Fastfile to use Crashlytics Beta!')
         @ui.message ""

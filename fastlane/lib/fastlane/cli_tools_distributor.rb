@@ -23,7 +23,7 @@ module Fastlane
         # the available lanes. This way it's much faster, which
         # is very important in this case, since it will be executed
         # every time one of the tools is launched
-        available_lanes = Fastlane::FastlaneFolder.available_lanes
+        available_lanes = FastlaneCore::FastlaneFolder.available_lanes
 
         tool_name = ARGV.first ? ARGV.first.downcase : nil
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)

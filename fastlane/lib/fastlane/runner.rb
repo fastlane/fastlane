@@ -39,7 +39,7 @@ module Fastlane
 
       return_val = nil
 
-      path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
