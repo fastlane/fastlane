@@ -8,8 +8,7 @@ module Screengrab
         UI.user_error!("Screengrabfile already exists at path '#{screengrabfile_path}'. Run 'screengrab' to use screengrab.")
       end
 
-      gem_path = Helper.gem_path("screengrab")
-      File.write(screengrabfile_path, File.read("#{gem_path}/lib/assets/ScreengrabfileTemplate"))
+      File.write(screengrabfile_path, File.read("#{Screengrab::ROOT}/lib/assets/ScreengrabfileTemplate"))
 
       UI.success("Successfully created new Screengrabfile at '#{screengrabfile_path}'")
     end
