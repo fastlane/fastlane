@@ -122,7 +122,7 @@ module Match
 
     # Copies the README.md into the git repo
     def self.copy_readme(directory)
-      template = File.read("#{Helper.gem_path('match')}/lib/assets/READMETemplate.md")
+      template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
       File.write(File.join(directory, "README.md"), template)
     end
   end
