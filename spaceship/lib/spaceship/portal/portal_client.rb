@@ -310,6 +310,8 @@ module Spaceship
     end
 
     def revoke_certificate!(certificate_id, type, mac: false)
+      ensure_csrf
+
       r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
         teamId: team_id,
         certificateId: certificate_id,
