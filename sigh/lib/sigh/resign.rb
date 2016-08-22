@@ -82,7 +82,7 @@ module Sigh
     end
 
     def find_resign_path
-      File.join(Helper.gem_path('sigh'), 'lib', 'assets', 'resign.sh')
+      File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
     end
 
     def find_ipa
