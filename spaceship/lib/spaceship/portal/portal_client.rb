@@ -208,6 +208,8 @@ module Spaceship
     end
 
     def create_app_group!(name, group_id)
+      ensure_csrf
+
       r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
         name: name,
         identifier: group_id,
@@ -217,6 +219,8 @@ module Spaceship
     end
 
     def delete_app_group!(app_group_id)
+      ensure_csrf
+
       r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
         teamId: team_id,
         applicationGroup: app_group_id
@@ -314,6 +318,8 @@ module Spaceship
     end
 
     def revoke_certificate!(certificate_id, type, mac: false)
+      ensure_csrf
+
       r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
         teamId: team_id,
         certificateId: certificate_id,
