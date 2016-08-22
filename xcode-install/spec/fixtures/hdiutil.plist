@@ -1,0 +1,31 @@
+<plist version="1.0">
+<dict>
+  <key>system-entities</key>
+  <array>
+    <dict>
+      <key>content-hint</key>
+      <string>GUID_partition_scheme</string>
+      <key>dev-entry</key>
+      <string>/dev/disk2</string>
+      <key>potentially-mountable</key>
+      <false/>
+      <key>unmapped-content-hint</key>
+      <string>GUID_partition_scheme</string>
+    </dict>
+    <dict>
+      <key>content-hint</key>
+      <string>Apple_HFS</string>
+      <key>dev-entry</key>
+      <string>/dev/disk2s1</string>
+      <key>mount-point</key>
+      <string>/Volumes/XcodeME</string>
+      <key>potentially-mountable</key>
+      <true/>
+      <key>unmapped-content-hint</key>
+      <string>48465300-0000-11AA-AA11-00306543ECAC</string>
+      <key>volume-kind</key>
+      <string>hfs</string>
+    </dict>
+  </array>
+</dict>
+</plist>

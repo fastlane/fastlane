@@ -1,0 +1,21 @@
+inherit_from: .rubocop_todo.yml
+
+Metrics/LineLength:
+  Max: 215
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FileName:
+  Exclude:
+    - bin/🎉
+    - bin/xcode-install
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Lint/Void:
+  Enabled: false
