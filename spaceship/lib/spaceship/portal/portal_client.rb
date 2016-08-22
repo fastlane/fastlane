@@ -64,6 +64,10 @@ module Spaceship
       if teams.count > 1
         puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
       end
+
+      if teams.count == 0
+        raise "User '#{user}' does not have access to any teams with an active membership"
+      end
       @current_team_id ||= teams[0]['teamId']
     end
 
