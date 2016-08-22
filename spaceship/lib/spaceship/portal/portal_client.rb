@@ -204,6 +204,8 @@ module Spaceship
     end
 
     def create_app_group!(name, group_id)
+      ensure_csrf
+
       r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
         name: name,
         identifier: group_id,
@@ -213,6 +215,8 @@ module Spaceship
     end
 
     def delete_app_group!(app_group_id)
+      ensure_csrf
+
       r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
         teamId: team_id,
         applicationGroup: app_group_id
