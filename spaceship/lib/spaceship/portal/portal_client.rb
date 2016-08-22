@@ -155,6 +155,9 @@ module Spaceship
     end
 
     def create_app!(type, name, bundle_id, mac: false)
+      # We moved the ensure_csrf to the top of this method
+      # as we got some users with issues around creating new apps
+      # https://github.com/fastlane/fastlane/issues/5813
       ensure_csrf
 
       ident_params = case type.to_sym
