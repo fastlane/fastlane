@@ -50,7 +50,7 @@ module XcodeInstall
 
     def download(version, progress, url = nil)
       return unless url || exist?(version)
-      xcode = seedlist.find { |x| x.name == version } unless url
+      xcode = seedlist.detect { |x| x.name == version } unless url
       dmg_file = Pathname.new(File.basename(url || xcode.path))
 
       result = Curl.new.fetch(url || xcode.url, CACHE_DIR, url ? nil : spaceship.cookie, dmg_file, progress)
@@ -130,7 +130,7 @@ HELP
 
     def open_release_notes_url(version)
       return if version.nil?
-      xcode = seedlist.find { |x| x.name == version }
+      xcode = seedlist.detect { |x| x.name == version }
       `open #{xcode.release_notes_url}` unless xcode.nil? || xcode.release_notes_url.nil?
     end
 
@@ -155,7 +155,7 @@ HELP
     end
 
     def symlink(version)
-      xcode = installed_versions.find { |x| x.version == version }
+      xcode = installed_versions.detect { |x| x.version == version }
       `sudo rm -f #{SYMLINK_PATH}` unless current_symlink.nil?
       `sudo ln -sf #{xcode.path} #{SYMLINK_PATH}` unless xcode.nil? || SYMLINK_PATH.exist?
     end
@@ -343,8 +343,8 @@ HELP
     end
 
     def xcode
-      Installer.new.installed_versions.find do |x|
-        x.available_simulators.find do |s|
+      Installer.new.installed_versions.detect do |x|
+        x.available_simulators.detect do |s|
           s.version == version
         end
       end

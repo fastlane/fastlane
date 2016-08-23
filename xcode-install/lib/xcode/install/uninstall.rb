@@ -22,7 +22,7 @@ module XcodeInstall
       end
 
       def run
-        installed_path = @installer.installed_versions.find { |x| x.version == @version }
+        installed_path = @installer.installed_versions.detect { |x| x.version == @version }
         return if installed_path.nil? || installed_path.path.nil?
 
         `sudo rm -rf #{installed_path.path}`
