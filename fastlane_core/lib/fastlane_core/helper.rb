@@ -140,8 +140,13 @@ module FastlaneCore
       @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
+    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
+    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    #
     # Path to the installed gem to load resources (e.g. resign.sh)
     def self.gem_path(gem_name)
+      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
+
       if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else

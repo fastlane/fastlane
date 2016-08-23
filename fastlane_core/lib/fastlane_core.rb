@@ -34,4 +34,5 @@ require 'commander'
 require 'fastlane_core/ui/fastlane_runner' # monkey patch
 
 module FastlaneCore
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 end
