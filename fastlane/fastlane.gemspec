@@ -59,7 +59,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
 
   # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
-  spec.add_dependency 'activesupport', '< 5'
+  spec.add_dependency 'activesupport', '< 5' if RUBY_VERSION < "2.2.2"
 
   # Development only
   spec.add_development_dependency 'rake'
