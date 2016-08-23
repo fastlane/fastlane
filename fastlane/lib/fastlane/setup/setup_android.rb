@@ -31,7 +31,7 @@ module Fastlane
       puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/fastlane/tree/master/supply#setup".yellow
       json_key_file = ask('Path to the json secret file: '.yellow)
 
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplateAndroid")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplateAndroid")
       template.gsub!('[[JSON_KEY_FILE]]', json_key_file)
       template.gsub!('[[PACKAGE_NAME]]', package_name)
       path = File.join(folder, 'Appfile')
@@ -40,7 +40,7 @@ module Fastlane
     end
 
     def generate_fastfile
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplateAndroid")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/FastfileTemplateAndroid")
 
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 

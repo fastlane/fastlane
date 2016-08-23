@@ -26,8 +26,7 @@ module Fastlane
     def self.update_md_file!
       @plugins = fetch_gems
 
-      lib_path = FastlaneCore::Helper.gem_path('fastlane')
-      template_path = File.join(lib_path, "lib/assets/AvailablePlugins.md.erb")
+      template_path = File.join(Fastlane::ROOT, "lib/assets/AvailablePlugins.md.erb")
       md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       puts md

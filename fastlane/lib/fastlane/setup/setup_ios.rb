@@ -156,7 +156,7 @@ module Fastlane
     end
 
     def generate_appfile(manually: false)
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplate")
       if manually
         ask_for_app_identifier
         ask_for_apple_id
@@ -233,7 +233,7 @@ module Fastlane
     def generate_fastfile(manually: false)
       scheme = self.project.schemes.first unless manually
 
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate")
 
       scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
       if scheme.length > 0
