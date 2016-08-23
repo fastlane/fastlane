@@ -16,8 +16,8 @@ module XcodeInstall
       installer = Installer.new
 
       seedlist = installer.send(:parse_seedlist, JSON.parse(fixture))
-      installer.stubs(:installed_versions).returns([])
-      installer.stubs(:xcodes).returns(seedlist)
+      installer.stub(:installed_versions).and_return([])
+      installer.stub(:xcodes).and_return(seedlist)
 
       expect(installer.list).to be == "6.1\n6.1.1\n6.2"
     end

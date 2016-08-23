@@ -8,22 +8,22 @@ module XcodeInstall
 
     def parse_prereleases(date)
       fixture = fixture(date)
-      @result.stubs(:body).returns(fixture)
+      @result.stub(:body).and_return(fixture)
 
       installer = Installer.new
       installer.send(:prereleases)
     end
 
     before do
-      devcenter = mock
-      devcenter.stubs(:download_file).returns(nil)
-      Installer.any_instance.stubs(:devcenter).returns(devcenter)
+      devcenter = double
+      devcenter.stub(:download_file).and_return(nil)
+      Installer.any_instance.stub(:devcenter).and_return(devcenter)
 
-      @result = mock
-      @result.stubs(:body).returns(nil)
-      client = mock
-      client.stubs(:request).returns(@result)
-      Spaceship::PortalClient.stubs(:login).returns(client)
+      @result = double
+      @result.stub(:body).and_return(nil)
+      client = double
+      client.stub(:request).and_return(@result)
+      Spaceship::PortalClient.stub(:login).and_return(client)
     end
 
     it 'can parse prereleases from 20150414' do

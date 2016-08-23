@@ -11,3 +11,5 @@ ENV['DELIVER_PASSWORD'] = '12345password'
 
 require 'bundler/setup'
 require 'xcode/install'
+
+RSpec::Mocks.configuration.syntax = :should

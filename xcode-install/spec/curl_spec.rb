@@ -20,7 +20,7 @@ module XcodeInstall
       XcodeInstall.silence_stderr do
         result = curl.fetch('http://0.0.0.0/test')
       end
-      result.should == false
+      expect(result).to eq(false)
     end
   end
 end
