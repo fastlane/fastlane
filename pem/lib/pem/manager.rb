@@ -37,7 +37,6 @@ module PEM
         UI.message "Successfully logged in"
       end
 
-      # rubocop:disable Metrics/AbcSize
       def create_certificate
         UI.important "Creating a new push certificate for app '#{PEM.config[:app_identifier]}'."
 
@@ -60,27 +59,27 @@ module PEM
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
+        output_path = PEM.config[:output_path]
+        FileUtils.mkdir_p(File.expand_path(output_path))
+
         if PEM.config[:save_private_key]
-          private_key_path = File.join(PEM.config[:output_path], "#{filename_base}.pkey")
+          private_key_path = File.join(output_path, "#{filename_base}.pkey")
           File.write(private_key_path, pkey.to_pem)
           UI.message("Private key: ".green + Pathname.new(private_key_path).realpath.to_s)
         end
 
         if PEM.config[:generate_p12]
-          output_path = PEM.config[:output_path]
-          FileUtils.mkdir_p(File.expand_path(output_path))
           p12_cert_path = File.join(output_path, "#{filename_base}.p12")
           p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
           File.write(p12_cert_path, p12.to_der)
           UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
         end
 
-        x509_cert_path = File.join(PEM.config[:output_path], "#{filename_base}.pem")
+        x509_cert_path = File.join(output_path, "#{filename_base}.pem")
         File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
         UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
         return x509_cert_path
       end
-      # rubocop:enable Metrics/AbcSize
 
       def certificate
         if PEM.config[:development]

@@ -38,7 +38,7 @@ match
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-`match` is the implementation of the https://codesigning.guide concept. `match` creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. `match` also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams"
+`match` is the implementation of the https://codesigning.guide concept. `match` creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. `match` also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
 
@@ -258,6 +258,25 @@ gym
 ...
 ```
 
+##### Registering new devices
+
+By using `match`, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use `match` in combination with the [`register_devices`](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#register_devices) action.
+
+```ruby
+lane :beta do
+  register_devices(devices_file: "./devices.txt")
+  match(type: "adhoc", force_for_new_devices: true)
+end
+```
+
+By using the `force_for_new_devices` parameter, `match` will check if the device count has changed since the last time you ran `match`, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
+
+If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
+
+```
+match adhoc --force_for_new_devices
+```
+
 ##### Multiple Targets
 
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
@@ -360,7 +379,7 @@ What's the worst that could happen for each of the profile types?
 
 ##### App Store Profiles
 
-An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review (which takes around 7 days). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
+An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
 
 ##### Development and Ad Hoc Profiles
 

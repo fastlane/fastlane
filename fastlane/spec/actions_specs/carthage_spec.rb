@@ -263,6 +263,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --platform iOS")
       end
 
+      it "sets the platform to (downcase) ios" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              platform: 'ios'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --platform ios")
+      end
+
       it "sets the platform to Mac" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -323,6 +333,16 @@ describe Fastlane do
         end.to raise_error("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
       end
 
+      it "sets the toolchain to Swift_2_3" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              toolchain: 'com.apple.dt.toolchain.Swift_2_3'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --toolchain com.apple.dt.toolchain.Swift_2_3")
+      end
+
       it "use custom derived data" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -332,6 +352,30 @@ describe Fastlane do
 
         expect(result).to \
           eq("carthage bootstrap --derived-data ../derived\\ data")
+      end
+
+      it "updates with a single dependency" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'update',
+              dependencies: ['TestDependency']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage update TestDependency")
+      end
+
+      it "updates with multiple dependencies" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'update',
+              dependencies: ['TestDependency1', 'TestDependency2']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage update TestDependency1 TestDependency2")
       end
 
       it "works with no parameters" do

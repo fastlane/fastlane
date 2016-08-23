@@ -2,9 +2,13 @@ module Fastlane
   module Helper
     class CrashlyticsHelper
       class << self
+        def discover_default_crashlytics_path
+          Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+        end
+
         def generate_ios_command(params)
           unless params[:crashlytics_path]
-            params[:crashlytics_path] = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+            params[:crashlytics_path] = discover_default_crashlytics_path
           end
 
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]

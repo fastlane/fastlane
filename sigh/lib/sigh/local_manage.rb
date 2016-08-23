@@ -41,7 +41,6 @@ module Sigh
       return command, clean_expired, clean_pattern, force
     end
 
-    # rubocop:disable Metrics/AbcSize
     def self.list_profiles
       profiles = load_profiles
 
@@ -84,7 +83,6 @@ module Sigh
 
       UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
     end
-    # rubocop:enable Metrics/AbcSize
 
     def self.profile_info(profile)
       if $verbose

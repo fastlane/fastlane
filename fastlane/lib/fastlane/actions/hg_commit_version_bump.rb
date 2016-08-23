@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     # Commits version bump.
@@ -155,4 +154,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

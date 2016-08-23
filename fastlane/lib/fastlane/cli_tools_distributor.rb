@@ -4,12 +4,17 @@ module Fastlane
   # tool or fastlane itself
   class CLIToolsDistributor
     class << self
+      def running_version_command?
+        ARGV.include?('-v') || ARGV.include?('--version')
+      end
+
       def take_off
         before_import_time = Time.now
 
         require "fastlane" # this might take a long time if there is no Gemfile :(
 
-        if Time.now - before_import_time > 3
+        # We want to avoid printing output other than the version number if we are running `fastlane -v`
+        if Time.now - before_import_time > 3 && !running_version_command?
           print_slow_fastlane_warning
         end
 

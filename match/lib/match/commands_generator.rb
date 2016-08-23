@@ -14,8 +14,6 @@ module Match
       FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
     end
 
-    # rubocop:disable Metrics/MethodLength
-    # rubocop:disable Metrics/AbcSize
     def run
       program :version, Match::VERSION
       program :description, Match::DESCRIPTION
@@ -120,7 +118,5 @@ module Match
 
       run!
     end
-    # rubocop:enable Metrics/MethodLength
-    # rubocop:enable Metrics/AbcSize
   end
 end

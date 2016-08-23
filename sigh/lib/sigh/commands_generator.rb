@@ -13,7 +13,6 @@ module Sigh
       FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Sigh::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
@@ -96,7 +95,6 @@ module Sigh
 
       run!
     end
-    # rubocop:enable Metrics/MethodLength
 
     def multiple_values_option_proc(command, name)
       proc do |value|

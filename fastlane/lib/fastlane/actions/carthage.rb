@@ -5,6 +5,11 @@ module Fastlane
         cmd = ["carthage"]
 
         cmd << params[:command]
+
+        if params[:command] == "update" && params[:dependencies].count > 0
+          cmd.concat params[:dependencies]
+        end
+
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
@@ -14,6 +19,7 @@ module Fastlane
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
+        cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
 
         Actions.sh(cmd.join(' '))
       end
@@ -39,6 +45,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
                                        end),
+          FastlaneCore::ConfigItem.new(key: :dependencies,
+                                       description: "Carthage dependencies to update",
+                                       default_value: [],
+                                       is_string: false,
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :use_ssh,
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
@@ -97,7 +108,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          value.split(',').each do |platform|
-                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.include? platform
+                                           UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.map(&:downcase).include?(platform.downcase)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :configuration,
@@ -108,7 +119,11 @@ module Fastlane
                                          if value.chomp(' ').empty?
                                            UI.user_error!("Please pass a valid build configuration. You can review the list of configurations for this project using the command: xcodebuild -list")
                                          end
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :toolchain,
+                                       env_name: "FL_CARTHAGE_TOOLCHAIN",
+                                       description: "Define which xcodebuild toolchain to use when building",
+                                       optional: true)
         ]
       end
 
@@ -117,7 +132,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton"]
       end
     end
   end

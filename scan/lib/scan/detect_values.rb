@@ -24,7 +24,19 @@ module Scan
       default_device_tvos if Scan.project.tvos?
       detect_destination
 
+      default_derived_data
+
       return config
+    end
+
+    def self.default_derived_data
+      return unless Scan.config[:derived_data_path].to_s.empty?
+      default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
+      # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
+      # We got 3 folders up to point to ".../DerivedData/app-[random_chars]/"
+      default_path = File.expand_path("../../..", default_path)
+      UI.verbose("Detected derived data path '#{default_path}'")
+      Scan.config[:derived_data_path] = default_path
     end
 
     def self.filter_simulators(simulators, deployment_target)
@@ -39,11 +51,16 @@ module Scan
     def self.default_device_ios
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       found_devices = []
+      xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
 
       if devices.any?
         # Optionally, we only do this if the user specified a custom device or an array of devices
         devices.each do |device|
-          lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
+          lookup_device = device.to_s.strip
+          has_version = lookup_device.include?(xcode_target) || lookup_device.include?('(')
+          lookup_device = lookup_device.tr('()', '') # Remove parenthesis
+          # Default to Xcode target version if no device version is specified.
+          lookup_device = lookup_device + " " + xcode_target unless has_version
 
           found = FastlaneCore::Simulator.all.detect do |d|
             (d.name + " " + d.ios_version).include? lookup_device
@@ -65,7 +82,6 @@ module Scan
       end
 
       sims = FastlaneCore::Simulator.all
-      xcode_target = Scan.project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")
       sims = filter_simulators(sims, xcode_target)
 
       # An iPhone 5s is reasonable small and useful for tests
@@ -89,7 +105,7 @@ module Scan
           lookup_device = device.to_s.strip.tr('()', '') # Remove parenthesis
 
           found = FastlaneCore::SimulatorTV.all.detect do |d|
-            (d.name + " " + d.tvos_version).include? lookup_device
+            (d.name + " " + d.os_version).include? lookup_device
           end
 
           if found

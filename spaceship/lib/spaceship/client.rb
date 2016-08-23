@@ -284,7 +284,6 @@ module Spaceship
 
       # get woinst, wois, and itctx cookie values
       request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa")
 
       case response.status
       when 403
@@ -401,7 +400,8 @@ module Spaceship
     end
 
     def log_response(method, url, response)
-      logger.debug("<< #{method.upcase}: #{url}: #{response.body}")
+      body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
+      logger.debug("<< #{method.upcase}: #{url}: #{body}")
     end
 
     # Actually sends the request to the remote server

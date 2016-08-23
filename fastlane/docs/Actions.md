@@ -1,7 +1,5 @@
 # Actions
 
-There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
-
 To get the most up-to-date information from the command line on your current version you can also run:
 
 ```sh
@@ -55,15 +53,17 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"     # One of: build, bootstrap, update, archive. (default: bootstrap)
-  use_ssh: false,          # Use SSH for downloading GitHub repositories.
-  use_submodules: false,   # Add dependencies as Git submodules.
-  use_binaries: true,      # Check out dependency repositories even when prebuilt frameworks exist
-  no_build: false,         # When bootstrapping Carthage do not build
-  no_skip_current: false,  # Don't skip building the current project (only for frameworks)
-  verbose: false,          # Print xcodebuild output inline
-  platform: "all",         # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
-  configuration: "Release" # Build configuration to use when building
+  command: "bootstrap"                            # One of: build, bootstrap, update, archive. (default: bootstrap)
+  dependencies: ['Alamofire', 'Notice'],          # Specify which dependencies to update (only for the update command)
+  use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
+  use_submodules: false,                          # Add dependencies as Git submodules.
+  use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,                                # When bootstrapping Carthage do not build
+  no_skip_current: false,                         # Don't skip building the current project (only for frameworks)
+  verbose: false,                                 # Print xcodebuild output inline
+  platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, 'tvOS', or comma-separated values of the formers except for ‘all’)
+  configuration: "Release",                       # Build configuration to use when building
+  toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
 )
 ```
 
@@ -326,7 +326,7 @@ resign(
 )
 ```
 
-You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.
+You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisioning profile strings or a hash that associates provisioning profile values to bundle identifier keys.
 
 ```ruby
 resign(
@@ -1590,6 +1590,17 @@ git_branch
 ```
 
 
+### git_tag_exists
+
+Checks whether the given tag exists in the repo
+
+```ruby
+if git_tag_exists(tag: "1.1.0")
+  UI.message("Found it 🚀")
+end
+```
+
+
 ### git_add
 
 To simply add one file before commit use
@@ -1740,7 +1751,7 @@ reset_git_repo
 reset_git_repo(force: true) # If you don't care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!
 reset_git_repo(skip_clean: true) # If you want 'git clean' to be skipped, thus NOT deleting untracked files like '.env'. Optional, defaults to false.
 
-# You can also specify a list of files that should be resetted.
+# You can also specify a list of files that should be reset.
 reset_git_repo(
   force: true,
   files: [
@@ -1781,7 +1792,10 @@ Get information about the last git commit, returns the commit hash, the abbrevia
 
 ```ruby
 commit = last_git_commit
-crashlytics(notes: commit[:message])
+crashlytics(notes: commit[:message]) # message of commit
+author = commit[:author] # author of the commit
+hash = commit[:commit_hash] # long sha of commit
+short_hash = commit[:abbreviated_commit_hash] # short sha of commit
 ```
 
 ### create_pull_request
@@ -1871,7 +1885,7 @@ slack(
     'Built by' => 'Jenkins',
   },
   default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads. Don't add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`.
-  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existings fields that were created using the `payload` property for instance.
+  attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments). This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
     thumb_url: 'http://example.com/path/to/thumb.png',
     fields: [{
       title: 'My Field',
@@ -2082,7 +2096,7 @@ It can process unit test results if formatted as junit report as shown in [xctes
 
 ### setup_jenkins
 
-This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will work only if the Fastlane was executed on a CI system.
+This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory. The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system.
 
 ```ruby
 setup_jenkins
@@ -2548,7 +2562,7 @@ Compress a file or directory
 ```ruby
 zip(path: "MyApp.app")
 
-zip(path: "MyApp.app", output_name: "Latest.app.zip")
+zip(path: "MyApp.app", output_path: "Latest.app.zip")
 ```
 
 ### ifttt

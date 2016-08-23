@@ -47,9 +47,13 @@ Style/SpecialGlobalVars:
   Enabled: false
 
 Metrics/AbcSize:
-  Max: 60
-  Exclude:
-    - '**/lib/*/options.rb'
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
 
 # The %w might be confusing for new users
 Style/WordArray:
@@ -75,8 +79,6 @@ Style/AndOr:
 Metrics/ClassLength:
   Max: 320
 
-Metrics/CyclomaticComplexity:
-  Max: 17
 
 # Configuration parameters: AllowURI, URISchemes.
 Metrics/LineLength:
@@ -130,13 +132,6 @@ Style/PerlBackrefs:
 Style/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
-
-Metrics/MethodLength:
-  Exclude:
-    - '**/lib/fastlane/actions/*.rb'
-    - '**/bin/fastlane'
-    - '**/lib/*/options.rb'
-  Max: 60
 
 AllCops:
   Include:

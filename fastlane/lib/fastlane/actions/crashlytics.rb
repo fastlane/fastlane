@@ -54,6 +54,7 @@ module Fastlane
         UI.verbose sanitizer.call(result) if $verbose
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
+        UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
       end
 
       def self.description

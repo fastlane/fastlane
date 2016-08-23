@@ -231,7 +231,7 @@ module Frameit
       results = {}
       words.each do |key|
         # Create empty background
-        empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
+        empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
         title_image.combine_options do |i|

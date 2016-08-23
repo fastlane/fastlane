@@ -36,14 +36,14 @@ module Spaceship
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
       elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
-        puts "Two Fator Authentication for account '#{self.user}' is enabled"
-        handle_two_fator(r)
+        puts "Two Factor Authentication for account '#{self.user}' is enabled"
+        handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
       end
     end
 
-    def handle_two_fator(response)
+    def handle_two_factor(response)
       security_code = response.body["phoneNumberVerification"]["securityCode"]
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,

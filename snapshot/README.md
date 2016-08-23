@@ -53,22 +53,6 @@ More information about [creating perfect screenshots](https://krausefx.com/blog/
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
-### Note: New `snapshot` with UI Tests in Xcode 7
-
-Apple announced a new version of Xcode with support for UI Tests built in right into Xcode. This technology allows `snapshot` to be even better: Instead of dealing with UI Automation Javascript code, you are now be able to write the screenshot code in Swift or Objective C allowing you to use debugging features like breakpoints.
-
-As a result, `snapshot` was completely rewritten from ground up without changing its public API.
-
-Please check out the [MigrationGuide to 1.0](/snapshot/MigrationGuide.md) :+1:
-
-**Why change to UI Tests?**
-
-- UI Automation is deprecated
-- UI Tests will evolve and support even more features in the future
-- UI Tests are much easier to debug
-- UI Tests are written in Swift or Objective C
-- UI Tests can be executed in a much cleaner and better way
-
 -------
 <p align="center">
     <a href="#features">Features</a> &bull;
@@ -126,7 +110,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 # UI Tests
 
 ## Getting started
-This project uses Apple's newly announced UI Tests. I will not go into detail on how to write scripts.
+This project uses Apple's newly announced UI Tests. We will not go into detail on how to write scripts.
 
 Here a few links to get started:
 
@@ -135,8 +119,6 @@ Here a few links to get started:
 - [UI Testing in Xcode 7](http://masilotti.com/ui-testing-xcode-7/)
 - [HSTestingBackchannel : ‘Cheat’ by communicating directly with your app](https://github.com/ConfusedVorlon/HSTestingBackchannel)
 - [Automating App Store screenshots using fastlane snapshot and frameit](https://tisunov.github.io/2015/11/06/automating-app-store-screenshots-generation-with-fastlane-snapshot-and-sketch.html)
-
-**Note**: Since there is no official way to trigger a screenshot from UI Tests, `snapshot` uses a workaround (described in [How Does It Work?](#how-does-it-work)) to trigger a screenshot. If you feel like this should be done right, please duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
 # Quick Start
 
@@ -168,7 +150,9 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 
 ![assets/snapshot.gif](assets/snapshot.gif)
 
-You can take a look at the example project to play around with it.
+You can try the `snapshot` [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
+
+To quick start your UI tests, you can use the UI Test recorder. You only have to interact with the simulator, and Xcode will generate the UI Test code for you. You can find the red record button on the bottom of the screen (more information in [this blog post](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 
 # Usage
 
@@ -325,9 +309,9 @@ The easiest solution would be to just render the UIWindow into a file. That's no
 
 When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occurred during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
 
-When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`.
+When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`. On tvOS, there is no orientation so we ask for a count of app views with type "Browser" (which should never exist on tvOS).
 
-`snapshot` then iterates through all test events and check where we did this weird rotation. Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application.
+`snapshot` then iterates through all test events and check where we either did this weird rotation (on iOS) or searched for browsers (on tvOS). Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application.
 
 In the test output, the Swift `snapshot` function will print out something like this
 

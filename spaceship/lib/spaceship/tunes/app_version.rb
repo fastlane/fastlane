@@ -354,10 +354,11 @@ module Spaceship
       # @param language (String): The language for this screenshot
       # @param device (string): The device for this screenshot
       def upload_screenshot!(screenshot_path, sort_order, language, device)
-        raise "sort_order must be positive" unless sort_order > 0
+        raise "sort_order must be higher than 0" unless sort_order > 0
         raise "sort_order must not be > 5" if sort_order > 5
         # this will also check both language and device parameters
         device_lang_screenshots = screenshots_data_for_language_and_device(language, device)["value"]
+
         existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
           upload_file = UploadFile.from_path screenshot_path
@@ -372,6 +373,15 @@ module Spaceship
                   "originalFileName" => upload_file.file_name
               }
           }
+
+          # We disable "scaling" for this device type / language combination
+          # We only set this, if we actually successfully uploaded a new screenshot
+          # for this device / language combination
+          # if this value is not set, iTC will fallback to another device type for screenshots
+          language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
+          device_language_details = language_details.find { |display_family| display_family['name'] == device }
+          device_language_details["scaled"]["value"] = false
+
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
           else # add
@@ -528,13 +538,17 @@ module Spaceship
         # IDEA: better error for non existing language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
-        devices_details = lang_details[data_field]["value"]
-        raise "Unexpected state: missing device details for #{device}" unless devices_details.key? device
-        devices_details[device]
+        display_families = lang_details["displayFamilies"]["value"]
+        device_details = display_families.find { |display_family| display_family['name'] == device }
+        raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
+        return device_details[data_field]
+      rescue => ex
+        raise "iTunes Connect error: #{ex}"
       end
 
       def setup_screenshots
         @screenshots = {}
+
         raw_data_details.each do |row|
           # Now that's one language right here
           @screenshots[row['language']] = setup_screenshots_for(row)
@@ -543,16 +557,60 @@ module Spaceship
 
       # generates the nested data structure to represent screenshots
       def setup_screenshots_for(row)
-        screenshots = row.fetch("screenshots", {}).fetch("value", nil)
-        return [] unless screenshots
+        return [] if row.nil? || row["displayFamilies"].nil?
+
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        screenshots.each do |device_type, value|
-          value["value"].each do |screenshot|
+        display_families.each do |display_family|
+          # {
+          #   "name": "iphone6Plus",
+          #   "scaled": {
+          #     "value": false,
+          #     "isEditable": false,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "screenshots": {
+          #     "value": [{
+          #       "value": {
+          #         "assetToken": "Purple62/v4/08/0a/04/080a0430-c2cc-2577-f491-9e0a09c58ffe/mzl.pbcpzqyg.jpg",
+          #         "sortOrder": 1,
+          #         "type": null,
+          #         "originalFileName": "ios-414-1.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }, {
+          #       "value": {
+          #         "assetToken": "Purple71/v4/de/81/aa/de81aa10-64f6-332e-c974-9ee46adab675/mzl.cshkjvwl.jpg",
+          #         "sortOrder": 2,
+          #         "type": null,
+          #         "originalFileName": "ios-414-2.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }],
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "trailer": {
+          #     "value": null,
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   }
+          # }
+
+          display_family.fetch("screenshots", {}).fetch("value", []).each do |screenshot|
             screenshot_data = screenshot["value"]
             data = {
-                device_type: device_type,
+                device_type: display_family['name'],
                 language: row["language"]
             }.merge(screenshot_data)
             result << Tunes::AppScreenshot.factory(data)
@@ -572,17 +630,19 @@ module Spaceship
 
       # generates the nested data structure to represent trailers
       def setup_trailers_for(row)
-        trailers = row.fetch("appTrailers", {}).fetch("value", nil)
-        return [] unless trailers
+        return [] if row.nil? || row["displayFamilies"].nil?
+
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        trailers.each do |device_type, value|
-          trailer_data = value["value"]
+        display_families.each do |display_family|
+          trailer_data = display_family.fetch("trailer", {}).fetch("value")
           next if trailer_data.nil?
           data = {
-              device_type: device_type,
-              language: row["language"]
+            device_type: display_family['name'],
+            language: row["language"]
           }.merge(trailer_data)
           result << Tunes::AppTrailer.factory(data)
         end

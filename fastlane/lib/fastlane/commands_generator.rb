@@ -23,8 +23,6 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Fastlane::VERSION
       program :description, [
@@ -43,7 +41,7 @@ module Fastlane
 
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
-        c.description = 'Run a sepcific lane. Pass the lane name and optionally the platform first.'
+        c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
         c.option '--env STRING', String, 'Add environment to use with `dotenv`'
 
         c.action do |args, options|
@@ -57,10 +55,14 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
+        if FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
+          CrashlyticsBetaCommandLineHandler.apply_options(c)
+        end
+
         c.action do |args, options|
           if args[0] == 'beta' && FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
-            require 'fastlane/setup/crashlytics_beta'
-            Fastlane::CrashlyticsBeta.new.run
+            beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
+            Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
             Fastlane::Setup.new.run
           end
@@ -261,8 +263,5 @@ module Fastlane
       UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
       UI.important("This command will be removed in one of the next releases")
     end
-
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
   end
 end

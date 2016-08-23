@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/AbcSize
-
 module Fastlane
   module Actions
     module SharedValues

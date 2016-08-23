@@ -39,9 +39,6 @@ module Produce
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Metrics/MethodLength
-    # rubocop:disable Metrics/CyclomaticComplexity
-    # rubocop:disable Metrics/AbcSize
     def update(on, app, options)
       updated = valid_services_for(options).count
 
@@ -73,7 +70,7 @@ module Produce
           when "complete"
             app.update_service(Spaceship.app_service.data_protection.complete)
           when "unlessopen"
-            app.update_service(Spaceship.app_service.data_proection.unless_open)
+            app.update_service(Spaceship.app_service.data_protection.unless_open)
           when "untilfirstauth"
             app.update_service(Spaceship.app_service.data_protection.until_first_auth)
           else

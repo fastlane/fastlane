@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 require 'fastlane/erb_template_helper'
 require 'ostruct'
 
@@ -112,6 +111,7 @@ module Fastlane
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
         title = info['CFBundleName']
+        device_family = info['UIDeviceFamily']
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
@@ -146,6 +146,7 @@ module Fastlane
         else
           html_template = eth.load("s3_html_template")
         end
+
         html_render = eth.render(html_template, {
           url: plist_url,
           plist_url: plist_url,
@@ -153,7 +154,8 @@ module Fastlane
           build_num: build_num,
           bundle_id: bundle_id,
           bundle_version: bundle_version,
-          title: title
+          title: title,
+          device_family: device_family
         })
 
         # Creates version from template
@@ -351,4 +353,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

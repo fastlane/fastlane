@@ -13,7 +13,6 @@ module Snapshot
       FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Snapshot::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
@@ -67,7 +66,7 @@ module Snapshot
         c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
 
         c.action do |args, options|
-          options.default ios_version: Snapshot::LatestIosVersion.version
+          options.default ios_version: Snapshot::LatestOsVersion.ios_version
           versions = options.ios_version.split(',') if options.ios_version
           require 'snapshot/reset_simulators'
 

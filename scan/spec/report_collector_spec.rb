@@ -28,5 +28,14 @@ describe Scan do
                                  "/tmp/report.json-compilation-database" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/report.json-compilation-database' &> /dev/null "
                               })
     end
+
+    it "use user specified report file name" do
+      commands = Scan::ReportCollector.new(false, "junit", "/tmp", false, "custom.xml").generate_commands(path)
+
+      expect(commands.count).to eq(1)
+      expect(commands).to eq({
+                                 "/tmp/custom.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/custom.xml' &> /dev/null "
+                             })
+    end
   end
 end

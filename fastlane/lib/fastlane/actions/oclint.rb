@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Fastlane
   module Actions
     module SharedValues
@@ -6,6 +5,7 @@ module Fastlane
     end
 
     class OclintAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         oclint_path = params[:oclint_path]
         if `which #{oclint_path}`.to_s.empty? and !Helper.test?
@@ -190,6 +190,7 @@ module Fastlane
                                        default_value: false)
         ]
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.output
         [
@@ -207,4 +208,3 @@ module Fastlane
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

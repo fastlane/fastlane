@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     class BundleInstallAction < Action
-      # rubocop:disable Metrics/CyclomaticComplexity
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         if gemfile_exists?(params)
@@ -31,7 +30,6 @@ module Fastlane
           UI.message("No Gemfile found")
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
       # rubocop:enable Metrics/PerceivedComplexity
 
       def self.gemfile_exists?(params)

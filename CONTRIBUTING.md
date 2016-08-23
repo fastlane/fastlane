@@ -78,8 +78,6 @@ PRs should reference an open GitHub issue (preferably those marked with the [hel
 
 If you're considering contributing new functionality, please open a new issue explaining the functionality desired first so that we can discuss as a community. We'll add the [help wanted](https://github.com/fastlane/fastlane/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label if we believe this to be a meaningful contribution that will benefit other fastlane users and you go ahead with the pull request. :raised_hands:
 
-**Pro tip:** GitHub will automatically turn references to issue numbers in the form `#1234` into a link to the issue/PR with that number within the same repo.
-
 - Adding automated tests that cover your changes and/or new functionality is important!
     - `fastlane` has a lot of moving parts and receives contributions from many developers. The best way to ensure that your contributions keep working is to ensure that there will be failing tests if something accidentally gets broken.
     - You can run the tests by executing `bundle install` and then `bundle exec rspec`.
@@ -106,7 +104,7 @@ One of the best ways we can keep fastlane an approachable, stable, and dependabl
 
 ## Contributing New Actions
 
-Writing a custom action is an easy way to extend the capabilities of fastlane. Actions that make good candidates for inclusion in the fastlane codebase are **flexible** and apply to **many projects, teams, and development setups**. Before working to contribute your custom action to fastlane, consider whether it is likely to solve a problem that many developers have. If not, it can still provide value for your fastlane environment! Check out the documentation for creating [local action extensions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/README.md#extensions).
+There are different approaches to build your own `fastlane` actions. You can either build your own local actions, or provide your own fastlane plugin. For more information, check out [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md#readme).
 
 ## Developing
 

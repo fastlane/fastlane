@@ -84,7 +84,21 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
 - Once complete run `screengrab` in your app project directory to generate screenshots
     - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
-- Your screenshots will be saved in a /screenshots directory in the directory where you ran `screengrab`
+- Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran `screengrab`
+
+## Improved screenshot capture with UI Automator
+
+As of `screengrab` 0.5.0, you can specify different strategies to control the way `screengrab` captures screenshots. The newer strategy delegates to [UI Automator](https://developer.android.com/topic/libraries/testing-support-library/index.html#UIAutomator) which fixes a number of problems compared to the original strategy:
+
+* Shadows/elevation are correctly captured for Material UI
+* Multi-window situations are correctly captured (dialogs, etc.)
+* Works on Android N
+
+However, UI Automator requires a device with **API level >= 18**, so it is not yet the default strategy. To enable it for all screenshots by default, make the following call before your tests run:
+
+```java
+Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+```
 
 ## Advanced Screengrabfile Configuration
 

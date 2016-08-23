@@ -22,6 +22,7 @@ module Frameit
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 end
 
 # rubocop:disable all

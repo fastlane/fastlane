@@ -52,6 +52,7 @@ module Snapshot
       # The order IS important, since those names are used to check for include?
       # and the iPhone 6 is inlucded in the iPhone 6 Plus
       {
+        'AppleTV1080p' => 'Apple TV',
         'iPhone6sPlus' => "5.5-Inch",
         'iPhone6Plus' => "5.5-Inch",
         'iPhone6s' => "4.7-Inch",

@@ -35,7 +35,7 @@ module FastlaneCore
         max_allowed_value_length = max_length - max_key_length - 7
         rows.map do |e|
           value = e[1]
-          value = value.truncate(max_allowed_value_length) if value.kind_of? String
+          value = value.to_s.truncate(max_allowed_value_length) unless [true, false].include?(value)
           [e[0], value]
         end
       end

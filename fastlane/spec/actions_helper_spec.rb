@@ -43,7 +43,7 @@ describe Fastlane do
       end
 
       it "can throws an error if plugin is damaged" do
-        expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!")
+        expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!", { show_github_issues: true })
         Fastlane::Actions.load_external_actions("spec/fixtures/broken_actions")
       end
     end

@@ -104,13 +104,13 @@ module Fastlane
           else
             UI.error "Could not find method 'run' in class #{class_name}."
             UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
-            UI.user_error!("Action '#{file_name}' is damaged!")
+            UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
           end
         rescue NameError
           # Action not found
           UI.error "Could not find '#{class_name}' class defined."
           UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
-          UI.user_error!("Action '#{file_name}' is damaged!")
+          UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
         end
       end
     end

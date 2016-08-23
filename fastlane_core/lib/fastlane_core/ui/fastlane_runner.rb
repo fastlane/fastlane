@@ -2,6 +2,16 @@ module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
+    unless Object.const_defined?("Faraday")
+      module Faraday
+        class SSLError < StandardError
+          # We create this empty error class if we didn't require Faraday
+          # so that we can use it in the rescue block below
+          # even if we didn't require Faraday or didn't use it
+        end
+      end
+    end
+
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
     def run!
       require_program :version, :description
@@ -40,8 +50,25 @@ module Commander
         abort e.to_s
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
-        show_github_issues(e.message)
+        show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
+      rescue Faraday::SSLError => e # SSL issues are very common
+        # SSL errors are very common when the Ruby or OpenSSL installation is somehow broken
+        # We want to show a nice error message to the user here
+        # We have over 20 GitHub issues just for this one error:
+        #   https://github.com/fastlane/fastlane/search?q=errno%3D0+state%3DSSLv3+read+server&type=Issues
+        ui = FastlaneCore::UI
+        ui.error "-----------------------------------------------------------------------"
+        ui.error e.to_s
+        ui.error "SSL errors can be caused by various components on your local machine"
+        ui.error "- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`"
+        ui.error "- If you use rvm:"
+        ui.error "  - First run `rvm osx-ssl-certs update all`"
+        ui.error "  - Then run `rvm reinstall ruby-2.2.3 --with-openssl-dir=/usr/local"
+        ui.error "- If that doesn't fix your issue, please google for the following error message:"
+        ui.error "  '#{e}'"
+        ui.error "-----------------------------------------------------------------------"
+        display_user_error!(e, e.to_s)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         collector.did_crash(@program[:name])
         handle_unknown_error!(e)

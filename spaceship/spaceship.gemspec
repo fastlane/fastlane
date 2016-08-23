@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # fastlane specific
-  spec.add_dependency 'credentials_manager', '>= 0.9.0' # to automatically get login information
+  spec.add_dependency 'credentials_manager', '>= 0.16.0' # to automatically get login information
 
   # external
   spec.add_dependency 'multi_xml', '~> 0.5'

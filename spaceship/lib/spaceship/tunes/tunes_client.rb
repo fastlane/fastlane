@@ -126,9 +126,7 @@ module Spaceship
       send_shared_login_request(user, password)
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Metrics/AbcSize
     def handle_itc_response(raw)
       return unless raw
       return unless raw.kind_of? Hash
@@ -186,9 +184,7 @@ module Spaceship
 
       return data
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
-    # rubocop:enable Metrics/AbcSize
 
     #####################################################
     # @!group Applications
@@ -540,18 +536,18 @@ module Spaceship
     end
 
     # All build trains, even if there is no TestFlight
-    def all_build_trains(app_id: nil)
-      r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=ios")
+    def all_build_trains(app_id: nil, platform: nil)
+      r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=#{platform || 'ios'}")
       handle_itc_response(r.body)
     end
 
-    def all_builds_for_train(app_id: nil, train: nil)
-      r = request(:get, "ra/apps/#{app_id}/trains/#{train}/buildHistory?platform=ios")
+    def all_builds_for_train(app_id: nil, train: nil, platform: nil)
+      r = request(:get, "ra/apps/#{app_id}/trains/#{train}/buildHistory?platform=#{platform || 'ios'}")
       handle_itc_response(r.body)
     end
 
-    def build_details(app_id: nil, train: nil, build_number: nil)
-      r = request(:get, "ra/apps/#{app_id}/platforms/ios/trains/#{train}/builds/#{build_number}/details")
+    def build_details(app_id: nil, train: nil, build_number: nil, platform: nil)
+      r = request(:get, "ra/apps/#{app_id}/platforms/#{platform || 'ios'}/trains/#{train}/builds/#{build_number}/details")
       handle_itc_response(r.body)
     end
 
@@ -565,13 +561,8 @@ module Spaceship
                                   feedback_email: nil,
                                   platform: 'ios')
       url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
-      r = request(:get) do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
 
-      build_info = r.body['data']
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       build_info["details"].each do |current|
         current["whatsNew"]["value"] = whats_new if whats_new
         current["description"]["value"] = description if description
@@ -609,13 +600,17 @@ module Spaceship
                                             review_user_name: nil,
                                             review_password: nil,
                                             review_notes: nil,
-                                            encryption: false)
+                                            encryption: false,
+                                            encryption_updated: false,
+                                            is_exempt: false,
+                                            proprietary: false,
+                                            third_party: false)
 
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       # Now fill in the values provided by the user
 
       # First the localised values:
-      build_info['testInfo']['details'].each do |current|
+      build_info['details'].each do |current|
         current['whatsNew']['value'] = changelog if changelog
         current['description']['value'] = description if description
         current['feedbackEmail']['value'] = feedback_email if feedback_email
@@ -623,63 +618,50 @@ module Spaceship
         current['privacyPolicyUrl']['value'] = privacy_policy_url if privacy_policy_url
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
-      build_info['significantChange'] ||= {}
-      build_info['significantChange']['value'] = significant_change
-      build_info['testInfo']['reviewFirstName']['value'] = first_name if first_name
-      build_info['testInfo']['reviewLastName']['value'] = last_name if last_name
-      build_info['testInfo']['reviewPhone']['value'] = phone_number if phone_number
-      build_info['testInfo']['reviewEmail']['value'] = review_email if review_email
-      build_info['testInfo']['reviewAccountRequired']['value'] = (review_user_name.to_s + review_password.to_s).length > 0
-      build_info['testInfo']['reviewUserName']['value'] = review_user_name if review_user_name
-      build_info['testInfo']['reviewPassword']['value'] = review_password if review_password
-      build_info['testInfo']['reviewNotes']['value'] = review_notes if review_notes
+
+      review_info = {
+        "significantChange" => {
+          "value" => significant_change
+        },
+        "buildTestInformationTO" => build_info,
+        "exportComplianceTO" => {
+          "usesEncryption" => {
+            "value" => encryption
+          },
+          "encryptionUpdated" => {
+            "value" => encryption_updated
+          },
+          "isExempt" => {
+            "value" => is_exempt
+          },
+          "containsProprietaryCryptography" => {
+            "value" => proprietary
+          },
+          "containsThirdPartyCryptography" => {
+            "value" => third_party
+          }
+        }
+      }
 
       r = request(:post) do |req| # same URL, but a POST request
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/review/submit"
 
-        req.body = build_info.to_json
+        req.body = review_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
-
-      encryption_info = r.body['data']
-      update_encryption_compliance(app_id: app_id,
-                                   train: train,
-                                   build_number: build_number,
-                                   platform: platform,
-                                   encryption_info: encryption_info,
-                                   encryption: encryption)
     end
     # rubocop:enable Metrics/ParameterLists
 
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
+      url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
       r = request(:get) do |req|
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/start"
+        req.url url
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
 
       r.body['data']
-    end
-
-    def update_encryption_compliance(app_id: nil, train: nil, build_number: nil, platform: 'ios', encryption_info: nil, encryption: nil, is_exempt: true, proprietary: false, third_party: false)
-      return unless encryption_info['exportComplianceRequired']
-      # only sometimes this is required
-
-      encryption_info['usesEncryption']['value'] = encryption
-      encryption_info['encryptionUpdated'] ||= {}
-      encryption_info['encryptionUpdated']['value'] = encryption
-      encryption_info['isExempt']['value'] = is_exempt
-      encryption_info['containsProprietaryCryptography']['value'] = proprietary
-      encryption_info['containsThirdPartyCryptography']['value'] = third_party
-
-      r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/submit/complete"
-        req.body = encryption_info.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      handle_itc_response(r.body)
     end
 
     #####################################################

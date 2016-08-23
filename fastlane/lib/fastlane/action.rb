@@ -75,6 +75,10 @@ module Fastlane
       self.name.split('::').last.gsub('Action', '').fastlane_underscore
     end
 
+    def self.lane_context
+      Actions.lane_context
+    end
+
     # Allows the user to call an action from an action
     def self.method_missing(method_sym, *arguments, &_block)
       UI.error("Unknown method '#{method_sym}'")

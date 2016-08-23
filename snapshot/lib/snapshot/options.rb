@@ -35,7 +35,7 @@ module Snapshot
                                      type: Array,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       available = FastlaneCore::Simulator.all
+                                       available = FastlaneCore::DeviceManager.simulators
                                        value.each do |current|
                                          unless available.any? { |d| d.name.strip == current.strip }
                                            UI.user_error!("Device '#{current}' not in list of available simulators '#{available.join(', ')}'")
@@ -61,7 +61,7 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :ios_version,
                                      description: "By default, the latest version should be used automatically. If you want to change it, do it here",
                                      short_option: "-i",
-                                     default_value: Snapshot::LatestIosVersion.version),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SNAPSHOT_SKIP_OPEN_SUMMARY',
                                      description: "Don't open the HTML summary after running `snapshot`",

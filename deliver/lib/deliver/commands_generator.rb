@@ -14,8 +14,6 @@ module Deliver
       FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
     def run
       program :version, Deliver::VERSION
       program :description, Deliver::DESCRIPTION
@@ -124,8 +122,6 @@ module Deliver
           end
         end
       end
-      # rubocop:enable Metrics/AbcSize
-      # rubocop:enable Metrics/MethodLength
 
       default_command :run
 

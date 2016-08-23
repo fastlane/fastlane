@@ -9,7 +9,7 @@ module Fastlane
       path = File.join(containing_folder, 'report.xml')
 
       @steps = results
-      xml_path = File.join(lib_path, "assets/report_template.xml.erb")
+      xml_path = File.join(Helper.gem_path("fastlane"), "lib/assets/report_template.xml.erb")
       xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
@@ -17,14 +17,6 @@ module Fastlane
       File.write(path, xml)
 
       return path
-    end
-
-    def self.lib_path
-      if !Helper.is_test? and Gem::Specification.find_all_by_name('fastlane').any?
-        return [Gem::Specification.find_by_name('fastlane').gem_dir, 'lib'].join('/')
-      else
-        return './lib'
-      end
     end
   end
 end

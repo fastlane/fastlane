@@ -3,11 +3,17 @@ require File.expand_path('../spec_helper', __FILE__)
 module Danger
   class Dangerfile
     module DSL
+      class GitHubObj
+        def pr_body
+          ""
+        end
+      end
+
       class Plugin
         attr_accessor :current_markdown
 
-        def pr_body # needed for the action
-          ""
+        def github # needed for the action
+          GitHubObj.new
         end
 
         def markdown(str)

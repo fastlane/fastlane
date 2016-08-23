@@ -1,9 +1,3 @@
-require 'date'
-require 'json'
-require 'faraday'
-require 'terminal-table'
-require 'colored'
-
 QUERY_DAYS = (ENV["DAYS"] || 4).to_i
 
 FASTLANE_MEMBERS = %w(asfalcone chaselatta fastlane-bot hemal i2amsam kimyoutora KrauseFx mfurtak MichaelDoyle mpirri ohwutup samrobbins snatchev vpolouchkine)
@@ -53,6 +47,12 @@ end
 
 desc "Display issue opening and closing statistics from GitHub"
 task :issue_stats do
+  require 'date'
+  require 'json'
+  require 'faraday'
+  require 'terminal-table'
+  require 'colored'
+
   raise "Please set GITHUB_SCRIPT_TOKEN in your environment with a GitHub personal access token value".red if GITHUB_TOKEN.to_s.empty?
 
   conn = Faraday.new(:url => BASE_URL)
