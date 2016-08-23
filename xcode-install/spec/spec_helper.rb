@@ -10,7 +10,4 @@ ENV['DELIVER_USER'] = 'xcversion'
 ENV['DELIVER_PASSWORD'] = '12345password'
 
 require 'bundler/setup'
-require 'bacon'
-require 'mocha-on-bacon'
-require 'pretty_bacon'
 require 'xcode/install'

@@ -369,7 +369,7 @@ HELP
       puts "Successfully installed #{name}"
     end
 
-    :private
+    private
 
     def prepare_package
       puts 'Mounting DMG'
@@ -468,7 +468,7 @@ HELP
       `touch #{cache_dir}com.apple.dt.Xcode.InstallCheckCache_#{osx_build_version}_#{tools_version}`
     end
 
-    :private
+    private
 
     def plist_entry(keypath)
       `/usr/libexec/PlistBuddy -c "Print :#{keypath}" "#{path}/Contents/Info.plist"`.chomp
@@ -476,7 +476,7 @@ HELP
 
     def fetch_version
       output = `DEVELOPER_DIR='' "#{@path}/Contents/Developer/usr/bin/xcodebuild" -version`
-      return '0.0' if output.nil? # ¯\_(ツ)_/¯
+      return '0.0' if output.nil?
       output.split("\n").first.split(' ')[1]
     end
   end
