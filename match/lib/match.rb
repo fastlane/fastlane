@@ -14,6 +14,7 @@ require 'match/change_password'
 require 'fastlane_core'
 require 'terminal-table'
 require 'spaceship'
+require 'git'
 
 module Match
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

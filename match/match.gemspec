@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'spaceship', '>= 0.24.0', '< 1.0.0' # communication layer with Apple's web services
   spec.add_dependency 'sigh', '>= 1.2.2', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.2.8', '< 2.0.0'
+  spec.add_dependency 'git', '>= 1.3.0', '< 2.0.0'
 
   # Development only
   spec.add_development_dependency 'bundler'

@@ -4,13 +4,11 @@ module Match
       return @dir if @dir
 
       @dir = Dir.mktmpdir
-      command = "git clone '#{git_url}' '#{@dir}'"
-      command << " --depth 1" if shallow_clone
 
       UI.message "Cloning remote git repo..."
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: $verbose,
-                                      print_command: $verbose)
+      opts = {path: @dir}
+      opts[:depth] = 1 if shallow_clone
+      Git.clone(git_url, ".", opts)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
@@ -51,25 +49,19 @@ module Match
     end
 
     def self.commit_changes(path, message, git_url, branch = "master")
-      Dir.chdir(path) do
-        return if `git status`.include?("nothing to commit")
+      git = Git.open(path)
 
-        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
-        File.write("match_version.txt", Match::VERSION) # unencrypted
+      # Avoid calling git.status if no branch exists
+      return unless git.current_branch.nil? or git.status.any?
 
-        commands = []
-        commands << "git add -A"
-        commands << "git commit -m #{message.shellescape}"
-        commands << "git push origin #{branch.shellescape}"
+      Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+      File.write(File.join(path, "match_version.txt"), Match::VERSION) # unencrypted
 
-        UI.message "Pushing changes to remote git repo..."
+      UI.message "Pushing changes to remote git repo..."
+      git.add(all: true)
+      git.commit("message")
+      git.push(:origin, branch)
 
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
-                                              print_all: $verbose,
-                                          print_command: $verbose)
-        end
-      end
       FileUtils.rm_rf(path)
       @dir = nil
     end
@@ -86,38 +78,23 @@ module Match
     def self.checkout_branch(branch)
       return unless @dir
 
-      commands = []
-      if branch_exists?(branch)
-        # Checkout the branch if it already exists
-        commands << "git checkout #{branch.shellescape}"
-      else
-        # If a new branch is being created, we create it as an 'orphan' to not inherit changes from the master branch.
-        commands << "git checkout --orphan #{branch.shellescape}"
-        # We also need to reset the working directory to not transfer any uncommitted changes to the new branch.
-        commands << "git reset --hard"
-      end
+      git = Git.open(@dir)
+      return if git.current_branch == branch
 
       UI.message "Checking out branch #{branch}..."
-
-      Dir.chdir(@dir) do
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: $verbose,
-                                                print_command: $verbose)
-        end
+      if git.is_branch?(branch)
+        git.checkout(branch)
+      else
+        git.checkout(["--orphan", branch])
+        # Add empty commit to avoid an Exception when calling git.status
+        git.commit("initial commit", allow_empty: true)
       end
-    end
 
-    # Checks if a specific branch exists in the git repo
-    def self.branch_exists?(branch)
-      return unless @dir
-
-      result = Dir.chdir(@dir) do
-        FastlaneCore::CommandExecutor.execute(command: "git branch --list origin/#{branch.shellescape} --no-color -r",
-                                              print_all: $verbose,
-                                              print_command: $verbose)
+      UI.message "Cleaning up..."
+      if git.status.any?
+        git.reset
+        git.clean(force: true, d: true)
       end
-      return !result.empty?
     end
 
     # Copies the README.md into the git repo
