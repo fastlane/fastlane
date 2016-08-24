@@ -129,7 +129,8 @@ module Spaceship
     end
 
     def update_service_for_app(app, service)
-      ensure_csrf
+      # TODO should this be App or Service?
+      ensure_csrf(Spaceship::App)
 
       request(:post, service.service_uri, {
         teamId: team_id,
@@ -142,7 +143,8 @@ module Spaceship
     end
 
     def associate_groups_with_app(app, groups)
-      ensure_csrf
+      # TODO should this be App or App Group?
+      ensure_csrf(Spaceship::App)
 
       request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
         teamId: team_id,
@@ -158,8 +160,7 @@ module Spaceship
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
       # https://github.com/fastlane/fastlane/issues/5813
-      ensure_csrf
-
+      ensure_csrf(Spaceship::App)
       ident_params = case type.to_sym
                      when :explicit
                        {
@@ -188,6 +189,8 @@ module Spaceship
     end
 
     def delete_app!(app_id, mac: false)
+      ensure_csrf(Spaceship::App)
+
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteAppId.action", {
         teamId: team_id,
         appIdId: app_id
@@ -212,7 +215,7 @@ module Spaceship
     end
 
     def create_app_group!(name, group_id)
-      ensure_csrf
+      ensure_csrf(Spaceship::AppGroup)
 
       r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
         name: name,
@@ -223,7 +226,7 @@ module Spaceship
     end
 
     def delete_app_group!(app_group_id)
-      ensure_csrf
+      ensure_csrf(Spaceship::AppGroup)
 
       r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
         teamId: team_id,
@@ -262,7 +265,7 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id, mac: false)
-      ensure_csrf
+      ensure_csrf(Spaceship::Device)
 
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
@@ -294,7 +297,7 @@ module Spaceship
     end
 
     def create_certificate!(type, csr, app_id = nil)
-      ensure_csrf
+      ensure_csrf(Spaceship::Certificate)
 
       r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
         teamId: team_id,
@@ -322,7 +325,7 @@ module Spaceship
     end
 
     def revoke_certificate!(certificate_id, type, mac: false)
-      ensure_csrf
+      ensure_csrf(Spaceship::Certificate)
 
       r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
         teamId: team_id,
@@ -350,7 +353,7 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf
+      ensure_csrf(Spaceship::ProvisioningProfile)
 
       params = {
         teamId: team_id,
@@ -380,7 +383,7 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf
+      ensure_csrf(Spaceship::ProvisioningProfile)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
@@ -390,7 +393,7 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
-      ensure_csrf
+      ensure_csrf(Spaceship::ProvisioningProfile)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", {
         teamId: team_id,
@@ -407,27 +410,19 @@ module Spaceship
 
     private
 
-    def ensure_csrf
-      # It's important we store this state here
-      # as we always want to request something at least once
-      return unless @requested_csrf_token.nil?
+    # TODO can this take klass and expected_key?
+    def ensure_csrf(klass)
+      if csrf_cache[klass]
+        @csrf_tokens = csrf_cache[klass]
+        return
+      end
 
-      # Update 23rd August 2016
-      # Instead of calling `Certificate::Production.all` we call `App.all`
-      # We've had issues when we only requested certificates, instead of apps, we don't know why
-      # Source: https://github.com/fastlane/fastlane/issues/5827
+      @csrf_tokens = nil
+      klass.all # to fetch the tokens
+      klass.all # to fetch the tokens
 
-      # If we directly create a new resource (e.g. app) without querying anything before
-      # we don't have a valid csrf token, that's why we have to do at least one request
-      App.all
-
-      # Update 18th August 2016
-      # For some reason, we have to query the resource twice to actually get a valid csrf_token
-      # I couldn't find out why, the first response does have a valid Set-Cookie header
-      # But it still needs this second request
-      App.all
-
-      @requested_csrf_token = true if csrf_tokens.count > 0
+      csrf_cache[klass] = csrf_tokens
     end
+
   end
 end

@@ -356,18 +356,39 @@ module Spaceship
     end
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
-    def store_csrf_tokens(response)
+    def store_csrf_tokens(response, expected_key)
       if response and response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
         if tokens and !tokens.empty?
-          @csrf_tokens = tokens
+         # TODO replace this by storing the expected_key in the hash directly
+
+          key = case expected_key
+                when 'appIds'
+                  Spaceship::App
+                when 'devices'
+                  Spaceship::Device
+                when 'applicationGroup'
+                  Spaceship::AppGroup
+                when 'certRequests'
+                  Spaceship::Certificate
+                when 'provisioningProfiles'
+                  Spaceship::ProvisioningProfile
+                else
+                  "none"
+                end
+
+          @csrf_cache = {} unless @csrf_cache
+          @csrf_cache[key] = tokens
         end
       end
     end
 
-    # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
+    end
+
+    def csrf_cache
+      @csrf_cache || {}
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
@@ -434,7 +455,7 @@ module Spaceship
       if content.nil?
         raise UnexpectedResponse, response.body
       else
-        store_csrf_tokens(response)
+        store_csrf_tokens(response, expected_key)
         content
       end
     end
