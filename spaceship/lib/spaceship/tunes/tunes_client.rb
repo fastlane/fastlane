@@ -271,6 +271,16 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def get_rating_summary(app_id, platform, versionId = '')
+      r = request(:get, "ra/apps/#{app_id}/reviews/summary?platform=#{platform}&versionId=#{versionId}")
+      parse_response(r, 'data')
+    end
+
+    def get_reviews(app_id, platform, storefront, versionId = '')
+      r = request(:get, "ra/apps/#{app_id}/reviews?platform=#{platform}&storefront=#{storefront}&versionId=#{versionId}")
+      parse_response(r, 'data')['reviews']
+    end
+
     #####################################################
     # @!group AppVersions
     #####################################################
