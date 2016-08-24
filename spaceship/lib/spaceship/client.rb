@@ -347,7 +347,7 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
-    # TODO: add docs
+    # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
     end
@@ -356,7 +356,6 @@ module Spaceship
 
     def do_login(user, password)
       @loggedin = false
-      @requested_csrf_token = nil
       ret = send_login_request(user, password) # different in subclasses
       @loggedin = true
       ret

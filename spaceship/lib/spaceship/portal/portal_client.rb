@@ -160,6 +160,7 @@ module Spaceship
       # as we got some users with issues around creating new apps
       # https://github.com/fastlane/fastlane/issues/5813
       ensure_csrf(Spaceship::App)
+
       ident_params = case type.to_sym
                      when :explicit
                        {
