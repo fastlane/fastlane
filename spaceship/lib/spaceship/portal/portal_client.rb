@@ -1,4 +1,5 @@
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class PortalClient < Spaceship::Client
     #####################################################
     # @!group Init and Login
@@ -442,6 +443,6 @@ module Spaceship
 
       csrf_cache[klass] = self.csrf_tokens
     end
-
   end
+  # rubocop:enable Metrics/ClassLength
 end
