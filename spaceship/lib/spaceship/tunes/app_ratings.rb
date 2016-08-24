@@ -54,8 +54,8 @@ module Spaceship
     end
 
     class AppRatingSummary < TunesBase
-      
-      # @return (Integer) total number of reviews recevied 
+
+      # @return (Integer) total number of reviews recevied
       attr_reader :review_count
 
       # @return (Integer) total number of ratings recevied
@@ -97,10 +97,10 @@ module Spaceship
 
       # @return (Float) the average rating for this summary (rounded to 2 decimal places)
       def average_rating
-        ((self.one_star_rating_count + 
-          (self.two_star_rating_count * 2) + 
-          (self.three_star_rating_count * 3) + 
-          (self.four_star_rating_count * 4) + 
+        ((self.one_star_rating_count +
+          (self.two_star_rating_count * 2) +
+          (self.three_star_rating_count * 3) +
+          (self.four_star_rating_count * 4) +
           (self.five_star_rating_count * 5)) / self.rating_count.to_f).round(2)
       end
     end
