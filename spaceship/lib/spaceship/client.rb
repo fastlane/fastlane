@@ -349,6 +349,7 @@ module Spaceship
 
     def do_login(user, password)
       @loggedin = false
+      @requested_csrf_token = nil
       ret = send_login_request(user, password) # different in subclasses
       @loggedin = true
       ret
