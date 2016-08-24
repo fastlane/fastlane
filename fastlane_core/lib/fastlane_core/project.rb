@@ -332,7 +332,7 @@ module FastlaneCore
 
       tries = 1
       begin
-        @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
+        return Timeout.timeout(timeout) { `#{command}`.to_s }
       rescue Timeout::Error
         raise if tries >= retries
 
