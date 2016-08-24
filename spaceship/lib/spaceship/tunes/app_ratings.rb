@@ -54,7 +54,6 @@ module Spaceship
     end
 
     class AppRatingSummary < TunesBase
-
       # @return (Integer) total number of reviews recevied
       attr_reader :review_count
 
