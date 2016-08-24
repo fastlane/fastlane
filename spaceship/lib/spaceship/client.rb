@@ -28,6 +28,8 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
+    attr_accessor :csrf_tokens
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -345,11 +347,15 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    # memorize the last csrf tokens from responses
+    def csrf_tokens
+      @csrf_tokens || {}
+    end
+
     private
 
     def do_login(user, password)
       @loggedin = false
-      @requested_csrf_token = nil
       ret = send_login_request(user, password) # different in subclasses
       @loggedin = true
       ret
@@ -363,11 +369,6 @@ module Spaceship
           @csrf_tokens = tokens
         end
       end
-    end
-
-    # memorize the last csrf tokens from responses
-    def csrf_tokens
-      @csrf_tokens || {}
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
