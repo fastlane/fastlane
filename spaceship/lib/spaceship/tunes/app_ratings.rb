@@ -38,7 +38,7 @@ module Spaceship
       end
 
       def unfold_store_fronts(attrs)
-        unfolded_store_fronts = Hash.new
+        unfolded_store_fronts = {}
 
         attrs.each do |info|
           unfolded_store_fronts[info['countryCode']] = AppRatingSummary.new(info['ratings'])
@@ -82,7 +82,7 @@ module Spaceship
         'ratingTwoCount' => :two_star_rating_count,
         'ratingThreeCount' => :three_star_rating_count,
         'ratingFourCount' => :four_star_rating_count,
-        'ratingFiveCount' => :five_star_rating_count,
+        'ratingFiveCount' => :five_star_rating_count
       })
 
       class << self
