@@ -363,7 +363,7 @@ module Spaceship
     end
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
-    def store_csrf_tokens(response, expected_key)
+    def store_csrf_tokens(response)
       if response and response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
         if tokens and !tokens.empty?
@@ -436,7 +436,7 @@ module Spaceship
       if content.nil?
         raise UnexpectedResponse, response.body
       else
-        store_csrf_tokens(response, expected_key)
+        store_csrf_tokens(response)
         content
       end
     end

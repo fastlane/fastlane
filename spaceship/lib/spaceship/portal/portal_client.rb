@@ -351,7 +351,8 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      # TODO: Document
+      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
+      # use a different entity to gather the csrf token
       ensure_csrf(Spaceship::App)
 
       params = {
@@ -382,7 +383,8 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      # TODO: Document
+      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
+      # use a different entity to gather the csrf token
       ensure_csrf(Spaceship::App)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
@@ -393,7 +395,8 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
-      # TODO: Document
+      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
+      # use a different entity to gather the csrf token
       ensure_csrf(Spaceship::App)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", {
@@ -411,12 +414,14 @@ module Spaceship
 
     private
 
-    # TODO: add docs
+    # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
     def csrf_cache
       @csrf_cache || {}
     end
 
-    # TODO add docs
+    # Ensures that there are csrf tokens for the appropriate entity type
+    # Relies on store_csrf_tokens to set csrf_tokens to the appropriate value
+    # then stores that in the correct place in cache
     def ensure_csrf(klass)
       if csrf_cache[klass]
         self.csrf_tokens = csrf_cache[klass]
@@ -424,9 +429,16 @@ module Spaceship
       end
 
       self.csrf_tokens = nil
-      # TODO: Add comments from previous code
-      klass.all # to fetch the tokens
-      klass.all # to fetch the tokens
+
+      # If we directly create a new resource (e.g. app) without querying anything before
+      # we don't have a valid csrf token, that's why we have to do at least one request
+      klass.all
+
+      # Update 18th August 2016
+      # For some reason, we have to query the resource twice to actually get a valid csrf_token
+      # I couldn't find out why, the first response does have a valid Set-Cookie header
+      # But it still needs this second request
+      klass.all
 
       csrf_cache[klass] = self.csrf_tokens
     end
