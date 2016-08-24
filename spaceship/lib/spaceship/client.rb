@@ -28,6 +28,8 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
+    attr_accessor :csrf_tokens
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -345,6 +347,11 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    # TODO: add docs
+    def csrf_tokens
+      @csrf_tokens || {}
+    end
+
     private
 
     def do_login(user, password)
@@ -360,35 +367,9 @@ module Spaceship
       if response and response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
         if tokens and !tokens.empty?
-         # TODO replace this by storing the expected_key in the hash directly
-
-          key = case expected_key
-                when 'appIds'
-                  Spaceship::App
-                when 'devices'
-                  Spaceship::Device
-                when 'applicationGroup'
-                  Spaceship::AppGroup
-                when 'certRequests'
-                  Spaceship::Certificate
-                when 'provisioningProfiles'
-                  Spaceship::ProvisioningProfile
-                else
-                  "none"
-                end
-
-          @csrf_cache = {} unless @csrf_cache
-          @csrf_cache[key] = tokens
+          @csrf_tokens = tokens
         end
       end
-    end
-
-    def csrf_tokens
-      @csrf_tokens || {}
-    end
-
-    def csrf_cache
-      @csrf_cache || {}
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)

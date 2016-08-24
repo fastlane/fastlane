@@ -129,7 +129,6 @@ module Spaceship
     end
 
     def update_service_for_app(app, service)
-      # TODO should this be App or Service?
       ensure_csrf(Spaceship::App)
 
       request(:post, service.service_uri, {
@@ -143,8 +142,7 @@ module Spaceship
     end
 
     def associate_groups_with_app(app, groups)
-      # TODO should this be App or App Group?
-      ensure_csrf(Spaceship::App)
+      ensure_csrf(Spaceship::AppGroup)
 
       request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
         teamId: team_id,
@@ -353,7 +351,8 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      # TODO: Document
+      ensure_csrf(Spaceship::App)
 
       params = {
         teamId: team_id,
@@ -383,7 +382,8 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      # TODO: Document
+      ensure_csrf(Spaceship::App)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
@@ -393,7 +393,8 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      # TODO: Document
+      ensure_csrf(Spaceship::App)
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", {
         teamId: team_id,
@@ -410,18 +411,24 @@ module Spaceship
 
     private
 
-    # TODO can this take klass and expected_key?
+    # TODO: add docs
+    def csrf_cache
+      @csrf_cache || {}
+    end
+
+    # TODO add docs
     def ensure_csrf(klass)
       if csrf_cache[klass]
-        @csrf_tokens = csrf_cache[klass]
+        self.csrf_tokens = csrf_cache[klass]
         return
       end
 
-      @csrf_tokens = nil
+      self.csrf_tokens = nil
+      # TODO: Add comments from previous code
       klass.all # to fetch the tokens
       klass.all # to fetch the tokens
 
-      csrf_cache[klass] = csrf_tokens
+      csrf_cache[klass] = self.csrf_tokens
     end
 
   end
