@@ -6,29 +6,6 @@ describe Spaceship::Client do
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
-  describe '#api_key' do
-    let(:path) { File.expand_path("~/Library/Caches/spaceship_api_key.txt") }
-    it 'returns the extracted api key from the login page' do
-      expect(subject.api_key).to eq('aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa')
-    end
-
-    it "stores a cached result in /tmp" do
-      File.delete(path) if File.exist?(path)
-      expect(subject.api_key).to eq('aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa')
-      expect(File.read(path)).to eq("aaabd3417a7776362562d2197faaa80a8aaab108fd934911bcbea0110d07faaa")
-    end
-
-    it "uses the cached api key if it exists" do
-      new_value = "NewValue"
-      File.write(path, new_value)
-      expect(subject.api_key).to eq(new_value)
-    end
-
-    after do
-      File.delete(path) if File.exist?(path)
-    end
-  end
-
   describe '#login' do
     it 'sets the session cookies' do
       response = subject.login(username, password)
