@@ -229,16 +229,16 @@ module Spaceship
       # Now fill in the values we have
       # some values are nil, that's why there is a hash
       data['versionString'] = { value: version }
-      data['newApp']['name'] = { value: name }
-      data['newApp']['bundleId']['value'] = bundle_id
-      data['newApp']['primaryLanguage']['value'] = primary_language || 'English'
-      data['newApp']['vendorId'] = { value: sku }
-      data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
-      data['companyName']['value'] = company_name if company_name
-      data['newApp']['appType'] = app_type
+      data['name'] = { value: name }
+      data['bundleId'] = { value: bundle_id }
+      data['primaryLanguage'] = { value: primary_language || 'English' }
+      data['vendorId'] = { value: sku }
+      data['bundleIdSuffix'] = { value: bundle_id_suffix }
+      data['companyName'] = { value: company_name } if company_name
+      data['enabledPlatformsForCreation'] = { value: [app_type] }
 
       data['initialPlatform'] = app_type
-      data['enabledPlatformsForCreation']['value'] = [app_type]
+      data['enabledPlatformsForCreation'] = { value: [app_type] }
 
       # Now send back the modified hash
       r = request(:post) do |req|
