@@ -372,6 +372,10 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
+      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
+      # use a different entity to gather the csrf token
+      ensure_csrf(Spaceship::App)
+
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
         provisioningProfileId: profile_id
