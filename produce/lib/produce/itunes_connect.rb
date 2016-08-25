@@ -33,11 +33,7 @@ module Produce
         UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
 
         application = fetch_application
-        counter = 0
         while application.nil?
-          counter += 1
-          UI.crash!("Couldn't find newly created app on iTunes Connect - please check the website for more information") if counter == 60
-
           # Since 2016-08-10 iTunes Connect takes some time to actually list the newly created application
           # We have no choice but to poll to see if the newly created app is already available
           UI.message("Waiting for the newly created application to be available on iTunes Connect...")
