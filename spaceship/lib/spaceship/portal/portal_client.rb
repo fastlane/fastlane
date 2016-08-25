@@ -1,5 +1,4 @@
 module Spaceship
-  # rubocop:disable Metrics/ClassLength
   class PortalClient < Spaceship::Client
     #####################################################
     # @!group Init and Login
@@ -7,29 +6,6 @@ module Spaceship
 
     def self.hostname
       "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/"
-    end
-
-    # Fetches the latest API Key from the Apple Dev Portal
-    def api_key
-      cache_path = File.expand_path("~/Library/Caches/spaceship_api_key.txt")
-      begin
-        cached = File.read(cache_path)
-      rescue Errno::ENOENT
-      end
-      return cached if cached
-
-      landing_url = "https://developer.apple.com/account/"
-      logger.info("GET: " + landing_url)
-      headers = @client.get(landing_url).headers
-      results = headers['location'].match(/.*appIdKey=(\h+)/)
-      if (results || []).length > 1
-        api_key = results[1]
-        FileUtils.mkdir_p(File.dirname(cache_path))
-        File.write(cache_path, api_key) if api_key.length == 64
-        return api_key
-      else
-        raise "Could not find latest API Key from the Dev Portal - the server might be slow right now"
-      end
     end
 
     def send_login_request(user, password)
@@ -449,5 +425,4 @@ module Spaceship
       csrf_cache[klass] = self.csrf_tokens
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end
