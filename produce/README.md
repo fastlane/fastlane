@@ -164,7 +164,7 @@ All available values can also be passed using environment variables, run `produc
 
 Your `Fastfile` should look like this
 ```ruby
-lane :appstore do
+lane :release do
   produce(
     username: 'felix@krausefx.com',
     app_identifier: 'com.krausefx.app',
