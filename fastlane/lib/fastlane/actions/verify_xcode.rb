@@ -33,12 +33,19 @@ module Fastlane
             "Authority=Apple Root CA",
             "TeamIdentifier=59GAB85EFG"
           ],
-          [ # Found on Xcode installations downloaded from developer.apple.com
+          [ # Found on Xcode installations (pre-Xcode 8) downloaded from developer.apple.com
             "Identifier=com.apple.dt.Xcode",
             "Authority=Software Signing",
             "Authority=Apple Code Signing Certification Authority",
             "Authority=Apple Root CA",
             "TeamIdentifier=not set"
+          ],
+          [ # Found on Xcode installations (post-Xcode 8) downloaded from developer.apple.com
+            "Identifier=com.apple.dt.Xcode",
+            "Authority=Software Signing",
+            "Authority=Apple Code Signing Certification Authority",
+            "Authority=Apple Root CA",
+            "TeamIdentifier=59GAB85EFG"
           ]
         ]
 
