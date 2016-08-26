@@ -449,5 +449,5 @@ module Spaceship
       csrf_cache[klass] = self.csrf_tokens
     end
   end
-  # rubocop:disable Metrics/ClassLength
+  # rubocop:enable Metrics/ClassLength
 end
