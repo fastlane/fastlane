@@ -66,22 +66,42 @@ team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
 
 ### Multiple users configuration
 
+#### Using environment vairables
+
 In big teams instead of specifying one email for `apple_id`, you can get `apple_id` from environment variable instead. 
 Doing this will allow different developers to specify their own apple ids, and won't affect others
 In case if this enviroment variable won't be setup - then it will be asked by fastlane on any command that requires apple_id
 
 ```ruby
+# Appfile
 # without default fallback user will be asked to input apple_id
 apple_id ENV["MY_APP_NAME_APPLE_ID"] 
 
 # In case if environment variable isn't set up, fallback email will be used
-apple_id ENV["MY_APP_NAME_APPLE_ID"] || "defaultintegratoremail@gmail.com"
+apple_id ENV["MY_APP_NAME_APPLE_ID"] || "default@email.com"
 ```
 
 ```bash
 # ~/.bashrc of some user
-export MY_APP_NAME_APPLE_ID="someuser@gmail.com"
+export MY_APP_NAME_APPLE_ID="some_user@gmail.com"
 
 # ~/.bashrc of some another user
-export MY_APP_NAME_APPLE_ID="someanotheruser@gmail.com"
+export MY_APP_NAME_APPLE_ID="another_user@gmail.com"
+```
+
+#### Using file check and .gitignore
+
+As an another option, you can use use file checking and .gitignore combination:
+```ruby
+# Appfile
+if File.exist?("apple_id.txt")
+  apple_id File.read("apple_id.txt")
+else
+  apple_id "default@email.com"
+end
+```
+
+```sh
+# .gitignore
+apple_id.txt
 ```
