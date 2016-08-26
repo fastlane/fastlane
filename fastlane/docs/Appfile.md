@@ -63,3 +63,25 @@ If you want to access those values from within your `Fastfile` use
 identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
 ```
+
+### Multiple users configuration
+
+In big teams instead of specifying one email for `apple_id`, you can get `apple_id` from environment variable instead. 
+Doing this will allow different developers to specify their own apple ids, and won't affect others
+In case if this enviroment variable won't be setup - then it will be asked by fastlane on any command that requires apple_id
+
+```ruby
+# without default fallback user will be asked to input apple_id
+apple_id ENV["MY_APP_NAME_APPLE_ID"] 
+
+# In case if environment variable isn't set up, fallback email will be used
+apple_id ENV["MY_APP_NAME_APPLE_ID"] || "defaultintegratoremail@gmail.com"
+```
+
+```bash
+# ~/.bashrc of some user
+export MY_APP_NAME_APPLE_ID="someuser@gmail.com"
+
+# ~/.bashrc of some another user
+export MY_APP_NAME_APPLE_ID="someanotheruser@gmail.com"
+```
