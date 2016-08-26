@@ -141,8 +141,9 @@ module Fastlane
           }
         end
 
-        # lane
-        if should_add_payload[:lane]
+        # Add the lane to the Slack message
+        # This might be nil, if slack is called as "one-off" action
+        if should_add_payload[:lane] && Actions.lane_context[Actions::SharedValues::LANE_NAME]
           slack_attachment[:fields] << {
             title: 'Lane',
             value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
