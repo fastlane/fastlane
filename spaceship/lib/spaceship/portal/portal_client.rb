@@ -1,4 +1,5 @@
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class PortalClient < Spaceship::Client
     #####################################################
     # @!group Init and Login
@@ -329,9 +330,9 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
-      # use a different entity to gather the csrf token
-      ensure_csrf(Spaceship::App)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       params = {
         teamId: team_id,
@@ -348,9 +349,9 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
-      # use a different entity to gather the csrf token
-      ensure_csrf(Spaceship::App)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
@@ -365,9 +366,9 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
-      # use a different entity to gather the csrf token
-      ensure_csrf(Spaceship::App)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
@@ -377,9 +378,9 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false)
-      # Calling provisioning_profiles uses a different api end point than creating or deleting them so we
-      # use a different entity to gather the csrf token
-      ensure_csrf(Spaceship::App)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", {
         teamId: team_id,
@@ -394,6 +395,27 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
+    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
+    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
+    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
+    # This method is being called from all requests that modify, create or downloading provisioning
+    # profiles.
+    # Source https://github.com/fastlane/fastlane/issues/5903
+    def fetch_csrf_token_for_provisioning(mac: false)
+      req = request(:post) do |r|
+        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          pageSize: 1,
+          pageNumber: 1,
+          sort: "name=asc"
+        }
+      end
+
+      parse_response(req, 'provisioningProfiles')
+      return nil
+    end
+
     private
 
     # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
@@ -404,6 +426,8 @@ module Spaceship
     # Ensures that there are csrf tokens for the appropriate entity type
     # Relies on store_csrf_tokens to set csrf_tokens to the appropriate value
     # then stores that in the correct place in cache
+    # This method also takes a block, if you want to send a custom request, instead of
+    # calling `.all` on the given klass. This is used for provisioning profiles.
     def ensure_csrf(klass)
       if csrf_cache[klass]
         self.csrf_tokens = csrf_cache[klass]
@@ -414,15 +438,16 @@ module Spaceship
 
       # If we directly create a new resource (e.g. app) without querying anything before
       # we don't have a valid csrf token, that's why we have to do at least one request
-      klass.all
+      block_given? ? yield : klass.all
 
       # Update 18th August 2016
       # For some reason, we have to query the resource twice to actually get a valid csrf_token
       # I couldn't find out why, the first response does have a valid Set-Cookie header
       # But it still needs this second request
-      klass.all
+      block_given? ? yield : klass.all
 
       csrf_cache[klass] = self.csrf_tokens
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
