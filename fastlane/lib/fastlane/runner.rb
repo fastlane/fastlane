@@ -145,7 +145,7 @@ module Fastlane
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
-        UI.success "Cruising over to lane '#{pretty.join(' ')}' 🚖"
+        UI.message "Cruising over to lane '#{pretty.join(' ')}' 🚖"
 
         # Actually switch lane now
         self.current_lane = new_lane
@@ -157,7 +157,7 @@ module Fastlane
         # Call the platform specific after block and then the general one
         execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
 
-        UI.success "Cruising back to lane '#{original_full}' 🚘".green
+        UI.message "Cruising back to lane '#{original_full}' 🚘"
         return result
       else
         raise LaneNotAvailableError.new, "Lane not found"
