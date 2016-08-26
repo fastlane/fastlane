@@ -146,7 +146,7 @@ module Fastlane
         end
 
         # By default we put xcodebuild.log in the Logs folder
-        buildlog_path ||= File.expand_path("~/Library/Logs/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}")
+        buildlog_path ||= File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}")
 
         # Joins args into space delimited string
         xcodebuild_args = xcodebuild_args.join(" ")
