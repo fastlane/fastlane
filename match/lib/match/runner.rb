@@ -91,7 +91,8 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
-      Utils.fill_environment(params, uuid)
+      profile_name = parsed["Name"]
+      Utils.fill_environment(params: params, uuid: uuid, profile_name: profile_name)
 
       return uuid
     end

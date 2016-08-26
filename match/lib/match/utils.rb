@@ -27,15 +27,27 @@ module Match
     end
 
     # Fill in the UUID of the profiles in environment variables, much recycling
-    def self.fill_environment(params, uuid)
+    def self.fill_environment(params: nil, uuid: nil, profile_name: nil)
       # instead we specify the UUID of the profiles
       key = environment_variable_name(params)
       UI.important "Setting environment variable '#{key}' to '#{uuid}'" if $verbose
       ENV[key] = uuid
+
+      if profile_name
+        key = profile_name_environment_variable_name(params)
+        UI.important "Setting environment variable '#{key}' to '#{profile_name}'" if $verbose
+        ENV[key] = profile_name
+      end
+
+      uuid
     end
 
     def self.environment_variable_name(params)
       ["sigh", params[:app_identifier], params[:type]].join("_")
+    end
+
+    def self.profile_name_environment_variable_name(params)
+      ["sigh", params[:app_identifier], "profile_name", params[:type]].join("_")
     end
   end
 end
