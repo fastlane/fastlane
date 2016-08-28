@@ -55,7 +55,7 @@ Define different environments (`lanes`) in your `Fastfile`: Examples are: `appst
 You define a `lane` like this (more details about the commands in the [Actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) documentation):
 
 ```ruby
-lane :appstore do
+lane :release do
   increment_build_number
   cocoapods
   scan
@@ -71,7 +71,7 @@ end
 To launch the `appstore` lane, just run:
 
 ```sh
-fastlane appstore
+fastlane release
 ```
 
               |  fastlane

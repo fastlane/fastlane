@@ -3,6 +3,7 @@ module Fastlane
     module SharedValues
       SCAN_DERIVED_DATA_PATH = :SCAN_DERIVED_DATA_PATH
       SCAN_GENERATED_PLIST_FILE = :SCAN_GENERATED_PLIST_FILE
+      SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
     end
 
     class ScanAction < Action
@@ -13,7 +14,7 @@ module Fastlane
           destination = values[:destination] # save destination value which can be later overridden
           Scan.config = values # we set this here to auto-detect missing values, which we need later on
           unless values[:derived_data_path].to_s.empty?
-            plist_files_before = Dir["#{values[:derived_data_path]}/**/Logs/Test/*TestSummaries.plist"]
+            plist_files_before = test_summary_filenames(values[:derived_data_path])
           end
 
           FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
@@ -29,8 +30,10 @@ module Fastlane
         ensure
           unless values[:derived_data_path].to_s.empty?
             Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path]
-            plist_files_after = Dir["#{values[:derived_data_path]}/**/Logs/Test/*TestSummaries.plist"]
-            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = (plist_files_after - plist_files_before).last
+            plist_files_after = test_summary_filenames(values[:derived_data_path])
+            all_test_summaries = (plist_files_after - plist_files_before)
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
           end
 
           FastlaneCore::UpdateChecker.show_update_status('scan', Scan::VERSION)
@@ -62,6 +65,12 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      private_class_method
+
+      def self.test_summary_filenames(derived_data_path)
+        Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
       end
     end
   end

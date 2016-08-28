@@ -6,6 +6,8 @@ end
 
 def itc_stub_login
   # Retrieving the current login URL
+  itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+  File.delete(itc_service_key_path) if File.exist?(itc_service_key_path)
 
   stub_request(:get, 'https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js').
     to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))

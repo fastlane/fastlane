@@ -28,6 +28,8 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
+    attr_accessor :csrf_tokens
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -308,6 +310,11 @@ module Spaceship
 
     def itc_service_key
       return @service_key if @service_key
+
+      # Check if we have a local cache of the key
+      itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+      return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+
       # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
       # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
       # the content be served only as plain-text, which seems to work around their problem, while not affecting
@@ -317,7 +324,12 @@ module Spaceship
       headers = { 'Accept-Encoding' => 'identity' }
       # We need a service key from a JS file to properly auth
       js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
-      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
+      @service_key = js.body.match(/itcServiceKey = '(.*)'/)[1]
+
+      # Cache the key locally
+      File.write(itc_service_key_path, @service_key)
+
+      return @service_key
     end
 
     #####################################################
@@ -345,6 +357,11 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    # memorize the last csrf tokens from responses
+    def csrf_tokens
+      @csrf_tokens || {}
+    end
+
     private
 
     def do_login(user, password)
@@ -362,11 +379,6 @@ module Spaceship
           @csrf_tokens = tokens
         end
       end
-    end
-
-    # memorize the last csrf tokens from responses
-    def csrf_tokens
-      @csrf_tokens || {}
     end
 
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)

@@ -96,7 +96,7 @@ module Scan
                                      short_option: "-l",
                                      env_name: "SCAN_BUILDLOG_PATH",
                                      description: "The directory were to store the raw log",
-                                     default_value: "~/Library/Logs/scan"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/scan"),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
