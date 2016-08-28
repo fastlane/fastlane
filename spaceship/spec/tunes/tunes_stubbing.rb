@@ -66,7 +66,6 @@ def itc_stub_applications
 end
 
 def itc_stub_ratings
-	# Rating summary
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews/summary?platform=ios&versionId=").
     to_return(status: 200, body: itc_read_fixture_file('ratings_summary.json'), headers: { 'Content-Type' => 'application/json' })
 
