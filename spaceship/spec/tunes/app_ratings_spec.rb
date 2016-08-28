@@ -41,11 +41,11 @@ describe Spaceship::Tunes::AppRatings do
 
       expect(reviews.count).to eq(4)
       expect(reviews.first).to eq({
-        "id" => 1000000000,
+        "id" => 1_000_000_000,
         "rating" => 2,
         "title" => "Title 1",
         "review" => "Review 1",
-        "created" => 1463887020000,
+        "created" => 1_463_887_020_000,
         "nickname" => "Reviewer1",
         "storeFront" => "NZ"
       })
