@@ -71,6 +71,7 @@ module Sigh
         c.option '--bundle_version STRING', String, 'Bundle version to force binary and all nested binaries to use (CFBundleIdentifier).'
         c.option '--use_app_entitlements', 'Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile.'
         c.option '-g', '--new_bundle_id STRING', String, 'New application bundle ID'
+        c.option '--keychain_path STRING', String, 'Path to the keychain that /usr/bin/codesign should use'
 
         c.action do |args, options|
           Sigh::Resign.new.run(options, args)
