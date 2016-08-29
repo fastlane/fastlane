@@ -160,7 +160,7 @@ module Gym
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :toolchain,
                                      env_name: "GYM_TOOLCHAIN",
-                                     description: "The toolchain that should be used for building the application",
+                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
