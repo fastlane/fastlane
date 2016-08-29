@@ -120,6 +120,12 @@ module Spaceship
         client.get_resolution_center(apple_id, platform)
       end
 
+      def ratings
+        attrs = client.get_rating_summary(apple_id, platform)
+        attrs[:application] = self
+        Tunes::AppRatings.factory(attrs)
+      end
+
       # kept for backward compatibility
       # tries to guess the platform of the currently submitted apps
       # note that as ITC now supports multiple app types, this might break
