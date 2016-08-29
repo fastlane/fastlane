@@ -294,6 +294,29 @@ app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last
 
 Right now, `spaceship` can't modify or create internal testers.
 
+## App ratings & reviews
+
+```ruby
+# Get the rating summary for an application
+ratings = app.ratings # => Spaceship::Tunes::AppRatings
+
+# Get the number of 5 star ratings
+five_star_count = ratings.rating_summary.five_star_rating_count
+
+# Find the average rating across all stores
+average_rating = ratings.rating_summary.average_rating
+
+# List store fronts the app is available in
+ratings.store_fronts # => Hash of country code to Spaceship::Tunes::AppRatingSummary
+
+# Find the average rating for a given store front
+average_rating = ratings.store_fronts["US"].average_rating
+
+# Get reviews for a given store front
+reviews = ratings.reviews("US") # => Array of hashes representing review data
+
+```
+
 ### License
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

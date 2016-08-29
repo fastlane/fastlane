@@ -1,0 +1,94 @@
+{
+	"data": {
+		"versions": {
+			"9935990": "1.0.3",
+			"447562633": "2.0.11",
+			"813151378": "2.1.0",
+			"590462967": "2.0.21",
+			"335852643": "2.0.9",
+			"572642665": "2.0.19",
+			"817962890": "2.3.1",
+			"595852783": "2.0.23",
+			"84842723": "2.0.7",
+			"482842633": "2.0.13",
+			"565103772": "2.0.17",
+			"11554467": "2.0.3",
+			"667073265": "2.0.27",
+			"607593026": "2.0.25",
+			"813260335": "2.1.1",
+			"818528126": "3.0.0",
+			"816754327": "2.3.0",
+			"10581947": "2.0.1",
+			"15346832": "2.0.5",
+			"549252647": "2.0.15",
+			"816482484": "2.2.4",
+			"814823343": "2.2.1",
+			"793582675": "2.0.29",
+			"815408101": "2.2.3"
+		},
+		"storeFronts": [{
+			"countryCode": "US",
+			"ratings": {
+				"reviewCount": 66,
+				"ratingCount": 113,
+				"ratingOneCount": 27,
+				"ratingTwoCount": 20,
+				"ratingThreeCount": 9,
+				"ratingFourCount": 12,
+				"ratingFiveCount": 45
+			},
+			"rssUrl": "https://itunes.apple.com/nz/rss/customerreviews/id=898536088/sortBy=mostRecent/xml"
+		}, {
+			"countryCode": "AU",
+			"ratings": {
+				"reviewCount": 6,
+				"ratingCount": 8,
+				"ratingOneCount": 7,
+				"ratingTwoCount": 0,
+				"ratingThreeCount": 0,
+				"ratingFourCount": 1,
+				"ratingFiveCount": 0
+			},
+			"rssUrl": "https://itunes.apple.com/au/rss/customerreviews/id=898536088/sortBy=mostRecent/xml"
+		}, {
+			"countryCode": "GB",
+			"ratings": {
+				"reviewCount": 2,
+				"ratingCount": 2,
+				"ratingOneCount": 1,
+				"ratingTwoCount": 0,
+				"ratingThreeCount": 0,
+				"ratingFourCount": 0,
+				"ratingFiveCount": 1
+			},
+			"rssUrl": "https://itunes.apple.com/gb/rss/customerreviews/id=898536088/sortBy=mostRecent/xml"
+		}, {
+			"countryCode": "NZ",
+			"ratings": {
+				"reviewCount": 1,
+				"ratingCount": 1,
+				"ratingOneCount": 1,
+				"ratingTwoCount": 0,
+				"ratingThreeCount": 0,
+				"ratingFourCount": 0,
+				"ratingFiveCount": 0
+			},
+			"rssUrl": "https://itunes.apple.com/us/rss/customerreviews/id=898536088/sortBy=mostRecent/xml"
+		}],
+		"ratings": {
+			"reviewCount": 75,
+			"ratingCount": 124,
+			"ratingOneCount": 36,
+			"ratingTwoCount": 20,
+			"ratingThreeCount": 9,
+			"ratingFourCount": 13,
+			"ratingFiveCount": 46
+		}
+	},
+	"messages": {
+		"warn": null,
+		"error": null,
+		"info": null
+	},
+	"statusCode": "SUCCESS"
+}
