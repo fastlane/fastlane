@@ -35,6 +35,7 @@ module Gym
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << "-archivePath '#{archive_path}'"

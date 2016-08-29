@@ -28,6 +28,10 @@ module Gym
         options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
         options << "-exportPath '#{temporary_output_path}'"
 
+        if Gym.config[:toolchain]
+          options << "-toolchain '#{Gym.config[:toolchain]}'"
+        end
+
         options
       end
 
