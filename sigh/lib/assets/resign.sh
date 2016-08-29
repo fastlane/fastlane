@@ -124,6 +124,7 @@ usage() {
     echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
     echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
+    echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
     echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
     echo -e "\t-h, --help\t\t\t\tDisplay help message." >&2
     exit 2
@@ -142,6 +143,7 @@ KEYCHAIN=""
 VERSION_NUMBER=""
 SHORT_VERSION=
 BUNDLE_VERSION=
+KEYCHAIN_PATH=
 RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
@@ -187,6 +189,10 @@ while [ "$1" != "" ]; do
             shift
             BUNDLE_VERSION="$1"
             ;;
+            --keychain-path )
+            shift
+            KEYCHAIN_PATH="$1"
+            ;;
         -v | --verbose )
             VERBOSE="--verbose"
             ;;
@@ -202,6 +208,12 @@ while [ "$1" != "" ]; do
     # Next arg
     shift
 done
+
+KEYCHAIN_FLAG=
+if [ -n "$KEYCHAIN_PATH" ]
+then
+    KEYCHAIN_FLAG="--keychain $KEYCHAIN_PATH"
+fi
 
 # Log the options
 for provision in ${RAW_PROVISIONS[@]}; do
@@ -221,6 +233,7 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
 [[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
 [[ -n "${BUNDLE_VERSION}" ]] && log "Specified bundle version to use: '$BUNDLE_VERSION'"
+[[ -n "${KEYCHAIN_FLAG}" ]] && log "Specified keychain to use: '$KEYCHAIN_PATH'"
 [[ -n "${NEW_FILE}" ]] && log "Output file name: '$NEW_FILE'"
 
 # Check that version number option is not clashing with short or bundle version options
@@ -514,7 +527,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
             then
-                /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" "$framework"
+                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
@@ -573,7 +586,7 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
         cp -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
@@ -582,7 +595,7 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
         cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
 
