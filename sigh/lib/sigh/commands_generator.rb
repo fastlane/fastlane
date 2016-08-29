@@ -69,6 +69,7 @@ module Sigh
         c.option '-e', '--entitlements PATH', String, 'The path to the entitlements file to use.'
         c.option '--short_version STRING', String, 'Short version string to force binary and all nested binaries to use (CFBundleShortVersionString).'
         c.option '--bundle_version STRING', String, 'Bundle version to force binary and all nested binaries to use (CFBundleIdentifier).'
+        c.option '--use_app_entitlements', 'Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile.'
         c.option '-g', '--new_bundle_id STRING', String, 'New application bundle ID'
 
         c.action do |args, options|
