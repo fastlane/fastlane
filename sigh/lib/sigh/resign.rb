@@ -5,10 +5,9 @@ module Sigh
   class Resign
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
-
       ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
+      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
         UI.user_error!("Failed to re-sign .ipa")
       end
     end
@@ -17,7 +16,7 @@ module Sigh
       self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
@@ -36,6 +35,7 @@ module Sigh
       verbose = "-v" if $verbose
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
+      specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
 
       command = [
         resign_path.shellescape,
@@ -50,7 +50,8 @@ module Sigh
         use_app_entitlements_flag,
         verbose,
         bundle_id,
-        ipa.shellescape
+        ipa.shellescape,
+        specific_keychain
       ].join(' ')
 
       puts command.magenta
@@ -76,12 +77,13 @@ module Sigh
       bundle_version = options.bundle_version || nil
       new_bundle_id = options.new_bundle_id || nil
       use_app_entitlements = options.use_app_entitlements || nil
+      keychain_path = options.keychain_path || nil
 
       if options.provisioning_name
         UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
       end
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path
     end
 
     def find_resign_path
