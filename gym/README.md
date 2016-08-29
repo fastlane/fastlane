@@ -193,7 +193,7 @@ Using `fastlane` you can define a configuration like
 
 ```ruby
 lane :beta do
-  xctool
+  scan
   gym(scheme: "MyApp")
   crashlytics
 end

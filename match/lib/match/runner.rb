@@ -31,6 +31,12 @@ module Match
       TablePrinter.print_summary(params, uuid)
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
+    rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
+      UI.error("An error occured while verifying your certificates and profiles with the Apple Developer Portal.")
+      UI.error("If you already have your certificates stored in git, you can run `match` in readonly mode")
+      UI.error("to just install the certificates and profiles without accessing the Dev Portal.")
+      UI.error("To do so, just pass `readonly: true` to your match call.")
+      raise ex
     ensure
       GitHelper.clear_changes
     end
