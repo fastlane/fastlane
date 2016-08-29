@@ -95,7 +95,7 @@ As an another option, you can use use file checking and .gitignore combination:
 ```ruby
 # Appfile
 if File.exist?("apple_id.txt")
-  apple_id File.read("apple_id.txt")
+  apple_id File.read("apple_id.txt").strip
 else
   apple_id "default@email.com"
 end
