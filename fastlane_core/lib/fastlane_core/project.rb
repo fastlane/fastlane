@@ -330,6 +330,8 @@ module FastlaneCore
 
       UI.command(command) if print
 
+      result = ''
+
       tries = 1
       begin
         Timeout.timeout(timeout) do
@@ -344,7 +346,6 @@ module FastlaneCore
         retry
       end
 
-      UI.command_output(result) if print
       return result
     end
 
