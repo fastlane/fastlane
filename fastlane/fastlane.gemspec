@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # Password Manager
-  spec.add_dependency 'spaceship', '>= 0.31.10', '< 1.0.0' # communication layer with Apple's web services
+  spec.add_dependency 'spaceship', '>= 0.32.0', '< 1.0.0' # communication layer with Apple's web services
 
   # All the fastlane tools
   spec.add_dependency 'deliver', '>= 1.13.3', '< 2.0.0'
@@ -49,14 +49,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 2.7.0', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.3.2', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.4.1', '< 2.0.0'
-  spec.add_dependency 'sigh', '>= 1.9.0', '< 2.0.0'
+  spec.add_dependency 'sigh', '>= 1.10.0', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.2.0', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.10.0', '< 2.0.0'
   spec.add_dependency 'scan', '>= 0.11.3', '< 2.0.0'
   spec.add_dependency 'supply', '>= 0.7.0', '< 1.0.0'
   spec.add_dependency 'match', '>= 0.6.3', '< 1.0.0'
-  spec.add_dependency 'screengrab', '>= 0.3.2', '< 1.0.0'
+  spec.add_dependency 'screengrab', '>= 0.5.0', '< 1.0.0'
 
   # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
   spec.add_dependency 'activesupport', '< 5'
