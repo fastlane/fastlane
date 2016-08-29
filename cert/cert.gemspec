@@ -22,8 +22,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.29.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '>= 0.22.0', '< 1.0.0' # access to the Dev Portal
+  spec.add_dependency 'fastlane_core', '>= 0.50.3', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'spaceship', '>= 0.32.0', '< 1.0.0' # access to the Dev Portal
 
   # Development only
   spec.add_development_dependency 'bundler'
