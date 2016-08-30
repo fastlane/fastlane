@@ -1,5 +1,5 @@
 describe Frameit do
-  describe Frameit::ConfigParser do
+  describe Frameit::StringsParser do
     describe "parse" do
       it "raise error when file can't be found" do
         expect do
@@ -32,6 +32,13 @@ describe Frameit do
           expect(Frameit::UI).to receive(:error).with(/Empty parsing result for .*translations.bad.strings/)
 
           translations = Frameit::StringsParser.parse("./spec/fixtures/translations.bad.strings")
+          expect(translations). to eq({})
+        end
+
+        it "explains that only UTF-16 is allowed if a UTF-8 encoded, but otherwise valid file is parsed" do
+          expect(Frameit::UI).to receive(:error).with(/.*translations.utf8.strings.*UTF16/)
+
+          translations = Frameit::StringsParser.parse("./spec/fixtures/translations.utf8.strings")
           expect(translations). to eq({})
         end
       end
