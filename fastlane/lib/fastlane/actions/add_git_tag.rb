@@ -23,6 +23,18 @@ module Fastlane
         "This will add an annotated git tag to the current branch"
       end
 
+      def self.details
+        [
+          "This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:",
+          "- `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'",
+          "- `lane` is the name of the current fastlane lane",
+          "- `prefix` is anything you want to stick in front of the version number, e.g. 'v'",
+          "- `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action",
+          "",
+          "For example for build 1234 in the 'appstore' lane it will tag the commit with `builds/appstore/1234`"
+        ].join("\n")
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :tag,
@@ -57,6 +69,25 @@ module Fastlane
                                        is_string: false,
                                        default_value: false)
         ]
+      end
+
+      def self.example_code
+        [
+          'add_git_tag # simple tag with default values',
+          'add_git_tag(
+            grouping: "fastlane-builds",
+            prefix: "v",
+            build_number: 123
+          )',
+          '# Alternatively, you can specify your own tag. Note that if you do specify a tag, all other arguments are ignored.
+          add_git_tag(
+            tag: "my_custom_tag"
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
 
       def self.authors
