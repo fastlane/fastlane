@@ -50,7 +50,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
-                                       description: "Show nothing",
+                                       description: "Execute command without logging output",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
