@@ -15,83 +15,77 @@ You can import another `Fastfile` by using the `import` action. This is useful i
 import './path/to/other/Fastfile'
 ```
 
-
+- [Testing](#testing)
+- [Building](#building)
+- [Screenshots](#screenshots)
+- [Project](#project)
+- [Beta](#beta)
+- [Releasing your app](#releasing-your-app)
+- [Source Control](#source-control)
+- [Notifications](#notifications)
 - [Misc](#misc)
 
 
 
 
-
-# Misc
-
-### adb
-
-Run ADB Actions
-
-> see adb --help for more details
-
-adb | 
------|----
-Supported platforms | android
-Author | @hjanuschka
-Returns | The output of the adb command
+# Testing
 
 
+# Building
 
 
-<details>
-  <summary>Parameters</summary>
-
-Key | Description
-----|------------
-  `serial` | Android serial, which device should be used for this command
-  `command` | All commands you want to pass to the adb command, e.g. `kill-server`
-  `adb_path` | The path to your `adb` binary
-
-</details>
+# Screenshots
 
 
+# Project
 
 
-
-### adb_devices
-
-Get an Array of Connected android device serials
-
-> fetches device list via adb
-
-adb_devices | 
------|----
-Supported platforms | android
-Author | @hjanuschka
-Returns | Array of devices
+# Beta
 
 
+# Releasing your app
 
 
-<details>
-  <summary>Parameters</summary>
-
-Key | Description
-----|------------
-  `adb_path` | The path to your `adb` binary
-
-</details>
-
-
-
-
+# Source Control
 
 ### add_git_tag
 
 This will add an annotated git tag to the current branch
 
-> 
+> This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:
+- `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'
+- `lane` is the name of the current fastlane lane
+- `prefix` is anything you want to stick in front of the version number, e.g. 'v'
+- `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action
+For example for build 1234 in the 'appstore' lane it will tag the commit with `builds/appstore/1234`
 
 add_git_tag | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic, @maschall
+
+
+
+##### Examples
+
+```ruby
+add_git_tag # simple tag with default values
+```
+
+```ruby
+add_git_tag(
+  grouping: "fastlane-builds",
+  prefix: "v",
+  build_number: 123
+)
+```
+
+```ruby
+# Alternatively, you can specify your own tag. Note that if you do specify a tag, all other arguments are ignored.
+add_git_tag(
+  tag: "my_custom_tag"
+)
+```
 
 
 
@@ -115,11 +109,147 @@ Key | Description
 
 
 
+
+# Notifications
+
+### twitter
+
+Post a tweet on Twitter.com
+
+> Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token.
+
+twitter | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @hjanuschka
+
+
+
+##### Example
+
+```ruby
+twitter(
+  message: "You rock!",
+  access_token: "XXXX",
+  access_token_secret: "xxx",
+  consumer_key: "xxx",
+  consumer_secret: "xxx"
+)
+```
+
+
+
+
+<details>
+  <summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `consumer_key` | Consumer Key
+  `consumer_secret` | Consumer Secret
+  `access_token` | Access Token
+  `access_token_secret` | Access Token Secret
+  `message` | The tweet
+
+</details>
+
+
+
+
+
+
+# Misc
+
+### adb
+
+Run ADB Actions
+
+> see adb --help for more details
+
+adb | 
+-----|----
+Supported platforms | android
+Author | @hjanuschka
+Returns | The output of the adb command
+
+
+
+##### Example
+
+```ruby
+adb(
+  command: "shell ls"
+)
+```
+
+
+
+
+<details>
+  <summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `serial` | Android serial, which device should be used for this command
+  `command` | All commands you want to pass to the adb command, e.g. `kill-server`
+  `adb_path` | The path to your `adb` binary
+
+</details>
+
+
+
+
+
+### adb_devices
+
+Get an Array of Connected android device serials
+
+> Fetches device list via adb, e.g. run an adb command on all connected devices.
+
+adb_devices | 
+-----|----
+Supported platforms | android
+Author | @hjanuschka
+Returns | Returns an array of all currently connected android devices
+
+
+
+##### Example
+
+```ruby
+adb_devices.each  do |device|
+  model = adb(command: "shell getprop ro.product.model",
+    serial: device.serial
+   ).strip
+
+  puts "Model #{model} is connected"
+end
+```
+
+
+
+
+<details>
+  <summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `adb_path` | The path to your `adb` binary
+
+</details>
+
+
+
+
+
 ### appaloosa
 
 Upload your app to Appaloosa Store
 
-> Appaloosa is a private mobile application store. This action  offers a quick deployment on the platform. You can create an  account, push to your existing account, or manage your user  groups. We accept iOS and Android applications.
+> Appaloosa is a private mobile application store. This action 
+offers a quick deployment on the platform. You can create an 
+account, push to your existing account, or manage your user 
+groups. We accept iOS and Android applications.
 
 appaloosa | 
 -----|----
@@ -513,7 +643,9 @@ Key | Description
 
 Automatically add a badge to your iOS app icon
 
-> This action will add a light/dark badge onto your app icon. You can also provide your custom badge/overlay or add an shield for more customization more info: https://github.com/HazAT/badge
+> This action will add a light/dark badge onto your app icon.
+You can also provide your custom badge/overlay or add an shield for more customization more info:
+https://github.com/HazAT/badge
 
 badge | 
 -----|----
@@ -1314,7 +1446,9 @@ Key | Description
 
 Download a file from a remote server (e.g. JSON file)
 
-> Specify the URL to download and get the content as a return value For more advanced networking code, use the Ruby functions instead: http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html
+> Specify the URL to download and get the content as a return value
+For more advanced networking code, use the Ruby functions instead:
+http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html
 
 download | 
 -----|----
@@ -1448,7 +1582,9 @@ Author | @lmirosevic
 
 Ensures the given text is nowhere in the code base
 
-> Makes sure the given text is nowhere in the code base. This can be used to check if there is any debug code still in your code base or if you have things like // TO DO or similar
+> Makes sure the given text is nowhere in the code base. This can be used
+to check if there is any debug code still in your code base or if you have
+things like // TO DO or similar
 
 ensure_no_debug_code | 
 -----|----
@@ -1478,7 +1614,8 @@ Key | Description
 
 Ensure the selected Xcode version with xcode-select matches a value
 
-> If building your app requires a specific version of Xcode, you can invoke this command before using gym.          For example, to ensure that a beta version is not accidentally selected to build, which would make uploading to TestFlight fail.
+> If building your app requires a specific version of Xcode, you can invoke this command before using gym.
+        For example, to ensure that a beta version is not accidentally selected to build, which would make uploading to TestFlight fail.
 
 ensure_xcode_version | 
 -----|----
@@ -1685,7 +1822,43 @@ Key | Description
 
 This will verify if a given release version is available on GitHub
 
-> This will return all information about a release. For example:                {"url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",                  "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",                  "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",                  "html_url"=>"https://github.com/fastlane/fastlane/releases/tag/1.8.0",                  "id"=>1537713,                  "tag_name"=>"1.8.0",                  "target_commitish"=>"master",                  "name"=>"1.8.0 Switch Lanes & Pass Parameters",                  "draft"=>false,                  "author"=>                   {"login"=>"KrauseFx",                    "id"=>869950,                    "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",                    "gravatar_id"=>"",                    "url"=>"https://api.github.com/users/KrauseFx",                    "html_url"=>"https://github.com/fastlane",                    "followers_url"=>"https://api.github.com/users/KrauseFx/followers",                    "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",                    "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",                    "starred_url"=>"https://api.github.com/users/KrauseFx/starred{/owner}{/repo}",                    "subscriptions_url"=>"https://api.github.com/users/KrauseFx/subscriptions",                    "organizations_url"=>"https://api.github.com/users/KrauseFx/orgs",                    "repos_url"=>"https://api.github.com/users/KrauseFx/repos",                    "events_url"=>"https://api.github.com/users/KrauseFx/events{/privacy}",                    "received_events_url"=>"https://api.github.com/users/KrauseFx/received_events",                    "type"=>"User",                    "site_admin"=>false},                  "prerelease"=>false,                  "created_at"=>"2015-07-14T23:33:01Z",                  "published_at"=>"2015-07-14T23:44:10Z",                  "assets"=>[],                  "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",                  "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",                  "body"=> ...Markdown...                 "This is one of the biggest updates of `fastlane` yet"               }
+> This will return all information about a release. For example:
+              {"url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",
+                 "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",
+                 "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",
+                 "html_url"=>"https://github.com/fastlane/fastlane/releases/tag/1.8.0",
+                 "id"=>1537713,
+                 "tag_name"=>"1.8.0",
+                 "target_commitish"=>"master",
+                 "name"=>"1.8.0 Switch Lanes & Pass Parameters",
+                 "draft"=>false,
+                 "author"=>
+                  {"login"=>"KrauseFx",
+                   "id"=>869950,
+                   "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",
+                   "gravatar_id"=>"",
+                   "url"=>"https://api.github.com/users/KrauseFx",
+                   "html_url"=>"https://github.com/fastlane",
+                   "followers_url"=>"https://api.github.com/users/KrauseFx/followers",
+                   "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",
+                   "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",
+                   "starred_url"=>"https://api.github.com/users/KrauseFx/starred{/owner}{/repo}",
+                   "subscriptions_url"=>"https://api.github.com/users/KrauseFx/subscriptions",
+                   "organizations_url"=>"https://api.github.com/users/KrauseFx/orgs",
+                   "repos_url"=>"https://api.github.com/users/KrauseFx/repos",
+                   "events_url"=>"https://api.github.com/users/KrauseFx/events{/privacy}",
+                   "received_events_url"=>"https://api.github.com/users/KrauseFx/received_events",
+                   "type"=>"User",
+                   "site_admin"=>false},
+                 "prerelease"=>false,
+                 "created_at"=>"2015-07-14T23:33:01Z",
+                 "published_at"=>"2015-07-14T23:44:10Z",
+                 "assets"=>[],
+                 "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",
+                 "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",
+                 "body"=> ...Markdown...
+                "This is one of the biggest updates of `fastlane` yet"
+              }
 
 get_github_release | 
 -----|----
@@ -2248,7 +2421,8 @@ Key | Description
 
 Import another Fastfile to use its lanes
 
-> This is useful if you have shared lanes across multiple apps and you want to store a Fastfile in a separate folder. The path must be relative to the Fastfile this is called from.
+> This is useful if you have shared lanes across multiple apps and you want to store a Fastfile
+in a separate folder. The path must be relative to the Fastfile this is called from.
 
 import | 
 -----|----
@@ -2296,7 +2470,8 @@ Key | Description
 
 Import another Fastfile from a remote git repository to use its lanes
 
-> This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository.
+> This is useful if you have shared lanes across multiple apps and you want to store the Fastfile
+in a remote git repository.
 
 import_from_git | 
 -----|----
@@ -2353,7 +2528,9 @@ Key | Description
 
 Increment the version number of your project
 
-> This action will increment the version number.  You first have to set up your Xcode project, if you haven't done it already: https://developer.apple.com/library/ios/qa/qa1827/_index.html
+> This action will increment the version number. 
+You first have to set up your Xcode project, if you haven't done it already:
+https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
 increment_version_number | 
 -----|----
@@ -2510,7 +2687,8 @@ Key | Description
 
 Is the current run being executed on a CI system, like Jenkins or Travis
 
-> The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service
+> The return value of this method is true if fastlane is currently executed on
+Travis, Jenkins, Circle or a similar CI service
 
 is_ci | 
 -----|----
@@ -3001,7 +3179,8 @@ Key | Description
 
 This will stop uploading the information which actions were run
 
-> By default, fastlane will share the used actions. No personal information is shard. More information available on https://github.com/fastlane/enhancer Using this action you can opt out
+> By default, fastlane will share the used actions. No personal information is shard. More information available on https://github.com/fastlane/enhancer
+Using this action you can opt out
 
 opt_out_usage | 
 -----|----
@@ -3019,7 +3198,14 @@ Author | @KrauseFx
 
 Makes sure a valid push profile is active and creates a new one if needed
 
-> Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server. Use it like this:  pem(   new_profile: proc do      # your upload code   end )
+> Additionally to the available options, you can also specify a block that only gets executed if a new
+profile was created. You can use it to upload the new profile to your server.
+Use it like this: 
+pem(
+  new_profile: proc do 
+    # your upload code
+  end
+)
 
 pem | 
 -----|----
@@ -3057,7 +3243,8 @@ Key | Description
 
 Upload a new binary to iTunes Connect for TestFlight beta testing
 
-> More details can be found on https://github.com/fastlane/fastlane/tree/master/pilot This integration will only do the TestFlight upload
+> More details can be found on https://github.com/fastlane/fastlane/tree/master/pilot
+This integration will only do the TestFlight upload
 
 pilot | 
 -----|----
@@ -3165,7 +3352,11 @@ Key | Description
 
 Creates or updates an item within your Podio app
 
-> Use this action to create or update an item within your Podio app         (see https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-).         Pass in dictionary with field keys and their values.         Field key is located under Modify app -> Advanced -> Developer -> External ID         (see https://developers.podio.com/examples/items)
+> Use this action to create or update an item within your Podio app
+        (see https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-).
+        Pass in dictionary with field keys and their values.
+        Field key is located under Modify app -> Advanced -> Developer -> External ID
+        (see https://developers.podio.com/examples/items)
 
 podio_item | 
 -----|----
@@ -3238,7 +3429,9 @@ Key | Description
 
 Ask the user for a value or for confirmation
 
-> You can use `prompt` to ask the user for a value or to just let the user confirm the next step When this is executed on a CI service, the passed `ci_input` value will be returned This action also supports multi-line inputs using the `multi_line_end_keyword` option.
+> You can use `prompt` to ask the user for a value or to just let the user confirm the next step
+When this is executed on a CI service, the passed `ci_input` value will be returned
+This action also supports multi-line inputs using the `multi_line_end_keyword` option.
 
 prompt | 
 -----|----
@@ -3335,7 +3528,9 @@ Author | @KrauseFx
 
 Loads a CocoaPods spec as JSON
 
-> This can be used for only specifying a version string in your podspec - and during your release process you'd read it from the podspec by running `version = read_podspec['version']` at the beginning of your lane
+> This can be used for only specifying a version string in your podspec
+- and during your release process you'd read it from the podspec by running
+`version = read_podspec['version']` at the beginning of your lane
 
 read_podspec | 
 -----|----
@@ -3468,7 +3663,14 @@ Author | @danramteke
 
 Codesign an existing ipa file
 
-> You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.  resign(ipa: "path", signing_identity: "identity", provisioning_profile: {   "com.example.awesome-app" => "App.mobileprovision",   "com.example.awesome-app.app-extension" => "Extension.mobileprovision" })
+> You may provide multiple provisioning profiles if the application contains
+nested applications or app extensions, which need their own provisioning
+profile. You can do so by passing an array of provisiong profile strings or a
+hash that associates provisioning profile values to bundle identifier keys.
+resign(ipa: "path", signing_identity: "identity", provisioning_profile: {
+  "com.example.awesome-app" => "App.mobileprovision",
+  "com.example.awesome-app.app-extension" => "Extension.mobileprovision"
+})
 
 resign | 
 -----|----
@@ -3823,7 +4025,11 @@ Key | Description
 
 This will create a new release on GitHub and upload assets for it
 
-> Creates a new release on GitHub. You must provide your GitHub Personal token         (get one from https://github.com/settings/tokens/new), the repository name         and tag name. By default that's 'master'. If the tag doesn't exist, one will be created on the commit or branch passed-in as         commitish. Out parameters provide the release's id, which can be used for later editing and the         release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter.
+> Creates a new release on GitHub. You must provide your GitHub Personal token
+        (get one from https://github.com/settings/tokens/new), the repository name
+        and tag name. By default that's 'master'. If the tag doesn't exist, one will be created on the commit or branch passed-in as
+        commitish. Out parameters provide the release's id, which can be used for later editing and the
+        release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter.
 
 set_github_release | 
 -----|----
@@ -3920,7 +4126,11 @@ Key | Description
 
 Setup xcodebuild, gym and scan for easier Jenkins integration
 
-> - Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin' - Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin' - Sets output directory to './output' (gym, scan and backup_xcarchive). - Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage). - Produce result bundle (gym and scan).
+> - Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'
+- Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'
+- Sets output directory to './output' (gym, scan and backup_xcarchive).
+- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage).
+- Produce result bundle (gym and scan).
 
 setup_jenkins | 
 -----|----
@@ -4054,7 +4264,9 @@ Key | Description
 
 Use slather to generate a code coverage report
 
-> Slather works with multiple code coverage formats including Xcode7 code coverage. Slather is available at https://github.com/SlatherOrg/slather 
+> Slather works with multiple code coverage formats including Xcode7 code coverage.
+Slather is available at https://github.com/SlatherOrg/slather
+
 
 slather | 
 -----|----
@@ -4503,37 +4715,6 @@ Key | Description
 
 
 
-### twitter
-
-Post on twitter
-
-> 
-
-twitter | 
------|----
-Supported platforms | ios, android, mac
-Author | @hjanuschka
-
-
-
-
-<details>
-  <summary>Parameters</summary>
-
-Key | Description
-----|------------
-  `consumer_key` | Consumer Key
-  `consumer_secret` | Consumer Secret
-  `access_token` | Access Token
-  `access_token_secret` | Access Token Secret
-  `message` | The tweet
-
-</details>
-
-
-
-
-
 ### typetalk
 
 Post a message to Typetalk
@@ -4556,7 +4737,8 @@ Author | @Nulab Inc.
 
 Unlock a keychain
 
-> Unlocks the give keychain file and adds it to the keychain search list Keychains can be replaced with `add_to_search_list: :replace`
+> Unlocks the give keychain file and adds it to the keychain search list
+Keychains can be replaced with `add_to_search_list: :replace`
 
 unlock_keychain | 
 -----|----
@@ -4759,7 +4941,12 @@ Key | Description
 
 Update projects code signing settings from your provisioning profile
 
-> This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj The `target_filter` value can be used to only update code signing for specified targets The `build_configuration` value can be used to only update code signing for specified build configurations of the targets passing through the `target_filter` Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles Example: `update_project_provisioning(xcodeproj: "..", target_filter: ".*WatchKit App.*")
+> This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set
+up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj
+The `target_filter` value can be used to only update code signing for specified targets
+The `build_configuration` value can be used to only update code signing for specified build configurations of the targets passing through the `target_filter`
+Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles
+Example: `update_project_provisioning(xcodeproj: "..", target_filter: ".*WatchKit App.*")
 
 update_project_provisioning | 
 -----|----
@@ -4994,7 +5181,9 @@ Author | @ashfurrow
 
 Verifies that the Xcode installation is properly signed by Apple
 
-> This action was implemented after the recent Xcode attack to make sure you're not using a hacked Xcode installation. http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/
+> This action was implemented after the recent Xcode attack to make sure
+you're not using a hacked Xcode installation.
+http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/
 
 verify_xcode | 
 -----|----
@@ -5021,7 +5210,8 @@ Key | Description
 
 Increment or set the version in a podspec file
 
-> You can use this action to manipulate any 'version' variable contained in a ruby file. For example, you can use it to bump the version of a cocoapods' podspec file.
+> You can use this action to manipulate any 'version' variable contained in a ruby file.
+For example, you can use it to bump the version of a cocoapods' podspec file.
 
 version_bump_podspec | 
 -----|----
@@ -5197,7 +5387,11 @@ Author | @dtrenz
 
 Downloads Xcode Bot assets like the `.xcarchive` and logs
 
-> This action downloads assets from your Xcode Server Bot (works with Xcode Server           using Xcode 6 and 7. By default this action downloads all assets, unzips them and           deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded           assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded           assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it
+> This action downloads assets from your Xcode Server Bot (works with Xcode Server
+          using Xcode 6 and 7. By default this action downloads all assets, unzips them and
+          deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded
+          assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded
+          assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it
 
 xcode_server_get_assets | 
 -----|----
