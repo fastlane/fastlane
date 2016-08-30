@@ -48,7 +48,7 @@ cocoapods(
   clean: true,                                    # Remove SCM directories
   integrate: true,                                # Integrate the Pods libraries into the Xcode project(s)
   repo_update: false,                             # Run `pod repo update` before install
-  silent: false,                                  # Show nothing
+  silent: false,                                  # Execute command without logging output
   verbose: false,                                 # Show more debugging information
   ansi: true,                                     # Show output with ANSI codes
   use_bundle_exec: true,                          # Use bundle exec when there is a Gemfile presented
