@@ -14,8 +14,9 @@ module Fastlane
     def work
       self.categories = {}
       ActionsList.all_actions do |action|
-        self.categories['Misc'] ||= []
-        self.categories['Misc'] << action
+        readable = readable_category_name(action.category)
+        self.categories[readable] ||= []
+        self.categories[readable] << action
       end
     end
 
@@ -27,6 +28,16 @@ module Fastlane
 
       File.write(target_path, result)
       UI.success(target_path)
+    end
+
+    private
+    def readable_category_name(category_symbol)
+      case category_symbol
+      when :misc
+        "Misc"
+      else
+        category_symbol.to_s.capitalize
+      end
     end
   end
 end

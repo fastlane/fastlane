@@ -44,10 +44,14 @@ module Fastlane
         [
           "zip",
           "zip(
-            path: './to_compress',
-            output_path: 'compressed.zip'
+            path: \"MyApp.app\",
+            output_path: \"Latest.app.zip\"
           )"
         ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.output
