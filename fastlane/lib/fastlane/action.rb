@@ -89,7 +89,7 @@ module Fastlane
 
     # Documentation category, availabe values defined in AVAILABLE_CATEGORIES
     def self.category
-      :misc # TODO: replace with :undefined
+      :undefined
     end
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user
