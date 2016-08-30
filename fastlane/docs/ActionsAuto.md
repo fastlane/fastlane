@@ -1,12 +1,12 @@
-# Actions
+# fastlane actions
 
-There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
+This page contains a list of all built-in fastlane actions and their available options.
 
-To get the most up-to-date information from the command line on your current version you can also run:
+To get the most up-to-date information from the command line on your current version you can also run
 
 ```sh
-fastlane actions: List all available fastlane actions
-fastlane action [action_name]:
+fastlane actions # list all available fastlane actions
+fastlane action [action_name] # more information for a specific action
 ```
 
 You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
@@ -16,13 +16,13 @@ import './path/to/other/Fastfile'
 ```
 
 
-- [Misc](#Misc)
+- [Misc](#misc)
 
 
 
 
 
-## Misc
+# Misc
 
 ### adb
 
@@ -30,7 +30,7 @@ Run ADB Actions
 
 > see adb --help for more details
 
-     | adb
+adb | 
 -----|----
 Supported platforms | android
 Author | @hjanuschka
@@ -60,7 +60,7 @@ Get an Array of Connected android device serials
 
 > fetches device list via adb
 
-     | adb_devices
+adb_devices | 
 -----|----
 Supported platforms | android
 Author | @hjanuschka
@@ -88,7 +88,7 @@ This will add an annotated git tag to the current branch
 
 > 
 
-     | add_git_tag
+add_git_tag | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic, @maschall
@@ -121,7 +121,7 @@ Upload your app to Appaloosa Store
 
 > Appaloosa is a private mobile application store. This action  offers a quick deployment on the platform. You can create an  account, push to your existing account, or manage your user  groups. We accept iOS and Android applications.
 
-     | appaloosa
+appaloosa | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @Appaloosa
@@ -155,7 +155,7 @@ Create or Update apps on Appetize.io
 
 > 
 
-     | appetize
+appetize | 
 -----|----
 Supported platforms | ios, android
 Author | @klundberg, @giginet
@@ -187,7 +187,7 @@ Generate an URL for appetize simulator
 
 > 
 
-     | appetize_viewing_url_generator
+appetize_viewing_url_generator | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -221,7 +221,7 @@ Run UI test by Appium with RSpec
 
 > 
 
-     | appium
+appium | 
 -----|----
 Supported platforms | ios
 Author | @yonekawa
@@ -255,7 +255,7 @@ Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project
 
 > 
 
-     | appledoc
+appledoc | 
 -----|----
 Supported platforms | ios, mac
 Author | @alexmx
@@ -325,7 +325,7 @@ Alias for the deliver action
 
 > 
 
-     | appstore
+appstore | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -390,7 +390,7 @@ Upload dSYM file to Apteligent (Crittercism)
 
 > 
 
-     | apteligent
+apteligent | 
 -----|----
 Supported platforms | ios
 Author | @Mo7amedFouad
@@ -419,7 +419,7 @@ This action uploads an artifact to artifactory
 
 > 
 
-     | artifactory
+artifactory | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @koglinjg
@@ -458,7 +458,7 @@ This action backs up your file to "[path].back"
 
 > 
 
-     | backup_file
+backup_file | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @gin0606
@@ -485,7 +485,7 @@ Save your [zipped] xcarchive elsewhere from default path
 
 > 
 
-     | backup_xcarchive
+backup_xcarchive | 
 -----|----
 Supported platforms | ios, mac
 Author | @dral3x
@@ -515,7 +515,7 @@ Automatically add a badge to your iOS app icon
 
 > This action will add a light/dark badge onto your app icon. You can also provide your custom badge/overlay or add an shield for more customization more info: https://github.com/HazAT/badge
 
-     | badge
+badge | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @DanielGri
@@ -552,7 +552,7 @@ Generate and upload an ipa file to appetize.io
 
 > This should be called from danger
 
-     | build_and_upload_to_appetize
+build_and_upload_to_appetize | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -581,7 +581,7 @@ This action runs `bundle install` (if available)
 
 > 
 
-     | bundle_install
+bundle_install | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @birmacher, @koglinjg
@@ -625,7 +625,7 @@ Runs `carthage` for your project
 
 > 
 
-     | carthage
+carthage | 
 -----|----
 Supported platforms | ios, mac
 Author | @bassrock, @petester42, @jschmid, @JaviSoto, @uny, @phatblat, @bfcrampton
@@ -663,7 +663,7 @@ Fetch or generate the latest available code signing identity
 
 > 
 
-     | cert
+cert | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -696,7 +696,7 @@ Collect git commit messages into a changelog
 
 > By default, messages will be collected back to the last tag, but the range can be controlled
 
-     | changelog_from_git_commits
+changelog_from_git_commits | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @mfurtak, @asfalcone, @SiarheiFedartsou
@@ -732,7 +732,7 @@ Send a success/error message to ChatWork
 
 > 
 
-     | chatwork
+chatwork | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @ChatWork Inc.
@@ -762,7 +762,7 @@ Deletes files created as result of running ipa, cert, sigh or download_dsyms
 
 > 
 
-     | clean_build_artifacts
+clean_build_artifacts | 
 -----|----
 Supported platforms | ios, mac
 Author | @lmirosevic
@@ -789,7 +789,7 @@ Remove the cache for pods
 
 > 
 
-     | clean_cocoapods_cache
+clean_cocoapods_cache | 
 -----|----
 Supported platforms | ios, mac
 Author | @alexmx
@@ -816,7 +816,7 @@ Deletes the Xcode Derived Data
 
 > Deletes the Derived Data from '~/Library/Developer/Xcode/DerivedData' or a supplied path
 
-     | clear_derived_data
+clear_derived_data | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -843,7 +843,7 @@ Copies a given string into the clipboard. Works only on macOS
 
 > 
 
-     | clipboard
+clipboard | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -870,7 +870,7 @@ Generates a Code Count that can be read by Jenkins (xml format)
 
 > This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.  See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin for more information.
 
-     | cloc
+cloc | 
 -----|----
 Supported platforms | ios, mac
 Author | @intere
@@ -901,7 +901,7 @@ Runs `pod install` for the project
 
 > 
 
-     | cocoapods
+cocoapods | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx, @tadpol, @birmacher, @Liquidsoul
@@ -935,7 +935,7 @@ Creates a 'Version Bump' commit. Run after `increment_build_number`
 
 > 
 
-     | commit_version_bump
+commit_version_bump | 
 -----|----
 Supported platforms | ios, mac
 Author | @lmirosevic
@@ -966,7 +966,7 @@ Small action to save your build artifacts. Useful when you use reset_git_repo
 
 > 
 
-     | copy_artifacts
+copy_artifacts | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic
@@ -996,7 +996,7 @@ Upload a new build to Crashlytics Beta
 
 > 
 
-     | crashlytics
+crashlytics | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx, @pedrogimenez
@@ -1033,7 +1033,7 @@ Create a new Keychain
 
 > 
 
-     | create_keychain
+create_keychain | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @gin0606
@@ -1067,7 +1067,7 @@ This will create a new pull request on GitHub
 
 > 
 
-     | create_pull_request
+create_pull_request | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @seei
@@ -1100,7 +1100,7 @@ Runs `danger` for the project
 
 > More information: https://github.com/danger/danger
 
-     | danger
+danger | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1129,7 +1129,7 @@ Print out an overview of the lane context values
 
 > 
 
-     | debug
+debug | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1147,7 +1147,7 @@ Defines a default platform to not have to specify the platform
 
 > 
 
-     | default_platform
+default_platform | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1165,7 +1165,7 @@ Delete keychains and remove them from the search list
 
 > 
 
-     | delete_keychain
+delete_keychain | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @gin0606
@@ -1192,7 +1192,7 @@ Uses deliver to upload new app metadata and builds to iTunes Connect
 
 > 
 
-     | deliver
+deliver | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -1257,7 +1257,7 @@ Upload a new build to DeployGate
 
 > 
 
-     | deploygate
+deploygate | 
 -----|----
 Supported platforms | ios
 Author | @tnj
@@ -1289,7 +1289,7 @@ Reads in production secrets set in a dotgpg file and puts them in ENV
 
 > More information about dotgpg can be found at https://github.com/ConradIrwin/dotgpg
 
-     | dotgpg_environment
+dotgpg_environment | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @simonlevy5
@@ -1316,7 +1316,7 @@ Download a file from a remote server (e.g. JSON file)
 
 > Specify the URL to download and get the content as a return value For more advanced networking code, use the Ruby functions instead: http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html
 
-     | download
+download | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1343,7 +1343,7 @@ Download dSYM files from Apple iTunes Connect for Bitcode apps
 
 > This action downloads dSYM files from Apple iTunes Connect after the ipa got re-compiled by Apple. Useful if you have Bitcode enabled
 
-     | download_dsyms
+download_dsyms | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -1376,7 +1376,7 @@ Creates a zipped dSYM in the project root from the .xcarchive
 
 > 
 
-     | dsym_zip
+dsym_zip | 
 -----|----
 Supported platforms | ios, mac
 Author | @lmirosevic
@@ -1405,7 +1405,7 @@ Raises an exception if not on a specific git branch
 
 > 
 
-     | ensure_git_branch
+ensure_git_branch | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @dbachrach, @Liquidsoul
@@ -1432,7 +1432,7 @@ Raises an exception if there are uncommited git changes
 
 > 
 
-     | ensure_git_status_clean
+ensure_git_status_clean | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic
@@ -1450,7 +1450,7 @@ Ensures the given text is nowhere in the code base
 
 > Makes sure the given text is nowhere in the code base. This can be used to check if there is any debug code still in your code base or if you have things like // TO DO or similar
 
-     | ensure_no_debug_code
+ensure_no_debug_code | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1480,7 +1480,7 @@ Ensure the selected Xcode version with xcode-select matches a value
 
 > If building your app requires a specific version of Xcode, you can invoke this command before using gym.          For example, to ensure that a beta version is not accidentally selected to build, which would make uploading to TestFlight fail.
 
-     | ensure_xcode_version
+ensure_xcode_version | 
 -----|----
 Supported platforms | ios, mac
 Author | @JaviSoto
@@ -1507,7 +1507,7 @@ Allows to Generate output files based on ERB templates
 
 > Renders an ERB template with `placeholders` given as a hash via parameter, if no :destination is set, returns rendered template as string
 
-     | erb
+erb | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -1536,7 +1536,7 @@ Verifies the minimum fastlane version required
 
 > 
 
-     | fastlane_version
+fastlane_version | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1554,7 +1554,7 @@ Send a message to a Flock group
 
 > 
 
-     | flock
+flock | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @Manav
@@ -1583,7 +1583,7 @@ Adds device frames around the screenshots using frameit
 
 > 
 
-     | frameit
+frameit | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -1614,7 +1614,7 @@ Runs test coverage reports for your Xcode project
 
 > 
 
-     | gcovr
+gcovr | 
 -----|----
 Supported platforms | ios
 Author | @dtrenz
@@ -1632,7 +1632,7 @@ Get the build number of your project
 
 > This action will return the current build number set on your project. You first have to set up your Xcode project, if you haven't done it already: https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-     | get_build_number
+get_build_number | 
 -----|----
 Supported platforms | ios, mac
 Author | @Liquidsoul
@@ -1659,7 +1659,7 @@ Get the build number from the current repository
 
 > 
 
-     | get_build_number_repository
+get_build_number_repository | 
 -----|----
 Supported platforms | ios, mac
 Author | @bartoszj, @pbrooks, @armadsen
@@ -1687,7 +1687,7 @@ This will verify if a given release version is available on GitHub
 
 > This will return all information about a release. For example:                {"url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",                  "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",                  "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",                  "html_url"=>"https://github.com/fastlane/fastlane/releases/tag/1.8.0",                  "id"=>1537713,                  "tag_name"=>"1.8.0",                  "target_commitish"=>"master",                  "name"=>"1.8.0 Switch Lanes & Pass Parameters",                  "draft"=>false,                  "author"=>                   {"login"=>"KrauseFx",                    "id"=>869950,                    "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",                    "gravatar_id"=>"",                    "url"=>"https://api.github.com/users/KrauseFx",                    "html_url"=>"https://github.com/fastlane",                    "followers_url"=>"https://api.github.com/users/KrauseFx/followers",                    "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",                    "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",                    "starred_url"=>"https://api.github.com/users/KrauseFx/starred{/owner}{/repo}",                    "subscriptions_url"=>"https://api.github.com/users/KrauseFx/subscriptions",                    "organizations_url"=>"https://api.github.com/users/KrauseFx/orgs",                    "repos_url"=>"https://api.github.com/users/KrauseFx/repos",                    "events_url"=>"https://api.github.com/users/KrauseFx/events{/privacy}",                    "received_events_url"=>"https://api.github.com/users/KrauseFx/received_events",                    "type"=>"User",                    "site_admin"=>false},                  "prerelease"=>false,                  "created_at"=>"2015-07-14T23:33:01Z",                  "published_at"=>"2015-07-14T23:44:10Z",                  "assets"=>[],                  "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",                  "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",                  "body"=> ...Markdown...                 "This is one of the biggest updates of `fastlane` yet"               }
 
-     | get_github_release
+get_github_release | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx, @czechboy0, @jaleksynas
@@ -1717,7 +1717,7 @@ Returns value from Info.plist of your project as native Ruby data structures
 
 > 
 
-     | get_info_plist_value
+get_info_plist_value | 
 -----|----
 Supported platforms | ios, mac
 Author | @kohtenko
@@ -1745,7 +1745,7 @@ Returns a value from Info.plist inside a .ipa file
 
 > This is useful for introspecting Info.plist files for .ipa files that have already been built.
 
-     | get_ipa_info_plist_value
+get_ipa_info_plist_value | 
 -----|----
 Supported platforms | ios, mac
 Author | @johnboiles
@@ -1774,7 +1774,7 @@ Get the version number of your project
 
 > This action will return the current version number set on your project. You first have to set up your Xcode project, if you haven't done it already: https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-     | get_version_number
+get_version_number | 
 -----|----
 Supported platforms | ios, mac
 Author | @Liquidsoul
@@ -1806,7 +1806,7 @@ Directly add the given file
 
 > 
 
-     | git_add
+git_add | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @4brunu
@@ -1833,7 +1833,7 @@ Returns the name of the current git branch
 
 > If no branch could be found, this action will return nil
 
-     | git_branch
+git_branch | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1851,7 +1851,7 @@ Directly commit the given file with the given message
 
 > 
 
-     | git_commit
+git_commit | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -1879,7 +1879,7 @@ Executes a simple git pull command
 
 > 
 
-     | git_pull
+git_pull | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx, @JaviSoto
@@ -1906,7 +1906,7 @@ Checks if the git tag with the given name exists in the current repo
 
 > 
 
-     | git_tag_exists
+git_tag_exists | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @antondomashnev
@@ -1934,7 +1934,7 @@ All gradle related actions, including building and testing your Android app
 
 > Run `./gradlew tasks` to get a list of all available gradle tasks for your project
 
-     | gradle
+gradle | 
 -----|----
 Supported platforms | ios, android
 Author | @KrauseFx, @lmirosevic
@@ -1971,7 +1971,7 @@ Easily build and sign your app using `gym`
 
 > More information: https://github.com/fastlane/fastlane/tree/master/gym
 
-     | gym
+gym | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -2006,12 +2006,19 @@ Key | Description
   `result_bundle` | Produce the result bundle describing what occurred will be placed
   `buildlog_path` | The directory where to store the build log
   `sdk` | The SDK that should be used for building the application
+  `toolchain` | The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)
   `provisioning_profile_path` | [DEPRECATED!] Use target specific provisioning profiles instead - The path to the provisioning profile (optional)
   `destination` | Use a custom destination for building the app
   `export_team_id` | Optional: Sometimes you need to specify a team id when exporting the ipa file
   `xcargs` | Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
   `xcconfig` | Use an extra XCCONFIG file to build your app
   `suppress_xcode_output` | Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+  `disable_xcpretty` | Disable xcpretty formatting of build output
+  `xcpretty_test_format` | Use the test (RSpec style) format for build output
+  `xcpretty_formatter` | A custom xcpretty formatter to use
+  `xcpretty_report_junit` | Have xcpretty create a JUnit-style XML report at the provided path
+  `xcpretty_report_html` | Have xcpretty create a simple HTML report at the provided path
+  `xcpretty_report_json` | Have xcpretty create a JSON compilation database at the provided path
 
 </details>
 
@@ -2025,7 +2032,7 @@ This will add a hg tag to the current branch
 
 > 
 
-     | hg_add_tag
+hg_add_tag | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @sjrmanning
@@ -2052,7 +2059,7 @@ This will commit a version bump to the hg repo
 
 > 
 
-     | hg_commit_version_bump
+hg_commit_version_bump | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @sjrmanning
@@ -2083,7 +2090,7 @@ Raises an exception if there are uncommited hg changes
 
 > 
 
-     | hg_ensure_clean_status
+hg_ensure_clean_status | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @sjrmanning
@@ -2101,7 +2108,7 @@ This will push changes to the remote hg repository
 
 > 
 
-     | hg_push
+hg_push | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @sjrmanning
@@ -2129,7 +2136,7 @@ Send a error/success message to HipChat
 
 > 
 
-     | hipchat
+hipchat | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @jingx23
@@ -2166,7 +2173,7 @@ Upload a new build to HockeyApp
 
 > 
 
-     | hockey
+hockey | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx, @modzelewski
@@ -2212,7 +2219,7 @@ Connect to the IFTTT Maker Channel. https://ifttt.com/maker
 
 > 
 
-     | ifttt
+ifttt | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @vpolouchkine
@@ -2243,7 +2250,7 @@ Import another Fastfile to use its lanes
 
 > This is useful if you have shared lanes across multiple apps and you want to store a Fastfile in a separate folder. The path must be relative to the Fastfile this is called from.
 
-     | import
+import | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -2261,7 +2268,7 @@ Import certificate from inputfile into a keychain
 
 > 
 
-     | import_certificate
+import_certificate | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @gin0606
@@ -2291,7 +2298,7 @@ Import another Fastfile from a remote git repository to use its lanes
 
 > This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository.
 
-     | import_from_git
+import_from_git | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @fabiomassimo, @KrauseFx, @Liquidsoul
@@ -2320,7 +2327,7 @@ Increment the build number of your project
 
 > 
 
-     | increment_build_number
+increment_build_number | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -2348,7 +2355,7 @@ Increment the version number of your project
 
 > This action will increment the version number.  You first have to set up your Xcode project, if you haven't done it already: https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-     | increment_version_number
+increment_version_number | 
 -----|----
 Supported platforms | ios, mac
 Author | @serluca
@@ -2377,7 +2384,7 @@ Installs an .ipa file on a connected iOS-device via usb or wifi
 
 > 
 
-     | install_on_device
+install_on_device | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -2407,7 +2414,7 @@ Install an Xcode plugin for the current user
 
 > 
 
-     | install_xcode_plugin
+install_xcode_plugin | 
 -----|----
 Supported platforms | ios, mac
 Author | @NeoNachoSoto
@@ -2435,7 +2442,7 @@ Upload a new build to Installr
 
 > 
 
-     | installr
+installr | 
 -----|----
 Supported platforms | ios
 Author | @scottrhoyt
@@ -2466,7 +2473,7 @@ Easily build and sign your app using shenzhen
 
 > More information on the shenzhen project page: https://github.com/nomad/shenzhen To make code signing work, it is recommended to set a the provisioning profile in the project settings.
 
-     | ipa
+ipa | 
 -----|----
 Supported platforms | ios
 Author | @joshdholtz
@@ -2505,7 +2512,7 @@ Is the current run being executed on a CI system, like Jenkins or Travis
 
 > The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service
 
-     | is_ci
+is_ci | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -2523,7 +2530,7 @@ Generate docs using Jazzy
 
 > 
 
-     | jazzy
+jazzy | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -2550,7 +2557,7 @@ Leave a comment on JIRA tickets
 
 > 
 
-     | jira
+jira | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @iAmChrisTruman
@@ -2581,7 +2588,7 @@ An alias to `Actions.lane_context`
 
 > 
 
-     | lane_context
+lane_context | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -2599,7 +2606,7 @@ Return last git commit hash, abbreviated commit hash, commit message and author
 
 > 
 
-     | last_git_commit
+last_git_commit | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @ngutman
@@ -2618,7 +2625,7 @@ Get the most recent git tag
 
 > 
 
-     | last_git_tag
+last_git_tag | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -2636,7 +2643,7 @@ Fetches most recent build number from TestFlight
 
 > Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.
 
-     | latest_testflight_build_number
+latest_testflight_build_number | 
 -----|----
 Supported platforms | ios
 Author | @daveanderson
@@ -2668,7 +2675,7 @@ Generates coverage data using lcov
 
 > 
 
-     | lcov
+lcov | 
 -----|----
 Supported platforms | ios, mac
 Author | @thiagolioy
@@ -2698,7 +2705,7 @@ Send a success/error message to an email group
 
 > 
 
-     | mailgun
+mailgun | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @thiagolioy
@@ -2737,7 +2744,7 @@ Generate a changelog using the Changes section from the current Jenkins build
 
 > This is useful when deploying automated builds. The changelog from Jenkins lists all the commit messages since the last build.
 
-     | make_changelog_from_jenkins
+make_changelog_from_jenkins | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @mandrizzle
@@ -2765,7 +2772,7 @@ Easily sync your certificates and profiles across your team using git
 
 > More details https://github.com/fastlane/fastlane/tree/master/match
 
-     | match
+match | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -2806,7 +2813,7 @@ Upload a file to Sonatype Nexus platform
 
 > 
 
-     | nexus_upload
+nexus_upload | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @xfreebird
@@ -2848,7 +2855,7 @@ Display a macOS notification with custom message and title
 
 > 
 
-     | notification
+notification | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @champo, @cbowns, @KrauseFx, @amarcadet, @dusek
@@ -2883,7 +2890,7 @@ Shows a macOS notification
 
 > 
 
-     | notify
+notify | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @champo, @KrauseFx
@@ -2901,7 +2908,7 @@ Return the total number of all commits in current git repo
 
 > 
 
-     | number_of_commits
+number_of_commits | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @onevcat
@@ -2920,7 +2927,7 @@ Lints implementation files with OCLint
 
 > 
 
-     | oclint
+oclint | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @HeEAaD
@@ -2964,7 +2971,7 @@ Create a new OneSignal application
 
 > You can use this action to automatically create a OneSignal application. You can also upload a .p12 with password, a GCM key, or both
 
-     | onesignal
+onesignal | 
 -----|----
 Supported platforms | ios
 Author | @timothybarraclough, @smartshowltd
@@ -2996,7 +3003,7 @@ This will stop uploading the information which actions were run
 
 > By default, fastlane will share the used actions. No personal information is shard. More information available on https://github.com/fastlane/enhancer Using this action you can opt out
 
-     | opt_out_usage
+opt_out_usage | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -3014,7 +3021,7 @@ Makes sure a valid push profile is active and creates a new one if needed
 
 > Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server. Use it like this:  pem(   new_profile: proc do      # your upload code   end )
 
-     | pem
+pem | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -3052,7 +3059,7 @@ Upload a new binary to iTunes Connect for TestFlight beta testing
 
 > More details can be found on https://github.com/fastlane/fastlane/tree/master/pilot This integration will only do the TestFlight upload
 
-     | pilot
+pilot | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -3095,7 +3102,7 @@ Pod lib lint
 
 > Test the syntax of your Podfile by linting the pod against the files of its directory
 
-     | pod_lib_lint
+pod_lib_lint | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @thierryxing
@@ -3129,7 +3136,7 @@ Push a Podspec to Trunk or a private repository
 
 > 
 
-     | pod_push
+pod_push | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @squarefrog
@@ -3160,7 +3167,7 @@ Creates or updates an item within your Podio app
 
 > Use this action to create or update an item within your Podio app         (see https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-).         Pass in dictionary with field keys and their values.         Field key is located under Modify app -> Advanced -> Developer -> External ID         (see https://developers.podio.com/examples/items)
 
-     | podio_item
+podio_item | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @pprochazka72, @laugejepsen
@@ -3193,7 +3200,7 @@ Creates the given application on iTC and the Dev Portal if necessary
 
 > 
 
-     | produce
+produce | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -3233,7 +3240,7 @@ Ask the user for a value or for confirmation
 
 > You can use `prompt` to ask the user for a value or to just let the user confirm the next step When this is executed on a CI service, the passed `ci_input` value will be returned This action also supports multi-line inputs using the `multi_line_end_keyword` option.
 
-     | prompt
+prompt | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -3263,7 +3270,7 @@ Push local tags to the remote - this will only push tags
 
 > 
 
-     | push_git_tags
+push_git_tags | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @vittoriom
@@ -3281,7 +3288,7 @@ Push local changes to the remote branch
 
 > 
 
-     | push_to_git_remote
+push_to_git_remote | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic
@@ -3312,7 +3319,7 @@ Prints out the given text
 
 > 
 
-     | puts
+puts | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -3330,7 +3337,7 @@ Loads a CocoaPods spec as JSON
 
 > This can be used for only specifying a version string in your podspec - and during your release process you'd read it from the podspec by running `version = read_podspec['version']` at the beginning of your lane
 
-     | read_podspec
+read_podspec | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @czechboy0
@@ -3357,7 +3364,7 @@ Recreate not shared Xcode project schemes
 
 > 
 
-     | recreate_schemes
+recreate_schemes | 
 -----|----
 Supported platforms | ios, mac
 Author | @jerolimov
@@ -3384,7 +3391,7 @@ Registers new devices to the Apple Dev Portal
 
 > 
 
-     | register_devices
+register_devices | 
 -----|----
 Supported platforms | ios
 Author | @lmirosevic
@@ -3414,7 +3421,7 @@ Resets git repo to a clean state by discarding uncommited changes
 
 > This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after the fastlane run. Untracked files like `.env` will also be deleted, unless `:skip_clean` is true. It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met: You have called the ensure_git_status_clean action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.
 
-     | reset_git_repo
+reset_git_repo | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @lmirosevic
@@ -3445,7 +3452,7 @@ Shutdown and reset running simulators
 
 > 
 
-     | reset_simulators
+reset_simulators | 
 -----|----
 Supported platforms | ios
 Author | @danramteke
@@ -3463,7 +3470,7 @@ Codesign an existing ipa file
 
 > You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.  resign(ipa: "path", signing_identity: "identity", provisioning_profile: {   "com.example.awesome-app" => "App.mobileprovision",   "com.example.awesome-app.app-extension" => "Extension.mobileprovision" })
 
-     | resign
+resign | 
 -----|----
 Supported platforms | ios
 Author | @lmirosevic
@@ -3498,7 +3505,7 @@ This action restore your file that was backuped with the `backup_file` action
 
 > 
 
-     | restore_file
+restore_file | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @gin0606
@@ -3525,7 +3532,7 @@ Outputs ascii-art for a rocket 🚀
 
 > 
 
-     | rocket
+rocket | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @JaviSoto, @radex
@@ -3543,7 +3550,7 @@ Rsync files from :source to :destination
 
 > A wrapper around rsync, rsync is a tool that lets you synchronize files, including permissions and so on for a more detailed information about rsync please see rsync(1) manpage.
 
-     | rsync
+rsync | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -3572,7 +3579,7 @@ Generates a plist file and uploads all to AWS S3
 
 > 
 
-     | s3
+s3 | 
 -----|----
 Supported platforms | ios
 Author | @joshdholtz
@@ -3613,7 +3620,7 @@ This action speaks out loud the given text
 
 > 
 
-     | say
+say | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -3631,7 +3638,7 @@ Easily run tests of your iOS app using `scan`
 
 > More information: https://github.com/fastlane/fastlane/tree/master/scan
 
-     | scan
+scan | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -3687,7 +3694,7 @@ Transfer files via SCP
 
 > 
 
-     | scp
+scp | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -3719,7 +3726,7 @@ Automated localized screenshots of your Android app on every device
 
 > 
 
-     | screengrab
+screengrab | 
 -----|----
 Supported platforms | android
 Author | @asfalcone, @i2amsam, @mfurtak
@@ -3761,7 +3768,7 @@ Set the build number from the current repository
 
 > 
 
-     | set_build_number_repository
+set_build_number_repository | 
 -----|----
 Supported platforms | ios, mac
 Author | @pbrooks, @armadsen
@@ -3788,7 +3795,7 @@ Set the changelog for all languages on iTunes Connect
 
 > This is useful if you have only one changelog for all languages
 
-     | set_changelog
+set_changelog | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -3818,7 +3825,7 @@ This will create a new release on GitHub and upload assets for it
 
 > Creates a new release on GitHub. You must provide your GitHub Personal token         (get one from https://github.com/settings/tokens/new), the repository name         and tag name. By default that's 'master'. If the tag doesn't exist, one will be created on the commit or branch passed-in as         commitish. Out parameters provide the release's id, which can be used for later editing and the         release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter.
 
-     | set_github_release
+set_github_release | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @czechboy0
@@ -3856,7 +3863,7 @@ Sets value to Info.plist of your project as native Ruby data structures
 
 > 
 
-     | set_info_plist_value
+set_info_plist_value | 
 -----|----
 Supported platforms | ios, mac
 Author | @kohtenko
@@ -3885,7 +3892,7 @@ Sets a value for a key with cocoapods-keys
 
 > 
 
-     | set_pod_key
+set_pod_key | 
 -----|----
 Supported platforms | ios, mac
 Author | @marcelofabri
@@ -3915,7 +3922,7 @@ Setup xcodebuild, gym and scan for easier Jenkins integration
 
 > - Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin' - Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin' - Sets output directory to './output' (gym, scan and backup_xcarchive). - Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage). - Produce result bundle (gym and scan).
 
-     | setup_jenkins
+setup_jenkins | 
 -----|----
 Supported platforms | ios, mac
 Author | @bartoszj
@@ -3952,7 +3959,7 @@ Generates a provisioning profile. Stores the profile in the current folder
 
 > 
 
-     | sigh
+sigh | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -3995,7 +4002,7 @@ Skip the creation of the fastlane/README.md file when running fastlane
 
 > 
 
-     | skip_docs
+skip_docs | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -4013,7 +4020,7 @@ Send a success/error message to your Slack group
 
 > 
 
-     | slack
+slack | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
@@ -4049,7 +4056,7 @@ Use slather to generate a code coverage report
 
 > Slather works with multiple code coverage formats including Xcode7 code coverage. Slather is available at https://github.com/SlatherOrg/slather 
 
-     | slather
+slather | 
 -----|----
 Supported platforms | ios, mac
 Author | @mattdelves
@@ -4100,7 +4107,7 @@ Generate new localised screenshots on multiple devices
 
 > 
 
-     | snapshot
+snapshot | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4150,7 +4157,7 @@ Invokes sonar-runner to programmatically run SonarQube analysis
 
 > See http://docs.sonarqube.org/display/SONAR/Analyzing+with+SonarQube+Scanner for details.
 
-     | sonar
+sonar | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @c_gretzki
@@ -4185,7 +4192,7 @@ Upload dSYM file to Splunk MINT
 
 > 
 
-     | splunkmint
+splunkmint | 
 -----|----
 Supported platforms | ios
 Author | @xfreebird
@@ -4220,7 +4227,7 @@ Allows remote command execution using ssh
 
 > Lets you execute remote commands via ssh using username/password or ssh-agent
 
-     | ssh
+ssh | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -4252,7 +4259,7 @@ Upload metadata, screenshots and binaries to Google Play
 
 > More information: https://github.com/fastlane/fastlane/tree/master/supply
 
-     | supply
+supply | 
 -----|----
 Supported platforms | android
 Author | @KrauseFx
@@ -4292,7 +4299,7 @@ Run swift code validation using SwiftLint
 
 > 
 
-     | swiftlint
+swiftlint | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -4324,7 +4331,7 @@ Specify the Team ID you want to use for the Apple Developer Portal
 
 > 
 
-     | team_id
+team_id | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4342,7 +4349,7 @@ Set a team to use by its name
 
 > 
 
-     | team_name
+team_name | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4360,7 +4367,7 @@ Upload a new build to TestFairy
 
 > 
 
-     | testfairy
+testfairy | 
 -----|----
 Supported platforms | ios
 Author | @taka0125, @tcurdt
@@ -4396,7 +4403,7 @@ Alias for the pilot action
 
 > 
 
-     | testflight
+testflight | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4439,7 +4446,7 @@ Run tests on real devices using Testmunk
 
 > 
 
-     | testmunk
+testmunk | 
 -----|----
 Supported platforms | ios
 Author | @mposchen, @johannesberdin
@@ -4469,7 +4476,7 @@ Upload a new build to Tryouts
 
 > 
 
-     | tryouts
+tryouts | 
 -----|----
 Supported platforms | ios, android
 Author | @alicertel
@@ -4502,7 +4509,7 @@ Post on twitter
 
 > 
 
-     | twitter
+twitter | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @hjanuschka
@@ -4533,7 +4540,7 @@ Post a message to Typetalk
 
 > 
 
-     | typetalk
+typetalk | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @Nulab Inc.
@@ -4551,7 +4558,7 @@ Unlock a keychain
 
 > Unlocks the give keychain file and adds it to the keychain search list Keychains can be replaced with `add_to_search_list: :replace`
 
-     | unlock_keychain
+unlock_keychain | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @xfreebird
@@ -4581,7 +4588,7 @@ This action changes the app group identifiers in the entitlements file
 
 > 
 
-     | update_app_group_identifiers
+update_app_group_identifiers | 
 -----|----
 Supported platforms | ios
 Author | @mathiasAichinger
@@ -4609,7 +4616,7 @@ Update the project's bundle identifier
 
 > 
 
-     | update_app_identifier
+update_app_identifier | 
 -----|----
 Supported platforms | ios
 Author | @squarefrog, @tobiasstrebitzer
@@ -4638,7 +4645,7 @@ Makes sure fastlane-tools are up-to-date when running fastlane
 
 > 
 
-     | update_fastlane
+update_fastlane | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @milch
@@ -4666,7 +4673,7 @@ This action changes the iCloud container identifiers in the entitlements file
 
 > 
 
-     | update_icloud_container_identifiers
+update_icloud_container_identifiers | 
 -----|----
 Supported platforms | ios
 Author | @JamesKuang
@@ -4694,7 +4701,7 @@ Update a Info.plist file with bundle identifier and display name
 
 > 
 
-     | update_info_plist
+update_info_plist | 
 -----|----
 Supported platforms | ios
 Author | @tobiasstrebitzer
@@ -4726,7 +4733,7 @@ Updated code signing settings from 'Automatic' to a specific profile
 
 > This feature is not yet 100% finished
 
-     | update_project_code_signing
+update_project_code_signing | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4754,7 +4761,7 @@ Update projects code signing settings from your provisioning profile
 
 > This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj The `target_filter` value can be used to only update code signing for specified targets The `build_configuration` value can be used to only update code signing for specified build configurations of the targets passing through the `target_filter` Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles Example: `update_project_provisioning(xcodeproj: "..", target_filter: ".*WatchKit App.*")
 
-     | update_project_provisioning
+update_project_provisioning | 
 -----|----
 Supported platforms | ios, mac
 Author | @tobiasstrebitzer, @czechboy0
@@ -4786,7 +4793,7 @@ Update Development Team ID
 
 > This action update the Developer Team ID of your Xcode Project.
 
-     | update_project_team
+update_project_team | 
 -----|----
 Supported platforms | ios, mac
 Author | @lgaches
@@ -4814,7 +4821,7 @@ Set the Urban Airship plist configuration values
 
 > This action updates the AirshipConfig.plist need to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for Enterprise and Production versions of the application.
 
-     | update_urban_airship_configuration
+update_urban_airship_configuration | 
 -----|----
 Supported platforms | ios
 Author | @kcharwood
@@ -4846,7 +4853,7 @@ Updates the URL schemes in the given Info.plist
 
 > 
 
-     | update_url_schemes
+update_url_schemes | 
 -----|----
 Supported platforms | ios, mac
 Author | @kmikael
@@ -4874,7 +4881,7 @@ Upload dSYM symbolication files to Crashlytics
 
 > This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build.
 
-     | upload_symbols_to_crashlytics
+upload_symbols_to_crashlytics | 
 -----|----
 Supported platforms | ios
 Author | @KrauseFx
@@ -4904,7 +4911,7 @@ Upload dSYM symbolication files to Sentry
 
 > This action allows you to upload symbolication files to Sentry. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode
 
-     | upload_symbols_to_sentry
+upload_symbols_to_sentry | 
 -----|----
 Supported platforms | ios
 Author | @joshdholtz
@@ -4938,7 +4945,7 @@ Able to verify various settings in ipa file
 
 > 
 
-     | verify_build
+verify_build | 
 -----|----
 Supported platforms | ios
 Author | @CodeReaper
@@ -4971,7 +4978,7 @@ Verifies all keys referenced from the Podfile are non-empty
 
 > 
 
-     | verify_pod_keys
+verify_pod_keys | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @ashfurrow
@@ -4989,7 +4996,7 @@ Verifies that the Xcode installation is properly signed by Apple
 
 > This action was implemented after the recent Xcode attack to make sure you're not using a hacked Xcode installation. http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/
 
-     | verify_xcode
+verify_xcode | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -5016,7 +5023,7 @@ Increment or set the version in a podspec file
 
 > You can use this action to manipulate any 'version' variable contained in a ruby file. For example, you can use it to bump the version of a cocoapods' podspec file.
 
-     | version_bump_podspec
+version_bump_podspec | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @Liquidsoul, @KrauseFx
@@ -5045,7 +5052,7 @@ Receive the version number from a podspec file
 
 > 
 
-     | version_get_podspec
+version_get_podspec | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @Liquidsoul, @KrauseFx
@@ -5072,7 +5079,7 @@ Archives the project using `xcodebuild`
 
 > 
 
-     | xcarchive
+xcarchive | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5090,7 +5097,7 @@ Builds the project using `xcodebuild`
 
 > 
 
-     | xcbuild
+xcbuild | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5108,7 +5115,7 @@ Cleans the project using `xcodebuild`
 
 > 
 
-     | xcclean
+xcclean | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5126,7 +5133,7 @@ Exports the project using `xcodebuild`
 
 > 
 
-     | xcexport
+xcexport | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5144,7 +5151,7 @@ Make sure a certain version of Xcode is installed
 
 > 
 
-     | xcode_install
+xcode_install | 
 -----|----
 Supported platforms | ios, mac
 Author | @Krausefx
@@ -5174,7 +5181,7 @@ Change the xcode-path to use. Useful for beta versions of Xcode
 
 > 
 
-     | xcode_select
+xcode_select | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5192,7 +5199,7 @@ Downloads Xcode Bot assets like the `.xcarchive` and logs
 
 > This action downloads assets from your Xcode Server Bot (works with Xcode Server           using Xcode 6 and 7. By default this action downloads all assets, unzips them and           deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded           assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded           assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it
 
-     | xcode_server_get_assets
+xcode_server_get_assets | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @czechboy0
@@ -5226,7 +5233,7 @@ Use the `xcodebuild` command to build and sign your app
 
 > More information on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xcodebuild
 
-     | xcodebuild
+xcodebuild | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5244,7 +5251,7 @@ Nice code coverage reports without hassle
 
 > More information: https://github.com/nakiostudio/xcov
 
-     | xcov
+xcov | 
 -----|----
 Supported platforms | ios, mac
 Author | @nakiostudio
@@ -5262,7 +5269,7 @@ Runs tests on the given simulator
 
 > 
 
-     | xctest
+xctest | 
 -----|----
 Supported platforms | ios, mac
 Author | @dtrenz
@@ -5280,7 +5287,7 @@ Run tests using xctool
 
 > It is recommended to store the build configuration in the `.xctool-args` file. More information available on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xctool
 
-     | xctool
+xctool | 
 -----|----
 Supported platforms | ios, mac
 Author | @KrauseFx
@@ -5298,7 +5305,7 @@ Select an Xcode to use by version specifier
 
 > 
 
-     | xcversion
+xcversion | 
 -----|----
 Supported platforms | ios, mac
 Author | @oysta
@@ -5323,9 +5330,9 @@ Key | Description
 
 Compress a file or folder to a zip
 
-> This action downloads assets from your Xcode Server Bot (works with Xcode Server           using Xcode 6 and 7. By default this action downloads all assets, unzips them and           deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded           assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded           assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it
+> 
 
-     | zip
+zip | 
 -----|----
 Supported platforms | ios, android, mac
 Author | @KrauseFx
