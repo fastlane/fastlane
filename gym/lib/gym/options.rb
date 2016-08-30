@@ -63,7 +63,8 @@ module Gym
                                      description: "The name of the resulting ipa file",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       value.gsub!(".ipa", "").gsub!(File::SEPARATOR, "_")
+                                       value.gsub!(".ipa", "")
+                                       value.gsub!(File::SEPARATOR, "_")
                                      end),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
