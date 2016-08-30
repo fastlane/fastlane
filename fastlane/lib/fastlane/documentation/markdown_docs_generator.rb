@@ -13,9 +13,10 @@ module Fastlane
 
     def work
       self.categories = {}
+      Fastlane::Action::AVAILABLE_CATEGORIES.each { |a| self.categories[readable_category_name(a)] = [] }
       ActionsList.all_actions do |action|
         readable = readable_category_name(action.category)
-        self.categories[readable] ||= []
+
         self.categories[readable] << action
       end
     end
@@ -31,10 +32,27 @@ module Fastlane
     end
 
     private
+
     def readable_category_name(category_symbol)
       case category_symbol
       when :misc
         "Misc"
+      when :source_control
+        "Source Control"
+      when :notifications
+        "Notifications"
+      when :testing
+        "Testing"
+      when :building
+        "Building"
+      when :screenshots
+        "Screenshots"
+      when :project
+        "Project"
+      when :beta
+        "Beta"
+      when :production
+        "Releasing your app"
       else
         category_symbol.to_s.capitalize
       end
