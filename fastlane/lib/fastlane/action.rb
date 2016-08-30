@@ -2,6 +2,17 @@ require 'fastlane/actions/actions_helper'
 
 module Fastlane
   class Action
+    AVAILABLE_CATEGORIES = [
+      :testing,
+      :screenshots,
+      :project,
+      :beta,
+      :production,
+      :source_control,
+      :notifications,
+      :misc
+    ]
+
     class << self
       attr_accessor :runner
     end
@@ -73,6 +84,12 @@ module Fastlane
     # to allow a simple `sh` in the custom actions
     def self.sh(command, print_command: true, print_command_output: true, error_callback: nil)
       Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
+
+    end
+
+    # Documentation category, availabe values defined in AVAILABLE_CATEGORIES
+    def self.category
+      :misc # TODO: replace with :undefined
     end
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user
