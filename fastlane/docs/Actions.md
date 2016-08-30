@@ -1,5 +1,7 @@
 # Actions
 
+There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
+
 To get the most up-to-date information from the command line on your current version you can also run:
 
 ```sh
@@ -53,7 +55,7 @@ More options are available:
 
 ```ruby
 carthage(
-  command: "bootstrap"                            # One of: build, bootstrap, update, archive. (default: bootstrap)
+  command: "bootstrap",                            # One of: build, bootstrap, update, archive. (default: bootstrap)
   dependencies: ['Alamofire', 'Notice'],          # Specify which dependencies to update (only for the update command)
   use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
   use_submodules: false,                          # Add dependencies as Git submodules.
@@ -414,8 +416,11 @@ delete_keychain(name: "KeychainName")
 Import certificates into the current default keychain. Use `create_keychain` to create a new keychain.
 
 ```ruby
-import_certificate certificate_path: "certs/AppleWWDRCA.cer"
-import_certificate certificate_path: "certs/dist.p12", certificate_password: ENV['CERT_PASSWORD']
+import_certificate(certificate_path: "certs/AppleWWDRCA.cer")
+import_certificate(
+  certificate_path: "certs/dist.p12", 
+  certificate_password: ENV['CERT_PASSWORD'] || "default"
+)
 ```
 
 ### [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
@@ -831,8 +836,7 @@ Other options
 ```ruby
 deliver(
   force: true, # Set to true to skip PDF verification
-  email: "itunes@connect.com" # different Apple ID than the dev portal
-  itc_provider: 'abcde12345' # pass a specific value to the iTMSTransporter -itc_provider option
+  itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
 )
 ```
 
@@ -853,7 +857,7 @@ This will use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver
 Additionally you can skip the submission of the new binary to the testers to only upload the build:
 
 ```ruby
-testflight(skip_deploy: true)
+testflight(skip_submission: true)
 ```
 
 ### `latest_testflight_build_number`
@@ -881,7 +885,7 @@ this requires `ios-deploy` to be installed please have a look at [ios-deploy](ht
 
 ```ruby
 install_on_device(
-  device_id: "a3be6c9ff7e5c3c6028597513243b0f933b876d4"
+  device_id: "a3be6c9ff7e5c3c6028597513243b0f933b876d4",
   ipa: "./app.ipa"
 )
 ```
@@ -917,11 +921,11 @@ Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
 
 When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:
 
-![Crashlytics Beta Groups Navigation](../assets/Beta-Groups-Nav.png)
+![Crashlytics Beta Groups Navigation](/img/actions/Beta-Groups-Nav.png)
 
 Each group's alias is then listed here:
 
-![Crashlytics Beta Groups Navigation](../assets/Beta-Group-Alias.png)
+![Crashlytics Beta Groups Navigation](../img/actions/Beta-Group-Alias.png)
 
 There are a couple reasons why aliases exist:
 
@@ -1147,7 +1151,7 @@ If you provide a `public_key`, this will overwrite an existing application. If y
 
 #### `device_grid` for your Pull Requests
 
-![../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png](../lib/fastlane/actions/device_grid/assets/GridExampleScreenshot.png)
+![/img/actions/GridExampleScreenshot.png](/img/actions/GridExampleScreenshot.png)
 
 Follow [this guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) to get a grid of devices every time you submit a pull request. The app will be uploaded to [appetize.io](https://appetize.io/) so you can stream and try them right in your browser.
 
@@ -1911,9 +1915,9 @@ mailgun(
   success: true,
   message: "This is the mail's content"
 )
+```
 
-or
-
+```ruby
 mailgun(
   postmaster: "MY_POSTMASTER",
   apikey: "MY_API_KEY",
@@ -2017,8 +2021,8 @@ onesignal(
   auth_token: "Your OneSignal Auth Token",
   app_name: "Name for OneSignal App",
   android_token: "Your Android GCM key (optional)",
-  apns_p12: "Path to Apple .p12 file (optional)"
-  apns_p12_password: "Password for .p12 file (optional)"
+  apns_p12: "Path to Apple .p12 file (optional)",
+  apns_p12_password: "Password for .p12 file (optional)",
   apns_env: "production/sandbox (defaults to production)"
 )
 ```
@@ -2029,7 +2033,7 @@ Send a text message to a Flock group.
 
 ```ruby
 flock(
-  message: "Hello"
+  message: "Hello",
   token: "xxx"
 )
 ```
