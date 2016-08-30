@@ -42,11 +42,11 @@ module Fastlane
 
       def self.example_code
         [
-          "zip",
-          "zip(
-            path: \"MyApp.app\",
-            output_path: \"Latest.app.zip\"
-          )"
+          'zip',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip"
+          )'
         ]
       end
 
