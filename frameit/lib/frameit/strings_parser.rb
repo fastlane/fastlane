@@ -25,6 +25,10 @@ module Frameit
         end
       end
 
+      if result.empty?
+        UI.error "Empty parsing result for #{path}. Please make sure the file is valid and UTF16 Big-endian encoded"
+      end
+
       result
     end
   end
