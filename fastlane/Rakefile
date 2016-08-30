@@ -15,5 +15,5 @@ end
 
 task :generate_docs do
   require 'fastlane/documentation/markdown_docs_generator'
-  Fastlane::MarkdownDocsGenerator.new.save_to_ssd!
+  Fastlane::MarkdownDocsGenerator.new.generate!
 end
