@@ -1,12 +1,12 @@
-# Actions
+# fastlane actions
 
-There are lots of predefined `fastlane` actions you can use. If you have ideas for more, please [let me know](https://github.com/fastlane/fastlane/issues/new).
+This page contains a list of all built-in fastlane actions and their available options.
 
-To get the most up-to-date information from the command line on your current version you can also run:
+To get the most up-to-date information from the command line on your current version you can also run
 
 ```sh
-fastlane actions: List all available fastlane actions
-fastlane action [action_name]:
+fastlane actions # list all available fastlane actions
+fastlane action [action_name] # more information for a specific action
 ```
 
 You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
@@ -16,13 +16,13 @@ import './path/to/other/Fastfile'
 ```
 
 <%- @categories.each do |category, actions| %>
-- [<%= category %>](#<%= category.gsub(" ", "-") %>)
+- [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <% end %>
 
 
 
 <%- @categories.each do |category, actions| %>
-## <%= category %>
+# <%= category %>
   <%- actions.each do |action| -%>
 
 ### <%= action.action_name %>
@@ -31,7 +31,7 @@ import './path/to/other/Fastfile'
 
 > <%= action.details.gsub("\n", " ") unless action.details.to_s.empty? %>
 
-     | <%= action.action_name %>
+<%= action.action_name %> | 
 -----|----
 Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 Author | @<%= Array(action.author || action.authors).join(", @") %>
@@ -51,7 +51,7 @@ Returns | <%= action.return_value %>
 
 <% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
