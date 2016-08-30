@@ -40,7 +40,7 @@ Returns | The output of the adb command
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -70,7 +70,7 @@ Returns | Array of devices
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -97,7 +97,7 @@ Author | @lmirosevic, @maschall
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -130,7 +130,7 @@ Author | @Appaloosa
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -164,7 +164,7 @@ Author | @klundberg, @giginet
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -197,7 +197,7 @@ Returns | The URL to preview the iPhone app
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -230,7 +230,7 @@ Author | @yonekawa
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -264,7 +264,7 @@ Author | @alexmx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -334,7 +334,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -399,7 +399,7 @@ Author | @Mo7amedFouad
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -428,7 +428,7 @@ Author | @koglinjg
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -467,7 +467,7 @@ Author | @gin0606
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -494,7 +494,7 @@ Author | @dral3x
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -524,7 +524,7 @@ Author | @DanielGri
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -561,7 +561,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -590,7 +590,7 @@ Author | @birmacher, @koglinjg
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -634,7 +634,7 @@ Author | @bassrock, @petester42, @jschmid, @JaviSoto, @uny, @phatblat, @bfcrampt
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -672,7 +672,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -706,7 +706,7 @@ Returns | Returns a String containing your formatted git commits
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -741,7 +741,7 @@ Author | @ChatWork Inc.
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -771,7 +771,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -798,7 +798,7 @@ Author | @alexmx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -825,7 +825,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -852,7 +852,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -879,7 +879,7 @@ Author | @intere
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -910,7 +910,7 @@ Author | @KrauseFx, @tadpol, @birmacher, @Liquidsoul
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -944,7 +944,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -975,7 +975,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1005,7 +1005,7 @@ Author | @KrauseFx, @pedrogimenez
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1042,7 +1042,7 @@ Author | @gin0606
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1076,7 +1076,7 @@ Author | @seei
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1109,7 +1109,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1174,7 +1174,7 @@ Author | @gin0606
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1201,7 +1201,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1266,7 +1266,7 @@ Author | @tnj
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1298,7 +1298,7 @@ Author | @simonlevy5
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1325,7 +1325,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1352,7 +1352,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1385,7 +1385,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1414,7 +1414,7 @@ Author | @dbachrach, @Liquidsoul
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1459,7 +1459,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1489,7 +1489,7 @@ Author | @JaviSoto
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1516,7 +1516,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1563,7 +1563,7 @@ Author | @Manav
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1592,7 +1592,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1641,7 +1641,7 @@ Author | @Liquidsoul
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1669,7 +1669,7 @@ Returns | The build number from the current repository
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1696,7 +1696,7 @@ Author | @KrauseFx, @czechboy0, @jaleksynas
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1726,7 +1726,7 @@ Author | @kohtenko
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1755,7 +1755,7 @@ Returns | Returns the value in the .ipa's Info.plist corresponding to the passed
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1783,7 +1783,7 @@ Author | @Liquidsoul
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1815,7 +1815,7 @@ Author | @4brunu
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1860,7 +1860,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1888,7 +1888,7 @@ Author | @KrauseFx, @JaviSoto
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1916,7 +1916,7 @@ Returns | Boolean value whether the tag exists or not
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1944,7 +1944,7 @@ Returns | The output of running the gradle task
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -1981,7 +1981,7 @@ Returns | The absolute path to the generated ipa file
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2041,7 +2041,7 @@ Author | @sjrmanning
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2068,7 +2068,7 @@ Author | @sjrmanning
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2117,7 +2117,7 @@ Author | @sjrmanning
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2145,7 +2145,7 @@ Author | @jingx23
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2182,7 +2182,7 @@ Author | @KrauseFx, @modzelewski
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2228,7 +2228,7 @@ Author | @vpolouchkine
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2277,7 +2277,7 @@ Author | @gin0606
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2307,7 +2307,7 @@ Author | @fabiomassimo, @KrauseFx, @Liquidsoul
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2336,7 +2336,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2364,7 +2364,7 @@ Author | @serluca
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2393,7 +2393,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2423,7 +2423,7 @@ Author | @NeoNachoSoto
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2451,7 +2451,7 @@ Author | @scottrhoyt
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2482,7 +2482,7 @@ Author | @joshdholtz
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2539,7 +2539,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2566,7 +2566,7 @@ Author | @iAmChrisTruman
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2653,7 +2653,7 @@ Returns | Integer representation of the latest build number uploaded to TestFlig
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2684,7 +2684,7 @@ Author | @thiagolioy
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2714,7 +2714,7 @@ Author | @thiagolioy
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2753,7 +2753,7 @@ Author | @mandrizzle
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2781,7 +2781,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2822,7 +2822,7 @@ Author | @xfreebird
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2864,7 +2864,7 @@ Author | @champo, @cbowns, @KrauseFx, @amarcadet, @dusek
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2936,7 +2936,7 @@ Author | @HeEAaD
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -2980,7 +2980,7 @@ Author | @timothybarraclough, @smartshowltd
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3030,7 +3030,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3068,7 +3068,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3111,7 +3111,7 @@ Author | @thierryxing
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3145,7 +3145,7 @@ Author | @squarefrog
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3176,7 +3176,7 @@ Author | @pprochazka72, @laugejepsen
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3209,7 +3209,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3249,7 +3249,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3297,7 +3297,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3346,7 +3346,7 @@ Author | @czechboy0
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3373,7 +3373,7 @@ Author | @jerolimov
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3400,7 +3400,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3430,7 +3430,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3479,7 +3479,7 @@ Author | @lmirosevic
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3514,7 +3514,7 @@ Author | @gin0606
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3559,7 +3559,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3588,7 +3588,7 @@ Author | @joshdholtz
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3647,7 +3647,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3703,7 +3703,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3735,7 +3735,7 @@ Author | @asfalcone, @i2amsam, @mfurtak
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3777,7 +3777,7 @@ Author | @pbrooks, @armadsen
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3804,7 +3804,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3836,7 +3836,7 @@ Access things like 'html_url', 'tag_name', 'name', 'body'
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3872,7 +3872,7 @@ Author | @kohtenko
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3901,7 +3901,7 @@ Author | @marcelofabri
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3931,7 +3931,7 @@ Author | @bartoszj
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -3969,7 +3969,7 @@ Returns | The UDID of the profile sigh just fetched/generated
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4029,7 +4029,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4065,7 +4065,7 @@ Author | @mattdelves
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4116,7 +4116,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4167,7 +4167,7 @@ Returns | The exit code of the sonar-runner binary
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4201,7 +4201,7 @@ Author | @xfreebird
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4236,7 +4236,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4268,7 +4268,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4308,7 +4308,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4376,7 +4376,7 @@ Author | @taka0125, @tcurdt
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4412,7 +4412,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4455,7 +4455,7 @@ Author | @mposchen, @johannesberdin
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4485,7 +4485,7 @@ Author | @alicertel
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4518,7 +4518,7 @@ Author | @hjanuschka
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4567,7 +4567,7 @@ Author | @xfreebird
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4597,7 +4597,7 @@ Author | @mathiasAichinger
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4625,7 +4625,7 @@ Author | @squarefrog, @tobiasstrebitzer
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4654,7 +4654,7 @@ Author | @milch
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4682,7 +4682,7 @@ Author | @JamesKuang
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4710,7 +4710,7 @@ Author | @tobiasstrebitzer
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4742,7 +4742,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4770,7 +4770,7 @@ Author | @tobiasstrebitzer, @czechboy0
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4802,7 +4802,7 @@ Author | @lgaches
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4830,7 +4830,7 @@ Author | @kcharwood
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4862,7 +4862,7 @@ Author | @kmikael
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4890,7 +4890,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4921,7 +4921,7 @@ Returns | The uploaded dSYM path(s)
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -4954,7 +4954,7 @@ Author | @CodeReaper
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5005,7 +5005,7 @@ Author | @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5032,7 +5032,7 @@ Author | @Liquidsoul, @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5061,7 +5061,7 @@ Author | @Liquidsoul, @KrauseFx
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5161,7 +5161,7 @@ Returns | The path to the newly installed Xcode version
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5208,7 +5208,7 @@ Author | @czechboy0
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5314,7 +5314,7 @@ Author | @oysta
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
@@ -5348,8 +5348,8 @@ zip
 
 ```ruby
 zip(
-  path: './to_compress',
-  output_path: 'compressed.zip'
+  path: "MyApp.app",
+  output_path: "Latest.app.zip"
 )
 ```
 
@@ -5357,7 +5357,7 @@ zip(
 
 
 <details>
-  <summary>Parameters (Click to expand)</summary>
+  <summary>Parameters</summary>
 
 Key | Description
 ----|------------
