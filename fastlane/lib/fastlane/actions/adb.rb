@@ -48,6 +48,14 @@ module Fastlane
       def self.output
       end
 
+      def self.example_code
+        [
+          'adb(
+            command: "shell ls"
+          )'
+        ]
+      end
+
       def self.return_value
         "The output of the adb command"
       end
