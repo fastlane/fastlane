@@ -19,10 +19,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Post on twitter"
+        "Post a tweet on Twitter.com"
       end
 
       def self.details
+        "Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token."
       end
 
       def self.available_options
@@ -54,6 +55,22 @@ module Fastlane
                                        optional: false)
 
         ]
+      end
+
+      def self.example_code
+        [
+          'twitter(
+            message: "You rock!",
+            access_token: "XXXX",
+            access_token_secret: "xxx",
+            consumer_key: "xxx",
+            consumer_secret: "xxx"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
 
       def self.authors
