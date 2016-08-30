@@ -12,8 +12,8 @@ module Sigh
       end
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
     end
 
     def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
