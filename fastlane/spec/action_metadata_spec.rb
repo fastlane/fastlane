@@ -6,7 +6,7 @@ describe Fastlane::Action do
       it "contains a valid category" do
         expect(action.category).to_not be_nil
         expect(action.category).to be_kind_of(Symbol)
-        expect(Fastlane::Action::AVAILABLE_CATEGORIES).to include(action.category)
+        expect(Fastlane::Action::AVAILABLE_CATEGORIES).to include(action.category), "Unknown action category '#{action.category}', must be one of #{Fastlane::Action::AVAILABLE_CATEGORIES.join(', ')}"
       end
 
       it "is a subclass of Action" do

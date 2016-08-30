@@ -48,6 +48,10 @@ module Fastlane
       def self.output
       end
 
+      def self.category
+        :building
+      end
+
       def self.example_code
         [
           'adb(
