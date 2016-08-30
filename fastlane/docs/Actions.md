@@ -41,6 +41,21 @@ If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integra
 cocoapods # this will run pod install
 ```
 
+More options are available:
+
+```ruby
+cocoapods(
+  clean: true,                                    # Remove SCM directories
+  integrate: true,                                # Integrate the Pods libraries into the Xcode project(s)
+  repo_update: false,                             # Run `pod repo update` before install
+  silent: false,                                  # Execute command without logging output
+  verbose: false,                                 # Show more debugging information
+  ansi: true,                                     # Show output with ANSI codes
+  use_bundle_exec: true,                          # Use bundle exec when there is a Gemfile presented
+  podfile: 'path/to/Podfile'                      # Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file
+)
+```
+
 ### [Carthage](https://github.com/Carthage/Carthage)
 
 This will execute `carthage bootstrap`
