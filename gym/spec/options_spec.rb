@@ -20,5 +20,12 @@ describe Gym do
 
       expect(Gym.config[:scheme]).to eq("Example")
     end
+
+    it "replaces SEPARATOR (i.e. /) character with underscore(_) in output name" do
+      options = { output_name: "feature" + File::SEPARATOR + "Example.ipa", project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      expect(Gym.config[:output_name]).to eq("feature_Example")
+    end
   end
 end
