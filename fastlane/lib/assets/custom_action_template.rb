@@ -4,12 +4,6 @@ module Fastlane
       [[NAME_UP]]_CUSTOM_VALUE = :[[NAME_UP]]_CUSTOM_VALUE
     end
 
-    # To share this integration with the other fastlane users:
-    # - Fork https://github.com/fastlane/fastlane/tree/master/fastlane
-    # - Clone the forked repository
-    # - Move this integration into lib/fastlane/actions
-    # - Commit, push and submit the pull request
-
     class [[NAME_CLASS]] < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
