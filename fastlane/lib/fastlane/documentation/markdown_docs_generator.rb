@@ -17,7 +17,11 @@ module Fastlane
       ActionsList.all_actions do |action|
         readable = readable_category_name(action.category)
 
-        self.categories[readable] << action
+        if self.categories[readable].kind_of?(Array)
+          self.categories[readable] << action
+        else
+          UI.error("Action '#{action.name}' doesn't contain category information... skipping")
+        end
       end
     end
 
