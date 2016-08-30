@@ -30,6 +30,7 @@ describe Fastlane::Action do
         authors.each do |author|
           expect(author).to_not start_with("@")
         end
+
         # TODO: validate author here
       end
 
