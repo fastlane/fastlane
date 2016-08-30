@@ -286,19 +286,19 @@ module Frameit
       if File.exist? strings_path
         parsed = StringsParser.parse(strings_path)
         result = parsed.find { |k, v| screenshot.path.upcase.include? k.upcase }
-        if result 
+        if result
           return result.last
         else
           File.open(strings_path, "rb") do |file|
             num = file.read(2).unpack("n")
             file.close
 
-            if num != 65279  # FEFF - 16bit Big-endian BOM
+            if num != 65_279 # FEFF - 16bit Big-endian BOM
               UI.error("Could not parse #{strings_path}. Please make sure it is UTF16, Big Endian Encoded")
             else
               UI.error("Could not parse #{strings_path}")
             end
-          end 
+          end
         end
       end
 
