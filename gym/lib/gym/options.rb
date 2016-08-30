@@ -64,6 +64,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
+                                       value.gsub!(File::SEPARATOR, "_")
                                      end),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
