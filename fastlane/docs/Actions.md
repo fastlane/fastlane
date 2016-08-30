@@ -1,10 +1,10 @@
 # Actions
 
-To get the most up-to-date information from the command line on your current version you can also run:
+To get the most up-to-date information from the command line on your current version you can run:
 
 ```sh
-fastlane actions: List all available fastlane actions
-fastlane action [action_name]:
+fastlane actions # List all available fastlane actions
+fastlane action [action_name] # Details for a specific fastlane action
 ```
 
 You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
