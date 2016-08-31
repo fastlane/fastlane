@@ -7,6 +7,7 @@ module Fastlane
       :building,
       :screenshots,
       :project,
+      :code_signing,
       :beta,
       :production,
       :source_control,
