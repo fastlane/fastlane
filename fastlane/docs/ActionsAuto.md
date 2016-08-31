@@ -19,6 +19,7 @@ import './path/to/other/Fastfile'
 - [Building](#building)
 - [Screenshots](#screenshots)
 - [Project](#project)
+- [Code Signing](#code-signing)
 - [Beta](#beta)
 - [Releasing your app](#releasing-your-app)
 - [Source Control](#source-control)
@@ -127,11 +128,129 @@ Key | Description
 
 
 
+### carthage
+
+Runs `carthage` for your project
+
+> 
+
+carthage | 
+-----|----
+Supported platforms | ios, mac
+Author | @bassrock, @petester42, @jschmid, @JaviSoto, @uny, @phatblat, @bfcrampton
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+carthage
+```
+
+```ruby
+carthage(
+  command: "bootstrap"        # One of: build, bootstrap, update, archive. (default: bootstrap)
+  dependencies: ["Alamofire", "Notice"],# Specify which dependencies to update (only for the update command)
+  use_ssh: false,   # Use SSH for downloading GitHub repositories.
+  use_submodules: false,      # Add dependencies as Git submodules.
+  use_binaries: true,         # Check out dependency repositories even when prebuilt frameworks exist
+  no_build: false,  # When bootstrapping Carthage do not build
+  no_skip_current: false,     # Don't skip building the current project (only for frameworks)
+  verbose: false,   # Print xcodebuild output inline
+  platform: "all",  # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
+  configuration: "Release",   # Build configuration to use when building
+  toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `command` | Carthage command (one of: build, bootstrap, update, archive)
+  `dependencies` | Carthage dependencies to update
+  `use_ssh` | Use SSH for downloading GitHub repositories
+  `use_submodules` | Add dependencies as Git submodules
+  `use_binaries` | Check out dependency repositories even when prebuilt frameworks exist
+  `no_build` | When bootstrapping Carthage do not build
+  `no_skip_current` | Don't skip building the Carthage project (in addition to its dependencies)
+  `derived_data` | Use derived data folder at path
+  `verbose` | Print xcodebuild output inline
+  `platform` | Define which platform to build for
+  `configuration` | Define which build configuration to use when building
+  `toolchain` | Define which xcodebuild toolchain to use when building
+
+</details>
+
+
+
+
+
 
 # Screenshots
 
 
 # Project
+
+
+# Code Signing
+
+### cert
+
+Fetch or generate the latest available code signing identity
+
+> **Important**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
+Use this action to download the latest code signing identity
+
+cert | 
+-----|----
+Supported platforms | ios
+Author | @KrauseFx
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+cert
+```
+
+```ruby
+cert(
+  development: true,
+  username: "user@email.com"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `development` | Create a development certificate instead of a distribution one
+  `force` | Create a certificate even if an existing certificate exists
+  `username` | Your Apple ID Username
+  `team_id` | The ID of your team if you're in multiple teams
+  `team_name` | The name of your team if you're in multiple teams
+  `output_path` | The path to a directory in which all certificates and private keys should be stored
+  `keychain_path` | Path to a custom keychain
+
+</details>
+
+
+
+
 
 
 # Beta
@@ -358,8 +477,109 @@ Key | Description
 
 
 
+### changelog_from_git_commits
+
+Collect git commit messages into a changelog
+
+> By default, messages will be collected back to the last tag, but the range can be controlled
+
+changelog_from_git_commits | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @mfurtak, @asfalcone, @SiarheiFedartsou
+Returns | Returns a String containing your formatted git commits
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+changelog_from_git_commits
+```
+
+```ruby
+changelog_from_git_commits(
+  between: ["7b092b3", "HEAD"], # Optional, lets you specify a revision/tag range between which to collect commit info
+  pretty: "- (%ae) %s", # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+  tag_match_pattern: nil, # Optional, lets you search for a tag name that matches a glob(7) pattern
+  match_lightweight_tag: false, # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+  include_merges: true # Optional, lets you filter out merge commits
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `between` | Array containing two Git revision values between which to collect messages, you mustn't use it with :commits_count key at the same time
+  `commits_count` | Number of commits to include in changelog, you mustn't use it with :between key at the same time
+  `pretty` | The format applied to each commit while generating the collected value
+  `tag_match_pattern` | A glob(7) pattern to match against when finding the last git tag
+  `match_lightweight_tag` | Whether or not to match a lightweight tag when searching for the last one
+  `include_merges` | Whether or not to include any commits that are merges
+[31m(DEPRECATED - use :merge_commit_filtering)[0m
+  `merge_commit_filtering` | Controls inclusion of merge commits when collecting the changelog.
+Valid values: 'include_merges', 'exclude_merges', 'only_include_merges'
+
+</details>
+
+
+
+
+
 
 # Notifications
+
+### chatwork
+
+Send a success/error message to ChatWork
+
+> Information on how to obtain an API token: http://developer.chatwork.com/ja/authenticate.html
+
+chatwork | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @astronaughts
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+chatwork(
+  message: "App successfully released!",
+  roomid: 12345,
+  success: true,
+  api_token: "Your Token"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `api_token` | ChatWork API Token
+  `message` | The message to post on ChatWork
+  `roomid` | The room ID
+  `success` | Was this build successful? (true/false)
+
+</details>
+
+
+
+
 
 ### twitter
 
@@ -849,6 +1069,44 @@ Key | Description
   `trust_policy` | Sets level of security when dealing with signed gems. Accepts `LowSecurity`, `MediumSecurity` and `HighSecurity` as values
   `without` | Exclude gems that are part of the specified named group
   `with` | Include gems that are part of the specified named group
+
+</details>
+
+
+
+
+
+### clean_build_artifacts
+
+Deletes files created as result of running ipa, cert, sigh or download_dsyms
+
+> This action deletes the files that get created in your repo as a result of running the `ipa` and `sigh` commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
+Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
+
+clean_build_artifacts | 
+-----|----
+Supported platforms | ios, mac
+Author | @lmirosevic
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+clean_build_artifacts
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `exclude_pattern` | Exclude all files from clearing that match the given Regex pattern: e.g. '.*.mobileprovision'
 
 </details>
 
