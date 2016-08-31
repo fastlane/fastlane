@@ -197,7 +197,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :documentation
       end
 
       def self.example_code
