@@ -47,6 +47,8 @@ module Fastlane
         "Notifications"
       when :code_signing
         "Code Signing"
+      when :documentation
+        "Documentation"
       when :testing
         "Testing"
       when :building
