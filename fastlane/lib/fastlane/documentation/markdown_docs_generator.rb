@@ -45,6 +45,8 @@ module Fastlane
         "Source Control"
       when :notifications
         "Notifications"
+      when :code_signing
+        "Code Signing"
       when :testing
         "Testing"
       when :building
