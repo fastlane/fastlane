@@ -82,14 +82,26 @@ module Fastlane
       all
     end
 
+    # Pass a action symbol (e.g. :deliver or :commit_version_bump)
+    # and this method will return a reference to the action class
+    # if it exists. In case the action with this name can't be found
+    # this method will return nil.
+    # This method is being called by `trigger_action_by_name` to see
+    # if a given action is available (either built-in or loaded from a plugin)
+    # and is also being called from the fastlane docs generator
+    def class_reference_from_action_name(method_sym)
+      method_str = method_sym.to_s.delete("?") # as a `?` could be at the end of the method name
+      class_ref = Actions.action_class_ref(method_str)
+
+      return class_ref if class_ref && class_ref.respond_to?(:run)
+      nil
+    end
+
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
     def trigger_action_by_name(method_sym, custom_dir, *arguments)
-      method_str = method_sym.to_s
-      method_str.delete!('?') # as a `?` could be at the end of the method name
-
       # First, check if there is a predefined method in the actions folder
-      class_ref = Actions.action_class_ref(method_str)
+      class_ref = class_reference_from_action_name(method_sym)
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
@@ -111,7 +123,7 @@ module Fastlane
           if Fastlane.plugin_manager.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
             # That's a plugin, but for some reason we can't find it
             UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
-          elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)
+          elsif Fastlane::Actions.formerly_bundled_actions.include?(method_sym.to_s)
             # This was a formerly bundled action which is now a plugin.
             UI.verbose(caller.join("\n"))
             UI.user_error!("The action '#{method_sym}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{method_sym}`")
