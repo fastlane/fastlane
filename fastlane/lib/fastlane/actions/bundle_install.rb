@@ -55,6 +55,15 @@ module Fastlane
         ["birmacher", "koglinjg"]
       end
 
+      def self.example_code
+        [
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :binstubs,

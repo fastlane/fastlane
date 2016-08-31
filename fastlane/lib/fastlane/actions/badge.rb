@@ -31,8 +31,22 @@ module Fastlane
         [
           "This action will add a light/dark badge onto your app icon.",
           "You can also provide your custom badge/overlay or add an shield for more customization more info:",
-          "https://github.com/HazAT/badge"
+          "https://github.com/HazAT/badge",
+          "**Note** If you want to reset the badge back to default you can use `sh 'git checkout -- <path>/Assets.xcassets/'`"
         ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'badge(dark: true)',
+          'badge(alpha: true)',
+          'badge(custom: "/Users/xxx/Desktop/badge.png")',
+          'badge(shield: "Version-0.0.3-blue", no_badge: true)'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.available_options

@@ -47,6 +47,23 @@ module Fastlane
         ["koglinjg"]
       end
 
+      def self.example_code
+        [
+          'artifactory(
+            username: "username",
+            password: "password",
+            endpoint: "https://artifactory.example.com/artifactory/",
+            file: "example.ipa",                                # File to upload
+            repo: "mobile_artifacts",                           # Artifactory repo
+            repo_path: "/ios/appname/example-major.minor.ipa"   # Path to place the artifact including its filename
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :file,
