@@ -20,6 +20,7 @@ import './path/to/other/Fastfile'
 - [Screenshots](#screenshots)
 - [Project](#project)
 - [Code Signing](#code-signing)
+- [Documentation](#documentation)
 - [Beta](#beta)
 - [Releasing your app](#releasing-your-app)
 - [Source Control](#source-control)
@@ -192,6 +193,139 @@ Key | Description
 
 
 
+### clean_cocoapods_cache
+
+Remove the cache for pods
+
+> 
+
+clean_cocoapods_cache | 
+-----|----
+Supported platforms | ios, mac
+Author | @alexmx
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+clean_cocoapods_cache
+```
+
+```ruby
+clean_cocoapods_cache(name: "CACHED_POD")
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `name` | Pod name to be removed from cache
+
+</details>
+
+
+
+
+
+### clear_derived_data
+
+Deletes the Xcode Derived Data
+
+> Deletes the Derived Data from '~/Library/Developer/Xcode/DerivedData' or a supplied path
+
+clear_derived_data | 
+-----|----
+Supported platforms | ios, mac
+Author | @KrauseFx
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+clear_derived_data
+```
+
+```ruby
+clear_derived_data(derived_data_path: "/custom/")
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `derived_data_path` | Custom path for derivedData
+
+</details>
+
+
+
+
+
+### cocoapods
+
+Runs `pod install` for the project
+
+> If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
+
+cocoapods | 
+-----|----
+Supported platforms | ios, mac
+Author | @KrauseFx, @tadpol, @birmacher, @Liquidsoul
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+cocoapods
+```
+
+```ruby
+cocoapods(
+  clean: true,
+  podfile: "./CustomPodfile"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `clean` | Remove SCM directories
+  `integrate` | Integrate the Pods libraries into the Xcode project(s)
+  `repo_update` | Run `pod repo update` before install
+  `silent` | Show nothing
+  `verbose` | Show more debugging information
+  `ansi` | Show output with ANSI codes
+  `use_bundle_exec` | Use bundle exec when there is a Gemfile presented
+  `podfile` | Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file
+
+</details>
+
+
+
+
+
 
 # Screenshots
 
@@ -245,6 +379,99 @@ Key | Description
   `team_name` | The name of your team if you're in multiple teams
   `output_path` | The path to a directory in which all certificates and private keys should be stored
   `keychain_path` | Path to a custom keychain
+
+</details>
+
+
+
+
+
+
+# Documentation
+
+### appledoc
+
+Generate Apple-like source code documentation from specially formatted source code comments.
+
+> Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project
+
+appledoc | 
+-----|----
+Supported platforms | ios, mac
+Author | @alexmx
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+appledoc(
+  project_name: "MyProjectName",
+  project_company: "Company Name",
+  input: "MyProjectSources",
+  ignore: [
+    "ignore/path/1",
+    "ingore/path/2"
+  ],
+  options: "--keep-intermediate-files --search-undocumented-doc",
+  warnings: "--warn-missing-output-path --warn-missing-company-id"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `input` | Path to source files
+  `output` | Output path
+  `templates` | Template files path
+  `docset_install_path` | DocSet installation path
+  `include` | Include static doc(s) at path
+  `ignore` | Ignore given path
+  `exclude_output` | Exclude given path from output
+  `index_desc` | File including main index description
+  `project_name` | Project name
+  `project_version` | Project version
+  `project_company` | Project company
+  `company_id` | Company UTI (i.e. reverse DNS name)
+  `create_html` | Create HTML
+  `create_docset` | Create documentation set
+  `install_docset` | Install documentation set to Xcode
+  `publish_docset` | Prepare DocSet for publishing
+  `html_anchors` | The html anchor format to use in DocSet HTML
+  `clean_output` | Remove contents of output path before starting
+  `docset_bundle_id` | DocSet bundle identifier
+  `docset_bundle_name` | DocSet bundle name
+  `docset_desc` | DocSet description
+  `docset_copyright` | DocSet copyright message
+  `docset_feed_name` | DocSet feed name
+  `docset_feed_url` | DocSet feed URL
+  `docset_feed_formats` | DocSet feed formats. Separated by a comma [atom,xml]
+  `docset_package_url` | DocSet package (.xar) URL
+  `docset_fallback_url` | DocSet fallback URL
+  `docset_publisher_id` | DocSet publisher identifier
+  `docset_publisher_name` | DocSet publisher name
+  `docset_min_xcode_version` | DocSet min. Xcode version
+  `docset_platform_family` | DocSet platform familiy
+  `docset_cert_issuer` | DocSet certificate issuer
+  `docset_cert_signer` | DocSet certificate signer
+  `docset_bundle_filename` | DocSet bundle filename
+  `docset_atom_filename` | DocSet atom feed filename
+  `docset_xml_filename` | DocSet xml feed filename
+  `docset_package_filename` | DocSet package (.xar,.tgz) filename
+  `options` | Documentation generation options
+  `crossref_format` | Cross reference template regex
+  `exit_threshold` | Exit code threshold below which 0 is returned
+  `docs_section_title` | Title of the documentation section (defaults to "Programming Guides"
+  `warnings` | Documentation generation warnings
+  `logformat` | Log format [0-3]
+  `verbose` | Log verbosity level [0-6,xcode]
 
 </details>
 
@@ -408,6 +635,64 @@ Key | Description
 
 
 
+### crashlytics
+
+Upload a new build to Crashlytics Beta
+
+> Additionally you can specify `notes`, `emails`, `groups` and `notifications`.
+#### Distributing to Groups
+When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:
+
+crashlytics | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @KrauseFx, @pedrogimenez
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+crashlytics
+```
+
+```ruby
+crashlytics(
+  crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+  api_token: "...",
+  build_secret: "...",
+  ipa_path: "./app.ipa"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `ipa_path` | Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action
+  `apk_path` | Path to your APK file
+  `crashlytics_path` | Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)
+  `api_token` | Crashlytics Beta API Token
+  `build_secret` | Crashlytics Build Secret
+  `notes_path` | Path to the release notes
+  `notes` | The release notes as string - uses :notes_path under the hood
+  `groups` | The groups used for distribution, separated by commas
+  `emails` | Pass email addresses of testers, separated by commas
+  `notifications` | Crashlytics notification option (true/false)
+  `debug` | Crashlytics debug option (true/false)
+
+</details>
+
+
+
+
+
 
 # Releasing your app
 
@@ -526,6 +811,57 @@ Key | Description
 [31m(DEPRECATED - use :merge_commit_filtering)[0m
   `merge_commit_filtering` | Controls inclusion of merge commits when collecting the changelog.
 Valid values: 'include_merges', 'exclude_merges', 'only_include_merges'
+
+</details>
+
+
+
+
+
+### create_pull_request
+
+This will create a new pull request on GitHub
+
+> 
+
+create_pull_request | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @seei
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+create_pull_request(
+  api_token: ENV["GITHUB_TOKEN"],
+  repo: "fastlane/fastlane",
+  title: "Amazing new feature",
+  head: "my-feature",       # optional, defaults to current branch name
+  base: "master", # optional, defaults to "master"
+  body: "Please pull this in!",       # optional
+  api_url: "http://yourdomain/api/v3" # optional, for Github Enterprise, defaults to "https://api.github.com"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `api_token` | Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+  `repo` | The name of the repository you want to submit the pull request to
+  `title` | The title of the pull request
+  `body` | The contents of the pull request
+  `head` | The name of the branch where your changes are implemented (defaults to the current branch name)
+  `base` | The name of the branch you want your changes pulled into (defaults to `master`)
+  `api_url` | The URL of Github API - used when the Enterprise (default to `https://api.github.com`)
 
 </details>
 
@@ -703,96 +1039,6 @@ Key | Description
   `language` | Device language in ISO 639-1 language code, e.g. 'de'
   `color` | Color of the device
   `launch_url` | Specify a deep link to open when your app is launched
-
-</details>
-
-
-
-
-
-### appledoc
-
-Generate Apple-like source code documentation from specially formatted source code comments.
-
-> Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project
-
-appledoc | 
------|----
-Supported platforms | ios, mac
-Author | @alexmx
-
-
-
-<details>
-<summary>1 Example</summary>
-
-```ruby
-appledoc(
-  project_name: "MyProjectName",
-  project_company: "Company Name",
-  input: "MyProjectSources",
-  ignore: [
-    "ignore/path/1",
-    "ingore/path/2"
-  ],
-  options: "--keep-intermediate-files --search-undocumented-doc",
-  warnings: "--warn-missing-output-path --warn-missing-company-id"
-)
-```
-
-
-</details>
-
-
-<details>
-<summary>Parameters</summary>
-
-Key | Description
-----|------------
-  `input` | Path to source files
-  `output` | Output path
-  `templates` | Template files path
-  `docset_install_path` | DocSet installation path
-  `include` | Include static doc(s) at path
-  `ignore` | Ignore given path
-  `exclude_output` | Exclude given path from output
-  `index_desc` | File including main index description
-  `project_name` | Project name
-  `project_version` | Project version
-  `project_company` | Project company
-  `company_id` | Company UTI (i.e. reverse DNS name)
-  `create_html` | Create HTML
-  `create_docset` | Create documentation set
-  `install_docset` | Install documentation set to Xcode
-  `publish_docset` | Prepare DocSet for publishing
-  `html_anchors` | The html anchor format to use in DocSet HTML
-  `clean_output` | Remove contents of output path before starting
-  `docset_bundle_id` | DocSet bundle identifier
-  `docset_bundle_name` | DocSet bundle name
-  `docset_desc` | DocSet description
-  `docset_copyright` | DocSet copyright message
-  `docset_feed_name` | DocSet feed name
-  `docset_feed_url` | DocSet feed URL
-  `docset_feed_formats` | DocSet feed formats. Separated by a comma [atom,xml]
-  `docset_package_url` | DocSet package (.xar) URL
-  `docset_fallback_url` | DocSet fallback URL
-  `docset_publisher_id` | DocSet publisher identifier
-  `docset_publisher_name` | DocSet publisher name
-  `docset_min_xcode_version` | DocSet min. Xcode version
-  `docset_platform_family` | DocSet platform familiy
-  `docset_cert_issuer` | DocSet certificate issuer
-  `docset_cert_signer` | DocSet certificate signer
-  `docset_bundle_filename` | DocSet bundle filename
-  `docset_atom_filename` | DocSet atom feed filename
-  `docset_xml_filename` | DocSet xml feed filename
-  `docset_package_filename` | DocSet package (.xar,.tgz) filename
-  `options` | Documentation generation options
-  `crossref_format` | Cross reference template regex
-  `exit_threshold` | Exit code threshold below which 0 is returned
-  `docs_section_title` | Title of the documentation section (defaults to "Programming Guides"
-  `warnings` | Documentation generation warnings
-  `logformat` | Log format [0-3]
-  `verbose` | Log verbosity level [0-6,xcode]
 
 </details>
 
@@ -1107,6 +1353,192 @@ clean_build_artifacts
 Key | Description
 ----|------------
   `exclude_pattern` | Exclude all files from clearing that match the given Regex pattern: e.g. '.*.mobileprovision'
+
+</details>
+
+
+
+
+
+### clipboard
+
+Copies a given string into the clipboard. Works only on macOS
+
+> 
+
+clipboard | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @KrauseFx
+
+
+
+<details>
+<summary>2 Examples</summary>
+
+```ruby
+clipboard(value: "https://github.com/fastlane/fastlane/tree/master/fastlane")
+```
+
+```ruby
+clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK])
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `value` | The string that should be copied into the clipboard
+
+</details>
+
+
+
+
+
+### cloc
+
+Generates a Code Count that can be read by Jenkins (xml format)
+
+> This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.
+See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin and https://github.com/AlDanial/cloc for more information.
+
+cloc | 
+-----|----
+Supported platforms | ios, mac
+Author | @intere
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+cloc(
+   exclude_dir: "ThirdParty,Resources",
+   output_directory: "reports",
+   source_directory: "MyCoolApp"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `binary_path` | Where the cloc binary lives on your system (full path including 'cloc')
+  `exclude_dir` | Comma separated list of directories to exclude
+  `output_directory` | Where to put the generated report file
+  `source_directory` | Where to look for the source code (relative to the project root folder)
+  `xml` | Should we generate an XML File (if false, it will generate a plain text file)?
+
+</details>
+
+
+
+
+
+### copy_artifacts
+
+Small action to save your build artifacts. Useful when you use reset_git_repo
+
+> This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s
+Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list
+
+copy_artifacts | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @lmirosevic
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+copy_artifacts(
+  target_path: "artifacts",
+  artifacts: ["*.cer", "*.mobileprovision", "*.ipa", "*.dSYM.zip"]
+)
+
+# Reset the git repo to a clean state, but leave our artifacts in place
+reset_git_repo(
+  exclude: "artifacts"
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `keep_original` | Set this to true if you want copy, rather than move, semantics
+  `target_path` | The directory in which you want your artifacts placed
+  `artifacts` | An array of file patterns of the files/folders you want to preserve
+  `fail_on_missing` | Fail when a source file isn't found
+
+</details>
+
+
+
+
+
+### create_keychain
+
+Create a new Keychain
+
+> 
+
+create_keychain | 
+-----|----
+Supported platforms | ios, android, mac
+Author | @gin0606
+
+
+
+<details>
+<summary>1 Example</summary>
+
+```ruby
+create_keychain(
+  name: "KeychainName",
+  default_keychain: true,
+  unlock: true,
+  timeout: 3600,
+  lock_when_sleeps: true
+)
+```
+
+
+</details>
+
+
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+  `name` | Keychain name
+  `password` | Password for the keychain
+  `default_keychain` | Set the default keychain
+  `unlock` | Unlock keychain after create
+  `timeout` | timeout interval in seconds. Set `false` if you want to specify "no time-out"
+  `lock_when_sleeps` | Lock keychain when the system sleeps
+  `lock_after_timeout` | Lock keychain after timeout interval
+  `add_to_search_list` | Add keychain to search list
 
 </details>
 

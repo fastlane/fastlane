@@ -26,7 +26,10 @@ module Fastlane
       end
 
       def self.details
-        "This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.  See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin for more information."
+        [
+          "This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.",
+          "See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin and https://github.com/AlDanial/cloc for more information."
+        ].join("\n")
       end
 
       def self.available_options
@@ -66,6 +69,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'cloc(
+             exclude_dir: "ThirdParty,Resources",
+             output_directory: "reports",
+             source_directory: "MyCoolApp"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end
