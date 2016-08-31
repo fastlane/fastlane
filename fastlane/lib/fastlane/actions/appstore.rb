@@ -30,6 +30,14 @@ module Fastlane
       def self.is_supported?(platform)
         Actions::DeliverAction.is_supported?(platform)
       end
+
+      def self.category
+        Actions::DeliverAction.category
+      end
+
+      def self.example_code
+        Actions::DeliverAction.example_code
+      end
     end
   end
 end

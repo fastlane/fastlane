@@ -226,6 +226,33 @@ module Fastlane
         url_for_download_response.kind_of?(Net::HTTPNotFound) ||
           url_for_download_response.kind_of?(Net::HTTPForbidden)
       end
+
+      def self.example_code
+        [
+          "appaloosa(
+            # Path tor your IPA or APK
+            binary: '/path/to/binary.ipa',
+            # You can find your store’s id at the bottom of the “Settings” page of your store
+            store_id: 'your_store_id',
+            # You can find your api_token at the bottom of the “Settings” page of your store
+            api_token: 'your_api_key',
+            # User group_ids visibility, if it's not specified we'll publish the app for all users in your store'
+            group_ids: '112, 232, 387',
+            # You can use fastlane/snapshot or specify your own screenshots folder.
+            # If you use snapshot please specify a local and a device to upload your screenshots from.
+            # When multiple values are specified in the Snapfile, we default to 'en-US'
+            locale: 'en-US',
+            # By default, the screenshots from the last device will be used
+            device: 'iPhone6',
+            # Screenshots' filenames should start with device's name like 'iphone6-s1.png' if device specified
+            screenshots: '/path/to_your/screenshots'
+          )"
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end
