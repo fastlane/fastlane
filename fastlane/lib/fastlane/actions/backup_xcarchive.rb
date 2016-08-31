@@ -103,6 +103,21 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'backup_xcarchive(
+            xcarchive: "/path/to/file.xcarchive", # Optional if you use the `xcodebuild` action
+            destination: "/somewhere/else/file.xcarchive", # Where the backup should be created
+            zip: false, # Enable compression of the archive. Defaults to `true`.
+            versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end
