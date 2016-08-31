@@ -36,7 +36,7 @@ import './path/to/other/Fastfile'
 
 Run UI test by Appium with RSpec
 
-> 
+
 
 appium | 
 -----|----
@@ -133,7 +133,7 @@ Key | Description
 
 Runs `carthage` for your project
 
-> 
+
 
 carthage | 
 -----|----
@@ -197,7 +197,7 @@ Key | Description
 
 Remove the cache for pods
 
-> 
+
 
 clean_cocoapods_cache | 
 -----|----
@@ -597,7 +597,7 @@ Key | Description
 
 Upload dSYM file to Apteligent (Crittercism)
 
-> 
+
 
 apteligent | 
 -----|----
@@ -822,7 +822,7 @@ Valid values: 'include_merges', 'exclude_merges', 'only_include_merges'
 
 This will create a new pull request on GitHub
 
-> 
+
 
 create_pull_request | 
 -----|----
@@ -1050,7 +1050,7 @@ Key | Description
 
 This action uploads an artifact to artifactory
 
-> 
+
 
 artifactory | 
 -----|----
@@ -1106,7 +1106,7 @@ Key | Description
 
 This action backs up your file to "[path].back"
 
-> 
+
 
 backup_file | 
 -----|----
@@ -1143,7 +1143,7 @@ Key | Description
 
 Save your [zipped] xcarchive elsewhere from default path
 
-> 
+
 
 backup_xcarchive | 
 -----|----
@@ -1281,7 +1281,7 @@ Key | Description
 
 This action runs `bundle install` (if available)
 
-> 
+
 
 bundle_install | 
 -----|----
@@ -1364,7 +1364,7 @@ Key | Description
 
 Copies a given string into the clipboard. Works only on macOS
 
-> 
+
 
 clipboard | 
 -----|----
@@ -1500,7 +1500,7 @@ Key | Description
 
 Create a new Keychain
 
-> 
+
 
 create_keychain | 
 -----|----
@@ -1550,7 +1550,7 @@ Key | Description
 
 Compress a file or folder to a zip
 
-> 
+
 
 zip | 
 -----|----
