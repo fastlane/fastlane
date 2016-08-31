@@ -29,7 +29,7 @@ import './path/to/other/Fastfile'
 
 <%= action.description %>
 
-> <%= action.details.gsub("\n\n", "\n") unless action.details.to_s.empty? %>
+<%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
 
 <%= action.action_name %> | 
 -----|----
