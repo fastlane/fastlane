@@ -312,7 +312,7 @@ module Spaceship
       return @service_key if @service_key
 
       # Check if we have a local cache of the key
-      itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
       # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
