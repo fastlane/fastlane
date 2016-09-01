@@ -2,12 +2,19 @@ describe Fastlane do
   describe Fastlane::PluginFetcher do
     describe "#fetch_gems" do
       before do
+        current_gem = "yolo"
         # We have to stub both a specific search, and the general listing
-        ["yolo", ""].each do |current_gem|
-          stub_request(:get, "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-#{current_gem}").
-            with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-            to_return(status: 200, body: File.read("spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
-        end
+        stub_request(:get, "https://rubygems.org/api/v1/search.json?page=1&query=fastlane-plugin-#{current_gem}").
+          to_return(status: 200, body: File.read("spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
+
+        stub_request(:get, "https://rubygems.org/api/v1/search.json?page=2&query=fastlane-plugin-#{current_gem}").
+          to_return(status: 200, body: [].to_json, headers: {})
+
+        stub_request(:get, "https://rubygems.org/api/v1/search.json?page=1&query=fastlane-plugin-").
+          to_return(status: 200, body: File.read("spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
+
+        stub_request(:get, "https://rubygems.org/api/v1/search.json?page=2&query=fastlane-plugin-").
+          to_return(status: 200, body: [].to_json, headers: {})
       end
 
       it "returns all available plugins if no search query is given" do
