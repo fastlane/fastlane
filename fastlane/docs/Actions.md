@@ -2056,6 +2056,9 @@ To obtain the token, create a new
 in your Flock admin panel.
 
 ### [JIRA](https://www.atlassian.com/software/jira)
+
+#### Commenting
+
 Leave a comment on a JIRA ticket.
 
 ```ruby
@@ -2066,6 +2069,21 @@ jira(
   ticket_id: "Ticket ID, i.e. IOS-123",
   comment_text: "Text to post as a comment"
 )
+```
+
+#### Versions
+
+Create a new release version for a JIRA project.
+
+```ruby
+create_jira_version(
+    url: 'https://yourjira.domain.com',
+    username: 'some_user',
+    password: 'SuperSecret!',
+    project_name: 'PROJ',
+    name: 'iOS 1.0.0',
+    description: 'Fastlane auto-created version'
+  )
 ```
 
 ## Other
