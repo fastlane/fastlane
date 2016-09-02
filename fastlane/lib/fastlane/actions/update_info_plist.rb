@@ -33,7 +33,7 @@ module Fastlane
 
           # Read existing plist file
           info_plist_path = File.join(folder, "..", params[:plist_path])
-          UI.user_error!("Couldn't find info plist file at path '#{params[:plist_path]}'") unless File.exist?(info_plist_path)
+          UI.user_error!("Couldn't find info plist file at path '#{info_plist_path}'") unless File.exist?(info_plist_path)
           plist = Xcodeproj::Plist.read_from_path(info_plist_path)
 
           # Update plist values

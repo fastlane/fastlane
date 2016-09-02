@@ -63,6 +63,9 @@ describe Fastlane do
       end
 
       it "throws an error when the info plist file does not exist" do
+        # This is path update_info_plist creates to locate the plist file.
+        full_path = [test_path, proj_file, '..', "NOEXIST-#{plist_path}"].join(File::SEPARATOR)
+
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             update_info_plist ({
@@ -72,7 +75,7 @@ describe Fastlane do
               display_name: '#{display_name}'
             })
           end").runner.execute(:test)
-        end.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'")
+        end.to raise_error("Couldn't find info plist file at path '#{full_path}'")
       end
 
       it "throws an error when the scheme does not exist" do
