@@ -207,7 +207,12 @@ module FastlaneCore
 
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
-        value = UI.input("#{option.description}: ")
+		if option.sensitive
+			        value = UI.password("#{option.description}: ")
+		else
+			        value = UI.input("#{option.description}: ")
+		end
+
         # Also store this value to use it from now on
         begin
           set(key, value)
