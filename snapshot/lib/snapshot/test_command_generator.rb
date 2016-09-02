@@ -64,7 +64,7 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def find_device(device_name, os_version)
+      def find_device(device_name, os_version = Snapshot.config[:ios_version])
         # We might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
