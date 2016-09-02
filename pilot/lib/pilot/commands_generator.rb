@@ -65,7 +65,6 @@ module Pilot
         c.description = "Distribute a previously uploaded binary to Apple TestFlight"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          config[:distribute_external] = true
           Pilot::BuildManager.new.distribute(config)
         end
       end
