@@ -17,7 +17,7 @@ describe Gym do
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
                              ""
                            ])
@@ -33,7 +33,7 @@ describe Gym do
       expect(result).to eq([
                              "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
                              ""
                            ])
@@ -50,7 +50,7 @@ describe Gym do
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
                              "-toolchain '#{options[:toolchain]}'",
                              ""
