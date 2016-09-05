@@ -13,7 +13,7 @@ module Gym
       end
       verify_archive
 
-      FileUtils.mkdir_p(Gym.config[:output_directory])
+      FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
