@@ -1,0 +1,46 @@
+{
+	"active": true,
+	"availableInMemberSite": true,
+	"categories": [
+	{
+		"active": null,
+		"dateCreated": 1052825460000,
+		"dateModified": 1079108316000,
+		"enabled": true,
+		"id": 187,
+		"name": "Developer Tools",
+		"sortOrder": 28
+	}
+	],
+	"dateAvailable": null,
+	"dateCreated": 1425695047000,
+	"dateDisabled": null,
+	"dateModified": 1425943753000,
+	"description": "This is the complete Xcode developer toolset for Mac, iPhone, and iPad. It includes the Xcode IDE, iOS Simulator, and all required tools and frameworks for building OS X and iOS apps.",
+	"files": [
+	{
+		"active": true,
+		"dateCreated": 1425696402000,
+		"dateModified": 1425929405000,
+		"fileSize": 2778059898,
+		"format": {
+			"active": null,
+			"dateCreated": 1066327569000,
+			"dateModified": null,
+			"description": "Disk Image",
+			"extension": ".dmg",
+			"id": 12
+			},
+			"id": 35240,
+			"name": "Xcode 6.3",
+			"remotePath": "/Developer_Tools/Xcode_6.2/Xcode_6.2.dmg",
+			"sortOrder": null,
+			"state": "ENABLED"
+		}
+	],
+	"id": 23600,
+	"name": "Xcode 6.3",
+	"prerelease": false,
+	"releasedSeed": true,
+	"state": "ENABLED"
+}

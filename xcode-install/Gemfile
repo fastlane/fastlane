@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gemspec
+
+group :development do
+  gem 'rspec'
+  gem 'rspec_junit_formatter'
+  gem 'rubocop', '0.38.0'
+  gem 'coveralls', require: false
+end
