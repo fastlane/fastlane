@@ -205,9 +205,12 @@ module FastlaneCore
 
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command
-      command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
-      command += " 2> /dev/null" if xcodebuild_suppress_stderr
-      command
+      command = ['xcodebuild']
+      command << 'clean' if FastlaneCore::Feature.enabled?('FASTLANE_USE_XCODEBUILD_CORE_DATA_WORKAROUND')
+      command << '-showBuildSettings'
+      command += xcodebuild_parameters
+      command << "2> /dev/null" if xcodebuild_suppress_stderr
+      command.join(' ')
     end
 
     # Get the build settings for our project
