@@ -55,8 +55,10 @@ sudo gem install screengrab
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:0.5.1'
+androidTestCompile 'tools.fastlane:screengrab:x.x.x'
 ```
+
+The latest version can be determined by visiting the [screengrab RubyGems page](https://rubygems.org/gems/screengrab)
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**
