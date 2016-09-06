@@ -361,8 +361,6 @@ describe FastlaneCore do
     describe 'xcodebuild_suppress_stderr option' do
       it 'generates an xcodebuild -list command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
-        require 'pry'
-        binding.pry
         expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
       end
 
