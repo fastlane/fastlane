@@ -28,7 +28,12 @@ module Gym
             framework = File.basename(path)
 
             begin
-              from = File.join(Xcode.xcode_path, "Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}")
+              if Gym.config[:toolchain]
+                from = File.join(Xcode.xcode_path, "Toolchains/#{Gym.config[:toolchain}/usr/lib/swift/iphoneos/#{framework}")
+              else
+                from = File.join(Xcode.xcode_path, "Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}")
+              end
+
               FileUtils.copy_file(from, File.join(swift_support, framework))
             rescue => ex
               UI.error("Error copying over framework file. Please try running gym without the legacy build API enabled")
