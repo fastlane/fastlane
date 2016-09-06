@@ -361,6 +361,8 @@ describe FastlaneCore do
     describe 'xcodebuild_suppress_stderr option' do
       it 'generates an xcodebuild -list command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        require 'pry'
+        binding.pry
         expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
       end
 
@@ -383,6 +385,23 @@ describe FastlaneCore do
           xcodebuild_suppress_stderr: true
         )
         expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})
+      end
+    end
+
+    describe 'FASTLANE_USE_XCODEBUILD_CORE_DATA_WORKAROUND' do
+      it 'does not add `clean` to the `xcodebuild -showBuildSettings` command if the feature switch is disabled' do
+        ENV.delete('FASTLANE_USE_XCODEBUILD_CORE_DATA_WORKAROUND')
+        project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        expected_command = "xcodebuild -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(expected_command)
+      end
+
+      it 'adds `clean` to the `xcodebuild -showBuildSettings` command if the feature switch is enabled' do
+        with_env_values('FASTLANE_USE_XCODEBUILD_CORE_DATA_WORKAROUND' => '1') do
+          project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+          expected_command = "xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj"
+          expect(project.build_xcodebuild_showbuildsettings_command).to eq(expected_command)
+        end
       end
     end
   end
