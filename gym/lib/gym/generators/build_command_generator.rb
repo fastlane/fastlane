@@ -38,7 +38,7 @@ module Gym
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath '#{archive_path}'"
+        options << "-archivePath #{archive_path.shellescape}"
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
