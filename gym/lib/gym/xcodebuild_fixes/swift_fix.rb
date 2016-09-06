@@ -29,7 +29,7 @@ module Gym
 
             begin
               if Gym.config[:toolchain]
-                from = File.join(Xcode.xcode_path, "Toolchains/#{Gym.config[:toolchain}/usr/lib/swift/iphoneos/#{framework}")
+                from = File.join(Xcode.xcode_path, "Toolchains/#{Gym.config[:toolchain]}/usr/lib/swift/iphoneos/#{framework}")
               else
                 from = File.join(Xcode.xcode_path, "Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}")
               end
