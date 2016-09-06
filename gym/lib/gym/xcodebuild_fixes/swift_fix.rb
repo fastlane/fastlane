@@ -12,7 +12,7 @@ module Gym
       def swift_library_fix
         require 'fileutils'
 
-        return if check_for_swift PackageCommandGenerator
+        return if check_for_swift(PackageCommandGenerator)
 
         UI.verbose "Packaging up the Swift Framework as the current app is a Swift app"
         ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
@@ -27,7 +27,15 @@ module Gym
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            FileUtils.copy_file("#{Xcode.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
+            begin
+              from = File.join(Xcode.xcode_path, "Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}")
+              FileUtils.copy_file(from, File.join(swift_support, framework))
+            rescue => ex
+              UI.error("Error copying over framework file. Please try running gym without the legacy build API enabled")
+              UI.error("For more information visit https://github.com/fastlane/fastlane/issues/5863")
+              UI.error("Missing file #{path} inside #{Xcode.xcode_path}")
+              UI.error(ex)
+            end
           end
 
           # Add "SwiftSupport" to the .ipa archive
