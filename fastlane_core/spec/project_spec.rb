@@ -300,6 +300,48 @@ describe FastlaneCore do
       end
     end
 
+    describe 'Project.xcode_build_settings_timeout' do
+      before do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
+      end
+      it "returns default value" do
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(10)
+      end
+      it "returns specified value" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+      end
+      it "returns 0 if empty" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = ''
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+      end
+      it "returns 0 if garbage" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = 'hiho'
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+      end
+    end
+
+    describe 'Project.xcode_build_settings_retries' do
+      before do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
+      end
+      it "returns default value" do
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+      end
+      it "returns specified value" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+      end
+      it "returns 0 if empty" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = ''
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+      end
+      it "returns 0 if garbage" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = 'hiho'
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+      end
+    end
+
     describe "Project.run_command" do
       def count_processes(text)
         `ps -aef | grep #{text} | grep -v grep | wc -l`.to_i
@@ -331,6 +373,17 @@ describe FastlaneCore do
         sleep(5)
         expect(count_processes(text)).to eq(count)
         # you would be expected to be able to see the number of processes go back to count right away.
+      end
+
+      it "retries and kills" do
+        text = "NEEDSRETRY"
+        cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
+
+        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(3).times
+
+        expect do
+          FastlaneCore::Project.run_command(cmd, timeout: 1, retries: 3)
+        end.to raise_error(Timeout::Error)
       end
     end
 
