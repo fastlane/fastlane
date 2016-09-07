@@ -296,9 +296,10 @@ module FastlaneCore
       # xcode >= 6 might hang here if the user schemes are missing
       begin
         timeout = FastlaneCore::Project.xcode_list_timeout
-        @raw = FastlaneCore::Project.run_command(command, timeout: timeout, print: !silent)
+        retries = FastlaneCore::Project.xcode_list_retries
+        @raw = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !silent)
       rescue Timeout::Error
-        UI.user_error!("xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
+        UI.user_error!("xcodebuild -list timed-out after #{timeout * retries} seconds. You might need to recreate the user schemes." \
           " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
       end
 
@@ -313,6 +314,11 @@ module FastlaneCore
     end
 
     # @internal to module
+    def self.xcode_list_retries
+      (ENV['FASTLANE_XCODE_LIST_RETRIES'] || 3).to_i
+    end
+
+    # @internal to module
     def self.xcode_build_settings_timeout
       (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
     end
@@ -323,9 +329,9 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command and kills it if timeouts, optionally retries before killing
-    # @raises Timeout::Error if timeout is passed after all retry attempts
-    # @returns the output
+    # runs the specified command with the specified number of retries, killing each run if it times out
+    # @raises Timeout::Error if all tries result in a timeout
+    # @returns the output of the command
     # Note: - currently affected by https://github.com/fastlane/fastlane/issues/1504
     #       - retry feature added to solve https://github.com/fastlane/fastlane/issues/4059
     def self.run_command(command, timeout: 0, retries: 0, print: true)
@@ -335,17 +341,24 @@ module FastlaneCore
 
       result = ''
 
-      tries = 1
+      total_tries = retries + 1
+      try = 1
       begin
         Timeout.timeout(timeout) do
-          result = `#{command}`.to_s # Using Helper.backticks doesn't work. Timeout don't times out and the command hangs forever
+          # Using Helper.backticks didn't work here. `Timeout` doesn't time out, and the command hangs forever
+          result = `#{command}`.to_s
         end
       rescue Timeout::Error
-        raise if tries >= retries
+        try_limit_reached = try >= total_tries
 
-        UI.verbose("Command timed out, trying again...")
+        message = "Command timed out after #{timeout} seconds on try #{try} of #{total_tries}"
+        message += ", trying again..." unless try_limit_reached
 
-        tries += 1
+        UI.important(message)
+
+        raise if try_limit_reached
+
+        try += 1
         retry
       end
 
