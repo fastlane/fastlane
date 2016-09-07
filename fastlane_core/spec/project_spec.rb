@@ -379,7 +379,7 @@ describe FastlaneCore do
         text = "NEEDSRETRY"
         cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
 
-        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(3).times
+        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(4).times
 
         expect do
           FastlaneCore::Project.run_command(cmd, timeout: 1, retries: 3)
