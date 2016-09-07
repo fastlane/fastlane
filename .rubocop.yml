@@ -79,6 +79,8 @@ Style/AndOr:
 Metrics/ClassLength:
   Max: 320
 
+Metrics/ModuleLength:
+  Max: 130
 
 # Configuration parameters: AllowURI, URISchemes.
 Metrics/LineLength:

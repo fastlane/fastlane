@@ -12,11 +12,34 @@ module FastlaneCore
 
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
-    def self.backticks(command, print: true)
-      UI.command(command) if print
-      result = `#{command}`
-      UI.command_output(result) if print
-      return result
+    def self.backticks(command, print: true, retriable_options: {})
+      require 'retriable'
+      tries = retriable_options[:tries] || 1
+      timeout = retriable_options[:timeout] || 3600
+      on_retry = proc do |exception, try, elapsed_time, next_interval|
+        if try < tries
+          UI.important("#{exception.class}: '#{exception.message}' - #{try} tries in #{elapsed_time} seconds and #{next_interval.to_i} seconds until the next try.")
+        end
+      end
+
+      options = {
+        on: Timeout::Error,
+        tries: tries,
+        timeout: timeout,
+        base_interval: 0,
+        on_retry: on_retry
+      }
+
+      begin
+        Retriable.retriable(options) do
+          UI.command(command) if print
+          result = `#{command}`
+          UI.command_output(result) if print
+          return result
+        end
+      rescue
+        UI.user_error!("Failed to execute: #{command}")
+      end
     end
 
     # @return true if the currently running program is a unit test

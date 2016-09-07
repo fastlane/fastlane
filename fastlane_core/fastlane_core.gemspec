@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plist', '~> 3.1' # needed for parsing provisioning profiles
   spec.add_dependency 'terminal-table', '~> 1.4.5' # options summary
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
+  spec.add_dependency 'retriable', '~> 2.1' # simple DSL to retry failed code blocks
 
   spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0' # fastlane password manager
 

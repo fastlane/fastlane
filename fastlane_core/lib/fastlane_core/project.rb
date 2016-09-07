@@ -219,7 +219,14 @@ module FastlaneCore
     def build_settings(key: nil, optional: true)
       unless @build_settings
         command = build_xcodebuild_showbuildsettings_command
-        @build_settings = Helper.backticks(command, print: false)
+        # Workaround for Xcode 8 problem:
+        # `xcodebuild -showBuildSettings` will hang up sometimes
+        # By retrying with specific timeout, this problem can be avoided
+        options = {
+          tries:  (ENV['FASTLANE_XCODEBUILD_SETTINGS_TRIES'] || 3).to_i,
+          timeout: (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
+        }
+        @build_settings = Helper.backticks(command, print: false, retriable_options: options)
       end
 
       begin
