@@ -219,7 +219,17 @@ module FastlaneCore
     def build_settings(key: nil, optional: true)
       unless @build_settings
         command = build_xcodebuild_showbuildsettings_command
-        @build_settings = Helper.backticks(command, print: false)
+
+        # xcode might hang here and retrying fixes the problem, see fastlane#4059
+        begin
+          timeout = FastlaneCore::Project.xcode_build_settings_timeout
+          retries = FastlaneCore::Project.xcode_build_settings_retries
+          @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !self.xcodebuild_list_silent)
+        rescue Timeout::Error
+          UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
+            " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
+            " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ")
+        end
       end
 
       begin
@@ -282,12 +292,11 @@ module FastlaneCore
       return @raw if @raw
 
       command = build_xcodebuild_list_command
-      UI.important(command) unless silent
 
       # xcode >= 6 might hang here if the user schemes are missing
       begin
         timeout = FastlaneCore::Project.xcode_list_timeout
-        @raw = FastlaneCore::Project.run_command(command, timeout: timeout)
+        @raw = FastlaneCore::Project.run_command(command, timeout: timeout, print: !silent)
       rescue Timeout::Error
         UI.user_error!("xcodebuild -list timed-out after #{timeout} seconds. You might need to recreate the user schemes." \
           " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
@@ -304,13 +313,43 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command and kills it if timeouts
-    # @raises Timeout::Error if timeout is passed
+    def self.xcode_build_settings_timeout
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
+    end
+
+    # @internal to module
+    def self.xcode_build_settings_retries
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] || 3).to_i
+    end
+
+    # @internal to module
+    # runs the specified command and kills it if timeouts, optionally retries before killing
+    # @raises Timeout::Error if timeout is passed after all retry attempts
     # @returns the output
-    # Note: currently affected by fastlane/fastlane_core#102
-    def self.run_command(command, timeout: 0)
+    # Note: - currently affected by https://github.com/fastlane/fastlane/issues/1504
+    #       - retry feature added to solve https://github.com/fastlane/fastlane/issues/4059
+    def self.run_command(command, timeout: 0, retries: 0, print: true)
       require 'timeout'
-      @raw = Timeout.timeout(timeout) { `#{command}`.to_s }
+
+      UI.command(command) if print
+
+      result = ''
+
+      tries = 1
+      begin
+        Timeout.timeout(timeout) do
+          result = `#{command}`.to_s # Using Helper.backticks doesn't work. Timeout don't times out and the command hangs forever
+        end
+      rescue Timeout::Error
+        raise if tries >= retries
+
+        UI.verbose("Command timed out, trying again...")
+
+        tries += 1
+        retry
+      end
+
+      return result
     end
 
     private
