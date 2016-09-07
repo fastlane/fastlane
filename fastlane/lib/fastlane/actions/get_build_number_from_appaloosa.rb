@@ -19,7 +19,7 @@ module Fastlane
         @current_version += 1 if params[:with_increment]
         UI.message "This version is incremented to #{@current_version}" if params[:with_increment]
 
-        Actions.lane_context[SharedValues::FL_APPALOOSA_BUILD_NUMBER] = "#{@current_version}"
+        Actions.lane_context[SharedValues::FL_APPALOOSA_BUILD_NUMBER] = @current_version.to_s
       end
 
       #####################################################
