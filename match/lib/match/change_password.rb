@@ -14,9 +14,9 @@ module Match
 
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
       loop do
-        password = ask(message.yellow) { |q| q.echo = "*" }
+        password = UI.password(message)
         if confirm
-          password2 = ask("Type passphrase again: ".yellow) { |q| q.echo = "*" }
+          password2 = UI.password("Type passphrase again: ")
           if password == password2
             return password
           end
