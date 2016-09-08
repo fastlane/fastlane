@@ -39,7 +39,7 @@ module FastlaneCore
 
       def select_project(config)
         loop do
-          path = ask("Couldn't automatically detect the project file, please provide a path: ".yellow).strip
+          path = UI.input("Couldn't automatically detect the project file, please provide a path: ")
           if File.directory? path
             if path.end_with? ".xcworkspace"
               config[:workspace] = path

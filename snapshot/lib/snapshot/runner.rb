@@ -203,7 +203,7 @@ module Snapshot
 
     def uninstall_app(device_type)
       UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
-      Snapshot.config[:app_identifier] ||= ask("App Identifier: ")
+      Snapshot.config[:app_identifier] ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"
