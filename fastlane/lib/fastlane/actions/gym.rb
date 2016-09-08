@@ -22,10 +22,15 @@ module Fastlane
           absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
           absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
+          # This might be the mac app path, so we don't want to set it here
+          # https://github.com/fastlane/fastlane/issues/5757
+          if absolute_ipa_path.include?(".ipa")
+            Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
+            ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
+          end
+
           Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if File.exist?(absolute_dsym_path)
           Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = Gym::BuildCommandGenerator.archive_path
-          ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
           ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if File.exist?(absolute_dsym_path)
 
           return absolute_ipa_path
