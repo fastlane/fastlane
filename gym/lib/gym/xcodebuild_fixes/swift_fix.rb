@@ -17,6 +17,17 @@ module Gym
         UI.verbose "Packaging up the Swift Framework as the current app is a Swift app"
         ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
 
+        # Decides which Swift toolchain we will use
+        toolchain = Gym.config[:toolchain]
+        unless toolchain
+          if is_swift_23
+            toolchain = "Swift_2.3.xctoolchain"
+          else
+            toolchain = "XcodeDefault.xctoolchain"
+          end
+        end
+        UI.verbose "Using Swift toolchain: #{toolchain}"
+
         Dir.mktmpdir do |tmpdir|
           # Copy all necessary Swift libraries to a temporary "SwiftSupport" directory so that we can
           # easily add it to the .ipa later.
@@ -28,12 +39,7 @@ module Gym
             framework = File.basename(path)
 
             begin
-              if Gym.config[:toolchain]
-                from = File.join(Xcode.xcode_path, "Toolchains/#{Gym.config[:toolchain]}/usr/lib/swift/iphoneos/#{framework}")
-              else
-                from = File.join(Xcode.xcode_path, "Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}")
-              end
-
+              from = File.join(Xcode.xcode_path, "Toolchains/#{toolchain}/usr/lib/swift/iphoneos/#{framework}")
               FileUtils.copy_file(from, File.join(swift_support, framework))
             rescue => ex
               UI.error("Error copying over framework file. Please try running gym without the legacy build API enabled")
@@ -57,6 +63,42 @@ module Gym
                                                     end)
           end
         end
+      end
+
+      # Returns true if all build settings are configured as 2.3
+      # Note: this probably should check the exact build configuration
+      # at some point
+      # @return true if all build settings are configured as 2.3
+      def is_swift_23
+
+        project = Gym.project
+        xcodeproj_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
+
+        project = Xcodeproj::Project.open(xcodeproj_path)
+
+        # Get array of unique swift versions
+        swift_versions = project.objects.select do |object|
+          object.isa == 'XCBuildConfiguration'
+        end.map(&:to_hash).map do |object_hash|
+          object_hash['buildSettings']
+        end.select do |build_settings|
+          build_settings.key?('SWIFT_VERSION')
+        end.map do |build_settings|
+          build_settings['SWIFT_VERSION']
+        end.uniq
+
+        # Warning and return false if multiple settings
+        # This probably shouldn't ever happen so didn't want to spend a lot of
+        # time to work around this problem
+        #
+        # Developer can use the "toolchain" config to get something super specific setup
+        # if (s)he wants :)
+        if swift_versions.count > 1
+          UI.warning "Build settings don't have SWIFT_VERSION set to 2.3 for all configurations. Cannot determine which toolchaint to use."
+          return false
+        end
+
+        return swift_versions.first == "2.3"
       end
 
       # @param the PackageCommandGenerator
