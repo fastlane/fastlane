@@ -23,7 +23,7 @@ describe Fastlane do
         ENV['DELIVER_USER'] = 'felix@sunapps.net'
       end
 
-      it "setup is successful and generated inital Fastfile", now: true do
+      it "setup is successful and generated inital Fastfile" do
         require 'produce'
 
         app = "app"
