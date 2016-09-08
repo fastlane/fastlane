@@ -98,7 +98,7 @@ describe FastlaneCore do
           project = './subdir/Something.xcodeproj'
           FileUtils.mkdir_p(project)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return(project)
+          expect(FastlaneCore::UI).to receive(:input).and_return(project)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -112,7 +112,7 @@ describe FastlaneCore do
           workspace = './subdir/Something.xcworkspace'
           FileUtils.mkdir_p(workspace)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -126,9 +126,9 @@ describe FastlaneCore do
           workspace = './subdir/Something.xcworkspace'
           FileUtils.mkdir_p(workspace)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
+          expect(FastlaneCore::UI).to receive(:input).and_return("something wrong")
           expect(FastlaneCore::UI).to receive(:error).with(/Couldn't find/)
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -143,9 +143,9 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspace)
           FileUtils.mkdir_p('other-directory')
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
+          expect(FastlaneCore::UI).to receive(:input).and_return('other-directory')
           expect(FastlaneCore::UI).to receive(:error).with(/Path must end with/)
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
