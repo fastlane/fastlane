@@ -70,13 +70,13 @@ module Gym
       # at some point
       # @return true if all build settings are configured as 2.3
       def is_swift_23
-
         project = Gym.project
         xcodeproj_path = project.is_workspace ? project.path.gsub('xcworkspace', 'xcodeproj') : project.path
 
         project = Xcodeproj::Project.open(xcodeproj_path)
 
         # Get array of unique swift versions
+        # rubocop:disable Style/MultilineBlockChain
         swift_versions = project.objects.select do |object|
           object.isa == 'XCBuildConfiguration'
         end.map(&:to_hash).map do |object_hash|
