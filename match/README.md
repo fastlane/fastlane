@@ -197,7 +197,7 @@ Then all your team has to do is `fastlane match` and keys, certs and profiles fo
 
 When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase using an environment variable, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
 
 #### New machine
 
