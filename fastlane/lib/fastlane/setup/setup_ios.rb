@@ -148,11 +148,11 @@ module Fastlane
     end
 
     def ask_for_apple_id
-      self.apple_id ||= ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
+      self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
     end
 
     def ask_for_app_identifier
-      self.app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
+      self.app_identifier = UI.input("App Identifier (com.krausefx.app): ")
     end
 
     def generate_appfile(manually: false)
@@ -207,7 +207,7 @@ module Fastlane
       rescue => exception
         if exception.to_s.include?("The App Name you entered has already been used")
           UI.important("It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.")
-          Produce.config[:app_name] = ask("App Name: ".yellow)
+          Produce.config[:app_name] = UI.input("App Name: ")
           Produce.config[:skip_devcenter] = true # since we failed on iTC
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
         end
@@ -235,7 +235,7 @@ module Fastlane
 
       template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate")
 
-      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
+      scheme = UI.input("Optional: The scheme name of your app (If you don't need one, just hit Enter): ") unless scheme
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else
