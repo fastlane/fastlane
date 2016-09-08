@@ -90,12 +90,12 @@ module FastlaneCore
 
     def input(message)
       verify_interactive!(message)
-      ask(message)
+      ask(message.to_s.yellow).to_s.strip
     end
 
     def confirm(message)
       verify_interactive!(message)
-      agree("#{message} (y/n)", true)
+      agree("#{message} (y/n)".yellow, true)
     end
 
     def select(message, options)
