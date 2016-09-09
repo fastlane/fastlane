@@ -38,6 +38,7 @@ module Fastlane
         params[:path] = config[:path]
         params[:upload_metadata] = config[:upload_metadata]
         params[:plist_template_path] = config[:plist_template_path]
+        params[:plist_file_name] = config[:plist_file_name]
         params[:html_template_path] = config[:html_template_path]
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
@@ -61,6 +62,7 @@ module Fastlane
         UI.user_error!("No IPA file path given, pass using `ipa: 'ipa path'`") unless ipa_file.to_s.length > 0
 
         plist_template_path = params[:plist_template_path]
+        plist_file_name = params[:plist_file_name]
         html_template_path = params[:html_template_path]
         html_file_name = params[:html_file_name]
         version_template_path = params[:version_template_path]
@@ -115,7 +117,7 @@ module Fastlane
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
-        plist_file_name = "#{url_part}#{title.delete(' ')}.plist"
+        plist_file_name ||= "#{url_part}#{title.delete(' ')}.plist"
         plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
 
         html_file_name ||= "index.html"
@@ -279,6 +281,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :plist_template_path,
                                        env_name: "",
                                        description: "plist template path",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :plist_file_name,
+                                       env_name: "",
+                                       description: "uploaded plist filename",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :html_template_path,
                                        env_name: "",
