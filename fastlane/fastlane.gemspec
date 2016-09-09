@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'frameit', '>= 2.7.0', '< 3.0.0'
   spec.add_dependency 'pem', '>= 1.3.2', '< 2.0.0'
   spec.add_dependency 'cert', '>= 1.4.1', '< 2.0.0'
-  spec.add_dependency 'sigh', '>= 1.10.0', '< 2.0.0'
+  spec.add_dependency 'sigh', '>= 1.10.2', '< 2.0.0'
   spec.add_dependency 'produce', '>= 1.2.0', '< 2.0.0'
   spec.add_dependency 'gym', '>= 1.7.0', '< 2.0.0'
   spec.add_dependency 'pilot', '>= 1.10.0', '< 2.0.0'
