@@ -20,8 +20,8 @@ module Scan
 
       Scan.project.select_scheme
 
-      default_device_ios if Scan.project.ios?
-      default_device_tvos if Scan.project.tvos?
+      detect_simulator_ios if Scan.project.ios?
+      detect_simulator_tvos if Scan.project.tvos?
       detect_destination
 
       default_derived_data
@@ -48,7 +48,7 @@ module Scan
         elsif operator == :equal
           sim_version == deployment_target_version
         else
-          false # fail gracefully, I guess?
+          false # this will show an error message in the detect_simulator method
         end
       end
     end
@@ -66,16 +66,16 @@ module Scan
       /\s(?=\([\d\.]+\)$)/
     end
 
-    def self.default_device_ios
+    def self.detect_simulator_ios
       # An iPhone 5s is a reasonably small and useful default for tests
-      default_device('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
+      detect_simulator('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
     end
 
-    def self.default_device_tvos
-      default_device('tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
+    def self.detect_simulator_tvos
+      detect_simulator('tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
     end
 
-    def self.default_device(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
+    def self.detect_simulator(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
@@ -83,16 +83,23 @@ module Scan
 
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
-          UI.user_error!(
-            ['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' ')
-          ) if array.empty?
+          if array.empty?
+            UI.user_error!(['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' '))
+          end
         end,
         :greater_than_or_equal,
         deployment_target_version
       ).tap do |sims|
-        UI.error("No simulators found that are greater than or equal to the version " \
-        "of deployment target (#{deployment_target_version})") if sims.empty?
+        if sims.empty?
+          UI.error("No simulators found that are greater than or equal to the version of deployment target (#{deployment_target_version})")
+        end
       end
+
+      # At this point we have all simulators for the given deployment target (or higher)
+
+      # We create 2 lambdas, which we iterate over later on
+      # If the first lambda `matches` found a simulator to use
+      # we'll never call the second one
 
       matches = lambda do
         set_of_simulators = devices.inject(
@@ -131,13 +138,17 @@ module Scan
       default = lambda do
         UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
 
-        Array(
+        result = Array(
           simulators
             .select { |sim| sim.name == default_device_name }
             .reverse # more efficient, because `simctl` prints higher versions first
             .sort_by! { |sim| Gem::Version.new(sim.os_version) }
             .last || simulators.first
         )
+
+        UI.error("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
+
+        result
       end
 
       # grab the first unempty evaluated array
