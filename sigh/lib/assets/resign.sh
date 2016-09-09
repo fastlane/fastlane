@@ -195,7 +195,6 @@ while [ "$1" != "" ]; do
             BUNDLE_VERSION="$1"
             ;;
         --use-app-entitlements )
-            shift
             USE_APP_ENTITLEMENTS="YES"
             ;;
         --keychain-path )
