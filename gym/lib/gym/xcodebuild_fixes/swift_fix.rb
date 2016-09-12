@@ -86,6 +86,7 @@ module Gym
         end.map do |build_settings|
           build_settings['SWIFT_VERSION']
         end.uniq
+        # rubocop:enable Style/MultilineBlockChain
 
         # Warning and return false if multiple settings
         # This probably shouldn't ever happen so didn't want to spend a lot of
