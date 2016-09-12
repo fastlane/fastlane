@@ -10,17 +10,31 @@ module Match
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
+      if params[:app_identifier].kind_of? Array
+        app_identifiers = params[:app_identifier]
+      else
+        app_identifiers = params[:app_identifier].split(/\s*,\s*/).uniq
+      end
+
       # Verify the App ID (as we don't want 'match' to fail at a later point)
-      spaceship.bundle_identifier_exists(params) if spaceship
+      if spaceship
+        app_identifiers.each do |app_identifier|
+          params[:app_identifier] = app_identifier
+          spaceship.bundle_identifier_exists(params)
+        end
+      end
 
       # Certificate
       cert_id = fetch_certificate(params: params)
       spaceship.certificate_exists(params, cert_id) if spaceship
 
-      # Provisioning Profile
-      uuid = fetch_provisioning_profile(params: params,
-                                certificate_id: cert_id)
-      spaceship.profile_exists(params, uuid) if spaceship
+      # Provisioning Profiles
+      app_identifiers.each do |app_identifier|
+        params[:app_identifier] = app_identifier
+        uuid = fetch_provisioning_profile(params: params,
+                                  certificate_id: cert_id)
+        spaceship.profile_exists(params, uuid) if spaceship
+      end
 
       # Done
       if self.changes_to_commit and !params[:readonly]
@@ -28,7 +42,11 @@ module Match
         GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
       end
 
-      TablePrinter.print_summary(params)
+      # Print a summary table for each app_identifier
+      app_identifiers.each do |app_identifier|
+        params[:app_identifier] = app_identifier
+        TablePrinter.print_summary(params)
+      end
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex

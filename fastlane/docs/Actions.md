@@ -1428,6 +1428,7 @@ Check out [codesigning.guide](https://codesigning.guide) for more information ab
 
 ```ruby
 match(type: "appstore", app_identifier: "tools.fastlane.app")
+match(type: "appstore", app_identifier: ["tools.fastlane.app", "tools.fastlane.app2", "tools.fastlane.app3"])
 match(type: "development", readonly: true)
 ```
 
