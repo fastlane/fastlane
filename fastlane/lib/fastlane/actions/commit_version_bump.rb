@@ -190,7 +190,7 @@ module Fastlane
       end
 
       def self.category
-        :version_control
+        :source_control
       end
     end
   end
