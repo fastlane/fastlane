@@ -689,7 +689,10 @@ function resign {
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
 
             # Add new entry to patched entitlements
-            plutil -insert "$KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
+            # plutil needs dots in the key path to be escaped (e.g. com\.apple\.security\.application-groups)
+            # otherwise it interprets they key path as nested keys
+            PLUTIL_KEY=`echo "$KEY" | sed 's/\./\\\\./g'`
+            plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
             # Patch the ID value if specified
             if [[ "$ID_TYPE" == "APP_ID" ]]; then
