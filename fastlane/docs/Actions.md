@@ -4119,6 +4119,9 @@ Author | @lmirosevic
 
 ```ruby
 ensure_git_status_clean
+match(type: "appstore", app_identifier: "tools.fastlane.app")
+match(type: "appstore", app_identifier: ["tools.fastlane.app", "tools.fastlane.app2", "tools.fastlane.app3"])
+match(type: "development", readonly: true)
 ```
 
 

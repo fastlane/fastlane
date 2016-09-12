@@ -174,20 +174,17 @@ match --help
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, call `match` for each of them:
+If you have several targets with different bundle identifiers, supply them as a comma-separated list to match:
 
 ```
-match appstore -a tools.fastlane.app
-match appstore -a tools.fastlane.app.watchkitapp
+match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
 You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
 lane :certificates do
-  match(app_identifier: "com.krausefx.app1", readonly: true)
-  match(app_identifier: "com.krausefx.app2", readonly: true)
-  match(app_identifier: "com.krausefx.app3", readonly: true)
+  match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"], readonly: true)
 end
 ```
 
@@ -282,8 +279,7 @@ match adhoc --force_for_new_devices
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
 
 ```ruby
-match(app_identifier: "tools.fastlane.app", type: "appstore")
-match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
+match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"], type: "appstore")
 ```
 
 `match` can even use the same one Git repository for all bundle identifiers.
