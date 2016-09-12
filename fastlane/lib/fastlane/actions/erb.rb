@@ -56,13 +56,13 @@ module Fastlane
 
       def self.example_code
         [
-          'Example `erb` template:
+          '# Example `erb` template:
 
-          Variable1 <%= var1 %>
-          Variable2 <%= var2 %>
-          <% for item in var3 %>
-                  <%= item %>
-          <% end %>
+          # Variable1 <%= var1 %>
+          # Variable2 <%= var2 %>
+          # <% for item in var3 %>
+          #        <%= item %>
+          # <% end %>
 
           erb(
             template: "1.erb",
