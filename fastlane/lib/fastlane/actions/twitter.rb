@@ -57,22 +57,6 @@ module Fastlane
         ]
       end
 
-      def self.example_code
-        [
-          'twitter(
-            message: "You rock!",
-            access_token: "XXXX",
-            access_token_secret: "xxx",
-            consumer_key: "xxx",
-            consumer_secret: "xxx"
-          )'
-        ]
-      end
-
-      def self.category
-        :notifications
-      end
-
       def self.authors
         ["hjanuschka"]
       end
