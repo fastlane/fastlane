@@ -21,7 +21,7 @@ module Fastlane
         [
           "Renders an ERB template with `placeholders` given as a hash via parameter,",
           "if no :destination is set, returns rendered template as string"
-          ].join("\n")
+        ].join("\n")
       end
 
       def self.available_options

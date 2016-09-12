@@ -38,7 +38,7 @@ module Fastlane
         [
           "Add this to your `Fastfile` to require a certain version of _fastlane_.",
           "Use it if you use an action that just recently came out and you need it"
-          ].join("\n")
+        ].join("\n")
       end
 
       def self.category
