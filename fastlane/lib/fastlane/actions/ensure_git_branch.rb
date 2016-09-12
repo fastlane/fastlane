@@ -28,7 +28,7 @@ module Fastlane
           'This action will check if your git repo is checked out to a specific branch.',
           'You may only want to make releases from a specific branch, so `ensure_git_branch`',
           'will stop a lane if it was accidentally executed on an incorrect branch.'
-        ].join('\n')
+        ].join("\n")
       end
 
       def self.available_options
