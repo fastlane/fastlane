@@ -92,7 +92,6 @@ module Fastlane
       def self.category
         :misc
       end
-
     end
   end
 end

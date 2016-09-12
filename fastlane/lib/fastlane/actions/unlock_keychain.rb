@@ -121,7 +121,7 @@ module Fastlane
             path: "/path/to/KeychainName.keychain",
             password: "mysecret",
             add_to_search_list: :replace # To only add a keychain use `true` or `:add`.
-          )'
+          )',
           'unlock_keychain( # In addition, the keychain can be selected as a default keychain
             path: "/path/to/KeychainName.keychain",
             password: "mysecret",

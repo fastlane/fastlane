@@ -120,12 +120,12 @@ module Fastlane
           'update_info_plist( # Change the Display Name of your app
             plist_path: "path/to/Info.plist",
             display_name: "MyApp-Beta"
-          )'
+          )',
           'update_info_plist( # Target a specific `xcodeproj` rather than finding the first available one
             xcodeproj: "path/to/Example.proj",
             plist_path: "path/to/Info.plist",
             display_name: "MyApp-Beta"
-          )'
+          )',
           'update_info_plist( # Advanced processing: find URL scheme for particular key and replace value
             xcodeproj: "path/to/Example.proj",
             plist_path: "path/to/Info.plist",
@@ -133,7 +133,7 @@ module Fastlane
               urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
             }
-          )'
+          )',
           'zip(
             path: "MyApp.app",
             output_path: "Latest.app.zip"

@@ -73,12 +73,12 @@ module Fastlane
       end
 
       def self.example_code
-      [
-        'update_app_group_identifiers(
-          entitlements_file: "/path/to/entitlements_file.entitlements",
-          app_group_identifiers: ["group.your.app.group.identifier"]
-        )'
-      ]
+        [
+          'update_app_group_identifiers(
+            entitlements_file: "/path/to/entitlements_file.entitlements",
+            app_group_identifiers: ["group.your.app.group.identifier"]
+          )'
+        ]
       end
 
       def self.category
