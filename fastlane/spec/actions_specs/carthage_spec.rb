@@ -343,6 +343,30 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --toolchain com.apple.dt.toolchain.Swift_2_3")
       end
 
+      it "sets the project directory to other" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          carthage(project_directory: 'other')
+        end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --project-directory other")
+      end
+
+      it "sets the project directory to other and the toolchain to Swift_2_3" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          carthage(toolchain: 'com.apple.dt.toolchain.Swift_2_3', project_directory: 'other')
+        end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --toolchain com.apple.dt.toolchain.Swift_2_3 --project-directory other")
+      end
+
+      it "does not set the project directory if none is provided" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          carthage
+        end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
       it "use custom derived data" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
