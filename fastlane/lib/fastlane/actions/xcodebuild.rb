@@ -56,6 +56,22 @@ module Fastlane
         [:ios, :mac].include? platform
       end
 
+      def self.example_code
+        [
+          'xcodebuild(
+            archive: true,
+            archive_path: "./build-dir/MyApp.xcarchive",
+            scheme: "MyApp",
+            workspace: "MyApp.xcworkspace"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
+
       def self.run(params)
         unless Helper.test?
           UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
@@ -355,7 +371,7 @@ module Fastlane
       end
 
       def self.details
-        "More information on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xcodebuild"
+        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead."
       end
 
       def self.author
