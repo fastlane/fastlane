@@ -180,15 +180,15 @@ If you have several targets with different bundle identifiers, supply them as a 
 match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a match lane like this:
+You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
-lane :match do
+lane :certificates do
   match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"], readonly: true)
 end
 ```
 
-Then all your team has to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
 #### Passphrase
 
