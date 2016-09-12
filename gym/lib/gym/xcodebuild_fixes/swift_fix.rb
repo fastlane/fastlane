@@ -95,7 +95,7 @@ module Gym
         # Developer can use the "toolchain" config to get something super specific setup
         # if (s)he wants :)
         if swift_versions.count > 1
-          UI.warning "Build settings don't have SWIFT_VERSION set to 2.3 for all configurations. Cannot determine which toolchaint to use."
+          UI.warning "Build settings don't have SWIFT_VERSION set to 2.3 for all configurations. Cannot determine which toolchain to use."
           return false
         end
 
