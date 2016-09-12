@@ -28,7 +28,7 @@ module Fastlane
           'some of your other actions will touch your filesystem, do things to your git repo,',
           'or just as a general reminder to save your work. Also needed as a prerequisite for',
           'some other actions like `reset_git_repo`.'
-        ].join('\n')
+        ].join("\n")
       end
 
       def self.output
