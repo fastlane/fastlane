@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.category
-         :building
+        :building
       end
 
       def self.author

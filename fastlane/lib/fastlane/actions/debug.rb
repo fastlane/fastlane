@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.category
-         :misc
+        :misc
       end
 
       def self.author
