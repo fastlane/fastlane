@@ -18,6 +18,7 @@ module Fastlane
 
       def self.details
         [
+          "You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).",
           "It is recommended to store the build configuration in the `.xctool-args` file.",
           "More information available on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xctool"
         ].join(' ')
@@ -28,7 +29,26 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'xctool :test',
+
+          '# If you prefer to have the build configuration stored in the `Fastfile`:
+          xctool :test, [
+            "--workspace", "\'AwesomeApp.xcworkspace\'",
+            "--scheme", "\'Schema Name\'",
+            "--configuration", "Debug",
+            "--sdk", "iphonesimulator",
+            "--arch", "i386"
+          ].join(" ")'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end
