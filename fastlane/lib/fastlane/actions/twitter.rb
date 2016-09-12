@@ -80,6 +80,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'twitter(
+            access_token: "XXXX",
+            access_token_secret: "xxx",
+            consumer_key: "xxx",
+            consumer_secret: "xxx",
+            message: "You rock!"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
     end
   end
 end
