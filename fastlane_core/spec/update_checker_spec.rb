@@ -66,6 +66,7 @@ describe FastlaneCore do
     describe "#generate_fetch_url" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
+        expect(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
       end
 
       it "generated the correct URL with no parameters, no platform value and no p_hash" do
