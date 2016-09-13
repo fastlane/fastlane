@@ -13,7 +13,7 @@ module Fastlane
           else
             UI.user_error!("Framework option is avaialble only for 'archive' command.")
           end
-        elsif command_name == "update" && params[:dependencies].count > 0
+        elsif command_name == "update" && params[:dependencies].count.positive?
           cmd.concat params[:dependencies]
         end
 
