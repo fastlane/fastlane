@@ -78,8 +78,16 @@ module Snapshot
         end
       end
 
-      def device_udid(device_name, os_version = Snapshot.config[:ios_version])
+      def device_udid(device_name)
+        os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
+        os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
+
         device = find_device(device_name, os_version)
+
+        if device.nil?
+          UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
+          return
+        end
 
         device ? device.udid : nil
       end
