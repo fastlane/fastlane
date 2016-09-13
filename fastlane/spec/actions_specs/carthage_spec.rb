@@ -429,7 +429,7 @@ describe Fastlane do
         context "when command is archive" do
           it "adds the framework" do
             result = Fastlane::FastFile.new.parse("lane :test do
-                carthage(command: #{command}, framework: 'myframework')
+                carthage(command: '#{command}', framework: 'myframework')
               end").runner.execute(:test)
             expect(result).to eq("carthage archive myframework")
           end
@@ -441,9 +441,9 @@ describe Fastlane do
           it "raises an exception" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: #{command}, framework: 'myframework')
+                  carthage(command: '#{command}', framework: 'myframework')
                 end").runner.execute(:test)
-            end.raise_error("Framework option is avaialble only for 'archive' command.")
+            end.to raise_error("Framework option is avaialble only for 'archive' command.")
           end
         end
 
@@ -451,11 +451,11 @@ describe Fastlane do
           let(:command) { 'build' }
 
           it "raises an exception" do
-            rexpect do
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: #{command}, framework: 'myframework')
+                  carthage(command: '#{command}', framework: 'myframework')
                 end").runner.execute(:test)
-            end.raise_error("Framework option is avaialble only for 'archive' command.")
+            end.to raise_error("Framework option is avaialble only for 'archive' command.")
           end
         end
 
@@ -465,9 +465,9 @@ describe Fastlane do
           it "raises an exception" do
             expect do
               Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: #{command}, framework: 'myframework')
+                  carthage(command: '#{command}', framework: 'myframework')
                 end").runner.execute(:test)
-            end.raise_error("Framework option is avaialble only for 'archive' command.")
+            end.to raise_error("Framework option is avaialble only for 'archive' command.")
           end
         end
       end

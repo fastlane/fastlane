@@ -4,9 +4,16 @@ module Fastlane
       def self.run(params)
         cmd = ["carthage"]
 
-        cmd << params[:command]
+        command_name = params[:command]
+        cmd << command_name
 
-        if params[:command] == "update" && params[:dependencies].count > 0
+        if params[:framework]
+          if command_name == "archive"
+            cmd << params[:framework]
+          else
+            UI.user_error!("Framework option is avaialble only for 'archive' command.")
+          end
+        elsif command_name == "update" && params[:dependencies].count > 0
           cmd.concat params[:dependencies]
         end
 
@@ -112,6 +119,10 @@ module Fastlane
                                            UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.map(&:downcase).include?(platform.downcase)
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :framework,
+                                       description: "Framework name to archive, could be applied only along with the archive command",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        env_name: "FL_CARTHAGE_CONFIGURATION",
                                        description: "Define which build configuration to use when building",
