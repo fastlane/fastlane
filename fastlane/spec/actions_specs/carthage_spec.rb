@@ -422,6 +422,55 @@ describe Fastlane do
           end").runner.execute(:test)
         end.not_to raise_error
       end
+
+      context "when specify framework" do
+        let(:command) { 'archive' }
+
+        context "when command is archive" do
+          it "adds the framework" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: #{command}, framework: 'myframework')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage archive myframework")
+          end
+        end
+
+        context "when command is update" do
+          let(:command) { 'update' }
+
+          it "raises an exception" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  carthage(command: #{command}, framework: 'myframework')
+                end").runner.execute(:test)
+            end.raise_error("Framework option is avaialble only for 'archive' command.")
+          end
+        end
+
+        context "when command is build" do
+          let(:command) { 'build' }
+
+          it "raises an exception" do
+            rexpect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  carthage(command: #{command}, framework: 'myframework')
+                end").runner.execute(:test)
+            end.raise_error("Framework option is avaialble only for 'archive' command.")
+          end
+        end
+
+        context "when command is bootstrap" do
+          let(:command) { 'bootstrap' }
+
+          it "raises an exception" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  carthage(command: #{command}, framework: 'myframework')
+                end").runner.execute(:test)
+            end.raise_error("Framework option is avaialble only for 'archive' command.")
+          end
+        end
+      end
     end
   end
 end
