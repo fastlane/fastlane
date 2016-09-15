@@ -1,6 +1,14 @@
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
     before do
+      mock_os_version = "6.6"
+      allow(Snapshot::LatestOsVersion).to receive(:version).and_return(mock_os_version)
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return(
+        [
+          FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: mock_os_version, udid: "11111", state: "Don't Care", is_simulator: true),
+          FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: mock_os_version, udid: "22222", state: "Don't Care", is_simulator: true)
+        ]
+      )
       fake_out_xcode_project_loading
     end
 
