@@ -1,5 +1,8 @@
 module Fastlane
   module Actions
+    module SharedValues
+    end
+
     module SettingsBundle
       class UpdateParameters
         attr_accessor :root_plist_path
