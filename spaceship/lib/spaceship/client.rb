@@ -293,7 +293,8 @@ module Spaceship
       when 200
         return response
       else
-        if response["Location"] == "/auth" # redirect to 2 step auth page
+        location = response["Location"]
+        if location && URI.parse(location).path == "/auth" # redirect to 2 step auth page
           handle_two_step(response)
           return true
         elsif (response.body || "").include?('invalid="true"')
