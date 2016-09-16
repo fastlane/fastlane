@@ -394,7 +394,7 @@ module Spaceship
       # Since 15th September 2016 this hidden behind another request
       # see https://github.com/fastlane/fastlane/issues/6137 for more information
       def certificates
-        @intenal_certificates ||= (details["certificates"] || []).collect do |cert|
+        @internal_certificates ||= (details["certificates"] || []).collect do |cert|
           Certificate.set_client(client).factory(cert)
         end
       end
