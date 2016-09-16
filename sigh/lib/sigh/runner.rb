@@ -65,7 +65,15 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      results = results.find_all do |current_profile|
+        if current_profile.valid?
+          true
+        else
+          UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
+          false
+        end
+      end
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
@@ -89,7 +97,7 @@ module Sigh
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}")
+            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
           end
         end
         installed
