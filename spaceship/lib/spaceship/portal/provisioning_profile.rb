@@ -164,10 +164,9 @@ module Spaceship
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
-          # eagerload the Apps, Devices, and Certificates using the same client if we have to.
+          # eagerload the Apps and Devices using the same client if we have to.
           attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
           attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
-          attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
 
           klass.client = @client
           klass.new(attrs)
@@ -390,6 +389,19 @@ module Spaceship
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
+      end
+
+      # Since 15th September 2016 this hidden behind another request
+      # see https://github.com/fastlane/fastlane/issues/6137 for more information
+      def certificates
+        @intenal_certificates ||= (details["certificates"] || []).collect do |cert|
+          Certificate.set_client(client).factory(cert)
+        end
+      end
+
+      # This is data that can only be fetched from the getProvisioningProfile.action API endpoint
+      def details
+        @details ||= client.provisioning_profile_details(provisioning_profile_id: self.id)
       end
     end
   end

@@ -159,27 +159,28 @@ describe Spaceship::ProvisioningProfile do
 
   describe "#repair" do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
+    let(:cert_id) { "3BH4JJSWM4" }
 
     it "repairs an existing profile with added devices" do
       profile.devices = Spaceship::Device.all_for_profile_type(profile.type)
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], mac: false).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], mac: false).and_return({})
       profile.repair!
     end
 
     it "update the certificate if the current one doesn't exist" do
       profile.certificates = []
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], [], mac: false).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair!
     end
 
     it "update the certificate if the current one is invalid" do
-      expect(profile.certificates.first.id).to eq('XC5PH8D47H') # this was the previous one
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], [], mac: false).and_return({})
+      expect(profile.certificates.first.id).to eq('3BH4JJSWM4') # this was the previous one
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
     end
 
     it "repairs an existing profile with no devices" do
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], [], mac: false).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair!
     end
 
@@ -187,7 +188,7 @@ describe Spaceship::ProvisioningProfile do
       it "Development" do
         profile = Spaceship::ProvisioningProfile::Development.all.first
         devices = ["RK3285QATH", "E687498679", "5YTNZ5A9RV", "VCD3RH54BK", "VA3Z744A8R", "T5VFWSCC2Z", "GD25LDGN99", "XJXGVS46MW", "L4378H292Z", "9T5RA84V77", "S4227Y42V5", "LEL449RZER", "WXQ7V239BE"]
-        expect(client).to receive(:repair_provisioning_profile!).with('475ESRP5F3', 'net.sunapps.7 Development', 'limited', '572XTN75U2', ["C8DL7464RQ"], devices, mac: false).and_return({})
+        expect(client).to receive(:repair_provisioning_profile!).with('475ESRP5F3', 'net.sunapps.7 Development', 'limited', '572XTN75U2', [cert_id], devices, mac: false).and_return({})
         profile.repair!
       end
     end
@@ -197,7 +198,7 @@ describe Spaceship::ProvisioningProfile do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "updates an existing profile" do
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["C8DL7464RQ"], [], mac: false).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["3BH4JJSWM4"], [], mac: false).and_return({})
       profile.update!
     end
   end
