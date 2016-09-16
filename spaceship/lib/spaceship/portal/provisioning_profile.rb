@@ -187,13 +187,20 @@ module Spaceship
           # see https://github.com/fastlane/fastlane/issues/6137 for more information
           # That's why we set it here
 
+          # The reason why we set access attrs["devices"], then profile_details["devices"] is just
+          # that we don't have to re-create all the stubs for the local unit tests
+          # Both contain the same format, but we don't want to update all the JSON and XML files
+          # and all the tests with new IDs, so we're just accessing the data here
+
           # Parse all the devices from the details request
+          profile_details["devices"] = attrs["devices"] unless (attrs["devices"] || []).empty?
           obj.devices = (profile_details["devices"] || []).collect do |device|
             Device.set_client(client).factory(device)
           end
 
           # Parse all the certificates from the details request
-          obj.certificates = (profile_details["certificates"] || []).collect do |cert|
+          profile_details["certificates"] = attrs["certificates"] unless (attrs["certificates"] || []).empty?
+          obj.certificates = (attrs["certificates"] || profile_details["certificates"] || []).collect do |cert|
             Certificate.set_client(client).factory(cert)
           end
 

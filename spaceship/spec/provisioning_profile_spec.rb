@@ -3,40 +3,32 @@ require 'spec_helper'
 describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
-  let(:cert_id) { "3BH4JJSWM4" }
-
-  describe '.factory' do
-    it 'should instantiate a subclass and pass the client' do
-      propro = Spaceship::ProvisioningProfile.factory({ 'distributionMethod' => 'store', 'appId' => {}, 'devices' => [{}], 'certificates' => [] })
-      expect(propro).to be_instance_of(Spaceship::ProvisioningProfile::AdHoc)
-      expect(propro.client).to eq(client)
-    end
-  end
+  let(:cert_id) { "C8DL7464RQ" }
 
   describe '#all' do
     let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 
     it "properly retrieves and filters the provisioning profiles" do
-      expect(provisioning_profiles.count).to eq(33) # ignore the Xcode generated profiles
+      expect(provisioning_profiles.count).to eq(3) # ignore the Xcode generated profiles
 
       profile = provisioning_profiles.last
-      expect(profile.name).to eq('net.sunapps.9 Development')
-      expect(profile.type).to eq('iOS Development')
-      expect(profile.app.app_id).to eq('572SH8263D')
+      expect(profile.name).to eq('net.sunapps.7 AdHoc')
+      expect(profile.type).to eq('iOS Distribution')
+      expect(profile.app.app_id).to eq('572XTN75U2')
       expect(profile.status).to eq('Active')
-      expect(profile.expires.to_s).to eq('2016-03-05T11:46:57+00:00')
-      expect(profile.uuid).to eq('34b221d4-31aa-4e55-9ea1-e5fac4f7ff8c')
+      expect(profile.expires.to_s).to eq('2015-11-25T22:45:50+00:00')
+      expect(profile.uuid).to eq('a8b1563e-7559-41f7-854b-6cd09f950d11')
       expect(profile.managed_by_xcode?).to eq(false)
-      expect(profile.distribution_method).to eq('limited')
-      expect(profile.class.type).to eq('limited')
-      expect(profile.class.pretty_type).to eq('Development')
-      expect(profile.type).to eq('iOS Development')
+      expect(profile.distribution_method).to eq('adhoc')
+      expect(profile.class.type).to eq('adhoc')
+      expect(profile.class.pretty_type).to eq('AdHoc')
+      expect(profile.type).to eq('iOS Distribution')
     end
 
     it 'should filter by the correct types' do
-      expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(3)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(13)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(17)
+      expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(1)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(1)
     end
 
     it 'should have an app' do
@@ -52,12 +44,12 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "returns the profile in an array if matching" do
-      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.9")
-      expect(profiles.count).to eq(2)
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.7")
+      expect(profiles.count).to eq(3)
 
-      expect(profiles.first.app.bundle_id).to eq('net.sunapps.9')
+      expect(profiles.first.app.bundle_id).to eq('net.sunapps.7')
       expect(profiles.first.distribution_method).to eq('store')
-      expect(profiles.last.distribution_method).to eq('limited')
+      expect(profiles.last.distribution_method).to eq('adhoc')
     end
   end
 
@@ -174,7 +166,7 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "update the certificate if the current one is invalid" do
-      expect(profile.certificates.first.id).to eq(cert_id) # this was the previous one
+      expect(profile.certificates.first.id).to eq("XC5PH8D47H")
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
     end
@@ -194,7 +186,7 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
-  describe "#update!" do
+  describe "#update!", nower: true do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "updates an existing profile" do

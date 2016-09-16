@@ -86,7 +86,7 @@
     "devices": [{
       "deviceId": "FVRY7XH22J",
       "name": "Felix Krause's iPhone 6s",
-      "deviceNumber": "116307ad03065412b3084f4dc8498922e0214e73",
+      "deviceNumber": "aaabbbccccddddaaabbb",
       "devicePlatform": "ios",
       "status": "c",
       "deviceClass": "iphone",
@@ -94,7 +94,7 @@
     }, {
       "deviceId": "4ZE252U553",
       "name": "Felix Krause's iPad",
-      "deviceNumber": "b667adcc475d70c9945995a64a4ad9762987fd76",
+      "deviceNumber": "aaabbbceeccddddaaabbb",
       "devicePlatform": "ios",
       "status": "c",
       "deviceClass": "ipad",
