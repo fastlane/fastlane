@@ -31,7 +31,7 @@ module FastlaneCore
       def limit_row_size(rows, max_length = 100)
         require 'fastlane_core/string_filters'
 
-        max_key_length = rows.map { |e| e[0].length }.max || 0
+        max_key_length = rows.collect { |e| e[0].length }.max || 0
         max_allowed_value_length = max_length - max_key_length - 7
         rows.map do |e|
           value = e[1]

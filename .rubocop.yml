@@ -155,3 +155,7 @@ Style/ZeroLengthPredicate:
 # Adds complexity
 Style/IfInsideElse:
   Enabled: false
+
+# Sometimes we just want to 'collect'
+Style/CollectionMethods:
+  Enabled: false
