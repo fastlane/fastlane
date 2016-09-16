@@ -23,7 +23,7 @@ module Sigh
         UI.success "Found #{profiles.count} matching profile(s)"
         profile = profiles.first
 
-        if Sigh.config[:force]
+        if Sigh.config[:force] || !profile.valid?
           if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
             UI.important "Updating the provisioning profile"
           else
@@ -65,7 +65,7 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
