@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
+  let(:cert_id) { "3BH4JJSWM4" }
 
   describe '.factory' do
     it 'should instantiate a subclass and pass the client' do
@@ -159,7 +160,6 @@ describe Spaceship::ProvisioningProfile do
 
   describe "#repair" do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
-    let(:cert_id) { "3BH4JJSWM4" }
 
     it "repairs an existing profile with added devices" do
       profile.devices = Spaceship::Device.all_for_profile_type(profile.type)
@@ -174,7 +174,7 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "update the certificate if the current one is invalid" do
-      expect(profile.certificates.first.id).to eq('3BH4JJSWM4') # this was the previous one
+      expect(profile.certificates.first.id).to eq(cert_id) # this was the previous one
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
     end
@@ -198,7 +198,7 @@ describe Spaceship::ProvisioningProfile do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "updates an existing profile" do
-      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', ["3BH4JJSWM4"], [], mac: false).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.update!
     end
   end
