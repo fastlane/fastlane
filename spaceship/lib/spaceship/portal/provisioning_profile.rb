@@ -119,6 +119,11 @@ module Spaceship
       #  profile.devices.first.name
       attr_accessor :devices
 
+      # This is the second level request, which is done before creating the object
+      # this includes information about the devices and the certificates
+      # more information on this issue https://github.com/fastlane/fastlane/issues/6137
+      attr_accessor :profile_details
+
       attr_mapping({
         'provisioningProfileId' => :id,
         'UUID' => :uuid,
@@ -148,7 +153,12 @@ module Spaceship
         # This is used to create a new object based on the server response.
         def factory(attrs)
           # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
-          attrs['distributionMethod'] = 'adhoc' if attrs['distributionMethod'] == 'store' && attrs['devices'].size > 0
+          profile_details = client.provisioning_profile_details(provisioning_profile_id: attrs["provisioningProfileId"])
+
+          # The only difference between App Store and Ad Hoc provisioniong profile is the devices that are attached
+          if attrs['distributionMethod'] == 'store' && (profile_details['devices'] || []).size > 0
+            attrs['distributionMethod'] = 'adhoc'
+          end
           # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
 
           klass = case attrs['distributionMethod']
@@ -164,12 +174,30 @@ module Spaceship
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
-          # eagerload the Apps and Devices using the same client if we have to.
+          # eagerload the Apps using the same client if we have to.
           attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
-          attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
 
           klass.client = @client
-          klass.new(attrs)
+          obj = klass.new(attrs)
+
+          # Set the response of the details request, in case we want to access it later on
+          obj.profile_details = profile_details
+
+          # Since 15th September 2016 certificates and devices are hidden behind another request
+          # see https://github.com/fastlane/fastlane/issues/6137 for more information
+          # That's why we set it here
+
+          # Parse all the devices from the details request
+          obj.devices = (profile_details["devices"] || []).collect do |device|
+            Device.set_client(client).factory(device)
+          end
+
+          # Parse all the certificates from the details request
+          obj.certificates = (attrs["certificates"] || profile_details["certificates"] || []).collect do |cert|
+            Certificate.set_client(client).factory(cert)
+          end
+
+          return obj
         end
 
         # @return (String) The human readable name of this profile type.
@@ -389,19 +417,6 @@ module Spaceship
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
-      end
-
-      # Since 15th September 2016 this hidden behind another request
-      # see https://github.com/fastlane/fastlane/issues/6137 for more information
-      def certificates
-        @internal_certificates ||= (details["certificates"] || []).collect do |cert|
-          Certificate.set_client(client).factory(cert)
-        end
-      end
-
-      # This is data that can only be fetched from the getProvisioningProfile.action API endpoint
-      def details
-        @details ||= client.provisioning_profile_details(provisioning_profile_id: self.id)
       end
     end
   end
