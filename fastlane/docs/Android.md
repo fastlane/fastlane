@@ -27,12 +27,14 @@ To enable `fastlane` to access Google Play you have to follow these steps:
 - Open the [Google Play Console](https://play.google.com/apps/publish/)
 - Select **Settings** tab, followed by the **API access** tab
 - Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
-- Click **Create credentials** and select **Service account**
-- Select **JSON** as the Key type and click **Create**
-- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
+- In the **Service accounts** section, click **Create Service Account**
+- Use 'Fastlane' as name and give 'owner' rights
+- Click **Create**, you should see a new entry in the list of service accounts
+- Click the overflow menu on the right and select **create key**
+- Choose **JSON** and download the file
 - Back on the Google Play developer console, click **Done** to close the dialog
 - Click on **Grant Access** for the newly added service account
-- Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
+- Choose **Release Manager** from the **Role** dropdown and click **Add user** to close the dialog
 
 ### JSON Key
 
