@@ -66,11 +66,11 @@ describe Spaceship::ProvisioningProfile do
     adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
 
     expect(adhoc.distribution_method).to eq('adhoc')
-    expect(adhoc.devices.count).to eq(13)
+    expect(adhoc.devices.count).to eq(2)
 
     device = adhoc.devices.first
-    expect(device.id).to eq('RK3285QATH')
-    expect(device.name).to eq('Felix Krause\'s iPhone 5')
+    expect(device.id).to eq('FVRY7XH22J')
+    expect(device.name).to eq('Felix Krause\'s iPhone 6s')
     expect(device.udid).to eq('aaabbbccccddddaaabbb')
     expect(device.platform).to eq('ios')
     expect(device.status).to eq('c')
@@ -166,7 +166,7 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "update the certificate if the current one is invalid" do
-      expect(profile.certificates.first.id).to eq("XC5PH8D47H")
+      expect(profile.certificates.first.id).to eq("3BH4JJSWM4")
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
     end
@@ -179,7 +179,7 @@ describe Spaceship::ProvisioningProfile do
     describe "Different Environments" do
       it "Development" do
         profile = Spaceship::ProvisioningProfile::Development.all.first
-        devices = ["RK3285QATH", "E687498679", "5YTNZ5A9RV", "VCD3RH54BK", "VA3Z744A8R", "T5VFWSCC2Z", "GD25LDGN99", "XJXGVS46MW", "L4378H292Z", "9T5RA84V77", "S4227Y42V5", "LEL449RZER", "WXQ7V239BE"]
+        devices = ["FVRY7XH22J", "4ZE252U553"]
         expect(client).to receive(:repair_provisioning_profile!).with('475ESRP5F3', 'net.sunapps.7 Development', 'limited', '572XTN75U2', [cert_id], devices, mac: false).and_return({})
         profile.repair!
       end
