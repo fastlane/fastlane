@@ -186,7 +186,7 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
-  describe "#update!", nower: true do
+  describe "#update!" do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
 
     it "updates an existing profile" do
