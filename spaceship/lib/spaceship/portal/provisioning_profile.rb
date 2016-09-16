@@ -379,7 +379,7 @@ module Spaceship
 
       # @return (Bool) Is the current provisioning profile valid?
       def valid?
-        return (status == 'Active' and certificate_valid?)
+        return status == 'Active'
       end
 
       # @return (Bool) Is this profile managed by Xcode?

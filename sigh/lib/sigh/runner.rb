@@ -78,6 +78,8 @@ module Sigh
       end
 
       return results if Sigh.config[:skip_certificate_verification]
+      
+      results = results.find_all(&:certificate_valid?)
 
       return results.find_all do |a|
         # Also make sure we have the certificate installed on the local machine

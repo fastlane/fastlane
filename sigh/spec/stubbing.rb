@@ -8,6 +8,7 @@ def stub_spaceship
   expect(Spaceship.client).to receive(:in_house?).and_return(false)
 
   allow(profile).to receive(:valid?).and_return(true)
+  allow(profile).to receive(:certificate_valid?).and_return(true)
   allow(profile.class).to receive(:pretty_type).and_return("pretty")
   allow(profile).to receive(:download).and_return("FileContent")
 
