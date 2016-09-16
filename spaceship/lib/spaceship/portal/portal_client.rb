@@ -329,6 +329,14 @@ module Spaceship
       parse_response(req, 'provisioningProfiles')
     end
 
+    def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
+      r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
+        teamId: team_id,
+        provisioningProfileId: provisioning_profile_id
+      })
+      parse_response(r, 'provisioningProfile')
+    end
+
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
       ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
