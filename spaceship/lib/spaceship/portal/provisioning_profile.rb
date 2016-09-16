@@ -193,7 +193,7 @@ module Spaceship
           end
 
           # Parse all the certificates from the details request
-          obj.certificates = (attrs["certificates"] || profile_details["certificates"] || []).collect do |cert|
+          obj.certificates = (profile_details["certificates"] || []).collect do |cert|
             Certificate.set_client(client).factory(cert)
           end
 
