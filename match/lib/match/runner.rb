@@ -4,8 +4,8 @@ module Match
 
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:workspace],
-                                             title: "Summary for match #{Match::VERSION}")
+                                            hide_keys: [:workspace],
+                                            title: "Summary for match #{Match::VERSION}")
 
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
@@ -14,7 +14,8 @@ module Match
       spaceship.bundle_identifier_exists(params) if spaceship
 
       # Certificate
-      cert_id = certificate(params: params)
+      cert_info = []
+      cert_id = certificate(params: params, cert_info: cert_info)
       spaceship.certificate_exists(params, cert_id) if spaceship
 
       # Provisioning Profile
@@ -29,6 +30,7 @@ module Match
       end
 
       TablePrinter.print_summary(params, uuid)
+      TablePrinter.print_certificate_info(params, cert_info[0]) if cert_info.length > 0
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
@@ -41,7 +43,7 @@ module Match
       GitHelper.clear_changes
     end
 
-    def certificate(params: nil)
+    def certificate(params: nil, cert_info: [])
       cert_type = :distribution
       cert_type = :development if params[:type] == "development"
       cert_type = :enterprise if Match.enterprise? && params[:type] == "enterprise"
@@ -69,6 +71,14 @@ module Match
         Utils.import(keys.last, params[:keychain_name])
       end
 
+      info = Utils.get_cert_info(cert_path)
+
+      cert_name = info.select { |key, value| key == 'Common Name' }
+      if cert_name.length > 0
+        Utils.fill_environment_cert(params, cert_name[0][1])
+        cert_info << info
+      end
+
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
     end
 
@@ -88,8 +98,8 @@ module Match
       if profile.nil? or params[:force]
         UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
         profile = Generator.generate_provisioning_profile(params: params,
-                                                       prov_type: prov_type,
-                                                  certificate_id: certificate_id)
+                                                          prov_type: prov_type,
+                                                          certificate_id: certificate_id)
         self.changes_to_commit = true
       end
 
