@@ -1,0 +1,21 @@
+desc "Common setup for all lanes"
+before_all do |lane, options|
+  File.write("/tmp/before_all.txt", options[:value])
+end
+
+lane :something do
+end
+
+lane :crash do
+  raise "Wups"
+end
+
+desc "Called on success"
+after_all do |lane, options|
+  File.write("/tmp/after_all.txt", options[:value])
+end
+
+desc "Called on error"
+error do |lane, exception, options|
+  File.write("/tmp/error.txt", options[:value])
+end

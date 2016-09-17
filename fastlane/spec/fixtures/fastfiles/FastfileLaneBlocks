@@ -1,0 +1,37 @@
+before_all do
+  File.write('/tmp/fastlane/before_all', '1')
+end
+
+before_each do |lane|
+  open('/tmp/fastlane/before_each', 'a') { |f| f << lane }
+end
+
+after_all do |lane|
+  File.write('/tmp/fastlane/after_all', lane)
+end
+
+after_each do |lane|
+  open('/tmp/fastlane/after_each', 'a') { |f| f << lane }
+end
+
+error do |lane, exception|
+  File.write('/tmp/fastlane/error', lane)
+end
+
+platform :ios do
+  desc "run_ios runner"
+  lane :run_ios do
+    lane1
+    lane2
+  end
+
+  desc "lane1 runner"
+  lane :lane1 do
+    puts "lane1"
+  end
+
+  desc "lane2 runner"
+  lane :lane2 do
+    puts "lane2"
+  end
+end

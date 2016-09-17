@@ -1,0 +1,16 @@
+== Devices ==
+-- iOS 9.3 --
+    iPhone 6s Plus (0311D4EC-14E7-443B-9F27-F32E72342799) (Shutdown)
+    iPad Pro (AD6A06DF-16EF-492D-8AF3-8128FCC03CBF) (Shutdown)
+-- tvOS 9.2 --
+    Apple TV 1080p (D7D591A8-17D2-47B4-8D2A-AFAFA28874C9) (Shutdown)
+-- watchOS 2.2 --
+    Apple Watch - 38mm (2A58326E-50F3-4575-9049-E119A4E6852D) (Shutdown)
+    Apple Watch - 42mm (C8250DD7-8C4E-4803-838A-731B42785262) (Shutdown)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.watchOS-2-0 --
+    Apple Watch - 38mm (22C04589-2AD4-42BB-9869-FB2331708E62) (Creating) (unavailable, runtime profile not found)
+    Apple Watch - 42mm (B98D4701-C719-41CD-BCCD-1288464D9B26) (Creating) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.watchOS-2-1 --
+    Apple Watch - 38mm (AF341B69-678E-48B0-9D12-A7502662D1BE) (Creating) (unavailable, runtime profile not found)
+    Apple Watch - 42mm (D2C4CBD0-DF62-45E3-8E25-72201827482E) (Creating) (unavailable, runtime profile not found)
+== Device Pairs ==

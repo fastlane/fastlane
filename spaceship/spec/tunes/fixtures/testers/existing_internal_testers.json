@@ -1,0 +1,52 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "users": [{
+      "testing": {
+        "value": false,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "id": null,
+      "testerId": "1d167b89-13c5-4dd8-b988-7a6a0190f774",
+      "firstName": {
+        "value": "Felix",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "lastName": {
+        "value": "Krause",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "emailAddress": {
+        "value": "felix@sunapps.net",
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "status": null,
+      "statusModTime": null,
+      "sessions": null,
+      "crashes": null,
+      "latestBuild": null,
+      "latestInstallByPlatform": {},
+      "groups": null
+    }],
+    "maxTestingUsers": 25,
+    "addingWillInvite": false,
+    "addingWillInviteByPlatform": null,
+    "groups": null
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

@@ -1,0 +1,169 @@
+{
+  "data": {
+    "iconUrl": "https://is4-ssl.mzstatic.com/image/thumb/Newsstand6/v4/9a/be/17/9abe173a-6411-8903-f1c2-5c6e28970d20/Icon-76@2x.png.png/150x150bb-80.png",
+    "uploadDate": 1443019906000,
+    "binaryState": "ITC.apps.preReleaseBuildStatus.Validated",
+    "fileName": "AppName.ipa",
+    "buildSdk": "13A340",
+    "buildPlatform": "13A340",
+    "bundleId": "com.appidnej",
+    "appName": "App Name",
+    "supportedArchitectures": "armv7, arm64",
+    "localizations": "English",
+    "newsstandApp": false,
+    "prerenderedIconFlag": true,
+    "entitlements": {
+      "Name.app/App": {
+        "application-identifier": "DSKLJLKFJ.com.appidentifier",
+        "get-task-allow": "false",
+        "beta-reports-active": "true",
+        "keychain-access-groups": "( \"DSKLJLKFJ.com.appidentifier\" )",
+        "com.apple.developer.team-identifier": "123123123"
+      }
+    },
+    "appPlatform": "ios",
+    "deviceProtocols": "",
+    "cfBundleVersion": "4",
+    "cfBundleShortVersion": "2.0.1",
+    "minOsVersion": "7.0",
+    "deviceFamilies": "iPhone / iPod touch, iPad",
+    "capabilities": "armv7",
+    "sizeInBytes": 3620096,
+    "sizesInBytes": {
+      "iPhone 4S": {
+        "uncompressed": 1390592,
+        "compressed": 926841
+      },
+      "iPad 4 Wifi": {
+        "uncompressed": 1390592,
+        "compressed": 926856
+      },
+      "iPhone 6 Plus": {
+        "uncompressed": 1519616,
+        "compressed": 998298
+      },
+      "iPhone 6s Plus": {
+        "uncompressed": 1519616,
+        "compressed": 998297
+      },
+      "iPad Air Wifi + Cell": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPhone 6": {
+        "uncompressed": 1519616,
+        "compressed": 998298
+      },
+      "iPhone 5": {
+        "uncompressed": 1390592,
+        "compressed": 926885
+      },
+      "iPad Pro WiFi + Cellular": {
+        "uncompressed": 1519616,
+        "compressed": 1013208
+      },
+      "iPad mini 4 WiFi + Cellular": {
+        "uncompressed": 1519616,
+        "compressed": 998276
+      },
+      "iPad 3 Wifi + Cell": {
+        "uncompressed": 1390592,
+        "compressed": 926856
+      },
+      "iPad Air Wifi": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPad Mini Wifi + Cell": {
+        "uncompressed": 1390592,
+        "compressed": 926837
+      },
+      "iPad Mini 2 Wifi + Cell": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPad Mini 3 Wifi + Cell": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPad Pro WiFi": {
+        "uncompressed": 1519616,
+        "compressed": 1013208
+      },
+      "Universal": {
+        "uncompressed": 2031616,
+        "compressed": 1405378
+      },
+      "iPod Touch Sixth Generation": {
+        "uncompressed": 1519616,
+        "compressed": 998282
+      },
+      "iPod Touch Fifth Generation": {
+        "uncompressed": 1390592,
+        "compressed": 926858
+      },
+      "iPhone 6s": {
+        "uncompressed": 1519616,
+        "compressed": 998285
+      },
+      "iPad 3 Wifi": {
+        "uncompressed": 1390592,
+        "compressed": 926856
+      },
+      "iPhone 5S": {
+        "uncompressed": 1519616,
+        "compressed": 998285
+      },
+      "iPad Mini 3 Wifi": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPad 2 3G": {
+        "uncompressed": 1390592,
+        "compressed": 926837
+      },
+      "iPad 2 Wifi": {
+        "uncompressed": 1390592,
+        "compressed": 926837
+      },
+      "iPad 4 Wifi + Cell": {
+        "uncompressed": 1390592,
+        "compressed": 926856
+      },
+      "iPad Mini 2 Wifi": {
+        "uncompressed": 1519616,
+        "compressed": 998293
+      },
+      "iPhone 5C": {
+        "uncompressed": 1390592,
+        "compressed": 926885
+      },
+      "iPad mini 4 WiFi": {
+        "uncompressed": 1519616,
+        "compressed": 998276
+      },
+      "iPad Mini Wifi": {
+        "uncompressed": 1390592,
+        "compressed": 926837
+      },
+      "iPad Air 2 Wifi + Cell": {
+        "uncompressed": 1519616,
+        "compressed": 998276
+      },
+      "iPad Air 2 Wifi": {
+        "uncompressed": 1519616,
+        "compressed": 998276
+      }
+    },
+    "containsODR": false,
+    "numberOfAssetPacks": 1,
+    "includesSymbols": false,
+    "dsymurl": "http://iosapps.itunes.apple.com/apple-assets-us-std-000001/Purple3/v4/57/d2/d8/57d2d873-e24b-75a2-asdfs-621628a10518/dSYMs?accessKey=lkjsdfjLKJlKJLKJDSFSDJF"
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": ["Success"]
+  },
+  "statusCode": "SUCCESS"
+}

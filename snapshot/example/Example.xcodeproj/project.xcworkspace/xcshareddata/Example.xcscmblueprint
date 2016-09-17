@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "0C13013A15CBECA0A0F90171BFF095518AA5D530",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : 0,
+    "0C13013A15CBECA0A0F90171BFF095518AA5D530" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "533C5D90-F082-4967-8C95-6B7CFF87EBBD",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : "",
+    "0C13013A15CBECA0A0F90171BFF095518AA5D530" : "snapshot"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Example",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "example\/Example.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/snapshot.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "0C13013A15CBECA0A0F90171BFF095518AA5D530"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/countdown",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF"
+    }
+  ]
+}

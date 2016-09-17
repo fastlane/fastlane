@@ -1,0 +1,109 @@
+{
+  "data": {
+    "requests": [{
+      "effectiveDate": 1457900260000,
+      "expirationDate": 1460319460000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["HM9Y9L49----"]
+    }, {
+      "effectiveDate": 1457900138000,
+      "expirationDate": 1460319338000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["3RXKMT34----"]
+    }, {
+      "effectiveDate": 1457872654000,
+      "expirationDate": 1460291854000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["TX6LL69M----"]
+    }, {
+      "effectiveDate": 1457871731000,
+      "expirationDate": 1460290931000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["74FTKEAM----"]
+    }, {
+      "effectiveDate": 1457864552000,
+      "expirationDate": 1460283752000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["6J49JFRP----"]
+    }, {
+      "effectiveDate": 1457703322000,
+      "expirationDate": 1460118922000,
+      "username": "c.steen@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["7P4Y3NAL----"]
+    }, {
+      "effectiveDate": 1457459346000,
+      "expirationDate": 1459874946000,
+      "username": "joe@wewanttoknow.com",
+      "version": {
+        "id": 816549081,
+        "appName": "DragonBox Numbers",
+        "version": "1.5.0",
+        "platform": "ios",
+        "numberOfCodes": 7,
+        "maximumNumberOfCodes": 100,
+        "contractFileName": "promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html"
+      },
+      "codes": ["RN3R77TW----"]
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

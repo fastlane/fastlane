@@ -1,0 +1,4 @@
+{
+ "errorMessage":"Invalid value(s) for key(s): [itunesId]",
+ "queryParameters":{"output":"json", "callback":"A javascript function to handle your search results", "country":"ISO-2A country code", "limit":"The number of search results to return", "term":"A search string", "lang":"ISO-2A language code"}
+}

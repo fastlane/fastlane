@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Install <%= title %></title>
+  </head>
+  <body>
+    <style type="text/css">
+      * {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        text-align: center;
+        background-color: #f5f5f5;
+      }
+      .oneRow {
+        width: 100%;
+        overflow: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        text-align: center;
+      }
+      .download {
+        margin: 30px;
+        font-size: 130%;
+      }
+      #appIcon {
+        -webkit-border-radius: 22.544%;
+        -moz-border-radius: 22.544%;
+        -ms-border-radius: 22.544%;
+          border-radius: 22.544%;
+
+        margin-bottom: 30px;
+      }
+      a {
+        text-decoration: none;
+        color: blue;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      #footnote {
+        color: #737373;
+        font-size: 14px;
+      }
+      #finished { display: none; }
+      #fastlaneLogo {
+        text-align: center;
+        max-width: 150px;
+        margin-top: 10px;
+      }
+    </style>
+
+    <h1 style="text-align: center;"><%= title %></h1>
+    <!-- <img src="app_icon.png" id="appIcon"> -->
+
+    <div class="oneRow">
+      <span class="download" id="ios">
+        <a href="itms-services://?action=download-manifest&url=<%= plist_url %>" id="text" class="btn btn-lg btn-default" onclick="document.getElementById('finished').id = '';">
+          Install <%= title %> <%= bundle_version %>
+        </a>
+      </span>
+
+      <!-- <span class="download" id="android">
+      </span> -->
+    </div>
+
+    <h3 id="invalid-device">Please open this page on your iPhone!</h3>
+
+    <p id="finished">
+      App is being installed. Close Safari using the home button.
+    </p>
+
+    <p id="footnote">
+      This is a beta version and is not meant to share with the public.
+    </p>
+    <img src="https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane_medium.png" id="fastlaneLogo" />
+  </body>
+
+  <script type='text/javascript'>
+    // Array of supported devices, 1 is iPhone, 2 is iPad
+    var deviceFamily = <%= device_family %>;
+
+    function isIphoneValid() {
+      return deviceFamily.indexOf(1) != -1;
+    }
+
+    function showError(error) {
+      document.getElementById("ios").remove();
+      document.getElementById("invalid-device").innerHTML = error;
+    }
+
+    function showInstallLink() {
+      document.getElementById("invalid-device").remove();
+    }
+
+    if (/iPhone|iPod/i.test(navigator.userAgent) && isIphoneValid() ) {
+      showInstallLink();
+    } else if (/iPad/i.test(navigator.userAgent)) {
+      // All apps (even "iPhone only") can be installed on iPads
+      showInstallLink()
+    } else {
+      var validDeviceName = isIphoneValid() ? "iOS device" : "iPad";
+      showError("Please open this page on your " + validDeviceName + "!");
+    }
+  </script>
+</html>

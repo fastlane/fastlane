@@ -1,0 +1,3 @@
+some_custom_block("parameter") do |value1, value2|
+  raise "Yeah: #{value1} #{value2}"
+end

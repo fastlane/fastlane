@@ -1,13 +1,24 @@
 *.gem
 *.rbc
 /.config
-/coverage/
+coverage/
 /InstalledFiles
 /pkg/
 /spec/reports/
 /test/tmp/
 /test/version_tmp/
 /tmp/
+rspec_logs.json
+test_output/
+.DS_STORE
+
+## Specific to Android
+.gradle/
+*.iml
+local.properties
+
+## Specific to screengrab
+/screengrab/example/fastlane/metadata/
 
 ## Specific to RubyMotion:
 .dat*
@@ -33,12 +44,11 @@ Gemfile.lock
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
-assets/fastlane_ultra_large.png
-
-# Added by Felix
+# fastlane specific
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
-spec/fixtures/fastfiles/report.xml
-fastlane/report.xml
+**/report.xml
+**/.bundle
+fastlane/lib/fastlane/plugins/template/.rubocop.yml

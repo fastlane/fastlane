@@ -1,0 +1,92 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "adamId": "1039164429",
+    "primaryLocaleCode": "en-US",
+    "features": ["PRERELEASE", "PRICING", "GAMECENTER"],
+    "appTransferState": null,
+    "localizedMetadata": [{
+      "localeCode": "en-US",
+      "name": "Updated by fastlane"
+    }, {
+      "localeCode": "de-DE",
+      "name": "why new itc 2"
+    }],
+    "platforms": [{
+      "type": "APP",
+      "platformString": "ios",
+      "inFlightVersion": {
+        "type": "APP",
+        "id": "813314674",
+        "version": "1.0",
+        "state": "prepareForUpload",
+        "stateKey": "prepareForUpload",
+        "stateGroup": "preRelease",
+        "largeAppIcon": {
+          "assetToken": "Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png",
+          "sortOrder": null,
+          "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png/1024x1024ss-80.png",
+          "thumbNailUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png/500x500bb-80.png",
+          "originalFileName": "noalpha.png"
+        },
+        "supportedHardware": ["iphone"],
+        "issuesCount": 0
+      },
+      "deliverableVersion": {
+        "type": "APP",
+        "id": "113314675",
+        "version": "1.1",
+        "state": "...",
+        "stateKey": "...",
+        "stateGroup": "...",
+        "largeAppIcon": {
+          "assetToken": "Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png",
+          "sortOrder": null,
+          "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png/1024x1024ss-80.png",
+          "thumbNailUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/42/45/f2/4245f2ee-3a37-a34d-a659-1f5f403ab2fe/pr_source.png/500x500bb-80.png",
+          "originalFileName": "noalpha.png"
+        },
+        "supportedHardware": ["iphone"],
+        "issuesCount": 0
+      }
+    },{
+      "type": "APP",
+      "platformString": "appletvos",
+      "inFlightVersion": {
+        "type": "APP",
+        "id": "814995239",
+        "version": "1.0",
+        "state": "prepareForUpload",
+        "stateKey": "prepareForUpload",
+        "stateGroup": "preRelease",
+        "largeAppIcon": {
+          "assetToken": null,
+          "sortOrder": null,
+          "url": null,
+          "thumbNailUrl": null,
+          "originalFileName": null
+        },
+        "supportedHardware": ["iphone"],
+        "issuesCount": 0
+      },
+      "deliverableVersion": null
+    }],
+    "allowedNewVersionPlatforms": [],
+    "submittablePlatforms": ["ios", "osx", "appletvos"],
+    "appStoreUrl": "https://itunes.apple.com/us/app/why-new-itc-2/id1039164429?ls=1&mt=8",
+    "analyticsUrl": null,
+    "salesAndTrendsUrl": null,
+    "canCreateAddOn": true,
+    "everSubmittedAnAddon": false,
+    "everSubmittedFreeSubscriptionAddon": true,
+    "freeSubscriptionAddonCount": 0
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

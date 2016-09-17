@@ -1,0 +1,3 @@
+issuer "asd" # Follow https://github.com/fastlane/supply#setup to get one
+keyfile "sdf" # Path to the keyfile
+package_name "tools.fastlane.localetester"

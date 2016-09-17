@@ -1,0 +1,99 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "testers": [{
+      "emailAddress": {
+        "value": "private@krausefx.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "firstName": {
+        "value": "Detlef",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "lastName": {
+        "value": "Müller",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "testerId": "1d167b89-13c5-4dd8-b988-7a6a0190faaa",
+      "devices": [{
+        "model": "iPhone 6",
+        "os": "iOS",
+        "osVersion": "8.3",
+        "name": null
+      }],
+      "latestInstalledAppAdamId": 794902327,
+      "latestInstalledVersion": "0.9.14",
+      "latestInstalledShortVersion": "1",
+      "latestInstalledDate": 1427565638420,
+      "latestInstalledName": "App Name Yeah",
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": true,
+      "itcUsername": null,
+      "groups": []
+    }, {
+      "emailAddress": {
+        "value": "ich@felixkrause.at",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "firstName": {
+        "value": "Felix",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "lastName": {
+        "value": "Krause",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "testerId": "1399e231-27bd-496d-83f5-2f067e923140",
+      "devices": [],
+      "latestInstalledAppAdamId": null,
+      "latestInstalledVersion": null,
+      "latestInstalledShortVersion": null,
+      "latestInstalledDate": null,
+      "latestInstalledName": null,
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": true,
+      "itcUsername": null,
+      "groups": []
+    }],
+    "devices": {
+      "iPhone": ["iPhone 6"]
+    },
+    "groups": {
+      "8dfd9f94-3983-46d5-a298-c866b2369a33": "MyGroup"
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

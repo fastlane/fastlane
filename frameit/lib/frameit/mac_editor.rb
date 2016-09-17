@@ -1,0 +1,32 @@
+module Frameit
+  # Responsible for framing Mac Screenshots
+  class MacEditor < Editor
+    def prepare_image
+      image = super
+      image.resize("#{offset['width']}x") if offset['width']
+    end
+
+    def put_device_into_background(background)
+      self.top_space_above_device = offset['titleHeight'] # needed for centering the title
+
+      @image = background.composite(image, "png") do |c|
+        c.compose "Over"
+        c.geometry offset['offset']
+      end
+
+      return image
+    end
+
+    def load_frame
+      nil # Macs don't need frames - backgrounds only
+    end
+
+    def should_add_title?
+      true # Mac screenshots always need a background
+    end
+
+    def generate_background
+      MiniMagick::Image.open(fetch_config['background']) # no resizing on the Mac
+    end
+  end
+end

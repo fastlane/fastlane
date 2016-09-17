@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>embedOnDemandResourcesAssetPacksInBundle</key>
+	<true/>
+	<key>manifest</key>
+	<dict>
+		<key>appURL</key>
+		<string>https://www.example.com/Example.ipa</string>
+		<key>displayImageURL</key>
+		<string>https://www.example.com/display.png</string>
+		<key>fullSizeImageURL</key>
+		<string>https://www.example.com/fullSize.png</string>
+	</dict>
+	<key>method</key>
+	<string>ad-hoc</string>
+</dict>
+</plist>

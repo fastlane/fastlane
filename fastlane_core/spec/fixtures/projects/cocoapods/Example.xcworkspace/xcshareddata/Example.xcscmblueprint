@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "DF27D2DFCC34D483E4F459B1C0A9AB596531C357",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : 0,
+    "DF27D2DFCC34D483E4F459B1C0A9AB596531C357" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B0B54A05-D112-479E-84BB-D9FA30D6062E",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF" : "",
+    "DF27D2DFCC34D483E4F459B1C0A9AB596531C357" : "fastlane_core\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Example",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "spec\/fixtures\/projects\/cocoapods\/Example.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/countdown",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "11BD64E841BB6AC3A48BA84DC911C1D4F58BDACF"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fastlane\/fastlane_core",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DF27D2DFCC34D483E4F459B1C0A9AB596531C357"
+    }
+  ]
+}

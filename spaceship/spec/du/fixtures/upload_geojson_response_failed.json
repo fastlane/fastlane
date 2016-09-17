@@ -1,0 +1,7 @@
+{
+  "statusCode" : 400,
+  "errorCodes" : [ "FILE_GEOJSON_FIELD_NOT_SUPPORTED" ],
+  "suggestionCode" : "TRANSIT_APP_FILE_INVALID_JSON",
+  "nonLocalizedMessage" : "The routing app coverage file is incorrectly formatted. Please refer to Apple's documentation.",
+  "localizedMessage" : "The routing app coverage file is in the wrong format. For more information, see the Location and Maps Programming Guide in the iOS Developer Library."
+}

@@ -1,0 +1,16 @@
+app_identifier "net.sunapps.1"
+apple_id "felix@sunapps.net"
+team_id "Q2CBPJ58CC"
+
+for_lane "beta" do
+  app_identifier "net.sunapps.1.beta"
+  team_id "3ECBP458CC"
+end
+
+for_lane "enterprise" do
+  app_identifier "enterprise.com"
+end
+
+for_lane "ios something" do
+  app_identifier "platform.com"
+end

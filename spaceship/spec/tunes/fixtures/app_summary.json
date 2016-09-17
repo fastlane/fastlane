@@ -1,0 +1,298 @@
+{
+  "data": {
+    "showSharedSecret": false,
+    "macBundlesEnabled": false,
+    "gameCenterGroupLink": "/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/gamescentergroup",
+    "canCreateMacApps": true,
+    "cloudStorageEnabled": true,
+    "cloudStorageLink": "/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/cloudstorage",
+    "catalogReportsLink": "/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/catalogreports",
+    "sharedSecretLink": "/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/sharedsecret",
+    "contractAnnouncements": [],
+    "enabledPlatforms": ["ios", "osx", "appletvos"],
+    "canCreateIOSApps": true,
+    "summaries": [{
+      "adamId": "898536088",
+      "name": "App Name 1",
+      "vendorId": "107",
+      "bundleId": "net.sunapps.107",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "0.9.8",
+          "state": "Ready for Sale",
+          "stateKey": "readyForSale",
+          "stateGroup": "readyForSale",
+          "largeAppIcon": {
+            "assetToken": "Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png",
+            "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/1024x1024ss-80.png",
+            "thumbNailUrl": "https://is4-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/500x500bb-80.png",
+            "sortOrder": null,
+            "originalFileName": "appicon.png"
+          },
+          "supportedHardware": ["iphone"],
+          "issuesCount": 0
+        },
+        "deliverableVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "1.0",
+          "state": "Prepare for Upload",
+          "stateKey": "prepareForUpload",
+          "stateGroup": "preRelease",
+          "largeAppIcon": {
+            "assetToken": "Purple4/v4/64/7a/e3/647ae3c4-033b-afcd-5af3-65ccb7240dc9/mzl.zybzvfar.png",
+            "url": "https://is4-ssl.mzstatic.com/image/thumb/Purple4/v4/64/7a/e3/647ae3c4-033b-afcd-5af3-65ccb7240dc9/mzl.zybzvfar.png/1024x1024ss-80.png",
+            "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple4/v4/64/7a/e3/647ae3c4-033b-afcd-5af3-65ccb7240dc9/mzl.zybzvfar.png/500x500bb-80.png",
+            "sortOrder": null,
+            "originalFileName": "appicon.png"
+          },
+          "supportedHardware": ["iphone"],
+          "issuesCount": 0
+        }
+      }
+      ],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1435685244000,
+      "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/78/7c/b5/787cb594-04a3-a7ba-ac17-b33d1582ebc9/mzl.dbqfnkxr.png/340x340bb-80.png",
+      "issuesCount": 0
+    }, {
+      "adamId": "1013943394",
+      "name": "app name why not",
+      "vendorId": "1435592086",
+      "bundleId": "net.sunapps.realtestda",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": null,
+        "deliverableVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "1.0",
+          "state": "prepareForUpload",
+          "stateKey": "prepareForUpload",
+          "stateGroup": "preRelease",
+          "largeAppIcon": {
+            "assetToken": null,
+            "url": null,
+            "thumbNailUrl": null,
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": [],
+          "issuesCount": 0
+        }
+      }],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1435596669000,
+      "iconUrl": null,
+      "issuesCount": 0
+    }, {
+      "adamId": "1006641907",
+      "name": "App Name 3",
+      "vendorId": "187",
+      "bundleId": "net.sunapps.187",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": null,
+        "deliverableVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "0.9.13",
+          "state": "waitingForReview",
+          "stateKey": "waitingForReview",
+          "stateGroup": "preRelease",
+          "largeAppIcon": {
+            "assetToken": "Purple5/v4/ac/90/92/ac909277-6706-f204-22d8-3736d10c1d85/pr_source.png",
+            "url": "https://is4-ssl.mzstatic.com/image/thumb/Purple5/v4/ac/90/92/ac909277-6706-f204-22d8-3736d10c1d85/pr_source.png/500x500bb-80.png",
+            "thumbNailUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple5/v4/ac/90/92/ac909277-6706-f204-22d8-3736d10c1d85/pr_source.png/340x340bb-80.png",
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": ["iPhone"],
+          "issuesCount": 0
+        }
+      }],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1435219008000,
+      "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple5/v4/ac/90/92/ac909277-6706-f204-22d8-3736d10c1d85/pr_source.png/340x340bb-80.png",
+      "issuesCount": 0,
+      "type": "ios"
+    }, {
+      "adamId": "999017138",
+      "name": "Profi App",
+      "vendorId": "191",
+      "bundleId": "net.sunapps.191",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "0.9.13",
+          "state": "readyForSale",
+          "stateKey": "readyForSale",
+          "stateGroup": "readyForSale",
+          "largeAppIcon": {
+            "assetToken": "Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0baf07/pr_source.png",
+            "url": "https://is2-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0baf07/pr_source.png/500x500bb-80.png",
+            "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0baf07/pr_source.png/340x340bb-80.png",
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": ["iPhone"],
+          "issuesCount": 0
+        },
+        "deliverableVersion": null
+      }],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1435193552000,
+      "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0baf07/pr_source.png/340x340bb-80.png",
+      "issuesCount": 0,
+      "type": "ios"
+    }, {
+      "adamId": "995365489",
+      "name": "Colorbook / Szene-Eventmagazin",
+      "vendorId": "192",
+      "bundleId": "net.sunapps.192",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "0.9.13",
+          "state": "readyForSale",
+          "stateKey": "readyForSale",
+          "stateGroup": "readyForSale",
+          "largeAppIcon": {
+            "assetToken": "Purple1/v4/52/18/05/521805d6-ecf0-8d75-5406-f2fa4ab02317/pr_source.png",
+            "url": "https://is4-ssl.mzstatic.com/image/thumb/Purple1/v4/52/18/05/521805d6-ecf0-8d75-5406-f2fa4ab02317/pr_source.png/500x500bb-80.png",
+            "thumbNailUrl": "https://is5-ssl.mzstatic.com/image/thumb/Purple1/v4/52/18/05/521805d6-ecf0-8d75-5406-f2fa4ab02317/pr_source.png/340x340bb-80.png",
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": ["iPhone"],
+          "issuesCount": 0
+        },
+        "deliverableVersion": null
+      }],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1434068792000,
+      "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Purple1/v4/52/18/05/521805d6-ecf0-8d75-5406-f2fa4ab02317/pr_source.png/340x340bb-80.png",
+      "issuesCount": 0,
+      "type": "ios"
+    }, {
+      "adamId": "980931301",
+      "name": "Yes",
+      "vendorId": "23",
+      "bundleId": "net.sunapps.23",
+      "appType": null,
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": {
+          "type": "APP",
+          "id": null,
+          "version": "0.9.13",
+          "state": "readyForSale",
+          "stateKey": "readyForSale",
+          "stateGroup": "readyForSale",
+          "largeAppIcon": {
+            "assetToken": "Purple3/v4/22/90/85/229085ce-4cbb-9311-4470-277dcc7d616e/pr_source.png",
+            "url": "https://is2-ssl.mzstatic.com/image/thumb/Purple3/v4/22/90/85/229085ce-4cbb-9311-4470-277dcc7d616e/pr_source.png/500x500bb-80.png",
+            "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/22/90/85/229085ce-4cbb-9311-4470-277dcc7d616e/pr_source.png/340x340bb-80.png",
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": ["iPhone"],
+          "issuesCount": 0
+        },
+        "deliverableVersion": null
+      }],
+      "buildVersionSets": [],
+      "lastModifiedDate": 1434068779000,
+      "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/22/90/85/229085ce-4cbb-9311-4470-277dcc7d616e/pr_source.png/340x340bb-80.png",
+      "issuesCount": 0,
+      "type": "ios"
+    },{
+      "adamId": "1000000000",
+      "name": "app name why not",
+      "vendorId": "1435592086",
+      "bundleId": "net.sunapps.stuckinprepare",
+      "appType": "ios",
+      "versionSets": [{
+        "type": "APP",
+        "platformString": "ios",
+        "inFlightVersion": {
+          "id": null,
+          "version": "1.0",
+          "state": "prepareForUpload",
+          "stateKey": "prepareForUpload",
+          "stateGroup": "preRelease",
+          "largeAppIcon": {
+            "assetToken": null,
+            "url": null,
+            "thumbNailUrl": null,
+            "sortOrder": null,
+            "originalFileName": null
+          },
+          "supportedHardware": [],
+          "issuesCount": 0
+        },
+        "deliverableVersion": null
+      }],
+      "buildVersionSets": null,
+      "lastModifiedDate": 1435596669000,
+      "iconUrl": null,
+      "issuesCount": 0,
+      "type": "ios"
+    }, {
+      "adamId": "928444013",
+      "name": "DragonBox Full Algebra Pack",
+      "vendorId": "20141010004",
+      "type": "iOS App Bundle",
+      "versions": null,
+      "versionSets": [{
+        "type": "BUNDLE",
+        "platformString": "ios",
+        "inFlightVersion": null,
+        "deliverableVersion": {
+          "type": "BUNDLE",
+          "version": null,
+          "state": "Developer Removed from Sale",
+          "stateGroup": "notForSale",
+          "stateKey": "developerRemovedFromSale",
+          "supportedHardware": ["ipad", "iphone"],
+          "issuesCount": 0,
+          "largeAppIcon": {
+            "assetToken": null,
+            "sortOrder": null,
+            "type": null,
+            "url": null,
+            "thumbNailUrl": null,
+            "originalFileName": null
+          }
+        }
+      }],
+      "lastModifiedDate": 1443771230000,
+      "iconUrl": "https://s5.mzstatic.com/us/r30/Purple1/v4/56/4a/b1/564ab13c-142f-bfc9-1a6d-598c017fe9a2/icon340x340.png"
+    }],
+    "canCreateAppBundles": true
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

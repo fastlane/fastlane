@@ -1,0 +1,106 @@
+{
+    "resultCount": 1,
+    "results": [
+        {
+            "kind": "software",
+            "features": [
+                "iosUniversal"
+            ],
+            "supportedDevices": [
+                "iPadMini4G",
+                "iPadMini",
+                "iPad23G",
+                "iPadFourthGen4G",
+                "iPodTouchFifthGen",
+                "iPhone4",
+                "iPhone4S",
+                "iPadThirdGen4G",
+                "iPhone5",
+                "iPadFourthGen",
+                "iPadThirdGen",
+                "iPhone5c",
+                "iPhone5s",
+                "iPad2Wifi"
+            ],
+            "isGameCenterEnabled": false,
+            "screenshotUrls": [
+                "http://a5.mzstatic.com/us/r30/Purple1/v4/e3/4c/c5/e34cc534-2c08-924f-0d65-ceb7318973af/screen1136x1136.jpeg",
+                "http://a5.mzstatic.com/us/r30/Purple3/v4/78/4b/9f/784b9fae-a4f2-d036-3638-1f9ddf413b12/screen1136x1136.jpeg",
+                "http://a1.mzstatic.com/us/r30/Purple4/v4/e2/d8/c5/e2d8c504-2e7f-9d34-b09c-f35cae5684a7/screen1136x1136.jpeg",
+                "http://a3.mzstatic.com/us/r30/Purple4/v4/31/36/f7/3136f749-1e7e-f71b-fc82-3405c0213e84/screen1136x1136.jpeg",
+                "http://a2.mzstatic.com/us/r30/Purple3/v4/eb/5f/26/eb5f26ac-5d93-58ad-3104-9742e4c9a8b9/screen1136x1136.jpeg"
+            ],
+            "ipadScreenshotUrls": [
+                "http://a3.mzstatic.com/us/r30/Purple3/v4/f1/88/89/f1888941-7d07-4327-2496-f758d18ad0f7/screen480x480.jpeg",
+                "http://a2.mzstatic.com/us/r30/Purple4/v4/9c/c8/81/9cc88117-c18b-1be2-b2e9-cf68dccff56c/screen480x480.jpeg",
+                "http://a2.mzstatic.com/us/r30/Purple4/v4/d8/5c/a4/d85ca466-f8ca-54ac-cdf0-1eb94751b209/screen480x480.jpeg",
+                "http://a2.mzstatic.com/us/r30/Purple3/v4/60/2e/7d/602e7d1c-a00d-2444-4e1c-33221f0612f8/screen480x480.jpeg",
+                "http://a4.mzstatic.com/us/r30/Purple5/v4/13/84/9c/13849ce6-a777-6128-2b4e-aba2973762f5/screen480x480.jpeg"
+            ],
+            "artworkUrl60": "http://a911.phobos.apple.com/us/r30/Purple5/v4/69/9d/69/699d6917-95d8-4323-9ff2-192715ac61ba/Icon-Production.png",
+            "artworkUrl512": "http://a1988.phobos.apple.com/us/r30/Purple1/v4/38/df/78/38df78e9-b1fe-882c-0217-74a7db41b913/mzl.gqntmaen.png",
+            "artistViewUrl": "https://itunes.apple.com/us/artist/facebook-inc./id284882218?uo=4",
+            "artistId": 284882218,
+            "artistName": "Facebook, Inc.",
+            "price": 0,
+            "version": "15.0",
+            "description": "Keeping up with friends is faster than ever.\n• See what friends are up to\n• Share updates, photos and videos\n• Get notified when friends like and comment on your posts\n• Text, chat and have group conversations\n• Play games and use your favorite apps\n\nRead our Data Use Policy, Terms and other important info in the legal section of our App Store description.\n\nContinued use of GPS running in the background can dramatically decrease battery life. Facebook doesn’t run GPS in the background unless you give us permission by turning on optional features that require this.",
+            "currency": "USD",
+            "genres": [
+                "Social Networking"
+            ],
+            "genreIds": [
+                "6005"
+            ],
+            "releaseDate": "2008-07-11T07:00:00Z",
+            "sellerName": "Facebook, Inc.",
+            "bundleId": "com.facebook.Facebook",
+            "trackId": 284882215,
+            "trackName": "Facebook",
+            "primaryGenreName": "Social Networking",
+            "primaryGenreId": 6005,
+            "releaseNotes": "Thanks for using Facebook! To make our app better for you, we bring updates to the App Store every 4 weeks. If you have iOS7 or up, you can update the app automatically (without checking back here) by going to Settings > iTunes & App Store > Automatic Downloads and turning on Updates.\n\nEvery update of our Facebook app includes improvements for speed and reliability. As other new features become available, we’ll highlight those for you in the app.",
+            "minimumOsVersion": "7.0",
+            "formattedPrice": "Free",
+            "wrapperType": "software",
+            "trackCensoredName": "Facebook",
+            "languageCodesISO2A": [
+                "NB",
+                "CS",
+                "DA",
+                "NL",
+                "EN",
+                "FI",
+                "FR",
+                "DE",
+                "EL",
+                "ID",
+                "IT",
+                "JA",
+                "KO",
+                "MS",
+                "PL",
+                "PT",
+                "RU",
+                "ZH",
+                "ES",
+                "SV",
+                "TH",
+                "ZH",
+                "TR",
+                "VI",
+                "ZU"
+            ],
+            "fileSizeBytes": "67617695",
+            "sellerUrl": "http://www.facebook.com/mobile",
+            "contentAdvisoryRating": "4+",
+            "averageUserRatingForCurrentVersion": 1.5,
+            "userRatingCountForCurrentVersion": 3328,
+            "artworkUrl100": "http://a1988.phobos.apple.com/us/r30/Purple1/v4/38/df/78/38df78e9-b1fe-882c-0217-74a7db41b913/mzl.gqntmaen.png",
+            "trackViewUrl": "https://itunes.apple.com/us/app/facebook/id284882215?mt=8&uo=4",
+            "trackContentRating": "4+",
+            "averageUserRating": 3.5,
+            "userRatingCount": 2840784
+        }
+    ]
+}

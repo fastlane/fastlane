@@ -1,0 +1,30 @@
+{
+    "creationTimestamp": "2015-08-06T10:55:20Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": "7d14e816-0f2e-42a0-81d1-e4c151d0c369",
+    "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/identifiers/listApplicationGroups.action",
+    "responseId": "4bc3cae3-fad8-4096-b658-1878ba013b2b",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": true,
+    "pageNumber": 1,
+    "pageSize": 500,
+    "totalRecords": 2,
+    "httpResponseHeaders": null,
+    "applicationGroupList": [{
+        "name": "First group",
+        "prefix": "9J57U9392R",
+        "identifier": "group.com.example.one",
+        "status": "current",
+        "applicationGroup": "44V62UZ8L7"
+    }, {
+        "name": "Group II",
+        "prefix": "9J57U9392R",
+        "identifier": "group.com.example.two",
+        "status": "current",
+        "applicationGroup": "2GKKV64NUG"
+    }
+    ]
+}

@@ -1,0 +1,106 @@
+{
+    "data": {
+        "adIdInfo": {
+            "limitsTracking": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": false,
+                "value": null
+            },
+            "sectionErrorKeys": [],
+            "sectionInfoKeys": [],
+            "sectionWarningKeys": [],
+            "servesAds": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": false,
+                "value": null
+            },
+            "tracksAction": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": false,
+                "value": null
+            },
+            "tracksInstall": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": false,
+                "value": null
+            },
+            "usesIdfa": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": true,
+                "value": null
+            }
+        },
+        "contentRights": {
+            "containsThirdPartyContent": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": true,
+                "value": null
+            },
+            "hasRights": {
+                "errorKeys": null,
+                "isEditable": false,
+                "isRequired": false,
+                "value": null
+            }
+        },
+        "exportCompliance": {
+            "appType": "iOS App",
+            "availableOnFrenchStore": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            },
+            "ccatFile": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            },
+            "containsProprietaryCryptography": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            },
+            "containsThirdPartyCryptography": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            },
+            "encryptionUpdated": null,
+            "exportComplianceRequired": true,
+            "isExempt": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            },
+            "platform": "ios",
+            "sectionErrorKeys": [],
+            "sectionInfoKeys": [],
+            "sectionWarningKeys": [],
+            "usesEncryption": {
+                "errorKeys": null,
+                "isEditable": true,
+                "isRequired": false,
+                "value": null
+            }
+        },
+        "previousPurchaseRestrictions": null,
+        "versionInfo": null
+    },
+    "messages": {
+        "error": null,
+        "info": null,
+        "warn": null
+    },
+    "statusCode": "SUCCESS"
+}

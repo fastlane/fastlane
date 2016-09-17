@@ -1,0 +1,110 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "testers": [{
+      "emailAddress": {
+        "value": "detlef@krausefx.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "firstName": {
+        "value": "Detlef",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "lastName": {
+        "value": "Müller",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "testerId": "4bb959dd-6a57-4aaf-b3ff-761041868817",
+      "devices": [],
+      "latestInstalledAppAdamId": null,
+      "latestInstalledVersion": null,
+      "latestInstalledShortVersion": null,
+      "latestInstalledDate": null,
+      "latestInstalledName": null,
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": true,
+      "itcUsername": "detlef@krausefx.com",
+      "groups": null,
+      "userName": "detlef@krausefx.com",
+      "isActive": {
+        "value": true,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    }, {
+      "emailAddress": {
+        "value": "felix@sunapps.net",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "firstName": {
+        "value": "Felix",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "lastName": {
+        "value": "Krause",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 2147483647,
+        "minLength": 0
+      },
+      "testerId": "1d167b89-13c5-4dd8-b988-7a6a0190f774",
+      "devices": [{
+        "model": "iPhone 6",
+        "os": "iOS",
+        "osVersion": "8.3",
+        "name": null
+      }],
+      "latestInstalledAppAdamId": 794902327,
+      "latestInstalledVersion": "0.9.14",
+      "latestInstalledShortVersion": "1",
+      "latestInstalledDate": 1427565638420,
+      "latestInstalledName": "Golfclub Gut Altentann",
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": true,
+      "itcUsername": "felix@sunapps.net",
+      "groups": null,
+      "userName": "felix@sunapps.net",
+      "isActive": {
+        "value": true,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    }],
+    "devices": {
+      "iPhone": ["iPhone 6"]
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

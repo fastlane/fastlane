@@ -1,0 +1,44 @@
+{
+  "certRequestId": "ESF52FQGU6",
+  "statusCode": 4,
+  "statusString": "Issued",
+  "csrPlatform": "ios",
+  "dateRequestedString": "Apr 29, 2015",
+  "dateRequested": "2015-04-29T16:07:11Z",
+  "expirationDate": "2016-04-28T15:57:11Z",
+  "expirationDateString": "Apr 28, 2016",
+  "certificateId": "HG3FQ9M282",
+  "typeString": "APNs Production iOS",
+  "certificateType": {
+    "certificateTypeDisplayId": "UPV3DW712I",
+    "name": "APNs Production iOS",
+    "platform": "ios",
+    "permissionType": "production",
+    "distributionType": "production",
+    "distributionMethod": "push",
+    "ownerType": "bundle",
+    "daysOverlap": 364,
+    "maxActive": 2
+  },
+  "certificate": {
+    "name": null,
+    "certificateId": "HG3FQ9M282",
+    "serialNumber": "7C4B29A2943BACA0",
+    "status": "Issued",
+    "statusCode": 0,
+    "expirationDate": "2016-04-28",
+    "certificatePlatform": "ios",
+    "certificateType": {
+      "certificateTypeDisplayId": "UPV3DW712I",
+      "name": "APNs Production iOS",
+      "platform": "ios",
+      "permissionType": "production",
+      "distributionType": "production",
+      "distributionMethod": "push",
+      "ownerType": "bundle",
+      "daysOverlap": 364,
+      "maxActive": 2
+    },
+    "hasAskKey": false
+  }
+}

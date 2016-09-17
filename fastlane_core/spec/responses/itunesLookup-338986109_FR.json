@@ -1,0 +1,82 @@
+{
+    "resultCount": 1,
+    "results": [
+        {
+            "screenshotUrls": [
+                "http://a5.mzstatic.com/eu/r30/Purple3/v4/59/05/d2/5905d2a8-1786-428a-55d7-83e10a0e280f/screen1136x1136.jpeg",
+                "http://a3.mzstatic.com/eu/r30/Purple1/v4/5d/c0/6b/5dc06b85-6804-5d06-c082-800693ff9a0d/screen1136x1136.jpeg",
+                "http://a2.mzstatic.com/eu/r30/Purple3/v4/15/de/3b/15de3b78-e0df-3bb2-fbd0-607036fbd2dd/screen1136x1136.jpeg",
+                "http://a3.mzstatic.com/eu/r30/Purple5/v4/63/da/18/63da18d7-8afe-846c-e627-32ebf4242975/screen1136x1136.jpeg",
+                "http://a5.mzstatic.com/eu/r30/Purple1/v4/24/8d/7d/248d7dd1-4dcc-e1b3-7634-81eebcdc9076/screen1136x1136.jpeg"
+            ],
+            "ipadScreenshotUrls": [],
+            "artworkUrl512": "http://is3.mzstatic.com/image/thumb/Purple69/v4/0b/28/9d/0b289d7c-7227-175e-814f-ddc69ea63001/mzl.ujaisbyd.png/0x0ss-85.jpg",
+            "artistViewUrl": "https://itunes.apple.com/fr/developer/orange/id286449796?uo=4",
+            "artworkUrl60": "http://is3.mzstatic.com/image/thumb/Purple69/v4/9b/fe/ec/9bfeeca3-be94-8ea1-0e23-13b805fd724f/AppIcon57x57.png/0x0ss-85.jpg",
+            "isGameCenterEnabled": false,
+            "kind": "software",
+            "features": [],
+            "supportedDevices": [
+                "iPhone5",
+                "iPhone5c",
+                "iPhone5s",
+                "iPhone6Plus",
+                "iPad2Wifi",
+                "iPadMini4G",
+                "iPadThirdGen4G",
+                "iPodTouchFifthGen",
+                "iPadThirdGen",
+                "iPadFourthGen",
+                "iPodTouchSixthGen",
+                "iPadFourthGen4G",
+                "iPadMini",
+                "iPhone4",
+                "iPad23G",
+                "iPhone6",
+                "iPhone4S"
+            ],
+            "advisories": [],
+            "languageCodesISO2A": [
+                "EN",
+                "FR"
+            ],
+            "fileSizeBytes": "16438563",
+            "sellerUrl": "http://www.118712.fr/118712-sur-votre-iphone.html",
+            "averageUserRatingForCurrentVersion": 1,
+            "userRatingCountForCurrentVersion": 2,
+            "trackContentRating": "4+",
+            "trackCensoredName": "118 712 annuaire - recherche inverse, pro, particulier",
+            "trackViewUrl": "https://itunes.apple.com/fr/app/118-712-annuaire-recherche/id338986109?mt=8&uo=4",
+            "contentAdvisoryRating": "4+",
+            "artworkUrl100": "http://is3.mzstatic.com/image/thumb/Purple69/v4/0b/28/9d/0b289d7c-7227-175e-814f-ddc69ea63001/mzl.ujaisbyd.png/0x0ss-85.jpg",
+            "currency": "EUR",
+            "wrapperType": "software",
+            "version": "4.2.2",
+            "artistId": 286449796,
+            "artistName": "Orange",
+            "genres": [
+                "Utilitaires",
+                "Style de vie"
+            ],
+            "price": 0,
+            "description": "Vos recherches à proximité en un clic !\n\nAccédez à l'annuaire gratuit 118 712 sur votre iPhone ou votre iPod Touch !\n\nQue vous cherchiez un particulier, un professionnel ou à qui appartient un numéro de téléphone, le 118 712 est l'application la plus complète du marché.\n\nGrâce au système de géolocalisation de votre iPhone, l'application vous permet de trouver, à proximité de l'endroit où vous vous situez ou sur la France entière, les professionnels dont vous avez besoin : restaurant, pharmacie, banque, station-service, ...\n\nAvec ses notes, avis, informations pratiques disponibles pour chacun d’entre eux, l’application devient un vrai guide de sorties.\n\nBien plus qu’un annuaire, l’application 118 712 vous permet de visualiser votre destination sur une carte, de calculer l’itinéraire le plus court pour s’y rendre, et de consulter l’info trafic en temps réel pour ajuster votre trajet.\n\nDes fonctionnalités inédites qui vont vous faciliter la vie :\n\n• Un moteur de recherche de dernière génération qui vous permet de trouver les professionnels et les particuliers à partir de leur localisation, de leur profession ou simplement à partir de leur nom.\n\n• Recevez sur votre iPhone des promotions exclusives ou des messages géo-localisés à proximité des commerces équipés du Beacon d'Orange\n\nMais aussi des indispensables :\n\n• L’accès en un clic à l’ensemble des professionnels lors de vos déplacements\n• La recherche inverse afin de savoir à qui appartient un numéro de téléphone inscrit dans l’annuaire\n• La visualisation des résultats de vos recherches sur un plan, en mode satellite ou en 3D\n• L’appel direct d’un correspondant depuis la liste de résultats\n• L’envoi de votre position à vos proches\n• La sauvegarde des coordonnées dans votre carnet d'adresses et/ou archivage dans vos favoris\n\nL'utilisation prolongée de la localisation GPS peut nuire à la durée de vie de votre batterie.",
+            "genreIds": [
+                "6002",
+                "6012"
+            ],
+            "releaseDate": "2009-11-20T23:00:19Z",
+            "sellerName": "Orange",
+            "bundleId": "com.orange.118712",
+            "releaseNotes": "Correction de bugs mineurs",
+            "trackId": 338986109,
+            "trackName": "118 712 annuaire - recherche inverse, pro, particulier",
+            "primaryGenreName": "Utilities",
+            "primaryGenreId": 6002,
+            "isVppDeviceBasedLicensingEnabled": true,
+            "minimumOsVersion": "7.0",
+            "formattedPrice": "Gratuit",
+            "averageUserRating": 3.5,
+            "userRatingCount": 4118
+        }
+    ]
+}

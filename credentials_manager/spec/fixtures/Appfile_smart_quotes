@@ -1,0 +1,4 @@
+# This file contains "smart quotes" which test our handling of correcting those
+# to be normal quotes
+app_identifier “such.app”
+apple_id ‘appfile@krausefx.com’

@@ -1,0 +1,49 @@
+{
+  "creationTimestamp": "2015-04-29T00:28:48Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/identifiers/addAppId.action",
+  "responseId": "278f3ddc-4ae1-40b0-8b79-a7555a31e879",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "appId": {
+    "appIdId": "7Z947A8XYJ",
+    "name": "Development App",
+    "appIdPlatform": "ios",
+    "prefix": "S56PJTAYEL",
+    "identifier": "tools.fastlane.spaceship.*",
+    "isWildCard": true,
+    "isDuplicate": false,
+    "features": {
+      "push": false,
+      "inAppPurchase": false,
+      "gameCenter": false,
+      "passbook": false,
+      "dataProtection": "",
+      "homeKit": false,
+      "cloudKitVersion": 1,
+      "iCloud": false,
+      "LPLF93JG7M": false,
+      "IAD53UNK2F": false,
+      "V66P55NK2I": false,
+      "SKC3T5S89Y": false,
+      "APG3427HIY": false,
+      "HK421J6T7P": false,
+      "WC421J6T7P": false
+    },
+    "enabledFeatures": [
+
+    ],
+    "isDevPushEnabled": false,
+    "isProdPushEnabled": false,
+    "associatedApplicationGroupsCount": null,
+    "associatedCloudContainersCount": null,
+    "associatedIdentifiersCount": null
+  }
+}

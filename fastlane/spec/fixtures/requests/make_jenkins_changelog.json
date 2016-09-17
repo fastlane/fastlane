@@ -1,0 +1,80 @@
+{
+	"actions": [{
+		"causes": [{
+			"shortDescription": "Started by an SCM change"
+		}]
+	}, {}, {
+		"parameters": [{
+			"name": "JENKINS_PARAM_BUILD_ENV",
+			"value": "Dev"
+		}]
+	}, {}, {
+		"buildsByBranchName": {
+			"refs/remotes/origin/master": {
+				"buildNumber": 26,
+				"buildResult": null,
+				"marked": {
+					"SHA1": "xxxx",
+					"branch": [{
+						"SHA1": "xxxx",
+						"name": "refs/remotes/origin/master"
+					}]
+				},
+				"revision": {
+					"SHA1": "xxxx",
+					"branch": [{
+						"SHA1": "xxxx",
+						"name": "refs/remotes/origin/master"
+					}]
+				}
+			}
+		},
+		"lastBuiltRevision": {
+			"SHA1": "xxxx",
+			"branch": [{
+				"SHA1": "xxxx",
+				"name": "refs/remotes/origin/master"
+			}]
+		},
+		"remoteUrls": ["git@bitbucket.org:xxxx/yyyyy.git"],
+		"scmName": ""
+	}, {}, {}, {}],
+	"artifacts": [],
+	"building": false,
+	"description": null,
+	"duration": 68755,
+	"estimatedDuration": 72381,
+	"executor": null,
+	"fullDisplayName": "xxxx.yyyyy #26",
+	"id": "2016-02-18_17-02-29",
+	"keepLog": false,
+	"number": 26,
+	"result": "SUCCESS",
+	"timestamp": 1455811349544,
+	"url": "http://example.com/job/the.job/26/",
+	"builtOn": "",
+	"changeSet": {
+		"items": [{
+			"affectedPaths": ["fastlane/Fastfile"],
+			"commitId": "xxxx",
+			"timestamp": 1455811343000,
+			"author": {
+				"absoluteUrl": "http://example.com/user/jerome@wewanttoknow.com",
+				"fullName": "Jerome Lacoste"
+			},
+			"comment": "Disable changelog generation from Jenkins until we sort it out\nThis commit has a body",
+			"date": "2016-02-18T17:02:23+0100 +0100",
+			"id": "69d3f6b6c48bd36879bbc8b0c9e7795e2b5aacd4",
+			"msg": "Disable changelog generation from Jenkins until we sort it out",
+			"paths": [{
+				"editType": "edit",
+				"file": "fastlane/Fastfile"
+			}]
+		}],
+		"kind": "git"
+	},
+	"culprits": [{
+		"absoluteUrl": "http://example.com/user/jerome@wewanttoknow.com",
+		"fullName": "Jerome Lacoste"
+	}]
+}
