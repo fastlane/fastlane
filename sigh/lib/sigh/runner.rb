@@ -121,8 +121,8 @@ module Sigh
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert,
-                                      mac: Sigh.config[:platform] == 'macos',
-                             sub_platform: Sigh.config[:platform] == 'tvos' ? 'tvos' : nil)
+                                      mac: Sigh.config[:platform].to_s == 'macos',
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvos' : nil)
       profile
     end
 
