@@ -162,6 +162,7 @@ Download and install the [Provisioning Plugin](https://github.com/chockenberry/P
 It will show you the ```pem``` files like this:
 ![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
+Mac OS X EI Capitan not need to install this Quicklook plugin, it's a built-in feature
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
