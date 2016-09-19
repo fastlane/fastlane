@@ -32,17 +32,30 @@ describe Match do
     end
 
     describe "fill_environment" do
+      it "#environment_variable_name uses the correct env variable" do
+        result = Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app", type: "appstore")
+        expect(result).to eq("sigh_tools.fastlane.app_appstore")
+      end
+
+      it "#environment_variable_name_team_id uses the correct env variable" do
+        result = Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app", type: "appstore")
+        expect(result).to eq("sigh_tools.fastlane.app_appstore_team-id")
+      end
+
+      it "#environment_variable_name_profile_name uses the correct env variable" do
+        result = Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app", type: "appstore")
+        expect(result).to eq("sigh_tools.fastlane.app_appstore_profile-name")
+      end
+
       it "pre-fills the environment" do
-        uuid = "my_uuid #{Time.now.to_i}"
-        values = {
-          app_identifier: "tools.fastlane.app",
-          type: "appstore"
-        }
-        result = Match::Utils.fill_environment(values, uuid)
+        my_key = "my_test_key"
+        uuid = "my_uuid"
+
+        result = Match::Utils.fill_environment(my_key, uuid)
         expect(result).to eq(uuid)
 
         item = ENV.find { |k, v| v == uuid }
-        expect(item[0]).to eq("sigh_tools.fastlane.app_appstore")
+        expect(item[0]).to eq(my_key)
         expect(item[1]).to eq(uuid)
       end
     end
