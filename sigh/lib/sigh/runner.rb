@@ -161,7 +161,7 @@ module Sigh
         UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
         UI.important "Available Code Signing Identities for current filters:"
         certificates.each do |c|
-          str = ["\t- Name:", c.owner_name, "- ID:", c.id + "- Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
           UI.message str.green
         end
       end
