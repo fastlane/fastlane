@@ -331,6 +331,9 @@ module Spaceship
       File.write(itc_service_key_path, @service_key)
 
       return @service_key
+    rescue => ex
+      puts ex.to_s
+      raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
     end
 
     #####################################################
