@@ -30,7 +30,29 @@ module Sigh
         c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
 
         c.action do |args, options|
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
+          user_input = options.__hash__
+
+          # The user might run sigh using
+          #
+          #   sigh development
+          #
+          #   sigh adhoc -u user@krausefx.com
+          #
+          # When the user runs this, it will use :development
+          #
+          #   sigh development --adhoc
+          #
+          case args.first
+          when "development"
+            user_input[:development] = true
+            user_input.delete(:adhoc)
+          when "adhoc"
+            user_input[:adhoc] = true
+            user_input.delete(:development)
+          end
+
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, user_input)
+
           Sigh::Manager.start
         end
       end
