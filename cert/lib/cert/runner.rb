@@ -137,7 +137,8 @@ module Cert
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
         if ex.to_s.include?("You already have a current")
-          UI.user_error!("Could not create another certificate, reached the maximum number of available certificates.", show_github_issues: true)
+          type_name = (Cert.config[:development] ? "Development" : "Distribution")
+          UI.user_error!("Could not create another #{type_name} certificate, reached the maximum number of available #{type_name} certificates.", show_github_issues: true)
         end
 
         raise ex
