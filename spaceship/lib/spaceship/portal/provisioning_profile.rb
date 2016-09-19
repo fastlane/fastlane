@@ -354,6 +354,9 @@ module Spaceship
       # @return (ProvisioningProfile) A new provisioning profile, as
       #  the repair method will generate a profile with a new ID
       def update!
+        # sigh handles more specific filtering and validation steps that make this logic OK
+        #
+        # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
           if mac?
             if self.kind_of? Development
