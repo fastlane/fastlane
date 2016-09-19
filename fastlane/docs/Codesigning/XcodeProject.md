@@ -31,6 +31,16 @@ PROVISIONING_PROFILE_SPECIFIER = "[team_id]/[profile_name]";
 
 You could pass the profile specifier via environment variables too (See Xcode 7 approach below), however in most cases it's enough to define it statically in your project, per target, since usually neither your Team ID, nor the provisioning profile change.
 
+If you want to set it dynamically, you can use sigh or match to fill the environment variables:
+
+```
+#sigh
+PROVISIONING_PROFILE_SPECIFIER = $(FASTLANE_TEAM_ID)/$(SIGH_PROFILE_NAME)
+
+#match
+PROVISIONING_PROFILE_SPECIFIER = $(FASTLANE_TEAM_ID)/$(sigh_[app_identifer]_profile_name_[build_type])
+```
+
 ## Xcode 7 and lower
 
 **Note**: This approach is deprecated with Xcode 8

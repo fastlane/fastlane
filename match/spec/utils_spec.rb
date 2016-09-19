@@ -38,12 +38,31 @@ describe Match do
           app_identifier: "tools.fastlane.app",
           type: "appstore"
         }
-        result = Match::Utils.fill_environment(values, uuid)
+        result = Match::Utils.fill_environment(params: values, uuid: uuid)
         expect(result).to eq(uuid)
 
         item = ENV.find { |k, v| v == uuid }
         expect(item[0]).to eq("sigh_tools.fastlane.app_appstore")
         expect(item[1]).to eq(uuid)
+      end
+
+      it "pre-fills the environment with the provisioning profile name" do
+        uuid = "my_uuid #{Time.now.to_i}"
+        name = "match tools.fastlane.app"
+        values = {
+            app_identifier: "tools.fastlane.app",
+            type: "appstore"
+        }
+        result = Match::Utils.fill_environment(params: values, uuid: uuid, profile_name: name)
+        expect(result).to eq(uuid)
+
+        item = ENV.find { |k, v| v == uuid }
+        expect(item[0]).to eq("sigh_tools.fastlane.app_appstore")
+        expect(item[1]).to eq(uuid)
+
+        item = ENV.find { |k, v| v == name }
+        expect(item[0]).to eq("sigh_tools.fastlane.app_profile_name_appstore")
+        expect(item[1]).to eq(name)
       end
     end
   end

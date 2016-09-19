@@ -36,7 +36,9 @@ module Sigh
 
     def self.install_profile(profile)
       udid = FastlaneCore::ProvisioningProfile.uuid(profile)
+      name = FastlaneCore::ProvisioningProfile.name(profile)
       ENV["SIGH_UDID"] = udid if udid
+      ENV["SIGH_PROFILE_NAME"] = name if name
 
       FastlaneCore::ProvisioningProfile.install(profile)
     end
