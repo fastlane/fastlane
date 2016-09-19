@@ -1,3 +1,3 @@
 # Codesigning
 
-Moved to <a href="/fastlane/docs/Codesigning">Codesigning folder</a>
+Moved to <a href="https://docs.fastlane.tools/codesigning/GettingStarted/">docs.fastlane.tools/codesigning/GettingStarted/</a>
