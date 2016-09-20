@@ -185,19 +185,6 @@ I won't go into too much technical details about the various API endpoints, but 
 - **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
 - **Multiple Spaceship**: You can launch multiple `spaceships` with different Apple accounts to do things like syncing the registered devices.
 
-# Credits
-
-The initial release was sponsored by [ZeroPush](https://zeropush.com).
-
-`spaceship` was developed by
-- [@KrauseFx](https://twitter.com/KrauseFx).
-- [@snatchev](https://twitter.com/snatchev/)
-- [@mathcarignani](https://twitter.com/mathcarignani/)
-
-[Open full list of contributors](https://github.com/fastlane/spaceship/graphs/contributors).
-
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
-
 # Code of Conduct
 Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
