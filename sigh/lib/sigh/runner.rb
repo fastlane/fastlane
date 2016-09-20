@@ -85,6 +85,20 @@ module Sigh
         end
       end
 
+      # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
+      # any more, since it requires an additional request
+      # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
+
+      results = results.find_all do |current_profile|
+        if profile_type == Spaceship.provisioning_profile.ad_hoc
+          current_profile.is_adhoc?
+        elsif profile_type == Spaceship.provisioning_profile.app_store
+          !current_profile.is_adhoc?
+        else
+          true
+        end
+      end
+
       return results if Sigh.config[:skip_certificate_verification]
 
       return results.find_all do |a|
@@ -97,10 +111,10 @@ module Sigh
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
+            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
           end
         end
-        installed
+        installed && a.certificate_valid?
       end
     end
 
