@@ -416,6 +416,7 @@ module Spaceship
       end
 
       private
+
       def fetch_details
         # Since 15th September 2016 certificates and devices are hidden behind another request
         # see https://github.com/fastlane/fastlane/issues/6137 for more information
