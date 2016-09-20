@@ -6,82 +6,84 @@
 //  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
+// This file should be used if your UI Tests are written in Swift 2.3
+
 import Foundation
 import XCTest
 
 var deviceLanguage = ""
 var locale = ""
 
-@available(*, deprecated, message: "use setupSnapshot: instead")
-func setLanguage(_ app: XCUIApplication) {
+@available(*, deprecated, message="use setupSnapshot: instead")
+func setLanguage(app: XCUIApplication) {
     setupSnapshot(app)
 }
 
-func setupSnapshot(_ app: XCUIApplication) {
+func setupSnapshot(app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
+func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
-open class Snapshot: NSObject {
+public class Snapshot: NSObject {
 
-    open class func setupSnapshot(_ app: XCUIApplication) {
+    public class func setupSnapshot(app: XCUIApplication) {
         setLanguage(app)
         setLocale(app)
         setLaunchArguments(app)
     }
 
-    class func setLanguage(_ app: XCUIApplication) {
+    class func setLanguage(app: XCUIApplication) {
         guard let prefix = pathPrefix() else {
             return
         }
 
-        let path = prefix.appendingPathComponent("language.txt")
+        let path = prefix.stringByAppendingPathComponent("language.txt")
 
         do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            deviceLanguage = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue).trimmingCharacters(in: trimCharacterSet) as String
+            let trimCharacterSet = NSCharacterSet.whitespaceAndNewlineCharacterSet()
+            deviceLanguage = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding).stringByTrimmingCharactersInSet(trimCharacterSet) as String
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))"]
         } catch {
             print("Couldn't detect/set language...")
         }
     }
 
-    class func setLocale(_ app: XCUIApplication) {
+    class func setLocale(app: XCUIApplication) {
         guard let prefix = pathPrefix() else {
             return
         }
 
-        let path = prefix.appendingPathComponent("locale.txt")
+        let path = prefix.stringByAppendingPathComponent("locale.txt")
 
         do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            locale = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue).trimmingCharacters(in: trimCharacterSet) as String
+            let trimCharacterSet = NSCharacterSet.whitespaceAndNewlineCharacterSet()
+            locale = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding).stringByTrimmingCharactersInSet(trimCharacterSet) as String
         } catch {
             print("Couldn't detect/set locale...")
         }
         if locale.isEmpty {
-            locale = Locale(identifier: deviceLanguage).identifier
+            locale = NSLocale(localeIdentifier: deviceLanguage).localeIdentifier
         }
         app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
     }
 
-    class func setLaunchArguments(_ app: XCUIApplication) {
+    class func setLaunchArguments(app: XCUIApplication) {
         guard let prefix = pathPrefix() else {
             return
         }
 
-        let path = prefix.appendingPathComponent("snapshot-launch_arguments.txt")
+        let path = prefix.stringByAppendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
-            let launchArguments = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String
+            let launchArguments = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
-            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
+            let matches = regex.matchesInString(launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
             let results = matches.map { result -> String in
-                (launchArguments as NSString).substring(with: result.range)
+                (launchArguments as NSString).substringWithRange(result.range)
             }
             app.launchArguments += results
         } catch {
@@ -89,7 +91,7 @@ open class Snapshot: NSObject {
         }
     }
 
-    open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
+    public class func snapshot(name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
@@ -101,7 +103,7 @@ open class Snapshot: NSObject {
         #if os(tvOS)
             XCUIApplication().childrenMatchingType(.Browser).count
         #else
-            XCUIDevice.shared().orientation = .unknown
+            XCUIDevice.sharedDevice().orientation = .Unknown
         #endif
     }
 
@@ -110,17 +112,17 @@ open class Snapshot: NSObject {
             return;
         #endif
 
-        let query = XCUIApplication().statusBars.children(matching: .other).element(boundBy: 1).children(matching: .other)
+        let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
 
-        while (0..<query.count).map({ query.element(boundBy: $0) }).contains(where: { $0.isLoadingIndicator }) {
+        while (0..<query.count).map({ query.elementBoundByIndex($0) }).contains({ $0.isLoadingIndicator }) {
             sleep(1)
             print("Waiting for loading indicator to disappear...")
         }
     }
 
     class func pathPrefix() -> NSString? {
-        if let path = ProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString? {
-            return path.appendingPathComponent("Library/Caches/tools.fastlane") as NSString?
+        if let path = NSProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString? {
+            return path.stringByAppendingPathComponent("Library/Caches/tools.fastlane")
         }
         print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
         return nil
