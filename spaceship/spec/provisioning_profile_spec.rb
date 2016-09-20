@@ -97,9 +97,9 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#valid?' do
     it "Valid profile" do
-      p = Spaceship::ProvisioningProfile.all.last
-      expect(p).to receive(:certificate_valid?).and_return(true)
-      expect(p.valid?).to eq(true)
+      profile = Spaceship::ProvisioningProfile.all.first
+      profile.status = 'Active'
+      expect(profile.valid?).to eq(true)
     end
 
     it "Invalid profile" do
