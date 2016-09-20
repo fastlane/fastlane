@@ -19,16 +19,22 @@ describe Spaceship::ProvisioningProfile do
       expect(profile.expires.to_s).to eq('2015-11-25T22:45:50+00:00')
       expect(profile.uuid).to eq('a8b1563e-7559-41f7-854b-6cd09f950d11')
       expect(profile.managed_by_xcode?).to eq(false)
-      expect(profile.distribution_method).to eq('adhoc')
-      expect(profile.class.type).to eq('adhoc')
-      expect(profile.class.pretty_type).to eq('AdHoc')
+      expect(profile.distribution_method).to eq('store')
+      expect(profile.class.type).to eq('store')
+      expect(profile.class.pretty_type).to eq('AppStore')
       expect(profile.type).to eq('iOS Distribution')
     end
 
     it 'should filter by the correct types' do
       expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(1)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(2)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(2)
+    end
+
+    it "AppStore and AdHoc are the same" do
+      Spaceship::ProvisioningProfile::AdHoc.all.each do |adhoc|
+        expect(Spaceship::ProvisioningProfile::AppStore.all.find_all { |a| a.id == adhoc.id }.count).to eq(1)
+      end
     end
 
     it 'should have an app' do
@@ -49,7 +55,6 @@ describe Spaceship::ProvisioningProfile do
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.7')
       expect(profiles.first.distribution_method).to eq('store')
-      expect(profiles.last.distribution_method).to eq('adhoc')
     end
   end
 
@@ -62,10 +67,10 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
-  it "updates the distribution method to adhoc if devices are enabled" do
-    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
+  it "distribution_method stays app store, even though it's an AdHoc profile which contains devices" do
+    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.find(&:is_adhoc?)
 
-    expect(adhoc.distribution_method).to eq('adhoc')
+    expect(adhoc.distribution_method).to eq('store')
     expect(adhoc.devices.count).to eq(2)
 
     device = adhoc.devices.first
@@ -97,8 +102,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#valid?' do
     it "Valid profile" do
-      p = Spaceship::ProvisioningProfile.all.last
-      expect(p).to receive(:certificate_valid?).and_return(true)
+      p = Spaceship::ProvisioningProfile.all.first
       expect(p.valid?).to eq(true)
     end
 
