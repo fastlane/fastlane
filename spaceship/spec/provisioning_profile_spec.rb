@@ -194,4 +194,34 @@ describe Spaceship::ProvisioningProfile do
       profile.update!
     end
   end
+
+  describe "#is_adhoc?" do
+    it "returns true when the profile is adhoc" do
+      profile = Spaceship::ProvisioningProfile::AdHoc.new
+      expect(profile).to receive(:devices).and_return(["device"])
+      expect(profile.is_adhoc?).to eq(true)
+    end
+
+    it "returns true when the profile is appstore with devices" do
+      profile = Spaceship::ProvisioningProfile::AppStore.new
+      expect(profile).to receive(:devices).and_return(["device"])
+      expect(profile.is_adhoc?).to eq(true)
+    end
+
+    it "returns false when the profile is appstore with no devices" do
+      profile = Spaceship::ProvisioningProfile::AppStore.new
+      expect(profile).to receive(:devices).and_return([])
+      expect(profile.is_adhoc?).to eq(false)
+    end
+
+    it "returns false when the profile is development" do
+      profile = Spaceship::ProvisioningProfile::Development.new
+      expect(profile.is_adhoc?).to eq(false)
+    end
+
+    it "returns false when the profile is inhouse" do
+      profile = Spaceship::ProvisioningProfile::InHouse.new
+      expect(profile.is_adhoc?).to eq(false)
+    end
+  end
 end

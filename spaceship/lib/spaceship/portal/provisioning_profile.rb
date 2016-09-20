@@ -381,8 +381,9 @@ module Spaceship
       end
 
       # @return (Bool) Is the current provisioning profile valid?
+      #                To also verify the certificate call certificate_valid?
       def valid?
-        return (status == 'Active' and certificate_valid?)
+        return status == 'Active'
       end
 
       # @return (Bool) Is this profile managed by Xcode?
@@ -413,6 +414,14 @@ module Spaceship
         end if (@certificates || []).empty?
 
         return @certificates
+      end
+
+      # @return (Bool) Is this current provisioning profile adhoc?
+      #                AppStore and AdHoc profiles are the same except that AdHoc has devices
+      def is_adhoc?
+        return false unless self.kind_of?(AppStore) || self.kind_of?(AdHoc)
+
+        return devices.count > 0
       end
 
       private
