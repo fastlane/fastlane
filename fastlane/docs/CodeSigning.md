@@ -1,3 +1,3 @@
 # Codesigning
 
-Moved to <a href="https://docs.fastlane.tools/codesigning/GettingStarted/">docs.fastlane.tools/codesigning/GettingStarted/</a>
+Moved to [docs.fastlane.tools](https://docs.fastlane.tools/codesigning/GettingStarted/)
