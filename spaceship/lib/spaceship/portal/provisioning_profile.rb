@@ -152,22 +152,12 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
-          profile_details = client.provisioning_profile_details(provisioning_profile_id: attrs["provisioningProfileId"])
-
-          # The only difference between App Store and Ad Hoc provisioniong profile is the devices that are attached
-          if attrs['distributionMethod'] == 'store' && (profile_details['devices'] || []).size > 0
-            attrs['distributionMethod'] = 'adhoc'
-          end
           # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
-
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
                   when 'store'
                     AppStore
-                  when 'adhoc'
-                    AdHoc
                   when 'inhouse'
                     InHouse
                   else
@@ -179,23 +169,6 @@ module Spaceship
 
           klass.client = @client
           obj = klass.new(attrs)
-
-          # Set the response of the details request, in case we want to access it later on
-          obj.profile_details = profile_details
-
-          # Since 15th September 2016 certificates and devices are hidden behind another request
-          # see https://github.com/fastlane/fastlane/issues/6137 for more information
-          # That's why we set it here
-
-          # Parse all the devices from the details request
-          obj.devices = (profile_details["devices"] || []).collect do |device|
-            Device.set_client(client).factory(device)
-          end
-
-          # Parse all the certificates from the details request
-          obj.certificates = (profile_details["certificates"] || []).collect do |cert|
-            Certificate.set_client(client).factory(cert)
-          end
 
           return obj
         end
@@ -420,6 +393,33 @@ module Spaceship
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
+      end
+
+      def devices
+        fetch_details
+
+        @devices = (self.profile_details["devices"] || []).collect do |device|
+          Device.set_client(client).factory(device)
+        end if (@devices || []).empty?
+
+        @devices
+      end
+
+      def certificates
+        fetch_details
+
+        @certificates = (profile_details["certificates"] || []).collect do |cert|
+          Certificate.set_client(client).factory(cert)
+        end if (@certificates || []).empty?
+
+        return @certificates
+      end
+
+      private
+      def fetch_details
+        # Since 15th September 2016 certificates and devices are hidden behind another request
+        # see https://github.com/fastlane/fastlane/issues/6137 for more information
+        self.profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id)
       end
     end
   end
