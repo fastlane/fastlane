@@ -116,7 +116,6 @@ module Spaceship
         if ENV['DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.response :logger
           c.proxy "https://127.0.0.1:8888"
         end
       end
