@@ -146,17 +146,29 @@ Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx
 # Get all available provisioning profiles
 profiles = Spaceship.provisioning_profile.all
 
-# Get all App Store profiles
-profiles_appstore = Spaceship.provisioning_profile.app_store.all
+# Get all App Store and Ad Hoc profiles
+# Both app_store.all and ad_hoc.all return the same
+# This is the case since September 2016, since the API has changed
+# and there is no fast way to get the type when fetching the profiles
+profiles_appstore_adhoc = Spaceship.provisioning_profile.app_store.all
+profiles_appstore_adhoc = Spaceship.provisioning_profile.ad_hoc.all
 
-# Get all AdHoc profiles
-profiles_adhoc = Spaceship.provisioning_profile.ad_hoc.all
+# To distinguish between App Store and Ad Hoc profiles use
+adhoc_only = profiles_appstore_adhoc.find_all do |current_profile|
+  current_profile.is_adhoc?
+end
 
 # Get all Development profiles
 profiles_dev = Spaceship.provisioning_profile.development.all
 
 # Fetch all profiles for a specific app identifier for the App Store
 filtered_profiles = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
+
+# Check if a provisioning profile is valid
+profile.valid?
+
+# Verify that the certificate of the provisioning profile is valid
+profile.certificate_valid?
 
 ##### Downloading #####
 
@@ -193,7 +205,7 @@ File.write("NewProfile.mobileprovision", profile.download)
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
 broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile|
-  # the below could be replaced with `!profile.valid?`, which takes longer but also verifies the code signing identity
+  # the below could be replaced with `!profile.valid? || !profile.certificate_valid?`, which takes longer but also verifies the code signing identity
   (profile.status == "Invalid" or profile.status == "Expired")
 end
 
@@ -203,7 +215,7 @@ broken_profiles.each do |profile|
 end
 
 # or to do the same thing, just more Ruby like
-Spaceship.provisioning_profile.all.find_all { |p| !p.valid? }.map(&:repair!)
+Spaceship.provisioning_profile.all.find_all { |p| !p.valid? || !p.certificate_valid? }.map(&:repair!)
 ```
 
 ## Devices
