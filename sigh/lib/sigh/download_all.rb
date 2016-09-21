@@ -19,7 +19,11 @@ module Sigh
 
     def download_profile(profile)
       FileUtils.mkdir_p(Sigh.config[:output_path])
-      profile_name = "#{profile.class.pretty_type}_#{profile.app.bundle_id}.mobileprovision" # default name
+
+      type_name = profile.class.pretty_type
+      type_name = "AdHoc" if profile.is_adhoc?
+
+      profile_name = "#{type_name}_#{profile.app.bundle_id}.mobileprovision" # default name
 
       output_path = File.join(Sigh.config[:output_path], profile_name)
       File.open(output_path, "wb") do |f|
