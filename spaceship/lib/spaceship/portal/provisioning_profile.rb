@@ -314,7 +314,7 @@ module Spaceship
           'inhouse'
         end
       end
-      
+
       # Represents a Mac Developer ID profile from the Dev Portal
       class Direct < ProvisioningProfile
         def self.type
