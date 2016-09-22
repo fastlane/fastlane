@@ -14,9 +14,11 @@ module Fastlane
 
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
-      Fastlane.plugin_manager.load_plugins
-      # *after* loading the plugins
-      Fastlane::PluginUpdateManager.start_looking_for_updates
+      unless ARGV.include?("env")
+        # *after* loading the plugins
+        Fastlane.plugin_manager.load_plugins
+        Fastlane::PluginUpdateManager.start_looking_for_updates
+      end
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -237,6 +239,15 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.print
         end
       end
 
