@@ -223,7 +223,7 @@ clear_derived_data
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
+You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/).
 
 ```ruby
 ipa(
@@ -255,7 +255,7 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning) before using this action.
+You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/) before using this action.
 
 Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
@@ -440,7 +440,7 @@ import_certificate(
 
 **Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead.
 
-Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
+Make sure to also read the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
