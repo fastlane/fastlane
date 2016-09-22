@@ -232,10 +232,9 @@ end
 
 def itc_stub_create_sandbox_tester
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap/add").
-    with(itc_read_fixture_file("create_sandbox_tester_payload.json"))
+    with(body: JSON.parse(itc_read_fixture_file("create_sandbox_tester_payload.json"))).
     to_return(status: 200, body: itc_read_fixture_file("create_sandbox_tester.json"),
               headers: { "Content-Type" => "application/json" })
-    # TODO figure out the min set of params needed
 end
 
 def itc_stub_pricing_tiers

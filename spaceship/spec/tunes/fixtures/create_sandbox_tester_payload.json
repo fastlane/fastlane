@@ -1,11 +1,7 @@
 {
   "user": {
-    "birthDay": {
-      "value": 2
-    },
-    "sandboxAccount": null,
-    "firstName": {
-      "value": "Steve"
+    "emailAddress": {
+      "value": "test2@test.com"
     },
     "password": {
       "value": "Passwordtest1"
@@ -13,23 +9,27 @@
     "confirmPassword": {
       "value": "Passwordtest1"
     },
-    "emailAddress": {
-      "value": "test2@test.com"
+    "firstName": {
+      "value": "Steve"
     },
-    "secretQuestion": {
-      "value": "secret_question"
+    "lastName": {
+      "value": "Brule"
     },
     "storeFront": {
       "value": "US"
     },
-    "secretAnswer": {
-      "value": "secret_answer"
+    "birthDay": {
+      "value": 1
     },
     "birthMonth": {
       "value": 1
     },
-    "lastName": {
-      "value": "Brule"
-    }
+    "secretQuestion": {
+      "value": "secret_question"
+    },
+    "secretAnswer": {
+      "value": "secret_answer"
+    },
+    "sandboxAccount": null
   }
 }
