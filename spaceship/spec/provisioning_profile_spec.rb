@@ -118,7 +118,7 @@ describe Spaceship::ProvisioningProfile do
       fake_app_info = {}
       expected_profile = "expected_profile"
       expect(Spaceship::ProvisioningProfile::Direct).to receive(:new).and_return(expected_profile)
-      profile = Spaceship::ProvisioningProfile.factory({'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'direct'})
+      profile = Spaceship::ProvisioningProfile.factory({ 'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'direct' })
       expect(profile).to eq(expected_profile)
     end
   end
@@ -184,7 +184,6 @@ describe Spaceship::ProvisioningProfile do
         Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
       end
     end
-
   end
 
   describe "#delete" do
