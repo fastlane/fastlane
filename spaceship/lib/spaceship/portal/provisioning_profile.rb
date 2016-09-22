@@ -440,7 +440,7 @@ module Spaceship
       def fetch_details
         # Since 15th September 2016 certificates and devices are hidden behind another request
         # see https://github.com/fastlane/fastlane/issues/6137 for more information
-        self.profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id)
+        self.profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
       end
     end
   end
