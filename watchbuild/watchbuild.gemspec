@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.43.1', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '>= 0.26.2', '< 1.0.0' # communication with Apple
+  spec.add_dependency 'fastlane_core', '>= 0.52.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'spaceship', '>= 0.32.1', '< 1.0.0' # communication with Apple
   spec.add_dependency 'terminal-notifier' # show a notification once the build is ready
 
   # Development only

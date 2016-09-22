@@ -60,6 +60,48 @@
     },
     "appIdId": "2UMR2S6P4L",
     "deviceCount": 13,
+    "certificates": [{
+      "name": "iOS Development: Felix Krause",
+      "displayName": null,
+      "certificateId": "3BH4JJSWM4",
+      "serialNumber": "76CE84A447D2E388",
+      "status": "Issued",
+      "statusCode": 0,
+      "expirationDate": "2017-09-15",
+      "expirationDateString": "Sep 15, 2017",
+      "certificatePlatform": "ios",
+      "certificateType": {
+        "certificateTypeDisplayId": "5QPB9NHCEI",
+        "name": "iOS Development",
+        "platform": "ios",
+        "permissionType": "development",
+        "distributionType": "development",
+        "distributionMethod": "app",
+        "ownerType": "teamMember",
+        "daysOverlap": 364,
+        "maxActive": 1
+      },
+      "hasAskKey": false
+    }],
+    "devices": [{
+      "deviceId": "FVRY7XH22J",
+      "name": "Felix Krause's iPhone 6s",
+      "deviceNumber": "aaabbbccccddddaaabbb",
+      "devicePlatform": "ios",
+      "status": "c",
+      "deviceClass": "iphone",
+      "model": "iPhone 6s"
+    }, {
+      "deviceId": "4ZE252U553",
+      "name": "Felix Krause's iPad",
+      "deviceNumber": "aaabbbceeccddddaaabbb",
+      "devicePlatform": "ios",
+      "status": "c",
+      "deviceClass": "ipad",
+      "model": "iPad Air (Model A1475)"
+    }],
+    "deviceIds": ["FVRY7XH22J", "4ZE252U553"],
+    "certificateIds": ["3BH4JJSWM4"],
     "certificateCount": 1,
     "UUID": "cc4d542e-1ee6-445f-967f-f19aea167e7a"
   }

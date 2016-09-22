@@ -12,7 +12,7 @@ module Fastlane
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship::Tunes.login(credentials.user, credentials.password)
-        ENV["FASTLANE_TEAM_ID"] = params[:team_id]
+        ENV["FASTLANE_ITC_TEAM_ID"] = params[:team_id]
         Spaceship::Tunes.select_team
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
 
@@ -84,7 +84,7 @@ module Fastlane
                                        default_value: 1,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       env_name: "FASTLANE_TEAM_ID",
+                                       env_name: "FASTLANE_ITC_TEAM_ID",
                                        description: "Your team ID if you're in multiple teams",
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        optional: true)
