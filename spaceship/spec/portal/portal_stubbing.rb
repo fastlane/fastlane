@@ -39,6 +39,10 @@ def adp_stub_provisioning
 
   # Download profiles
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+    with(:body => {"provisioningProfileId"=>true, "teamId"=>"XXXXXXXXXX"}).
+    to_return(:status => 200, :body => "", :headers => {})
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
     with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
     to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -148,6 +152,10 @@ def adp_stub_apps
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action').
     with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
     to_return(status: 200, body: adp_read_fixture_file('listApps.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listAppIds.action").
+    with(:body => {"pageNumber"=>"1", "pageSize"=>"500", "sort"=>"name=asc", "teamId"=>"XXXXXXXXXX"}).
+    to_return(:status => 200, :body => adp_read_fixture_file('listAppsMac.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/getAppIdDetail.action").
     with(body: { appIdId: "B7JBD8LHAA", teamId: "XXXXXXXXXX" }).

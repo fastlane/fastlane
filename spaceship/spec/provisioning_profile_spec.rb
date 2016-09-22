@@ -60,7 +60,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#class.type' do
     it "Returns only valid profile types" do
-      valid = %w(limited adhoc store)
+      valid = %w(limited adhoc store direct)
       Spaceship::ProvisioningProfile.all.each do |profile|
         expect(valid).to include(profile.class.type)
       end
@@ -113,6 +113,16 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
+  describe '#factory' do
+    it 'creates a Direct profile type for distributionMethod "direct"' do
+      fake_app_info = {}
+      expected_profile = "expected_profile"
+      expect(Spaceship::ProvisioningProfile::Direct).to receive(:new).and_return(expected_profile)
+      profile = Spaceship::ProvisioningProfile.factory({'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'direct'})
+      expect(profile).to eq(expected_profile)
+    end
+  end
+
   describe '#create!' do
     let(:certificate) { Spaceship::Certificate.all.first }
 
@@ -144,6 +154,37 @@ describe Spaceship::ProvisioningProfile do
         Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'notExisting', certificate: certificate)
       end.to raise_error "Could not find app with bundle id 'notExisting'"
     end
+
+    describe 'modify devices to prevent having devices on profile types where it does not make sense' do
+      it 'Direct (Mac) profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = []
+        expect(Spaceship::ProvisioningProfile::Direct.client).to receive(:create_provisioning_profile!).with('Delete Me', 'direct', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: true, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::Direct.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, mac: true, devices: fake_devices)
+      end
+
+      it 'Development profile types have devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = fake_devices.collect(&:id)
+        expect(Spaceship::ProvisioningProfile::Development.client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
+
+      it 'AdHoc profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = fake_devices.collect(&:id)
+        expect(Spaceship::ProvisioningProfile::AdHoc.client).to receive(:create_provisioning_profile!).with('Delete Me', 'adhoc', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::AdHoc.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
+
+      it 'AppStore profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = []
+        expect(Spaceship::ProvisioningProfile::AppStore.client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
+    end
+
   end
 
   describe "#delete" do
