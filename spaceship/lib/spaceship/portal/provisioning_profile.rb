@@ -29,6 +29,8 @@ module Spaceship
       #     "adhoc"
       # @example Development Profile
       #     "limited"
+      # @example Mac Developer ID Profile
+      #     "direct"
       attr_accessor :distribution_method
 
       # @return (String) The name of this profile
@@ -152,7 +154,7 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
+          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
@@ -160,6 +162,8 @@ module Spaceship
                     AppStore
                   when 'inhouse'
                     InHouse
+                  when 'direct'
+                    Direct # Mac-only
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
@@ -205,7 +209,10 @@ module Spaceship
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          devices = [] if self == AppStore || self == InHouse # App Store Profiles MUST NOT have devices
+          if self == AppStore || self == InHouse || self == Direct
+            # Distribution Profiles MUST NOT have devices
+            devices = []
+          end
 
           certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]
@@ -308,6 +315,13 @@ module Spaceship
         end
       end
 
+      # Represents a Mac Developer ID profile from the Dev Portal
+      class Direct < ProvisioningProfile
+        def self.type
+          'direct'
+        end
+      end
+
       # Download the current provisioning profile. This will *not* store
       # the provisioning profile on the file system. Instead this method
       # will return the content of the profile.
@@ -345,6 +359,8 @@ module Spaceship
           if mac?
             if self.kind_of? Development
               self.certificates = [Spaceship::Certificate::MacDevelopment.all.first]
+            elsif self.kind_of? Direct
+              self.certificates = [Spaceship::Certificate::DeveloperIDApplication.all.first]
             else
               self.certificates = [Spaceship::Certificate::MacAppDistribution.all.first]
             end
