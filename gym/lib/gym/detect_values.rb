@@ -33,6 +33,8 @@ module Gym
     # Helper Methods
 
     def self.detect_provisioning_profile
+      return unless Gym.config[:use_legacy_build_api]
+
       unless Gym.config[:provisioning_profile_path]
         Dir.chdir(File.expand_path("..", Gym.project.path)) do
           profiles = Dir["*.mobileprovision"]
