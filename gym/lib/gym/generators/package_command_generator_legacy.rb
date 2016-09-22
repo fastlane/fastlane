@@ -96,10 +96,6 @@ module Gym
         if Gym.config[:export_method].to_s.length > 0
           UI.important "Legacy build api is enabled, the `export_method` value will be ignored"
         end
-
-        if Gym.config[:toolchain].to_s.length > 0
-          UI.important "Legacy build api is enabled, the `toolchain` value will be ignored"
-        end
       end
     end
   end
