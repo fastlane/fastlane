@@ -826,7 +826,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def create_sandbox_tester!(tester_class:, email:, password:, first_name:, last_name:, country:)
+    def create_sandbox_tester!(tester_class: nil, email: nil, password: nil, first_name: nil, last_name: nil, country: nil)
       url = tester_class.url[:create]
       r = request(:post) do |req|
         req.url url
@@ -842,8 +842,8 @@ module Spaceship
             birthMonth: { value: 1 },
             secretQuestion: { value: 'secret_question' },
             secretAnswer: { value: 'secret_answer' },
-            sandboxAccount: nil,
-          },
+            sandboxAccount: nil
+          }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end

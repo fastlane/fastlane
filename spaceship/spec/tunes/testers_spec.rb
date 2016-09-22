@@ -84,13 +84,13 @@ describe Spaceship::Tunes::Tester do
       expect(t.country).to eq("GB")
     end
 
-    it 'creates sandbox testers correctly', now: true do
+    it 'creates sandbox testers correctly' do
       t = Spaceship::Tunes::SandboxTester.create!(
         email: 'test2@test.com',
         password: 'Passwordtest1',
         country: 'US',
         first_name: 'Steve',
-        last_name: 'Brule',
+        last_name: 'Brule'
       )
       expect(t.class).to eq(Spaceship::Tunes::SandboxTester)
 

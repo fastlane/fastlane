@@ -208,19 +208,19 @@ module Spaceship
       # @return (String) The two-letter country code of this tester
       # @example
       #   "US"
-      attr_accessor :country      
+      attr_accessor :country
 
       attr_mapping(
         'emailAddress.value' => :email,
         'firstName.value' => :first_name,
         'lastName.value' => :last_name,
-        'storeFront.value' => :country,
+        'storeFront.value' => :country
       )
 
       def self.url
         {
           index:  "ra/users/iap",
-          create: "ra/users/iap/add",
+          create: "ra/users/iap/add"
         }
       end
 
@@ -228,7 +228,7 @@ module Spaceship
         client.sandbox_testers(self).map { |tester| self.new(tester) }
       end
 
-      def self.create!(email:, password:, first_name: 'Test', last_name: 'Test', country: 'US')
+      def self.create!(email: nil, password: nil, first_name: 'Test', last_name: 'Test', country: 'US')
         data = client.create_sandbox_tester!(
           tester_class: self,
           email: email,
