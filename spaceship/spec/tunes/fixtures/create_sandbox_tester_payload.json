@@ -1,0 +1,35 @@
+{
+  "user": {
+    "birthDay": {
+      "value": 2
+    },
+    "sandboxAccount": null,
+    "firstName": {
+      "value": "Steve"
+    },
+    "password": {
+      "value": "Passwordtest1"
+    },
+    "confirmPassword": {
+      "value": "Passwordtest1"
+    },
+    "emailAddress": {
+      "value": "test2@test.com"
+    },
+    "secretQuestion": {
+      "value": "secret_question"
+    },
+    "storeFront": {
+      "value": "US"
+    },
+    "secretAnswer": {
+      "value": "secret_answer"
+    },
+    "birthMonth": {
+      "value": 1
+    },
+    "lastName": {
+      "value": "Brule"
+    }
+  }
+}
