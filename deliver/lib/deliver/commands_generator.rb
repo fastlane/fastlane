@@ -63,7 +63,7 @@ module Deliver
         c.description = 'Create the initial `deliver` configuration based on an existing app'
         c.action do |args, options|
           if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
-            UI.important("You already got a running deliver setup in this directory")
+            UI.important("You already have a running deliver setup in this directory")
             return 0
           end
 
