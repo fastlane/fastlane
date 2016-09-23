@@ -1,101 +1,101 @@
 module Fastlane
-    module Actions
-        class SonarAction < Action
-            def self.run(params)
-            verify_sonar_scanner_binary
-            
-            command_prefix = [
-            'cd',
-            File.expand_path('.').shellescape,
-            '&&'
-            ].join(' ')
-            
-            sonar_scanner_args = []
-            sonar_scanner_args << "-Dproject.settings=\"#{params[:project_configuration_path]}\"" if params[:project_configuration_path]
-            sonar_scanner_args << "-Dsonar.projectKey=\"#{params[:project_key]}\"" if params[:project_key]
-            sonar_scanner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
-            sonar_scanner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
-            sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
-            sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
-            sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
-            sonar_scanner_args << params[:sonar_scanner_args] if params[:sonar_scanner_args]
-            
-            command = [
-            command_prefix,
-            'sonar-scanner',
-            sonar_scanner_args
-            ].join(' ')
-            
-            Action.sh command
-        end
-        
-        def self.verify_sonar_scanner_binary
+  module Actions
+    class SonarAction < Action
+      def self.run(params)
+        verify_sonar_scanner_binary
+
+        command_prefix = [
+          'cd',
+          File.expand_path('.').shellescape,
+          '&&'
+        ].join(' ')
+
+        sonar_scanner_args = []
+        sonar_scanner_args << "-Dproject.settings=\"#{params[:project_configuration_path]}\"" if params[:project_configuration_path]
+        sonar_scanner_args << "-Dsonar.projectKey=\"#{params[:project_key]}\"" if params[:project_key]
+        sonar_scanner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
+        sonar_scanner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
+        sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
+        sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
+        sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
+        sonar_scanner_args << params[:sonar_scanner_args] if params[:sonar_scanner_args]
+
+        command = [
+          command_prefix,
+          'sonar-scanner',
+          sonar_scanner_args
+        ].join(' ')
+
+        Action.sh command
+      end
+
+      def self.verify_sonar_scanner_binary
         UI.user_error!("You have to install sonar-scanner using `brew install sonar-runner`") unless `which sonar-scanner`.to_s.length > 0
+      end
+
+      #####################################################
+      # @!group Documentation
+      #####################################################
+
+      def self.description
+        "Invokes sonar-scanner to programmatically run SonarQube analysis"
+      end
+
+      def self.details
+        "See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner for details."
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :project_configuration_path,
+                                        env_name: "FL_SONAR_SCANNER_PROPERTIES_PATH",
+                                        description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", # default is enforced by sonar-scanner binary
+                                        optional: true,
+                                        verify_block: proc do |value|
+                                          UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? or File.exist?(value)
+                                        end),
+          FastlaneCore::ConfigItem.new(key: :project_key,
+                                       env_name: "FL_SONAR_SCANNER_PROJECT_KEY",
+                                       description: "The key sonar uses to identify the project, e.g. `name.gretzki.awesomeApp`. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_name,
+                                       env_name: "FL_SONAR_SCANNER_PROJECT_NAME",
+                                       description: "The name of the project that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_version,
+                                       env_name: "FL_SONAR_SCANNER_PROJECT_VERSION",
+                                       description: "The project's version that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sources_path,
+                                       env_name: "FL_SONAR_SCANNER_SOURCES_PATH",
+                                       description: "Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_language,
+                                       env_name: "FL_SONAR_SCANNER_PROJECT_LANGUAGE",
+                                       description: "Language key, e.g. objc",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :source_encoding,
+                                       env_name: "FL_SONAR_SCANNER_SOURCE_ENCODING",
+                                       description: "Used encoding of source files, e.g., UTF-8",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_scanner_args,
+                                       env_name: "FL_SONAR_SCANNER_ARGS",
+                                       description: "Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_SCANNER_ARGS=\"-Dsonar.verbose=true\"",
+                                       optional: true)
+        ]
+      end
+
+      def self.return_value
+        "The exit code of the sonar-scanner binary"
+      end
+
+      def self.authors
+        ["c_gretzki"]
+      end
+
+      def self.is_supported?(platform)
+        true
+      end
     end
-    
-    #####################################################
-    # @!group Documentation
-    #####################################################
-    
-    def self.description
-    "Invokes sonar-scanner to programmatically run SonarQube analysis"
-end
-
-def self.details
-"See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner for details."
-end
-
-def self.available_options
-[
-FastlaneCore::ConfigItem.new(key: :project_configuration_path,
-                             env_name: "FL_SONAR_SCANNER_PROPERTIES_PATH",
-                             description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", # default is enforced by sonar-scanner binary
-                             optional: true,
-                             verify_block: proc do |value|
-                             UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? or File.exist?(value)
-                             end),
-FastlaneCore::ConfigItem.new(key: :project_key,
-                             env_name: "FL_SONAR_SCANNER_PROJECT_KEY",
-                             description: "The key sonar uses to identify the project, e.g. `name.gretzki.awesomeApp`. Must either be specified here or inside the sonar project configuration file",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :project_name,
-                             env_name: "FL_SONAR_SCANNER_PROJECT_NAME",
-                             description: "The name of the project that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :project_version,
-                             env_name: "FL_SONAR_SCANNER_PROJECT_VERSION",
-                             description: "The project's version that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :sources_path,
-                             env_name: "FL_SONAR_SCANNER_SOURCES_PATH",
-                             description: "Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :project_language,
-                             env_name: "FL_SONAR_SCANNER_PROJECT_LANGUAGE",
-                             description: "Language key, e.g. objc",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :source_encoding,
-                             env_name: "FL_SONAR_SCANNER_SOURCE_ENCODING",
-                             description: "Used encoding of source files, e.g., UTF-8",
-                             optional: true),
-FastlaneCore::ConfigItem.new(key: :sonar_scanner_args,
-                             env_name: "FL_SONAR_SCANNER_ARGS",
-                             description: "Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_SCANNER_ARGS=\"-Dsonar.verbose=true\"",
-                             optional: true)
-]
-end
-
-def self.return_value
-"The exit code of the sonar-scanner binary"
-end
-
-def self.authors
-["c_gretzki"]
-end
-
-def self.is_supported?(platform)
-true
-end
-end
-end
+  end
 end
