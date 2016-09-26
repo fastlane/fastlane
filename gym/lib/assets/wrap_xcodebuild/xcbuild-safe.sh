@@ -49,6 +49,11 @@ if which rbenv > /dev/null; then
   unset GEM_PATH
 fi
 
+if type -t chruby > /dev/null; then
+  echo "chruby detected, forcing to use system ruby"
+  chruby system
+fi
+
 # to help troubleshooting
 # env | sort > /tmp/env.wrapper
 # rvm info >> /tmp/env.wrapper
