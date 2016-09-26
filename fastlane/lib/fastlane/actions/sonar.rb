@@ -78,7 +78,7 @@ module Fastlane
                                        env_name: "FL_SONAR_RUNNER_SOURCE_ENCODING",
                                        description: "Used encoding of source files, e.g., UTF-8",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :sonar_scanner_args,
+          FastlaneCore::ConfigItem.new(key: :sonar_runner_args,
                                        env_name: "FL_SONAR_RUNNER_ARGS",
                                        description: "Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS=\"-Dsonar.verbose=true\"",
                                        optional: true)
