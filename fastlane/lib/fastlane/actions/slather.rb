@@ -230,7 +230,6 @@ Slather is available at https://github.com/SlatherOrg/slather
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["mattdelves"]
       end
 

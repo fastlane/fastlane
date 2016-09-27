@@ -102,6 +102,10 @@ module Fastlane
         'Upload a new build to TestFairy'
       end
 
+      def self.details
+        "You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)"
+      end
+
       def self.available_options
         [
           # required
@@ -172,6 +176,20 @@ module Fastlane
                                        description: "Array of options (shake,video_only_wifi,anonymous)",
                                        default_value: [])
         ]
+      end
+
+      def self.example_code
+        [
+          'testfairy(
+            api_key: "...",
+            ipa: "./ipa_file.ipa",
+            comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
 
       def self.output

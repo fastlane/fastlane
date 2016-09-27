@@ -61,6 +61,10 @@ module Fastlane
         "Upload a new build to Tryouts"
       end
 
+      def self.details
+        "More information http://tryouts.readthedocs.org/en/latest/releases.html#create-release"
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :app_id,
@@ -109,6 +113,20 @@ module Fastlane
                                      is_string: false,
                                      default_value: 2)
         ]
+      end
+
+      def self.example_code
+        [
+          'tryouts(
+            api_token: "...",
+            app_id: "application-id",
+            build_file: "test.ipa",
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.output

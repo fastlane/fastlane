@@ -45,16 +45,24 @@ module Fastlane
       end
 
       def self.return_value
-        # If you method provides a return value, you can describe here what it does
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["KrauseFx"]
       end
 
       def self.is_supported?(platform)
         platform == :android
+      end
+
+      def self.example_code
+        [
+          'supply'
+        ]
+      end
+
+      def self.category
+        :production
       end
     end
   end
