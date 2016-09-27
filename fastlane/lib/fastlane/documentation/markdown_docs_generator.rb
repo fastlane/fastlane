@@ -36,7 +36,7 @@ module Fastlane
         conn.basic_auth(ENV["ENHANCER_USER"], ENV["ENHANCER_PASSWORD"])
         @launches = JSON.parse(conn.get('/index.json').body)
       end
-      
+
       found = @launches.find { |c| c["action"] == action_name.to_s }
 
       return found["launches"] if found
