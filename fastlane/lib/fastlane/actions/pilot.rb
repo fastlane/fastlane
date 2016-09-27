@@ -42,6 +42,23 @@ module Fastlane
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
       end
 
+      def self.example_code
+        [
+          'testflight',
+          'pilot # alias for "testflight"',
+          'testflight(skip_submission: true) # to only upload the build',
+          'testflight(
+            username: "felix@krausefx.com",
+            app_identifier: "com.krausefx.app",
+            itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
+
       def self.authors
         ["KrauseFx"]
       end

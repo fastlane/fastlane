@@ -25,7 +25,6 @@ module Fastlane
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["KrauseFx"]
       end
 
