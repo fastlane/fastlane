@@ -1,6 +1,8 @@
 require 'pry'
 module Fastlane
   class MarkdownDocsGenerator
+    ENHANCER_URL = "http://127.0.0.1:3000"
+
     attr_accessor :categories
 
     def initialize
@@ -13,16 +15,32 @@ module Fastlane
 
     def work
       self.categories = {}
-      Fastlane::Action::AVAILABLE_CATEGORIES.each { |a| self.categories[readable_category_name(a)] = [] }
+      Fastlane::Action::AVAILABLE_CATEGORIES.each { |a| self.categories[readable_category_name(a)] = {} }
       ActionsList.all_actions do |action|
         readable = readable_category_name(action.category)
 
-        if self.categories[readable].kind_of?(Array)
-          self.categories[readable] << action
+        if self.categories[readable].kind_of?(Hash)
+          self.categories[readable][number_of_launches_for_action(action.action_name)] = action
         else
           UI.error("Action '#{action.name}' doesn't contain category information... skipping")
         end
       end
+    end
+
+    def number_of_launches_for_action(action_name)
+      require 'faraday'
+      require 'json'
+
+      unless @launches
+        conn = Faraday.new(ENHANCER_URL)
+        conn.basic_auth(ENV["ENHANCER_USER"], ENV["ENHANCER_PASSWORD"])
+        @launches = JSON.parse(conn.get('/index.json').body)
+      end
+      
+      found = @launches.find { |c| c["action"] == action_name.to_s }
+
+      return found["launches"] if found
+      return rand # so we don't overwrite another action, this is between 0 and 1
     end
 
     def generate!(target_path: "docs/ActionsAuto.md")

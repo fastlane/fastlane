@@ -23,7 +23,7 @@ import './path/to/other/Fastfile'
 
 <%- @categories.each do |category, actions| %>
 # <%= category %>
-  <%- actions.each do |action| -%>
+  <%- actions.sort.reverse.to_h.each do |_number_of_launches, action| -%>
 
 ### <%= action.action_name %>
 
