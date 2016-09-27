@@ -20,7 +20,7 @@ module Supply
     # @!group Login
     #####################################################
 
-    # instanciate a client given the supplied configuration
+    # instantiate a client given the supplied configuration
     def self.make_from_config
       unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
         UI.user_error! "Missing auth credentials: You must specify either 'json_key' or 'key' and 'issuer'"
