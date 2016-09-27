@@ -113,10 +113,14 @@ module Spaceship
         c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
-        if ENV['DEBUG']
+        if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy "https://127.0.0.1:8888"
+        end
+
+        if ENV["DEBUG"]
+          puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
         end
       end
     end
