@@ -87,7 +87,7 @@ lane :release do |options|
       description: description,
       is_draft: false
     )
-    
+
     # Actual release of the gem
     #
     sh "gem push ../pkg/#{tool_name}-#{version}.gem"
