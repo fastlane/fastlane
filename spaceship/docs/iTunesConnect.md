@@ -263,10 +263,11 @@ For a full list of available options, check out [app_submission.rb](https://gith
 
 ## Testers
 
-There are 2 types of testers:
+There are 3 types of testers:
 
 - **External testers**: usually not part of your team. You can invite up to 1000/2000 external testers. Before distributing a build to those testers you need to submit your app to beta review.
 - **Internal testers**: Employees that are registered in your iTunes Connect team. They get access to all builds without having to wait for review.
+**Sandbox testers**: Dummy accounts to test development-mode apps with in-app purchase or Apple Pay.
 
 ```ruby
 # Find an internal tester based on the email address
@@ -293,6 +294,18 @@ app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last
 ```
 
 Right now, `spaceship` can't modify or create internal testers.
+
+# Load all sandbox testers
+testers = Spaceship::Tunes::SandboxTester.all
+
+# Create a sandbox tester
+testers = Spaceship::Tunes::SandboxTester.create!(
+  email: 'sandbox@test.com', # required
+  password: 'Passwordtest1', # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
+  country: 'US', # optional, defaults to 'US'
+  first_name: 'Steve', # optional, defaults to 'Test'
+  last_name: 'Brule', # optional, defaults to 'Test'
+)
 
 ## App ratings & reviews
 

@@ -4,7 +4,9 @@ module Match
       return @dir if @dir
 
       @dir = Dir.mktmpdir
-      command = "git clone '#{git_url}' '#{@dir}'"
+
+      # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
+      command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{@dir}'"
       command << " --depth 1" if shallow_clone
 
       UI.message "Cloning remote git repo..."

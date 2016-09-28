@@ -65,7 +65,15 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      results = results.find_all do |current_profile|
+        if current_profile.valid?
+          true
+        else
+          UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
+          false
+        end
+      end
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
@@ -74,6 +82,20 @@ module Sigh
           results = filtered
         elsif (filtered || []).count > 0
           results = filtered
+        end
+      end
+
+      # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
+      # any more, since it requires an additional request
+      # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
+
+      results = results.find_all do |current_profile|
+        if profile_type == Spaceship.provisioning_profile.ad_hoc
+          current_profile.is_adhoc?
+        elsif profile_type == Spaceship.provisioning_profile.app_store
+          !current_profile.is_adhoc?
+        else
+          true
         end
       end
 
@@ -89,10 +111,10 @@ module Sigh
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}")
+            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
           end
         end
-        installed
+        installed && a.certificate_valid?
       end
     end
 
@@ -153,7 +175,7 @@ module Sigh
         UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
         UI.important "Available Code Signing Identities for current filters:"
         certificates.each do |c|
-          str = ["\t- Name:", c.owner_name, "- ID:", c.id + "- Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
           UI.message str.green
         end
       end
@@ -176,7 +198,7 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
+      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")

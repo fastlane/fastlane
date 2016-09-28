@@ -223,7 +223,7 @@ clear_derived_data
 
 Build your app right inside `fastlane` and the path to the resulting ipa is automatically available to all other actions.
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
+You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/).
 
 ```ruby
 ipa(
@@ -255,7 +255,7 @@ See how [Product Hunt](https://github.com/fastlane/examples/blob/master/ProductH
 
 ### update_project_provisioning
 
-You should check out the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning) before using this action.
+You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/) before using this action.
 
 Updates your Xcode project to use a specific provisioning profile for code signing, so that you can properly build and sign the .ipa file using the [ipa](#ipa) action or a CI service.
 
@@ -440,7 +440,7 @@ import_certificate(
 
 **Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead.
 
-Make sure to also read the [code signing guide](https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning).
+Make sure to also read the [code signing guide](https://docs.fastlane.tools/codesigning/GettingStarted/).
 
 ```ruby
 # Create an archive. (./build-dir/MyApp.xcarchive)
@@ -1997,15 +1997,6 @@ Display a notification using the macOS notification center. Uses [terminal-notif
 ```
 
 [ByMyEyes](https://github.com/fastlane/examples/blob/master/BeMyEyes/Fastfile) uses the `notify` action to show a success message after `fastlane` finished executing.
-
-### [Testmunk](http://testmunk.com)
-Run your functional tests on real iOS devices over the cloud (for free on an iPod). With this simple [testcase](https://github.com/testmunk/TMSample/blob/master/testcases/smoke/smoke_features.zip) you can ensure your app launches and there is no crash at launch. Tests can be extended with [Testmunk's library](http://docs.testmunk.com/en/latest/steps.html) or custom steps. More details about this action can be found in [`testmunk.rb`](https://github.com/fastlane/fastlane/blob/master/lib/fastlane/actions/testmunk.rb).
-
-```ruby
-ENV['TESTMUNK_EMAIL'] = 'email@email.com'
-# Additionally, you have to set TESTMUNK_API, TESTMUNK_APP and TESTMUNK_IPA
-testmunk
-```
 
 ### [Podio](http://podio.com)
 Creates an item within your Podio app. In case an item with the given identifying value already exists within your Podio app, it updates that item. To find out how to get your authentication credentials see [Podio API documentation](https://developers.podio.com). To find out how to get your identifying field (external ID) and general info about Podio item see [tutorials](https://developers.podio.com/examples/items).

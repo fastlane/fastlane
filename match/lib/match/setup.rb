@@ -5,7 +5,7 @@ module Match
 
       UI.important "Please create a new, private git repository"
       UI.important "to store the certificates and profiles there"
-      url = ask("URL of the Git Repo: ")
+      url = UI.input("URL of the Git Repo: ")
 
       template.gsub!("[[GIT_URL]]", url)
       File.write(path, template)

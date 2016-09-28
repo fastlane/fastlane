@@ -97,4 +97,19 @@ describe Screengrab::Runner do
       end
     end
   end
+
+  describe :run_adb_command do
+    it 'filters out lines which are ADB warnings' do
+      adb_response = <<-ADB_OUTPUT.strip_heredoc
+            adb: /home/me/rubystack-2.3.1-4/common/lib/libcrypto.so.1.0.0: no version information available (required by adb)
+            List of devices attached
+            e1dbf228               device usb:1-1.2 product:a33gdd model:SM_A300H device:a33g
+
+          ADB_OUTPUT
+
+      set_mock_adb_response("test", adb_response)
+
+      expect(@runner.run_adb_command("test").lines.any? { |line| line.start_with?('adb: ') }).to eq(false)
+    end
+  end
 end

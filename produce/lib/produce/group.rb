@@ -8,7 +8,7 @@ module Produce
 
       ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
 
-      group_identifier = options.group_identifier || ask("Group identifier: ")
+      group_identifier = options.group_identifier || UI.input("Group identifier: ")
 
       if app_group_exists? group_identifier
         UI.success("[DevCenter] Group '#{options.group_name} (#{options.group_identifier})' already exists, nothing to do on the Dev Center")

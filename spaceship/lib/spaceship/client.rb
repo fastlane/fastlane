@@ -113,11 +113,14 @@ module Spaceship
         c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
-        if ENV['DEBUG']
+        if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.response :logger
           c.proxy "https://127.0.0.1:8888"
+        end
+
+        if ENV["DEBUG"]
+          puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
         end
       end
     end
@@ -293,7 +296,8 @@ module Spaceship
       when 200
         return response
       else
-        if response["Location"] == "/auth" # redirect to 2 step auth page
+        location = response["Location"]
+        if location && URI.parse(location).path == "/auth" # redirect to 2 step auth page
           handle_two_step(response)
           return true
         elsif (response.body || "").include?('invalid="true"')
@@ -312,7 +316,7 @@ module Spaceship
       return @service_key if @service_key
 
       # Check if we have a local cache of the key
-      itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
       # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
@@ -330,6 +334,9 @@ module Spaceship
       File.write(itc_service_key_path, @service_key)
 
       return @service_key
+    rescue => ex
+      puts ex.to_s
+      raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
     end
 
     #####################################################

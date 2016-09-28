@@ -818,6 +818,39 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Sandbox Testers
+    #####################################################
+    def sandbox_testers(tester_class)
+      url = tester_class.url[:index]
+      r = request(:get, url)
+      parse_response(r, 'data')
+    end
+
+    def create_sandbox_tester!(tester_class: nil, email: nil, password: nil, first_name: nil, last_name: nil, country: nil)
+      url = tester_class.url[:create]
+      r = request(:post) do |req|
+        req.url url
+        req.body = {
+          user: {
+            emailAddress: { value: email },
+            password: { value: password },
+            confirmPassword: { value: password },
+            firstName: { value: first_name },
+            lastName: { value: last_name },
+            storeFront: { value: country },
+            birthDay: { value: 1 },
+            birthMonth: { value: 1 },
+            secretQuestion: { value: 'secret_question' },
+            secretAnswer: { value: 'secret_answer' },
+            sandboxAccount: nil
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')['user']
+    end
+
+    #####################################################
     # @!group State History
     #####################################################
     def versions_history(app_id, platform)

@@ -23,8 +23,7 @@ unless ENV["DEBUG"]
 end
 
 cache_paths = [
-  File.expand_path("~/Library/Caches/spaceship_api_key.txt"),
-  File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+  File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]
 
 def try_delete(path)

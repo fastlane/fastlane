@@ -1,7 +1,32 @@
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
+    let(:os_version) { "9.3" }
+    let(:iphone6_9_3) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: os_version, udid: "11111", state: "Don't Care", is_simulator: true) }
+    let(:iphone6_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: '9.0', udid: "11111", state: "Don't Care", is_simulator: true) }
+    let(:iphone6_9_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: '9.2', udid: "11111", state: "Don't Care", is_simulator: true) }
+    let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
+
     before do
+      allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV])
       fake_out_xcode_project_loading
+    end
+
+    describe '#find_device' do
+      it 'finds a device that has a matching name and OS version' do
+        found = Snapshot::TestCommandGenerator.find_device('iPhone 6', '9.0')
+        expect(found).to eq(iphone6_9_0)
+      end
+
+      it 'does not find a device that has a different name' do
+        found = Snapshot::TestCommandGenerator.find_device('iPhone 5', '9.0')
+        expect(found).to be(nil)
+      end
+
+      it 'finds a device with the same name, but a different OS version, picking the highest available OS version' do
+        found = Snapshot::TestCommandGenerator.find_device('iPhone 6', '10.0')
+        expect(found).to be(iphone6_9_3)
+      end
     end
 
     describe "Valid Configuration" do

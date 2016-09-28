@@ -82,10 +82,10 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like (standard, basic or rspec)",
+                                     description: "Define how the output should look like (standard, basic, rspec or raw)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', "rspec"].include?(value)
+                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",

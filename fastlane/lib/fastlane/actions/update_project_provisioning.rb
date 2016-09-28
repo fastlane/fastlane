@@ -8,7 +8,7 @@ module Fastlane
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
+        UI.message("https://docs.fastlane.tools/codesigning/GettingStarted/")
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first

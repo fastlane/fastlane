@@ -67,9 +67,9 @@ module Sigh
     end
 
     def get_inputs(options, args)
-      ipa = args.first || find_ipa || ask('Path to ipa file: ')
+      ipa = args.first || find_ipa || UI.input('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || UI.input('Path to provisioning file: ')
       entitlements = options.entitlements || nil
       version = options.version_number || nil
       display_name = options.display_name || nil
@@ -139,7 +139,7 @@ module Sigh
 
     def ask_for_signing_identity
       print_available_identities
-      ask('Signing Identity: ')
+      UI.input('Signing Identity: ')
     end
 
     # Hash of available signing identities

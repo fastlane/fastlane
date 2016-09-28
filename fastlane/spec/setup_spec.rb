@@ -16,8 +16,7 @@ describe Fastlane do
         FileUtils.rm_rf(workspace) if File.directory? workspace
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
-        $terminal = HighLine.new # mock user inputs :)
-        allow($terminal).to receive(:ask).and_return("y")
+        expect(FastlaneCore::UI).to receive(:input).and_return("y")
 
         allow(Fastlane::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
 
