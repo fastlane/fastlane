@@ -7,6 +7,8 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Match::VERSION}")
 
+      UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
+
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
