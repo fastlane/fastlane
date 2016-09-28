@@ -62,7 +62,7 @@ module Fastlane
         #  @homepage="https://github.com/afonsograca/fastlane-plugin-synx",
         #  @info="Organise your Xcode project folder to match your Xcode groups.",
         #  @name="synx">
-        
+
         self.plugins << {
           linked_title: ruby_gem_info.linked_title,
           action_name: action_name.split("/").last,
