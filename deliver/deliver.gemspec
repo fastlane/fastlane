@@ -22,9 +22,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # fastlane dependencies
-  spec.add_dependency 'fastlane_core', '>= 0.52.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.16.0', '< 1.0.0'
-  spec.add_dependency 'spaceship', '>= 0.34.1', '< 1.0.0' # Communication with iTunes Connect
+  spec.add_dependency "fastlane_core", ">= 0.52.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "credentials_manager", ">= 0.16.1", "< 1.0.0"
+  spec.add_dependency "spaceship", ">= 0.34.1", "< 1.0.0" # Communication with iTunes Connect
 
   # third party dependencies
   spec.add_dependency 'fastimage', '~> 1.6' # fetch the image sizes from the screenshots
