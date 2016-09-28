@@ -18,6 +18,7 @@ import './path/to/other/Fastfile'
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
+- [Plugins](#Plugins)
 
 
 
@@ -68,3 +69,10 @@ Key | Description
 
   <%- end %>
 <%- end %>
+
+# Plugins
+| Action | Plugin | Description | Usage Number
+---------|--------|-------------|--------------
+<%- @plugins.each do |plugin| -%>
+<%= plugin[:action_name] %> | <%= plugin[:linked_title] %> | <%= plugin[:description] %> | <%= plugin[:usage] %>
+<%- end -%>
