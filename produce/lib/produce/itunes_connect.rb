@@ -36,12 +36,12 @@ module Produce
         counter = 0
         while application.nil?
           counter += 1
-          UI.crash!("Couldn't find newly created app on iTunes Connect - please check the website for more information") if counter == 60
+          UI.crash!("Couldn't find newly created app on iTunes Connect - please check the website for more information") if counter == 200
 
           # Since 2016-08-10 iTunes Connect takes some time to actually list the newly created application
           # We have no choice but to poll to see if the newly created app is already available
           UI.message("Waiting for the newly created application to be available on iTunes Connect...")
-          sleep 10
+          sleep 15
           application = fetch_application
         end
 

@@ -26,15 +26,16 @@ module Danger
       deep_link_matches = github.pr_body.match(/:link:\s(.*)/) # :link: emoji
       deep_link = deep_link_matches[1] if deep_link_matches
 
-      markdown("<table>")
+      html = ""
+      html << "<table>"
       languages.each do |current_language|
-        markdown("<tr>")
-        markdown("<td>")
-        markdown("<b>#{current_language[0..1]}</b>")
-        markdown("</td>")
+        html << "<tr>"
+        html << "<td>"
+        html << "<b>#{current_language[0..1]}</b>"
+        html << "</td>"
 
         devices.each do |current_device|
-          markdown("<td>")
+          html << "<td>"
 
           params = {
             public_key: public_key,
@@ -46,19 +47,20 @@ module Danger
           url = Fastlane::Helper.backticks("#{prefix_command}fastlane run appetize_viewing_url_generator #{params_str}")
           url = url.match(%r{Result:.*(https\:\/\/.*)})[1].strip
 
-          markdown("<a href='#{url}'>")
-          markdown("<p align='center'>")
-          markdown("<img height='130' src='#{url_for_device(current_device)}' />")
-          markdown("<br />")
-          markdown(beautiful_device_name(current_device))
-          markdown("</p>")
-          markdown("</a>")
+          html << "<a href='#{url}'>"
+          html << "<p align='center'>"
+          html << "<img height='130' src='#{url_for_device(current_device)}' />"
+          html << "<br />"
+          html << beautiful_device_name(current_device)
+          html << "</p>"
+          html << "</a>"
 
-          markdown("</td>")
+          html << "</td>"
         end
-        markdown("</tr>")
+        html << "</tr>"
       end
-      markdown("</table>")
+      html << "</table>"
+      markdown(html)
     ensure
       ENV.delete(fastlane_colors_env) unless fastlane_colors_were_disabled
     end

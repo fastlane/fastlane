@@ -1,0 +1,43 @@
+{
+  "data": [
+    {
+      "emailAddress": {
+        "value": "test@test.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 100,
+        "minLength": 1
+      },
+      "firstName": {
+        "value": "Test",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 32,
+        "minLength": 1
+      },
+      "lastName": {
+        "value": "McTestington",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 64,
+        "minLength": 1
+      },
+      "storeFront": {
+        "value": "GB",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "sandboxAccount": true
+    }
+  ],
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

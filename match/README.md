@@ -181,23 +181,23 @@ match appstore -a tools.fastlane.app
 match appstore -a tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a match lane like this:
+You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
-lane :match do
+lane :certificates do
   match(app_identifier: "com.krausefx.app1", readonly: true)
   match(app_identifier: "com.krausefx.app2", readonly: true)
   match(app_identifier: "com.krausefx.app3", readonly: true)
 end
 ```
 
-Then all your team has to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
 #### Passphrase
 
 When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase using an environment variable, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
 
 #### New machine
 
@@ -290,21 +290,13 @@ match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
 
 ### Setup Xcode project
 
-[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+[Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
 `match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
-<img src="assets/UDIDPrint.png" width="700" />
-
-Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
-
-<img src="assets/XcodeProjectSettings.png" width="700" />
-
-Profile environment variables are named after `$(sigh_<bundle_identifier>_<profile_type>)`
-
-e.g. `$(sigh_tools.fastlane.app_development)`
+More information about how to setup your Xcode project can be found [here](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from Xcode manually
 

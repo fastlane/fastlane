@@ -20,6 +20,7 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
+        cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
 
         Actions.sh(cmd.join(' '))
       end
@@ -123,6 +124,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :toolchain,
                                        env_name: "FL_CARTHAGE_TOOLCHAIN",
                                        description: "Define which xcodebuild toolchain to use when building",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_directory,
+                                       env_name: "FL_CARTHAGE_PROJECT_DIRECTORY",
+                                       description: "Define the directory containing the Carthage project",
                                        optional: true)
         ]
       end

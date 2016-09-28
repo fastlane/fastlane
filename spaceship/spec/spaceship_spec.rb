@@ -20,7 +20,7 @@ describe Spaceship do
   end
 
   it "ProvisioningProfile" do
-    expect(Spaceship.provisioning_profile.all.count).to eq(33)
+    expect(Spaceship.provisioning_profile.all.count).to eq(3)
   end
 
   it "App" do

@@ -24,7 +24,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Automatically add a badge to your iOS app icon"
+        "Automatically add a badge to your app icon"
       end
 
       def self.details
