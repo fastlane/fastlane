@@ -71,9 +71,6 @@ module Fastlane
         :source_control
       end
 
-
-
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :files,

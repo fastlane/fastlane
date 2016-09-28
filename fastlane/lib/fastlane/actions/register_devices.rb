@@ -117,7 +117,6 @@ module Fastlane
       def self.category
         :code_signing
       end
-
     end
   end
 end
