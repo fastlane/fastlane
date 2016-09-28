@@ -31,6 +31,28 @@ module Fastlane
         ].join("\n")
       end
 
+      def self.example_code
+        [
+          'resign(
+            ipa: "path/to/ipa", # can omit if using the `ipa` action
+            signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
+            provisioning_profile: "path/to/profile", # can omit if using the `sigh` action
+          )',
+          'resign(
+            ipa: "path/to/ipa", # can omit if using the `ipa` action
+            signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
+            provisioning_profile: {
+              "com.example.awesome-app" => "path/to/profile",
+              "com.example.awesome-app.app-extension" => "path/to/app-extension/profile"
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :ipa,
