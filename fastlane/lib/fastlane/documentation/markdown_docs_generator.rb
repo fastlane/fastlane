@@ -1,7 +1,7 @@
 require 'pry'
 module Fastlane
   class MarkdownDocsGenerator
-    ENHANCER_URL = "http://127.0.0.1:3000"
+    ENHANCER_URL = "https://fastlane-enhancer.herokuapp.com"
 
     attr_accessor :categories
 
