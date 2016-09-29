@@ -12,7 +12,9 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          if values[:provisioning_profile_path].to_s.length == 0
+          should_use_legacy_api = values[:use_legacy_build_api] || Gym::Xcode.pre7?
+
+          if values[:provisioning_profile_path].to_s.length.zero? && should_use_legacy_api
             sigh_path = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
             values[:provisioning_profile_path] = File.expand_path(sigh_path) if sigh_path
           end
