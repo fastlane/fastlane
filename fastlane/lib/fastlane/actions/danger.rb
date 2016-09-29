@@ -66,11 +66,11 @@ module Fastlane
 
       def self.example_code
         [
-          'danger(github_api_token: GITHUB_API_TOKEN)',
+          'danger',
           'danger(
             danger_id: "unit-tests",
             dangerfile: "tests/MyOtherDangerFile",
-            github_api_token: GITHUB_API_TOKEN,
+            github_api_token: ENV["GITHUB_API_TOKEN"],
             verbose: true
           )'
         ]
