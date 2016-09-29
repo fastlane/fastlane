@@ -127,7 +127,7 @@ module Gym
             # Reads options from hash
             hash = normalize_export_options(Gym.config[:export_options])
           else
-            # Reads optoins from file
+            # Reads options from file
             hash = Plist.parse_xml(Gym.config[:export_options])
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
