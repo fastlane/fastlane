@@ -42,9 +42,6 @@ module Fastlane
         ]
       end
 
-      def self.output
-      end
-
       def self.return_value
         nil
       end

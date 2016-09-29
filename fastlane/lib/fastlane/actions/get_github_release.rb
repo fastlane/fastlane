@@ -141,6 +141,17 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'release = get_github_release(url: "fastlane/fastlane", version: "1.0.0")
+          puts release["name"]'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end
