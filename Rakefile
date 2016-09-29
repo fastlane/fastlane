@@ -42,6 +42,7 @@ end
 task :update_dependencies do
   puts "Updating all internal fastlane dependencies"
 
+  # This requires all version numbers to be x.x.x (3 components)
   regex = %r{spec.add_dependency .(.+).\, .\>\= (\d+\.\d+\.\d+).\, .\< \d+\.\d+\.\d+.}
 
   Dir["./**/*.gemspec"].each do |current_gemspec_path|
