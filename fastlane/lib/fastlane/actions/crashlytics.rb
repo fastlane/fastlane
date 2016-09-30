@@ -76,7 +76,7 @@ module Fastlane
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
