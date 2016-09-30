@@ -25,6 +25,16 @@ module Fastlane
       def self.step_text
         nil
       end
+
+      def self.example_code
+        [
+          'puts "Hi there"'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

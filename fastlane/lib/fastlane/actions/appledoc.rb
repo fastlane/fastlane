@@ -113,7 +113,7 @@ module Fastlane
       end
 
       def self.description
-        "Generate Apple-like source code documentation from specially formatted source code comments"
+        "Generate Apple-like source code documentation from the source code"
       end
 
       def self.details

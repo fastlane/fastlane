@@ -14,6 +14,7 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
+      :deprecated,
       :misc
     ]
 
