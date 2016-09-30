@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/fastlane/fastlane/tree/master/gym"
+        "More information: https://fastlane.tools/gym"
       end
 
       def self.return_value
@@ -62,6 +62,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'gym(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
+          'gym(
+            workspace: "MyApp.xcworkspace",
+            configuration: "Debug",
+            scheme: "MyApp",
+            silent: true,
+            clean: true,
+            output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+            output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+            sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end
