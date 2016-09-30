@@ -65,6 +65,25 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'pem',
+          'pem(
+            force: true, # create a new profile, even if the old one is still valid
+            app_identifier: "net.sunapps.9", # optional app identifier,
+            save_private_key: true,
+            new_profile: proc do |profile_path| # this block gets called when a new profile was generated
+              puts profile_path # the absolute path to the new PEM file
+              # insert the code to upload the PEM file to the server
+            end
+          )'
+        ]
+      end
+
+      def self.category
+        :push
+      end
     end
   end
 end

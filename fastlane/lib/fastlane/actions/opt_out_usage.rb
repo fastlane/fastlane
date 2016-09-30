@@ -26,6 +26,16 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'opt_out_usage'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

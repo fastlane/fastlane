@@ -80,6 +80,17 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :tvos, :watchos, :caros].include?(platform)
       end
+
+      def self.example_code
+        [
+          'install_xcode_plugin(url: "https://example.com/clubmate/plugin.zip")',
+          'install_xcode_plugin(github: "https://github.com/contentful/ContentfulXcodePlugin")'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

@@ -79,7 +79,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :push
       end
     end
   end

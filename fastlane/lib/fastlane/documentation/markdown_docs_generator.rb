@@ -123,6 +123,8 @@ module Fastlane
         "Testing"
       when :building
         "Building"
+      when :push
+        "Push"
       when :screenshots
         "Screenshots"
       when :project
