@@ -29,7 +29,7 @@ module Fastlane
       end
 
       def self.category
-        :notifications
+        :deprecated
       end
     end
   end

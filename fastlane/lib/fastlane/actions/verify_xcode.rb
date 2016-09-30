@@ -147,7 +147,7 @@ module Fastlane
       end
 
       def self.category
-        :buiding
+        :building
       end
     end
   end

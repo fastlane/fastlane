@@ -133,6 +133,8 @@ module Fastlane
         "Beta"
       when :production
         "Releasing your app"
+      when :deprecated
+        "Deprecated"
       else
         category_symbol.to_s.capitalize
       end
