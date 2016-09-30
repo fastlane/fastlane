@@ -33,6 +33,13 @@ module Fastlane
         "Send a message to a Flock group"
       end
 
+      def self.details
+        [
+          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)",
+          "in your Flock admin panel."
+        ].join("\n")
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :message,
@@ -54,6 +61,19 @@ module Fastlane
 
       def self.author
         "Manav"
+      end
+
+      def self.example_code
+        [
+          'flock(
+            message: "Hello",
+            token: "xxx"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
 
       def self.is_supported?(platform)

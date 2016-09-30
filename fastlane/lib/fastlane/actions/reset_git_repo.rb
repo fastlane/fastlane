@@ -53,6 +53,24 @@ module Fastlane
         ].join(' ')
       end
 
+      def self.example_code
+        [
+          'reset_git_repo',
+          'reset_git_repo(force: true) # If you don\'t care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!',
+          'reset_git_repo(skip_clean: true) # If you want "git clean" to be skipped, thus NOT deleting untracked files like ".env". Optional, defaults to false.',
+          'reset_git_repo(
+            force: true,
+            files: [
+              "./file.txt"
+            ]
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :files,

@@ -87,8 +87,15 @@ module Fastlane
       def self.details
         [
           "This action downloads dSYM files from Apple iTunes Connect after",
-          "the ipa got re-compiled by Apple. Useful if you have Bitcode enabled"
-        ].join(" ")
+          "the ipa got re-compiled by Apple. Useful if you have Bitcode enabled",
+          "```ruby",
+          "lane :refresh_dsyms do",
+          "  download_dsyms                  # Download dSYM files from iTC",
+          "  upload_symbols_to_crashlytics   # Upload them to Crashlytics",
+          "  clean_build_artifacts           # Delete the local dSYM files",
+          "end",
+          "```"
+        ].join("\n")
       end
 
       def self.available_options
@@ -160,6 +167,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'download_dsyms',
+          'download_dsyms(version: "1.0.0", build_number: "345")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

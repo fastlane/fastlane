@@ -70,9 +70,6 @@ module Fastlane
         ]
       end
 
-      def self.output
-      end
-
       def self.return_value
       end
 
@@ -82,6 +79,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'jira(
+            url: "https://bugs.yourdomain.com",
+            username: "Your username",
+            password: "Your password",
+            ticket_id: "Ticket ID, i.e. IOS-123",
+            comment_text: "Text to post as a comment"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

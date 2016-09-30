@@ -67,6 +67,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'changelog = prompt(text: "Changelog: ")',
+          'changelog = prompt(
+            text: "Changelog: ",
+            multi_line_end_keyword: "END"
+          )
+
+          hockey(notes: changelog)'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

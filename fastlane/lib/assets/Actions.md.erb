@@ -1,0 +1,78 @@
+# fastlane actions
+
+This page contains a list of all built-in fastlane actions and their available options.
+
+To get the most up-to-date information from the command line on your current version you can also run
+
+```sh
+fastlane actions # list all available fastlane actions
+fastlane action [action_name] # more information for a specific action
+```
+
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
+<%- @categories.each do |category, actions| -%>
+- [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
+<%- end -%>
+- [Plugins](#Plugins)
+
+
+
+<%- @categories.each do |category, actions| %>
+# <%= category %>
+  <%- actions.sort.reverse.to_h.each do |_number_of_launches, action| -%>
+
+### <%= action.action_name %>
+
+<%= action.description %>
+
+<%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
+
+<%= action.action_name %> | 
+-----|----
+Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
+Author | @<%= Array(action.author || action.authors).join(", @") %>
+<%- unless action.return_value.to_s.empty? -%>
+Returns | <%= action.return_value %>
+<%- end -%>
+
+<% if (action.example_code || []).count > 0 %>
+
+<details>
+<summary><%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %></summary>
+<% action.example_code.each do |current_sample| %>
+```ruby
+<%= current_sample.gsub("          ", "") %>
+```
+<% end %>
+<% end %>
+</details>
+
+<% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
+<details>
+<summary>Parameters</summary>
+
+Key | Description
+----|------------
+<%- (action.available_options || []).each do |config_item| -%>
+  <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
+  `<%= config_item.key %>` | <%= config_item.description %>
+<%- end %>
+</details>
+<% end %>
+
+
+
+  <%- end %>
+<%- end %>
+
+# Plugins
+| Action | Plugin | Description | Usage Number
+---------|--------|-------------|--------------
+<%- @plugins.each do |plugin| -%>
+<%= plugin[:action_name] %> | <%= plugin[:linked_title] %> | <%= plugin[:description] %> | <%= plugin[:usage] %>
+<%- end -%>

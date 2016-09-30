@@ -289,6 +289,19 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'xcode_server_get_assets(
+            host: "10.99.0.59", # Specify Xcode Server\'s Host or IP Address
+            bot_name: "release-1.3.4" # Specify the particular Bot
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
+      end
     end
   end
 end

@@ -67,6 +67,20 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'update_urban_airship_configuration(
+            plist_path: "AirshipConfig.plist",
+            production_app_key: "PRODKEY",
+            production_app_secret: "PRODSECRET"
+          )'
+        ]
+      end
+
+      def self.category
+        :push
+      end
     end
   end
 end

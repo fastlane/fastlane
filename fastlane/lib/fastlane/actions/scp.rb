@@ -83,6 +83,31 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'scp(
+            host: "dev.januschka.com",
+            username: "root",
+            upload: {
+              src: "/root/dir1",
+              dst: "/tmp/new_dir"
+            }
+          )',
+          'scp(
+            host: "dev.januschka.com",
+            username: "root",
+            download: {
+              src: "/root/dir1",
+              dst: "/tmp/new_dir"
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

@@ -226,16 +226,29 @@ Slather is available at https://github.com/SlatherOrg/slather
       end
 
       def self.output
-        # Define the shared values you are going to provide
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["mattdelves"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'slather(
+            build_directory: "foo",
+            input_format: "bah",
+            scheme: "MyScheme",
+            proj: "MyProject.xcodeproj"
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

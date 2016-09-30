@@ -41,6 +41,18 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'if git_tag_exists(tag: "1.1.0")
+            UI.message("Found it 🚀")
+          end'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

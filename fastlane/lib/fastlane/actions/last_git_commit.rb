@@ -24,6 +24,20 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'commit = last_git_commit
+          crashlytics(notes: commit[:message]) # message of commit
+          author = commit[:author] # author of the commit
+          hash = commit[:commit_hash] # long sha of commit
+          short_hash = commit[:abbreviated_commit_hash] # short sha of commit'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

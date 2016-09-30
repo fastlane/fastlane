@@ -38,14 +38,14 @@ module Fastlane
         ].join(' ')
 
         if Helper.test?
-          Actions.lane_context[SharedValues::BUILD_NUMBER] = command
+          return Actions.lane_context[SharedValues::BUILD_NUMBER] = command
         else
           Actions.sh command
 
           # Store the new number in the shared hash
           build_number = `#{command_prefix} agvtool what-version`.split("\n").last.strip
 
-          Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+          return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
       rescue => ex
         UI.error('Make sure to follow the steps to setup your Xcode project: https://developer.apple.com/library/ios/qa/qa1827/_index.html')
@@ -80,8 +80,30 @@ module Fastlane
         ]
       end
 
+      def self.return_value
+        "The new build number"
+      end
+
       def self.author
         "KrauseFx"
+      end
+
+      def self.example_code
+        [
+          'increment_build_number # automatically increment by one',
+          'increment_build_number(
+            build_number: "75" # set a specific number
+          )',
+          'increment_build_number(
+            build_number: 75, # specify specific build number (optional, omitting it increments by one)
+            xcodeproj: "./path/to/MyApp.xcodeproj" # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+          )',
+          'build_number = increment_build_number'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

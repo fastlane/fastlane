@@ -109,6 +109,22 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios].include?(platform)
       end
+
+      def self.example_code
+        [
+          'installr(
+            api_token: "...",
+            ipa: "test.ipa",
+            notes: "The next great version of the app!",
+            notify: "dev,qa",
+            add: "exec,ops"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

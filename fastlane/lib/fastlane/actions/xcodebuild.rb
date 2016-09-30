@@ -56,6 +56,21 @@ module Fastlane
         [:ios, :mac].include? platform
       end
 
+      def self.example_code
+        [
+          'xcodebuild(
+            archive: true,
+            archive_path: "./build-dir/MyApp.xcarchive",
+            scheme: "MyApp",
+            workspace: "MyApp.xcworkspace"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.run(params)
         unless Helper.test?
           UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
@@ -355,7 +370,7 @@ module Fastlane
       end
 
       def self.details
-        "More information on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xcodebuild"
+        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead."
       end
 
       def self.author
@@ -372,6 +387,16 @@ module Fastlane
 
       def self.description
         "Archives the project using `xcodebuild`"
+      end
+
+      def self.example_code
+        [
+          'xcarchive'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.author
@@ -402,6 +427,16 @@ module Fastlane
         params_hash = params || {}
         params_hash[:build] = true
         XcodebuildAction.run(params_hash)
+      end
+
+      def self.example_code
+        [
+          'xcbuild'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.description
@@ -443,6 +478,16 @@ module Fastlane
         "Cleans the project using `xcodebuild`"
       end
 
+      def self.example_code
+        [
+          'xcclean'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.author
         "dtrenz"
       end
@@ -478,6 +523,16 @@ module Fastlane
         "Exports the project using `xcodebuild`"
       end
 
+      def self.example_code
+        [
+          'xcexport'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.author
         "dtrenz"
       end
@@ -510,6 +565,18 @@ module Fastlane
         params_hash[:test] = true
 
         XcodebuildAction.run(params_hash)
+      end
+
+      def self.example_code
+        [
+          'xctest(
+            destination: "name=iPhone 7s,OS=10.0"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.description
