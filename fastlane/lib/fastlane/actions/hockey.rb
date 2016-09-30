@@ -203,6 +203,27 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
       end
+
+      def self.details
+        [
+          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.",
+          "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'hockey(
+            api_token: "...",
+            ipa: "./app.ipa",
+            notes: "Changelog"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

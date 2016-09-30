@@ -84,7 +84,14 @@ module Fastlane
       private_class_method :help_message
 
       def self.description
-        "Upload a new build to DeployGate"
+        "Upload a new build to [DeployGate](https://deploygate.com/)"
+      end
+
+      def self.details
+        [
+          "You can retrieve your username and API token on [your settings page](https://deploygate.com/settings)",
+          "More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -129,6 +136,22 @@ module Fastlane
           ['DEPLOYGATE_REVISION', 'auto incremented revision number'],
           ['DEPLOYGATE_APP_INFO', 'Contains app revision, bundle identifier, etc.']
         ]
+      end
+
+      def self.example_code
+        [
+          'deploygate(
+            api_token: "...",
+            user: "target username or organization name",
+            ipa: "./ipa_file.ipa",
+            message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+            distribution_key: "(Optional) Target Distribution Key"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
 
       def self.author

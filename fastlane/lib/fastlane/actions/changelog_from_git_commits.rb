@@ -130,6 +130,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'changelog_from_git_commits',
+          'changelog_from_git_commits(
+            between: ["7b092b3", "HEAD"], # Optional, lets you specify a revision/tag range between which to collect commit info
+            pretty: "- (%ae) %s", # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+            match_lightweight_tag: false, # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+            include_merges: true # Optional, lets you filter out merge commits
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

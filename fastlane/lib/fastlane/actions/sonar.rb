@@ -42,7 +42,10 @@ module Fastlane
       end
 
       def self.details
-        "See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner for details."
+        [
+          "See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner for details.",
+          "It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action."
+        ].join("\n")
       end
 
       def self.available_options
@@ -95,6 +98,21 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'sonar(
+            project_key: "name.gretzki.awesomeApp",
+            project_version: "1.0",
+            project_name: "iOS - AwesomeApp",
+            sources_path: File.expand_path("../AwesomeApp")
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

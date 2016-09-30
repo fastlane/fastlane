@@ -24,7 +24,10 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/danger/danger"
+        [
+          "Formalize your Pull Request etiquette.",
+          "More information: https://github.com/danger/danger"
+        ].join("\n")
       end
 
       def self.available_options
@@ -59,6 +62,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'danger',
+          'danger(
+            danger_id: "unit-tests",
+            dangerfile: "tests/MyOtherDangerFile",
+            github_api_token: ENV["GITHUB_API_TOKEN"],
+            verbose: true
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.authors

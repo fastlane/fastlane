@@ -46,6 +46,13 @@ module Fastlane
         "Small action to save your build artifacts. Useful when you use reset_git_repo"
       end
 
+      def self.details
+        [
+          "This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
+          "Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list"
+        ].join("\n")
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :keep_original,
@@ -77,6 +84,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'copy_artifacts(
+            target_path: "artifacts",
+            artifacts: ["*.cer", "*.mobileprovision", "*.ipa", "*.dSYM.zip"]
+          )
+
+          # Reset the git repo to a clean state, but leave our artifacts in place
+          reset_git_repo(
+            exclude: "artifacts"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

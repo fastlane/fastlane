@@ -91,7 +91,11 @@ module Fastlane
           "- Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'",
           "- Sets output directory to './output' (gym, scan and backup_xcarchive).",
           "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage).",
-          "- Produce result bundle (gym and scan)."
+          "- Produce result bundle (gym and scan).",
+          "",
+          "This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.",
+          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain",
+          "will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system."
         ].join("\n")
       end
 
@@ -168,6 +172,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'setup_jenkins'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

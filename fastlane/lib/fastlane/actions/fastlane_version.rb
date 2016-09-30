@@ -30,6 +30,21 @@ module Fastlane
         "Verifies the minimum fastlane version required"
       end
 
+      def self.example_code
+        ['fastlane_version "1.50.0"']
+      end
+
+      def self.details
+        [
+          "Add this to your `Fastfile` to require a certain version of _fastlane_.",
+          "Use it if you use an action that just recently came out and you need it"
+        ].join("\n")
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.is_supported?(platform)
         true
       end

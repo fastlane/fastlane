@@ -154,6 +154,31 @@ module Fastlane
       def self.author
         ["KrauseFx", "pedrogimenez"]
       end
+
+      def self.details
+        [
+          "Additionally you can specify `notes`, `emails`, `groups` and `notifications`.",
+          "#### Distributing to Groups",
+          "",
+          "When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'crashlytics',
+          'crashlytics(
+            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+            api_token: "...",
+            build_secret: "...",
+            ipa_path: "./app.ipa"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

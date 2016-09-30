@@ -37,6 +37,16 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'git_branch'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

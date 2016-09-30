@@ -141,6 +141,16 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'version = get_version_number(xcodeproj: "Project.xcodeproj")'
+        ]
+      end
+
+      def self.category
+        :project
+      end
     end
   end
 end

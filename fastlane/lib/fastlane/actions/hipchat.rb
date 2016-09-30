@@ -172,6 +172,25 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.details
+        "Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status."
+      end
+
+      def self.example_code
+        [
+          'hipchat(
+            message: "App successfully released!",
+            message_format: "html", # or "text", defaults to "html"
+            channel: "Room or @username",
+            success: true
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
     end
   end
 end

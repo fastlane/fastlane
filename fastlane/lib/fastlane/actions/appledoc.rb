@@ -113,6 +113,10 @@ module Fastlane
       end
 
       def self.description
+        "Generate Apple-like source code documentation from the source code"
+      end
+
+      def self.details
         "Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project"
       end
 
@@ -190,6 +194,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.category
+        :documentation
+      end
+
+      def self.example_code
+        [
+          'appledoc(
+            project_name: "MyProjectName",
+            project_company: "Company Name",
+            input: "MyProjectSources",
+            ignore: [
+              "ignore/path/1",
+              "ingore/path/2"
+            ],
+            options: "--keep-intermediate-files --search-undocumented-doc",
+            warnings: "--warn-missing-output-path --warn-missing-company-id"
+          )'
+        ]
       end
     end
   end

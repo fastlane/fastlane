@@ -39,6 +39,7 @@ module Fastlane
       end
 
       def self.details
+        "Check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) for more information"
       end
 
       def self.available_options
@@ -99,7 +100,8 @@ module Fastlane
         ]
       end
 
-      def self.output
+      def self.category
+        :misc
       end
 
       def self.return_value

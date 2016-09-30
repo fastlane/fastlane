@@ -41,6 +41,22 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :android
       end
+
+      def self.example_code
+        [
+          'screengrab',
+          'screengrab(
+            locales: ["en-US", "fr-FR", "ja-JP"],
+            clear_previous_screenshots: true,
+            app_apk_path: "build/outputs/apk/example-debug.apk",
+            tests_apk_path: "build/outputs/apk/example-debug-androidTest-unaligned.apk"
+          )'
+        ]
+      end
+
+      def self.category
+        :screenshots
+      end
     end
   end
 end

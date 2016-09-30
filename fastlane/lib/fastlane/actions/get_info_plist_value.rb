@@ -26,6 +26,10 @@ module Fastlane
         "Returns value from Info.plist of your project as native Ruby data structures"
       end
 
+      def self.details
+        "Get a value from a plist file, which can be used to fetch the app identifier and more information about your app"
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :key,
@@ -54,6 +58,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'identifier = get_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier")'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end
