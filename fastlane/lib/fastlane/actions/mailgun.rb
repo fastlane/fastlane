@@ -134,7 +134,7 @@ module Fastlane
           'mailgun(
             to: "fastlane@krausefx.com",
             success: true,
-            message: "This is the mail"s content"
+            message: "This is the mail\'s content"
           )',
           'mailgun(
             postmaster: "MY_POSTMASTER",
