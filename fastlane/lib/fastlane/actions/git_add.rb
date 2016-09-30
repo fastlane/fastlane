@@ -21,10 +21,6 @@ module Fastlane
         "Directly add the given file"
       end
 
-      def self.details
-        ""
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
@@ -52,6 +48,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'git_add(path: "./version.txt")',
+          'git_add(path: ["./version.txt", "./changelog.txt"])'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end
