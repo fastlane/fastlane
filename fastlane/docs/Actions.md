@@ -990,6 +990,19 @@ This action allows you to upload symbolication files to Crashlytics. It's extra 
 upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")
 ```
 
+### `upload_symbols_to_new_relic`
+
+This action allows you to upload symbolication files to New Relic.
+
+```ruby
+upload_symbols_to_new_relic(
+            dsym_path: "./App.dSYM.zip",
+            new_relic_license_key: 'something123',
+            new_relic_app_name: 'appname',
+            new_relic_upload_libs: 'applib,otherlib'
+)
+```
+
 ### [upload_symbols_to_sentry](https://getsentry.com)
 
 This action allows you to upload symbolication files to Sentry.
