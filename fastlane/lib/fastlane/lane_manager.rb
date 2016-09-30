@@ -96,7 +96,7 @@ module Fastlane
         is_error_step = !current[:error].to_s.empty?
 
         name = current[:name][0..60]
-        name = name.red if is_error_step 
+        name = name.red if is_error_step
         index = i + 1
         index = "💥" if is_error_step
         rows << [index, name, current[:time].to_i]
