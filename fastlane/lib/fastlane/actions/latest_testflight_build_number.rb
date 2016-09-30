@@ -56,7 +56,10 @@ module Fastlane
       end
 
       def self.details
-        "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC."
+        [
+          "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.",
+          "Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+        ].join("\n")
       end
 
       def self.available_options
@@ -107,6 +110,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'latest_testflight_build_number(version: "1.3")',
+          'increment_build_number({
+            build_number: latest_testflight_build_number + 1
+          })'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

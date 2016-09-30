@@ -10,6 +10,7 @@ module Fastlane
       :code_signing,
       :documentation,
       :beta,
+      :push,
       :production,
       :source_control,
       :notifications,

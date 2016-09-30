@@ -31,6 +31,20 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'if is_ci?
+            puts "I"m a computer"
+          else
+            say "Hi Human!"
+          end'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end
