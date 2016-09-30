@@ -100,7 +100,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action. For Mac zip the .app. For Android provide path to .apk file",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
