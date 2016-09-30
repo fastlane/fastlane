@@ -50,7 +50,7 @@ module Fastlane
         [
           'hg_push',
           'hg_push(
-            destination: "ssh://hg@repohost.com/owner/repo"
+            destination: "ssh://hg@repohost.com/owner/repo",
             force: true
           )'
         ]

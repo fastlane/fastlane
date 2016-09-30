@@ -151,7 +151,7 @@ module Fastlane
         [
           'before_all do
             update_fastlane
-            ...
+            # ...
           end'
         ]
       end

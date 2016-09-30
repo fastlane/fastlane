@@ -136,7 +136,7 @@ module Fastlane
         [
           'carthage',
           'carthage(
-            command: "bootstrap"                            # One of: build, bootstrap, update, archive. (default: bootstrap)
+            command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
             dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.

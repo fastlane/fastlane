@@ -171,8 +171,8 @@ module Fastlane
 
       def self.example_code
         [
-          'download_dsym',
-          'download_dsym(version: "1.0.0", build_number: "345")'
+          'download_dsyms',
+          'download_dsyms(version: "1.0.0", build_number: "345")'
         ]
       end
 
