@@ -42,7 +42,7 @@ module Fastlane
       end
 
       def self.description
-        "Easily build and sign your app using `gym`"
+        "Easily build and sign your app using _gym_"
       end
 
       def self.details

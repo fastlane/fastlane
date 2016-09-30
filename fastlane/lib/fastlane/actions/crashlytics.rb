@@ -76,7 +76,7 @@ module Fastlane
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
@@ -158,9 +158,7 @@ module Fastlane
       def self.details
         [
           "Additionally you can specify `notes`, `emails`, `groups` and `notifications`.",
-          "#### Distributing to Groups",
-          "",
-          "When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
         ].join("\n")
       end
 

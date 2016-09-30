@@ -32,7 +32,7 @@ module Fastlane
       end
 
       def self.details
-        "Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this `fastlane` action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc."
+        "Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this _fastlane_ action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc."
       end
 
       def self.available_options
