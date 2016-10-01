@@ -38,6 +38,15 @@ module Fastlane
       def self.category
         :source_control
       end
+
+      def self.sample_return_value
+        {
+          message: "message",
+          author: "author",
+          commit_hash: "commit_hash",
+          abbreviated_commit_hash: "short_hash"
+        }
+      end
     end
   end
 end

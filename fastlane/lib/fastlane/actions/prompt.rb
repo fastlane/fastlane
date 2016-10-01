@@ -76,8 +76,12 @@ module Fastlane
             multi_line_end_keyword: "END"
           )
 
-          hockey(notes: changelog)'
+          crashlytics(notes: changelog)'
         ]
+      end
+
+      def self.sample_return_value
+        "User Content\nWithNewline"
       end
 
       def self.category
