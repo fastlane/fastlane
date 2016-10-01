@@ -226,7 +226,7 @@ module Fastlane
             ],
             enable_rules: [                       # List of rules to pick explicitly
               "DoubleNegative",
-              "SwitchStatementsDon"TNeedDefaultWhenFullyCovered"
+              "SwitchStatementsDon\'TNeedDefaultWhenFullyCovered"
             ],
             disable_rules: ["GotoStatement"],     # List of rules to disable
             list_enabled_rules: true,             # List enabled rules

@@ -121,6 +121,10 @@ module Fastlane
         ]
       end
 
+      def self.sample_return_value
+        2
+      end
+
       def self.category
         :misc
       end
