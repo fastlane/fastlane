@@ -93,9 +93,13 @@ module Fastlane
 
       rows = []
       actions.each_with_index do |current, i|
+        is_error_step = !current[:error].to_s.empty?
+
         name = current[:name][0..60]
-        name = name.red unless current[:error].to_s.empty?
-        rows << [i + 1, name, current[:time].to_i]
+        name = name.red if is_error_step
+        index = i + 1
+        index = "💥" if is_error_step
+        rows << [index, name, current[:time].to_i]
       end
 
       puts ""
