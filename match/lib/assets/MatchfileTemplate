@@ -2,7 +2,7 @@ git_url "[[GIT_URL]]"
 
 type "development" # The default type, can be: appstore, adhoc or development
 
-# app_identifier "tools.fastlane.app" 
+# app_identifier ["tools.fastlane.app", "tools.fastlane.app2"]
 # username "user@fastlane.tools" # Your Apple Developer Portal username
 
 # For all available options run `match --help`
