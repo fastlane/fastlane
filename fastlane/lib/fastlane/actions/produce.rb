@@ -64,8 +64,8 @@ module Fastlane
             app_identifier: "com.krausefx.app",
             app_name: "MyApp",
             language: "English",
-            version: "1.0",
-            sku: 123,
+            app_version: "1.0",
+            sku: "123",
             team_name: "SunApps GmbH" # Only necessary when in multiple teams.
           )'
         ]
