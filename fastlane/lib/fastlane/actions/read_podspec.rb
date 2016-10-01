@@ -73,6 +73,12 @@ module Fastlane
         ]
       end
 
+      def self.sample_return_value
+        {
+          'version' => 1.0
+        }
+      end
+
       def self.category
         :misc
       end

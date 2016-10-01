@@ -56,6 +56,13 @@ module Fastlane
       nil
     end
 
+    def self.sample_return_value
+      # Very optional
+      # You can return a sample return value, that might be returned by the actual action
+      # This is currently only used when generating the documentation and running its tests
+      nil
+    end
+
     def self.author
       nil
     end
