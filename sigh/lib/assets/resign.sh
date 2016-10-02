@@ -530,7 +530,29 @@ function resign {
         log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
         PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
     fi
-
+    
+    # Check for and resign any dylibs in the main bundle directory 
+    DYLIBS_DIR="$APP_PATH/*dylib"
+    if [ -d "$DYLIBS_DIR" ];
+    then
+        if [ "$TEAM_IDENTIFIER" == "" ];
+        then
+            error "ERROR: dylibs in mainBundle detected, re-signing iOS 8 (or higher) applications wihout a team identifier in the certificate/profile does not work"
+        fi
+        
+        log "Resigning dylibs using certificate: '$CERTIFICATE'"
+        for dylib in "$DYLIBS_DIR"
+        do
+            if [[ "$dylib" == *.dylib ]]
+            then
+                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$dylib"
+                checkStatus
+            else
+                log "Ignoring non-dylib: $dylib"
+            fi
+        done
+    fi
+    
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ];
