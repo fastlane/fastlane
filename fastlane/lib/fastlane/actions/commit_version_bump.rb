@@ -8,13 +8,15 @@ module Fastlane
         require 'set'
         require 'shellwords'
 
-        xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
-
         # find the repo root path
         repo_path = Actions.sh('git rev-parse --show-toplevel').strip
         repo_pathname = Pathname.new(repo_path)
 
+        xcodeproj_path = params[:xcodeproj] ? File.expand_path(params[:xcodeproj]) : nil
+
         if xcodeproj_path
+          # if directory don't exists the path may be relative
+          xcodeproj_path = File.expand_path(File.join('.', params[:xcodeproj])) unless File.directory?(xcodeproj_path)
           # ensure that the xcodeproj passed in was OK
           UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
         else
