@@ -40,7 +40,7 @@ module Fastlane
 
       def self.example_code
         [
-          'adb_devices.each  do |device|
+          'adb_devices.each do |device|
             model = adb(command: "shell getprop ro.product.model",
                         serial: device.serial).strip
 
