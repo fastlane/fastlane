@@ -139,7 +139,9 @@ module Pilot
         # true -> false, where the second true is transient. This causes a spurious failure. Find build by build_version
         # and ensure it's not processing before proceeding - it had to have already been false before, to get out of the
         # previous loop.
-        full_build = app.build_trains[latest_build.train_version].builds.find do |b|
+        build_train = app.build_trains[latest_build.train_version]
+        builds = build_train ? build_train.builds : []
+        full_build = builds.find do |b|
           b.build_version == latest_build.build_version
         end
 
