@@ -69,8 +69,10 @@ module Fastlane
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
                    emails: emails,
                    groups: groups,
-                    notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action!
+                    notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action
             notifications: true) # Should this distribution notify your testers via email?
+
+    # for all available options run `fastlane action crashlytics`
 
     # You can notify your team in chat that a beta build has been uploaded
     # slack(
