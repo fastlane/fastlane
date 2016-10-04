@@ -58,7 +58,7 @@ module Fastlane
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
   #
   lane :beta do |values|
-
+    # Fabric generated this lane for deployment to Crashlytics Beta
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
 
