@@ -62,7 +62,7 @@ module Match
         commands = []
         commands << "git add -A"
         commands << "git commit -m #{message.shellescape}"
-        commands << "git push origin #{branch.shellescape}"
+        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape}"
 
         UI.message "Pushing changes to remote git repo..."
 
@@ -74,6 +74,9 @@ module Match
       end
       FileUtils.rm_rf(path)
       @dir = nil
+    rescue => ex
+      UI.error("Couldn't commit or push changes back to git...")
+      UI.error(ex)
     end
 
     def self.clear_changes
