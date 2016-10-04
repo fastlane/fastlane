@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -840,8 +842,8 @@ module Spaceship
             storeFront: { value: country },
             birthDay: { value: 1 },
             birthMonth: { value: 1 },
-            secretQuestion: { value: 'secret_question' },
-            secretAnswer: { value: 'secret_answer' },
+            secretQuestion: { value: SecureRandom.hex },
+            secretAnswer: { value: SecureRandom.hex },
             sandboxAccount: nil
           }
         }.to_json
