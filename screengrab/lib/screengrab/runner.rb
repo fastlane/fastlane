@@ -177,13 +177,13 @@ module Screengrab
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
       UI.message 'Installing tests APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")
