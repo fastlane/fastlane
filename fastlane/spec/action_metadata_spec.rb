@@ -2,7 +2,7 @@ require 'fastlane/documentation/actions_list'
 
 describe Fastlane::Action do
   Fastlane::ActionsList.all_actions do |action, name|
-    describe name, now: true do
+    describe name do
       it "contains a valid category" do
         expect(action.category).to_not be_nil
         expect(action.category).to be_kind_of(Symbol)
