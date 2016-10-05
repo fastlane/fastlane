@@ -5,7 +5,7 @@ module Fastlane
 
     class FastlaneVersionAction < Action
       def self.run(params)
-        params = nil unless params.kind_of? Array
+        params = nil unless params.kind_of?(Array)
         value = (params || []).first
         defined_version = Gem::Version.new(value) if value
 
@@ -15,7 +15,7 @@ module Fastlane
           UI.user_error!("The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}. Please update using `sudo gem update fastlane`.")
         end
 
-        UI.message("fastlane version valid")
+        UI.message("Your fastlane version #{Fastlane::VERSION} matches the minimum requirement of #{defined_version}  ✅")
       end
 
       def self.step_text
