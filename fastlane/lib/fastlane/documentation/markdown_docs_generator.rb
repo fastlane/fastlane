@@ -1,4 +1,3 @@
-require 'pry'
 module Fastlane
   class MarkdownDocsGenerator
     ENHANCER_URL = "https://fastlane-enhancer.herokuapp.com"
