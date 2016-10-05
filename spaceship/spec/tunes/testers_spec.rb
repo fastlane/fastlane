@@ -88,23 +88,31 @@ describe Spaceship::Tunes::Tester do
 
     describe "creation" do
       before { allow(SecureRandom).to receive(:hex).and_return('so_secret') }
-
       it 'creates sandbox testers correctly' do
+        t = Spaceship::Tunes::SandboxTester.create!(
+          email: 'test2@test.com',
+          password: 'Passwordtest1',
+          country: 'US',
+          first_name: 'Steve',
+          last_name: 'Brule'
+        )
+        expect(t.class).to eq(Spaceship::Tunes::SandboxTester)
 
-      t = Spaceship::Tunes::SandboxTester.create!(
-        email: 'test2@test.com',
-        password: 'Passwordtest1',
-        country: 'US',
-        first_name: 'Steve',
-        last_name: 'Brule'
-      )
-      expect(t.class).to eq(Spaceship::Tunes::SandboxTester)
-
-      expect(t.email).to eq("test2@test.com")
-      expect(t.first_name).to eq("Steve")
-      expect(t.last_name).to eq("Brule")
-      expect(t.country).to eq("US")
+        expect(t.email).to eq("test2@test.com")
+        expect(t.first_name).to eq("Steve")
+        expect(t.last_name).to eq("Brule")
+        expect(t.country).to eq("US")
+      end
     end
+
+    describe "deletion", now: true do
+      it 'deletes a user' do
+        expect { Spaceship::Tunes::SandboxTester.delete!(['test@test.com']) }.not_to raise_error
+      end
+
+      it 'deletes all users', now: true do
+        expect { Spaceship::Tunes::SandboxTester.delete_all! }.not_to raise_error
+      end
     end
   end
 

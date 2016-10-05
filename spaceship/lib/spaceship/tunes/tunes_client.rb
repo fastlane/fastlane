@@ -852,6 +852,22 @@ module Spaceship
       parse_response(r, 'data')['user']
     end
 
+    def delete_sandbox_testers!(tester_class, emails)
+      url = tester_class.url[:delete]
+      request(:post) do |req|
+        req.url url
+        req.body = emails.map do |email|
+          {
+            emailAddress: {
+              value: email
+            }
+          }
+        end.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      true
+    end
+
     #####################################################
     # @!group State History
     #####################################################
