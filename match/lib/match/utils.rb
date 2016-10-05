@@ -11,10 +11,7 @@ module Match
       # We need to expand each path because File.exist? won't handle directories including ~ properly
       #
       # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
-      # has changed for some users:
-      # - https://github.com/fastlane/fastlane/issues/5649
-      # - https://github.com/fastlane/fastlane/issues/6151
-      # - https://github.com/fastlane/fastlane/issues/5649
+      # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
       #
       keychain_paths = [
         File.join(Dir.home, 'Library', 'Keychains', keychain),
