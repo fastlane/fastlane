@@ -114,7 +114,7 @@ module Pilot
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
       loop do
-        sleep wait_processing_interval
+        sleep(wait_processing_interval)
 
         # before we look for processing builds, we need to ensure that there
         #  is a build train for this application; new applications don't
@@ -143,8 +143,8 @@ module Pilot
           b.build_version == latest_build.build_version
         end
 
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})")
-        sleep wait_processing_interval
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
+        sleep(wait_processing_interval)
       end
 
       if full_build && !full_build.processing && full_build.valid
