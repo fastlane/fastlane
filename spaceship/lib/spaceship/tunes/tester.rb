@@ -221,7 +221,7 @@ module Spaceship
         {
           index:  "ra/users/iap",
           create: "ra/users/iap/add",
-          delete: "ra/users/iap/delete",
+          delete: "ra/users/iap/delete"
         }
       end
 
