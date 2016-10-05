@@ -21,6 +21,16 @@ module Fastlane
       def self.author
         "KrauseFx"
       end
+
+      def self.example_code
+        [
+          'say "I can speak"'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

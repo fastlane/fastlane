@@ -38,7 +38,10 @@ module Fastlane
       end
 
       def self.details
-        "This should be called from danger"
+        [
+          "This should be called from danger",
+          "More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+        ].join("\n")
       end
 
       def self.available_options
@@ -74,6 +77,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

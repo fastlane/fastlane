@@ -12,7 +12,9 @@ module Fastlane
         begin
           FastlaneCore::UpdateChecker.start_looking_for_update('gym') unless Helper.is_test?
 
-          if values[:provisioning_profile_path].to_s.length == 0
+          should_use_legacy_api = values[:use_legacy_build_api] || Gym::Xcode.pre_7?
+
+          if values[:provisioning_profile_path].to_s.length.zero? && should_use_legacy_api
             sigh_path = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
             values[:provisioning_profile_path] = File.expand_path(sigh_path) if sigh_path
           end
@@ -40,11 +42,11 @@ module Fastlane
       end
 
       def self.description
-        "Easily build and sign your app using `gym`"
+        "Easily build and sign your app using _gym_"
       end
 
       def self.details
-        "More information: https://github.com/fastlane/fastlane/tree/master/gym"
+        "More information: https://fastlane.tools/gym"
       end
 
       def self.return_value
@@ -62,6 +64,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'gym(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
+          'gym(
+            workspace: "MyApp.xcworkspace",
+            configuration: "Debug",
+            scheme: "MyApp",
+            silent: true,
+            clean: true,
+            output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
+            output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
+            sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

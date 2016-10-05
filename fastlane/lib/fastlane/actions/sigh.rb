@@ -55,6 +55,10 @@ module Fastlane
         "The UDID of the profile sigh just fetched/generated"
       end
 
+      def self.details
+        "**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning."
+      end
+
       def self.available_options
         require 'sigh'
         Sigh::Options.available_options
@@ -62,6 +66,21 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'sigh',
+          'sigh(
+            adhoc: true,
+            force: true,
+            filename: "myFile.mobileprovision"
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

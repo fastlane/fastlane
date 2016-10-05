@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.description
-        "Shows a macOS notification"
+        "Shows a macOS notification - use `notification` instead"
       end
 
       def self.author
@@ -22,6 +22,14 @@ module Fastlane
 
       def self.is_supported?(platform)
         Helper.mac?
+      end
+
+      def self.example_code
+        []
+      end
+
+      def self.category
+        :deprecated
       end
     end
   end

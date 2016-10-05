@@ -39,6 +39,37 @@ task :rubygems_admins do
   end
 end
 
+task :update_dependencies do
+  puts "Updating all internal fastlane dependencies"
+
+  # This requires all version numbers to be x.x.x (3 components)
+  regex = %r{spec.add_dependency .(.+).\, .\>\= (\d+\.\d+\.\d+).\, .\< \d+\.\d+\.\d+.}
+
+  Dir["./**/*.gemspec"].each do |current_gemspec_path|
+    content = File.read(current_gemspec_path)
+
+    content.gsub!(regex) do |full_match|
+      gem_name = $1
+      current_version_number = Gem::Version.new($2) # used to detect if we actually changed something
+
+      version_path = "./#{gem_name}/lib/#{gem_name}/version.rb"
+      if File.exist?(version_path) && gem_name != "screengrab" # internal dependency
+        version = Gem::Version.new(File.read(version_path).match(/VERSION.=..(\d+\.\d+\.\d+)./)[1])
+        next_major_version = Gem::Version.new("#{version.segments[0] + 1}.0.0")
+
+        puts "🚀  Updating #{gem_name} from #{current_version_number} to #{version} for #{gem_name}" if version != current_version_number
+
+        "spec.add_dependency \"#{gem_name}\", \">= #{version}\", \"< #{next_major_version}\""
+      else
+        full_match # external dependency
+      end
+    end
+
+    puts "✅   Writing to #{current_gemspec_path}"
+    File.write(current_gemspec_path, content)
+  end
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################

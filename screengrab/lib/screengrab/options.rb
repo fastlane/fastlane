@@ -37,7 +37,7 @@ module Screengrab
                                      default_value: File.join("fastlane", "metadata", "android")),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
-                                     description: "Don't open the summary after running `screengrab`",
+                                     description: "Don't open the summary after running _screengrab_",
                                      default_value: DEFAULT_SKIP_OPEN_SUMMARY,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_package_name,

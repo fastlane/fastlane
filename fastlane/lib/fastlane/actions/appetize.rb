@@ -87,7 +87,15 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        "Create or Update apps on Appetize.io"
+        "Upload your app to Appetize.io to stream it in the browser"
+      end
+
+      def self.details
+        [
+          "If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.",
+          "",
+          "To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+        ].join("\n")
       end
 
       def self.available_options
@@ -142,6 +150,20 @@ module Fastlane
 
       def self.authors
         ["klundberg", "giginet"]
+      end
+
+      def self.category
+        :beta
+      end
+
+      def self.example_code
+        [
+          'appetize(
+            path: "./MyApp.zip",
+            api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
+            public_key: "your_public_key" # get it from https://appetize.io/dashboard
+          )'
+        ]
       end
     end
   end

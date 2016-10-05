@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         UI.message("You shouldn't use update_project_code_signing")
         UI.message("Have you considered using the recommended way to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
+        UI.message("https://docs.fastlane.tools/codesigning/getting-started/")
 
         path = params[:path]
         path = File.join(path, "project.pbxproj")
@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.details
-        "This feature is not yet 100% finished"
+        "Don't use this actoin, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
       end
 
       def self.available_options
@@ -50,6 +50,14 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        []
+      end
+
+      def self.category
+        :deprecated
       end
     end
   end

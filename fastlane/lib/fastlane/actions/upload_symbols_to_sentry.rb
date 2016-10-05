@@ -137,6 +137,21 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'upload_symbols_to_sentry(
+            auth_token: "...",
+            org_slug: "...",
+            project_slug: "...",
+            dsym_path: "./App.dSYM.zip"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

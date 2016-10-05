@@ -54,6 +54,16 @@ module Fastlane
         ]
       end
 
+      def self.example_code
+        [
+          'data = download(url: "https://host.com/api.json")'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.authors
         ["KrauseFx"]
       end

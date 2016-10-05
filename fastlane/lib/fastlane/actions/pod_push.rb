@@ -73,9 +73,6 @@ module Fastlane
         ]
       end
 
-      def self.output
-      end
-
       def self.return_value
         nil
       end
@@ -86,6 +83,23 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          '# If no path is supplied then Trunk will attempt to find the first Podspec in the current directory.
+          pod_push',
+          '# Alternatively, supply the Podspec file path
+          pod_push(path: "TSMessages.podspec")',
+          '# You may also push to a private repo instead of Trunk
+          pod_push(path: "TSMessages.podspec", repo: "MyRepo")',
+          '# If the podspec has a dependency on another private pod, then you will have to supply the sources you want the podspec to lint with for pod_push to succeed. Read more here - https://github.com/CocoaPods/CocoaPods/issues/2543.
+          pod_push(path: "TMessages.podspec", repo: "MyRepo", sources: ["https://github.com/MyGithubPage/Specs", "https://github.com/CocoaPods/Specs"])'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

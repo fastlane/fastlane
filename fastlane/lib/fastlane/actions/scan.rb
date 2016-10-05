@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.description
-        "Easily run tests of your iOS app using `scan`"
+        "Easily run tests of your iOS app using _scan_"
       end
 
       def self.details
@@ -71,6 +71,21 @@ module Fastlane
 
       def self.test_summary_filenames(derived_data_path)
         Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+      end
+
+      def self.example_code
+        [
+          'scan',
+          'scan(
+            workspace: "App.xcworkspace",
+            scheme: "MyTests",
+            clean: false
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

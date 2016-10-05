@@ -41,6 +41,20 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'snapshot',
+          'snapshot(
+            skip_open_summary: true,
+            clean: true
+          )'
+        ]
+      end
+
+      def self.category
+        :screenshots
+      end
     end
   end
 end

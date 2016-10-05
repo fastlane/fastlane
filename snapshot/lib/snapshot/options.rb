@@ -64,7 +64,7 @@ module Snapshot
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SNAPSHOT_SKIP_OPEN_SUMMARY',
-                                     description: "Don't open the HTML summary after running `snapshot`",
+                                     description: "Don't open the HTML summary after running _snapshot_",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :clear_previous_screenshots,

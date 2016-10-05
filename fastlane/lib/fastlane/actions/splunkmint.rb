@@ -134,6 +134,20 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'splunkmint(
+            dsym: "My.app.dSYM.zip",
+            api_key: "43564d3a",
+            api_token: "e05456234c4869fb7e0b61"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

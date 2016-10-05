@@ -30,6 +30,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :log_output,
                                        description: "If output should be logged to the console",
+                                       type: TrueClass,
                                        default_value: false,
                                        optional: true)
         ]
@@ -41,6 +42,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.details
+        "Import certificates into the current default keychain. Use `create_keychain` to create a new keychain."
+      end
+
+      def self.example_code
+        [
+          'import_certificate(certificate_path: "certs/AppleWWDRCA.cer")',
+          'import_certificate(
+            certificate_path: "certs/dist.p12",
+            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

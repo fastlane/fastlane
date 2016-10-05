@@ -127,7 +127,7 @@ module Gym
             # Reads options from hash
             hash = normalize_export_options(Gym.config[:export_options])
           else
-            # Reads optoins from file
+            # Reads options from file
             hash = Plist.parse_xml(Gym.config[:export_options])
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
@@ -167,8 +167,9 @@ module Gym
       def print_legacy_information
         return if Gym.config[:provisioning_profile_path].to_s.length == 0
 
-        UI.error "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning"
+        UI.error "You're using Xcode 7 or above, the `provisioning_profile_path` value will be ignored"
+        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://docs.fastlane.tools/codesigning/GettingStarted/"
+        UI.error "This is just a warning, gym will continue running just as expected, but the parameter will be ignored"
       end
     end
   end

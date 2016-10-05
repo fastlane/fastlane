@@ -86,6 +86,24 @@ module Fastlane
       def self.authors
         ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
       end
+
+      def self.details
+        "If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app."
+      end
+
+      def self.example_code
+        [
+          'cocoapods',
+          'cocoapods(
+            clean: true,
+            podfile: "./CustomPodfile"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
     end
   end
 end
