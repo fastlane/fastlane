@@ -18,7 +18,7 @@ module Frameit
       system("open '#{DOWNLOAD_URL}'")
       UI.success "----------------------------------------------------"
       UI.success "Download the zip files for the following devices"
-      UI.success "iPhone 6s, iPhone 6s Plus, iPhone SE, iPad mini 4 and iPad Pro"
+      UI.success "iPhone 7, iPhone 7 Plus, iPhone SE, iPad mini 4 and iPad Pro"
       UI.success "You only need to download the devices you want to use"
       UI.success "Press Enter when you downloaded the zip files"
       UI.success "----------------------------------------------------"

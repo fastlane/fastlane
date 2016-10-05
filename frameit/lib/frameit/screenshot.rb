@@ -22,9 +22,9 @@ module Frameit
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
       when sizes::IOS_55
-        return 'iPhone-6s-Plus'
+        return 'iPhone-7-Plus'
       when sizes::IOS_47
-        return 'iPhone-6s'
+        return 'iPhone-7'
       when sizes::IOS_40
         return Frameit.config[:use_legacy_iphone5s] ? 'iPhone_5s' : 'iPhone-SE'
       when sizes::IOS_35
