@@ -141,14 +141,20 @@ module Spaceship
         logger.debug("Request was successful")
       end
 
-      handle_response_hash = lambda do |hash|
+      # We pass on the `current_language` so that the error message tells the user
+      # what language the error was caused in
+      handle_response_hash = lambda do |hash, current_language = nil|
         errors = []
-        if hash.kind_of? Hash
-          hash.each do |key, value|
-            errors += handle_response_hash.call(value)
+        if hash.kind_of?(Hash)
+          current_language ||= hash["language"]
 
-            if key == 'errorKeys' and value.kind_of? Array and value.count > 0
-              errors += value
+          hash.each do |key, value|
+            errors += handle_response_hash.call(value, current_language)
+
+            next unless key == 'errorKeys' and value.kind_of?(Array) and value.count > 0
+            # Prepend the error with the language so it's easier to understand for the user
+            errors += value.collect do |current_error_message|
+              current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
             end
           end
         elsif hash.kind_of? Array
