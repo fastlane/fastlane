@@ -14,7 +14,7 @@ module Match
         FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
                                             print_all: $verbose,
                                         print_command: $verbose)
-      rescue => ex
+      rescue
         UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
         UI.error("Run the following command manually to make sure you're properly authenticated:")
         UI.command(command)
