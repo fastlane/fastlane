@@ -8,7 +8,7 @@ require 'spaceship/helper/net_http_generic_request'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
-if ENV["DEBUG"]
+if ENV["SPACESHIP_DEBUG"]
   require 'openssl'
   # this has to be on top of this file, since the value can't be changed later
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
