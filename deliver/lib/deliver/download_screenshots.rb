@@ -18,7 +18,7 @@ module Deliver
           original_file_extension = File.basename(screenshot.original_file_name)
           file_name += "." + original_file_extension
 
-          UI.message("Downloading existing screenshot '#{file_name}'")
+          UI.message("Downloading existing screenshot '#{file_name}' for language '#{language}'")
 
           # If the screen shot is for an appleTV we need to store it in a way that we'll know it's an appleTV
           # screen shot later as the screen size is the same as an iPhone 6 Plus in landscape.
