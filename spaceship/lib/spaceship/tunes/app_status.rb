@@ -49,7 +49,8 @@ module Spaceship
           'pendingContract' => PENDING_CONTRACT,
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
-          'inReview' => IN_REVIEW
+          'inReview' => IN_REVIEW,
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
         }
 
         mapping.each do |k, v|

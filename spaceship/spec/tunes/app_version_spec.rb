@@ -165,8 +165,12 @@ describe Spaceship::AppVersion, all: true do
         expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
       end
 
-      it "parses readyForSale" do
+      it "parses prepareForUpload" do
         expect(Spaceship::Tunes::AppStatus.get_from_string('prepareForUpload')).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
+      end
+
+      it "parses pendingDeveloperRelease" do
+        expect(Spaceship::Tunes::AppStatus.get_from_string('pendingDeveloperRelease')).to eq(Spaceship::Tunes::AppStatus::PENDING_DEVELOPER_RELEASE)
       end
     end
 
