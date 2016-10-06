@@ -193,8 +193,10 @@ private_lane :print_release_changelog do |options|
   tool_name = options[:tool]
   old_version = options[:old_version]
 
-  changes = sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..").gsub("\n\n", "\n")
-  puts "Changes since release #{old_version}:\n#{changes}"
+  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: false).gsub("\n\n", "\n")
+  changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
+
+  puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
 end
 
 desc "Add a git tag in the fastlane repo for this release"
