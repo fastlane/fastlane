@@ -364,14 +364,18 @@ module Spaceship
           upload_file = UploadFile.from_path screenshot_path
           screenshot_data = client.upload_screenshot(self, upload_file, device)
 
+          # Since October 2016 we also need to pass the size, height, width and checksum
+          # otherwise iTunes Connect validation will fail at a later point
           new_screenshot = {
-              "value" => {
-                  "assetToken" => screenshot_data["token"],
-                  "sortOrder" => sort_order,
-                  "url" => nil,
-                  "thumbNailUrl" => nil,
-                  "originalFileName" => upload_file.file_name
-              }
+            "value" => {
+              "assetToken" => screenshot_data["token"],
+              "sortOrder" => sort_order,
+              "originalFileName" => upload_file.file_name,
+              "size" => screenshot_data["length"],
+              "height" => screenshot_data["height"],
+              "width" => screenshot_data["width"],
+              "checksum" => screenshot_data["md5"]
+            }
           }
 
           # We disable "scaling" for this device type / language combination
