@@ -17,7 +17,6 @@ module Fastlane
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
-        ENV["FASTLANE_TEAM_ID"] = params[:team_id]
         Spaceship.select_team
 
         if devices
@@ -72,10 +71,21 @@ module Fastlane
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       env_name: "FASTLANE_TEAM_ID",
-                                       description: "optional: Your team ID",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                       optional: true),
+                                     env_name: "REGISTER_DEVICES_TEAM_ID",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       env_name: "REGISTER_DEVICES_TEAM_NAME",
+                                       description: "The name of your Developer Portal team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                       end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
