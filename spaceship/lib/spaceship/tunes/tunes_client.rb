@@ -83,15 +83,21 @@ module Spaceship
       t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
-      if t_name.length > 0
+      if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
+        puts "Looking for iTunes Connect Team with name #{t_name}" if $verbose
+
         teams.each do |t|
           t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
         end
+
+        puts "Could not find team with name '#{t_name}', trying to fallback to default team" if t_id.length.zero?
       end
 
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
+        puts "Looking for iTunes Connect Team with ID #{t_id}" if $verbose
+
         # actually set the team id here
         self.team_id = t_id
         return
@@ -100,6 +106,15 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
+        puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
+        first_team = teams.first["contentProvider"]
+        puts ""
+        puts "  itc_team_id \"#{first_team['contentProviderId']}\""
+        puts ""
+        puts "or"
+        puts ""
+        puts "  itc_team_name \"#{first_team['name']}\""
+        puts ""
         teams.each_with_index do |team, i|
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
@@ -141,14 +156,20 @@ module Spaceship
         logger.debug("Request was successful")
       end
 
-      handle_response_hash = lambda do |hash|
+      # We pass on the `current_language` so that the error message tells the user
+      # what language the error was caused in
+      handle_response_hash = lambda do |hash, current_language = nil|
         errors = []
-        if hash.kind_of? Hash
-          hash.each do |key, value|
-            errors += handle_response_hash.call(value)
+        if hash.kind_of?(Hash)
+          current_language ||= hash["language"]
 
-            if key == 'errorKeys' and value.kind_of? Array and value.count > 0
-              errors += value
+          hash.each do |key, value|
+            errors += handle_response_hash.call(value, current_language)
+
+            next unless key == 'errorKeys' and value.kind_of?(Array) and value.count > 0
+            # Prepend the error with the language so it's easier to understand for the user
+            errors += value.collect do |current_error_message|
+              current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
             end
           end
         elsif hash.kind_of? Array

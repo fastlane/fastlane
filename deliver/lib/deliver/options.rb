@@ -120,7 +120,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-k",
                                      env_name: "DELIVER_TEAM_ID",
-                                     description: "The ID of your team if you're in multiple teams",
+                                     description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
@@ -130,21 +130,30 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-e",
                                      env_name: "DELIVER_TEAM_NAME",
-                                     description: "The name of your team if you're in multiple teams",
+                                     description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :dev_portal_team_id,
                                      short_option: "-s",
                                      env_name: "DELIVER_DEV_PORTAL_TEAM_ID",
-                                     description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
+                                     description: "The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :dev_portal_team_name,
+                                     short_option: "-y",
+                                     env_name: "DELIVER_DEV_PORTAL_TEAM_NAME",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",

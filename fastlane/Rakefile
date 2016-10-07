@@ -12,3 +12,8 @@ task :generate_plugins do
   require 'fastlane/plugins/plugin_fetcher'
   Fastlane::PluginFetcher.update_md_file!
 end
+
+task :generate_docs do
+  require 'fastlane/documentation/markdown_docs_generator'
+  Fastlane::MarkdownDocsGenerator.new.generate!
+end

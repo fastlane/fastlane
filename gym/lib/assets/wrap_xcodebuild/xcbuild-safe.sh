@@ -43,8 +43,16 @@ fi
 
 if which rbenv > /dev/null; then
   echo "rbenv detected, removing env variables"
+
+  # Cause rbenv to use system ruby. Lasts only for the scope of this
+  # session which will normally just be this script.
+  rbenv shell system
+
   unset RUBYLIB
   unset RUBYOPT
+  unset _ORIGINAL_GEM_PATH
+  unset BUNDLE_BIN_PATH
+  unset BUNDLE_GEMFILE
   unset GEM_HOME
   unset GEM_PATH
 fi

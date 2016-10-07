@@ -58,6 +58,17 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'match(type: "appstore", app_identifier: "tools.fastlane.app")',
+          'match(type: "development", readonly: true)'
+        ]
+      end
+
+      def self.category
+        :code_signing
+      end
     end
   end
 end

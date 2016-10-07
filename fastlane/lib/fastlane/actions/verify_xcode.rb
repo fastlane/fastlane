@@ -138,6 +138,17 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end
+
+      def self.example_code
+        [
+          'verify_xcode',
+          'verify_xcode(xcode_path: "/Applications/Xcode.app")'
+        ]
+      end
+
+      def self.category
+        :building
+      end
     end
   end
 end

@@ -46,16 +46,22 @@ module Fastlane
         ]
       end
 
-      def self.output
-        []
-      end
-
       def self.authors
         ["kohtenko"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

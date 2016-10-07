@@ -27,6 +27,10 @@ module Fastlane
         "Sets a value for a key with cocoapods-keys"
       end
 
+      def self.details
+        "Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys)"
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
@@ -54,6 +58,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'set_pod_key(
+            key: "APIToken",
+            value: "1234",
+            project: "MyProject"
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

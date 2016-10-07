@@ -165,8 +165,12 @@ describe Spaceship::AppVersion, all: true do
         expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
       end
 
-      it "parses readyForSale" do
+      it "parses prepareForUpload" do
         expect(Spaceship::Tunes::AppStatus.get_from_string('prepareForUpload')).to eq(Spaceship::Tunes::AppStatus::PREPARE_FOR_SUBMISSION)
+      end
+
+      it "parses pendingDeveloperRelease" do
+        expect(Spaceship::Tunes::AppStatus.get_from_string('pendingDeveloperRelease')).to eq(Spaceship::Tunes::AppStatus::PENDING_DEVELOPER_RELEASE)
       end
     end
 
@@ -560,7 +564,7 @@ describe Spaceship::AppVersion, all: true do
         itc_stub_invalid_update
         expect do
           version.save!
-        end.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
+        end.to raise_error("[German]: The App Name you entered has already been used. [English]: The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations.")
       end
 
       it "works with valid update data" do

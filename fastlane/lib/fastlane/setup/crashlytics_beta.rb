@@ -58,7 +58,7 @@ module Fastlane
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
   #
   lane :beta do |values|
-
+    # Fabric generated this lane for deployment to Crashlytics Beta
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
 
@@ -69,8 +69,10 @@ module Fastlane
              build_secret: '#{@beta_info.build_secret}',#{crashlytics_path_arg}
                    emails: emails,
                    groups: groups,
-                    notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action!
+                    notes: 'Distributed with fastlane', # Check out the changelog_from_git_commits action
             notifications: true) # Should this distribution notify your testers via email?
+
+    # for all available options run `fastlane action crashlytics`
 
     # You can notify your team in chat that a beta build has been uploaded
     # slack(

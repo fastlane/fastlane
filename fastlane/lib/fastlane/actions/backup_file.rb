@@ -26,6 +26,16 @@ module Fastlane
                                        optional: false)
         ]
       end
+
+      def self.example_code
+        [
+          'backup_file(path: "/path/to/file")'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

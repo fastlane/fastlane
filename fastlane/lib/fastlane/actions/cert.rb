@@ -34,6 +34,13 @@ module Fastlane
         "Fetch or generate the latest available code signing identity"
       end
 
+      def self.details
+        [
+          "**Important**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.",
+          "Use this action to download the latest code signing identity"
+        ].join("\n")
+      end
+
       def self.available_options
         require 'cert'
         Cert::Options.available_options
@@ -45,6 +52,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'cert',
+          'cert(
+            development: true,
+            username: "user@email.com"
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

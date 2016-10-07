@@ -86,6 +86,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'create_keychain(
+            name: "KeychainName",
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: true
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

@@ -136,8 +136,9 @@ module Fastlane
 
       def self.details
         [
+          "**Note**: This action is deprecated, use _gym_ instead",
           "More information on the shenzhen project page: https://github.com/nomad/shenzhen",
-          "To make code signing work, it is recommended to set a the provisioning profile in the project settings."
+          "To make code signing work, follow https://docs.fastlane.tools/codesigning/xcode-project/#"
         ].join(' ')
       end
 
@@ -209,6 +210,29 @@ module Fastlane
 
       def self.author
         "joshdholtz"
+      end
+
+      def self.example_code
+        [
+          'ipa(
+            workspace: "MyApp.xcworkspace",
+            configuration: "Debug",
+            scheme: "MyApp",
+            # (optionals)
+            clean: true,                     # This means "Do Clean". Cleans project before building (the default if not specified).
+            destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+            ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+            xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+            embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+            identity: "MyIdentity",          # Identity to be used along with --embed
+            sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+            archive: true                    # this means "Do Archive". Archive project after building (the default if not specified).
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

@@ -126,7 +126,7 @@ module Sigh
 
       profiles = []
       profile_paths.each do |profile_path|
-        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}'`)
+        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}' 2> /dev/null`) # /dev/null: https://github.com/fastlane/fastlane/issues/6387
         profile['Path'] = profile_path
         profiles << profile
       end

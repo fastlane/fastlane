@@ -132,6 +132,29 @@ module Fastlane
         ]
       end
 
+      def self.example_code
+        [
+          'carthage',
+          'carthage(
+            command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
+            use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
+            use_submodules: false,                          # Add dependencies as Git submodules.
+            use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
+            no_build: false,                                # When bootstrapping Carthage do not build
+            no_skip_current: false,                         # Don\'t skip building the current project (only for frameworks)
+            verbose: false,                                 # Print xcodebuild output inline
+            platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
+            configuration: "Release",                       # Build configuration to use when building
+            toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end

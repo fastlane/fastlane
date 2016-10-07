@@ -56,6 +56,19 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'rsync(
+            source: "root@host:/tmp/1.txt",
+            destination: "/tmp/local_file.txt"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

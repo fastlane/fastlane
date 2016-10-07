@@ -69,7 +69,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -78,7 +78,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :itc_team_id,
                                      short_option: "-k",
@@ -97,7 +97,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end)
       ]
     end

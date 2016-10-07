@@ -84,6 +84,19 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'apteligent(
+            app_id: "...",
+            api_key: "..."
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

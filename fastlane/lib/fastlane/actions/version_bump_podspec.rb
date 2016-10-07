@@ -74,6 +74,17 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")',
+          'version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

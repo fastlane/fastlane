@@ -37,6 +37,7 @@ module Fastlane
       end
 
       def self.details
+        "Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. This will make sure to use the correct Xcode for later actions."
       end
 
       def self.available_options
@@ -79,6 +80,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'xcode_install(version: "7.1")'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

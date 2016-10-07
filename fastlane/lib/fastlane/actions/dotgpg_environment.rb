@@ -37,6 +37,16 @@ module Fastlane
         ["simonlevy5"]
       end
 
+      def self.example_code
+        [
+          "dotgpg_environment(dotgpg_file: './path/to/gpgfile')"
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.is_supported?(platform)
         true
       end
