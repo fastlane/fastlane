@@ -2,6 +2,8 @@ module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)
   class AppfileConfig
     def self.try_fetch_value(key)
+      # We need to load the file every time we call this method
+      # to support the `for_lane` keyword
       begin
         return self.new.data[key]
       rescue => ex
@@ -20,7 +22,7 @@ module CredentialsManager
 
     def initialize(path = nil)
       if path
-        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
+        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(File.expand_path(path))
       end
 
       path ||= self.class.default_path
@@ -41,10 +43,33 @@ module CredentialsManager
           # rubocop:disable Lint/Eval
           eval(content)
           # rubocop:enable Lint/Eval
+
+          print_debug_information(path: full_path) if $verbose
         end
       end
 
       fallback_to_default_values
+    end
+
+    def print_debug_information(path: nil)
+      self.class.already_printed_debug_information ||= {}
+      return if self.class.already_printed_debug_information[self.data]
+      # self.class.already_printed_debug_information is a hash, we use to detect if we already printed this data
+      # this is necessary, as on the course of a fastlane run, the values might change, e.g. when using
+      # the `for_lane` keyword.
+
+      puts "Successfully loaded Appfile at path '#{path}'".yellow
+
+      self.data.each do |key, value|
+        puts "- #{key.to_s.cyan}: '#{value.to_s.green}'"
+      end
+      puts "-------"
+
+      self.class.already_printed_debug_information[self.data] = true
+    end
+
+    def self.already_printed_debug_information
+      @already_printed_debug_information ||= {}
     end
 
     def fallback_to_default_values
