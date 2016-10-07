@@ -66,6 +66,23 @@ module Spaceship
 
     # Set a new team ID which will be used from now on
     def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      # 
+      #     invalid content provider id
+      # 
+      available_teams = teams.collect do |team|
+        team.fetch("contentProvider", {}).fetch("contentProviderId", nil)
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
       response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
         req.body = { contentProviderId: team_id }.to_json
