@@ -7,6 +7,7 @@ module Snapshot
         parts << "xcodebuild"
         parts += options
         parts += destination(device_type)
+        parts += build_settings
         parts += actions
         parts += suffix
         parts += pipe
@@ -39,6 +40,13 @@ module Snapshot
         options
       end
 
+      def build_settings
+        build_settings = []
+        build_settings << "FASTLANE_SNAPSHOT=YES"
+
+        build_settings
+      end
+
       def actions
         actions = []
         actions << :clean if Snapshot.config[:clean]
@@ -56,25 +64,41 @@ module Snapshot
         ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
-      def device_udid(device)
-        # we now fetch the device's udid. Why? Because we might get this error message
+      def find_device(device_name, os_version = Snapshot.config[:ios_version])
+        # We might get this error message
         # > The requested device could not be found because multiple devices matched the request.
         #
         # This happens when you have multiple simulators for a given device type / iOS combination
         #   { platform:iOS Simulator, id:1685B071-AFB2-4DC1-BE29-8370BA4A6EBD, OS:9.0, name:iPhone 5 }
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
-
-        device_udid = nil
-        FastlaneCore::Simulator.all.each do |sim|
-          device_udid = sim.udid if sim.name.strip == device.strip and sim.ios_version == Snapshot.config[:ios_version]
-        end
-
-        return device_udid
+        simulators = FastlaneCore::DeviceManager.simulators
+        # Sort devices with matching names by OS version, largest first, so that we can
+        # pick the device with the newest OS in case an exact OS match is not available
+        name_matches = simulators.find_all { |sim| sim.name.strip == device_name.strip }
+                                 .sort_by { |sim| Gem::Version.new(sim.os_version) }
+                                 .reverse
+        name_matches.find { |sim| sim.os_version == os_version } || name_matches.first
       end
 
-      def destination(device)
-        value = "platform=iOS Simulator,id=#{device_udid(device)},OS=#{Snapshot.config[:ios_version]}"
+      def device_udid(device_name, os_version = Snapshot.config[:ios_version])
+        device = find_device(device_name, os_version)
+
+        device ? device.udid : nil
+      end
+
+      def destination(device_name)
+        os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
+        os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
+
+        device = find_device(device_name, os_version)
+        if device.nil?
+          UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
+          return
+        elsif device.os_version != os_version
+          UI.important("Using device named '#{device_name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
+        end
+        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
 
         return ["-destination '#{value}'"]
       end

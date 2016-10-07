@@ -23,7 +23,7 @@ module Fastlane
         unless params[:apns_p12].nil?
           data = File.read(params[:apns_p12])
           apns_p12 = Base64.encode64(data)
-          payload["apns_env"] = [:apns_env]
+          payload["apns_env"] = params[:apns_env]
           payload["apns_p12"] = apns_p12
           # we need to have something for the p12 password, even if it's an empty string
           payload["apns_p12_password"] = apns_p12_password || ""
@@ -115,15 +115,29 @@ module Fastlane
         ]
       end
 
-      def self.return_value
-      end
-
       def self.authors
         ["timothybarraclough", "smartshowltd"]
       end
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'onesignal(
+            auth_token: "Your OneSignal Auth Token",
+            app_name: "Name for OneSignal App",
+            android_token: "Your Android GCM key (optional)",
+            apns_p12: "Path to Apple .p12 file (optional)",
+            apns_p12_password: "Password for .p12 file (optional)",
+            apns_env: "production/sandbox (defaults to production)"
+          )'
+        ]
+      end
+
+      def self.category
+        :push
       end
     end
   end

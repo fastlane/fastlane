@@ -100,7 +100,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action. For Mac zip the .app. For Android provide path to .apk file",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
@@ -124,23 +124,23 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
-                                       description: "Notify testers? 1 for yes",
+                                       description: "Notify testers? \"1\" for yes",
                                        default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
-                                       description: "Download status: 1 = No user can download; 2 = Available for download",
+                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
-                                      description: "Notes type for your :notes, 0 = Textile, 1 = Markdown (default)",
+                                      description: "Notes type for your :notes, \"0\" = Textile, \"1\" = Markdown (default)",
                                       default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :release_type,
                                       env_name: "FL_HOCKEY_RELEASE_TYPE",
-                                      description: "Release type of the app: 0 = Beta (default), 1 = Store, 2 = Alpha, 3 = Enterprise",
+                                      description: "Release type of the app: \"0\" = Beta (default), \"1\" = Store, \"2\" = Alpha, \"3\" = Enterprise",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :mandatory,
                                       env_name: "FL_HOCKEY_MANDATORY",
-                                      description: "Set to 1 to make this update mandatory",
+                                      description: "Set to \"1\" to make this update mandatory",
                                       default_value: "0"),
           FastlaneCore::ConfigItem.new(key: :teams,
                                       env_name: "FL_HOCKEY_TEAMS",
@@ -178,7 +178,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :owner_id,
                                       env_name: "FL_HOCKEY_OWNER_ID",
                                       description: "ID for the owner of the app",
-                                      optional: true)
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :strategy,
+                                       env_name: "FL_HOCKEY_STRATEGY",
+                                       description: "Strategy: 'add' = to add the build as a new build even if it has the same build number (default); 'replace' = to replace a build with the same build number",
+                                       default_value: "add",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
+                                       end)
         ]
       end
 
@@ -197,6 +204,26 @@ module Fastlane
         [:ios, :mac, :android].include? platform
       end
 
+      def self.details
+        [
+          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.",
+          "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'hockey(
+            api_token: "...",
+            ipa: "./app.ipa",
+            notes: "Changelog"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

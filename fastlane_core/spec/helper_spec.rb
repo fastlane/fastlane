@@ -11,6 +11,11 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
 
+      it "returns true when building in Jenkins Slave" do
+        stub_const('ENV', { 'JENKINS_HOME' => '/fake/jenkins/home' })
+        expect(FastlaneCore::Helper.is_ci?).to be true
+      end
+
       it "returns true when building in Travis CI" do
         stub_const('ENV', { 'TRAVIS' => true })
         expect(FastlaneCore::Helper.is_ci?).to be true

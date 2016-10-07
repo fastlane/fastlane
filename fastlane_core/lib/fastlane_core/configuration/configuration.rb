@@ -15,7 +15,11 @@ module FastlaneCore
     attr_accessor :config_file_name
 
     def self.create(available_options, values)
+      UI.user_error!("values parameter must be a hash") unless values.kind_of?(Hash)
       v = values.dup
+      v.each do |key, val|
+        v[key] = val.dup if val.kind_of?(String) # this is necessary when fetching a value from an environment variable
+      end
 
       if v.kind_of?(Hash) && available_options.kind_of?(Array) # we only want to deal with the new configuration system
         # Now see if --verbose would be a valid input
@@ -47,18 +51,18 @@ module FastlaneCore
       @available_options.each do |item|
         UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
       end
-      UI.user_error!("values parameter must be a hash") unless @values.kind_of? Hash
+      UI.user_error!("values parameter must be a hash") unless @values.kind_of?(Hash)
     end
 
     def verify_value_exists
       # Make sure the given value keys exist
       @values.each do |key, value|
         next if key == :trace # special treatment
-
         option = option_for_key(key)
         if option
+          @values[key] = option.auto_convert_value(value)
           UI.deprecated("Using deprecated option: '--#{key}' (#{option.deprecated})") if option.deprecated
-          option.verify!(value) # Call the verify block for it too
+          option.verify!(@values[key]) # Call the verify block for it too
         else
           UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
         end
@@ -186,7 +190,7 @@ module FastlaneCore
       return value unless ask
 
       # fallback to asking
-      if Helper.is_test? or Helper.is_ci?
+      if Helper.is_test? or !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
@@ -196,7 +200,7 @@ module FastlaneCore
 
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
-        value = ask("#{option.description}: ")
+        value = UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
           set(key, value)
@@ -249,7 +253,7 @@ module FastlaneCore
     end
 
     # Aliases `[key]` to `fetch(key)` because Ruby can do it.
-    alias_method :[], :fetch
-    alias_method :[]=, :set
+    alias [] fetch
+    alias []= set
   end
 end

@@ -24,6 +24,12 @@ describe Fastlane do
       end
     end
 
+    it "#action_class_ref" do
+      expect(Fastlane::Actions.action_class_ref("gym")).to eq(Fastlane::Actions::GymAction)
+      expect(Fastlane::Actions.action_class_ref(:cocoapods)).to eq(Fastlane::Actions::CocoapodsAction)
+      expect(Fastlane::Actions.action_class_ref('notExistentObv')).to eq(nil)
+    end
+
     it "#load_default_actions" do
       expect(Fastlane::Actions.load_default_actions.count).to be > 6
     end
@@ -37,7 +43,7 @@ describe Fastlane do
       end
 
       it "can throws an error if plugin is damaged" do
-        expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!")
+        expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!", { show_github_issues: true })
         Fastlane::Actions.load_external_actions("spec/fixtures/broken_actions")
       end
     end

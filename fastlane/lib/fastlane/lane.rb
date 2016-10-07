@@ -42,8 +42,8 @@ module Fastlane
       # Makes sure the lane name is valid
       def verify_lane_name(name)
         if self.black_list.include?(name.to_s)
-          UI.error "Lane Name '#{name}' can not be one of the followings: #{self.black_list}"
-          UI.user_error!("Name '#{name}' is already taken")
+          UI.error "Lane name '#{name}' is invalid! Invalid names are #{self.black_list.join(', ')}."
+          UI.user_error!("Lane name '#{name}' is invalid")
         end
 
         if self.gray_list.include?(name.to_sym)
@@ -52,14 +52,38 @@ module Fastlane
           # We still allow it, because we're nice
           # Otherwise we might break existing setups
         end
+
+        self.ensure_name_not_conflicts(name.to_s)
       end
 
       def black_list
-        %w(run init new_action lanes list docs action actions help)
+        %w(
+          run
+          init
+          new_action
+          lanes
+          list
+          docs
+          action
+          actions
+          enable_auto_complete
+          new_plugin
+          add_plugin
+          install_plugins
+          update_plugins
+          search_plugins
+          help
+        )
       end
 
       def gray_list
         Fastlane::TOOLS
+      end
+
+      def ensure_name_not_conflicts(name)
+        # First, check if there is a predefined method in the actions folder
+        return unless Actions.action_class_ref(name)
+        UI.error("Name of the lane '#{name}' is already taken by the action named '#{name}'")
       end
     end
   end

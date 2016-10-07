@@ -1,0 +1,24 @@
+### Available Plugins
+
+To get an up to date list of all available plugins run
+
+```no-highlight
+fastlane search_plugins
+```
+
+To search for a specific plugin
+
+```no-highlight
+fastlane search_plugins [search_query]
+```
+
+You can find more information about how to start using plugins in [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md).
+
+#### List of plugins
+
+| Plugin Name | Description | Downloads
+--------------|-------------|----------|----------
+<% @plugins.each do |current| %>
+<%= current.linked_title %> | <%= current.info %> | <%= current.downloads %>
+
+<% end %>

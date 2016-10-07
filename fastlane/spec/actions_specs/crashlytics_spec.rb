@@ -126,8 +126,7 @@ describe Fastlane do
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
              "-notifications YES",
-             "-debug NO"
-            ].each do |to_be|
+             "-debug NO"].each do |to_be|
               expect(command).to include(to_be)
             end
           end
@@ -272,8 +271,8 @@ describe Fastlane do
         end
 
         describe "Invalid Parameters" do
-          # If this test fails, there might be a Crashlytics.framework somewhere in the .. directory
           it "raises an error if no crashlytics path was given" do
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({

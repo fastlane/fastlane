@@ -98,7 +98,7 @@ describe FastlaneCore do
           project = './subdir/Something.xcodeproj'
           FileUtils.mkdir_p(project)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return(project)
+          expect(FastlaneCore::UI).to receive(:input).and_return(project)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -112,7 +112,7 @@ describe FastlaneCore do
           workspace = './subdir/Something.xcworkspace'
           FileUtils.mkdir_p(workspace)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -126,9 +126,9 @@ describe FastlaneCore do
           workspace = './subdir/Something.xcworkspace'
           FileUtils.mkdir_p(workspace)
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return("something wrong")
+          expect(FastlaneCore::UI).to receive(:input).and_return("something wrong")
           expect(FastlaneCore::UI).to receive(:error).with(/Couldn't find/)
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -143,9 +143,9 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspace)
           FileUtils.mkdir_p('other-directory')
 
-          expect(FastlaneCore::Project).to receive(:ask).and_return('other-directory')
+          expect(FastlaneCore::UI).to receive(:input).and_return('other-directory')
           expect(FastlaneCore::UI).to receive(:error).with(/Path must end with/)
-          expect(FastlaneCore::Project).to receive(:ask).and_return(workspace)
+          expect(FastlaneCore::UI).to receive(:input).and_return(workspace)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -164,7 +164,7 @@ describe FastlaneCore do
     describe "Valid Standard Project" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "#path" do
@@ -206,8 +206,11 @@ describe FastlaneCore do
 
     describe "Valid CocoaPods Project" do
       before do
-        options = { workspace: "./spec/fixtures/projects/cocoapods/Example.xcworkspace", scheme: "Example" }
-        @workspace = FastlaneCore::Project.new(options)
+        options = {
+          workspace: "./spec/fixtures/projects/cocoapods/Example.xcworkspace",
+          scheme: "Example"
+        }
+        @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "#schemes returns all schemes" do
@@ -222,7 +225,7 @@ describe FastlaneCore do
     describe "Mac Project" do
       before do
         options = { project: "./spec/fixtures/projects/Mac.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "#mac?" do
@@ -245,7 +248,7 @@ describe FastlaneCore do
     describe "TVOS Project" do
       before do
         options = { project: "./spec/fixtures/projects/ExampleTVOS.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "#mac?" do
@@ -268,7 +271,7 @@ describe FastlaneCore do
     describe "Build Settings" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
@@ -294,6 +297,48 @@ describe FastlaneCore do
       it "returns 0 if garbage" do
         ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = 'hiho'
         expect(FastlaneCore::Project.xcode_list_timeout).to eq(0)
+      end
+    end
+
+    describe 'Project.xcode_build_settings_timeout' do
+      before do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
+      end
+      it "returns default value" do
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(10)
+      end
+      it "returns specified value" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+      end
+      it "returns 0 if empty" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = ''
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+      end
+      it "returns 0 if garbage" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = 'hiho'
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+      end
+    end
+
+    describe 'Project.xcode_build_settings_retries' do
+      before do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
+      end
+      it "returns default value" do
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+      end
+      it "returns specified value" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+      end
+      it "returns 0 if empty" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = ''
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+      end
+      it "returns 0 if garbage" do
+        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = 'hiho'
+        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
       end
     end
 
@@ -328,6 +373,69 @@ describe FastlaneCore do
         sleep(5)
         expect(count_processes(text)).to eq(count)
         # you would be expected to be able to see the number of processes go back to count right away.
+      end
+
+      it "retries and kills" do
+        text = "NEEDSRETRY"
+        cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
+
+        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(4).times
+
+        expect do
+          FastlaneCore::Project.run_command(cmd, timeout: 1, retries: 3)
+        end.to raise_error(Timeout::Error)
+      end
+    end
+
+    describe 'xcodebuild_list_silent option' do
+      it 'is not silent by default' do
+        project = FastlaneCore::Project.new(
+          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          xcodebuild_suppress_stderr: true
+        )
+
+        expect(project).to receive(:raw_info).with(silent: false).and_call_original
+
+        project.configurations
+      end
+
+      it 'makes the raw_info method be silent if configured' do
+        project = FastlaneCore::Project.new(
+          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          xcodebuild_list_silent: true,
+          xcodebuild_suppress_stderr: true
+        )
+        expect(project).to receive(:raw_info).with(silent: true).and_call_original
+
+        project.configurations
+      end
+    end
+
+    describe 'xcodebuild_suppress_stderr option' do
+      it 'generates an xcodebuild -list command without stderr redirection by default' do
+        project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
+      end
+
+      it 'generates an xcodebuild -list command that redirects stderr to /dev/null' do
+        project = FastlaneCore::Project.new(
+          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          xcodebuild_suppress_stderr: true
+        )
+        expect(project.build_xcodebuild_list_command).to match(%r{2> /dev/null})
+      end
+
+      it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
+        project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        expect(project.build_xcodebuild_showbuildsettings_command).not_to match(%r{2> /dev/null})
+      end
+
+      it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null' do
+        project = FastlaneCore::Project.new(
+          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          xcodebuild_suppress_stderr: true
+        )
+        expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})
       end
     end
   end

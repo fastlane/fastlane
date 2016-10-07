@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     # Commits version bump.
@@ -89,8 +88,7 @@ module Fastlane
                    "But found these actual changes: \n#{hg_dirty_files.join("\n")}.",
                    "Make sure you have cleaned up the build artifacts and are only left with the changed version files at this",
                    "stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to ",
-                   "bypass this check, and always commit a version bump regardless of the state of the working directory."
-                  ].join("\n")
+                   "bypass this check, and always commit a version bump regardless of the state of the working directory."].join("\n")
             UI.user_error!(str)
           end
         end
@@ -153,7 +151,32 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.details
+        [
+          "The mercurial equivalent of the [`commit_version_bump`](#commit_version_bump) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](#increment_build_number).",
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
+          "- All .plist files",
+          "- The `.xcodeproj/project.pbxproj` file",
+          "Then commits those files to the repo.",
+          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action."
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'hg_commit_version_bump',
+          'hg_commit_version_bump(
+            message: "Version Bump",                 # create a commit with a custom message
+            xcodeproj: "./path/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

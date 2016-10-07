@@ -7,20 +7,26 @@ module Fastlane
     end
 
     class LatestTestflightBuildNumberAction < Action
-
       def self.run(params)
         require 'spaceship'
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship::Tunes.login(credentials.user, credentials.password)
+        ENV["FASTLANE_ITC_TEAM_ID"] = params[:team_id]
         Spaceship::Tunes.select_team
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
 
         version_number = params[:version]
         unless version_number
           # Automatically fetch the latest version in testflight
-          if app.build_trains.keys.last
-            version_number = app.build_trains.keys.last
+          begin
+            testflight_version = app.build_trains.keys.last
+          rescue
+            UI.user_error!("could not find any versions on iTC - and 'version' option is not set") unless params[:version]
+            testflight_version = params[:version]
+          end
+          if testflight_version
+            version_number = testflight_version
           else
             UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
@@ -29,8 +35,8 @@ module Fastlane
 
         UI.message("Fetching the latest build number for version #{version_number}")
 
-        train = app.build_trains[version_number]
         begin
+          train = app.build_trains[version_number]
           build_number = train.builds.map(&:build_version).map(&:to_i).sort.last
         rescue
           UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
@@ -50,7 +56,10 @@ module Fastlane
       end
 
       def self.details
-        "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC."
+        [
+          "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.",
+          "Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+        ].join("\n")
       end
 
       def self.available_options
@@ -73,11 +82,15 @@ module Fastlane
                                        description: "The version number whose latest build number we want",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
-                                       env_name: "INTITIAL_BUILD_NUMBER",
+                                       env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
-                                       optional: true,
-                                       is_string: false)
-
+                                       default_value: 1,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :team_id,
+                                       env_name: "FASTLANE_ITC_TEAM_ID",
+                                       description: "Your team ID if you're in multiple teams",
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       optional: true)
         ]
       end
 
@@ -97,6 +110,23 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'latest_testflight_build_number(version: "1.3")',
+          'increment_build_number({
+            build_number: latest_testflight_build_number + 1
+          })'
+        ]
+      end
+
+      def self.sample_return_value
+        2
+      end
+
+      def self.category
+        :misc
       end
     end
   end

@@ -56,6 +56,21 @@ module Fastlane
         [:ios, :mac].include? platform
       end
 
+      def self.example_code
+        [
+          'xcodebuild(
+            archive: true,
+            archive_path: "./build-dir/MyApp.xcarchive",
+            scheme: "MyApp",
+            workspace: "MyApp.xcworkspace"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.run(params)
         unless Helper.test?
           UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
@@ -146,7 +161,7 @@ module Fastlane
         end
 
         # By default we put xcodebuild.log in the Logs folder
-        buildlog_path ||= File.expand_path("~/Library/Logs/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}")
+        buildlog_path ||= File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}")
 
         # Joins args into space delimited string
         xcodebuild_args = xcodebuild_args.join(" ")
@@ -280,10 +295,12 @@ module Fastlane
           # Normalize some values
           export_options[:teamID] = CredentialsManager::AppfileConfig.try_fetch_value(:team_id) if !export_options[:teamID] && CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
           export_options[:onDemandResourcesAssetPacksBaseURL] = URI.escape(export_options[:onDemandResourcesAssetPacksBaseURL]) if export_options[:onDemandResourcesAssetPacksBaseURL]
-          export_options[:manifest][:appURL] = URI.escape(export_options[:manifest][:appURL]) if export_options[:manifest][:appURL]
-          export_options[:manifest][:displayImageURL] = URI.escape(export_options[:manifest][:displayImageURL]) if export_options[:manifest][:displayImageURL]
-          export_options[:manifest][:fullSizeImageURL] = URI.escape(export_options[:manifest][:fullSizeImageURL]) if export_options[:manifest][:fullSizeImageURL]
-          export_options[:manifest][:assetPackManifestURL] = URI.escape(export_options[:manifest][:assetPackManifestURL]) if export_options[:manifest][:assetPackManifestURL]
+          if export_options[:manifest]
+            export_options[:manifest][:appURL] = URI.escape(export_options[:manifest][:appURL]) if export_options[:manifest][:appURL]
+            export_options[:manifest][:displayImageURL] = URI.escape(export_options[:manifest][:displayImageURL]) if export_options[:manifest][:displayImageURL]
+            export_options[:manifest][:fullSizeImageURL] = URI.escape(export_options[:manifest][:fullSizeImageURL]) if export_options[:manifest][:fullSizeImageURL]
+            export_options[:manifest][:assetPackManifestURL] = URI.escape(export_options[:manifest][:assetPackManifestURL]) if export_options[:manifest][:assetPackManifestURL]
+          end
 
           # Saves options to plist
           path = "#{Tempfile.new('exportOptions').path}.plist"
@@ -353,7 +370,7 @@ module Fastlane
       end
 
       def self.details
-        "More information on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xcodebuild"
+        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://github.com/fastlane/fastlane/tree/master/gym) for building your ipa file and [scan](https://github.com/fastlane/fastlane/tree/master/scan) for testing your app instead."
       end
 
       def self.author
@@ -370,6 +387,16 @@ module Fastlane
 
       def self.description
         "Archives the project using `xcodebuild`"
+      end
+
+      def self.example_code
+        [
+          'xcarchive'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.author
@@ -400,6 +427,16 @@ module Fastlane
         params_hash = params || {}
         params_hash[:build] = true
         XcodebuildAction.run(params_hash)
+      end
+
+      def self.example_code
+        [
+          'xcbuild'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.description
@@ -441,6 +478,16 @@ module Fastlane
         "Cleans the project using `xcodebuild`"
       end
 
+      def self.example_code
+        [
+          'xcclean'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.author
         "dtrenz"
       end
@@ -476,6 +523,16 @@ module Fastlane
         "Exports the project using `xcodebuild`"
       end
 
+      def self.example_code
+        [
+          'xcexport'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.author
         "dtrenz"
       end
@@ -508,6 +565,18 @@ module Fastlane
         params_hash[:test] = true
 
         XcodebuildAction.run(params_hash)
+      end
+
+      def self.example_code
+        [
+          'xctest(
+            destination: "name=iPhone 7s,OS=10.0"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.description

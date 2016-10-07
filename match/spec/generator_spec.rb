@@ -35,7 +35,6 @@ describe Match::Generator do
 
       config = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: 'app_identifier',
-        adhoc: false,
         development: true,
         output_path: 'workspace/profiles/development',
         username: 'username',

@@ -82,10 +82,10 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like (standard, basic or rspec)",
+                                     description: "Define how the output should look like (standard, basic, rspec or raw)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', "rspec"].include?(value)
+                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
@@ -96,7 +96,7 @@ module Scan
                                      short_option: "-l",
                                      env_name: "SCAN_BUILDLOG_PATH",
                                      description: "The directory were to store the raw log",
-                                     default_value: "~/Library/Logs/scan"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/scan"),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
@@ -121,7 +121,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :open_report,
                                      short_option: "-g",
                                      env_name: "SCAN_OPEN_REPORT",
-                                     description: "Don't open the HTML report when tests are completed",
+                                     description: "Should the HTML report be opened when tests are completed",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :configuration,
@@ -173,7 +173,15 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
                                     description: "Only post on Slack if the tests fail",
                                     is_string: false,
-                                    default_value: false)
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
+                                    is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                    description: "Sets custom full report file name",
+                                    optional: true,
+                                    is_string: true)
       ]
     end
   end

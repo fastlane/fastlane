@@ -36,6 +36,9 @@ frameit
 
 ###### Quickly put your screenshots into the right device frames
 
+`frameit` allows you to put a gorgeous device frame around your iOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
+
+
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 
@@ -50,7 +53,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 <h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
-
 
 
 # Features
@@ -141,7 +143,8 @@ Use it to define the general information:
       "color": "#545454"
     },
     "background": "./background.jpg",
-    "padding": 50
+    "padding": 50,
+    "show_complete_frame": false
   },
 
   "data": [
@@ -172,6 +175,7 @@ Use it to define the general information:
   ]
 }
 ```
+The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
@@ -187,6 +191,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 **Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
+**Note:** You **MUST** provide a background if you want titles. `frameit` will not add the tiles if a background is not specified.
 
 #### Uploading screenshots to iTC
 
@@ -194,7 +199,7 @@ Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to uploa
 
 ### Mac
 
-With `frameit` 2.0 it's possible to also frame Mac OS X Application screenshots. You have to provide the following:
+With `frameit` 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
 
 - The `offset` information so `frameit` knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac

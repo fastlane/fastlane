@@ -13,8 +13,7 @@ module Deliver
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
                                 :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category
-                               ]
+                                :secondary_first_sub_category, :secondary_second_sub_category]
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
@@ -164,7 +163,7 @@ module Deliver
     def set_review_information(v, options)
       return unless options[:app_review_information]
       info = options[:app_review_information]
-      UI.user_error!("`app_review_information` must be a hash") unless info.kind_of?(Hash)
+      UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       v.review_first_name = info[:first_name] if info[:first_name]
       v.review_last_name = info[:last_name] if info[:last_name]

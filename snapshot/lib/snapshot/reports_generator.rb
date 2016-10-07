@@ -52,13 +52,16 @@ module Snapshot
       # The order IS important, since those names are used to check for include?
       # and the iPhone 6 is inlucded in the iPhone 6 Plus
       {
-        'iPhone6sPlus' => "5.5-Inch",
-        'iPhone6Plus' => "5.5-Inch",
-        'iPhone6s' => "4.7-Inch",
-        'iPhone6' => "4.7-Inch",
-        'iPhone5' => "4-Inch",
-        'iPhone4' => "3.5-Inch",
-        'iPadPro' => "iPad Pro",
+        'AppleTV1080p' => 'Apple TV',
+        'iPhone6sPlus' => "iPhone6sPlus (5.5-Inch)",
+        'iPhone6Plus' => "iPhone6Plus (5.5-Inch)",
+        'iPhone6s' => "iPhone6s (4.7-Inch)",
+        'iPhone6' => "iPhone6 (4.7-Inch)",
+        'iPhone5' => "iPhone5 (4-Inch)",
+        'iPhone4' => "iPhone4 (3.5-Inch)",
+        'iPadPro(9.7inch)' => "iPad Pro (9.7 inch)",
+        'iPadPro(12.9inch)' => "iPad Pro (12.9 inch)",
+        'iPad Pro' => "iPad Pro",
         'iPad' => "iPad",
         'Mac' => "Mac"
       }

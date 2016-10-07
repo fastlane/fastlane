@@ -5,7 +5,7 @@ module Fastlane
         params[:text] += " (y/n)" if params[:boolean]
         UI.message(params[:text])
 
-        return params[:ci_input] if Helper.is_ci?
+        return params[:ci_input] unless UI.interactive?
 
         if params[:multi_line_end_keyword]
           # Multi line
@@ -66,6 +66,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'changelog = prompt(text: "Changelog: ")',
+          'changelog = prompt(
+            text: "Changelog: ",
+            multi_line_end_keyword: "END"
+          )
+
+          crashlytics(notes: changelog)'
+        ]
+      end
+
+      def self.sample_return_value
+        "User Content\nWithNewline"
+      end
+
+      def self.category
+        :misc
       end
     end
   end

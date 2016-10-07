@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w(bin/spaceship README.md LICENSE)
+  spec.files = Dir["lib/**/*"] + %w(bin/spaceship bin/spaceauth README.md LICENSE)
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # fastlane specific
-  spec.add_dependency 'credentials_manager', '>= 0.9.0' # to automatically get login information
+  spec.add_dependency 'credentials_manager', '>= 0.16.0' # to automatically get login information
 
   # external
   spec.add_dependency 'multi_xml', '~> 0.5'

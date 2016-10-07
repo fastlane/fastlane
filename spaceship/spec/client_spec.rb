@@ -15,6 +15,14 @@ describe Spaceship::Client do
     end
   end
 
+  class TestResponse
+    attr_accessor :body
+
+    def initialize(body = nil)
+      @body = body
+    end
+  end
+
   let(:subject) { TestClient.new }
   let(:unauth_error) { Spaceship::Client::UnauthorizedAccessError.new }
   let(:test_uri) { "http://example.com" }
@@ -98,6 +106,13 @@ describe Spaceship::Client do
 
         expect(subject.req_home.body).to eq(default_body)
       end
+    end
+  end
+
+  describe "#log_response" do
+    it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
+      response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
   end
 end

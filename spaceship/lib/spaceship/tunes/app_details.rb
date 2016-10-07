@@ -32,6 +32,10 @@ module Spaceship
 
       attr_accessor :secondary_second_sub_category
 
+      attr_accessor :primary_locale_code
+
+      attr_accessor :available_primary_locale_codes
+
       attr_mapping(
         'localizedMetadata.value' => :languages,
         'primaryCategory.value' => :primary_category,
@@ -39,7 +43,9 @@ module Spaceship
         'primarySecondSubCategory.value' => :primary_second_sub_category,
         'secondaryCategory.value' => :secondary_category,
         'secondaryFirstSubCategory.value' => :secondary_first_sub_category,
-        'secondarySecondSubCategory.value' => :secondary_second_sub_category
+        'secondarySecondSubCategory.value' => :secondary_second_sub_category,
+        'primaryLocaleCode.value' => :primary_locale_code,
+        'availablePrimaryLocaleCodes' => :available_primary_locale_codes
       )
 
       class << self
@@ -78,32 +84,38 @@ module Spaceship
       # Custom Setters
       #
       def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
@@ -111,6 +123,17 @@ module Spaceship
       # @!group General
       #####################################################
       def setup
+      end
+
+      private
+
+      def prefix_mzgenre(value)
+        (value.include? "MZGenre") ? value : "MZGenre.#{value}"
+      end
+
+      def prefix_apps(value)
+        return value unless value.include? "Stickers"
+        (value.include? "Apps") ? value : "Apps.#{value}"
       end
     end
   end

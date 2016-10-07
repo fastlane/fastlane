@@ -20,7 +20,7 @@ module Supply
     # @!group Login
     #####################################################
 
-    # instanciate a client given the supplied configuration
+    # instantiate a client given the supplied configuration
     def self.make_from_config
       unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
         UI.user_error! "Missing auth credentials: You must specify either 'json_key' or 'key' and 'issuer'"
@@ -127,7 +127,8 @@ module Supply
         result = android_publisher.get_listing(
           current_package_name,
           current_edit.id,
-          language)
+          language
+        )
 
         return Listing.new(self, language, result)
       rescue Google::Apis::ClientError => e
@@ -153,7 +154,8 @@ module Supply
         android_publisher.list_apk_listings(
           current_package_name,
           current_edit.id,
-          apk_version_code)
+          apk_version_code
+        )
       end
 
       return (result.listings || []).map do |row|
@@ -182,7 +184,8 @@ module Supply
           current_package_name,
           current_edit.id,
           language,
-          listing)
+          listing
+        )
       end
     end
 
@@ -193,7 +196,8 @@ module Supply
         android_publisher.upload_apk(
           current_package_name,
           current_edit.id,
-          upload_source: path_to_apk)
+          upload_source: path_to_apk
+        )
       end
 
       return result_upload.version_code
@@ -216,7 +220,8 @@ module Supply
           current_package_name,
           current_edit.id,
           track,
-          track_body)
+          track_body
+        )
       end
     end
 
@@ -228,7 +233,8 @@ module Supply
         android_publisher.get_track(
           current_package_name,
           current_edit.id,
-          track)
+          track
+        )
       end
 
       return result.version_codes
@@ -248,7 +254,8 @@ module Supply
           current_edit.id,
           apk_listing.apk_version_code,
           apk_listing.language,
-          apk_listing_object)
+          apk_listing_object
+        )
       end
     end
 
@@ -264,7 +271,8 @@ module Supply
           current_package_name,
           current_edit.id,
           language,
-          image_type)
+          image_type
+        )
       end
 
       (result.images || []).map(&:url)
@@ -281,7 +289,8 @@ module Supply
           language,
           image_type,
           upload_source: image_path,
-          content_type: 'image/*')
+          content_type: 'image/*'
+        )
       end
     end
 
@@ -293,7 +302,8 @@ module Supply
           current_package_name,
           current_edit.id,
           language,
-          image_type)
+          image_type
+        )
       end
     end
 

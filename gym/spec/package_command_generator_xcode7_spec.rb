@@ -17,7 +17,7 @@ describe Gym do
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
                              ""
                            ])
@@ -33,8 +33,26 @@ describe Gym do
       expect(result).to eq([
                              "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             ""
+                           ])
+    end
+
+    it "supports passing a toolchain to use" do
+      options = {
+        project: "./examples/standard/Example.xcodeproj",
+        toolchain: "com.apple.dt.toolchain.Swift_2_3"
+      }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-toolchain '#{options[:toolchain]}'",
                              ""
                            ])
     end

@@ -17,7 +17,7 @@ module Snapshot
         UI.user_error!("Run 'xcode-select --install' and start snapshot again")
       end
 
-      if Snapshot::LatestIosVersion.version.to_f < 9 # to_f is bad, but should be good enough
+      if Snapshot::LatestOsVersion.ios_version.to_f < 9 # to_f is bad, but should be good enough
         UI.error '#############################################################'
         UI.error "# Your xcode-select Xcode version is below 7.0"
         UI.error "# To use snapshot 1.0 and above you need at least iOS 9"

@@ -35,7 +35,9 @@ produce
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+`produce` creates new iOS apps on both the Apple Developer Portal and iTunes Connect with the minimum required information.
+
+Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 <p align="center">
@@ -50,7 +52,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 -------
 
 <h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
-
 
 # Features
 
@@ -107,7 +108,7 @@ If you want to enable Application Services for an App ID (HomeKit and HealthKit 
 
     produce enable_services --homekit --healthkit
 
-If you want to disable Application Servies for an App ID (iCloud in this case):
+If you want to disable Application Services for an App ID (iCloud in this case):
 
     produce disable_services --icloud
 
@@ -163,7 +164,7 @@ All available values can also be passed using environment variables, run `produc
 
 Your `Fastfile` should look like this
 ```ruby
-lane :appstore do
+lane :release do
   produce(
     username: 'felix@krausefx.com',
     app_identifier: 'com.krausefx.app',

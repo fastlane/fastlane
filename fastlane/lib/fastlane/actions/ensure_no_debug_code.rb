@@ -47,7 +47,7 @@ module Fastlane
 
       def self.details
         [
-          "Makes sure the given text is nowhere in the code base. This can be used",
+          "You don't want any debug code to slip into production. This can be used",
           "to check if there is any debug code still in your code base or if you have",
           "things like // TO DO or similar"
         ].join("\n")
@@ -86,6 +86,26 @@ module Fastlane
 
       def self.authors
         ["KrauseFx"]
+      end
+
+      def self.example_code
+        [
+          'ensure_no_debug_code(text: "// TODO")',
+          'ensure_no_debug_code(text: "Log.v",
+                          extension: "java")',
+          'ensure_no_debug_code(text: "NSLog",
+                               path: "./lib",
+                          extension: "m")',
+          'ensure_no_debug_code(text: "(^#define DEBUG|NSLog)",
+                               path: "./lib",
+                          extension: "m")',
+          'ensure_no_debug_code(text: "<<<<<<",
+                         extensions: ["m", "swift", "java"])'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.is_supported?(platform)

@@ -14,7 +14,8 @@ module Fastlane
       def self.notify_incoming_message_webhook(base_url, message, token)
         uri = URI.join(base_url + '/', token)
         response = Net::HTTP.start(
-          uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          uri.host, uri.port, use_ssl: uri.scheme == 'https'
+        ) do |http|
           request = Net::HTTP::Post.new uri.path
           request.content_type = 'application/json'
           request.body = JSON.generate("text" => message)
@@ -30,6 +31,13 @@ module Fastlane
 
       def self.description
         "Send a message to a Flock group"
+      end
+
+      def self.details
+        [
+          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)",
+          "in your Flock admin panel."
+        ].join("\n")
       end
 
       def self.available_options
@@ -53,6 +61,19 @@ module Fastlane
 
       def self.author
         "Manav"
+      end
+
+      def self.example_code
+        [
+          'flock(
+            message: "Hello",
+            token: "xxx"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
 
       def self.is_supported?(platform)

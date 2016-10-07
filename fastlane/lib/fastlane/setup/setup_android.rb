@@ -24,14 +24,14 @@ module Fastlane
       UI.message('------------------------------')
       UI.success('To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.')
 
-      package_name = ask('Package Name (com.krausefx.app): '.yellow)
+      package_name = UI.input("Package Name (com.krausefx.app): ")
       puts ""
       puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
       puts "Feel free to just click Enter to skip not provide certain things"
       puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/fastlane/tree/master/supply#setup".yellow
-      json_key_file = ask('Path to the json secret file: '.yellow)
+      json_key_file = UI.input("Path to the json secret file: ")
 
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplateAndroid")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplateAndroid")
       template.gsub!('[[JSON_KEY_FILE]]', json_key_file)
       template.gsub!('[[PACKAGE_NAME]]', package_name)
       path = File.join(folder, 'Appfile')
@@ -40,7 +40,7 @@ module Fastlane
     end
 
     def generate_fastfile
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/FastfileTemplateAndroid")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/FastfileTemplateAndroid")
 
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 

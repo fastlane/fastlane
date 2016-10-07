@@ -20,9 +20,12 @@ module CredentialsManager
       return @user
     end
 
+    def fetch_password_from_env
+      ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+    end
+
     def password(ask_if_missing: true)
-      @password ||= ENV["FASTLANE_PASSWORD"]
-      @password ||= ENV["DELIVER_PASSWORD"]
+      @password ||= fetch_password_from_env
       unless @password
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
@@ -36,6 +39,13 @@ module CredentialsManager
     # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
       puts "The login credentials for '#{user}' seem to be wrong".red
+
+      if fetch_password_from_env
+        puts "The password was taken from the environment variable"
+        puts "Please make sure it is correct"
+        return false
+      end
+
       if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts "Removing Keychain entry for user '#{user}'...".yellow
         remove_from_keychain
@@ -63,17 +73,19 @@ module CredentialsManager
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
       puts "The login information you enter will be stored in your Mac OS Keychain".green
-      puts "You can also pass the password using the `FASTLANE_PASSWORD` env variable".green
+      puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
       puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
       puts "-------------------------------------------------------------------------------------".green
 
       if @user.to_s.length == 0
+        raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
         @user = ask("Username: ") while @user.to_s.length == 0
         # we return here, as only the username was asked for now, we'll get called for the pw again anyway
         return
       end
 
       while @password.to_s.length == 0
+        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
         @password = ask("Password (for #{@user}): ") { |q| q.echo = "*" }
       end
 

@@ -36,7 +36,7 @@ deliver
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
-`deliver` can upload ipa or pkg files, app screenshots and more to iTunes Connect from the command line.
+`deliver` uploads screenshots, metadata and binaries to iTunes Connect. Use `deliver` to submit your app for App Store review.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
@@ -110,7 +110,7 @@ Provide the path to an `ipa` file to upload and submit your app for review:
 deliver --ipa "App.ipa" --submit_for_review
 ```
 
-or you can specify path to `pkg` file for Mac OS X apps:
+or you can specify path to `pkg` file for macOS apps:
 
 ```
 deliver --pkg "MacApp.pkg"
@@ -149,7 +149,7 @@ A detailed description about how your credentials are handled is available in a 
 
 ### How does this thing even work? Is magic involved? 🎩###
 
-Your password will be stored in the Mac OS X keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
+Your password will be stored in the macOS keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 
 Before actually uploading anything to iTunes, ```deliver``` will generate a HTML summary of the collected data.
 
@@ -244,7 +244,7 @@ DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" deliver
 ```
 
 ## HTTP Proxy
-iTunes Transporter is a Java application bundled with Xcode. In addtion to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
+iTunes Transporter is a Java application bundled with Xcode. In addition to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
 
 ```bash
 TOOLS_PATH=$( xcode-select -p )

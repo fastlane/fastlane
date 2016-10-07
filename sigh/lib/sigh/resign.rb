@@ -5,17 +5,18 @@ module Sigh
   class Resign
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
-
-      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+        UI.user_error!("Failed to re-sign .ipa")
+      end
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
       resign_path = find_resign_path
       signing_identity = find_signing_identity(signing_identity)
 
@@ -25,7 +26,7 @@ module Sigh
 
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
-      entitlements = "-e #{entitlements}" if entitlements
+      entitlements = "-e #{entitlements.shellescape}" if entitlements
       provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
@@ -33,6 +34,8 @@ module Sigh
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
       verbose = "-v" if $verbose
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
+      use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
+      specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
 
       command = [
         resign_path.shellescape,
@@ -44,9 +47,11 @@ module Sigh
         display_name,
         short_version,
         bundle_version,
+        use_app_entitlements_flag,
         verbose,
         bundle_id,
-        ipa.shellescape
+        ipa.shellescape,
+        specific_keychain
       ].join(' ')
 
       puts command.magenta
@@ -62,25 +67,27 @@ module Sigh
     end
 
     def get_inputs(options, args)
-      ipa = args.first || find_ipa || ask('Path to ipa file: ')
+      ipa = args.first || find_ipa || UI.input('Path to ipa file: ')
       signing_identity = options.signing_identity || ask_for_signing_identity
-      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || ask('Path to provisioning file: ')
+      provisioning_profiles = options.provisioning_profile || find_provisioning_profile || UI.input('Path to provisioning file: ')
       entitlements = options.entitlements || nil
       version = options.version_number || nil
       display_name = options.display_name || nil
       short_version = options.short_version || nil
       bundle_version = options.bundle_version || nil
       new_bundle_id = options.new_bundle_id || nil
+      use_app_entitlements = options.use_app_entitlements || nil
+      keychain_path = options.keychain_path || nil
 
       if options.provisioning_name
         UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
       end
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path
     end
 
     def find_resign_path
-      File.join(Helper.gem_path('sigh'), 'lib', 'assets', 'resign.sh')
+      File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
     end
 
     def find_ipa
@@ -92,12 +99,18 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until installed_identies.include?(signing_identity)
+      until (signing_identity = sha1_for_signing_identity(signing_identity))
         UI.error "Couldn't find signing identity '#{signing_identity}'."
         signing_identity = ask_for_signing_identity
       end
 
       signing_identity
+    end
+
+    def sha1_for_signing_identity(signing_identity)
+      identities = installed_identities
+      return signing_identity if identities.keys.include?(signing_identity)
+      identities.key(signing_identity)
     end
 
     def validate_params(resign_path, ipa, provisioning_profiles)
@@ -121,27 +134,45 @@ module Sigh
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identies.join("\n\t")}\n"
+      UI.message "Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n"
     end
 
     def ask_for_signing_identity
       print_available_identities
-      ask('Signing Identity: ')
+      UI.input('Signing Identity: ')
     end
 
-    # Array of available signing identities
-    def installed_identies
-      available = `security find-identity -v -p codesigning`
-      ids = []
+    # Hash of available signing identities
+    def installed_identities
+      available = request_valid_identities
+      ids = {}
       available.split("\n").each do |current|
         begin
-          (ids << current.match(/.*\"(.*)\"/)[1])
+          sha1 = current.match(/[a-zA-Z0-9]{40}/).to_s
+          name = current.match(/.*\"(.*)\"/)[1]
+          ids[sha1] = name
         rescue
           nil
         end # the last line does not match
       end
 
       ids
+    end
+
+    def request_valid_identities
+      `security find-identity -v -p codesigning`
+    end
+
+    def installed_identity_descriptions
+      descriptions = []
+      installed_identities.group_by { |sha1, name| name }.each do |name, identities|
+        descriptions << name
+        # Show SHA-1 for homonymous identities
+        descriptions += identities.map do |sha1, _|
+          "\t#{sha1}"
+        end
+      end
+      descriptions
     end
   end
 end

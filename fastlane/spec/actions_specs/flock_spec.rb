@@ -5,7 +5,8 @@ describe Fastlane do
 
       def run_flock(**arguments)
         parsed_arguments = Fastlane::ConfigurationHelper.parse(
-          Fastlane::Actions::FlockAction, arguments)
+          Fastlane::Actions::FlockAction, arguments
+        )
 
         Fastlane::Actions::FlockAction.run(parsed_arguments)
       end
@@ -20,14 +21,16 @@ describe Fastlane do
           expect { run_flock token: 'xxx' }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/message/)
-            end)
+            end
+          )
         end
 
         it 'requires token' do
           expect { run_flock message: 'xxx' }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/token/)
-            end)
+            end
+          )
         end
 
         it 'allows environment variables' do
@@ -43,13 +46,14 @@ describe Fastlane do
         expect { run_flock message: 'message', token: 'token' }.to(
           raise_error(FastlaneCore::Interface::FastlaneError) do |error|
             expect(error.message).to match(/Error sending message to Flock/)
-          end)
+          end
+        )
       end
 
       it 'performs POST request with specified options' do
         stub_request(:post, "#{FLOCK_BASE_URL}/token").
           with(body: '{"text":"message"}',
-               headers: {'Content-Type' => 'application/json'}).
+               headers: { 'Content-Type' => 'application/json' }).
           to_return(status: 200)
         run_flock message: 'message', token: 'token'
       end

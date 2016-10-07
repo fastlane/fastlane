@@ -21,13 +21,13 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined?SpecHelper
+      defined? SpecHelper
     end
 
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -64,6 +64,11 @@ module FastlaneCore
     # Does the user use iTerm?
     def self.iterm?
       !!ENV["ITERM_SESSION_ID"]
+    end
+
+    # Logs base directory
+    def self.buildlog_path
+      return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
     end
 
     # All Xcode Related things
@@ -132,11 +137,16 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
+    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
+    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    #
     # Path to the installed gem to load resources (e.g. resign.sh)
     def self.gem_path(gem_name)
+      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
+
       if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else

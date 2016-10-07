@@ -5,7 +5,7 @@ require 'snapshot/detect_values'
 require 'snapshot/screenshot_flatten'
 require 'snapshot/screenshot_rotate'
 require 'snapshot/dependency_checker'
-require 'snapshot/latest_ios_version'
+require 'snapshot/latest_os_version'
 require 'snapshot/test_command_generator'
 require 'snapshot/error_handler'
 require 'snapshot/collector'
@@ -45,6 +45,7 @@ module Snapshot
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 
   Snapshot::DependencyChecker.check_dependencies
 

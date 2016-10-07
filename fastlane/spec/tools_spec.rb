@@ -14,6 +14,7 @@ describe Fastlane do
       ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
       expect(UI).to receive(:error).with("Lane name 'gym' should not be used because it is the name of a fastlane tool")
       expect(UI).to receive(:error).with("It is recommended to not use 'gym' as the name of your lane")
+      expect(UI).to receive(:error).with("Name of the lane 'gym' is already taken by the action named 'gym'")
       ff.lane :gym do
       end
     end

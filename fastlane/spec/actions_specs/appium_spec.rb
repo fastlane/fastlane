@@ -1,12 +1,11 @@
 module Appium
   class Driver
-
   end
 end
 
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Appium", now: true do
+    describe "Appium" do
       before :each do
         allow_any_instance_of(Appium::Driver).to receive(:start_driver)
       end

@@ -32,15 +32,19 @@ module Snapshot
       self.collected_errors = []
       results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
-      Snapshot.config[:devices].each do |device|
+      Snapshot.config[:devices].each_with_index do |device, device_index|
         launch_arguments_set.each do |launch_arguments|
-          Snapshot.config[:languages].each do |language|
+          Snapshot.config[:languages].each_with_index do |language, language_index|
             locale = nil
             if language.kind_of?(Array)
               locale = language[1]
               language = language[0]
             end
             results[device] ||= {}
+
+            current_run = device_index * Snapshot.config[:languages].count + language_index + 1
+            number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
+            UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
           end
@@ -49,7 +53,7 @@ module Snapshot
 
       print_results(results)
 
-      raise self.collected_errors.join('; ') if self.collected_errors.count > 0
+      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -190,16 +194,16 @@ module Snapshot
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
-    def open_simulator_for_device(device)
+    def open_simulator_for_device(device_name)
       return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
 
-      UI.message("Explicitly opening simulator for device: #{device}")
-      `open -a Simulator --args -CurrentDeviceUDID #{TestCommandGenerator.device_udid(device)}`
+      device = TestCommandGenerator.find_device(device_name)
+      FastlaneCore::Simulator.launch(device) if device
     end
 
     def uninstall_app(device_type)
       UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
-      Snapshot.config[:app_identifier] ||= ask("App Identifier: ")
+      Snapshot.config[:app_identifier] ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"

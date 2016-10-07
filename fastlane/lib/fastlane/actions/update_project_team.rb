@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.description
-        "Update Development Team ID"
+        "Update Xcode Development Team ID"
       end
 
       def self.details
@@ -36,7 +36,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :teamid,
                                        env_name: "FL_PROJECT_TEAM_ID",
                                        description: "The Team ID  you want to use",
-                                       default_value: ENV["TEAM_ID"])
+                                       default_value: ENV["TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
         ]
       end
 
@@ -46,6 +46,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'update_project_team(
+            path: "Example.xcodeproj",
+            teamid: "A3ZZVJ7CNY"
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

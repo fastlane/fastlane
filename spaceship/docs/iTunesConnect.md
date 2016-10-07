@@ -3,7 +3,7 @@ iTunes Connect API
 
 # Usage
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`. 
+To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`.
 
 In general the classes are pre-fixed with the `Tunes` module.
 
@@ -39,10 +39,10 @@ Spaceship::Tunes::Application.all.collect do |app|
 end
 
 # Create a new app
-app = Spaceship::Tunes::Application.create!(name: "App Name", 
-                                primary_language: "English", 
+app = Spaceship::Tunes::Application.create!(name: "App Name",
+                                primary_language: "English",
                                          version: "1.0", # initial version
-                                             sku: 123, 
+                                             sku: 123,
                                        bundle_id: "com.krausefx.app")
 ```
 
@@ -67,7 +67,7 @@ version.update_price_tier("3")
 
 You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
 
-While you usually can modify some values in the production version (e.g. app description), most options are already locked. 
+While you usually can modify some values in the production version (e.g. app description), most options are already locked.
 
 With `spaceship` you can access the versions like this
 
@@ -82,7 +82,7 @@ You can then go ahead and modify app metadata on the version objects:
 v = app.edit_version
 
 # Access information
-v.app_status        # => "Waiting for Review" 
+v.app_status        # => "Waiting for Review"
 v.version           # => "0.9.14"
 
 # Update app metadata
@@ -163,7 +163,7 @@ attr_reader :marketing_url
 attr_reader :screenshots
 ```
 
-**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_version.rb).
+**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_version.rb).
 
 ## Select a build for review
 
@@ -182,7 +182,7 @@ version.save!
 To clarify:
 
 - **version number**: Is set via the `CFBundleShortVersionString` property. It's the version number that appears on the App Store. (`0.9.21` on the screenshot)
-- **build number**: Is set via the `CFBundleVersion` property. It's not visible in the App Store. It has to be incrememented before uploading a new build. (`99993` on the screenshot)
+- **build number**: Is set via the `CFBundleVersion` property. It's not visible in the App Store. It has to be incremented before uploading a new build. (`99993` on the screenshot)
 
 A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
 
@@ -259,14 +259,15 @@ submission.add_id_info_uses_idfa = false
 submission.complete!
 ```
 
-For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/tunes/app_submission.rb).
+For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb).
 
 ## Testers
 
-There are 2 types of testers:
+There are 3 types of testers:
 
 - **External testers**: usually not part of your team. You can invite up to 1000/2000 external testers. Before distributing a build to those testers you need to submit your app to beta review.
 - **Internal testers**: Employees that are registered in your iTunes Connect team. They get access to all builds without having to wait for review.
+**Sandbox testers**: Dummy accounts to test development-mode apps with in-app purchase or Apple Pay.
 
 ```ruby
 # Find an internal tester based on the email address
@@ -293,6 +294,41 @@ app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last
 ```
 
 Right now, `spaceship` can't modify or create internal testers.
+
+# Load all sandbox testers
+testers = Spaceship::Tunes::SandboxTester.all
+
+# Create a sandbox tester
+testers = Spaceship::Tunes::SandboxTester.create!(
+  email: 'sandbox@test.com', # required
+  password: 'Passwordtest1', # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
+  country: 'US', # optional, defaults to 'US'
+  first_name: 'Steve', # optional, defaults to 'Test'
+  last_name: 'Brule', # optional, defaults to 'Test'
+)
+
+## App ratings & reviews
+
+```ruby
+# Get the rating summary for an application
+ratings = app.ratings # => Spaceship::Tunes::AppRatings
+
+# Get the number of 5 star ratings
+five_star_count = ratings.rating_summary.five_star_rating_count
+
+# Find the average rating across all stores
+average_rating = ratings.rating_summary.average_rating
+
+# List store fronts the app is available in
+ratings.store_fronts # => Hash of country code to Spaceship::Tunes::AppRatingSummary
+
+# Find the average rating for a given store front
+average_rating = ratings.store_fronts["US"].average_rating
+
+# Get reviews for a given store front
+reviews = ratings.reviews("US") # => Array of hashes representing review data
+
+```
 
 ### License
 

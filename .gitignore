@@ -10,6 +10,8 @@ coverage/
 /tmp/
 rspec_logs.json
 test_output/
+.DS_STORE
+.keys
 
 ## Specific to Android
 .gradle/
@@ -43,10 +45,11 @@ Gemfile.lock
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
-# Added by Felix
+# fastlane specific
 /*.itmsp
 .idea
 spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml
 **/.bundle
+fastlane/lib/fastlane/plugins/template/.rubocop.yml

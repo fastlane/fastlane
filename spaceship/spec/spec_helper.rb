@@ -1,3 +1,7 @@
+require 'simplecov'
+require 'coveralls'
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+
 require 'spaceship'
 require 'plist'
 
@@ -5,26 +9,10 @@ require 'plist'
 module SpecHelper
 end
 
-require 'simplecov'
-require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
-
 require 'client_stubbing'
 require 'portal/portal_stubbing'
 require 'tunes/tunes_stubbing'
 require 'du/du_stubbing'
-
-SimpleCov.at_exit do
-  puts "Coverage done"
-  SimpleCov.result.format!
-end
-
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-]
-
-SimpleCov.start
 
 ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"
@@ -35,12 +23,11 @@ unless ENV["DEBUG"]
 end
 
 cache_paths = [
-  File.expand_path("~/Library/Caches/spaceship_api_key.txt"),
-  "/tmp/spaceship_itc_login_url.txt"
+  File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]
 
 def try_delete(path)
-  FileUtils.rm_f path if File.exist? path
+  FileUtils.rm_f(path) if File.exist? path
 end
 
 RSpec.configure do |config|

@@ -25,12 +25,25 @@ module Fastlane
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["KrauseFx"]
       end
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'if is_ci?
+            puts "I\'m a computer"
+          else
+            say "Hi Human!"
+          end'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

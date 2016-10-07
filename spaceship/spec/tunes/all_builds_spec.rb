@@ -21,7 +21,7 @@ describe Spaceship::Tunes::Application do
     it "#all_builds_for_train" do
       result = app.all_builds_for_train(train: "2.0.1").first
       expect(result.apple_id).to eq("898536088")
-      expect(result.id).to eq(123123)
+      expect(result.id).to eq(123_123)
       expect(result.build_version).to eq("4")
       expect(result.train_version).to eq("2.0.1")
     end

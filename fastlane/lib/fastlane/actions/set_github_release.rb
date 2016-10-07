@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/AbcSize
-
 module Fastlane
   module Actions
     module SharedValues
@@ -256,6 +254,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'github_release = set_github_release(
+            repository_name: "fastlane/fastlane",
+            api_token: ENV["GITHUB_TOKEN"],
+            name: "Super New actions",
+            tag_name: "v1.22.0",
+            description: (File.read("changelog") rescue "No changelog provided"),
+            commitish: "master",
+            upload_assets: ["example_integration.ipa", "./pkg/built.gem"]
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

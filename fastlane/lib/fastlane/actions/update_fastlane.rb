@@ -5,7 +5,6 @@ module Fastlane
   module Actions
     # Makes sure fastlane tools are up-to-date when running fastlane
     class UpdateFastlaneAction < Action
-
       ALL_TOOLS = [
         "fastlane",
         "fastlane_core",
@@ -27,7 +26,6 @@ module Fastlane
         "match"
       ]
 
-      # rubocop:disable Metrics/AbcSize
       def self.run(options)
         if options[:no_update]
           return
@@ -104,7 +102,6 @@ module Fastlane
           exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
         end
       end
-      # rubocop:enable Metrics/AbcSize
 
       def self.all_installed_tools
         Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq
@@ -112,6 +109,20 @@ module Fastlane
 
       def self.description
         "Makes sure fastlane-tools are up-to-date when running fastlane"
+      end
+
+      def self.details
+        [
+          "This action will look at all installed fastlane tools and update them to the next available minor version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.",
+          "If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.",
+          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:",
+          "```bash",
+          "export GEM_HOME=~/.gems",
+          "export PATH=$PATH:~/.gems/bin",
+          "```",
+          "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
+          "Recommended usage of the `update_fastlane` action is at the top of the `before_all` block, before running any other action"
+        ].join("\n\n")
       end
 
       def self.available_options
@@ -134,6 +145,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'before_all do
+            update_fastlane
+            # ...
+          end'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

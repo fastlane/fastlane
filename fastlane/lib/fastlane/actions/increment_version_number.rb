@@ -98,8 +98,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
                                        description: "Change to a specific version. This will replace the bump type value",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_VERSION_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
@@ -117,8 +116,39 @@ module Fastlane
         ]
       end
 
+      def self.return_value
+        "The new version number"
+      end
+
       def self.author
         "serluca"
+      end
+
+      def self.example_code
+        [
+          'increment_version_number # Automatically increment patch version number',
+          'increment_version_number(
+            bump_type: "patch" # Automatically increment patch version number
+          )',
+          'increment_version_number(
+            bump_type: "minor" # Automatically increment minor version number
+          )',
+          'increment_version_number(
+            bump_type: "major" # Automatically increment major version number
+          )',
+          'increment_version_number(
+            version_number: "2.1.1" # Set a specific version number
+          )',
+          'increment_version_number(
+            version_number: "2.1.1",                # specify specific version number (optional, omitting it increments patch version number)
+            xcodeproj: "./path/to/MyApp.xcodeproj"  # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+          )',
+          'version = increment_version_number'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

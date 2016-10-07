@@ -117,7 +117,11 @@ module Pilot
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :itc_provider,
+                                     env_name: "PILOT_ITC_PROVIDER",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     optional: true)
       ]
     end
   end

@@ -15,7 +15,7 @@ module Pilot
                                                                   package_path: "/tmp",
                                                                       platform: platform)
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
@@ -33,26 +33,56 @@ module Pilot
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       uploaded_build = wait_for_processing_build # this might take a while
 
+      distribute(options, uploaded_build)
+    end
+
+    def distribute(options, build = nil)
+      start(options)
+      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+        config[:app_identifier] = UI.input("App Identifier: ")
+      end
+
+      if build.nil?
+        builds = app.all_processing_builds + app.builds
+        # sort by upload_date
+        builds.sort! { |a, b| a.upload_date <=> b.upload_date }
+        build = builds.last
+        if build.nil?
+          UI.user_error!("No builds found.")
+          return
+        end
+        if build.processing
+          UI.user_error!("Build #{build.train_version}(#{build.build_version}) is still processing.")
+          return
+        end
+        if build.testing_status == "External"
+          UI.user_error!("Build #{build.train_version}(#{build.build_version}) has already been distributed.")
+          return
+        end
+
+        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
+      end
+
       # First, set the changelog (if necessary)
       if options[:changelog].to_s.length > 0
-        uploaded_build.update_build_information!(whats_new: options[:changelog])
+        build.update_build_information!(whats_new: options[:changelog])
         UI.success "Successfully set the changelog for build"
       end
 
       return if config[:skip_submission]
-      distribute_build(uploaded_build, options)
+      distribute_build(build, options)
       UI.message("Successfully distributed build to beta testers 🚀")
     end
 
     def list(options)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
-        config[:app_identifier] = ask("App Identifier: ")
+        config[:app_identifier] = UI.input("App Identifier: ")
       end
 
       builds = app.all_processing_builds + app.builds
       # sort by upload_date
-      builds.sort! {|a, b| a.upload_date <=> b.upload_date }
+      builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
       puts Terminal::Table.new(
@@ -79,17 +109,26 @@ module Pilot
     def wait_for_processing_build
       # the upload date of the new buid
       # we use it to identify the build
-
       start = Time.now
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
       loop do
-        sleep wait_processing_interval
-        builds = app.all_processing_builds
-        break if builds.count == 0
-        latest_build = builds.last
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
+        sleep(wait_processing_interval)
+
+        # before we look for processing builds, we need to ensure that there
+        #  is a build train for this application; new applications don't
+        #  build trains right away, and if we don't do this check, we will
+        #  get break out of this loop and then generate an error later when we
+        #  have a nil build
+        if FastlaneCore::Feature.enabled?('PILOT_WAIT_FOR_NEW_BUILD_TRAINS_ON_ITUNES_CONNECT') && app.build_trains.count == 0
+          UI.message("New application; waiting for build train to appear on iTunes Connect")
+        else
+          builds = app.all_processing_builds
+          break if builds.count == 0
+          latest_build = builds.last
+          UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
+        end
       end
 
       UI.user_error!("Error receiving the newly uploaded binary, please check iTunes Connect") if latest_build.nil?
@@ -100,12 +139,14 @@ module Pilot
         # true -> false, where the second true is transient. This causes a spurious failure. Find build by build_version
         # and ensure it's not processing before proceeding - it had to have already been false before, to get out of the
         # previous loop.
-        full_build = app.build_trains[latest_build.train_version].builds.find do |b|
+        build_train = app.build_trains[latest_build.train_version]
+        builds = build_train ? build_train.builds : []
+        full_build = builds.find do |b|
           b.build_version == latest_build.build_version
         end
 
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})")
-        sleep wait_processing_interval
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
+        sleep(wait_processing_interval)
       end
 
       if full_build && !full_build.processing && full_build.valid

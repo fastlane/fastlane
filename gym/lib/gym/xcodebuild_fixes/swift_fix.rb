@@ -12,7 +12,7 @@ module Gym
       def swift_library_fix
         require 'fileutils'
 
-        return if check_for_swift PackageCommandGenerator
+        return if check_for_swift(PackageCommandGenerator)
 
         UI.verbose "Packaging up the Swift Framework as the current app is a Swift app"
         ipa_swift_frameworks = Dir["#{PackageCommandGenerator.appfile_path}/Frameworks/libswift*"]
@@ -27,14 +27,35 @@ module Gym
           ipa_swift_frameworks.each do |path|
             framework = File.basename(path)
 
-            FileUtils.copy_file("#{Xcode.xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/#{framework}", File.join(swift_support, framework))
+            begin
+              toolchain_dir = toolchain_dir_name_for_toolchain(Gym.config[:toolchain])
+
+              from = File.join(Xcode.xcode_path, "Toolchains/#{toolchain_dir}/usr/lib/swift/iphoneos/#{framework}")
+              to = File.join(swift_support, framework)
+
+              UI.verbose("Copying Swift framework from '#{from}'")
+              FileUtils.copy_file(from, to)
+            rescue => ex
+              UI.error("Error copying over framework file. Please try running gym without the legacy build API enabled")
+              UI.error("For more information visit https://github.com/fastlane/fastlane/issues/5863")
+              UI.error("Missing file #{path} inside #{Xcode.xcode_path}")
+
+              if Gym.config[:toolchain].nil?
+                UI.important("If you're using Swift 2.3, but already updated to Xcode 8")
+                UI.important("try adding the following parameter to your gym call:")
+                UI.success("gym(use_legacy_build_api: true, toolchain: :swift_2_3)")
+                UI.message("or")
+                UI.success("gym --use_legacy_build_api --toolchain swift_2_3")
+              end
+
+              UI.user_error!(ex)
+            end
           end
 
           # Add "SwiftSupport" to the .ipa archive
           Dir.chdir(tmpdir) do
             command_parts = ["zip --recurse-paths '#{PackageCommandGenerator.ipa_path}' SwiftSupport"]
             command_parts << "> /dev/null" unless $verbose
-            Runner.new.print_command(command_parts, "Fix Swift embedded code if needed") if $verbose
 
             FastlaneCore::CommandExecutor.execute(command: command_parts,
                                                 print_all: false,
@@ -44,6 +65,13 @@ module Gym
                                                     end)
           end
         end
+      end
+
+      def toolchain_dir_name_for_toolchain(toolchain)
+        return "Swift_2.3.xctoolchain" if toolchain == "com.apple.dt.toolchain.Swift_2_3"
+
+        UI.error("No specific folder was found for toolchain #{toolchain}. Using the default toolchain location.") if toolchain
+        return "XcodeDefault.xctoolchain"
       end
 
       # @param the PackageCommandGenerator

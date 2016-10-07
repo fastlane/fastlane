@@ -217,7 +217,7 @@ module Fastlane
         branch_option = ""
         branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-        clone_command = "git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
+        clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
         UI.message "Cloning remote git repo..."
         Actions.sh(clone_command)
@@ -263,6 +263,11 @@ module Fastlane
       value ||= yield if block_given?
       collector.did_launch_action(:puts)
       Fastlane::Actions::PutsAction.run([value])
+    end
+
+    def test(params = {})
+      # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
+      self.runner.try_switch_to_lane(:test, [params])
     end
   end
 end

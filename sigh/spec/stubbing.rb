@@ -10,6 +10,7 @@ def stub_spaceship
   allow(profile).to receive(:valid?).and_return(true)
   allow(profile.class).to receive(:pretty_type).and_return("pretty")
   allow(profile).to receive(:download).and_return("FileContent")
+  allow(profile).to receive(:is_adhoc?).and_return(false)
 
   types = [Spaceship.provisioning_profile, Spaceship.provisioning_profile.app_store]
   types.each do |current|
@@ -21,4 +22,8 @@ def stub_spaceship
   certs.each do |current|
     allow(current).to receive(:all).and_return([certificate])
   end
+end
+
+def stub_request_valid_identities(resign, value)
+  expect(resign).to receive(:request_valid_identities).and_return(value)
 end

@@ -8,4 +8,5 @@ require 'security'
 require 'highline/import' # to hide the entered password
 
 module CredentialsManager
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 end

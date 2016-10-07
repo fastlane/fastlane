@@ -14,8 +14,13 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
-        string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
+        if $verbose
+          string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
+        elsif ENV["FASTLANE_HIDE_TIMESTAMP"]
+          string = ""
+        else
+          string = "[#{datetime.strftime('%H:%M:%S')}]: "
+        end
 
         string += "#{msg}\n"
 
@@ -85,12 +90,12 @@ module FastlaneCore
 
     def input(message)
       verify_interactive!(message)
-      ask(message)
+      ask(message.to_s.yellow).to_s.strip
     end
 
     def confirm(message)
       verify_interactive!(message)
-      agree("#{message} (y/n)", true)
+      agree("#{message} (y/n)".yellow, true)
     end
 
     def select(message, options)

@@ -10,13 +10,23 @@ module Fastlane
 
         platform = params.first.to_sym
 
-        SupportedPlatforms.verify! platform
+        SupportedPlatforms.verify!(platform)
 
         Actions.lane_context[SharedValues::DEFAULT_PLATFORM] = platform
       end
 
       def self.description
         "Defines a default platform to not have to specify the platform"
+      end
+
+      def self.example_code
+        [
+          'default_platform :android'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.author

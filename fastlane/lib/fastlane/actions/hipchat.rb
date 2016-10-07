@@ -51,7 +51,8 @@ module Fastlane
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
-            uri = URI.parse("https://#{api_host}/v2/user/#{channel}/message")
+            escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
+            uri = URI.parse("https://#{api_host}/v2/user/#{escaped_channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
 
@@ -170,6 +171,25 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.details
+        "Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status."
+      end
+
+      def self.example_code
+        [
+          'hipchat(
+            message: "App successfully released!",
+            message_format: "html", # or "text", defaults to "html"
+            channel: "Room or @username",
+            success: true
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

@@ -17,12 +17,15 @@ module Fastlane
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
+        lanes = ff.runner.lanes[platform]
+
+        if lanes.nil? || lanes.empty? || lanes.all? { |_, lane| lane.is_private }
+          next
+        end
+
         output << "## #{formatted_platform(platform)}" if platform
 
-        value = ff.runner.lanes[platform]
-        next unless value
-
-        value.each do |lane_name, lane|
+        lanes.each do |lane_name, lane|
           next if lane.is_private
           output << render(platform, lane_name, lane.description.join("\n\n"))
         end
@@ -32,12 +35,13 @@ module Fastlane
         output << ""
       end
 
-      output << "This README.md is auto-generated and will be re-generated every time to run [fastlane](https://fastlane.tools)."
+      output << "This README.md is auto-generated and will be re-generated every time [fastlane](https://fastlane.tools) is run."
       output << "More information about fastlane can be found on [https://fastlane.tools](https://fastlane.tools)."
       output << "The documentation of fastlane can be found on [GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane)."
+      output << ""
 
       File.write(output_path, output.join("\n"))
-      UI.success "Successfully generated documentation to path '#{File.expand_path(output_path)}'" if $verbose
+      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if $verbose
     end
 
     #####################################################

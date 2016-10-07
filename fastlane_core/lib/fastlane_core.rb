@@ -4,6 +4,8 @@ require 'json'
 require 'fastlane_core/core_ext/string'
 
 require 'fastlane_core/version'
+require 'fastlane_core/feature/feature'
+require 'fastlane_core/features'
 require 'fastlane_core/helper'
 require 'fastlane_core/xcodebuild_list_output_parser'
 require 'fastlane_core/configuration/configuration'
@@ -32,4 +34,5 @@ require 'commander'
 require 'fastlane_core/ui/fastlane_runner' # monkey patch
 
 module FastlaneCore
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 end

@@ -243,7 +243,7 @@ describe Spaceship::Application do
       it "fetches remaining promocodes" do
         promocodes = app.promocodes
         expect(promocodes.count).to eq(1)
-        expect(promocodes[0].app_id).to eq(816549081)
+        expect(promocodes[0].app_id).to eq(816_549_081)
         expect(promocodes[0].app_name).to eq('DragonBox Numbers')
         expect(promocodes[0].version).to eq('1.5.0')
         expect(promocodes[0].platform).to eq('ios')
@@ -258,13 +258,13 @@ describe Spaceship::Application do
 
         promocodes = promocodes[4]
 
-        expect(promocodes.effective_date).to eq(1457864552000)
-        expect(promocodes.expiration_date).to eq(1460283752000)
+        expect(promocodes.effective_date).to eq(1_457_864_552_000)
+        expect(promocodes.expiration_date).to eq(1_460_283_752_000)
         expect(promocodes.username).to eq('joe@wewanttoknow.com')
 
         expect(promocodes.codes.count).to eq(1)
         expect(promocodes.codes[0]).to eq('6J49JFRP----')
-        expect(promocodes.version.app_id).to eq(816549081)
+        expect(promocodes.version.app_id).to eq(816_549_081)
         expect(promocodes.version.app_name).to eq('DragonBox Numbers')
         expect(promocodes.version.version).to eq('1.5.0')
         expect(promocodes.version.platform).to eq('ios')

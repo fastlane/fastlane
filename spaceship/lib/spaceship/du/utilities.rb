@@ -10,6 +10,7 @@ module Spaceship
     def content_type(path)
       path = path.downcase
       return 'image/jpeg' if path.end_with?('.jpg')
+      return 'image/jpeg' if path.end_with?('.jpeg')
       return 'image/png' if path.end_with?('.png')
       return 'application/json' if path.end_with?('.geojson')
       return 'video/quicktime' if path.end_with?('.mov')

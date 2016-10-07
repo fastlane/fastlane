@@ -44,10 +44,14 @@ module Fastlane
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
-      rescue => ex
+      rescue Exception => ex # rubocop:disable Lint/RescueException
+        # We also catch Exception, since the implemented action might send a SystemExit signal
+        # (or similar). We still want to catch that, since we want properly finish running fastlane
+        # Tested with `xcake`, which throws a `Xcake::Informative` object
+
         UI.important 'Variable Dump:'.yellow
         UI.message Actions.lane_context
-        UI.error ex.to_s
+        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -69,6 +73,8 @@ module Fastlane
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)
 
+      Fastlane::PluginUpdateManager.show_update_status
+
       if error
         UI.error 'fastlane finished with errors'
         raise error
@@ -87,8 +93,13 @@ module Fastlane
 
       rows = []
       actions.each_with_index do |current, i|
+        is_error_step = !current[:error].to_s.empty?
+
         name = current[:name][0..60]
-        rows << [i + 1, name, current[:time].to_i]
+        name = name.red if is_error_step
+        index = i + 1
+        index = "💥" if is_error_step
+        rows << [index, name, current[:time].to_i]
       end
 
       puts ""

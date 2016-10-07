@@ -28,7 +28,7 @@ module Spaceship
         lookup(keys)
       end
 
-      alias_method :[], :get
+      alias [] get
 
       def set(keys, value)
         raise "'keys' must be an array, got #{keys.class} instead" unless keys.kind_of?(Array)
@@ -46,10 +46,10 @@ module Spaceship
         end
       end
 
-      def to_json
+      def to_json(*a)
         h = @hash.dup
         h.delete(:application)
-        h.to_json
+        h.to_json(*a)
       end
     end
 

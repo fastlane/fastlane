@@ -105,8 +105,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :build_directory,
                                        env_name: "FL_SLATHER_BUILD_DIRECTORY", # The name of the environment variable
                                        description: "The location of the build output", # a short description of this parameter
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :proj,
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
@@ -117,18 +116,15 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :workspace,
                                        env_name: "FL_SLATHER_WORKSPACE",
                                        description: "The workspace that slather looks at",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
                                        description: "The input format that slather should look for",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,
                                        env_name: "FL_SLATHER_BUILDKITE_ENABLED", # The name of the environment variable
                                        description: "Tell slather that it is running on Buildkite",
@@ -223,22 +219,36 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :decimals,
                                       env_name: "FL_SLATHER_DECIMALS",
                                       description: "The amount of decimals to use for % coverage reporting",
+                                      is_string: false,
                                       default_value: false,
                                       optional: true)
         ]
       end
 
       def self.output
-        # Define the shared values you are going to provide
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["mattdelves"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'slather(
+            build_directory: "foo",
+            input_format: "bah",
+            scheme: "MyScheme",
+            proj: "MyProject.xcodeproj"
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

@@ -70,7 +70,10 @@ module Fastlane
       end
 
       def self.details
-        "This is useful if you have only one changelog for all languages"
+        [
+          "This is useful if you have only one changelog for all languages.",
+          "You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages."
+        ].join("\n")
       end
 
       def self.available_options
@@ -105,6 +108,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

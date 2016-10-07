@@ -3,7 +3,7 @@ module Fastlane
     class BackupFileAction < Action
       def self.run(params)
         path = params[:path]
-        FileUtils.cp(path, "#{path}.back", {preserve: true})
+        FileUtils.cp(path, "#{path}.back", { preserve: true })
         UI.message("Successfully created a backup 💾")
       end
 
@@ -25,6 +25,16 @@ module Fastlane
                                        description: "Path to the file you want to backup",
                                        optional: false)
         ]
+      end
+
+      def self.example_code
+        [
+          'backup_file(path: "/path/to/file")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

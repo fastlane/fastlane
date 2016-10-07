@@ -77,11 +77,16 @@ module Screengrab
     end
 
     def select_device
-      devices = @executor.execute(command: "adb devices -l", print_all: true, print_command: true).split("\n")
+      devices = run_adb_command("adb devices -l", print_all: true, print_command: true).split("\n")
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
-      # devices.reject! { |d| d.include?("List of devices attached") || d.include?("* daemon") || d.include?("unauthorized") || d.include?("offline") }
       devices.reject! do |device|
-        ['unauthorized', 'offline', '* daemon', 'List of devices attached'].any? { |status| device.include? status }
+        [
+          'server is out of date',   # The adb server is out of date and must be restarted
+          'unauthorized',            # The device has not yet accepted ADB control
+          'offline',                 # The device is offline, skip it
+          '* daemon',                # Messages printed when the daemon is starting up
+          'List of devices attached' # Header of table for data we want
+        ].any? { |status| device.include? status }
       end
 
       UI.user_error! 'There are no connected and authorized devices or emulators' if devices.empty?
@@ -130,9 +135,9 @@ module Screengrab
     end
 
     def determine_external_screenshots_path(device_serial)
-      device_ext_storage = @executor.execute(command: "adb -s #{device_serial} shell echo \\$EXTERNAL_STORAGE",
-                                             print_all: true,
-                                             print_command: true)
+      device_ext_storage = run_adb_command("adb -s #{device_serial} shell echo \\$EXTERNAL_STORAGE",
+                                           print_all: true,
+                                           print_command: true)
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
@@ -145,9 +150,9 @@ module Screengrab
 
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(device_serial, device_path) do |path|
-          @executor.execute(command: "adb -s #{device_serial} shell rm -rf #{path}",
-                            print_all: true,
-                            print_command: true)
+          run_adb_command("adb -s #{device_serial} shell rm -rf #{path}",
+                          print_all: true,
+                          print_command: true)
         end
       end
     end
@@ -172,36 +177,36 @@ module Screengrab
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
-      apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{app_apk_path}",
-                        print_all: true,
-                        print_command: true)
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path.shellescape}",
+                                           print_all: true,
+                                           print_command: true)
       UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
       UI.message 'Installing tests APK'
-      apk_install_output = @executor.execute(command: "adb -s #{device_serial} install -r #{tests_apk_path}",
-                        print_all: true,
-                        print_command: true)
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path.shellescape}",
+                                           print_all: true,
+                                           print_command: true)
       UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")
     end
 
     def grant_permissions(device_serial)
       UI.message 'Granting the permission necessary to change locales on the device'
-      @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.CHANGE_CONFIGURATION",
-                        print_all: true,
-                        print_command: true)
+      run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.CHANGE_CONFIGURATION",
+                      print_all: true,
+                      print_command: true)
 
-      device_api_version = @executor.execute(command: "adb -s #{device_serial} shell getprop ro.build.version.sdk",
-                                             print_all: true,
-                                             print_command: true).to_i
+      device_api_version = run_adb_command("adb -s #{device_serial} shell getprop ro.build.version.sdk",
+                                           print_all: true,
+                                           print_command: true).to_i
 
       if device_api_version >= 23
         UI.message 'Granting the permissions necessary to access device external storage'
-        @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
-                          print_all: true,
-                          print_command: true)
-        @executor.execute(command: "adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.READ_EXTERNAL_STORAGE",
-                          print_all: true,
-                          print_command: true)
+        run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
+                        print_all: true,
+                        print_command: true)
+        run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.READ_EXTERNAL_STORAGE",
+                        print_all: true,
+                        print_command: true)
       end
     end
 
@@ -216,11 +221,11 @@ module Screengrab
         instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
         instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
-        test_output = @executor.execute(command: instrument_command.join(" \\\n"),
-                                        print_all: true,
-                                        print_command: true)
+        test_output = run_adb_command(instrument_command.join(" \\\n"),
+                                      print_all: true,
+                                      print_command: true)
 
-        UI.user_error! "Tests failed" if test_output.include?("FAILURES!!!")
+        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
       end
     end
 
@@ -230,20 +235,24 @@ module Screengrab
 
       UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
 
-      device_screenshots_paths.each do |device_path|
-        if_device_path_exists(device_serial, device_path) do |path|
-          @executor.execute(command: "adb -s #{device_serial} pull #{path} #{@config[:output_directory]}",
+      # Make a temp directory into which to pull the screenshots before they are moved to their final location.
+      # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
+      Dir.mktmpdir do |tempdir|
+        device_screenshots_paths.each do |device_path|
+          if_device_path_exists(device_serial, device_path) do |path|
+            run_adb_command("adb -s #{device_serial} pull #{path} #{tempdir}",
                             print_all: false,
                             print_command: true)
+          end
         end
-      end
 
-      # The SDK can't 100% determine what kind of device it is running on relative to the categories that
-      # supply and Google Play care about (phone, 7" tablet, TV, etc.).
-      #
-      # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
-      # user provided device_type option value to match the directory structure that supply expects
-      move_pulled_screenshots(device_type_dir_name)
+        # The SDK can't 100% determine what kind of device it is running on relative to the categories that
+        # supply and Google Play care about (phone, 7" tablet, TV, etc.).
+        #
+        # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
+        # user provided device_type option value to match the directory structure that supply expects
+        move_pulled_screenshots(tempdir, device_type_dir_name)
+      end
 
       ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
@@ -259,23 +268,34 @@ module Screengrab
       ending_screenshot_count - starting_screenshot_count
     end
 
-    def move_pulled_screenshots(device_type_dir_name)
+    def move_pulled_screenshots(pull_dir, device_type_dir_name)
       # Glob pattern that finds the pulled screenshots directory for each locale
-      # (Matches: fastlane/metadata/android/en-US/images/screenshots)
-      screenshots_dir_pattern = File.join(@config[:output_directory], '**', "screenshots")
+      # Possible matches:
+      #   [pull_dir]/en-US/images/screenshots
+      #   [pull_dir]/screengrab/en-US/images/screenshots
+      screenshots_dir_pattern = File.join(pull_dir, '**', "screenshots")
 
       Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
         src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)
 
-        # We move the screenshots by replacing the last segment of the screenshots directory path with
-        # the device_type specific name
+        # The :output_directory is the final location for the screenshots, so we begin by replacing
+        # the temp directory portion of the path, with the output directory
+        dest_dir = screenshots_dir.gsub(pull_dir, @config[:output_directory])
+
+        # Different versions of adb are inconsistent about whether they will pull down the containing
+        # directory for the screenshots, so we'll try to remove that path from the directory name when
+        # creating the destination path.
+        # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
+        dest_dir = dest_dir.gsub('screengrab/', '')
+
+        # We then replace the last segment of the screenshots directory path with the device_type
+        # specific name, as expected by supply
         #
         # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
-        dest_dir = File.join(File.dirname(screenshots_dir), device_type_dir_name)
+        dest_dir = File.join(File.dirname(dest_dir), device_type_dir_name)
 
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)
-        FileUtils.rm_r(screenshots_dir)
         UI.success "Screenshots copied to #{dest_dir}"
       end
     end
@@ -283,21 +303,34 @@ module Screengrab
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
     def if_device_path_exists(device_serial, device_path)
-      return if @executor.execute(command: "adb -s #{device_serial} shell ls #{device_path}",
-                                  print_all: false,
-                                  print_command: false).include?('No such file')
+      return if run_adb_command("adb -s #{device_serial} shell ls #{device_path}",
+                                print_all: false,
+                                print_command: false).include?('No such file')
 
       yield device_path
+    rescue
+      # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
+      # We can safely ignore that and treat it as if it returned 'No such file'
     end
 
     def open_screenshots_summary(device_type_dir_name)
       unless @config[:skip_open_summary]
         UI.message "Opening screenshots summary"
         # MCF: this isn't OK on any platform except Mac
-        @executor.execute(command: "open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
-                          print_all: false,
-                          print_command: true)
+        run_adb_command("open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
+                        print_all: false,
+                        print_command: true)
       end
+    end
+
+    def run_adb_command(command, print_all: false, print_command: false)
+      output = @executor.execute(command: command,
+                                 print_all: print_all,
+                                 print_command: print_command) || ''
+      output.lines.reject do |line|
+        # Debug/Warning output from ADB}
+        line.start_with?('adb: ')
+      end.join('') # Lines retain their newline chars
     end
   end
 end

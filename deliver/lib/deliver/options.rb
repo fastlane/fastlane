@@ -78,7 +78,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
-                                     description: "Skip the HTML file verification",
+                                     description: "Skip the HTML report file verification",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
@@ -146,6 +146,10 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :itc_provider,
+                                     env_name: "DELIVER_ITC_PROVIDER",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     optional: true),
 
         # App Metadata
         # Non Localised
@@ -209,7 +213,17 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       UI.user_error!(":keywords must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                       value.each do |language, keywords|
+                                         # Auto-convert array to string
+                                         keywords = keywords.join(", ") if keywords.kind_of?(Array)
+                                         value[language] = keywords
+
+                                         UI.user_error!(":keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :release_notes,
                                      description: "Metadata: Localised release notes for this version",
                                      optional: true,

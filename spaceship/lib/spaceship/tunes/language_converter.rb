@@ -29,22 +29,13 @@ module Spaceship
 
         private
 
-        # Path to the gem to fetch resoures
-        def spaceship_gem_path
-          if Gem::Specification.find_all_by_name('spaceship').any?
-            return Gem::Specification.find_by_name('spaceship').gem_dir
-          else
-            return './'
-          end
-        end
-
         # Get the mapping JSON parsed
         def mapping
-          @languages ||= JSON.parse(File.read(File.join(spaceship_gem_path, "lib", "assets", "languageMapping.json")))
+          @languages ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "languageMapping.json")))
         end
 
         def readable_mapping
-          @readable ||= JSON.parse(File.read(File.join(spaceship_gem_path, "lib", "assets", "languageMappingReadable.json")))
+          @readable ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "languageMappingReadable.json")))
         end
       end
     end

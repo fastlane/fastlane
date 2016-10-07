@@ -19,7 +19,7 @@ describe Fastlane do
 
         it "Successfully collected all actions" do
           ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
-          expect(ff.collector.launches).to eq({default_platform: 1, frameit: 1, team_id: 2})
+          expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
         end
 
         it "Successfully handles exceptions" do

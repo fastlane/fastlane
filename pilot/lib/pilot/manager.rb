@@ -44,7 +44,7 @@ module Pilot
         app_id ||= @app.apple_id
       end
 
-      app_id ||= ask("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
 
       return app_id
     end
@@ -52,7 +52,7 @@ module Pilot
     def fetch_app_identifier
       result = config[:app_identifier]
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
-      result ||= ask("Please enter the app's bundle identifier: ")
+      result ||= UI.input("Please enter the app's bundle identifier: ")
       UI.verbose("App identifier (#{result})")
       return result
     end

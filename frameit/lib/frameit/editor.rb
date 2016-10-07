@@ -142,6 +142,12 @@ module Frameit
     end
 
     def put_device_into_background(background)
+      show_complete_frame = fetch_config['show_complete_frame']
+      if show_complete_frame
+        max_height = background.height - top_space_above_device
+        image.resize "x#{max_height}>"
+      end
+
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
@@ -225,7 +231,7 @@ module Frameit
       results = {}
       words.each do |key|
         # Create empty background
-        empty_path = File.join(Helper.gem_path('frameit'), "lib/assets/empty.png")
+        empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
         title_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
         title_image.combine_options do |i|
@@ -239,6 +245,9 @@ module Frameit
         UI.verbose("Adding text '#{text}'")
 
         text.gsub! '\n', "\n"
+        text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
+
+        interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
         title_image.combine_options do |i|
@@ -246,6 +255,7 @@ module Frameit
           i.gravity "Center"
           i.pointsize actual_font_size
           i.draw "text 0,0 '#{text}'"
+          i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
         title_image.trim # remove white space

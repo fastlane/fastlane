@@ -41,12 +41,23 @@ module Fastlane
                                        optional: true,
                                        description: "The path to your `adb` binary",
                                        is_string: true,
-                                       default_value: "adb"
-                                      )
+                                       default_value: "adb")
         ]
       end
 
       def self.output
+      end
+
+      def self.category
+        :building
+      end
+
+      def self.example_code
+        [
+          'adb(
+            command: "shell ls"
+          )'
+        ]
       end
 
       def self.return_value

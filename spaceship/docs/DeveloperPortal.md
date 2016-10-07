@@ -3,7 +3,7 @@ Developer Portal API
 
 # Usage
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`. 
+To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`.
 
 ## Login
 
@@ -83,7 +83,7 @@ Spaceship.app_group.all.collect do |group|
 end
 
 # Create a new group
-group = Spaceship.app_group.create!(group_id: "group.com.example.another", 
+group = Spaceship.app_group.create!(group_id: "group.com.example.another",
                                         name: "Another group")
 
 # Associate an app with this group (overwrites any previous associations)
@@ -146,17 +146,29 @@ Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx
 # Get all available provisioning profiles
 profiles = Spaceship.provisioning_profile.all
 
-# Get all App Store profiles
-profiles_appstore = Spaceship.provisioning_profile.app_store.all
+# Get all App Store and Ad Hoc profiles
+# Both app_store.all and ad_hoc.all return the same
+# This is the case since September 2016, since the API has changed
+# and there is no fast way to get the type when fetching the profiles
+profiles_appstore_adhoc = Spaceship.provisioning_profile.app_store.all
+profiles_appstore_adhoc = Spaceship.provisioning_profile.ad_hoc.all
 
-# Get all AdHoc profiles
-profiles_adhoc = Spaceship.provisioning_profile.ad_hoc.all
+# To distinguish between App Store and Ad Hoc profiles use
+adhoc_only = profiles_appstore_adhoc.find_all do |current_profile|
+  current_profile.is_adhoc?
+end
 
 # Get all Development profiles
 profiles_dev = Spaceship.provisioning_profile.development.all
 
 # Fetch all profiles for a specific app identifier for the App Store
 filtered_profiles = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
+
+# Check if a provisioning profile is valid
+profile.valid?
+
+# Verify that the certificate of the provisioning profile is valid
+profile.certificate_valid?
 
 ##### Downloading #####
 
@@ -192,9 +204,9 @@ File.write("NewProfile.mobileprovision", profile.download)
 
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
-broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile| 
-  # the below could be replaced with `!profile.valid?`, which takes longer but also verifies the code signing identity
-  (profile.status == "Invalid" or profile.status == "Expired") 
+broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile|
+  # the below could be replaced with `!profile.valid? || !profile.certificate_valid?`, which takes longer but also verifies the code signing identity
+  (profile.status == "Invalid" or profile.status == "Expired")
 end
 
 # Iterate over all broken profiles and repair them
@@ -203,7 +215,7 @@ broken_profiles.each do |profile|
 end
 
 # or to do the same thing, just more Ruby like
-Spaceship.provisioning_profile.all.find_all { |p| !p.valid? }.map(&:repair!)
+Spaceship.provisioning_profile.all.find_all { |p| !p.valid? || !p.certificate_valid? }.map(&:repair!)
 ```
 
 ## Devices
@@ -219,7 +231,7 @@ Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 
 ```ruby
 # Use the InHouse class to get all enterprise certificates
-cert = Spaceship.certificate.in_house.all.first 
+cert = Spaceship.certificate.in_house.all.first
 
 # Create a new InHouse Enterprise distribution profile
 profile = Spaceship.provisioning_profile.in_house.create!(bundle_id: "com.krausefx.*",
@@ -270,36 +282,36 @@ app.delete!
 
 ## Example Data
 
-Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/spaceship/blob/master/lib/spaceship/portal/provisioning_profile.rb) for all available attributes.
+Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/portal/provisioning_profile.rb) for all available attributes.
 
-The example data below is a provisioning profile, containing a device, certificate and app. 
+The example data below is a provisioning profile, containing a device, certificate and app.
 
 ```
-#<Spaceship::ProvisioningProfile::AdHoc 
+#<Spaceship::ProvisioningProfile::AdHoc
   @devices=[
-    #<Spaceship::Device 
-      @id="5YTNZ5A9AA", 
-      @name="Felix iPhone 6", 
+    #<Spaceship::Device
+      @id="5YTNZ5A9AA",
+      @name="Felix iPhone 6",
       @udid="39d2cab02642dc2bfdbbff4c0cb0e50c8632faaa"
-    >,  ...], 
+    >,  ...],
   @certificates=[
-    #<Spaceship::Certificate::Production 
-      @id="LHNT9C2AAA", 
-      @name="iOS Distribution", 
+    #<Spaceship::Certificate::Production
+      @id="LHNT9C2AAA",
+      @name="iOS Distribution",
       @expires=#<DateTime: 2016-02-10T23:44:20>
-    ], 
-  @id="72SRVUNAAA", 
-  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa", 
-  @expires=#<DateTime: 2016-02-10T23:44:20>, 
-  @distribution_method="adhoc", 
-  @name="com.krausefx.app AppStore", 
-  @status="Active", 
-  @platform="ios", 
-  @app=#<Spaceship::App 
-    @app_id="2UMR2S6AAA", 
-    @name="App Name", 
-    @platform="ios", 
-    @bundle_id="com.krausefx.app", 
+    ],
+  @id="72SRVUNAAA",
+  @uuid="43cda0d6-04a5-4964-89c0-a24b5f258aaa",
+  @expires=#<DateTime: 2016-02-10T23:44:20>,
+  @distribution_method="adhoc",
+  @name="com.krausefx.app AppStore",
+  @status="Active",
+  @platform="ios",
+  @app=#<Spaceship::App
+    @app_id="2UMR2S6AAA",
+    @name="App Name",
+    @platform="ios",
+    @bundle_id="com.krausefx.app",
     @is_wildcard=false>
   >
 >

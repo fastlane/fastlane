@@ -36,6 +36,8 @@ scan
 
 ###### The easiest way to run tests of your iOS and Mac app
 
+`scan` makes it easy to run tests of your iOS and Mac app on a simulator or connected device. 
+
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
@@ -52,8 +54,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 <h5 align="center"><code>scan</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
 # What's scan?
-
-`scan` makes it super easy to run tests of your iOS and Mac app. It does all the heavy lifting for you to run your tests... the easy way.
 
 ![https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large](https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large)
 
@@ -168,7 +168,7 @@ Run `scan init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
-devices: ["iPhone 6s", "iPad Air"]
+devices ["iPhone 6s", "iPad Air"]
 
 clean true
 

@@ -19,3 +19,6 @@ if `cd ..; git remote -v`.include?("countdown")
   gem "supply", path: "../supply"
   gem "scan", path: "../scan"
 end
+
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval(File.read(plugins_path), binding) if File.exist?(plugins_path)

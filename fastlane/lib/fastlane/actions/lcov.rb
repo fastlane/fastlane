@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     class LcovAction < Action
-
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
@@ -85,6 +84,19 @@ module Fastlane
         ["/Applications/*", "/Frameworks/*"]
       end
 
+      def self.example_code
+        [
+          'lcov(
+            project_name: "ProjectName",
+            scheme: "yourScheme",
+            output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
+      end
     end
   end
 end
