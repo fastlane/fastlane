@@ -35,6 +35,12 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+</h4>
+<hr />
+
 _snapshot_ generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
@@ -329,6 +335,12 @@ If you find a better way to do any of this, please submit an issue on GitHub or 
 Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
 # Tips
+
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+</h4>
+<hr />
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
