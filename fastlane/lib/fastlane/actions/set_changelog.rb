@@ -4,7 +4,11 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
+        UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
+        Spaceship::Tunes.select_team
+        UI.message("Login successful")
+
         app = Spaceship::Application.find(params[:app_identifier])
 
         version_number = params[:version]
@@ -98,7 +102,26 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :changelog,
                                        env_name: "FL_SET_CHANGELOG_CHANGELOG",
                                        description: "Changelog text that should be uploaded to iTunes Connect",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :team_id,
+                                       short_option: "-k",
+                                       env_name: "FL_SET_CHANGELOG_TEAM_ID",
+                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       short_option: "-e",
+                                       env_name: "FL_SET_CHANGELOG_TEAM_NAME",
+                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
+                                       end)
         ]
       end
 

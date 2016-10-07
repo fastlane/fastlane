@@ -27,19 +27,19 @@ module Cert
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                     description: "The ID of your team if you're in multiple teams",
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "CERT_TEAM_NAME",
-                                     description: "The name of your team if you're in multiple teams",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
