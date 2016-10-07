@@ -11,8 +11,11 @@ module Fastlane
         require 'spaceship'
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
+        UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(credentials.user, credentials.password)
         Spaceship::Tunes.select_team
+        UI.message("Login successful")
+
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
 
         version_number = params[:version]
