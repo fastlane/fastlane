@@ -68,9 +68,9 @@ module Spaceship
     def team_id=(team_id)
       # First, we verify the team actually exists, because otherwise iTC would return the
       # following confusing error message
-      # 
+      #
       #     invalid content provider id
-      # 
+      #
       available_teams = teams.collect do |team|
         team.fetch("contentProvider", {}).fetch("contentProviderId", nil)
       end
