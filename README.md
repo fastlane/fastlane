@@ -49,7 +49,11 @@ Then to deploy a new 'beta' version of your app just run
 :computer: | Support for iOS, Mac, and Android apps
 :octocat: | Full Git and Mercurial support
 
-Check out the new [docs.fastlane.tools](https://docs.fastlane.tools).
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
+</h4>
+<hr />
 
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 
@@ -89,6 +93,12 @@ Typically you'll use `fastlane` by triggering individual lanes:
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
 - `fastlane new_action`: Create a new action *(integration)* for fastlane
+
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
+</h4>
+<hr />
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
