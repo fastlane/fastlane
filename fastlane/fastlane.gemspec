@@ -30,8 +30,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.3' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '~> 1.6.2' # macOS notifications
-  spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
-  spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions

@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcpretty', '>= 0.2.2' # pretty xcodebuild output
   spec.add_dependency 'xcpretty-travis-formatter', '>= 0.0.3'
   spec.add_dependency 'slack-notifier', '~> 1.3'
-  spec.add_dependency 'terminal-table', '>= 1.4.5' # print out build information
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # print out build information
 
   # Development only
   spec.add_development_dependency "bundler"

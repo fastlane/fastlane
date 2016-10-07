@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "fastlane_core", ">= 0.52.1", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency 'xcpretty', '>= 0.2.3' # pretty xcodebuild output
-  spec.add_dependency 'terminal-table', '>= 1.4.5' # print out build information
-  spec.add_dependency 'plist' # Generate the Xcode config plist file
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # print out build information
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Generate the Xcode config plist file
   spec.add_dependency 'rubyzip', '>= 1.1.7' # fix swift/ipa
 
   # Development only

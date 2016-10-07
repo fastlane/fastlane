@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "spaceship", ">= 0.34.3", "< 1.0.0" # iTunes Connect communication
   spec.add_dependency 'credentials_manager', '>= 0.16.0'
 
-  spec.add_dependency 'terminal-table', '>= 1.4.5' # User's information
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # User's information
 
   # Development only
   spec.add_development_dependency 'bundler'
