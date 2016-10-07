@@ -46,10 +46,7 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
-          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
-          'rejected' => REJECTED,
-          'uploadReceived' => UPLOAD_RECEIVED,
-          'processingForAppStore' => PROCESSING_FOR_APP_STORE
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
         }
 
         mapping.each do |k, v|

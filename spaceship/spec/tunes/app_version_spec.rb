@@ -172,18 +172,6 @@ describe Spaceship::AppVersion, all: true do
       it "parses pendingDeveloperRelease" do
         expect(Spaceship::Tunes::AppStatus.get_from_string('pendingDeveloperRelease')).to eq(Spaceship::Tunes::AppStatus::PENDING_DEVELOPER_RELEASE)
       end
-
-      it "parses rejected" do
-        expect(Spaceship::Tunes::AppStatus.get_from_string('rejected')).to eq(Spaceship::Tunes::AppStatus::REJECTED)
-      end
-
-      it "parses uploadReceived" do
-        expect(Spaceship::Tunes::AppStatus.get_from_string('uploadReceived')).to eq(Spaceship::Tunes::AppStatus::UPLOAD_RECEIVED)
-      end
-
-      it "parses processingForAppStore" do
-        expect(Spaceship::Tunes::AppStatus.get_from_string('processingForAppStore')).to eq(Spaceship::Tunes::AppStatus::PROCESSING_FOR_APP_STORE)
-      end
     end
 
     describe "Screenshots" do
