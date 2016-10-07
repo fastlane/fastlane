@@ -374,11 +374,7 @@ When the app dies directly after the application is launched there might be 2 pr
 
 ## Determine language
 
-To detect the currently used localization in your tests, use the following code:
-
-```javascript
-You can access the language using the `deviceLanguage` variable.
-```
+To detect the currently used localization in your tests, access the `deviceLanguage` variable from `SnapshotHelper.swift`.
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
