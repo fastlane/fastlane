@@ -72,7 +72,7 @@ module Spaceship
       #     invalid content provider id
       #
       available_teams = teams.collect do |team|
-        team.fetch("contentProvider", {}).fetch("contentProviderId", nil)
+        (team["contentProvider"] || {})["contentProviderId"]
       end
 
       result = available_teams.find do |available_team_id|
