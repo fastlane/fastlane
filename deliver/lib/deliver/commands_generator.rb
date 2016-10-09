@@ -116,6 +116,12 @@ module Deliver
           if res
             require 'deliver/setup'
             v = options[:app].latest_version
+            if options[:app_version].to_s.length > 0 && v.version != options[:app_version]
+              if options[:app].live_version.version != options[:app_version]
+                raise "Neither the current nor live version match specified app_version \"#{options[:app_version]}\""
+              end
+              v = options[:app].live_version
+            end
             Deliver::Setup.new.generate_metadata_files(v, path)
           else
             return 0
