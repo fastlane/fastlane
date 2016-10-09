@@ -220,7 +220,8 @@ module Spaceship
       def self.url
         {
           index:  "ra/users/iap",
-          create: "ra/users/iap/add"
+          create: "ra/users/iap/add",
+          delete: "ra/users/iap/delete"
         }
       end
 
@@ -238,6 +239,14 @@ module Spaceship
           country: country
         )
         self.new(data)
+      end
+
+      def self.delete!(emails)
+        client.delete_sandbox_testers!(self, emails)
+      end
+
+      def self.delete_all!
+        delete!(self.all.map(&:email))
       end
     end
   end

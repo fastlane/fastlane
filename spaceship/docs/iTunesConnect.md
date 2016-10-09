@@ -307,6 +307,12 @@ testers = Spaceship::Tunes::SandboxTester.create!(
   last_name: 'Brule', # optional, defaults to 'Test'
 )
 
+# Delete sandbox testers by email
+Spaceship::Tunes::SandboxTester.delete!(['sandbox@test.com', 'sandbox2@test.com'])
+
+# Delete all sandbox testers
+Spaceship::Tunes::SandboxTester.delete_all!
+
 ## App ratings & reviews
 
 ```ruby
