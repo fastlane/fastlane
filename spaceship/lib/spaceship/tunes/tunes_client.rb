@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -878,14 +880,30 @@ module Spaceship
             storeFront: { value: country },
             birthDay: { value: 1 },
             birthMonth: { value: 1 },
-            secretQuestion: { value: 'secret_question' },
-            secretAnswer: { value: 'secret_answer' },
+            secretQuestion: { value: SecureRandom.hex },
+            secretAnswer: { value: SecureRandom.hex },
             sandboxAccount: nil
           }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       parse_response(r, 'data')['user']
+    end
+
+    def delete_sandbox_testers!(tester_class, emails)
+      url = tester_class.url[:delete]
+      request(:post) do |req|
+        req.url url
+        req.body = emails.map do |email|
+          {
+            emailAddress: {
+              value: email
+            }
+          }
+        end.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      true
     end
 
     #####################################################
