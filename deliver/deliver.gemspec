@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   # third party dependencies
   spec.add_dependency 'fastimage', '~> 1.6' # fetch the image sizes from the screenshots
-  spec.add_dependency 'plist', '~> 3.1.0' # for reading the Info.plist of the ipa file
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # for reading the Info.plist of the ipa file
 
   # Development only
   spec.add_development_dependency 'bundler'
