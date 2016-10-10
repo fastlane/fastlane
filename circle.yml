@@ -1,4 +1,6 @@
 machine:
+  python:
+    version: 2.7.11
   xcode:
     version: "7.3"
 dependencies:
