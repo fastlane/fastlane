@@ -112,6 +112,8 @@ lane :release do |options|
     )
   end
 
+  update_docs
+
   clubmate
 
   puts "You can now tweet:".green
