@@ -48,6 +48,12 @@ lane :release do |options|
   #
   tool_name = options[:tool] || detect_tool
 
+  # Git verification
+  #
+  ensure_git_status_clean
+  ensure_git_branch(branch: 'master')
+  git_pull
+
   # Verifying RubyGems version
   #
   validate_repo(tool_name: tool_name)
@@ -59,12 +65,6 @@ lane :release do |options|
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     UI.user_error!("Version number #{version} was already deployed")
   end
-
-  # Git verification
-  #
-  ensure_git_status_clean
-  ensure_git_branch(branch: 'master')
-  git_pull
 
   # Then push to git remote
   #
