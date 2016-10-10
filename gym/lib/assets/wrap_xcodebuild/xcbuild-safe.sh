@@ -4,8 +4,8 @@
 # Modified to work in RVM and non RVM environments
 #
 # Xcode 7 (incl. 7.0.1) seems to have a dependency on the system ruby.
-# xcodebuild is screwed up by using rvm to map to another non-system
-# ruby†. This script is a fix that allows you call xcodebuild in a
+# xcodebuild has issues by using rvm to map to another non-system
+# ruby. This script is a fix that allows you call xcodebuild in a
 # "safe" rvm environment, but will not (AFAIK) affect the "external"
 # rvm setting.
 #
@@ -18,8 +18,6 @@
 #   path/to/xcbuild-safe.sh arg1 ... argn
 #
 # -----
-# † Because, you know, that *never* happens when you are building
-# Xcode projects, say with abstruse tools like Rake or CocoaPods.
 
 which rvm > /dev/null
 
