@@ -128,8 +128,7 @@ lane :verify_docs do
     temporary_gemfile = temporary_gemfile.join("\n")
     puts `sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)` # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
     sh "bundle install"
-    sh "pip install -r requirements.txt --ignore-installed" if Helper.ci?
-    sh "bundle exec fastlane test"
+    sh "bundle exec fastlane test skip_building:true" # skip_building since we don't have a proper python environment set up
   end
 end
 
