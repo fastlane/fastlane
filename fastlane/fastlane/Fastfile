@@ -143,7 +143,7 @@ lane :update_docs do
     Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
 
     # Create a new branch
-    sh "git checkout -b 'update-actions-md'"
+    sh "git checkout -b 'update-actions-md-#{Time.now.to_i}'"
 
     Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
       if `git status -s`.length > 0
