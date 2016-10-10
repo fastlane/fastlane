@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "fastlane_core", ">= 0.52.1", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency 'plist', '~> 3.1' # for reading the provisioning profile
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # for reading the provisioning profile
   spec.add_dependency "spaceship", ">= 0.34.3", "< 1.0.0" # communication with Apple
 
   # Development only
