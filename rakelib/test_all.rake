@@ -98,6 +98,7 @@ task :test_all do
 
           sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
+          sh "bundle exec fastlane verify_docs"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
