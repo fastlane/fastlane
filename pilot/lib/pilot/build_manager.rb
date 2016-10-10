@@ -63,10 +63,10 @@ module Pilot
         UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
       end
 
-      # First, set the changelog (if necessary)
-      if options[:changelog].to_s.length > 0
-        build.update_build_information!(whats_new: options[:changelog])
-        UI.success "Successfully set the changelog for build"
+      # First, set the changelog and/or description if necessary
+      if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0
+        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description])
+        UI.success "Successfully set the changelog and/or description for build"
       end
 
       return if config[:skip_submission]
