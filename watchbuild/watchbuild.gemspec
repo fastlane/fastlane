@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "fastlane_core", ">= 0.52.1", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency "spaceship", ">= 0.34.3", "< 1.0.0" # communication with Apple
+  spec.add_dependency "spaceship", ">= 0.35.0", "< 1.0.0" # communication with Apple
   spec.add_dependency 'terminal-notifier' # show a notification once the build is ready
 
   # Development only
