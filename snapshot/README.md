@@ -35,7 +35,13 @@ snapshot
 
 ###### Automate taking localized screenshots of your iOS app on every device
 
-'snapshot' generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+</h4>
+<hr />
+
+_snapshot_ generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -49,7 +55,7 @@ It's hard to get everything right!
 
 More information about [creating perfect screenshots](https://krausefx.com/blog/creating-perfect-app-store-screenshots-of-your-ios-app).
 
-`snapshot` runs completely in the background - you can do something else, while your computer takes the screenshots for you.
+_snapshot_ runs completely in the background - you can do something else, while your computer takes the screenshots for you.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
@@ -75,11 +81,11 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
-- `snapshot` automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
+- _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
-After `snapshot` successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
+After _snapshot_ successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
 
 ![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
@@ -150,7 +156,7 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 
 ![assets/snapshot.gif](assets/snapshot.gif)
 
-You can try the `snapshot` [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
+You can try the _snapshot_ [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
 
 To quick start your UI tests, you can use the UI Test recorder. You only have to interact with the simulator, and Xcode will generate the UI Test code for you. You can find the red record button on the bottom of the screen (more information in [this blog post](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 
@@ -162,13 +168,13 @@ snapshot
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
 
-If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and `snapshot` will continue with the next device or language. To stop the flow after the first error, run
+If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 
 ```sh
 snapshot --stop_after_first_error
 ```
 
-Also by default, `snapshot` will open the HTML after all is done. This can be skipped with the following command
+Also by default, _snapshot_ will open the HTML after all is done. This can be skipped with the following command
 
 
 ```sh
@@ -181,19 +187,19 @@ There are a lot of options available that define how to build your app, for exam
 snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
 ```
 
-Reinstall the app before running `snapshot`
+Reinstall the app before running _snapshot_
 
 ```sh
 snapshot --reinstall_app --app_identifier "tools.fastlane.app"
 ```
 
-By default `snapshot` automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#372](https://github.com/fastlane/snapshot/issues/372)). You can adapt this number using
+By default _snapshot_ automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#372](https://github.com/fastlane/snapshot/issues/372)). You can adapt this number using
 
 ```sh
 snapshot --number_of_retries 3
 ```
 
-Add photos and/or videos to the simulator before running `snapshot`
+Add photos and/or videos to the simulator before running _snapshot_
 
 ```sh
 snapshot --add_photos MyTestApp/Assets/demo.jpg --add_videos MyTestApp/Assets/demo.mp4
@@ -205,7 +211,7 @@ For a list for all available options run
 snapshot --help
 ```
 
-After running `snapshot` you will get a nice summary:
+After running _snapshot_ you will get a nice summary:
 
 <img src="assets/testSummary.png" width="500">
 
@@ -254,13 +260,13 @@ You can run this command in the terminal to delete and re-create all iOS simulat
 snapshot reset_simulators
 ```
 
-**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running `snapshot`.
+**Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running _snapshot_.
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
 ## Update snapshot helpers
 
-Some updates require the helper files to be updated. `snapshot` will automatically warn you and tell you how to update.
+Some updates require the helper files to be updated. _snapshot_ will automatically warn you and tell you how to update.
 
 Basically you can run
 
@@ -285,7 +291,7 @@ name.text = NSUserDefaults.standardUserDefaults().stringForKey("firstName")
 // name.text = "Felix"
 ```
 
-`snapshot` includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by `snapshot`.
+_snapshot_ includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by _snapshot_.
 
 ```swift
 if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
@@ -293,7 +299,7 @@ if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
 }
 ```
 
-Specify multiple argument strings and `snapshot` will generate screenshots for each combination of arguments, devices, and languages. This is useful for comparing the same screenshots with different feature flags, dynamic text sizes, and different data sets.
+Specify multiple argument strings and _snapshot_ will generate screenshots for each combination of arguments, devices, and languages. This is useful for comparing the same screenshots with different feature flags, dynamic text sizes, and different data sets.
 
 ```ruby
 # Snapfile for A/B Test Comparison
@@ -305,30 +311,36 @@ launch_arguments([
 
 # How does it work?
 
-The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So `snapshot` uses a different approach:
+The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So _snapshot_ uses a different approach:
 
-When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occurred during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which `snapshot` stores in a temporary folder.
+When you run unit tests in Xcode, the reporter generates a plist file, documenting all events that occurred during the tests ([More Information](http://michele.io/test-logs-in-xcode)). Additionally, Xcode generates screenshots before, during and after each of these events. There is no way to manually trigger a screenshot event. The screenshots and the plist files are stored in the DerivedData directory, which _snapshot_ stores in a temporary folder.
 
-When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from `snapshot`. On tvOS, there is no orientation so we ask for a count of app views with type "Browser" (which should never exist on tvOS).
+When the user calls `snapshot(...)` in the UI Tests (Swift or Objective C) the script actually does a rotation to `.Unknown` which doesn't have any effect on the actual app, but is enough to trigger a screenshot. It has no effect to the application and is not something you would do in your tests. The goal was to find *some* event that a user would never trigger, so that we know it's from _snapshot_. On tvOS, there is no orientation so we ask for a count of app views with type "Browser" (which should never exist on tvOS).
 
-`snapshot` then iterates through all test events and check where we either did this weird rotation (on iOS) or searched for browsers (on tvOS). Once `snapshot` has all events triggered by `snapshot` it collects a ordered list of all the file names of the actual screenshots of the application.
+_snapshot_ then iterates through all test events and check where we either did this weird rotation (on iOS) or searched for browsers (on tvOS). Once _snapshot_ has all events triggered by _snapshot_ it collects a ordered list of all the file names of the actual screenshots of the application.
 
-In the test output, the Swift `snapshot` function will print out something like this
+In the test output, the Swift _snapshot_ function will print out something like this
 
 > snapshot: [some random text here]
 
-`snapshot` finds all these entries using a regex. The number of `snapshot` outputs in the terminal and the number of `snapshot` events in the plist file should be the same. Knowing that, `snapshot` automatically matches these 2 lists to identify the name of each of these screenshots. They are then copied over to the output directory and separated by language and device.
+_snapshot_ finds all these entries using a regex. The number of _snapshot_ outputs in the terminal and the number of _snapshot_ events in the plist file should be the same. Knowing that, _snapshot_ automatically matches these 2 lists to identify the name of each of these screenshots. They are then copied over to the output directory and separated by language and device.
 
-2 thing have to be passed on from `snapshot` to the `xcodebuild` command line tool:
+2 thing have to be passed on from _snapshot_ to the `xcodebuild` command line tool:
 
 - The device type is passed via the `destination` parameter of the `xcodebuild` parameter
-- The language is passed via a temporary file which is written by `snapshot` before running the tests and read by the UI Tests when launching the application
+- The language is passed via a temporary file which is written by _snapshot_ before running the tests and read by the UI Tests when launching the application
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
 Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
 
 # Tips
+
+<hr />
+<h4 align="center">
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+</h4>
+<hr />
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
@@ -374,17 +386,13 @@ When the app dies directly after the application is launched there might be 2 pr
 
 ## Determine language
 
-To detect the currently used localization in your tests, use the following code:
-
-```javascript
-You can access the language using the `deviceLanguage` variable.
-```
+To detect the currently used localization in your tests, access the `deviceLanguage` variable from `SnapshotHelper.swift`.
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
 
 # Code of Conduct
-Help us keep `snapshot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _snapshot_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

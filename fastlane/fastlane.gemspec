@@ -25,14 +25,14 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'krausefx-shenzhen', '>= 0.14.10' # to upload to Hockey and Crashlytics and build the app
-  spec.add_dependency 'slack-notifier', '~> 1.3' # Slack notifications
+  spec.add_dependency 'krausefx-shenzhen', '>= 0.14.10', '< 1.0.0' # to upload to Hockey and Crashlytics and build the app
+  spec.add_dependency 'slack-notifier', '>= 1.3', '< 2.0.0' # Slack notifications
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.3' # prettify xcodebuild output
-  spec.add_dependency 'terminal-notifier', '~> 1.6.2' # macOS notifications
-  spec.add_dependency 'terminal-table', '~> 1.4.5' # Actions documentation
-  spec.add_dependency 'plist', '~> 3.1.0' # Needed for set_build_number_repository and get_info_plist_value actions
-  spec.add_dependency 'addressable', '~> 2.3' # Support for URI templates
+  spec.add_dependency 'terminal-notifier', '>= 1.6.2', '< 2.0.0' # macOS notifications
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Needed for set_build_number_repository and get_info_plist_value actions
+  spec.add_dependency 'addressable', '>= 2.3', '< 3.0.0' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions
   spec.add_dependency 'word_wrap', '~> 1.0.0'  # to add line breaks for tables with long strings
@@ -41,11 +41,11 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency "credentials_manager", ">= 0.16.1", "< 1.0.0" # Password Manager
-  spec.add_dependency "spaceship", ">= 0.34.3", "< 1.0.0" # communication layer with Apple's web services
+  spec.add_dependency "spaceship", ">= 0.35.0", "< 1.0.0" # communication layer with Apple's web services
 
   # All the fastlane tools
-  spec.add_dependency "deliver", ">= 1.14.0", "< 2.0.0"
-  spec.add_dependency "snapshot", ">= 1.16.1", "< 2.0.0"
+  spec.add_dependency "deliver", ">= 1.14.2", "< 2.0.0"
+  spec.add_dependency "snapshot", ">= 1.16.2", "< 2.0.0"
   spec.add_dependency "frameit", ">= 2.8.0", "< 3.0.0"
   spec.add_dependency "pem", ">= 1.3.2", "< 2.0.0"
   spec.add_dependency "cert", ">= 1.4.3", "< 2.0.0"
@@ -53,7 +53,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "produce", ">= 1.2.1", "< 2.0.0"
   spec.add_dependency "gym", ">= 1.11.0", "< 2.0.0"
   spec.add_dependency "pilot", ">= 1.10.1", "< 2.0.0"
-  spec.add_dependency "scan", ">= 0.13.0", "< 1.0.0"
+  spec.add_dependency "scan", ">= 0.13.1", "< 1.0.0"
   spec.add_dependency "supply", ">= 0.7.1", "< 1.0.0"
   spec.add_dependency "match", ">= 0.8.1", "< 1.0.0"
   spec.add_dependency 'screengrab', '>= 0.5.2', '< 1.0.0'

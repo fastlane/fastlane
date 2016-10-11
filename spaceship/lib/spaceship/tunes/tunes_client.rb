@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -66,6 +68,23 @@ module Spaceship
 
     # Set a new team ID which will be used from now on
     def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider id
+      #
+      available_teams = teams.collect do |team|
+        (team["contentProvider"] || {})["contentProviderId"]
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
       response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
         req.body = { contentProviderId: team_id }.to_json
@@ -83,15 +102,21 @@ module Spaceship
       t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
-      if t_name.length > 0
+      if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
+        puts "Looking for iTunes Connect Team with name #{t_name}" if $verbose
+
         teams.each do |t|
           t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
         end
+
+        puts "Could not find team with name '#{t_name}', trying to fallback to default team" if t_id.length.zero?
       end
 
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
+        puts "Looking for iTunes Connect Team with ID #{t_id}" if $verbose
+
         # actually set the team id here
         self.team_id = t_id
         return
@@ -100,6 +125,15 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
+        puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
+        first_team = teams.first["contentProvider"]
+        puts ""
+        puts "  itc_team_id \"#{first_team['contentProviderId']}\""
+        puts ""
+        puts "or"
+        puts ""
+        puts "  itc_team_name \"#{first_team['name']}\""
+        puts ""
         teams.each_with_index do |team, i|
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
@@ -846,14 +880,30 @@ module Spaceship
             storeFront: { value: country },
             birthDay: { value: 1 },
             birthMonth: { value: 1 },
-            secretQuestion: { value: 'secret_question' },
-            secretAnswer: { value: 'secret_answer' },
+            secretQuestion: { value: SecureRandom.hex },
+            secretAnswer: { value: SecureRandom.hex },
             sandboxAccount: nil
           }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       parse_response(r, 'data')['user']
+    end
+
+    def delete_sandbox_testers!(tester_class, emails)
+      url = tester_class.url[:delete]
+      request(:post) do |req|
+        req.url url
+        req.body = emails.map do |email|
+          {
+            emailAddress: {
+              value: email
+            }
+          }
+        end.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      true
     end
 
     #####################################################

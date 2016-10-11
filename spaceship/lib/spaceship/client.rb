@@ -369,25 +369,6 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    private
-
-    def do_login(user, password)
-      @loggedin = false
-      ret = send_login_request(user, password) # different in subclasses
-      @loggedin = true
-      ret
-    end
-
-    # Is called from `parse_response` to store the latest csrf_token (if available)
-    def store_csrf_tokens(response)
-      if response and response.headers
-        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
-          @csrf_tokens = tokens
-        end
-      end
-    end
-
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
@@ -406,6 +387,40 @@ module Spaceship
       log_response(method, url_or_path, response)
 
       return response
+    end
+
+    def parse_response(response, expected_key = nil)
+      if response.body
+        # If we have an `expected_key`, select that from response.body Hash
+        # Else, don't.
+        content = expected_key ? response.body[expected_key] : response.body
+      end
+
+      if content.nil?
+        raise UnexpectedResponse, response.body
+      else
+        store_csrf_tokens(response)
+        content
+      end
+    end
+
+    private
+
+    def do_login(user, password)
+      @loggedin = false
+      ret = send_login_request(user, password) # different in subclasses
+      @loggedin = true
+      ret
+    end
+
+    # Is called from `parse_response` to store the latest csrf_token (if available)
+    def store_csrf_tokens(response)
+      if response and response.headers
+        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
+        if tokens and !tokens.empty?
+          @csrf_tokens = tokens
+        end
+      end
     end
 
     def log_request(method, url, params)
@@ -439,21 +454,6 @@ module Spaceship
           raise AppleTimeoutError.new, "Apple 302 detected"
         end
         return response
-      end
-    end
-
-    def parse_response(response, expected_key = nil)
-      if response.body
-        # If we have an `expected_key`, select that from response.body Hash
-        # Else, don't.
-        content = expected_key ? response.body[expected_key] : response.body
-      end
-
-      if content.nil?
-        raise UnexpectedResponse, response.body
-      else
-        store_csrf_tokens(response)
-        content
       end
     end
 

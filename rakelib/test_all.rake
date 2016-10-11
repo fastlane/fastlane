@@ -98,6 +98,7 @@ task :test_all do
 
           sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
+          sh "bundle exec fastlane verify_docs" unless repo == "danger-device_grid"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"
@@ -110,20 +111,6 @@ task :test_all do
       end
     end
   end
-
-  # require 'coveralls'
-  # require 'simplecov'
-  # SimpleCov.command_name('Unit Tests')
-  # r = {}
-  # for_each_gem do |repo|
-  #   begin
-  #     puts "Loading coverage data of #{repo}"
-  #     data = JSON.parse(File.read(File.join(repo, "coverage", ".resultset.json")))
-  #     r = SimpleCov::Result.from_hash(data).original_result.merge_resultset(r)
-  #   rescue => ex
-  #     puts "No test results found for #{repo} => #{ex}"
-  #   end
-  # end
 
   failed_tests_by_gem = {}
   example_count = 0
@@ -159,10 +146,6 @@ task :test_all do
   end
 
   if exceptions.empty?
-    # r.delete_if { |path, coverage| path.to_s.match(/spec/) }
-    # Only upload coverage results if tests are successful
-    # Coveralls::SimpleCov::Formatter.new.format(SimpleCov::Result.new(r))
-
     puts "Success 🚀".green
   else
     box "Exceptions 💣"
