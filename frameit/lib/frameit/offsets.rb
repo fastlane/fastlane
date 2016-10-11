@@ -44,6 +44,11 @@ module Frameit
             'offset' => '+48+90',
             'width' => 805
           }
+        when size::ANDROID_NEXUS_6P
+          return {
+              'offset' => '+62+329',
+              'width' => 1440
+          }
         end
       when Orientation::LANDSCAPE
         case screenshot.screen_size
@@ -83,6 +88,11 @@ module Frameit
           return {
             'offset' => '+88+48',
             'width' => 1075
+          }
+        when size::ANDROID_NEXUS_6P
+          return {
+            'offset' => '+329+71',
+            'width' => 2560
           }
         end
       end
