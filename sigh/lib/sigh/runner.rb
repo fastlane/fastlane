@@ -67,7 +67,7 @@ module Sigh
       UI.message "Fetching profiles..."
       results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
       results = results.find_all do |current_profile|
-        if current_profile.valid?
+        if current_profile.valid? || Sigh.config[:force]
           true
         else
           UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
