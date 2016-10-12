@@ -137,6 +137,11 @@ end
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
+  if ENV["ENHANCER_USER"].to_s.length == 0 || ENV["ENHANCER_PASSWORD"].to_s.length == 0
+    UI.error("No ENHANCER_USER or ENHANCER_PASSWORD environment variables found, which are required to generate a new Actions.md")
+    next
+  end
+
   clone_docs do
     require 'fastlane/documentation/markdown_docs_generator'
     actions_md_path = File.expand_path("docs/actions.md")
