@@ -147,7 +147,7 @@ lane :update_docs do
     actions_md_path = File.expand_path("docs/actions.md")
     Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
 
-    if `git status -s`.length == 0
+    if `git status --porcelain`.length == 0
       UI.success("No changes in the actions.md ✅")
     else
       # Create a new branch
@@ -176,15 +176,12 @@ def clone_docs
   require 'tmpdir'
   git_url = "https://github.com/fastlane/docs"
 
-  tmp_path = Dir.mktmpdir("fl_clone")
-  Dir.chdir(tmp_path) do
+  Dir.mktmpdir("fl_clone") do
     sh "git clone #{git_url} --depth=1"
     Dir.chdir("docs") do
       yield
     end
   end
-
-  FileUtils.rm_rf(tmp_path)
 end
 
 error do |lane, exception|
