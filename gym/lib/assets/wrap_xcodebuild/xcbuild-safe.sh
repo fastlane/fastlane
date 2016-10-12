@@ -38,9 +38,6 @@ if which rbenv > /dev/null; then
   # Cause rbenv to use system ruby. Lasts only for the scope of this
   # session which will normally just be this script.
   rbenv shell system
-
-  unset GEM_HOME
-  unset GEM_PATH
 fi
 
 # Since Xcode has a dependency to 2 external gems: sqlite and CFPropertyList
@@ -51,6 +48,11 @@ unset RUBYOPT
 unset BUNDLE_BIN_PATH
 unset _ORIGINAL_GEM_PATH
 unset BUNDLE_GEMFILE
+# Even if we do not use rbenv in some environments such as CircleCI,
+# We also need to unset GEM_HOME and GEM_PATH explicitly.
+# More information https://github.com/fastlane/fastlane/issues/6277
+unset GEM_HOME
+unset GEM_PATH
 
 set -x          # echoes commands
 xcodebuild "$@" # calls xcodebuild with all the arguments passed to this
