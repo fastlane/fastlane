@@ -10,7 +10,7 @@ module Deliver
       [
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
-                                     env_name: "DELIVER_USERNAME",
+                                     env_name: "DELIVER_USER",
                                      description: "Your Apple ID Username",
                                      default_value: user),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
