@@ -112,13 +112,13 @@ lane :release do |options|
     )
   end
 
-  update_docs
-
   clubmate
 
   puts "You can now tweet:".green
   tag_url = "https://github.com/fastlane/fastlane/releases/tag/#{tool_name}/#{version}"
   puts "[#{tool_name}] #{github_release['name']} #{tag_url}"
+
+  update_docs
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
