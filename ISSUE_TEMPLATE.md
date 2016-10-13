@@ -28,4 +28,4 @@ Do you use bundler to execute fastlane (i.e. `bundle exec fastlane`)?
 
 Do you use a Ruby environment manager (e.g. `chruby`, `rbenv`, `rvm`)?
 
-What Xcode Version do you use (e.g. 7, 8)
+What Xcode version do you use (e.g. 7.3, 8.0)
