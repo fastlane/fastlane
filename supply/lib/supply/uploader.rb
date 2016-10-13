@@ -34,7 +34,7 @@ module Supply
 
     def promote_track
       version_codes = client.track_version_codes(Supply.config[:track])
-      client.update_track(Supply.config[:track], 1.0, nil)
+      client.update_track(Supply.config[:track], 0.1, nil)
       version_codes.each do |apk_version_code|
         client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], apk_version_code)
       end
