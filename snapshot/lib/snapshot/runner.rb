@@ -22,7 +22,11 @@ module Snapshot
 
       verify_helper_is_current
 
-      FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
+      # Also print out the path to the used Xcode installation
+      # We go 2 folders up, to not show "Contents/Developer/"
+      values = Snapshot.config.values(ask: false)
+      values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
+      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
