@@ -173,6 +173,14 @@ module Gym
                                      verify_block: proc do |value|
                                        UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
                                      end),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_uuid,
+                                     env_name: "GYM_PROVISIONING_PROFILE_UUID",
+                                     description: "The UUID of the provisioning profile (Xcode 7 and older)",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_specifier,
+                                     env_name: "GYM_PROVISIONING_PROFILE_SPECIFIER",
+                                     description: "The name of the provision profile (Xcode 8 and above)",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
