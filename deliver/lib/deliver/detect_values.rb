@@ -22,7 +22,7 @@ module Deliver
 
     def find_app(options)
       search_by = options[:app_identifier]
-      search_by = options[:app] if search_by.to_s.length == 0
+      search_by = options[:app] if search_by.to_s.length.zero?
       app = Spaceship::Application.find(search_by)
       if app
         options[:app] = app
