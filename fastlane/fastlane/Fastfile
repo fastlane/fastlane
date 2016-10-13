@@ -112,13 +112,13 @@ lane :release do |options|
     )
   end
 
-  update_docs
-
   clubmate
 
   puts "You can now tweet:".green
   tag_url = "https://github.com/fastlane/fastlane/releases/tag/#{tool_name}/#{version}"
   puts "[#{tool_name}] #{github_release['name']} #{tag_url}"
+
+  update_docs
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
@@ -137,12 +137,17 @@ end
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
+  if ENV["ENHANCER_USER"].to_s.length == 0 || ENV["ENHANCER_PASSWORD"].to_s.length == 0
+    UI.error("No ENHANCER_USER or ENHANCER_PASSWORD environment variables found, which are required to generate a new Actions.md")
+    next
+  end
+
   clone_docs do
     require 'fastlane/documentation/markdown_docs_generator'
     actions_md_path = File.expand_path("docs/actions.md")
     Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
 
-    if `git status -s`.length == 0
+    if `git status --porcelain`.length == 0
       UI.success("No changes in the actions.md ✅")
     else
       # Create a new branch
@@ -171,15 +176,12 @@ def clone_docs
   require 'tmpdir'
   git_url = "https://github.com/fastlane/docs"
 
-  tmp_path = Dir.mktmpdir("fl_clone")
-  Dir.chdir(tmp_path) do
+  Dir.mktmpdir("fl_clone") do
     sh "git clone #{git_url} --depth=1"
     Dir.chdir("docs") do
       yield
     end
   end
-
-  FileUtils.rm_rf(tmp_path)
 end
 
 error do |lane, exception|

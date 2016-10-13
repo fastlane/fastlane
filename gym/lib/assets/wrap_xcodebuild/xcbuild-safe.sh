@@ -17,10 +17,10 @@
 #
 #   path/to/xcbuild-safe.sh arg1 ... argn
 #
+# More information available here: https://github.com/fastlane/fastlane/issues/6495
 # -----
 
 which rvm > /dev/null
-
 if [[ $? -eq 0 ]]; then
   echo "RVM detected, forcing to use system ruby"
   # This allows you to use rvm in a script. Otherwise you get a BS
@@ -30,13 +30,6 @@ if [[ $? -eq 0 ]]; then
   # Cause rvm to use system ruby. AFAIK, this is effective only for
   # the scope of this script.
   rvm use system
-
-  # rvm doesn't unset itself properly without doing this
-  unset RUBYLIB
-  unset RUBYOPT
-  unset BUNDLE_BIN_PATH
-  unset _ORIGINAL_GEM_PATH
-  unset BUNDLE_GEMFILE
 fi
 
 if which rbenv > /dev/null; then
@@ -45,19 +38,21 @@ if which rbenv > /dev/null; then
   # Cause rbenv to use system ruby. Lasts only for the scope of this
   # session which will normally just be this script.
   rbenv shell system
-
-  unset RUBYLIB
-  unset RUBYOPT
-  unset _ORIGINAL_GEM_PATH
-  unset BUNDLE_BIN_PATH
-  unset BUNDLE_GEMFILE
-  unset GEM_HOME
-  unset GEM_PATH
 fi
 
-# to help troubleshooting
-# env | sort > /tmp/env.wrapper
-# rvm info >> /tmp/env.wrapper
+# Since Xcode has a dependency to 2 external gems: sqlite and CFPropertyList
+# More information https://github.com/fastlane/fastlane/issues/6495
+# We have to unset those variables for rbenv, rvm and when the user uses bundler
+unset RUBYLIB
+unset RUBYOPT
+unset BUNDLE_BIN_PATH
+unset _ORIGINAL_GEM_PATH
+unset BUNDLE_GEMFILE
+# Even if we do not use rbenv in some environments such as CircleCI,
+# We also need to unset GEM_HOME and GEM_PATH explicitly.
+# More information https://github.com/fastlane/fastlane/issues/6277
+unset GEM_HOME
+unset GEM_PATH
 
 set -x          # echoes commands
 xcodebuild "$@" # calls xcodebuild with all the arguments passed to this
