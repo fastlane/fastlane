@@ -57,12 +57,13 @@ module Gym
 
       def buildsettings
         config = Gym.config
-        
+
         buildsettings = []
         buildsettings << "CODE_SIGN_IDENTITY=#{config[:codesigning_identity].shellescape}" if config[:codesigning_identity]
         buildsettings << "PROVISIONING_PROFILE=#{config[:provisioning_profile_uuid].shellescape}" if config[:provisioning_profile_uuid]
         buildsettings << "PROVISIONING_PROFILE_SPECIFIER=#{config[:provisioning_profile_specifier].shellescape}" if config[:provisioning_profile_specifier]
         buildsettings << config[:xcargs] if config[:xcargs]
+
         buildsettings
       end
 

@@ -16,6 +16,14 @@ module Gym
         is_pre = v.split('.')[0].to_i < 7
         is_pre
       end
+
+      # Below Xcode 8 (which offers a new nice API to specify provision profiles)
+      def pre_8?
+        UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+        v = xcode_version
+        is_pre = v.split('.')[0].to_i < 8
+        is_pre
+      end
     end
   end
 end

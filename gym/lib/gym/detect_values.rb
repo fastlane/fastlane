@@ -51,7 +51,15 @@ module Gym
       end
 
       if Gym.config[:provisioning_profile_path]
-        FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
+        provisioning_path = Gym.config[:provisioning_profile_path]
+        FastlaneCore::ProvisioningProfile.install(provisioning_path)
+
+        if Xcode.pre_8?
+          Gym.config[:provisioning_profile_uuid] = FastlaneCore::ProvisioningProfile.uuid(provisioning_path)
+        else
+          Gym.config[:provisioning_profile_specifier] = FastlaneCore::ProvisioningProfile.name(provisioning_path)
+        end
+
       end
     end
 
