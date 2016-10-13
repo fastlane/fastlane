@@ -37,6 +37,11 @@ module FastlaneCore
       def uuid(path)
         parse(path).fetch("UUID")
       end
+      
+      # @return [String] The Name of the given provisioning profile
+      def name(path)
+        parse(path).fetch("Name")
+      end
 
       def profiles_path
         path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
