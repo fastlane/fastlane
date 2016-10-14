@@ -80,6 +80,24 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). `deli
 - `MZGenre.Apps.Travel_Regional`
 - `MZGenre.Apps.Womens_Interest`
 
+### Available Stickers Subcategories
+
+- `MZGenre.Apps.Stickers.Animals`
+- `MZGenre.Apps.Stickers.Art`
+- `MZGenre.Apps.Stickers.BirthdaysAndCelebrations`
+- `MZGenre.Apps.Stickers.Celebrities`
+- `MZGenre.Apps.Stickers.Characters`
+- `MZGenre.Apps.Stickers.FoodAndDrink`
+- `MZGenre.Apps.Stickers.Emotions`
+- `MZGenre.Apps.Stickers.Fashion`
+- `MZGenre.Apps.Stickers.Games`
+- `MZGenre.Apps.Stickers.KidsAndFamily`
+- `MZGenre.Apps.Stickers.MoviesAndTV`
+- `MZGenre.Apps.Stickers.Music`
+- `MZGenre.Apps.Stickers.People`
+- `MZGenre.Apps.Stickers.Places`
+- `MZGenre.Apps.Stickers.Sports`
+
 ### Available Languages
 
 - `no`
