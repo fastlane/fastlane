@@ -28,6 +28,27 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). `deli
 - `Utilities`
 - `Weather`
 
+### Available Game Subcategories
+
+- `MZGenre.Action`
+- `MZGenre.Adventure`
+- `MZGenre.Arcade`
+- `MZGenre.Board`
+- `MZGenre.Card`
+- `MZGenre.Casino`
+- `MZGenre.Dice`
+- `MZGenre.Educational`
+- `MZGenre.Family`
+- `MZGenre.Music`
+- `MZGenre.Puzzle`
+- `MZGenre.Racing`
+- `MZGenre.RolePlaying`
+- `MZGenre.Simulation`
+- `MZGenre.Sports`
+- `MZGenre.Strategy`
+- `MZGenre.Trivia`
+- `MZGenre.Word`
+
 ### Available Languages
 
 - `no`
