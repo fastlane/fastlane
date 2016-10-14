@@ -64,12 +64,6 @@ describe FastlaneCore do
         expect(config[:another_boolean]).to be(true)
       end
 
-      it "ignores the same item being set after the first time" do
-        config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileRepeatedValueSet')
-        expect(config[:app_identifier]).to eq('the.expected.value')
-      end
-
       describe "Handling invalid broken configuration files" do
         it "automatically corrects invalid quotations" do
           config = FastlaneCore::Configuration.create(options, {})
@@ -118,6 +112,60 @@ describe FastlaneCore do
           else UI.user_error!("no")
           end
         end)
+      end
+
+      describe "for_lane and for_platform support" do
+        it "reads global keys when not specifying lane or platform" do
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('./spec/fixtures/ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.global.id")
+        end
+
+        it "reads global keys when platform and lane dont match" do
+          ENV["FASTLANE_PLATFORM_NAME"] = :osx.to_s
+          ENV["FASTLANE_LANE_NAME"] = :debug.to_s
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('./spec/fixtures/ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.global.id")
+        end
+
+        it "reads lane setting when platform doesn't match or no for_platform" do
+          ENV["FASTLANE_PLATFORM_NAME"] = :osx.to_s
+          ENV["FASTLANE_LANE_NAME"] = :enterprise.to_s
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('./spec/fixtures/ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.forlane.enterprise")
+        end
+
+        it "reads platform setting when lane doesn't match or no for_lane" do
+          ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+          ENV["FASTLANE_LANE_NAME"] = :debug.to_s
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('./spec/fixtures/ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.forplatform.ios")
+        end
+
+        it "reads platform and lane setting" do
+          ENV["FASTLANE_PLATFORM_NAME"] = :ios.to_s
+          ENV["FASTLANE_LANE_NAME"] = :release.to_s
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('./spec/fixtures/ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.forplatformios.forlanerelease")
+        end
+
+        after(:each) do
+          ENV.delete("FASTLANE_PLATFORM_NAME")
+          ENV.delete("FASTLANE_LANE_NAME")
+        end
       end
     end
   end
