@@ -22,10 +22,14 @@ module Sigh
       if profiles.count > 0
         UI.success "Found #{profiles.count} matching profile(s)"
         profile = profiles.first
-
-        if Sigh.config[:force]
+        if Sigh.config[:force] or Sigh.config[:add]
           if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
             UI.important "Updating the provisioning profile"
+          elsif Sigh.config[:add] and !Spaceship.device.find_by_udid(Sigh.config[:add])
+            UI.user_error!("Provided UDID not found in list of available devices")
+          elsif Sigh.config[:add]
+            UI.important "Attempting to add #{Sigh.config[:add]} to the provision profile"
+            profile.devices.push(Spaceship.device.find_by_udid(Sigh.config[:add]))
           else
             UI.important "Updating the profile to include all devices"
             profile.devices = Spaceship.device.all_for_profile_type(profile.type)
