@@ -12,36 +12,36 @@ module Fastlane
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
+        unless params[:provisioning_profile_specifier]
+          # validate folder
+          project_file_path = File.join(folder, "project.pbxproj")
+          UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
-        # validate folder
-        project_file_path = File.join(folder, "project.pbxproj")
-        UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
-
-        # download certificate
-        unless File.exist?(params[:certificate])
-          UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
-          File.open(params[:certificate], "w") do |file|
-            file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+          # download certificate
+          unless File.exist?(params[:certificate])
+            UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
+            require 'open-uri'
+            File.open(params[:certificate], "w") do |file|
+              file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+            end
           end
+
+          # parsing mobileprovision file
+          UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
+          profile = File.read(params[:profile])
+          p7 = OpenSSL::PKCS7.new(profile)
+          store = OpenSSL::X509::Store.new
+          UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
+          cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
+          store.add_cert(cert)
+          p7.verify([cert], store)
+          data = Plist.parse_xml(p7.data)
         end
-
-        # parsing mobileprovision file
-        UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
-        profile = File.read(params[:profile])
-        p7 = OpenSSL::PKCS7.new(profile)
-        store = OpenSSL::X509::Store.new
-        UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
-        cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
-        store.add_cert(cert)
-        p7.verify([cert], store)
-        data = Plist.parse_xml(p7.data)
-
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
 
         # manipulate project file
-        UI.success("Going to update project '#{folder}' with UUID")
+        UI.success("Going to update project provisioning settings '#{folder}'")
         require 'xcodeproj'
 
         project = Xcodeproj::Project.open(folder)
@@ -61,8 +61,11 @@ module Fastlane
               UI.important("Skipping configuration #{config_name} as it doesn't match the filter '#{configuration}'")
               next
             end
-
-            build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            if params[:provisioning_profile_specifier]
+              build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = params[:provisioning_profile_specifier]
+            else
+              build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            end
           end
         end
 
@@ -108,6 +111,10 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :provisioning_profile_specifier,
+                                       env_name: "FL_PROJECT_PROVISIONING_PROFILE_SPECIFIER",
+                                       description: "A filter for the target name. Use a standard regex",
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
                                        description: "Legacy option, use 'target_filter' instead",
