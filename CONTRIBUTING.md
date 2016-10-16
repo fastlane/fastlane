@@ -81,7 +81,7 @@ If you're considering contributing new functionality, please open a new issue ex
 - Adding automated tests that cover your changes and/or new functionality is important!
     - `fastlane` has a lot of moving parts and receives contributions from many developers. The best way to ensure that your contributions keep working is to ensure that there will be failing tests if something accidentally gets broken.
     - You can run the tests by executing `bundle install`, then:
-        - Run tests only for a given too by `cd` in that tool subdirectory (e.g. `cd pilot`) then running `bundle exec rspec`,
+        - Run tests only for a given tool by `cd` in that tool subdirectory (e.g. `cd pilot`) then running `bundle exec rspec`,
         - Or test all the Fastlane tools by running `rake test_all` from the root of your working copy.
 - Your code editor should indent using spaces with a tab size of 2 spaces.
 
