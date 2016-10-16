@@ -18,6 +18,7 @@ You can find more information about how to start using plugins in [Plugins.md](h
 
 | Plugin Name | Description | Downloads
 --------------|-------------|----------|----------
+[sharethemeal](https://github.com/hjanuschka/fastlane-plugin-aws_device_farm) | ShareTheMeal for _fastlane_ | 1877
 [changelog](https://github.com/pajapro/fastlane-plugin-changelog) | Automate changes to your project CHANGELOG.md | 1733
 `polidea` | Polidea's fastlane action | 1596
 `automated_test_emulator_run` | Allows to wrap gradle task or shell command that runs integrated tests that prepare and starts single AVD before test run. After tests are finished, emulator is killed and deleted. | 1256
