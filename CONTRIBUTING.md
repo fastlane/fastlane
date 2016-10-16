@@ -87,7 +87,7 @@ If you're considering contributing new functionality, please open a new issue ex
 
 To submit the changes to the fastlane repo, you have to do the following:
 
-- Run `git push origin master`.
+- Run `git push origin master` (replace `master` with the name of the branch you made your modifications onto in your fork when appropriate).
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
 ## What Do All These Labels Mean?
