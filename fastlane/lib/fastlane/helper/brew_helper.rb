@@ -8,7 +8,7 @@ module Fastlane
     #
     # @param [String, Gem::Requirement, Gem::Requirement] version_requirement
     #        An optional version requirement
-    #   
+    #
     def self.verify_brew_formula!(formula_name, version_requirement = nil)
       verify_homebrew!(formula_name)
 
@@ -37,6 +37,11 @@ module Fastlane
     private
 
     # will check if homebrew is installed
+    #
+    # @param [String] formula_name
+    #        Name of the brew formula we want to check the homebrew installation for.
+    #        This name is only used to provide more context in the error message if brew isn't installed.
+    #
     def self.verify_homebrew!(formula_name = nil)
       `which brew`
       unless $?.success?
