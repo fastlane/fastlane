@@ -3,6 +3,7 @@ module Fastlane
     class BadgeAction < Action
       def self.run(params)
         Actions.verify_gem!('badge')
+        Actions.verify_brew_formula!('imagemagick')
         require 'badge'
         options = {
           dark: params[:dark],
