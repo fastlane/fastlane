@@ -34,8 +34,6 @@ module Fastlane
       true
     end
 
-    private
-
     # will check if homebrew is installed
     #
     # @param [String] formula_name
