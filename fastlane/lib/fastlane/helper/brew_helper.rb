@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     # will make sure a binary is installed via brew. If it's not, an appropriate error message is shown
-    # this will *not* 'require' the gem
     #
     # @param [String] formula_name
     #        Name of the brew formula to check
