@@ -142,7 +142,6 @@ module Fastlane
         [:ios, :mac, :android].include?(platform)
       end
 
-      private
       def self.check_imagemagick!
         unless `which convert`.include? 'convert'
           UI.error("You have to install ImageMagick to use `badge`")
@@ -156,6 +155,7 @@ module Fastlane
         end
         true
       end
+      private_class_method :check_imagemagick!
     end
   end
 end
