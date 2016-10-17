@@ -3,7 +3,7 @@ module Fastlane
     class BadgeAction < Action
       def self.run(params)
         Actions.verify_gem!('badge')
-        Actions.verify_brew_formula!('imagemagick')
+        check_imagemagick!
         require 'badge'
         options = {
           dark: params[:dark],
@@ -140,6 +140,21 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac, :android].include?(platform)
+      end
+
+      private
+      def self.check_imagemagick!
+        unless `which convert`.include? 'convert'
+          UI.error("You have to install ImageMagick to use `badge`")
+          UI.error("")
+          UI.error("Install it using:")
+          UI.command("brew update && brew install imagemagick")
+          UI.error("")
+          UI.error("If you don't have homebrew, visit http://brew.sh")
+
+          UI.user_error!("Install ImageMagick and start your lane again!")
+        end
+        true
       end
     end
   end
