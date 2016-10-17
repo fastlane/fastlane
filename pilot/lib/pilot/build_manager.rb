@@ -123,13 +123,12 @@ module Pilot
           break if builds.count == 0
           latest_build = builds.last
           
-          if must_update_build_info
+          if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary
             if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
               build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description])
               UI.success "Successfully set the changelog and/or description for build"
             end
-            # TODO: check if this actually can update the changelog immediately?
             must_update_build_info = false
           end
           
