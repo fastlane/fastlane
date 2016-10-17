@@ -52,7 +52,7 @@ module Frameit
         c.description = "Helps you adding new frames."
 
         c.action do |args, options|
-          Frameit::FrameConverter.new.run
+          # Frameit::FrameDownloader. # TODO
         end
       end
 

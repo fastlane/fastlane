@@ -31,14 +31,16 @@ module Frameit
 
     def prepare_image
       @image = MiniMagick::Image.open(screenshot.path)
+      @image.rotate(90) unless self.screenshot.portrait?
     end
 
     private
 
     def store_result
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-      image.format "png"
-      image.write output_path
+      image.rotate(-90) unless self.screenshot.portrait?
+      image.format("png")
+      image.write(output_path)
       UI.success "Added frame: '#{File.expand_path(output_path)}'"
     end
 

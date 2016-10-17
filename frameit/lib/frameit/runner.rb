@@ -4,14 +4,15 @@ require 'fastimage'
 module Frameit
   class Runner
     def initialize
-      converter = FrameConverter.new
-      if converter.frames_exist?
-        # Just make sure, the PSD files are converted to PNG
-        converter.convert_frames
-      else
+      # TODO
+      # converter = FrameDownloader.new
+      # if converter.frames_exist?
+      #   # Just make sure, the PSD files are converted to PNG
+        # converter.convert_frames
+      # else
         # First run
-        converter.run
-      end
+        # converter.run
+      # end
     end
 
     def run(path, color = nil)
@@ -28,6 +29,8 @@ module Frameit
           next if full_path.include? ".itmsp/" # a package file, we don't want to modify that
           next if full_path.include? "device_frames/" # these are the device frames the user is using
           next if full_path.downcase.include? "watch" # we don't care about watches right now
+
+          UI.message("Framing screenshot '#{full_path}'")
 
           begin
             screenshot = Screenshot.new(full_path, color)
