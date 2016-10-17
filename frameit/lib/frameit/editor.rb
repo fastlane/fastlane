@@ -9,8 +9,12 @@ module Frameit
       self.screenshot = screenshot
       prepare_image
 
-      if load_frame # e.g. Mac doesn't need a frame
+      if load_frame # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(load_frame)
+      elsif self.class == Editor
+        # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
+        # Message is already shown elsewhere
+        return
       end
 
       if should_add_title?
