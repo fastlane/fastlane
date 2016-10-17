@@ -33,7 +33,6 @@ module FastlaneCore
       return false
     end
 
-  
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
