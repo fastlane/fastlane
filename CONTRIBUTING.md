@@ -80,12 +80,14 @@ If you're considering contributing new functionality, please open a new issue ex
 
 - Adding automated tests that cover your changes and/or new functionality is important!
     - `fastlane` has a lot of moving parts and receives contributions from many developers. The best way to ensure that your contributions keep working is to ensure that there will be failing tests if something accidentally gets broken.
-    - You can run the tests by executing `bundle install` and then `bundle exec rspec`.
+    - You can run the tests by executing `bundle install`, then:
+        - Run tests only for a given tool by `cd` in that tool subdirectory (e.g. `cd pilot`) then running `bundle exec rspec`,
+        - Or test all `fastlane` tools by running `rake test_all` from the root of your working copy.
 - Your code editor should indent using spaces with a tab size of 2 spaces.
 
 To submit the changes to the fastlane repo, you have to do the following:
 
-- Run `git push upstream master`.
+- Run `git push origin master` (replace `master` with the name of the branch you made your modifications onto in your fork when appropriate).
 - Open `https://github.com/fastlane/fastlane` in your browser and click the green "Create Pull Request" button
 
 ## What Do All These Labels Mean?
