@@ -155,7 +155,7 @@ module Fastlane
     def collect_details
       details = nil
       loop do
-        details = @ui.input("\nPlease enter a detailed information of this fastlane plugin:")
+        details = @ui.input("\nPlease enter a detailed description of this fastlane plugin:")
         break if details_valid?(details)
 
         @ui.message('A detailed description is required.')
