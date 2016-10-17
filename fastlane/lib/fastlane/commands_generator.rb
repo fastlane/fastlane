@@ -14,7 +14,8 @@ module Fastlane
 
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
-      unless ARGV.include?("env")
+      # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
+      unless ARGV[0] == "env"
         # *after* loading the plugins
         Fastlane.plugin_manager.load_plugins
         Fastlane::PluginUpdateManager.start_looking_for_updates
@@ -244,10 +245,11 @@ module Fastlane
 
       command :env do |c|
         c.syntax = 'fastlane env'
-        c.description = 'Print your fastlane environment'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
         c.action do |args, options|
           require "fastlane/environment_printer"
-          Fastlane::EnvironmentPrinter.print
+          env_info = Fastlane::EnvironmentPrinter.get
+          puts env_info
         end
       end
 
