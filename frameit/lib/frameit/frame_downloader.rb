@@ -4,8 +4,11 @@ module Frameit
     HOST_URL = "https://s3.eu-central-1.amazonaws.com/fastlane-playground/device-frames/"
 
     def download_frames
+      print_disclaimer
+
       require 'json'
       require 'fileutils'
+
       UI.message("Downloading device frames...")
       FileUtils.mkdir_p(templates_path)
 
@@ -21,12 +24,21 @@ module Frameit
     end
 
     def frames_exist?
-      return false # TODO
-      Dir["#{templates_path}/**/*.png"].count > 0
+      Dir["#{templates_path}/*.png"].count > 0 && File.read(File.join(templates_path, "version.txt")).to_i > 0
     end
 
     def templates_path
       File.join(ENV['HOME'], FRAME_PATH)
+    end
+
+    def print_disclaimer
+      UI.header "Device frames disclaimer"
+      UI.important "All used device frames are available via Facebook Design: http://facebook.design/devices"
+      UI.message "----------------------------------------"
+      UI.message "While Facebook has redrawn and shares these assets for the benefit of the design community, Facebook does not own any of the underlying product or user interface designs. " 
+      UI.message "By accessing these assets, you agree to obtain all necessary permissions from the underlying rights holders and/or adhere to any applicable brand use guidelines before using them. "
+      UI.message "Facebook disclaims all express or implied warranties with respect to these assets, including non-infringement of intellectual property rights."
+      UI.message "----------------------------------------"
     end
 
     private
