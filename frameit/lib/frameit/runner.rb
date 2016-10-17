@@ -4,15 +4,10 @@ require 'fastimage'
 module Frameit
   class Runner
     def initialize
-      # TODO
-      # converter = FrameDownloader.new
-      # if converter.frames_exist?
-      #   # Just make sure, the PSD files are converted to PNG
-        # converter.convert_frames
-      # else
-        # First run
-        # converter.run
-      # end
+      downloader = FrameDownloader.new
+      unless downloader.frames_exist?
+        downloader.download_frames
+      end
     end
 
     def run(path, color = nil)
