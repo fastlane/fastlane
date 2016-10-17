@@ -9,8 +9,9 @@ module Fastlane
       author = collect_author(detect_author)
       email = collect_email(detect_email)
       summary = collect_summary
+      details = collect_details
 
-      PluginInfo.new(plugin_name, author, email, summary)
+      PluginInfo.new(plugin_name, author, email, summary, details)
     end
 
     #
@@ -146,6 +147,25 @@ module Fastlane
 
     def summary_valid?(summary)
       !summary.to_s.strip.empty?
+    end
+    #
+    # Summary
+    #
+
+    def collect_details
+      details = nil
+      loop do
+        details = @ui.input("\nPlease enter a detailed description of this fastlane plugin:")
+        break if details_valid?(details)
+
+        @ui.message('A detailed description is required.')
+      end
+
+      details
+    end
+
+    def details_valid?(details)
+      !details.to_s.strip.empty?
     end
   end
 end
