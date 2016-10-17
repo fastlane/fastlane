@@ -6,7 +6,7 @@ module Gym
       # @param [String] The output of the errored build
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
-        # The order of the handling below is import
+        # The order of the handling below is important
         case output
         when /Your build settings specify a provisioning profile with the UUID/
           print "Invalid code signing settings"
@@ -50,6 +50,7 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "https://stackoverflow.com/a/17031697/445598"
         end
+        print_full_log_path
         UI.user_error!("Error building the application - see the log above")
       end
 
@@ -91,6 +92,7 @@ module Gym
           print "Unfortunately the new Xcode export API is unstable and causes problems on some projects"
           print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
+        print_full_log_path
         UI.user_error!("Error packaging up the application")
       end
 
@@ -119,6 +121,13 @@ module Gym
       # Just to make things easier
       def print(text)
         UI.error text
+      end
+
+      def print_full_log_path
+        return if Gym.config[:disable_xcpretty]
+        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        UI.error("📋  For a more detailed error log, check the full log at:")
+        UI.error("📋  #{log_path}")
       end
     end
   end
