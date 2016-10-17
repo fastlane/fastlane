@@ -8,13 +8,14 @@ oldwd = nil
 
 describe Fastlane::PluginGenerator do
   describe '#generate' do
-    let(:plugin_info) { Fastlane::PluginInfo.new('tester_thing', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary') }
+    let(:plugin_info) { Fastlane::PluginInfo.new('tester_thing', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'details') }
     let(:plugin_name) { plugin_info.plugin_name }
     let(:gem_name) { plugin_info.gem_name }
     let(:require_path) { plugin_info.require_path }
     let(:author) { plugin_info.author }
     let(:email) { plugin_info.email }
     let(:summary) { plugin_info.summary }
+    let(:details) { plugin_info.details }
 
     before(:each) do
       stub_plugin_exists_on_rubygems(plugin_name, false)
@@ -39,6 +40,7 @@ describe Fastlane::PluginGenerator do
         expect(test_ui).to receive(:input).and_return(author)
         expect(test_ui).to receive(:input).and_return(email)
         expect(test_ui).to receive(:input).and_return(summary)
+        expect(test_ui).to receive(:input).and_return(details)
 
         generator.generate
 
@@ -190,6 +192,7 @@ describe Fastlane::PluginGenerator do
 
       # Check the default behavior of the rest of the methods
       expect(action_class.description).to eq(summary)
+      expect(action_class.details).to eq(details)
       expect(action_class.authors).to eq([author])
       expect(action_class.available_options).to eq([])
       expect(action_class.is_supported?(:ios)).to be(true)
