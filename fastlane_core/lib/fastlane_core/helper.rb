@@ -24,6 +24,16 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
+    def self.bundler?
+      # Bundler environment variable
+      ['BUNDLE_BIN_PATH', 'BUNDLE_GEMFILE'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
+    end
+
+  
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
@@ -45,6 +55,10 @@ module FastlaneCore
 
     def self.is_ci?
       ci?
+    end
+
+    def self.is_bundler?
+      self.bundler?
     end
 
     def self.is_mac?
