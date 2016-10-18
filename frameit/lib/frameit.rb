@@ -32,8 +32,12 @@ module Frameit
     config_files = Dir["./**/Framefile.json"]
     if config_files.count > 0
       config = ConfigParser.new.load(config_files.first)
-      @frames_version = config.data["device_frame_version"] if config.data["device_frame_version"].to_s.length > 0
+      if config.data["device_frame_version"].to_s.length > 0
+        @frames_version = config.data["device_frame_version"]
+      end
     end
+
+    UI.success("Using device frames version '#{@frames_version}'")
 
     return @frames_version
   end
