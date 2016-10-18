@@ -54,6 +54,7 @@ module Frameit
     end
 
     private
+
     def download_file(path, txt: "file")
       url = File.join(HOST_URL, Frameit.frames_version, path)
       UI.message("Downloading #{txt} from '#{url}' ...")

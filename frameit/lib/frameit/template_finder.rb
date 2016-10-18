@@ -26,6 +26,7 @@ module Frameit
           UI.error("Couldn't find template for screenshot type '#{filename}'")
           UI.error("Please run `frameit download_frames` to download the latest frames")
         end
+        return filename if Helper.test?
         return nil
       else
         return templates.first.tr(" ", "\ ")
