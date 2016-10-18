@@ -38,7 +38,7 @@ module Frameit
           end
         end
       else
-        UI.error "Could not find screenshots"
+        UI.error "Could not find screenshots in current directory: '#{File.expand_path(path)}'"
       end
     end
   end
