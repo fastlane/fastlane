@@ -143,17 +143,16 @@ module Fastlane
       end
 
       def self.check_imagemagick!
-        unless `which convert`.include? 'convert'
-          UI.error("You have to install ImageMagick to use `badge`")
-          UI.error("")
-          UI.error("Install it using:")
-          UI.command("brew update && brew install imagemagick")
-          UI.error("")
-          UI.error("If you don't have homebrew, visit http://brew.sh")
+        return if `which convert`.include?('convert')
 
-          UI.user_error!("Install ImageMagick and start your lane again!")
-        end
-        true
+        UI.error("You have to install ImageMagick to use `badge`")
+        UI.error("")
+        UI.error("Install it using:")
+        UI.command("brew update && brew install imagemagick")
+        UI.error("")
+        UI.error("If you don't have homebrew, visit http://brew.sh")
+
+        UI.user_error!("Install ImageMagick and start your lane again!")
       end
       private_class_method :check_imagemagick!
     end
