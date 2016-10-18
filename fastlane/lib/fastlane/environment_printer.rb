@@ -32,6 +32,7 @@ module Fastlane
         table << "| Plugin | Version | Update-Status |\n"
         table << "|--------|---------|\n"
         plugin_manager.available_plugins.each do |plugin|
+          begin
           installed_version = Fastlane::ActionCollector.determine_version(plugin)
           update_url = FastlaneCore::UpdateChecker.generate_fetch_url(plugin)
           latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
@@ -40,6 +41,9 @@ module Fastlane
           else
             update_status = "🚫 Update availaible"
           end
+        rescue
+          update_status = "💥 Check failed"
+        end
           table << "| #{plugin} | #{installed_version} | #{update_status} |\n"
         end
 
@@ -61,12 +65,16 @@ module Fastlane
         update_status = "N/A"
 
         next unless Fastlane::TOOLS.include?(x.name.to_sym)
-        update_url = FastlaneCore::UpdateChecker.generate_fetch_url(x.name)
-        latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
-        if Gem::Version.new(x.version) == Gem::Version.new(latest_version)
-          update_status = "✅ Up-To-Date"
-        else
-          update_status = "🚫 Update availaible"
+        begin
+          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(x.name)
+          latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
+          if Gem::Version.new(x.version) == Gem::Version.new(latest_version)
+            update_status = "✅ Up-To-Date"
+          else
+            update_status = "🚫 Update availaible"
+          end
+        rescue
+          update_status = "💥 Check failed"
         end
         table << "| #{x.name} | #{x.version} | #{update_status} |\n"
       end
