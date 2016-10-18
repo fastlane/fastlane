@@ -42,9 +42,14 @@ module Frameit
       UI.header "Device frames disclaimer"
       UI.important "All used device frames are available via Facebook Design: http://facebook.design/devices"
       UI.message "----------------------------------------"
-      UI.message "While Facebook has redrawn and shares these assets for the benefit of the design community, Facebook does not own any of the underlying product or user interface designs. " 
-      UI.message "By accessing these assets, you agree to obtain all necessary permissions from the underlying rights holders and/or adhere to any applicable brand use guidelines before using them. "
-      UI.message "Facebook disclaims all express or implied warranties with respect to these assets, including non-infringement of intellectual property rights."
+      UI.message "While Facebook has redrawn and shares these assets for the benefit"
+      UI.message "of the design community, Facebook does not own any of the underlying"
+      UI.message "product or user interface designs."
+      UI.message "By accessing these assets, you agree to obtain all necessary permissions"
+      UI.message "from the underlying rights holders and/or adhere to any applicable brand"
+      UI.message "use guidelines before using them."
+      UI.message "Facebook disclaims all express or implied warranties with respect to these assets, including"
+      UI.message "non-infringement of intellectual property rights."
       UI.message "----------------------------------------"
     end
 
