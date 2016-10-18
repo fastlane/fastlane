@@ -15,6 +15,13 @@ module Frameit
         if screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35
           UI.important "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'"
           UI.error "Looked for: '#{filename}.png'"
+        elsif screenshot.color == Frameit::Color::ROSE_GOLD || screenshot.color == Frameit::Color::GOLD
+          # Unfortunately not every device type is available in rose gold or gold
+          # This is why we can't have nice things #yatusabes
+          # fallback to a white iPhone, which looks similar
+          UI.important("Unfortunatey device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to silver...")
+          screenshot.color = Frameit::Color::SILVER
+          return self.get_template(screenshot)
         else
           # TODO: implement this here
           UI.error("Couldn't find template for screenshot type '#{filename}'")
