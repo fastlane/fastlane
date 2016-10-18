@@ -24,7 +24,7 @@ module FastlaneCore
         eval(content) # this is okay in this case
         # rubocop:enable Lint/Eval
 
-        print_resulting_config_values(path)
+        print_resulting_config_values(path) # only on success
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
@@ -33,18 +33,24 @@ module FastlaneCore
 
     def print_resulting_config_values(path)
       require 'terminal-table'
-      UI.success("Successfully loaded #{path}")
+      UI.success("Successfully loaded '#{File.expand_path(path)}' 📄")
 
-      # require 'pry'
-      # binding.pry
       # Show message when self.modified_values is empty
-      return if self.modified_values.empty?
+      if self.modified_values.empty?
+        UI.important("No values defined in #{path}")
+        return
+      end
+
       rows = self.modified_values.collect do |key, value|
         [key, value] if value.to_s.length > 0
       end.compact
+
+      puts ""
       puts Terminal::Table.new(rows: rows, title: "Detected Values from '#{path}'")
+      puts ""
     end
 
+    # This is used to display only the values that have changed in the summary table
     def modified_values
       @modified_values ||= {}
     end
