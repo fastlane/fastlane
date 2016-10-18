@@ -30,7 +30,7 @@ module Frameit
       when sizes::IOS_35
         return 'iPhone 4' # TODO
       when sizes::IOS_IPAD
-        return 'iPad Mini 4'
+        return 'iPad Air 2'
       when sizes::IOS_IPAD_PRO
         return 'iPad Pro'
       when sizes::MAC
