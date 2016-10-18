@@ -17,7 +17,7 @@ module Frameit
                                      description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
+                                       available = ['iPhone_7_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
                                        unless available.include? value
                                          UI.user_error!("Invalid device type '#{value}'. Available values: #{available}")
                                        end

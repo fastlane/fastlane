@@ -9,13 +9,13 @@ module Frameit
         case screenshot.screen_size
         when size::IOS_55
           return {
-            'offset' => '+41+146',
-            'width' => 541
+            'offset' => '+32+113',
+            'width' => 422
           }
         when size::IOS_47
           return {
-            'offset' => "+43+154",
-            'width' => 530
+            'offset' => "+29+105",
+            'width' => 361
           }
         when size::IOS_40
           if Frameit.config[:use_legacy_iphone5s]
