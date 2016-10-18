@@ -200,6 +200,15 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
                                     description: "Sets custom full report file name",
                                     optional: true,
+                                    is_string: true),
+        FastlaneCore::ConfigItem.new(key: :build_for_testing,
+                                    description: "Build for testing (Xcode 8+)",
+                                    optional: true,
+                                    is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :test_with_xctestrun,
+                                    description: "Path to .xctestrun file to test. Implies 'test-without-building' action (Xcode 8+)",
+                                    optional: true,
                                     is_string: true)
       ]
     end
