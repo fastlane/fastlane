@@ -294,5 +294,38 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file("reject_app_version_success.json"),
                   headers: { "Content-Type" => "application/json" })
     end
+
+    def itc_stub_supported_countries
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/supportedCountries").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('supported_countries.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_add_territory
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'add_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'add_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_remove_territory
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'remove_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'remove_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_uninclude_future_territories
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'uninclude_all_future_territories_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'uninclude_all_future_territories_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
   end
 end
