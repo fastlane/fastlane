@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
+  # rubocop:disable Metrics/ModuleLength
   module Helper
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
@@ -22,6 +23,15 @@ module FastlaneCore
     # @return true if the currently running program is a unit test
     def self.test?
       defined? SpecHelper
+    end
+
+    # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
+    def self.bundler?
+      # Bundler environment variable
+      ['BUNDLE_BIN_PATH', 'BUNDLE_GEMFILE'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -154,4 +164,5 @@ module FastlaneCore
       end
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
