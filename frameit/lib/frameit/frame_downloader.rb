@@ -1,7 +1,7 @@
 module Frameit
   class FrameDownloader
     FRAME_PATH = '.frameit/devices_frames_2'
-    HOST_URL = "https://s3.eu-central-1.amazonaws.com/fastlane-playground/device-frames/"
+    HOST_URL = "https://fastlane.github.io/frameit-frames"
 
     def download_frames
       print_disclaimer
