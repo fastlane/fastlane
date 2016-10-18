@@ -14,7 +14,7 @@ module Frameit
 
       frames_version = download_file("version.txt")
       File.write(File.join(templates_path, "version.txt"), frames_version)
-      UI.message("Using frame version '#{frames_version}', you can optionally lock that version in your Framefile.json using `device_frame_version`")
+      UI.important("Using frame version '#{frames_version}', you can optionally lock that version in your Framefile.json using `device_frame_version`")
 
       files = JSON.parse(download_file("files.json"))
       files.each_with_index do |current, index|

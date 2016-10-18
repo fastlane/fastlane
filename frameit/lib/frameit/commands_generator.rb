@@ -49,10 +49,19 @@ module Frameit
 
       command :setup do |c|
         c.syntax = 'frameit setup'
-        c.description = "Helps you adding new frames."
+        c.description = "Downloads and sets up the latest device frames"
 
         c.action do |args, options|
-          # Frameit::FrameDownloader. # TODO
+          Frameit::FrameDownloader.new.download_frames
+        end
+      end
+
+      command :download_frames do |c|
+        c.syntax = 'frameit download_frames'
+        c.description = "Downloads and sets up the latest device frames"
+
+        c.action do |args, options|
+          Frameit::FrameDownloader.new.download_frames
         end
       end
 

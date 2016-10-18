@@ -116,9 +116,9 @@ To use the silver version of the frames:
 
     frameit silver
 
-To run the setup process again to add new frames use:
+To download the latest frames
 
-    frameit setup
+    frameit download_frames
 
 When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
