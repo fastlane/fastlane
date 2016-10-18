@@ -17,9 +17,7 @@ module Frameit
           UI.error "Looked for: '#{filename}.png'"
         else
           # TODO: implement this here
-          require 'pry'
-          binding.pry
-          UI.error("Couldn't find template")
+          UI.error("Couldn't find template for screenshot type '#{filename}'")
         end
         return nil
       else
