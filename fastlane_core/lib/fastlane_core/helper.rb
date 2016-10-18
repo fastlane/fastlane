@@ -56,10 +56,6 @@ module FastlaneCore
       ci?
     end
 
-    def self.is_bundler?
-      self.bundler?
-    end
-
     def self.is_mac?
       self.mac?
     end

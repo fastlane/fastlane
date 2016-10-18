@@ -53,14 +53,14 @@ module FastlaneCore
       puts '#######################################################################'.green
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
-      if Helper.is_bundler?
+      if Helper.bundler?
         puts "# Update using 'bundle update #{gem_name.downcase}'.".green
       else
         puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
       end
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
 
-      if Random.rand(5) == 1 && !Helper.is_bundler?
+      if Random.rand(5) == 1 && !Helper.bundler?
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end

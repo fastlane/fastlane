@@ -1,19 +1,19 @@
 describe FastlaneCore do
   describe FastlaneCore::Helper do
-    describe "#is_bundler?" do
+    describe "#bundler?" do
       it "returns false when not in a bundler environment" do
         stub_const('ENV', {})
-        expect(FastlaneCore::Helper.is_bundler?).to be false
+        expect(FastlaneCore::Helper.bundler?).to be false
       end
 
       it "returns true BUNDLE_BIN_PATH is defined" do
         stub_const('ENV', { 'BUNDLE_BIN_PATH' => '/fake/elsewhere' })
-        expect(FastlaneCore::Helper.is_bundler?).to be true
+        expect(FastlaneCore::Helper.bundler?).to be true
       end
 
       it "returns true BUNDLE_GEMFILE is defined" do
         stub_const('ENV', { 'BUNDLE_GEMFILE' => '/fake/elsewhere/myFile' })
-        expect(FastlaneCore::Helper.is_bundler?).to be true
+        expect(FastlaneCore::Helper.bundler?).to be true
       end
     end
 
