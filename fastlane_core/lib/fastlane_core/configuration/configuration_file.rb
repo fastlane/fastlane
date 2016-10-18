@@ -37,7 +37,7 @@ module FastlaneCore
 
       # Show message when self.modified_values is empty
       if self.modified_values.empty?
-        UI.important("No values defined in #{path}")
+        UI.important("No values defined in '#{path}'")
         return
       end
 
