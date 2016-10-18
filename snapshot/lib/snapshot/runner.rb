@@ -13,7 +13,7 @@ module Snapshot
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
         UI.error "You updated to snapshot 1.0 which now uses UI Automation"
-        UI.error "Please follow the migration guide: https://github.com/fastlane/snapshot/blob/master/MigrationGuide.md"
+        UI.error "Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md"
         UI.error "And read the updated documentation: https://github.com/fastlane/fastlane/tree/master/snapshot"
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
