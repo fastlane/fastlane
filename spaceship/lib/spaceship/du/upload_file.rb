@@ -33,7 +33,7 @@ module Spaceship
       def remove_alpha_channel(original)
         path = "/tmp/#{Digest::MD5.hexdigest(original)}.png"
         FileUtils.copy(original, path)
-        `sips -s format bmp '#{path}' &> /dev/null ` # &> /dev/null since there is warning because of the extension
+        `sips -s format bmp '#{path}' &> /dev/null` # &> /dev/null since there is warning because of the extension
         `sips -s format png '#{path}'`
         return path
       end
