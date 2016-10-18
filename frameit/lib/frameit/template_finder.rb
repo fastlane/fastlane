@@ -6,10 +6,8 @@ module Frameit
       return nil if screenshot.mac?
 
       filename = "Apple #{screenshot.device_name} #{screenshot.color}"
-      templates_path = File.join(ENV['HOME'], FrameDownloader::FRAME_PATH)
 
-      templates = Dir["../**/#{filename}.{png,jpg}"] # local directory
-      templates += Dir["#{templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
+      templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
 
       UI.verbose "Looking for #{filename} and found #{templates.count} template(s)"
 
@@ -18,11 +16,10 @@ module Frameit
           UI.important "Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'"
           UI.error "Looked for: '#{filename}.png'"
         else
-          # TODO: implenent this here
-          UI.error "Could not find a valid template for screenshot '#{screenshot.path}'"
-          UI.error "You can download new templates from '#{FrameConverter::DOWNLOAD_URL}'"
-          UI.error "and store them in '#{templates_path}'"
-          UI.error "Missing file: '#{filename}.png'"
+          # TODO: implement this here
+          require 'pry'
+          binding.pry
+          UI.error("Couldn't find template")
         end
         return nil
       else

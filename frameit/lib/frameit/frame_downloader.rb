@@ -12,23 +12,30 @@ module Frameit
       UI.message("Downloading device frames...")
       FileUtils.mkdir_p(templates_path)
 
-      files = JSON.parse(download_file("files.json").body)
+      frames_version = download_file("version.txt")
+      File.write(File.join(templates_path, "version.txt"), frames_version)
+      UI.message("Using frame version '#{frames_version}', you can optionally lock that version in your Framefile.json using `device_frame_version`")
+
+      files = JSON.parse(download_file("files.json"))
       files.each_with_index do |current, index|
         content = download_file(current, txt: "#{index + 1} of #{files.count} files")
-        File.write(File.join(templates_path, current), content.body)
+        File.write(File.join(templates_path, current), content)
       end
-      File.write(File.join(templates_path, "version.txt"), download_file("version.txt").body)
-      File.write(File.join(templates_path, "offsets.json"), download_file("offsets.json").body)
+      File.write(File.join(templates_path, "offsets.json"), download_file("offsets.json"))
 
       UI.success("Successfully downloaded all required image assets")
     end
 
-    def frames_exist?
+    def frames_exist?(version: "latest")
       Dir["#{templates_path}/*.png"].count > 0 && File.read(File.join(templates_path, "version.txt")).to_i > 0
     end
 
+    def self.templates_path
+      File.join(ENV['HOME'], FRAME_PATH, Frameit.frames_version)
+    end
+
     def templates_path
-      File.join(ENV['HOME'], FRAME_PATH)
+      self.class.templates_path
     end
 
     def print_disclaimer
@@ -43,9 +50,14 @@ module Frameit
 
     private
     def download_file(path, txt: "file")
-      url = File.join(HOST_URL, path)
+      url = File.join(HOST_URL, Frameit.frames_version, path)
       UI.message("Downloading #{txt} from '#{url}' ...")
-      return Excon.get(url.gsub(' ', '%20'))
+      body = Excon.get(url.gsub(' ', '%20')).body
+      raise body if body.include?("<Error>")
+      return body
+    rescue => ex
+      UI.error(ex)
+      UI.user_error!("Error accessing URL '#{url}'")
     end
   end
 end

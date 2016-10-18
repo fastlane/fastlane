@@ -11,7 +11,9 @@ module Frameit
         @offsets = JSON.parse(File.read(offsets_json_path))
       end
 
-      return @offsets["portrait"][screenshot.device_name]
+      offset_value = @offsets["portrait"][screenshot.device_name]
+      UI.error("Tried looking for offset information for 'portrait', #{screenshot.device_name}") unless offset_value
+      return offset_value
 
       # TODO: Remove all that
       size = Deliver::AppScreenshot::ScreenSize

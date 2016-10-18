@@ -134,6 +134,7 @@ Use it to define the general information:
 
 ```json
 {
+  "device_frame_version": "latest",
   "default": {
     "keyword": {
       "font": "./fonts/MyFont-Rg.otf"
