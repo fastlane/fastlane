@@ -15,4 +15,20 @@ describe Fastlane::Actions::BadgeAction do
       end.to raise_error(/Install ImageMagick/)
     end
   end
+
+  describe '#check_imagemagick!' do
+    it "does nothing if ImageMagick is installed" do
+      expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which convert').and_return('/usr/local/bin/convert')
+
+      Fastlane::Actions::BadgeAction.send(:check_imagemagick!)
+    end
+
+    it "raises an error if ImageMagick is not installed" do
+      expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which convert').and_return('')
+
+      expect do
+        Fastlane::Actions::BadgeAction.send(:check_imagemagick!)
+      end.to raise_error(/Install ImageMagick/)
+    end
+  end
 end
