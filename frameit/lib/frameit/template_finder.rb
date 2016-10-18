@@ -23,8 +23,8 @@ module Frameit
           screenshot.color = Frameit::Color::SILVER
           return self.get_template(screenshot)
         else
-          # TODO: implement this here
           UI.error("Couldn't find template for screenshot type '#{filename}'")
+          UI.error("Please run `frameit download_frames` to download the latest frames")
         end
         return nil
       else
