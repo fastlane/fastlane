@@ -12,7 +12,7 @@ module Match
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
-      if params[:app_identifier].kind_of? Array
+      if params[:app_identifier].kind_of?(Array)
         app_identifiers = params[:app_identifier]
       else
         app_identifiers = params[:app_identifier].split(/\s*,\s*/).uniq
