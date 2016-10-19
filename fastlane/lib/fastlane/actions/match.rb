@@ -62,7 +62,8 @@ module Fastlane
       def self.example_code
         [
           'match(type: "appstore", app_identifier: "tools.fastlane.app")',
-          'match(type: "development", readonly: true)'
+          'match(type: "development", readonly: true)',
+          'match(app_identifier: ["tools.fastlane.app", "tools.fastlane.sleepy"])'
         ]
       end
 
