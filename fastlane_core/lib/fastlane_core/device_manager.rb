@@ -40,7 +40,7 @@ module FastlaneCore
             end
 
             if match && !match[4] && (os_type == requested_os_type || requested_os_type == "")
-              @devices << Device.new(name: match[1], os_version: os_version, udid: match[2], state: match[3], is_simulator: true)
+              @devices << Device.new(name: match[1], os_type: os_type, os_version: os_version, udid: match[2], state: match[3], is_simulator: true)
             end
           end
         end
@@ -90,7 +90,7 @@ module FastlaneCore
             device_uuids.each do |device_uuid|
               match = instruments_device.match(/(.+) \(([0-9.]+)\) \[([0-9a-f]+)\]?/)
               if match && match[3] == device_uuid
-                devices << Device.new(name: match[1], udid: match[3], os_version: match[2], state: "Booted", is_simulator: false)
+                devices << Device.new(name: match[1], udid: match[3], os_type: requested_os_type, os_version: match[2], state: "Booted", is_simulator: false)
                 UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
               end
             end
@@ -124,7 +124,7 @@ module FastlaneCore
       #       next unless os_version.include?(requested_os_type)
 
       #       os = os_version.gsub(requested_os_type + " ", "").strip
-      #       @devices << Device.new(name: device['name'], os_version: os, udid: device['udid'])
+      #       @devices << Device.new(name: device['name'], os_type: requested_os_type, os_version: os, udid: device['udid'])
       #     end
       #   end
 
@@ -145,14 +145,16 @@ module FastlaneCore
     class Device
       attr_accessor :name
       attr_accessor :udid
+      attr_accessor :os_type
       attr_accessor :os_version
       attr_accessor :ios_version # Preserved for backwards compatibility
       attr_accessor :state
       attr_accessor :is_simulator
 
-      def initialize(name: nil, udid: nil, os_version: nil, state: nil, is_simulator: nil)
+      def initialize(name: nil, udid: nil, os_type: nil, os_version: nil, state: nil, is_simulator: nil)
         self.name = name
         self.udid = udid
+        self.os_type = os_type
         self.os_version = os_version
         self.ios_version = os_version
         self.state = state
