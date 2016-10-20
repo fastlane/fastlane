@@ -124,6 +124,7 @@ module Fastlane
       table << "| fastlane | #{Fastlane::VERSION} |\n"
       table << "| OS  | #{`sw_vers -productVersion`.strip}|\n"
       table << "| Ruby  | #{RUBY_VERSION}|\n"
+      table << "| Bundler? | #{FastlaneCore::Helper.bundler?}"
       table << "| Xcode Path | #{`xcode-select -p`.strip.tr("\n", ' ')}|\n"
       table << "| Xcode Version | #{`xcodebuild -version`.strip.tr("\n", ' ')}|\n"
       table << "| Git | #{`git --version`.strip.split("\n").first} |\n"
