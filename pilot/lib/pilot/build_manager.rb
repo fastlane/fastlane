@@ -100,7 +100,7 @@ module Pilot
 
     # This method will takes care of checking for the processing builds every few seconds
     # @return [Build] The build that we just uploaded
-    def wait_for_processing_build options
+    def wait_for_processing_build(options)
       # the upload date of the new buid
       # we use it to identify the build
       start = Time.now
@@ -122,7 +122,7 @@ module Pilot
           builds = app.all_processing_builds
           break if builds.count == 0
           latest_build = builds.last
-          
+
           if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary
             if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
@@ -131,7 +131,7 @@ module Pilot
             end
             must_update_build_info = false
           end
-          
+
           UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
         end
       end
