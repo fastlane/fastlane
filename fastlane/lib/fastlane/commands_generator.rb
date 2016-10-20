@@ -158,22 +158,6 @@ module Fastlane
         end
       end
 
-      command :enable_crash_reporting do |c|
-        c.syntax = 'fastlane enable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
-      command :disable_crash_reporting do |c|
-        c.syntax = 'fastlane disable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
@@ -254,12 +238,6 @@ module Fastlane
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create
       return false
-    end
-
-    def show_crashreporter_note
-      UI.important("fastlane doesn't use a crash reporter any more")
-      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
-      UI.important("This command will be removed in one of the next releases")
     end
   end
 end

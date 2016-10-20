@@ -13,6 +13,15 @@ module Fastlane
         ["<%= author.gsub('"', "'") %>"]
       end
 
+      def self.return_value
+        # If your method provides a return value, you can describe here what it does
+      end
+
+      def self.details
+        # Optional:
+        "<%= details.gsub('"', "'") %>"
+      end
+
       def self.available_options
         [
           # FastlaneCore::ConfigItem.new(key: :your_option,

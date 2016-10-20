@@ -253,16 +253,46 @@ describe Fastlane::PluginInfoCollector do
     end
   end
 
+  describe "details collection" do
+    it "accepts a valid details" do
+      expect(test_ui).to receive(:input).and_return('details')
+
+      expect(collector.collect_details).to eq('details')
+    end
+
+    it "accepts a valid details after rejecting an invalid details" do
+      expect(test_ui).to receive(:input).and_return('')
+      expect(test_ui).to receive(:input).and_return('details')
+
+      expect(collector.collect_details).to eq('details')
+    end
+  end
+
+  describe "#details_valid?" do
+    it "handles valid details" do
+      expect(collector.details_valid?('details')).to be_truthy
+    end
+
+    it "handles an empty details" do
+      expect(collector.details_valid?('')).to be_falsey
+    end
+
+    it "handles all-spaces details" do
+      expect(collector.details_valid?('    ')).to be_falsey
+    end
+  end
+
   describe '#collect_info' do
     it "returns a PluginInfo summarizing the user input" do
       expect(test_ui).to receive(:input).and_return('test_name')
       expect(test_ui).to receive(:input).and_return('Fabricio Devtoolio')
       expect(test_ui).to receive(:input).and_return('fabric.devtools@gmail.com')
       expect(test_ui).to receive(:input).and_return('summary')
+      expect(test_ui).to receive(:input).and_return('details')
       expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.email', print: $verbose).and_return('')
       expect(FastlaneCore::Helper).to receive(:backticks).with('git config --get user.name', print: $verbose).and_return('')
 
-      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary')
+      info = Fastlane::PluginInfo.new('test_name', 'Fabricio Devtoolio', 'fabric.devtools@gmail.com', 'summary', 'details')
       expect(collector.collect_info).to eq(info)
     end
   end

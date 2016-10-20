@@ -113,6 +113,7 @@ lane :release do |options|
   end
 
   clubmate
+  donate_food
 
   puts "You can now tweet:".green
   tag_url = "https://github.com/fastlane/fastlane/releases/tag/#{tool_name}/#{version}"
@@ -176,10 +177,12 @@ def clone_docs
   require 'tmpdir'
   git_url = "https://github.com/fastlane/docs"
 
-  Dir.mktmpdir("fl_clone") do
-    sh "git clone #{git_url} --depth=1"
-    Dir.chdir("docs") do
-      yield
+  Dir.mktmpdir("fl_clone") do |tmp_dir|
+    Dir.chdir(tmp_dir) do
+      sh "git clone #{git_url} --depth=1"
+      Dir.chdir("docs") do
+        yield
+      end
     end
   end
 end
@@ -271,4 +274,14 @@ desc "Add a git tag in the fastlane repo for this release"
 private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
+end
+
+lane :donate_food do |options|
+  if ENV["SHARETHEMEAL_USERHASH"].to_s.length > 0
+    sharethemeal(
+      amount: "0.5",
+      currency: "USD",
+      team_id: "fastlane"
+    )
+  end
 end

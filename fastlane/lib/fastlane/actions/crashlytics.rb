@@ -101,7 +101,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
-                                       description: "Crashlytics Beta API Token",
+                                       description: "Crashlytics API Key",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),

@@ -14,8 +14,9 @@ module Scan
       Scan.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Snapfile there
+      imported_path = File.expand_path(Scan.scanfile_name)
       Dir.chdir(File.expand_path("..", Scan.project.path)) do
-        config.load_configuration_file(Scan.scanfile_name)
+        config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
       end
 
       Scan.project.select_scheme

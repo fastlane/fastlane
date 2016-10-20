@@ -18,6 +18,7 @@ You can find more information about how to start using plugins in [Plugins.md](h
 
 | Plugin Name | Description | Downloads
 --------------|-------------|----------|----------
+[sharethemeal](https://github.com/hjanuschka/fastlane-plugin-aws_device_farm) | ShareTheMeal for _fastlane_ | 1877
 [changelog](https://github.com/pajapro/fastlane-plugin-changelog) | Automate changes to your project CHANGELOG.md | 1733
 `polidea` | Polidea's fastlane action | 1596
 `automated_test_emulator_run` | Allows to wrap gradle task or shell command that runs integrated tests that prepare and starts single AVD before test run. After tests are finished, emulator is killed and deleted. | 1256
@@ -46,6 +47,7 @@ You can find more information about how to start using plugins in [Plugins.md](h
 [clubmate](https://github.com/KrauseFx/fastlane-plugin-clubmate) | Print the Club Mate logo in your build output | 529
 [ftp](https://github.com/PoissonBallon/fastlane-ftp-plugin) | Simple ftp upload and download for Fastlane | 526
 [github_status](https://github.com/mfurtak/fastlane-plugin-github_status) | Provides the ability to display and act upon GitHub server status as part of your build | 526
+[aws_device_farm](https://github.com/hjanuschka/fastlane-plugin-aws_device_farm) | Run Android-Instrumentation or iOS XCUI-Tests on AWS Device Farm | 509
 [poeditor_export](https://github.com/Supmenow/fastlane-plugin-poeditor_export) | Exports translations from POEditor.com | 506
 `version_from_last_tag` | Perform a regex on last (latest) git tag and perform a regex to extract a version number such as Release 1.2.3 | 477
 [jira_transition](https://github.com/valeriomazzeo/fastlane-plugin-jira_transition) | Apply a JIRA transition to issues mentioned in the changelog | 469
@@ -68,3 +70,4 @@ You can find more information about how to start using plugins in [Plugins.md](h
 [act](https://github.com/richardszalay/fastlane-plugin-act) | Applies changes to plists and app icons inside a compiled IPA | 167
 [coreos](https://github.com/icuisine-pos/fastlane-plugin-coreos) | Deploy docker services to CoreOS hosts | 124
 [framer](https://github.com/spreaker/fastlane-framer-plugin) | Create images combining app screenshots with templates to make nice pictures for the App Store | 102
+[firim](https://github.com/whlsxl/firim) | Upload ipa to fir.im | 1
