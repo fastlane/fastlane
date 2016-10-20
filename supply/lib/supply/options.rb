@@ -22,11 +22,12 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the rollout",
-                                     default_value: '1.0',
+                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     default_value: '0.1',
                                      verify_block: proc do |value|
-                                       available = %w(0.005 0.01 0.05 0.1 0.2 0.5 1.0)
-                                       UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
+                                       min = 0.05
+                                       max = 0.5
+                                       UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      env_name: "SUPPLY_METADATA_PATH",
