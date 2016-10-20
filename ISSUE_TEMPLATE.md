@@ -8,19 +8,11 @@
 ##### Complete output when running fastlane, including the stack trace and command used
 
 ```
-INSERT OUTPUT HERE
-```
-
-### Configuration Files
-
-Please copy the complete content of your `Fastfile` and any other configuration files you use below:
-
-Fastfile:
-```ruby
-# INSERT CONTENT HERE
+[INSERT OUTPUT HERE]
 ```
 
 ### Environment
 
-Please replace this with the output of `fastlane env`.
-e.g. via `fastlane env | pbcopy`, if you are using bundler use: `bundle exec fastlane env | pbcopy`
+Please run `fastlane env` and copy the output below. This will help us help you :+1:
+
+[INSERT OUTPUT HERE]
