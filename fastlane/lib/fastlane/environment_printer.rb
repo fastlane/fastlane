@@ -172,7 +172,7 @@ module Fastlane
     end
 
     # Copy a given string into the clipboard
-    # Make sure to ask the user first, as some people don't 
+    # Make sure to ask the user first, as some people don't
     # use a clipboard manager, so they might lose something important
     def self.copy_to_clipboard(string)
       require 'tmpdir'
