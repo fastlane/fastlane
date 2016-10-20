@@ -234,6 +234,11 @@ module Fastlane
           require "fastlane/environment_printer"
           env_info = Fastlane::EnvironmentPrinter.get
           puts env_info
+          if UI.confirm("🙄 Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
+            Fastlane::EnvironmentPrinter.copy_to_clipboard(env_info)
+            UI.success("Successfully copied markdown into your clipboard 🎨")
+          end
+          UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
         end
       end
 

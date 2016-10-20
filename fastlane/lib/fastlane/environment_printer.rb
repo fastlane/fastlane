@@ -163,5 +163,15 @@ module Fastlane
       env_output << "\n\n"
       env_output
     end
+
+    # Copy a given string into the clipboard
+    # Make sure to ask the user first, as some people don't 
+    # use a clipboard manager, so they might lose something important
+    def self.copy_to_clipboard(string)
+      require 'tmpdir'
+      tmp_file = File.join(Dir.mktmpdir, "temporary") # so that we don't have problems with escaping the string
+      File.write(tmp_file, string)
+      `cat '#{tmp_file}' | pbcopy`
+    end
   end
 end
