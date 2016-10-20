@@ -13,10 +13,8 @@ module Fastlane
       env_output << "</details>"
 
       # Adding title
-      env_header = "### Issue description:"
-      env_header << "\n\n[insert text here]\n\n"
       status = (env_output.include?("🚫") ? "🚫" : "✅")
-      env_header << "<details><summary>#{status} fastlane environment #{status}</summary>\n\n"
+      env_header = "<details><summary>#{status} fastlane environment #{status}</summary>\n\n"
 
       return env_header + env_output
     end
@@ -118,23 +116,31 @@ module Fastlane
 
       env_output = "### Stack\n\n"
       product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
-      table = ""
-      table << "| Key |  Value |\n"
-      table << "|-----|---------|\n"
-      table << "| fastlane | #{Fastlane::VERSION} |\n"
-      table << "| OS  | #{`sw_vers -productVersion`.strip}|\n"
-      table << "| Ruby  | #{RUBY_VERSION}|\n"
-      table << "| Bundler? | #{FastlaneCore::Helper.bundler?}"
-      table << "| Xcode Path | #{`xcode-select -p`.strip.tr("\n", ' ')}|\n"
-      table << "| Xcode Version | #{`xcodebuild -version`.strip.tr("\n", ' ')}|\n"
-      table << "| Git | #{`git --version`.strip.split("\n").first} |\n"
-      table << "| Installation Source | #{$PROGRAM_NAME} |\n"
-      table << "| Host | #{product} #{version} (#{build}) |\n"
-      table << "| Ruby Lib Dir | #{RbConfig::CONFIG['libdir']}|\n"
-      table << "| OpenSSL Version | #{OpenSSL::OPENSSL_VERSION} |\n"
+      table_content = {
+        "fastlane" => Fastlane::VERSION,
+        "OS" => `sw_vers -productVersion`.strip,
+        "Ruby" => RUBY_VERSION,
+        "Bundler?" => Helper.bundler?,
+        "Xcode Path" => Helper.xcode_path,
+        "Xcode Version" => Helper.xcode_version,
+        "Git" => `git --version`.strip.split("\n").first,
+        "Installation Source" => $PROGRAM_NAME,
+        "Host" => "#{product} #{version} (#{build})",
+        "Ruby Lib Dir" => RbConfig::CONFIG['libdir'],
+        "OpenSSL Version" => OpenSSL::OPENSSL_VERSION
+      }
+      table = ["| Key | Value |"]
+      table += table_content.collect { |k, v| "| #{k} | #{v} |" }
 
-      rendered_table = MarkdownTableFormatter.new table
-      env_output << rendered_table.to_md
+      begin
+        rendered_table = MarkdownTableFormatter.new(table.join("\n"))
+        env_output << rendered_table.to_md
+      rescue => ex
+        UI.error(ex)
+        UI.error("Error rendering markdown table using the following text:")
+        UI.message(table.join("\n"))
+        env_output << table.join("\n")
+      end
 
       env_output << "\n\n"
       env_output
@@ -160,7 +166,8 @@ module Fastlane
 
       appfile_path = CredentialsManager::AppfileConfig.default_path
       if appfile_path && File.exist?(appfile_path)
-        env_output << "`Appfile` located in #{appfile_path}\n"
+        env_output << "<details>"
+        env_output << "<summary>`#{appfile_path}`</summary>\n"
         env_output << "\n"
         env_output << "```ruby\n"
         env_output <<  File.read(appfile_path)
