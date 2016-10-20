@@ -4,15 +4,21 @@ module Fastlane
       UI.important("Generating fastlane environment output, this might take a few seconds...")
       require "fastlane/markdown_table_formatter"
       env_output = ""
-      env_output << "### fastlane environment\n"
-      env_output << "\n"
       env_output << print_system_environment
       env_output << print_fastlane_files
       env_output << print_loaded_fastlane_gems
       env_output << print_loaded_plugins
       env_output << print_loaded_gems
       env_output << print_date
-      env_output
+      env_output << "</details>"
+
+      # Adding title
+      env_header = "### Issue description:"
+      env_header << "\n\n[insert text here]\n\n"
+      status = (env_output.include?("🚫") ? "🚫" : "✅")
+      env_header << "<details><summary>#{status} fastlane environment #{status}</summary>\n\n"
+
+      return env_header + env_output
     end
 
     def self.print_date
@@ -62,10 +68,11 @@ module Fastlane
       table = ""
       table << "| Gem | Version | Update-Status |\n"
       table << "|-----|---------|------------|\n"
+      fastlane_tools = Fastlane::TOOLS + [:fastlane_core, :credentials_manager]
       Gem.loaded_specs.values.each do |x|
         update_status = "N/A"
 
-        next unless Fastlane::TOOLS.include?(x.name.to_sym)
+        next unless fastlane_tools.include?(x.name.to_sym)
         begin
           update_url = FastlaneCore::UpdateChecker.generate_fetch_url(x.name)
           latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
@@ -85,13 +92,14 @@ module Fastlane
 
       env_output << "\n\n"
 
-      env_output
+      return env_output
     end
 
     def self.print_loaded_gems
-      env_output = "### Loaded Gems\n\n"
-      table = ""
-      table << "| Gem | Version |\n"
+      env_output = "<details>"
+      env_output << "<summary><b>Loaded gems</b></summary>\n\n"
+
+      table = "| Gem | Version |\n"
       table << "|-----|---------|\n"
       Gem.loaded_specs.values.each do |x|
         unless Fastlane::TOOLS.include?(x.name.to_sym)
@@ -99,11 +107,10 @@ module Fastlane
         end
       end
       rendered_table = MarkdownTableFormatter.new table
+
       env_output << rendered_table.to_md
-
-      env_output << "\n\n"
-
-      env_output
+      env_output << "</details>\n\n"
+      return env_output
     end
 
     def self.print_system_environment
