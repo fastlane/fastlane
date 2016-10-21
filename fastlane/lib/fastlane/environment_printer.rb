@@ -174,7 +174,7 @@ module Fastlane
         env_output <<  "```\n"
         env_output << "</details>"
       else
-        env_output <<  "**No Appfile found**\n"
+        env_output << "**No Appfile found**\n"
       end
       env_output << "\n\n"
       env_output
