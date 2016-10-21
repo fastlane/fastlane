@@ -32,10 +32,14 @@ module Frameit
                                      end),
         FastlaneCore::ConfigItem.new(key: :use_legacy_iphone5s,
                            env_name: "FRAMEIT_USE_LEGACY_IPHONE_5_S",
-                           optional: true,
                            is_string: false,
                            description: "use iPhone 5s instead of iPhone SE frames",
-                           default_value: false)
+                           default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_legacy_iphone6s,
+                           env_name: "FRAMEIT_USE_LEGACY_IPHONE_6_S",
+                           is_string: false,
+                           description: "Use iPhone 6s frames instead of iPhone 7 frames",
+                           default_value: false),
       ]
     end
   end
