@@ -75,7 +75,6 @@ module Gym
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]
-
           if report_output_junit
             pipe << " --report junit --output "
             pipe << report_output_junit.shellescape
