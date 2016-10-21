@@ -38,7 +38,9 @@ module Gym
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath #{archive_path.shellescape}"
+        options << "-archivePath #{archive_path.
+
+cape}"
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
@@ -80,8 +82,8 @@ module Gym
             pipe << report_output_junit.shellescape
           elsif report_output_html
             pipe << " --report html --output "
-            pipe << report_output_html
-          elsif report_output_json.shellescape
+            pipe << report_output_html.shellescape
+          elsif report_output_json
             pipe << " --report json-compilation-database --output "
             pipe << report_output_json.shellescape
           end
