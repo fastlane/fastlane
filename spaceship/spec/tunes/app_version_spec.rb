@@ -239,11 +239,16 @@ describe Spaceship::AppVersion, all: true do
         allow(client.du_client).to receive(:upload_watch_icon).and_return(json)
       end
 
-      it "modifies the large app data after update" do
+      it "stores extra information in the raw_data" do
         version.upload_large_icon!("path_to_jpg")
-        expect(version.large_app_icon.url).to eq(nil)
-        expect(version.large_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
-        expect(version.large_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
+        expect(version.raw_data["largeAppIcon"]["value"]).to eq({
+          assetToken: "Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg",
+          originalFileName: "ftl_FAKEMD5_icon1024.jpg",
+           size: 198_508,
+           height: 1024,
+           width: 1024,
+           checksum: "d41d8cd98f00b204e9800998ecf8427e"
+           })
       end
 
       it "deletes the large app data" do
@@ -251,13 +256,6 @@ describe Spaceship::AppVersion, all: true do
         expect(version.large_app_icon.url).to eq(nil)
         expect(version.large_app_icon.original_file_name).to eq(nil)
         expect(version.large_app_icon.asset_token).to eq(nil)
-      end
-
-      it "modifies the watch app data after update" do
-        version.upload_watch_icon!("path_to_jpg")
-        expect(version.watch_app_icon.url).to eq(nil)
-        expect(version.watch_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
-        expect(version.watch_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
       end
 
       it "deletes the watch app data" do
