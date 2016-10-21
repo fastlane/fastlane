@@ -14,6 +14,8 @@ describe Frameit do
           "offset" => "+60+225",
           "width" => 752
         })
+
+        Frameit.config = {}
       end
 
       it "properly frame screenshots with captions that include apostrophes" do

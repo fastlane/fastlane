@@ -39,7 +39,7 @@ module Frameit
                            env_name: "FRAMEIT_USE_LEGACY_IPHONE_6_S",
                            is_string: false,
                            description: "Use iPhone 6s frames instead of iPhone 7 frames",
-                           default_value: false),
+                           default_value: false)
       ]
     end
   end
