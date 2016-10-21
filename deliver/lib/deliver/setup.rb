@@ -45,7 +45,7 @@ module Deliver
           else
             content = app_details.send(key)[language]
           end
-
+          content << "\n"
           resulting_path = File.join(path, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
@@ -60,7 +60,7 @@ module Deliver
         else
           content = app_details.send(key)
         end
-
+        content << "\n"
         resulting_path = File.join(path, "#{key}.txt")
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
