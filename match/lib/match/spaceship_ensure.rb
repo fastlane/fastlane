@@ -31,6 +31,8 @@ module Match
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
+      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
