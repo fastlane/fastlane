@@ -20,42 +20,44 @@ module Match
       Spaceship.select_team
     end
 
-    def bundle_identifier_exists(params)
-      found = Spaceship.app.find(params[:app_identifier])
+    def bundle_identifier_exists(username: nil, app_identifier: nil)
+      found = Spaceship.app.find(app_identifier)
       return if found
 
       require 'sigh'
       Sigh::Runner.new.print_produce_command({
-        username: params[:username],
-        app_identifier: params[:app_identifier]
+        username: username,
+        app_identifier: app_identifier
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
+      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `match` with the same user and team every time.")
-      UI.user_error!("Couldn't find bundle identifier '#{params[:app_identifier]}' for the user '#{params[:username]}'")
+      UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificate_exists(params, certificate_id)
+    def certificate_exists(username: nil, certificate_id: nil)
       found = Spaceship.certificate.all.find do |cert|
         cert.id == certificate_id
       end
       return if found
 
       UI.error("Certificate '#{certificate_id}' (stored in your git repo) is not available on the Developer Portal")
-      UI.error("for the user #{params[:username]}")
+      UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
       UI.user_error!("To reset the certificates of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
 
-    def profile_exists(params, uuid)
+    def profile_exists(username: nil, uuid: nil)
       found = Spaceship.provisioning_profile.all.find do |profile|
         profile.uuid == uuid
       end
       return if found
 
       UI.error("Provisioning profile '#{uuid}' is not available on the Developer Portal")
-      UI.error("for the user #{params[:username]}")
+      UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by deleting the provisioning profile on the Dev Portal")
       UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
