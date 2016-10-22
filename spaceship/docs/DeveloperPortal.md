@@ -121,6 +121,14 @@ dev_push_certs = Spaceship.certificate.development_push.all
 
 # Download a push profile
 cert_content = dev_push_certs.first.download
+
+# Creating a push certificate
+
+# Create a new certificate signing request
+csr, pkey = Spaceship.certificate.create_certificate_signing_request
+
+# Use the signing request to create a new push certificate
+Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
 ### Create a Certificate
@@ -131,9 +139,6 @@ csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
 # Use the signing request to create a new distribution certificate
 Spaceship.certificate.production.create!(csr: csr)
-
-# Use the signing request to create a new push certificate
-Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
 ## Provisioning Profiles
