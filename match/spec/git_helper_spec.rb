@@ -7,7 +7,7 @@ describe Match do
           type: "appstore"
         }
         result = Match::GitHelper.generate_commit_message(values)
-        expect(result).to eq("[fastlane] Updated tools.fastlane.app for appstore")
+        expect(result).to eq("[fastlane] Updated appstore")
       end
     end
 

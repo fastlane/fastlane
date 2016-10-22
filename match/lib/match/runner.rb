@@ -15,27 +15,26 @@ module Match
       if params[:app_identifier].kind_of?(Array)
         app_identifiers = params[:app_identifier]
       else
-        app_identifiers = params[:app_identifier].split(/\s*,\s*/).uniq
+        app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
       end
 
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          params[:app_identifier] = app_identifier
-          spaceship.bundle_identifier_exists(params)
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
         end
       end
 
       # Certificate
       cert_id = fetch_certificate(params: params)
-      spaceship.certificate_exists(params, cert_id) if spaceship
+      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
       # Provisioning Profiles
       app_identifiers.each do |app_identifier|
-        params[:app_identifier] = app_identifier
         uuid = fetch_provisioning_profile(params: params,
-                                  certificate_id: cert_id)
-        spaceship.profile_exists(params, uuid) if spaceship
+                                  certificate_id: cert_id,
+                                  app_identifier: app_identifier)
+        spaceship.profile_exists(username: params[:username], uuid: uuid) if spaceship
       end
 
       # Done
@@ -46,8 +45,7 @@ module Match
 
       # Print a summary table for each app_identifier
       app_identifiers.each do |app_identifier|
-        params[:app_identifier] = app_identifier
-        TablePrinter.print_summary(params)
+        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type])
       end
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
@@ -93,8 +91,7 @@ module Match
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
-    def fetch_provisioning_profile(params: nil, certificate_id: nil)
-      app_identifier = params[:app_identifier]
+    def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil)
       prov_type = params[:type].to_sym
 
       profile_name = [Match::Generator.profile_type_name(prov_type), app_identifier].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
@@ -111,7 +108,8 @@ module Match
         UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
-                                                  certificate_id: certificate_id)
+                                                  certificate_id: certificate_id,
+                                                  app_identifier: app_identifier)
         self.changes_to_commit = true
       end
 
