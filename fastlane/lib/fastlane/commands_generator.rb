@@ -224,6 +224,16 @@ module Fastlane
         end
       end
 
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment'
+
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.print
+        end
+      end
+
       default_command :trigger
       run!
     end
