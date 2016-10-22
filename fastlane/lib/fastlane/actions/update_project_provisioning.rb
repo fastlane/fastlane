@@ -113,7 +113,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :provisioning_profile_specifier,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_SPECIFIER",
-                                       description: "A filter for the target name. Use a standard regex",
+                                       description: "The provisioning profile specifier (e.g: 'app.sample AppStore')",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
