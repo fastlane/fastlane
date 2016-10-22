@@ -56,9 +56,11 @@ module Frameit
     private
 
     def download_file(path, txt: "file")
-      url = File.join(HOST_URL, Frameit.frames_version, path)
+      require 'uri'
+
+      url = File.join(HOST_URL, Frameit.frames_version, URI.escape(path))
       UI.message("Downloading #{txt} from '#{url}' ...")
-      body = Excon.get(url.gsub(' ', '%20')).body
+      body = Excon.get(url).body
       raise body if body.include?("<Error>")
       return body
     rescue => ex
