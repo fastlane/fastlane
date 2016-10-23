@@ -93,6 +93,7 @@ Typically you'll use `fastlane` by triggering individual lanes:
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
 - `fastlane new_action`: Create a new action *(integration)* for fastlane
+- `fastlane env`: Print out the fastlane ruby environment when submitting an issue
 
 <hr />
 <h4 align="center">
