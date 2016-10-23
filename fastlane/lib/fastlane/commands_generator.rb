@@ -14,9 +14,12 @@ module Fastlane
 
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
-      Fastlane.plugin_manager.load_plugins
-      # *after* loading the plugins
-      Fastlane::PluginUpdateManager.start_looking_for_updates
+      # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
+      unless ARGV[0] == "env"
+        # *after* loading the plugins
+        Fastlane.plugin_manager.load_plugins
+        Fastlane::PluginUpdateManager.start_looking_for_updates
+      end
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -221,6 +224,21 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          env_info = Fastlane::EnvironmentPrinter.get
+          puts env_info
+          if FastlaneCore::Helper.mac? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
+            Fastlane::EnvironmentPrinter.copy_to_clipboard(env_info)
+            UI.success("Successfully copied markdown into your clipboard 🎨")
+          end
+          UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
         end
       end
 
