@@ -182,8 +182,8 @@ For the list of available options run `xcodebuild -help`.
 
 ## Setup code signing
 
-- [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
-- [Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+- [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
+- [Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/xcode-project/)
 
 ## Automating the whole process
 
