@@ -32,7 +32,6 @@ scan
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/scan/LICENSE)
 [![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](http://rubygems.org/gems/scan)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### The easiest way to run tests of your iOS and Mac app
 
