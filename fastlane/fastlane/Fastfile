@@ -148,6 +148,10 @@ lane :update_docs do
     actions_md_path = File.expand_path("docs/actions.md")
     Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
 
+    Bundler.with_clean_env do
+      sh "bundle update"
+    end
+
     if `git status --porcelain`.length == 0
       UI.success("No changes in the actions.md ✅")
     else
@@ -156,7 +160,7 @@ lane :update_docs do
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        git_commit(path: actions_md_path, message: "Update actions.md for latest fastlane release 🚀")
+        git_commit(path: [actions_md_path, "Gemfile.lock"], message: "Update actions.md for latest fastlane release 🚀")
         # Push them to the git remote
         push_to_git_remote
 
