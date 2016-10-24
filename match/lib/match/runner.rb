@@ -60,9 +60,7 @@ module Match
     end
 
     def fetch_certificate(params: nil)
-      cert_type = :distribution
-      cert_type = :development if params[:type] == "development"
-      cert_type = :enterprise if Match.enterprise? && params[:type] == "enterprise"
+      cert_type = Match.cert_type_sym params[:type]
 
       certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
@@ -92,7 +90,7 @@ module Match
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
     def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil)
-      prov_type = params[:type].to_sym
+      prov_type = Match.profile_type_sym params[:type]
 
       profile_name = [Match::Generator.profile_type_name(prov_type), app_identifier].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
@@ -107,7 +105,7 @@ module Match
 
       if profile.nil? or params[:force]
         if params[:readonly]
-          all_profiles = Dir.entries(base_dir).reject {|f| f.start_with? "." }
+          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with? "." }
           UI.error "No matching provisioning profiles found for '#{profile_name}'"
           UI.error "A new one cannot be created because you enabled `readonly`"
           UI.error "Certificates in your repo for type `#{prov_type}`:"

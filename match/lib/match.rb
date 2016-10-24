@@ -29,4 +29,21 @@ module Match
   def self.enterprise?
     ENV["MATCH_FORCE_ENTERPRISE"]
   end
+
+  def self.type_is_enterprise?(type)
+    Match.enterprise? && type != "development"
+  end
+
+  def self.profile_type_sym(type)
+    return :enterprise if self.type_is_enterprise? type
+    return :adhoc if type == "adhoc"
+    return :appstore if type == "appstore"
+    return :development
+  end
+
+  def self.cert_type_sym(type)
+    return :enterprise if self.type_is_enterprise? type
+    return :development if type == "development"
+    return :distribution
+  end
 end

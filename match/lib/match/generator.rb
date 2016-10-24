@@ -36,7 +36,7 @@ module Match
     def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil)
       require 'sigh'
 
-      prov_type = :enterprise if Match.enterprise? && ENV["SIGH_PROFILE_ENTERPRISE"] && !params[:type] == "development"
+      prov_type = Match.profile_type_sym(params[:type])
 
       profile_name = ["match", profile_type_name(prov_type), app_identifier].join(" ")
 
