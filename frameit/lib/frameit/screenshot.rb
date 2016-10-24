@@ -28,7 +28,7 @@ module Frameit
       when sizes::IOS_40
         return Frameit.config[:use_legacy_iphone5s] ? 'iPhone 5s' : 'iPhone SE'
       when sizes::IOS_35
-        return 'iPhone 4' # TODO
+        return 'iPhone 4'
       when sizes::IOS_IPAD
         return 'iPad Air 2'
       when sizes::IOS_IPAD_PRO
