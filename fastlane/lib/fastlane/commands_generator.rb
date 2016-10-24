@@ -11,7 +11,15 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       $verbose = true if ARGV.include?("--verbose")
+      $capture_output = true if ARGV.include?("--capture_output")
 
+      if $capture_output
+        # Trace mode is enabled
+        # redirect STDOUT and STDERR
+        out_channel = StringIO.new
+        $stdout = out_channel
+        $stderr = out_channel
+      end
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
@@ -24,6 +32,14 @@ module Fastlane
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       Fastlane::PluginUpdateManager.show_update_status
+      if $capture_output
+        $captured_output = Helper.strip_ansi_colors($stdout.string)
+        $stdout = STDOUT
+        $stderr = STDERR
+
+        require "fastlane/environment_printer"
+        Fastlane::EnvironmentPrinter.output
+      end
     end
 
     def run
@@ -39,6 +55,7 @@ module Fastlane
       program :help_formatter, :compact
 
       global_option('--verbose') { $verbose = true }
+      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
 
       always_trace!
 
@@ -232,13 +249,7 @@ module Fastlane
         c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
         c.action do |args, options|
           require "fastlane/environment_printer"
-          env_info = Fastlane::EnvironmentPrinter.get
-          puts env_info
-          if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
-            Fastlane::EnvironmentPrinter.copy_to_clipboard(env_info)
-            UI.success("Successfully copied markdown into your clipboard 🎨")
-          end
-          UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
+          Fastlane::EnvironmentPrinter.output
         end
       end
 
