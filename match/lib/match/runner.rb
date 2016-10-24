@@ -95,7 +95,8 @@ module Match
       prov_type = params[:type].to_sym
 
       profile_name = [Match::Generator.profile_type_name(prov_type), app_identifier].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      profiles = Dir[File.join(params[:workspace], "profiles", prov_type.to_s, "#{profile_name}.mobileprovision")]
+      base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
+      profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles
       profile = profiles.last
@@ -105,7 +106,15 @@ module Match
       end
 
       if profile.nil? or params[:force]
-        UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        if params[:readonly]
+          all_profiles = Dir.entries(base_dir).reject {|f| f.start_with? "." }
+          UI.error "No matching provisioning profiles found for '#{profile_name}'"
+          UI.error "A new one cannot be created because you enabled `readonly`"
+          UI.error "Certificates in your repo for type `#{prov_type}`:"
+          all_profiles.each { |p| UI.error "- '#{p}'" }
+          UI.error "If you are certain that a profile should exist, double-check the recent changes to your match repository"
+          UI.user_error! "No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information."
+        end
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
