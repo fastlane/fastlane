@@ -26,7 +26,7 @@ FastlaneCore
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane_core/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane_core/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane_core.svg?style=flat)](http://rubygems.org/gems/fastlane_core)
 
 All shared code of the fastlane tools is stored in this repository.
