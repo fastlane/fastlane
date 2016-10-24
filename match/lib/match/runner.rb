@@ -1,6 +1,7 @@
 module Match
   class Runner
     attr_accessor :changes_to_commit
+    attr_accessor :spaceship
 
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
@@ -10,7 +11,7 @@ module Match
       UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
 
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
-      spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
+      self.spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
 
       if params[:app_identifier].kind_of?(Array)
         app_identifiers = params[:app_identifier]
@@ -31,10 +32,11 @@ module Match
 
       # Provisioning Profiles
       app_identifiers.each do |app_identifier|
-        uuid = fetch_provisioning_profile(params: params,
-                                  certificate_id: cert_id,
-                                  app_identifier: app_identifier)
-        spaceship.profile_exists(username: params[:username], uuid: uuid) if spaceship
+        loop do
+          break if fetch_provisioning_profile(params: params,
+                                      certificate_id: cert_id,
+                                      app_identifier: app_identifier)
+        end
       end
 
       # Done
@@ -117,6 +119,13 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
+
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+        # This profile is invalid, let's remove the local file and generate a new one
+        File.delete(profile)
+        self.changes_to_commit = true
+        return nil
+      end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
                                                                        type: prov_type),
