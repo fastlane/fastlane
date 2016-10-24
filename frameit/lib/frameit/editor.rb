@@ -9,8 +9,13 @@ module Frameit
       self.screenshot = screenshot
       prepare_image
 
-      if load_frame # e.g. Mac doesn't need a frame
+      if load_frame # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(load_frame)
+        self.frame.rotate(90) unless self.screenshot.portrait? # we use portrait device frames for landscape screenshots
+      elsif self.class == Editor
+        # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
+        # Message is already shown elsewhere
+        return
       end
 
       if should_add_title?
@@ -37,16 +42,30 @@ module Frameit
 
     def store_result
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-      image.format "png"
-      image.write output_path
+      image.format("png")
+      image.write(output_path)
       UI.success "Added frame: '#{File.expand_path(output_path)}'"
     end
 
     # puts the screenshot into the frame
     def put_into_frame
+      # We have to rotate the screenshot, since the offset information is for portrait
+      # only. Instead of doing the calculations ourselves, it's much easier to let
+      # imagemagick do the hard lifting for landscape screenshots
+      unless self.screenshot.portrait?
+        frame.rotate(-90)
+        @image.rotate(-90)
+      end
+
       @image = frame.composite(image, "png") do |c|
         c.compose "Over"
         c.geometry offset['offset']
+      end
+
+      # We have to revert the state to be landscape screenshots
+      unless self.screenshot.portrait?
+        frame.rotate(90)
+        @image.rotate(90)
       end
     end
 
@@ -89,11 +108,11 @@ module Frameit
 
       if self.frame # we have no frame on le mac
         resize_frame!
-        @image = put_into_frame
+        put_into_frame
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
-        image.resize "#{frame_width}x"
+        @image.resize "#{frame_width}x"
       end
 
       self.top_space_above_device = vertical_frame_padding
@@ -160,7 +179,9 @@ module Frameit
 
     # Resize the frame as it's too low quality by default
     def resize_frame!
-      multiplicator = (screenshot.size[0].to_f / offset['width'].to_f) # by how much do we have to change this?
+      screenshot_width = self.screenshot.portrait? ? screenshot.size[0] : screenshot.size[1]
+
+      multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
       frame.resize "#{new_frame_width.round}x" # resize it to the calculated witdth
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
@@ -271,7 +292,7 @@ module Frameit
       return @config if @config
 
       config_path = File.join(File.expand_path("..", screenshot.path), "Framefile.json")
-      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist? config_path
+      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
       @config = file.fetch_value(screenshot.path)

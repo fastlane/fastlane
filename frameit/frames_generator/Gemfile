@@ -1,0 +1,4 @@
+gem 'rake'
+gem 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
+gem 'colored'
+gem 'pry'
