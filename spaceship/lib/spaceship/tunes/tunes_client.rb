@@ -946,6 +946,14 @@ module Spaceship
       parse_response(r, 'data')['requests']
     end
 
+    #####################################################
+    # @!group Export Compliances
+    #####################################################
+    def app_export_compliances(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/exportcompliances")
+      parse_response(r, 'data')
+    end
+
     private
 
     def with_tunes_retry(tries = 5, &_block)

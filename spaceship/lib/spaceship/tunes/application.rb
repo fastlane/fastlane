@@ -378,6 +378,17 @@ module Spaceship
         end
       end
 
+      #####################################################
+      # @!group Export Compliances
+      #####################################################
+      def export_compliances
+        ensure_not_a_bundle
+        data = client.app_export_compliances(app_id: self.apple_id)
+        data.map do |attrs|
+          Tunes::AppExportCompliance.factory(attrs)
+        end
+      end
+
       # private to module
       def ensure_not_a_bundle
         # we only support applications

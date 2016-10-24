@@ -276,6 +276,12 @@ def itc_stub_promocodes_history
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_export_compliances
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/exportcompliances").
+    to_return(status: 200, body: itc_read_fixture_file("export_compliances.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
@@ -297,5 +303,6 @@ RSpec.configure do |config|
     itc_stub_promocodes
     itc_stub_generate_promocodes
     itc_stub_promocodes_history
+    itc_stub_export_compliances
   end
 end
