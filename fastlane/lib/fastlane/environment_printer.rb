@@ -1,5 +1,15 @@
 module Fastlane
   class EnvironmentPrinter
+    def self.output
+      env_info = get
+      puts env_info
+      if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
+        copy_to_clipboard(env_info)
+        UI.success("Successfully copied markdown into your clipboard 🎨")
+      end
+      UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
+    end
+
     def self.get
       UI.important("Generating fastlane environment output, this might take a few seconds...")
       require "fastlane/markdown_table_formatter"
@@ -10,13 +20,20 @@ module Fastlane
       env_output << print_loaded_plugins
       env_output << print_loaded_gems
       env_output << print_date
-      env_output << "</details>"
 
       # Adding title
       status = (env_output.include?("🚫") ? "🚫" : "✅")
       env_header = "<details><summary>#{status} fastlane environment #{status}</summary>\n\n"
+      env_tail = "</details>"
+      final_output = ""
 
-      return env_header + env_output
+      if $captured_output
+        final_output << "### Captured Output\n\n"
+        final_output << "Command Used: `#{ARGV.join(' ')}`\n"
+        final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{$captured_output}\n\n```\n\n</details>\n\n"
+      end
+
+      final_output << env_header + env_output + env_tail
     end
 
     def self.print_date
