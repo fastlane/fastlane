@@ -41,9 +41,9 @@ module Deliver
       (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
         v.description.languages.each do |language|
           if UploadMetadata::LOCALISED_VERSION_VALUES.include?(key)
-            content = v.send(key)[language]
+            content = v.send(key)[language].to_s
           else
-            content = app_details.send(key)[language]
+            content = app_details.send(key)[language].to_s
           end
           content << "\n"
           resulting_path = File.join(path, language, "#{key}.txt")
@@ -56,9 +56,9 @@ module Deliver
       # All non-localised metadata
       (UploadMetadata::NON_LOCALISED_VERSION_VALUES + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
         if UploadMetadata::NON_LOCALISED_VERSION_VALUES.include?(key)
-          content = v.send(key)
+          content = v.send(key).to_s
         else
-          content = app_details.send(key)
+          content = app_details.send(key).to_s
         end
         content << "\n"
         resulting_path = File.join(path, "#{key}.txt")
