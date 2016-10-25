@@ -158,7 +158,6 @@ module Cert
       KeychainImporter.import_file(private_key_path)
       KeychainImporter.import_file(cert_path)
 
-
       # Generate p12 file
       p12_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       p12 = OpenSSL::PKCS12.create(ENV['CERT_P12_PASSWORD'], certificate.name, pkey, cert, public)
