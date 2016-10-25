@@ -101,8 +101,8 @@ module Spaceship
     def initialize
       options = {
        request: {
-          timeout:       300,
-          open_timeout:  300
+          timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
       @cookie = HTTP::CookieJar.new
