@@ -83,7 +83,7 @@ module Cert
         end
 
         path = store_certificate(certificate)
-        private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
+        private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.pem"))
 
         if FastlaneCore::CertChecker.installed?(path)
           # This certificate is installed on the local machine
@@ -149,18 +149,25 @@ module Cert
       request_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.certSigningRequest"))
       File.write(request_path, csr.to_pem)
 
-      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
-      File.write(private_key_path, pkey)
+      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.pem"))
+      File.write(private_key_path, pkey.to_pem)
 
-      cert_path = store_certificate(certificate)
+      cert_path, cert = store_certificate(certificate)
 
       # Import all the things into the Keychain
       KeychainImporter.import_file(private_key_path)
       KeychainImporter.import_file(cert_path)
 
+
+      # Generate p12 file
+      p12_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
+      p12 = OpenSSL::PKCS12.create(ENV['CERT_P12_PASSWORD'], certificate.name, pkey, cert, public)
+      File.write(p12_key_path, p12.to_der)
+
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
       ENV["CER_FILE_PATH"] = cert_path
+      ENV["P12_CERTIFICATE_PATH"] = p12_key_path
 
       UI.success "Successfully generated #{certificate.id} which was imported to the local machine."
 
@@ -169,9 +176,9 @@ module Cert
 
     def store_certificate(certificate)
       path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.cer"))
-      raw_data = certificate.download_raw
-      File.write(path, raw_data)
-      return path
+      cert = certificate.download
+      File.write(path, cert.to_pem)
+      return path, cert
     end
   end
 end
