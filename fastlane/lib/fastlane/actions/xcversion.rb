@@ -40,8 +40,8 @@ module Fastlane
 
       def self.example_code
         [
-          'xcversion version: "7.1" # Selects Xcode 7.1.0',
-          'xcversion version: "~> 7.1.0" # Selects the latest installed version from the 7.1.x set'
+          'xcversion(version: "8.1") # Selects Xcode 8.1.0',
+          'xcversion(version: "~> 8.1.0") # Selects the latest installed version from the 8.1.x set'
         ]
       end
 
