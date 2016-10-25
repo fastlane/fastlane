@@ -31,11 +31,13 @@ module Match
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
       # Provisioning Profiles
-      app_identifiers.each do |app_identifier|
-        loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier)
+      unless params[:skip_profile]
+        app_identifiers.each do |app_identifier|
+          loop do
+            break if fetch_provisioning_profile(params: params,
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier)
+          end
         end
       end
 
@@ -50,7 +52,11 @@ module Match
         TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type])
       end
 
-      UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
+      if params[:skip_profile]
+        UI.success "All required keys and certificates are installed 🙌".green
+      else
+        UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
+      end
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
       UI.error("An error occured while verifying your certificates and profiles with the Apple Developer Portal.")
       UI.error("If you already have your certificates stored in git, you can run `match` in readonly mode")
