@@ -87,7 +87,10 @@ module Spaceship
 
       response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
-        req.body = { contentProviderId: team_id }.to_json
+        req.body = {
+          contentProviderId: team_id,
+          dsId: Time.now.to_i.to_s # https://github.com/fastlane/fastlane/issues/6711
+        }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
