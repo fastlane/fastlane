@@ -31,7 +31,7 @@ module Fastlane
       plugin_manager = Fastlane::PluginManager.new
       plugin_manager.load_plugins
       if plugin_manager.available_plugins.length <= 0
-        env_output << "**No plugins Loaded***\n"
+        env_output << "**No plugins Loaded**\n"
       else
         table = ""
         table << "| Plugin | Version | Update-Status |\n"
