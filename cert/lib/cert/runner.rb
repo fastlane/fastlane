@@ -160,7 +160,7 @@ module Cert
 
       # Generate p12 file
       p12_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
-      p12 = OpenSSL::PKCS12.create(ENV['CERT_P12_PASSWORD'], certificate.name, pkey, cert, public)
+      p12 = OpenSSL::PKCS12.create(ENV['CERT_P12_PASSWORD'], certificate.name, pkey, cert)
       File.write(p12_key_path, p12.to_der)
 
       # Environment variables for the fastlane action
