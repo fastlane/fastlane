@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.details
-        "Don't use this actoin, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
+        "Don't use this action, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
       end
 
       def self.available_options
