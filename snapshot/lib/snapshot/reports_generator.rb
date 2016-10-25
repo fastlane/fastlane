@@ -53,6 +53,8 @@ module Snapshot
       # and the iPhone 6 is inlucded in the iPhone 6 Plus
       {
         'AppleTV1080p' => 'Apple TV',
+        'iPhone7Plus' => "iPhone7Plus (5.5-Inch)",
+        'iPhone7' => "iPhone7 (4.7-Inch)",
         'iPhone6sPlus' => "iPhone6sPlus (5.5-Inch)",
         'iPhone6Plus' => "iPhone6Plus (5.5-Inch)",
         'iPhone6s' => "iPhone6s (4.7-Inch)",
