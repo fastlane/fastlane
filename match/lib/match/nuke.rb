@@ -47,7 +47,7 @@ module Match
     # Collect all the certs/profiles
     def prepare_list
       UI.message "Fetching certificates and profiles..."
-      cert_type = type.to_sym
+      cert_type = Match.cert_type_sym(type)
 
       prov_types = [:development]
       prov_types = [:appstore, :adhoc] if cert_type == :distribution
