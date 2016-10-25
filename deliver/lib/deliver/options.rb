@@ -161,7 +161,7 @@ module Deliver
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
                                      env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
-                                     description: "Clear all previously uploaded screenshots",
+                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      is_string: false,
                                      default_value: false),
 
