@@ -26,10 +26,12 @@ module Match
     return envs
   end
 
+  # @return [Boolean] returns true if the unsupported enterprise mode should be enabled
   def self.enterprise?
     ENV["MATCH_FORCE_ENTERPRISE"]
   end
 
+  # @return [Boolean] returns true if match should interpret the given [certificate|profile] type as an enterprise one
   def self.type_is_enterprise?(type)
     Match.enterprise? && type != "development"
   end
