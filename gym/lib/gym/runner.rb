@@ -15,21 +15,23 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      if Gym.project.ios? || Gym.project.tvos?
-        fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
-        package_app
-        fix_package
-        compress_and_move_dsym
-        path = move_ipa
-        move_manifest
-        move_app_thinning
-        move_app_thinning_size_report
-        move_apps_folder
+      unless Gym.config[:skip_export]
+        if Gym.project.ios? || Gym.project.tvos?
+          fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
+          package_app
+          fix_package
+          compress_and_move_dsym
+          path = move_ipa
+          move_manifest
+          move_app_thinning
+          move_app_thinning_size_report
+          move_apps_folder
 
-        path
-      elsif Gym.project.mac?
-        compress_and_move_dsym
-        copy_mac_app
+          path
+        elsif Gym.project.mac?
+          compress_and_move_dsym
+          copy_mac_app
+        end
       end
     end
 
