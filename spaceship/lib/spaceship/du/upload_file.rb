@@ -33,7 +33,7 @@ module Spaceship
       def remove_alpha_channel(original)
         path = "/tmp/#{Digest::MD5.hexdigest(original)}.png"
         FileUtils.copy(original, path)
-        if Helper.mac? # sips is only available on macOS
+        if mac? # sips is only available on macOS
           `sips -s format bmp '#{path}' &> /dev/null` # &> /dev/null since there is warning because of the extension
           `sips -s format png '#{path}'`
         end
@@ -47,6 +47,10 @@ module Spaceship
       args.each do |k, v|
         instance_variable_set("@#{k}", v) unless v.nil?
       end
+    end
+    
+    def mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
 end
