@@ -127,9 +127,9 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 
 Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`.
 
-### Spaceship in use
+### _spaceship_ in use
 
-Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
+All [fastlane tools](https://fastlane.tools) that communicate with Apple's web services in some way, use _spaceship_ to do so.
 
 # Technical Details
 
