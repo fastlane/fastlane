@@ -151,7 +151,7 @@ module Spaceship
             # https://github.com/fastlane/fastlane/issues/1873
             # https://github.com/fastlane/fastlane/issues/4002
             error_message = [""] # to have a nice new-line in the beginning
-            error_message << "TestFlight requires you to provide the answer to the encryption question"]
+            error_message << "TestFlight requires you to provide the answer to the encryption question"
             error_message << "to provide the reply, please add the following to your Info.plist file"
             error_message << ""
             error_message << "<key>ITSAppUsesNonExemptEncryption</key><false/>"
