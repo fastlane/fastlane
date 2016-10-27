@@ -66,6 +66,10 @@ module Gym
         Gym.cache[:ipa_path]
       end
 
+      def pkg_path
+        File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+      end
+
       # The path the the dsym file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
