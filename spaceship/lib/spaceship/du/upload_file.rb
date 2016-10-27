@@ -48,7 +48,7 @@ module Spaceship
         instance_variable_set("@#{k}", v) unless v.nil?
       end
     end
-    
+
     def mac?
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
