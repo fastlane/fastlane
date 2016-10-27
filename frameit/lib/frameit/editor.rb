@@ -238,7 +238,13 @@ module Frameit
     end
 
     def actual_font_size
+
+      if fetch_config['titleFontSize']
+        return fetch_config['titleFontSize']
+      end
+      
       [@image.width / 10.0].max.round
+      
     end
 
     # The space between the keyword and the title
