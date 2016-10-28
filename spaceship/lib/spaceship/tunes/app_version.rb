@@ -30,6 +30,9 @@ module Spaceship
       # @return (String) App Status (e.g. 'readyForSale'). You should use `app_status` instead
       attr_accessor :raw_status
 
+      # @return (String) Build Version
+      attr_accessor :build_version
+
       # @return (Bool)
       attr_accessor :can_reject_version
 
@@ -133,6 +136,7 @@ module Spaceship
         'largeAppIcon.value.url' => :app_icon_url,
         'releaseOnApproval.value' => :release_on_approval,
         'status' => :raw_status,
+        'preReleaseBuild.buildVersion' => :build_version,
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
@@ -213,6 +217,16 @@ module Spaceship
           self.languages << new_language
         end
         nil
+      end
+
+      def current_build_number
+        if self.is_live?
+          build_version
+        else
+          if candidate_builds.length > 0
+            candidate_builds.first.build_version
+          end
+        end
       end
 
       # Returns an array of all builds that can be sent to review
