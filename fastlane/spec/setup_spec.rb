@@ -16,8 +16,7 @@ describe Fastlane do
         FileUtils.rm_rf(workspace) if File.directory? workspace
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
-        $terminal = HighLine.new # mock user inputs :)
-        allow($terminal).to receive(:ask).and_return("y")
+        expect(FastlaneCore::UI).to receive(:input).and_return("y")
 
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
 
@@ -26,8 +25,6 @@ describe Fastlane do
 
       it "setup is successful and generated inital Fastfile" do
         require 'produce'
-
-        allow(FastlaneCore::Helper).to receive(:gem_path).with('fastlane').and_return(File.expand_path(".")) # since we chdir later on
 
         app = "app"
 

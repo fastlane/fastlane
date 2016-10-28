@@ -8,12 +8,13 @@ module Snapshot
         UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use snapshot.")
       end
 
-      gem_path = Helper.gem_path("snapshot")
-      File.write(snapfile_path, File.read("#{gem_path}/lib/assets/SnapfileTemplate"))
-      File.write(File.join(path, 'SnapshotHelper.swift'), File.read("#{gem_path}/lib/assets/SnapshotHelper.swift"))
+      File.write(snapfile_path, File.read("#{Snapshot::ROOT}/lib/assets/SnapfileTemplate"))
+      File.write(File.join(path, 'SnapshotHelper.swift'), File.read("#{Snapshot::ROOT}/lib/assets/SnapshotHelper.swift"))
+      File.write(File.join(path, 'SnapshotHelper2-3.swift'), File.read("#{Snapshot::ROOT}/lib/assets/SnapshotHelper2-3.swift"))
 
-      puts "Successfully created SnapshotHelper.swift '#{File.join(path, 'SnapshotHelper.swift')}'".green
-      puts "Successfully created new Snapfile at '#{snapfile_path}'".green
+      puts "✅  Successfully created SnapshotHelper.swift '#{File.join(path, 'SnapshotHelper.swift')}'".green
+      puts "✅  Successfully created SnapshotHelper2-3.swift '#{File.join(path, 'SnapshotHelper2-3.swift')} (if your UI tests are written in Swift 2.3)'".green
+      puts "✅  Successfully created new Snapfile at '#{snapfile_path}'".green
 
       puts "-------------------------------------------------------".yellow
       puts "Open your Xcode project and make sure to do the following:".yellow

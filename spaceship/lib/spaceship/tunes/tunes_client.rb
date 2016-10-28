@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -66,9 +68,29 @@ module Spaceship
 
     # Set a new team ID which will be used from now on
     def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider id
+      #
+      available_teams = teams.collect do |team|
+        (team["contentProvider"] || {})["contentProviderId"]
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
       response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
-        req.body = { contentProviderId: team_id }.to_json
+        req.body = {
+          contentProviderId: team_id,
+          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+        }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
@@ -83,15 +105,21 @@ module Spaceship
       t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
-      if t_name.length > 0
+      if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
+        puts "Looking for iTunes Connect Team with name #{t_name}" if $verbose
+
         teams.each do |t|
           t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
         end
+
+        puts "Could not find team with name '#{t_name}', trying to fallback to default team" if t_id.length.zero?
       end
 
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
+        puts "Looking for iTunes Connect Team with ID #{t_id}" if $verbose
+
         # actually set the team id here
         self.team_id = t_id
         return
@@ -100,6 +128,15 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
+        puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
+        first_team = teams.first["contentProvider"]
+        puts ""
+        puts "  itc_team_id \"#{first_team['contentProviderId']}\""
+        puts ""
+        puts "or"
+        puts ""
+        puts "  itc_team_name \"#{first_team['name']}\""
+        puts ""
         teams.each_with_index do |team, i|
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
@@ -141,14 +178,20 @@ module Spaceship
         logger.debug("Request was successful")
       end
 
-      handle_response_hash = lambda do |hash|
+      # We pass on the `current_language` so that the error message tells the user
+      # what language the error was caused in
+      handle_response_hash = lambda do |hash, current_language = nil|
         errors = []
-        if hash.kind_of? Hash
-          hash.each do |key, value|
-            errors += handle_response_hash.call(value)
+        if hash.kind_of?(Hash)
+          current_language ||= hash["language"]
 
-            if key == 'errorKeys' and value.kind_of? Array and value.count > 0
-              errors += value
+          hash.each do |key, value|
+            errors += handle_response_hash.call(value, current_language)
+
+            next unless key == 'errorKeys' and value.kind_of?(Array) and value.count > 0
+            # Prepend the error with the language so it's easier to understand for the user
+            errors += value.collect do |current_error_message|
+              current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
             end
           end
         elsif hash.kind_of? Array
@@ -229,16 +272,16 @@ module Spaceship
       # Now fill in the values we have
       # some values are nil, that's why there is a hash
       data['versionString'] = { value: version }
-      data['newApp']['name'] = { value: name }
-      data['newApp']['bundleId']['value'] = bundle_id
-      data['newApp']['primaryLanguage']['value'] = primary_language || 'English'
-      data['newApp']['vendorId'] = { value: sku }
-      data['newApp']['bundleIdSuffix']['value'] = bundle_id_suffix
-      data['companyName']['value'] = company_name if company_name
-      data['newApp']['appType'] = app_type
+      data['name'] = { value: name }
+      data['bundleId'] = { value: bundle_id }
+      data['primaryLanguage'] = { value: primary_language || 'English' }
+      data['vendorId'] = { value: sku }
+      data['bundleIdSuffix'] = { value: bundle_id_suffix }
+      data['companyName'] = { value: company_name } if company_name
+      data['enabledPlatformsForCreation'] = { value: [app_type] }
 
       data['initialPlatform'] = app_type
-      data['enabledPlatformsForCreation']['value'] = [app_type]
+      data['enabledPlatformsForCreation'] = { value: [app_type] }
 
       # Now send back the modified hash
       r = request(:post) do |req|
@@ -269,6 +312,16 @@ module Spaceship
     def get_resolution_center(app_id, platform)
       r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter?v=latest")
       parse_response(r, 'data')
+    end
+
+    def get_rating_summary(app_id, platform, versionId = '')
+      r = request(:get, "ra/apps/#{app_id}/reviews/summary?platform=#{platform}&versionId=#{versionId}")
+      parse_response(r, 'data')
+    end
+
+    def get_reviews(app_id, platform, storefront, versionId = '')
+      r = request(:get, "ra/apps/#{app_id}/reviews?platform=#{platform}&storefront=#{storefront}&versionId=#{versionId}")
+      parse_response(r, 'data')['reviews']
     end
 
     #####################################################
@@ -805,6 +858,55 @@ module Spaceship
 
     def remove_tester_from_app!(tester, app_id)
       update_tester_from_app!(tester, app_id, false)
+    end
+
+    #####################################################
+    # @!group Sandbox Testers
+    #####################################################
+    def sandbox_testers(tester_class)
+      url = tester_class.url[:index]
+      r = request(:get, url)
+      parse_response(r, 'data')
+    end
+
+    def create_sandbox_tester!(tester_class: nil, email: nil, password: nil, first_name: nil, last_name: nil, country: nil)
+      url = tester_class.url[:create]
+      r = request(:post) do |req|
+        req.url url
+        req.body = {
+          user: {
+            emailAddress: { value: email },
+            password: { value: password },
+            confirmPassword: { value: password },
+            firstName: { value: first_name },
+            lastName: { value: last_name },
+            storeFront: { value: country },
+            birthDay: { value: 1 },
+            birthMonth: { value: 1 },
+            secretQuestion: { value: SecureRandom.hex },
+            secretAnswer: { value: SecureRandom.hex },
+            sandboxAccount: nil
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')['user']
+    end
+
+    def delete_sandbox_testers!(tester_class, emails)
+      url = tester_class.url[:delete]
+      request(:post) do |req|
+        req.url url
+        req.body = emails.map do |email|
+          {
+            emailAddress: {
+              value: email
+            }
+          }
+        end.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      true
     end
 
     #####################################################

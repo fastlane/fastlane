@@ -3,6 +3,7 @@ module Fastlane
     class BadgeAction < Action
       def self.run(params)
         Actions.verify_gem!('badge')
+        check_imagemagick!
         require 'badge'
         options = {
           dark: params[:dark],
@@ -24,15 +25,29 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Automatically add a badge to your iOS app icon"
+        "Automatically add a badge to your app icon"
       end
 
       def self.details
         [
           "This action will add a light/dark badge onto your app icon.",
           "You can also provide your custom badge/overlay or add an shield for more customization more info:",
-          "https://github.com/HazAT/badge"
+          "https://github.com/HazAT/badge",
+          "**Note** If you want to reset the badge back to default you can use `sh 'git checkout -- <path>/Assets.xcassets/'`"
         ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'badge(dark: true)',
+          'badge(alpha: true)',
+          'badge(custom: "/Users/xxx/Desktop/badge.png")',
+          'badge(shield: "Version-0.0.3-blue", no_badge: true)'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.available_options
@@ -126,6 +141,20 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :android].include?(platform)
       end
+
+      def self.check_imagemagick!
+        return if `which convert`.include?('convert')
+
+        UI.error("You have to install ImageMagick to use `badge`")
+        UI.error("")
+        UI.error("Install it using:")
+        UI.command("brew update && brew install imagemagick")
+        UI.error("")
+        UI.error("If you don't have homebrew, visit http://brew.sh")
+
+        UI.user_error!("Install ImageMagick and start your lane again!")
+      end
+      private_class_method :check_imagemagick!
     end
   end
 end

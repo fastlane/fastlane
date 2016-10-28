@@ -32,7 +32,6 @@ supply
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/supply/LICENSE)
 [![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
@@ -54,7 +53,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Features
 - Update existing Android applications on Google Play via the command line
@@ -75,15 +74,20 @@ Install the gem
 
 Setup consists of setting up your Google Developers Service Account
 
-- Open the [Google Play Console](https://play.google.com/apps/publish/)
-- Select **Settings** tab, followed by the **API access** tab
-- Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
-- Click **Create credentials** and select **Service account**
-- Select **JSON** as the Key type and click **Create**
-- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
-- Back on the Google Play developer console, click **Done** to close the dialog
-- Click on **Grant Access** for the newly added service account
-- Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
+1. Open the [Google Play Console](https://play.google.com/apps/publish/)
+1. Select **Settings** tab, followed by the **API access** tab
+1. Click the **Create Service Account** button and follow the **Google API Console** link in the dialog
+1. Click the **Create Service account** button at the top of the developers console screen
+1. Provide a name for the service account
+1. Click **Select a role** and choose **Project > Service Account Actor**
+1. Check the **Furnish a new private key** checkbox
+1. Select **JSON** as the Key type
+1. Click **Create** to close the dialog
+1. Make a note of the file name of the JSON file downloaded to your computer
+1. Back on the Google Play developer console, click **Done** to close the dialog
+1. Click on **Grant Access** for the newly added service account
+1. Choose **Release Manager** from the **Role** dropdown
+1. Click **Add user** to close the dialog
 
 ### Migrating Google credential format (from .p12 key file to .json)
 
@@ -173,7 +177,7 @@ You can add changelog files under the `changelogs/` directory for each locale. T
 
 ## Track Promotion
 
-A common Play publishing scenario might involve uploading an APK version to a test track, testing it, and finally promoting that version to production. 
+A common Play publishing scenario might involve uploading an APK version to a test track, testing it, and finally promoting that version to production.
 
 This can be done using the `--track_promote_to` parameter.  The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
 
@@ -181,7 +185,7 @@ This can be done using the `--track_promote_to` parameter.  The `--track_promote
 
 ### [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

@@ -58,6 +58,14 @@ module Fastlane
         ["JaviSoto"]
       end
 
+      def self.example_code
+        ['ensure_xcode_version(version: "7.2")']
+      end
+
+      def self.category
+        :building
+      end
+
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end

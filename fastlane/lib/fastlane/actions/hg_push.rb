@@ -18,6 +18,10 @@ module Fastlane
         "This will push changes to the remote hg repository"
       end
 
+      def self.details
+        "The mercurial equivalent of [`push_to_git_remote`](#push_to_git_remote) — pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :force,
@@ -40,6 +44,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'hg_push',
+          'hg_push(
+            destination: "ssh://hg@repohost.com/owner/repo",
+            force: true
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

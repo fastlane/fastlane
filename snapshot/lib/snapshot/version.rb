@@ -1,4 +1,4 @@
 module Snapshot
-  VERSION = "1.13.1".freeze
+  VERSION = "1.16.3".freeze
   DESCRIPTION = "Automate taking localized screenshots of your iOS app on every device"
 end

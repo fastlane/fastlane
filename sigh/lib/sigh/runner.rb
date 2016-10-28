@@ -65,7 +65,15 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier]).find_all(&:valid?)
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      results = results.find_all do |current_profile|
+        if current_profile.valid?
+          true
+        else
+          UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
+          false
+        end
+      end
 
       # Take the provisioning profile name into account
       if Sigh.config[:provisioning_name].to_s.length > 0
@@ -74,6 +82,20 @@ module Sigh
           results = filtered
         elsif (filtered || []).count > 0
           results = filtered
+        end
+      end
+
+      # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
+      # any more, since it requires an additional request
+      # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
+
+      results = results.find_all do |current_profile|
+        if profile_type == Spaceship.provisioning_profile.ad_hoc
+          current_profile.is_adhoc?
+        elsif profile_type == Spaceship.provisioning_profile.app_store
+          !current_profile.is_adhoc?
+        else
+          true
         end
       end
 
@@ -89,10 +111,10 @@ module Sigh
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.important("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}")
+            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
           end
         end
-        installed
+        installed && a.certificate_valid?
       end
     end
 
@@ -153,7 +175,7 @@ module Sigh
         UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
         UI.important "Available Code Signing Identities for current filters:"
         certificates.each do |c|
-          str = ["\t- Name:", c.owner_name, "- ID:", c.id + "- Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
           UI.message str.green
         end
       end
@@ -163,7 +185,10 @@ module Sigh
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important "No certificates for filter: #{filters}" if filters.length > 0
-        UI.user_error!("Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. You can use cert to generate one: \nhttps://github.com/fastlane/fastlane/tree/master/cert")
+        message = "Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. "
+        message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide."
+        message += "If you don't want to do so, you can also use cert to generate a new one: https://fastlane.tools/cert"
+        UI.user_error!(message)
       end
 
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
@@ -173,7 +198,7 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile.class.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
+      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
       profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")

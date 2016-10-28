@@ -65,10 +65,10 @@ module Fastlane
           UI.error("Release on tag #{params[:tag_name]} already exists!")
         when 404
           UI.error(response.body)
-          UI.user_error!("Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).")
+          UI.user_error!("Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)")
         when 401
           UI.error(response.body)
-          UI.user_error!("You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token.")
+          UI.user_error!("You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
         else
           if response[:status] != 200
             UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
@@ -188,6 +188,7 @@ module Fastlane
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        is_string: true,
+                                       default_value: ENV["GITHUB_API_TOKEN"],
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :tag_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_TAG_NAME",
@@ -254,6 +255,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'github_release = set_github_release(
+            repository_name: "fastlane/fastlane",
+            api_token: ENV["GITHUB_TOKEN"],
+            name: "Super New actions",
+            tag_name: "v1.22.0",
+            description: (File.read("changelog") rescue "No changelog provided"),
+            commitish: "master",
+            upload_assets: ["example_integration.ipa", "./pkg/built.gem"]
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

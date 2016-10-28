@@ -53,9 +53,14 @@ module FastlaneCore
       puts '#######################################################################'.green
       puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       puts "# It is recommended to use the latest version.".green
-      puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
+      if Helper.bundler?
+        puts "# Update using 'bundle update #{gem_name.downcase}'.".green
+      else
+        puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
+      end
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
-      if Random.rand(5) == 1
+
+      if Random.rand(5) == 1 && !Helper.bundler?
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
@@ -71,6 +76,7 @@ module FastlaneCore
 
       project_hash = p_hash(ARGV, gem_name)
       params["p_hash"] = project_hash if project_hash
+      params["platform"] = @platform if @platform # this has to be called after `p_hash`
 
       url += "?" + URI.encode_www_form(params) if params.count > 0
       return url
@@ -148,10 +154,17 @@ module FastlaneCore
       require 'credentials_manager'
 
       # check if this is an android project first because some of the same params exist for iOS and Android tools
-      value = android_app_identifier(args, gem_name) || ios_app_identifier(args)
+      app_identifier = android_app_identifier(args, gem_name)
+      @platform = nil # since have a state in-between runs
+      if app_identifier
+        @platform = :android
+      else
+        app_identifier = ios_app_identifier(args)
+        @platform = :ios if app_identifier
+      end
 
-      if value
-        return Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt") # hashed + salted the bundle identifier
+      if app_identifier
+        return Digest::SHA256.hexdigest("p#{app_identifier}fastlan3_SAlt") # hashed + salted the bundle identifier
       end
 
       return nil

@@ -100,7 +100,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action. For Mac zip the .app. For Android provide path to .apk file",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
@@ -202,6 +202,27 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
+      end
+
+      def self.details
+        [
+          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.",
+          "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'hockey(
+            api_token: "...",
+            ipa: "./app.ipa",
+            notes: "Changelog"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

@@ -25,6 +25,7 @@ module Fastlane
     def inspector_recieved_empty_report(report, inspector)
       puts "Found no similar issues. To create a new issue, please visit:"
       puts "https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/issues/new"
+      puts "Run `fastlane env` to append the fastlane environment to your issue"
     end
 
     # Called when there have been networking issues in creating the report.

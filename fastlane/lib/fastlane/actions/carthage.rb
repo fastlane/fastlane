@@ -20,6 +20,7 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
+        cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
 
         Actions.sh(cmd.join(' '))
       end
@@ -123,8 +124,35 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :toolchain,
                                        env_name: "FL_CARTHAGE_TOOLCHAIN",
                                        description: "Define which xcodebuild toolchain to use when building",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_directory,
+                                       env_name: "FL_CARTHAGE_PROJECT_DIRECTORY",
+                                       description: "Define the directory containing the Carthage project",
                                        optional: true)
         ]
+      end
+
+      def self.example_code
+        [
+          'carthage',
+          'carthage(
+            command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
+            use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
+            use_submodules: false,                          # Add dependencies as Git submodules.
+            use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
+            no_build: false,                                # When bootstrapping Carthage do not build
+            no_skip_current: false,                         # Don\'t skip building the current project (only for frameworks)
+            verbose: false,                                 # Print xcodebuild output inline
+            platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
+            configuration: "Release",                       # Build configuration to use when building
+            toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
 
       def self.is_supported?(platform)

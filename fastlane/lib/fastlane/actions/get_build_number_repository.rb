@@ -69,6 +69,14 @@ module Fastlane
         "Get the build number from the current repository"
       end
 
+      def self.details
+        [
+          "This action will get the **build number** according to what the SCM HEAD reports.",
+          "Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).",
+          "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash."
+        ].join("\n")
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :use_hg_revision_number,
@@ -96,6 +104,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'get_build_number_repository'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

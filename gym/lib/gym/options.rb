@@ -64,6 +64,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
+                                       value.gsub!(File::SEPARATOR, "_")
                                      end),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
@@ -152,12 +153,17 @@ module Gym
                                      short_option: "-l",
                                      env_name: "GYM_BUILDLOG_PATH",
                                      description: "The directory where to store the build log",
-                                     default_value: "~/Library/Logs/gym"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/gym"),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",
                                      description: "The SDK that should be used for building the application",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :toolchain,
+                                     env_name: "GYM_TOOLCHAIN",
+                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",

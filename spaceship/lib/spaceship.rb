@@ -13,6 +13,8 @@ require 'spaceship/tunes/spaceship'
 
 # To support legacy code
 module Spaceship
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
   # Dev Portal
   Certificate = Spaceship::Portal::Certificate
   ProvisioningProfile = Spaceship::Portal::ProvisioningProfile

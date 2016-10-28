@@ -35,9 +35,10 @@ module Gym
         options += project_path_array
         options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath '#{archive_path}'"
+        options << "-archivePath #{archive_path.shellescape}"
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
@@ -76,13 +77,13 @@ module Gym
           report_output_json = Gym.config[:xcpretty_report_json]
           if report_output_junit
             pipe << " --report junit --output "
-            pipe << report_output_junit
+            pipe << report_output_junit.shellescape
           elsif report_output_html
             pipe << " --report html --output "
-            pipe << report_output_html
+            pipe << report_output_html.shellescape
           elsif report_output_json
             pipe << " --report json-compilation-database --output "
-            pipe << report_output_json
+            pipe << report_output_json.shellescape
           end
         end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]

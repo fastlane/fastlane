@@ -13,7 +13,7 @@ module Snapshot
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
         UI.error "You updated to snapshot 1.0 which now uses UI Automation"
-        UI.error "Please follow the migration guide: https://github.com/fastlane/snapshot/blob/master/MigrationGuide.md"
+        UI.error "Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md"
         UI.error "And read the updated documentation: https://github.com/fastlane/fastlane/tree/master/snapshot"
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
@@ -22,7 +22,11 @@ module Snapshot
 
       verify_helper_is_current
 
-      FastlaneCore::PrintTable.print_values(config: Snapshot.config, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
+      # Also print out the path to the used Xcode installation
+      # We go 2 folders up, to not show "Contents/Developer/"
+      values = Snapshot.config.values(ask: false)
+      values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
+      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
@@ -203,7 +207,7 @@ module Snapshot
 
     def uninstall_app(device_type)
       UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
-      Snapshot.config[:app_identifier] ||= ask("App Identifier: ")
+      Snapshot.config[:app_identifier] ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"

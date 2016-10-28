@@ -24,6 +24,13 @@ module Fastlane
         "Adds device frames around the screenshots using frameit"
       end
 
+      def self.details
+        [
+          "Use [frameit](https://github.com/fastlane/fastlane/tree/master/frameit) to prepare perfect screenshots for the App Store, your website, QA",
+          "or emails. You can add background and titles to the framed screenshots as well."
+        ].join("\n")
+      end
+
       def self.available_options
         require "frameit"
         require "frameit/options"
@@ -37,6 +44,17 @@ module Fastlane
 
       def self.author
         "KrauseFx"
+      end
+
+      def self.example_code
+        [
+          'frameit',
+          'frameit :silver'
+        ]
+      end
+
+      def self.category
+        :screenshots
       end
 
       def self.is_supported?(platform)

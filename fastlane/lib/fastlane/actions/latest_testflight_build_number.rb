@@ -11,9 +11,11 @@ module Fastlane
         require 'spaceship'
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
+        UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(credentials.user, credentials.password)
-        ENV["FASTLANE_TEAM_ID"] = params[:team_id]
         Spaceship::Tunes.select_team
+        UI.message("Login successful")
+
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
 
         version_number = params[:version]
@@ -56,7 +58,10 @@ module Fastlane
       end
 
       def self.details
-        "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC."
+        [
+          "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.",
+          "Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+        ].join("\n")
       end
 
       def self.available_options
@@ -84,10 +89,24 @@ module Fastlane
                                        default_value: 1,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       env_name: "FASTLANE_TEAM_ID",
-                                       description: "Your team ID if you're in multiple teams",
+                                       short_option: "-k",
+                                       env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_ID",
+                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       is_string: false, # as we also allow integers, which we convert to strings anyway
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
-                                       optional: true)
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       short_option: "-e",
+                                       env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
+                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
+                                       end)
         ]
       end
 
@@ -107,6 +126,23 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'latest_testflight_build_number(version: "1.3")',
+          'increment_build_number({
+            build_number: latest_testflight_build_number + 1
+          })'
+        ]
+      end
+
+      def self.sample_return_value
+        2
+      end
+
+      def self.category
+        :misc
       end
     end
   end

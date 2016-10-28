@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'shellwords'
 
 module Fastlane
   module Actions
@@ -17,8 +16,7 @@ module Fastlane
         # If any of the paths include "*", we assume that we are referring to the Unix entries
         # e.g /tmp/fastlane/* refers to all the files in /tmp/fastlane
         # We use Dir.glob to expand all those paths, this would create an array of arrays though, so flatten
-        # Lastly, we shell escape everything in case they contain incompatible symbols (e.g. spaces)
-        artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten.map(&:shellescape)
+        artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten
 
         UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{target_path}")
         UI.verbose(params[:keep_original] ? "Keeping original files" : "Not keeping original files")
@@ -46,6 +44,13 @@ module Fastlane
 
       def self.description
         "Small action to save your build artifacts. Useful when you use reset_git_repo"
+      end
+
+      def self.details
+        [
+          "This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
+          "Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list"
+        ].join("\n")
       end
 
       def self.available_options
@@ -79,6 +84,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'copy_artifacts(
+            target_path: "artifacts",
+            artifacts: ["*.cer", "*.mobileprovision", "*.ipa", "*.dSYM.zip"]
+          )
+
+          # Reset the git repo to a clean state, but leave our artifacts in place
+          reset_git_repo(
+            exclude: "artifacts"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

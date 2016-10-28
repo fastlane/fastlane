@@ -119,7 +119,7 @@ module FastlaneCore
     class FastlaneError < StandardError
       attr_reader :show_github_issues
 
-      def initialize(show_github_issues: true)
+      def initialize(show_github_issues: false)
         @show_github_issues = show_github_issues
       end
     end

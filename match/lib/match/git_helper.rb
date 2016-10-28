@@ -4,13 +4,22 @@ module Match
       return @dir if @dir
 
       @dir = Dir.mktmpdir
+
       command = "git clone '#{git_url}' '#{@dir}'"
       command << " --depth 1" if shallow_clone
 
       UI.message "Cloning remote git repo..."
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: $verbose,
-                                      print_command: $verbose)
+      begin
+        # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
+        FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
+                                            print_all: $verbose,
+                                        print_command: $verbose)
+      rescue
+        UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
+        UI.error("Run the following command manually to make sure you're properly authenticated:")
+        UI.command(command)
+        UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
+      end
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
@@ -37,8 +46,6 @@ module Match
       [
         "[fastlane]",
         "Updated",
-        params[:app_identifier],
-        "for",
         params[:type].to_s
       ].join(" ")
     end
@@ -60,7 +67,7 @@ module Match
         commands = []
         commands << "git add -A"
         commands << "git commit -m #{message.shellescape}"
-        commands << "git push origin #{branch.shellescape}"
+        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape}"
 
         UI.message "Pushing changes to remote git repo..."
 
@@ -72,6 +79,9 @@ module Match
       end
       FileUtils.rm_rf(path)
       @dir = nil
+    rescue => ex
+      UI.error("Couldn't commit or push changes back to git...")
+      UI.error(ex)
     end
 
     def self.clear_changes
@@ -122,7 +132,7 @@ module Match
 
     # Copies the README.md into the git repo
     def self.copy_readme(directory)
-      template = File.read("#{Helper.gem_path('match')}/lib/assets/READMETemplate.md")
+      template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
       File.write(File.join(directory, "README.md"), template)
     end
   end

@@ -12,13 +12,15 @@ module Fastlane
         UI.message("Updating development team (#{params[:teamid]}) for the given project '#{path}'")
 
         p = File.read(path)
-        File.write(path, p.gsub(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};"))
+        p.gsub!(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};")
+        p.gsub!(/DEVELOPMENT_TEAM = .*;/, "DEVELOPMENT_TEAM = #{params[:teamid]};")
+        File.write(path, p)
 
         UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'")
       end
 
       def self.description
-        "Update Development Team ID"
+        "Update Xcode Development Team ID"
       end
 
       def self.details
@@ -46,6 +48,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'update_project_team(
+            path: "Example.xcodeproj",
+            teamid: "A3ZZVJ7CNY"
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

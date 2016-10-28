@@ -8,7 +8,7 @@ require 'spaceship/helper/net_http_generic_request'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
-if ENV["DEBUG"]
+if ENV["SPACESHIP_DEBUG"]
   require 'openssl'
   # this has to be on top of this file, since the value can't be changed later
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -27,6 +27,8 @@ module Spaceship
     # The logger in which all requests are logged
     # /tmp/spaceship[time]_[pid].log by default
     attr_accessor :logger
+
+    attr_accessor :csrf_tokens
 
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
@@ -99,8 +101,8 @@ module Spaceship
     def initialize
       options = {
        request: {
-          timeout:       300,
-          open_timeout:  300
+          timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
       @cookie = HTTP::CookieJar.new
@@ -111,11 +113,14 @@ module Spaceship
         c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
-        if ENV['DEBUG']
+        if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.response :logger
           c.proxy "https://127.0.0.1:8888"
+        end
+
+        if ENV["DEBUG"]
+          puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
         end
       end
     end
@@ -291,7 +296,8 @@ module Spaceship
       when 200
         return response
       else
-        if response["Location"] == "/auth" # redirect to 2 step auth page
+        location = response["Location"]
+        if location && URI.parse(location).path == "/auth" # redirect to 2 step auth page
           handle_two_step(response)
           return true
         elsif (response.body || "").include?('invalid="true"')
@@ -308,6 +314,11 @@ module Spaceship
 
     def itc_service_key
       return @service_key if @service_key
+
+      # Check if we have a local cache of the key
+      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
+      return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+
       # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
       # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
       # the content be served only as plain-text, which seems to work around their problem, while not affecting
@@ -317,7 +328,15 @@ module Spaceship
       headers = { 'Accept-Encoding' => 'identity' }
       # We need a service key from a JS file to properly auth
       js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
-      @service_key ||= js.body.match(/itcServiceKey = '(.*)'/)[1]
+      @service_key = js.body.match(/itcServiceKey = '(.*)'/)[1]
+
+      # Cache the key locally
+      File.write(itc_service_key_path, @service_key)
+
+      return @service_key
+    rescue => ex
+      puts ex.to_s
+      raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
     end
 
     #####################################################
@@ -345,25 +364,6 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
-    private
-
-    def do_login(user, password)
-      @loggedin = false
-      ret = send_login_request(user, password) # different in subclasses
-      @loggedin = true
-      ret
-    end
-
-    # Is called from `parse_response` to store the latest csrf_token (if available)
-    def store_csrf_tokens(response)
-      if response and response.headers
-        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
-          @csrf_tokens = tokens
-        end
-      end
-    end
-
     # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
@@ -387,6 +387,40 @@ module Spaceship
       log_response(method, url_or_path, response)
 
       return response
+    end
+
+    def parse_response(response, expected_key = nil)
+      if response.body
+        # If we have an `expected_key`, select that from response.body Hash
+        # Else, don't.
+        content = expected_key ? response.body[expected_key] : response.body
+      end
+
+      if content.nil?
+        raise UnexpectedResponse, response.body
+      else
+        store_csrf_tokens(response)
+        content
+      end
+    end
+
+    private
+
+    def do_login(user, password)
+      @loggedin = false
+      ret = send_login_request(user, password) # different in subclasses
+      @loggedin = true
+      ret
+    end
+
+    # Is called from `parse_response` to store the latest csrf_token (if available)
+    def store_csrf_tokens(response)
+      if response and response.headers
+        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
+        if tokens and !tokens.empty?
+          @csrf_tokens = tokens
+        end
+      end
     end
 
     def log_request(method, url, params)
@@ -420,21 +454,6 @@ module Spaceship
           raise AppleTimeoutError.new, "Apple 302 detected"
         end
         return response
-      end
-    end
-
-    def parse_response(response, expected_key = nil)
-      if response.body
-        # If we have an `expected_key`, select that from response.body Hash
-        # Else, don't.
-        content = expected_key ? response.body[expected_key] : response.body
-      end
-
-      if content.nil?
-        raise UnexpectedResponse, response.body
-      else
-        store_csrf_tokens(response)
-        content
       end
     end
 

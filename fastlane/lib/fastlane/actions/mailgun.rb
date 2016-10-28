@@ -128,6 +128,31 @@ module Fastlane
         end
         eth.render(html_template, hash)
       end
+
+      def self.example_code
+        [
+          'mailgun(
+            to: "fastlane@krausefx.com",
+            success: true,
+            message: "This is the mail\'s content"
+          )',
+          'mailgun(
+            postmaster: "MY_POSTMASTER",
+            apikey: "MY_API_KEY",
+            to: "DESTINATION_EMAIL",
+            from: "EMAIL_FROM_NAME",
+            success: true,
+            message: "Mail Body",
+            app_link: "http://www.myapplink.com",
+            ci_build_link: "http://www.mycibuildlink.com",
+            template_path: "HTML_TEMPLATE_PATH"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
     end
   end
 end

@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.30.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'spaceship', '>= 0.31.1', '< 1.0.0' # Apple Dev Portal and iTunes Connect Access
+  spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "spaceship", ">= 0.36.2", "< 1.0.0" # Apple Dev Portal and iTunes Connect Access
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -34,5 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
-  spec.add_development_dependency "rubocop", '~> 0.38.0'
+  spec.add_development_dependency 'rubocop', '~> 0.44.0'
 end

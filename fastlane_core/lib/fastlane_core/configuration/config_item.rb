@@ -58,7 +58,7 @@ module FastlaneCore
 
     # This will raise an exception if the value is not valid
     def verify!(value)
-      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid? value
+      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid?(value)
       true
     end
 

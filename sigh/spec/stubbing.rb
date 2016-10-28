@@ -10,6 +10,7 @@ def stub_spaceship
   allow(profile).to receive(:valid?).and_return(true)
   allow(profile.class).to receive(:pretty_type).and_return("pretty")
   allow(profile).to receive(:download).and_return("FileContent")
+  allow(profile).to receive(:is_adhoc?).and_return(false)
 
   types = [Spaceship.provisioning_profile, Spaceship.provisioning_profile.app_store]
   types.each do |current|

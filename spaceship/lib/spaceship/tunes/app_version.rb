@@ -304,6 +304,19 @@ module Spaceship
         setup_trailers
       end
 
+      # This method will generate the required keys/values
+      # for iTunes Connect to validate the uploaded image
+      def generate_image_metadata(image_data, original_file_name)
+        {
+          assetToken: image_data["token"],
+          originalFileName: original_file_name,
+          size: image_data["length"],
+          height: image_data["height"],
+          width: image_data["width"],
+          checksum: image_data["md5"]
+        }
+      end
+
       # Uploads or removes the large icon
       # @param icon_path (String): The path to the icon. Use nil to remove it
       def upload_large_icon!(icon_path)
@@ -314,7 +327,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_large_icon(self, upload_image)
 
-        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
+        raw_data["largeAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
       end
 
       # Uploads or removes the watch icon
@@ -327,7 +340,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_watch_icon(self, upload_image)
 
-        @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
+        raw_data["watchAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
       end
 
       # Uploads or removes the transit app file
@@ -364,14 +377,18 @@ module Spaceship
           upload_file = UploadFile.from_path screenshot_path
           screenshot_data = client.upload_screenshot(self, upload_file, device)
 
+          # Since October 2016 we also need to pass the size, height, width and checksum
+          # otherwise iTunes Connect validation will fail at a later point
           new_screenshot = {
-              "value" => {
-                  "assetToken" => screenshot_data["token"],
-                  "sortOrder" => sort_order,
-                  "url" => nil,
-                  "thumbNailUrl" => nil,
-                  "originalFileName" => upload_file.file_name
-              }
+            "value" => {
+              "assetToken" => screenshot_data["token"],
+              "sortOrder" => sort_order,
+              "originalFileName" => upload_file.file_name,
+              "size" => screenshot_data["length"],
+              "height" => screenshot_data["height"],
+              "width" => screenshot_data["width"],
+              "checksum" => screenshot_data["md5"]
+            }
           }
 
           # We disable "scaling" for this device type / language combination

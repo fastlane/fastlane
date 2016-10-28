@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
+  # rubocop:disable Metrics/ModuleLength
   module Helper
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
@@ -22,6 +23,15 @@ module FastlaneCore
     # @return true if the currently running program is a unit test
     def self.test?
       defined? SpecHelper
+    end
+
+    # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
+    def self.bundler?
+      # Bundler environment variable
+      ['BUNDLE_BIN_PATH', 'BUNDLE_GEMFILE'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -140,8 +150,13 @@ module FastlaneCore
       @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
     end
 
+    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
+    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    #
     # Path to the installed gem to load resources (e.g. resign.sh)
     def self.gem_path(gem_name)
+      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
+
       if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
@@ -149,4 +164,5 @@ module FastlaneCore
       end
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end

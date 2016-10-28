@@ -17,7 +17,7 @@ module Fastlane
           UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
 
           command = []
-          command << submit_binary
+          command << submit_binary.shellescape
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"

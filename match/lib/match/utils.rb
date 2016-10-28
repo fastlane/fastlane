@@ -9,9 +9,15 @@ module Match
       # as the keychain path.
       #
       # We need to expand each path because File.exist? won't handle directories including ~ properly
+      #
+      # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
+      # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
+      #
       keychain_paths = [
         File.join(Dir.home, 'Library', 'Keychains', keychain),
-        keychain
+        File.join(Dir.home, 'Library', 'Keychains', "#{keychain}-db"),
+        keychain,
+        "#{keychain}-db"
       ].map { |path| File.expand_path(path) }
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
@@ -26,16 +32,26 @@ module Match
       Helper.backticks(command, print: $verbose)
     end
 
-    # Fill in the UUID of the profiles in environment variables, much recycling
-    def self.fill_environment(params, uuid)
-      # instead we specify the UUID of the profiles
-      key = environment_variable_name(params)
-      UI.important "Setting environment variable '#{key}' to '#{uuid}'" if $verbose
-      ENV[key] = uuid
+    # Fill in an environment variable, ready to be used in _xcodebuild_
+    def self.fill_environment(key, value)
+      UI.important "Setting environment variable '#{key}' to '#{value}'" if $verbose
+      ENV[key] = value
     end
 
-    def self.environment_variable_name(params)
-      ["sigh", params[:app_identifier], params[:type]].join("_")
+    def self.environment_variable_name(app_identifier: nil, type: nil)
+      base_environment_variable_name(app_identifier: app_identifier, type: type).join("_")
+    end
+
+    def self.environment_variable_name_team_id(app_identifier: nil, type: nil)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["team-id"]).join("_")
+    end
+
+    def self.environment_variable_name_profile_name(app_identifier: nil, type: nil)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["profile-name"]).join("_")
+    end
+
+    def self.base_environment_variable_name(app_identifier: nil, type: nil)
+      ["sigh", app_identifier, type]
     end
   end
 end

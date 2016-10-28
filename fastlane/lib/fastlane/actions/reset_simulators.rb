@@ -29,6 +29,16 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'reset_simulators'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

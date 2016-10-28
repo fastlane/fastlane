@@ -2,6 +2,22 @@ require 'fastlane/actions/actions_helper'
 
 module Fastlane
   class Action
+    AVAILABLE_CATEGORIES = [
+      :testing,
+      :building,
+      :screenshots,
+      :project,
+      :code_signing,
+      :documentation,
+      :beta,
+      :push,
+      :production,
+      :source_control,
+      :notifications,
+      :deprecated,
+      :misc
+    ]
+
     class << self
       attr_accessor :runner
     end
@@ -40,6 +56,13 @@ module Fastlane
       nil
     end
 
+    def self.sample_return_value
+      # Very optional
+      # You can return a sample return value, that might be returned by the actual action
+      # This is currently only used when generating the documentation and running its tests
+      nil
+    end
+
     def self.author
       nil
     end
@@ -59,6 +82,11 @@ module Fastlane
       UI.crash!("Implementing `is_supported?` for all actions is mandatory. Please update #{self}")
     end
 
+    # Returns an array of string of sample usage of this action
+    def self.example_code
+      nil
+    end
+
     # Is printed out in the Steps: output in the terminal
     # Return nil if you don't want any logging in the terminal/JUnit Report
     def self.step_text
@@ -68,6 +96,11 @@ module Fastlane
     # to allow a simple `sh` in the custom actions
     def self.sh(command, print_command: true, print_command_output: true, error_callback: nil)
       Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
+    end
+
+    # Documentation category, availabe values defined in AVAILABLE_CATEGORIES
+    def self.category
+      :undefined
     end
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user

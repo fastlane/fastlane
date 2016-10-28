@@ -19,6 +19,16 @@ module Fastlane
         "Defines a default platform to not have to specify the platform"
       end
 
+      def self.example_code
+        [
+          'default_platform :android'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.author
         "KrauseFx"
       end

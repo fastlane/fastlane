@@ -8,7 +8,7 @@ module Fastlane
       ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning")
+        UI.message("https://docs.fastlane.tools/codesigning/GettingStarted/")
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
@@ -78,6 +78,7 @@ module Fastlane
 
       def self.details
         [
+          "You should check out the code signing gide before using this action: https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning",
           "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
           "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
           "The `target_filter` value can be used to only update code signing for specified targets",
@@ -128,6 +129,21 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'update_project_provisioning(
+            xcodeproj: "Project.xcodeproj",
+            profile: "./watch_app_store.mobileprovision", # optional if you use sigh
+            target_filter: ".*WatchKit Extension.*", # matches name or type of a target
+            build_configuration: "Release"
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

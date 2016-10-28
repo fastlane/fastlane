@@ -26,12 +26,26 @@ module Fastlane
       def self.return_value
       end
 
+      def self.details
+        "Tell _fastlane_ to not automatically create a `fastlane/README.md` when running _fastlane_. You can always trigger the creation of this file manually by running `fastlane docs`"
+      end
+
       def self.authors
         ["KrauseFx"]
       end
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'skip_docs'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

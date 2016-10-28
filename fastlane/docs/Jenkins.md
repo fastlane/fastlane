@@ -39,10 +39,10 @@ I recommend the following plugins:
 Use the following as your build step:
 
 ```
-fastlane appstore
+fastlane release
 ```
 
-Replace `appstore` with the lane you want to use.
+Replace `release` with the lane you want to use.
 
 ### setup_jenkins
 

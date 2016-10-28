@@ -47,12 +47,12 @@ end
 
 You only have to use `for_platform` if you're using `platform [platform_name] do` in your `Fastfile`.
 
-`fastlane` will always use the lane specific value if given, otherwise fall back to the value on the top of the file. Therefore, while driving the `:beta` lane, this configuration is loaded:
+`fastlane` will always use the lane specific value if given, otherwise fall back to the value on the top of the file. Therefore, while driving the `:test` lane, this configuration is loaded:
 
 ```ruby
-app_identifier "net.sunapps.1.beta"
+app_identifier "com.app.test"
 apple_id "felix@krausefx.com"
-team_id "Q2CBPJ58CC"
+team_id "123"
 ```
 
 ### Accessing from fastlane

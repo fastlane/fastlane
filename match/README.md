@@ -32,7 +32,6 @@ match
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
 [![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Easily sync your certificates and profiles across your team using git
 
@@ -53,7 +52,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 
@@ -174,30 +173,27 @@ match --help
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, call `match` for each of them:
+If you have several targets with different bundle identifiers, supply them as a comma-separated list to match:
 
 ```
-match appstore -a tools.fastlane.app
-match appstore -a tools.fastlane.app.watchkitapp
+match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a match lane like this:
+You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
-lane :match do
-  match(app_identifier: "com.krausefx.app1", readonly: true)
-  match(app_identifier: "com.krausefx.app2", readonly: true)
-  match(app_identifier: "com.krausefx.app3", readonly: true)
+lane :certificates do
+  match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"], readonly: true)
 end
 ```
 
-Then all your team has to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
 #### Passphrase
 
 When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase using an environment variable, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
 
 #### New machine
 
@@ -282,29 +278,20 @@ match adhoc --force_for_new_devices
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
 
 ```ruby
-match(app_identifier: "tools.fastlane.app", type: "appstore")
-match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
+match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"], type: "appstore")
 ```
 
 `match` can even use the same one Git repository for all bundle identifiers.
 
 ### Setup Xcode project
 
-[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+[Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
 `match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
-<img src="assets/UDIDPrint.png" width="700" />
-
-Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
-
-<img src="assets/XcodeProjectSettings.png" width="700" />
-
-Profile environment variables are named after `$(sigh_<bundle_identifier>_<profile_type>)`
-
-e.g. `$(sigh_tools.fastlane.app_development)`
+More information about how to setup your Xcode project can be found [here](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from Xcode manually
 
@@ -401,7 +388,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

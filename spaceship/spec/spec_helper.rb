@@ -23,12 +23,11 @@ unless ENV["DEBUG"]
 end
 
 cache_paths = [
-  File.expand_path("~/Library/Caches/spaceship_api_key.txt"),
-  "/tmp/spaceship_itc_login_url.txt"
+  File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]
 
 def try_delete(path)
-  FileUtils.rm_f path if File.exist? path
+  FileUtils.rm_f(path) if File.exist? path
 end
 
 RSpec.configure do |config|

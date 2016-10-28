@@ -22,9 +22,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'fastimage', '~> 1.6.3' # fetch the image sizes from the screenshots
-  spec.add_dependency 'fastlane_core', '>= 0.50.2', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'xcpretty', '>= 0.2.1' # beautiful Xcode output
-  spec.add_dependency 'plist', '~> 3.1.0' # parsing the Xcode output plist
+  spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # beautiful Xcode output
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # parsing the Xcode output plist
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -35,6 +35,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
-  spec.add_development_dependency "rubocop", '~> 0.38.0'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
+  spec.add_development_dependency 'rubocop', '~> 0.44.0'
 end

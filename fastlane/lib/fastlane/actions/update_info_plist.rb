@@ -33,7 +33,7 @@ module Fastlane
 
           # Read existing plist file
           info_plist_path = File.join(folder, "..", params[:plist_path])
-          UI.user_error!("Couldn't find info plist file at path '#{params[:plist_path]}'") unless File.exist?(info_plist_path)
+          UI.user_error!("Couldn't find info plist file at path '#{info_plist_path}'") unless File.exist?(info_plist_path)
           plist = Xcodeproj::Plist.read_from_path(info_plist_path)
 
           # Update plist values
@@ -62,6 +62,10 @@ module Fastlane
 
       def self.description
         'Update a Info.plist file with bundle identifier and display name'
+      end
+
+      def self.details
+        "This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target."
       end
 
       def self.available_options
@@ -105,6 +109,40 @@ module Fastlane
 
       def self.author
         'tobiasstrebitzer'
+      end
+
+      def self.example_code
+        [
+          'update_info_plist( # update app identifier string
+            plist_path: "path/to/Info.plist",
+            app_identifier: "com.example.newappidentifier"
+          )',
+          'update_info_plist( # Change the Display Name of your app
+            plist_path: "path/to/Info.plist",
+            display_name: "MyApp-Beta"
+          )',
+          'update_info_plist( # Target a specific `xcodeproj` rather than finding the first available one
+            xcodeproj: "path/to/Example.proj",
+            plist_path: "path/to/Info.plist",
+            display_name: "MyApp-Beta"
+          )',
+          'update_info_plist( # Advanced processing: find URL scheme for particular key and replace value
+            xcodeproj: "path/to/Example.proj",
+            plist_path: "path/to/Info.plist",
+            block: lambda { |plist|
+              urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
+              urlScheme[:CFBundleURLSchemes] = ["acme-production"]
+            }
+          )',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip"
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

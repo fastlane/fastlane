@@ -6,6 +6,8 @@ end
 
 def itc_stub_login
   # Retrieving the current login URL
+  itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
+  File.delete(itc_service_key_path) if File.exist?(itc_service_key_path)
 
   stub_request(:get, 'https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js').
     to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
@@ -63,6 +65,14 @@ def itc_stub_applications
 
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/814624685/stateHistory?platform=ios").
     to_return(status: 200, body: itc_read_fixture_file('app_version_states_history.json'), headers: { 'Content-Type' => 'application/json' })
+end
+
+def itc_stub_ratings
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews/summary?platform=ios&versionId=").
+    to_return(status: 200, body: itc_read_fixture_file('ratings_summary.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews?platform=ios&storefront=US&versionId=").
+    to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
 def itc_stub_build_details
@@ -214,6 +224,27 @@ def itc_stub_user_detail
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_sandbox_testers
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap").
+    to_return(status: 200, body: itc_read_fixture_file("sandbox_testers.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_create_sandbox_tester
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap/add").
+    with(body: JSON.parse(itc_read_fixture_file("create_sandbox_tester_payload.json"))).
+    to_return(status: 200, body: itc_read_fixture_file("create_sandbox_tester.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_delete_sandbox_tester
+  body = JSON.parse(itc_read_fixture_file("delete_sandbox_tester_payload.json"))
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap/delete").
+    with(body: JSON.parse(itc_read_fixture_file("delete_sandbox_tester_payload.json")).to_json).
+    to_return(status: 200, body: itc_read_fixture_file("delete_sandbox_tester.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 def itc_stub_pricing_tiers
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/matrix").
     to_return(status: 200, body: itc_read_fixture_file("pricing_tiers.json"),
@@ -257,6 +288,9 @@ RSpec.configure do |config|
     itc_stub_testflight
     itc_stub_app_version_ref
     itc_stub_user_detail
+    itc_stub_sandbox_testers
+    itc_stub_create_sandbox_tester
+    itc_stub_delete_sandbox_tester
     itc_stub_candiate_builds
     itc_stub_pricing_tiers
     itc_stub_release_to_store

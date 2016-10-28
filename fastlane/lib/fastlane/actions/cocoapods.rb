@@ -50,7 +50,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
-                                       description: "Show nothing",
+                                       description: "Execute command without logging output",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
@@ -85,6 +85,24 @@ module Fastlane
 
       def self.authors
         ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
+      end
+
+      def self.details
+        "If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app."
+      end
+
+      def self.example_code
+        [
+          'cocoapods',
+          'cocoapods(
+            clean: true,
+            podfile: "./CustomPodfile"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

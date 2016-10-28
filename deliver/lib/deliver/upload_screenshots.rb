@@ -24,6 +24,17 @@ module Deliver
       indized = {} # per language and device type
 
       screenshots_per_language = screenshots.group_by(&:language)
+      enabled_languages = screenshots_per_language.keys
+      if enabled_languages.count > 0
+        v.create_languages(enabled_languages)
+        lng_text = "language"
+        lng_text += "s" if enabled_languages.count != 1
+        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        v.save!
+        # This refreshes the app version from iTC after enabling a localization
+        v = app.edit_version
+      end
+
       screenshots_per_language.each do |language, screenshots_for_language|
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
@@ -34,7 +45,7 @@ module Deliver
           index = indized[screenshot.language][screenshot.device_type]
 
           if index > 5
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'")
+            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
 

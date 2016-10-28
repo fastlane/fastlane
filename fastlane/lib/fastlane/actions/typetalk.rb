@@ -72,6 +72,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'typetalk(
+            message: "App successfully released!",
+            note_path: "ChangeLog.md",
+            topicId: 1,
+            success: true,
+            typetalk_token: "Your Typetalk Token"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
     end
   end
 end

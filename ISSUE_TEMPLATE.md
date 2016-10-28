@@ -8,22 +8,11 @@
 ##### Complete output when running fastlane, including the stack trace and command used
 
 ```
-INSERT OUTPUT HERE
-```
-
-### Configuration Files
-
-Please copy the complete content of your `Fastfile` and any other configuration files you use below:
-
-Fastfile:
-```ruby
-# INSERT CONTENT HERE
+[INSERT OUTPUT HERE]
 ```
 
 ### Environment
 
-fastlane version (run `fastlane -v`):
+Please run `fastlane env` and copy the output below. This will help us help you :+1:
 
-Do you use bundler to execute fastlane (i.e. `bundle exec fastlane`)?
-
-Do you use a Ruby environment manager (e.g. `chruby`, `rbenv`, `rvm`)?
+[INSERT OUTPUT HERE]

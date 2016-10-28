@@ -22,7 +22,7 @@ describe Gym do
       xcargs = xcargs_hash.map do |k, v|
         "#{k.to_s.shellescape}=#{v.shellescape}"
       end.join ' '
-      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example' }
+      options = { project: "./examples/standard/Example.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3", xcargs: xcargs, scheme: 'Example' }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::BuildCommandGenerator.generate
@@ -32,8 +32,9 @@ describe Gym do
                              "-scheme Example",
                              "-project ./examples/standard/Example.xcodeproj",
                              "-sdk '9.0'",
+                             "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
                              "-destination 'generic/platform=iOS'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
                              "| tee #{log_path.shellescape}",
@@ -59,7 +60,7 @@ describe Gym do
                              "-project ./examples/standard/Example.xcodeproj",
                              "-sdk '9.0'",
                              "-destination 'generic/platform=iOS'",
-                             "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
                              "| tee #{log_path.shellescape}"
@@ -82,7 +83,7 @@ describe Gym do
                                "-scheme Example",
                                "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
-                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| xcpretty"
@@ -142,7 +143,7 @@ describe Gym do
                                "-scheme Example",
                                "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
-                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                "-derivedDataPath '/tmp/my/derived_data'",
                                :archive,
                                "| tee #{log_path.shellescape}",
@@ -165,7 +166,7 @@ describe Gym do
                                "-scheme Example",
                                "-project ./examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
-                               "-archivePath '#{Gym::BuildCommandGenerator.archive_path}'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                "-resultBundlePath './ExampleProductName.result'",
                                :archive,
                                "| tee #{log_path.shellescape}",

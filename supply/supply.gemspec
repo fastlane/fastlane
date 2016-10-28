@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'google-api-client', '~> 0.9.1' # Google API Client to access Play Publishing API
 
   # fastlane
-  spec.add_dependency 'fastlane_core', '>= 0.43.4' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.15.0'
+  spec.add_dependency 'fastlane_core', '>= 0.52.0' # all shared code and dependencies
+  spec.add_dependency 'credentials_manager', '>= 0.16.0'
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -38,5 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
-  spec.add_development_dependency "rubocop", '~> 0.38.0'
+  spec.add_development_dependency 'rubocop', '~> 0.44.0'
 end

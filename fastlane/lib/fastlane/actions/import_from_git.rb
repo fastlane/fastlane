@@ -43,6 +43,20 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'import_from_git(
+            url: "git@github.com:fastlane/fastlane.git", # The url of the repository to import the Fastfile from.
+            branch: "HEAD", # The branch to checkout on the repository. Defaults to `HEAD`.
+            path: "fastlane/Fastfile" # The path of the Fastfile in the repository. Defaults to `fastlane/Fastfile`.
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

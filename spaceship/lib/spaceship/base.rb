@@ -46,10 +46,10 @@ module Spaceship
         end
       end
 
-      def to_json
+      def to_json(*a)
         h = @hash.dup
         h.delete(:application)
-        h.to_json
+        h.to_json(*a)
       end
     end
 
@@ -123,7 +123,8 @@ module Spaceship
         else
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
-          rescue NameError, NoMethodError
+          rescue NoMethodError
+          rescue NameError
           end
         end
         return @attr_mapping

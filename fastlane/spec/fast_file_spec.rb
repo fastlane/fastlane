@@ -188,7 +188,7 @@ describe Fastlane do
         before_each = File.read("/tmp/fastlane/before_each")
         after_each = File.read("/tmp/fastlane/after_each")
 
-        %w( run lane1 lane2 ).each do |lane|
+        %w(run lane1 lane2).each do |lane|
           expect(before_each).to include(lane)
           expect(after_each).to include(lane)
         end

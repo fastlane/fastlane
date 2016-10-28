@@ -9,16 +9,16 @@ module Fastlane
     def self.fetch_name
       puts "Must be lower case, and use a '_' between words. Do not use '.'".green
       puts "examples: 'testflight', 'upload_to_s3'".green
-      name = ask('Name of your action: ')
+      name = UI.input("Name of your action: ")
       until name_valid?(name)
         puts "Name is invalid. Please ensure the name is all lowercase, free of spaces and without special characters! Try again."
-        name = ask('Name of your action: ')
+        name = UI.input("Name of your action: ")
       end
       name
     end
 
     def self.generate_action(name)
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/custom_action_template.rb")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/custom_action_template.rb")
       template.gsub!('[[NAME]]', name)
       template.gsub!('[[NAME_UP]]', name.upcase)
       template.gsub!('[[NAME_CLASS]]', name.fastlane_class + 'Action')

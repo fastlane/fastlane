@@ -90,6 +90,25 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.example_code
+        [
+          'swiftlint(
+            mode: :lint,                          # SwiftLint mode: :lint (default) or :autocorrect
+            output_file: "swiftlint.result.json", # The path of the output file (optional)
+            config_file: ".swiftlint-ci.yml",     # The path of the configuration file (optional)
+            files: [                              # List of files to process (optional)
+              "AppDelegate.swift",
+              "path/to/project/Model.swift"
+            ],
+            ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
+      end
+
       def self.handle_swiftlint_error(ignore_exit_status, exit_status)
         if ignore_exit_status
           failure_suffix = 'which would normally fail the build.'

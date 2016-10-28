@@ -38,6 +38,12 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
+      # xcodeproj has a bug in certain versions that causes it to change directories
+      # and not return to the original working directory
+      # https://github.com/CocoaPods/Xcodeproj/issues/426
+      # Setting this environment variable causes xcodeproj to work around the problem
+      ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
+
       load_dot_env(env)
 
       started = Time.now
@@ -93,9 +99,13 @@ module Fastlane
 
       rows = []
       actions.each_with_index do |current, i|
+        is_error_step = !current[:error].to_s.empty?
+
         name = current[:name][0..60]
-        name = name.red unless current[:error].to_s.empty?
-        rows << [i + 1, name, current[:time].to_i]
+        name = name.red if is_error_step
+        index = i + 1
+        index = "💥" if is_error_step
+        rows << [index, name, current[:time].to_i]
       end
 
       puts ""

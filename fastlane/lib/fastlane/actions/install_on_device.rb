@@ -68,8 +68,25 @@ module Fastlane
         ["hjanuschka"]
       end
 
+      def self.details
+        "Installs the ipa on the device, if no id is given, the first found iOS device will be used, works via USB or Wi-Fi. This requires `ios-deploy` to be installed please have a look at [ios-deploy](https://github.com/phonegap/ios-deploy). to quickly install it, use `npm -g i ios-deploy`"
+      end
+
       def self.is_supported?(platform)
-        true
+        platform == :ios
+      end
+
+      def self.example_code
+        [
+          'install_on_device(
+            device_id: "a3be6c9ff7e5c3c6028597513243b0f933b876d4",
+            ipa: "./app.ipa"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

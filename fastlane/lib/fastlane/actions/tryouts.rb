@@ -61,6 +61,10 @@ module Fastlane
         "Upload a new build to Tryouts"
       end
 
+      def self.details
+        "More information http://tryouts.readthedocs.org/en/latest/releases.html#create-release"
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :app_id,
@@ -77,7 +81,7 @@ module Fastlane
                                      end),
           FastlaneCore::ConfigItem.new(key: :build_file,
                                      env_name: "TRYOUTS_BUILD_FILE",
-                                     description: "Path to your IPA or APK file. Optional if you use the `gym` or `xcodebuild` action",
+                                     description: "Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
@@ -109,6 +113,20 @@ module Fastlane
                                      is_string: false,
                                      default_value: 2)
         ]
+      end
+
+      def self.example_code
+        [
+          'tryouts(
+            api_token: "...",
+            app_id: "application-id",
+            build_file: "test.ipa",
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.output

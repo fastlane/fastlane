@@ -97,7 +97,23 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'pod_lib_lint',
+          '# Allow ouput detail in console
+          pod_lib_lint(verbose: true)',
+          '# Allow warnings during pod lint
+          pod_lib_lint(allow_warnings: true)',
+          '# If the podspec has a dependency on another private pod, then you will have to supply the sources
+          pod_lib_lint(sources: ["https://github.com/MyGithubPage/Specs", "https://github.com/CocoaPods/Specs"])'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

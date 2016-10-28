@@ -34,7 +34,7 @@ describe Spaceship::AppSubmission do
 
       expect do
         app.create_submission
-      end.to raise_error "The App Name you entered has already been used. The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations."
+      end.to raise_error("[German]: The App Name you entered has already been used. [English]: The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations.")
     end
 
     it "raises an error when submitting an app that is already in review" do

@@ -35,7 +35,7 @@ screengrab
 
 ###### Automated localized screenshots of your Android app on every device
 
-`screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using ([`supply`](https://github.com/fastlane/fastlane/tree/master/supply).
+`screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using [`supply`](https://github.com/fastlane/fastlane/tree/master/supply).
 
 <img src="assets/running-screengrab.gif" width="640">
 
@@ -55,8 +55,10 @@ sudo gem install screengrab
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:0.3.2'
+androidTestCompile 'tools.fastlane:screengrab:x.x.x'
 ```
+
+The latest version can be determined by visiting the [screengrab RubyGems page](https://rubygems.org/gems/screengrab)
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**
@@ -168,7 +170,7 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload screenshots, metadata and your app to the Play Store
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).

@@ -21,21 +21,21 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'fastlane_core', '>= 0.50.0', '< 1.0.0' # all shared code and dependencies
-  spec.add_dependency 'xcpretty', '>= 0.2.1' # pretty xcodebuild output
-  spec.add_dependency 'terminal-table' # print out build information
-  spec.add_dependency 'plist' # Generate the Xcode config plist file
+  spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # pretty xcodebuild output
+  spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # print out build information
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Generate the Xcode config plist file
   spec.add_dependency 'rubyzip', '>= 1.1.7' # fix swift/ipa
 
   # Development only
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "fastlane", ">= 1.33.0" # yes, we use fastlane for testing
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rubocop", '~> 0.38.0'
   spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency "pry"
   spec.add_development_dependency "yard", "~> 0.8.7.4"
   spec.add_development_dependency "webmock", "~> 1.19.0"
   spec.add_development_dependency "coveralls"
+  spec.add_development_dependency 'rubocop', '~> 0.44.0'
 end

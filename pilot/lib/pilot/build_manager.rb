@@ -39,7 +39,7 @@ module Pilot
     def distribute(options, build = nil)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
-        config[:app_identifier] = ask("App Identifier: ")
+        config[:app_identifier] = UI.input("App Identifier: ")
       end
 
       if build.nil?
@@ -63,10 +63,10 @@ module Pilot
         UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
       end
 
-      # First, set the changelog (if necessary)
-      if options[:changelog].to_s.length > 0
-        build.update_build_information!(whats_new: options[:changelog])
-        UI.success "Successfully set the changelog for build"
+      # First, set the changelog and/or description if necessary
+      if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
+        UI.success "Successfully set the changelog and/or description for build"
       end
 
       return if config[:skip_submission]
@@ -77,7 +77,7 @@ module Pilot
     def list(options)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
-        config[:app_identifier] = ask("App Identifier: ")
+        config[:app_identifier] = UI.input("App Identifier: ")
       end
 
       builds = app.all_processing_builds + app.builds
@@ -114,7 +114,7 @@ module Pilot
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
       loop do
-        sleep wait_processing_interval
+        sleep(wait_processing_interval)
 
         # before we look for processing builds, we need to ensure that there
         #  is a build train for this application; new applications don't
@@ -139,12 +139,14 @@ module Pilot
         # true -> false, where the second true is transient. This causes a spurious failure. Find build by build_version
         # and ensure it's not processing before proceeding - it had to have already been false before, to get out of the
         # previous loop.
-        full_build = app.build_trains[latest_build.train_version].builds.find do |b|
+        build_train = app.build_trains[latest_build.train_version]
+        builds = build_train ? build_train.builds : []
+        full_build = builds.find do |b|
           b.build_version == latest_build.build_version
         end
 
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})")
-        sleep wait_processing_interval
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
+        sleep(wait_processing_interval)
       end
 
       if full_build && !full_build.processing && full_build.valid
