@@ -16,8 +16,11 @@ module Scan
 
       commands = generate_commands(path)
       commands.each do |output_path, command|
-        system(command)
-        UI.success("Successfully generated report at '#{output_path}'")
+        if system(command)
+          UI.success("Successfully generated report at '#{output_path}'")
+        else
+          UI.user_error!("Failed to generate report at '#{output_path}'")
+        end
 
         if @open_report and output_path.end_with?(".html")
           # Open the HTML file
