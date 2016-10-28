@@ -16,6 +16,7 @@ describe Spaceship::AppVersion, all: true do
 
       expect(version.application).to eq(app)
       expect(version.is_live?).to eq(false)
+      expect(version.current_build_number).to eq("9")
       expect(version.copyright).to eq("2015 SunApps GmbH")
       expect(version.version_id).to eq(812_106_519)
       expect(version.raw_status).to eq('readyForSale')
@@ -162,6 +163,7 @@ describe Spaceship::AppVersion, all: true do
         version = app.live_version
 
         expect(version.app_status).to eq("Ready for Sale")
+        expect(version.current_build_number).to eq("9")
         expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
       end
 
