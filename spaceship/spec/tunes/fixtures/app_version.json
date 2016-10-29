@@ -754,6 +754,9 @@
             "isRequired": true,
             "errorKeys": null
         },
+        "preReleaseBuild": {
+          "buildVersion": "9"
+        },
         "preReleaseBuildTrainVersionString": "0.9.13",
         "preReleaseBuildIconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/2d/eb/52/2deb529b-63ad-d456-017b-b379bac333dc/Icon-60@2x.png.png/150x150bb-80.png",
         "preReleaseBuildUploadDate": 1427833468000,

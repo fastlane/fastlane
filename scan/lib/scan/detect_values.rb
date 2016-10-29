@@ -21,8 +21,17 @@ module Scan
 
       Scan.project.select_scheme
 
-      detect_simulator_ios if Scan.project.ios?
-      detect_simulator_tvos if Scan.project.tvos?
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      if devices.count > 0
+        detect_simulator(devices, '', '', '', nil)
+      else
+        if Scan.project.ios?
+          # An iPhone 5s is a reasonably small and useful default for tests
+          detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
+        elsif Scan.project.tvos?
+          detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
+        end
+      end
       detect_destination
 
       default_derived_data
@@ -67,20 +76,10 @@ module Scan
       /\s(?=\([\d\.]+\)$)/
     end
 
-    def self.detect_simulator_ios
-      # An iPhone 5s is a reasonably small and useful default for tests
-      detect_simulator('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
-    end
-
-    def self.detect_simulator_tvos
-      detect_simulator('tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
-    end
-
-    def self.detect_simulator(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
+    def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
-      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
-      deployment_target_version = Scan.project.build_settings(key: deployment_target_key)
+      deployment_target_version = Scan.project.build_settings(key: deployment_target_key) || '0'
 
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
@@ -163,7 +162,6 @@ module Scan
       Helper.xcode_version.split(".").first.to_i >= 8
     end
 
-    # Is it an iOS, a tvOS or a macOS device?
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
@@ -174,10 +172,8 @@ module Scan
       end
 
       # building up the destination now
-      if Scan.project.ios?
-        Scan.config[:destination] = Scan.devices.map { |d| "platform=iOS Simulator,id=#{d.udid}" }
-      elsif Scan.project.tvos?
-        Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
+      if Scan.devices.count > 0
+        Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       else
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
