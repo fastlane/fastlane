@@ -2742,7 +2742,7 @@ register_devices(
 Key | Description
 ----|------------
   `devices` | A hash of devices, with the name as key and the UDID as value
-  `devices_file` | Provide a path to the devices to register
+  `devices_file` | Provide a path to a file with the devices to register. For format see examples above.
   `team_id` | optional: Your team ID
   `username` | Optional: Your Apple ID
 
