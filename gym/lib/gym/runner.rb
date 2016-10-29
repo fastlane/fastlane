@@ -28,8 +28,10 @@ module Gym
 
         path
       elsif Gym.project.mac?
-        package_app
-        move_pkg
+        if Gym.config[:export_method]
+          package_app
+          move_pkg
+        end
         compress_and_move_dsym
         copy_mac_app
       end
