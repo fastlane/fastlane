@@ -133,6 +133,7 @@ module Fastlane
       end
 
       def self.details
+        "Verifies that the built app was built using the expected build resources. This is relevant for people who build on machines that are used to build apps with different profiles, certificates and/or bundle identifiers to guard against configuration mistakes."
       end
 
       def self.available_options
@@ -184,6 +185,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'verify_build(
+            provisioning_type: "distribution",
+            bundle_identifier: "com.example.myapp"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

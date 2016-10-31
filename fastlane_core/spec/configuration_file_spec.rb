@@ -86,6 +86,25 @@ describe FastlaneCore do
         end
       end
 
+      describe "Prints out a table of summary" do
+        it "shows a warning when no values were found" do
+          expect(FastlaneCore::UI).to receive(:important).with("No values defined in './spec/fixtures/ConfigFileEmpty'")
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileEmpty')
+        end
+
+        it "prints out a table of all the set values" do
+          expect(Terminal::Table).to receive(:new).with({
+            rows: [[:app_identifier, "com.krausefx.app"], [:apple_id, "from_le_block"]],
+            title: "Detected Values from './spec/fixtures/ConfigFileValid'"
+          })
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileValid')
+        end
+      end
+
       it "allows using a custom block to handle special callbacks" do
         config = FastlaneCore::Configuration.create(options, {})
         config.load_configuration_file('ConfigFileUnhandledBlock', proc do |method_sym, arguments, block|

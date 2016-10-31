@@ -36,7 +36,6 @@ module Spaceship
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
       elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
-        puts "Two Factor Authentication for account '#{self.user}' is enabled"
         handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
@@ -44,6 +43,11 @@ module Spaceship
     end
 
     def handle_two_factor(response)
+      two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
+      puts "Two Factor Authentication for account '#{self.user}' is enabled"
+      puts "If you're running this in a non-interactive session (e.g. server or CI)"
+      puts "check out #{two_factor_url}"
+
       security_code = response.body["phoneNumberVerification"]["securityCode"]
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,

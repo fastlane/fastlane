@@ -31,6 +31,16 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'recreate_schemes(project: "./path/to/MyApp.xcodeproj")'
+        ]
+      end
+
+      def self.category
+        :project
+      end
     end
   end
 end

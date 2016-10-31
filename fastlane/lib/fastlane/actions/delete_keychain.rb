@@ -9,6 +9,10 @@ module Fastlane
         Fastlane::Actions.sh "security delete-keychain #{params[:name].shellescape}", log: false
       end
 
+      def self.details
+        "Keychains can be deleted after being creating with `create_keychain`"
+      end
+
       def self.description
         "Delete keychains and remove them from the search list"
       end
@@ -20,6 +24,16 @@ module Fastlane
                                        description: "Keychain name",
                                        optional: false)
         ]
+      end
+
+      def self.example_code
+        [
+          'delete_keychain(name: "KeychainName")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.authors

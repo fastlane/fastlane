@@ -77,13 +77,13 @@ module Gym
           report_output_json = Gym.config[:xcpretty_report_json]
           if report_output_junit
             pipe << " --report junit --output "
-            pipe << report_output_junit
+            pipe << report_output_junit.shellescape
           elsif report_output_html
             pipe << " --report html --output "
-            pipe << report_output_html
+            pipe << report_output_html.shellescape
           elsif report_output_json
             pipe << " --report json-compilation-database --output "
-            pipe << report_output_json
+            pipe << report_output_json.shellescape
           end
         end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]

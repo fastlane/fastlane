@@ -31,11 +31,33 @@ module Fastlane
         ].join("\n")
       end
 
+      def self.example_code
+        [
+          'resign(
+            ipa: "path/to/ipa", # can omit if using the `ipa` action
+            signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
+            provisioning_profile: "path/to/profile", # can omit if using the _sigh_ action
+          )',
+          'resign(
+            ipa: "path/to/ipa", # can omit if using the `ipa` action
+            signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
+            provisioning_profile: {
+              "com.example.awesome-app" => "path/to/profile",
+              "com.example.awesome-app.app-extension" => "path/to/app-extension/profile"
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_RESIGN_IPA",
-                                       description: "Path to the ipa file to resign. Optional if you use the `gym` or `xcodebuild` action",
+                                       description: "Path to the ipa file to resign. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -51,7 +73,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :provisioning_profile,
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
-                                       description: "Path to your provisioning_profile. Optional if you use `sigh`",
+                                       description: "Path to your provisioning_profile. Optional if you use _sigh_",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
                                        is_string: false,
                                        verify_block: proc do |value|

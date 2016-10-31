@@ -46,8 +46,22 @@ module Fastlane
         ['vittoriom']
       end
 
+      def self.details
+        "If you only want to push the tags and nothing else, you can use the `push_git_tags` action"
+      end
+
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'push_git_tags'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

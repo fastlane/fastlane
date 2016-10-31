@@ -1,5 +1,7 @@
 module Frameit
   class ConfigParser
+    attr_reader :data
+
     def load(path)
       return nil unless File.exist?(path) # we are okay with no config at all
       UI.verbose("Parsing config file '#{path}'")

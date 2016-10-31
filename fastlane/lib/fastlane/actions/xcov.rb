@@ -13,7 +13,10 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/nakiostudio/xcov"
+        [
+          "Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.",
+          "More information: https://github.com/nakiostudio/xcov"
+        ].join("\n")
       end
 
       def self.author
@@ -41,6 +44,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'xcov(
+            workspace: "YourWorkspace.xcworkspace",
+            scheme: "YourScheme",
+            output_directory: "xcov_output"
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

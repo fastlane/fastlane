@@ -9,6 +9,13 @@ describe Frameit do
         allow_any_instance_of(MiniMagick::Image).to receive(:composite) { |instance| instance }
         allow_any_instance_of(MiniMagick::Image).to receive(:format) {}
         allow_any_instance_of(MiniMagick::Image).to receive(:write) {}
+
+        expect(Frameit::Offsets).to receive(:image_offset).and_return({
+          "offset" => "+60+225",
+          "width" => 752
+        })
+
+        Frameit.config = {}
       end
 
       it "properly frame screenshots with captions that include apostrophes" do

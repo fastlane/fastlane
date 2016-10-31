@@ -17,7 +17,6 @@ module Fastlane
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
-        ENV["FASTLANE_TEAM_ID"] = params[:team_id]
         Spaceship.select_team
 
         if devices
@@ -72,10 +71,21 @@ module Fastlane
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       env_name: "FASTLANE_TEAM_ID",
-                                       description: "optional: Your team ID",
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                       optional: true),
+                                     env_name: "REGISTER_DEVICES_TEAM_ID",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       env_name: "REGISTER_DEVICES_TEAM_NAME",
+                                       description: "The name of your Developer Portal team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                       end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
@@ -83,8 +93,39 @@ module Fastlane
         ]
       end
 
+      def self.details
+        [
+          "This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.",
+          "This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.",
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`."
+        ].join("\n")
+      end
+
       def self.author
         "lmirosevic"
+      end
+
+      def self.example_code
+        [
+          'register_devices(
+            devices: {
+              "Luka iPhone 6" => "1234567890123456789012345678901234567890",
+              "Felix iPad Air 2" => "abcdefghijklmnopqrstvuwxyzabcdefghijklmn"
+            }
+          ) # Simply provide a list of devices as a Hash',
+          'register_devices(
+            devices_file: "./devices.txt"
+          ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)',
+          'register_devices(
+            devices_file: "./devices.txt", # You must pass in either `devices_file` or `devices`.
+            team_id: "XXXXXXXXXX",         # Optional, if you"re a member of multiple teams, then you need to pass the team ID here.
+            username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

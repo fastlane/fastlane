@@ -193,6 +193,22 @@ module Fastlane
         embed_response_dictionary = JSON.parse(embed_response.body)
         embed_response_dictionary['embed_id']
       end
+
+      def self.example_code
+        [
+          'podio_item(
+            identifying_value: "Your unique value",
+            other_fields: {
+              "field1" => "fieldValue",
+              "field2" => "fieldValue2"
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
     end
   end
 end

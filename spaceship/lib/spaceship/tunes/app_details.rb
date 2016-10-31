@@ -84,32 +84,38 @@ module Spaceship
       # Custom Setters
       #
       def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
@@ -117,6 +123,17 @@ module Spaceship
       # @!group General
       #####################################################
       def setup
+      end
+
+      private
+
+      def prefix_mzgenre(value)
+        value.include?("MZGenre") ? value : "MZGenre.#{value}"
+      end
+
+      def prefix_apps(value)
+        return value unless value.include? "Stickers"
+        value.include?("Apps") ? value : "Apps.#{value}"
       end
     end
   end

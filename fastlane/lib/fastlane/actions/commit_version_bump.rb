@@ -155,12 +155,42 @@ module Fastlane
         ]
       end
 
+      def self.details
+        [
+          "This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.",
+          "",
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
+          "- All .plist files",
+          "- The `.xcodeproj/project.pbxproj` file",
+          "",
+          "Then commits those files to the repo.",
+          "",
+          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "",
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action."
+        ].join("\n")
+      end
+
       def self.author
         "lmirosevic"
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'commit_version_bump',
+          'commit_version_bump(
+            message: "Version Bump",                    # create a commit with a custom message
+            xcodeproj: "./path/to/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

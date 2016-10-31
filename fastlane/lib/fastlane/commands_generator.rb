@@ -14,9 +14,12 @@ module Fastlane
 
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
-      Fastlane.plugin_manager.load_plugins
-      # *after* loading the plugins
-      Fastlane::PluginUpdateManager.start_looking_for_updates
+      # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
+      unless ARGV[0] == "env"
+        # *after* loading the plugins
+        Fastlane.plugin_manager.load_plugins
+        Fastlane::PluginUpdateManager.start_looking_for_updates
+      end
       self.new.run
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
@@ -55,12 +58,10 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
-        if FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
-          CrashlyticsBetaCommandLineHandler.apply_options(c)
-        end
+        CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
-          if args[0] == 'beta' && FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_CRASHLYTICS_BETA_INITIALIZATION')
+          if args[0] == 'beta'
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
@@ -160,22 +161,6 @@ module Fastlane
         end
       end
 
-      command :enable_crash_reporting do |c|
-        c.syntax = 'fastlane enable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
-      command :disable_crash_reporting do |c|
-        c.syntax = 'fastlane disable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
@@ -242,6 +227,21 @@ module Fastlane
         end
       end
 
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          env_info = Fastlane::EnvironmentPrinter.get
+          puts env_info
+          if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
+            Fastlane::EnvironmentPrinter.copy_to_clipboard(env_info)
+            UI.success("Successfully copied markdown into your clipboard 🎨")
+          end
+          UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
+        end
+      end
+
       default_command :trigger
       run!
     end
@@ -256,12 +256,6 @@ module Fastlane
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create
       return false
-    end
-
-    def show_crashreporter_note
-      UI.important("fastlane doesn't use a crash reporter any more")
-      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
-      UI.important("This command will be removed in one of the next releases")
     end
   end
 end

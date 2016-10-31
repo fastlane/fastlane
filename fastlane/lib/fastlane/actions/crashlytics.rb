@@ -76,7 +76,7 @@ module Fastlane
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
@@ -101,7 +101,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
-                                       description: "Crashlytics Beta API Token",
+                                       description: "Crashlytics API Key",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
@@ -153,6 +153,29 @@ module Fastlane
 
       def self.author
         ["KrauseFx", "pedrogimenez"]
+      end
+
+      def self.details
+        [
+          "Additionally you can specify `notes`, `emails`, `groups` and `notifications`.",
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'crashlytics',
+          'crashlytics(
+            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+            api_token: "...",
+            build_secret: "...",
+            ipa_path: "./app.ipa"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

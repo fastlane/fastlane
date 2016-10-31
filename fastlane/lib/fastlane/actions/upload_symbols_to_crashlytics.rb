@@ -114,7 +114,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        optional: true,
-                                       description: "Crashlytics Beta API Token",
+                                       description: "Crashlytics API Key",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") if value.to_s.length == 0
                                        end),
@@ -150,6 +150,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'upload_symbols_to_crashlytics(dsym_path: "./App.dSYM.zip")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

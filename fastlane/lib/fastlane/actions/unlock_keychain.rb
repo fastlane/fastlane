@@ -110,6 +110,33 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'unlock_keychain( # Unlock an existing keychain and add it to the keychain search list
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret"
+          )',
+          'unlock_keychain( # By default the keychain is added to the existing. To replace them with the selected keychain you may use `:replace`
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret",
+            add_to_search_list: :replace # To only add a keychain use `true` or `:add`.
+          )',
+          'unlock_keychain( # In addition, the keychain can be selected as a default keychain
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret",
+            set_default: true
+          )',
+          'unlock_keychain( # If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
+            path: "KeychainName",
+            password: "mysecret"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

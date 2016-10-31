@@ -23,17 +23,17 @@ class ExampleUITests: XCTestCase {
     {
         snapshot("0Launch")
         let tabBar = XCUIApplication().tabBars
-        let secondButton = tabBar.buttons.elementBoundByIndex(1)
+        let secondButton = tabBar.buttons.element(boundBy: 1)
 
-        XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft
+        XCUIDevice().orientation = UIDeviceOrientation.landscapeLeft
         snapshot("1LandscapeLeft")
         
         secondButton.tap()
-        XCUIDevice().orientation = UIDeviceOrientation.LandscapeRight
+        XCUIDevice().orientation = UIDeviceOrientation.landscapeRight
         snapshot("2LandscapeRight")
 
         secondButton.tap()
-        XCUIDevice().orientation = UIDeviceOrientation.Portrait
+        XCUIDevice().orientation = UIDeviceOrientation.portrait
         snapshot("3Portrait")
     }
 }

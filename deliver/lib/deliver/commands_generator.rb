@@ -63,7 +63,7 @@ module Deliver
         c.description = 'Create the initial `deliver` configuration based on an existing app'
         c.action do |args, options|
           if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
-            UI.important("You already got a running deliver setup in this directory")
+            UI.important("You already have a running deliver setup in this directory")
             return 0
           end
 
@@ -113,13 +113,18 @@ module Deliver
           path = options[:metadata_path] || File.join(containing, 'metadata')
           res = ENV["DELIVER_FORCE_OVERWRITE"]
           res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?")
-          if res
-            require 'deliver/setup'
-            v = options[:app].latest_version
-            Deliver::Setup.new.generate_metadata_files(v, path)
-          else
-            return 0
+          return 0 unless res
+
+          require 'deliver/setup'
+          v = options[:app].latest_version
+          if options[:app_version].to_s.length > 0
+            v = options[:app].live_version if v.version != options[:app_version]
+            if v.version != options[:app_version]
+              raise "Neither the current nor live version match specified app_version \"#{options[:app_version]}\""
+            end
           end
+
+          Deliver::Setup.new.generate_metadata_files(v, path)
         end
       end
 

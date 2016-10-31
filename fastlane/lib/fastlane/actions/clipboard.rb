@@ -30,6 +30,17 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'clipboard(value: "https://github.com/fastlane/fastlane/tree/master/fastlane")',
+          'clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] || "")'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

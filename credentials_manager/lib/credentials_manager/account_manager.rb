@@ -78,12 +78,14 @@ module CredentialsManager
       puts "-------------------------------------------------------------------------------------".green
 
       if @user.to_s.length == 0
+        raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
         @user = ask("Username: ") while @user.to_s.length == 0
         # we return here, as only the username was asked for now, we'll get called for the pw again anyway
         return
       end
 
       while @password.to_s.length == 0
+        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
         @password = ask("Password (for #{@user}): ") { |q| q.echo = "*" }
       end
 

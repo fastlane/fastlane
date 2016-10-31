@@ -11,6 +11,7 @@ coverage/
 rspec_logs.json
 test_output/
 .DS_STORE
+.keys
 
 ## Specific to Android
 .gradle/

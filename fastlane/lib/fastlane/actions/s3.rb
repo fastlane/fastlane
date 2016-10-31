@@ -1,5 +1,6 @@
 require 'fastlane/erb_template_helper'
 require 'ostruct'
+require 'uri'
 
 module Fastlane
   module Actions
@@ -47,7 +48,6 @@ module Fastlane
 
         # Pulling parameters for other uses
         s3_region = params[:region]
-        s3_subdomain = params[:region] ? "s3-#{params[:region]}" : "s3"
         s3_access_key = params[:access_key]
         s3_secret_access_key = params[:secret_access_key]
         s3_bucket = params[:bucket]
@@ -117,8 +117,9 @@ module Fastlane
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
+        s3_domain = AWS::Core::Endpoints.hostname(s3_region, 's3') || 's3.amazonaws.com'
         plist_file_name ||= "#{url_part}#{title.delete(' ')}.plist"
-        plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
+        plist_url = URI::HTTPS.build(host: s3_domain, path: "/#{s3_bucket}/#{plist_file_name}").to_s
 
         html_file_name ||= "index.html"
 
@@ -200,9 +201,56 @@ module Fastlane
         return true
       end
 
+      # @return true if loading the AWS SDK from the 'aws-sdk' gem yields the expected v1 API, or false otherwise
+      def self.load_from_original_gem_name
+        begin
+          # We don't use `Actions.verify_gem!` here, because we want to silently be OK with this gem not being
+          # present, in case the user has already migrated to 'aws-sdk-v1' (see #load_from_v1_gem_name)
+          Gem::Specification.find_by_name('aws-sdk')
+          require 'aws-sdk'
+        rescue Gem::LoadError
+          UI.verbose("The 'aws-sdk' gem is not present")
+          return false
+        end
+
+        UI.verbose("The 'aws-sdk' gem is present")
+        true
+      end
+
+      def self.load_from_v1_gem_name
+        Actions.verify_gem!('aws-sdk-v1')
+        require 'aws-sdk-v1'
+      end
+
+      def self.v1_sdk_module_present?
+        begin
+          # Here we'll make sure that the `AWS` module is defined. If it is, the gem is the v1.x API.
+          Object.const_get("AWS")
+        rescue NameError
+          UI.verbose("Couldn't find the needed `AWS` module in the 'aws-sdk' gem")
+          return false
+        end
+
+        UI.verbose("Found the needed `AWS` module in the 'aws-sdk' gem")
+        true
+      end
+
       def self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
-        Actions.verify_gem!('aws-sdk')
-        require 'aws-sdk'
+        # The AWS SDK API changed completely in v2.x. The most stable way to keep using the V1 API is to
+        # require the 'aws-sdk-v1' gem directly. However, for those customers who are using the 'aws-sdk'
+        # gem at v1.x, we don't want to break their setup which currently works.
+        #
+        # Therefore, we will attempt to load the v1 API from the original gem name, but go on to load
+        # from the aws-sdk-v1 gem name if necessary
+        loaded_original_gem = load_from_original_gem_name
+
+        if !loaded_original_gem || !v1_sdk_module_present?
+          load_from_v1_gem_name
+          UI.verbose("Loaded AWS SDK v1.x from the `aws-sdk-v1` gem")
+        else
+          UI.verbose("Loaded AWS SDK v1.x from the `aws-sdk` gem")
+        end
+
         if s3_region
           s3_client = AWS::S3.new(
             access_key_id: s3_access_key,
@@ -258,6 +306,14 @@ module Fastlane
 
       def self.description
         "Generates a plist file and uploads all to AWS S3"
+      end
+
+      def self.details
+        [
+          "Upload a new build to Amazon S3 to distribute the build to beta testers. ",
+          "Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.",
+          "It is recommended to **not** store the AWS access keys in the `Fastfile`. The uploaded `version.json` file provides an easy way for apps to poll if a new update is available."
+        ].join(" ")
       end
 
       def self.available_options
@@ -355,6 +411,28 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          's3',
+          's3(
+            # All of these are used to make Shenzhen\'s `ipa distribute:s3` command
+            access_key: ENV["S3_ACCESS_KEY"],               # Required from user.
+            secret_access_key: ENV["S3_SECRET_ACCESS_KEY"], # Required from user.
+            bucket: ENV["S3_BUCKET"],                       # Required from user.
+            ipa: "AppName.ipa",                             # Optional is you use `ipa` to build
+            dsym: "AppName.app.dSYM.zip",                   # Optional is you use `ipa` to build
+            path: "v{CFBundleShortVersionString}_b{CFBundleVersion}/", # This is actually the default.
+            upload_metadata: true,                          # Upload version.json, plist and HTML. Set to false to skip uploading of these files.
+            version_file_name: "app_version.json",          # Name of the file to upload to S3. Defaults to "version.json"
+            version_template_path: "path/to/erb"            # Path to an ERB to configure the structure of the version JSON file
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

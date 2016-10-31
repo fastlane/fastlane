@@ -24,6 +24,7 @@ module Gym
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
       detect_configuration
+      detect_toolchain
 
       config[:output_name] ||= Gym.project.app_name
 
@@ -33,7 +34,9 @@ module Gym
     # Helper Methods
 
     def self.detect_provisioning_profile
-      unless Gym.config[:provisioning_profile_path]
+      if Gym.config[:provisioning_profile_path].nil?
+        return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
+
         Dir.chdir(File.expand_path("..", Gym.project.path)) do
           profiles = Dir["*.mobileprovision"]
           if profiles.count == 1
@@ -86,6 +89,16 @@ module Gym
           UI.error "Couldn't find specified configuration '#{config[:configuration]}'."
           config[:configuration] = nil
         end
+      end
+    end
+
+    # The toolchain parameter is used if you don't use the default toolchain of Xcode (e.g. Swift 2.3 with Xcode 8)
+    def self.detect_toolchain
+      return unless Gym.config[:toolchain]
+
+      # Convert the aliases to the full string to make it easier for the user #justfastlanethings
+      if Gym.config[:toolchain].to_s == "swift_2_3"
+        Gym.config[:toolchain] = "com.apple.dt.toolchain.Swift_2_3"
       end
     end
   end

@@ -81,6 +81,7 @@ module Screengrab
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
       devices.reject! do |device|
         [
+          'server is out of date',   # The adb server is out of date and must be restarted
           'unauthorized',            # The device has not yet accepted ADB control
           'offline',                 # The device is offline, skip it
           '* daemon',                # Messages printed when the daemon is starting up
@@ -176,13 +177,13 @@ module Screengrab
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
       UI.message 'Installing tests APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")

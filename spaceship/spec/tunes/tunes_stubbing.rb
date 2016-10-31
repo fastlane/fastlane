@@ -224,6 +224,27 @@ def itc_stub_user_detail
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_sandbox_testers
+  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap").
+    to_return(status: 200, body: itc_read_fixture_file("sandbox_testers.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_create_sandbox_tester
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap/add").
+    with(body: JSON.parse(itc_read_fixture_file("create_sandbox_tester_payload.json"))).
+    to_return(status: 200, body: itc_read_fixture_file("create_sandbox_tester.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
+def itc_stub_delete_sandbox_tester
+  body = JSON.parse(itc_read_fixture_file("delete_sandbox_tester_payload.json"))
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/iap/delete").
+    with(body: JSON.parse(itc_read_fixture_file("delete_sandbox_tester_payload.json")).to_json).
+    to_return(status: 200, body: itc_read_fixture_file("delete_sandbox_tester.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 def itc_stub_pricing_tiers
   stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/matrix").
     to_return(status: 200, body: itc_read_fixture_file("pricing_tiers.json"),
@@ -267,6 +288,9 @@ RSpec.configure do |config|
     itc_stub_testflight
     itc_stub_app_version_ref
     itc_stub_user_detail
+    itc_stub_sandbox_testers
+    itc_stub_create_sandbox_tester
+    itc_stub_delete_sandbox_tester
     itc_stub_candiate_builds
     itc_stub_pricing_tiers
     itc_stub_release_to_store

@@ -19,16 +19,22 @@ describe Spaceship::ProvisioningProfile do
       expect(profile.expires.to_s).to eq('2015-11-25T22:45:50+00:00')
       expect(profile.uuid).to eq('a8b1563e-7559-41f7-854b-6cd09f950d11')
       expect(profile.managed_by_xcode?).to eq(false)
-      expect(profile.distribution_method).to eq('adhoc')
-      expect(profile.class.type).to eq('adhoc')
-      expect(profile.class.pretty_type).to eq('AdHoc')
+      expect(profile.distribution_method).to eq('store')
+      expect(profile.class.type).to eq('store')
+      expect(profile.class.pretty_type).to eq('AppStore')
       expect(profile.type).to eq('iOS Distribution')
     end
 
     it 'should filter by the correct types' do
       expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(1)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(2)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(2)
+    end
+
+    it "AppStore and AdHoc are the same" do
+      Spaceship::ProvisioningProfile::AdHoc.all.each do |adhoc|
+        expect(Spaceship::ProvisioningProfile::AppStore.all.find_all { |a| a.id == adhoc.id }.count).to eq(1)
+      end
     end
 
     it 'should have an app' do
@@ -49,23 +55,22 @@ describe Spaceship::ProvisioningProfile do
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.7')
       expect(profiles.first.distribution_method).to eq('store')
-      expect(profiles.last.distribution_method).to eq('adhoc')
     end
   end
 
   describe '#class.type' do
     it "Returns only valid profile types" do
-      valid = %w(limited adhoc store)
+      valid = %w(limited adhoc store direct)
       Spaceship::ProvisioningProfile.all.each do |profile|
         expect(valid).to include(profile.class.type)
       end
     end
   end
 
-  it "updates the distribution method to adhoc if devices are enabled" do
-    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
+  it "distribution_method stays app store, even though it's an AdHoc profile which contains devices" do
+    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.find(&:is_adhoc?)
 
-    expect(adhoc.distribution_method).to eq('adhoc')
+    expect(adhoc.distribution_method).to eq('store')
     expect(adhoc.devices.count).to eq(2)
 
     device = adhoc.devices.first
@@ -97,8 +102,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#valid?' do
     it "Valid profile" do
-      p = Spaceship::ProvisioningProfile.all.last
-      expect(p).to receive(:certificate_valid?).and_return(true)
+      p = Spaceship::ProvisioningProfile.all.first
       expect(p.valid?).to eq(true)
     end
 
@@ -106,6 +110,16 @@ describe Spaceship::ProvisioningProfile do
       profile = Spaceship::ProvisioningProfile.all.first
       profile.status = 'Expired'
       expect(profile.valid?).to eq(false)
+    end
+  end
+
+  describe '#factory' do
+    it 'creates a Direct profile type for distributionMethod "direct"' do
+      fake_app_info = {}
+      expected_profile = "expected_profile"
+      expect(Spaceship::ProvisioningProfile::Direct).to receive(:new).and_return(expected_profile)
+      profile = Spaceship::ProvisioningProfile.factory({ 'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'direct' })
+      expect(profile).to eq(expected_profile)
     end
   end
 
@@ -139,6 +153,36 @@ describe Spaceship::ProvisioningProfile do
       expect do
         Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'notExisting', certificate: certificate)
       end.to raise_error "Could not find app with bundle id 'notExisting'"
+    end
+
+    describe 'modify devices to prevent having devices on profile types where it does not make sense' do
+      it 'Direct (Mac) profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = []
+        expect(Spaceship::ProvisioningProfile::Direct.client).to receive(:create_provisioning_profile!).with('Delete Me', 'direct', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: true, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::Direct.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, mac: true, devices: fake_devices)
+      end
+
+      it 'Development profile types have devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = fake_devices.collect(&:id)
+        expect(Spaceship::ProvisioningProfile::Development.client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
+
+      it 'AdHoc profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = fake_devices.collect(&:id)
+        expect(Spaceship::ProvisioningProfile::AdHoc.client).to receive(:create_provisioning_profile!).with('Delete Me', 'adhoc', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::AdHoc.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
+
+      it 'AppStore profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = []
+        expect(Spaceship::ProvisioningProfile::AppStore.client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
+      end
     end
   end
 
@@ -192,6 +236,36 @@ describe Spaceship::ProvisioningProfile do
     it "updates an existing profile" do
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false).and_return({})
       profile.update!
+    end
+  end
+
+  describe "#is_adhoc?" do
+    it "returns true when the profile is adhoc" do
+      profile = Spaceship::ProvisioningProfile::AdHoc.new
+      expect(profile).to receive(:devices).and_return(["device"])
+      expect(profile.is_adhoc?).to eq(true)
+    end
+
+    it "returns true when the profile is appstore with devices" do
+      profile = Spaceship::ProvisioningProfile::AppStore.new
+      expect(profile).to receive(:devices).and_return(["device"])
+      expect(profile.is_adhoc?).to eq(true)
+    end
+
+    it "returns false when the profile is appstore with no devices" do
+      profile = Spaceship::ProvisioningProfile::AppStore.new
+      expect(profile).to receive(:devices).and_return([])
+      expect(profile.is_adhoc?).to eq(false)
+    end
+
+    it "returns false when the profile is development" do
+      profile = Spaceship::ProvisioningProfile::Development.new
+      expect(profile.is_adhoc?).to eq(false)
+    end
+
+    it "returns false when the profile is inhouse" do
+      profile = Spaceship::ProvisioningProfile::InHouse.new
+      expect(profile.is_adhoc?).to eq(false)
     end
   end
 end
