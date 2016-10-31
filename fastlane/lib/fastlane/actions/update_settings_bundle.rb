@@ -80,7 +80,7 @@ module Fastlane
         end
 
         def is_supported?(platform)
-          [:ios, :mac].include? platform
+          platform == :ios
         end
 
         def output
