@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      SETTINGS_PLIST_PATH = :SETTINGS_PLIST_PATH
+    end
+
     # SettingsBundle utility module
     module SettingsBundle
       class << self
@@ -21,8 +25,6 @@ module Fastlane
           end
 
           raise "#{update_params.version_key} not found in #{update_params.settings_plist_path}" if current_app_version_specifier.nil?
-
-          Actions.lane_context[SharedValues::SETTINGS_PLIST_PATH] = settings_plist_path
 
           # Formatted app version for settings bundle:
           # version (build)
@@ -83,12 +85,17 @@ module Fastlane
 
         def output
           [
+            [
+              'SETTINGS_PLIST_PATH',
+              'The path to the updated plist file'
+            ]
           ]
         end
 
         def run(params)
           # raises if can't parse the file
           SettingsBundle.update params
+          Actions.lane_context[SharedValues::SETTINGS_PLIST_PATH] = params[:path]
         end
       end
     end
