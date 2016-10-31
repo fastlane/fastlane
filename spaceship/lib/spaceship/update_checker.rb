@@ -18,7 +18,7 @@ module Spaceship
 
       show_update_message(Spaceship::VERSION, version)
     rescue => ex
-      puts "#{ex}" if $verbose
+      puts ex.to_s if $verbose
       puts "Couldn't verify that spaceship is up to date"
     end
 
