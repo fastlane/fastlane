@@ -14,7 +14,7 @@ module Fastlane
           # Load Root.plist (raises)
           root_plist = Plist::parse_xml options[:path]
       
-          # Find the preference specifier for CurrentAppVersion
+          # Find the preference specifier for the setting key
           preference_specifiers = root_plist["PreferenceSpecifiers"]
 
           raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.is_a? Array
