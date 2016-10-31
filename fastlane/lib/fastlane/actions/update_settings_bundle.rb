@@ -72,7 +72,7 @@ module Fastlane
             current_app_version_specifier["DefaultValue"] = formatted_version
 
             # Save (raises)
-            Plist::Emit.save_plist root_plist, update_params.settings_plist_path
+            Plist::Emit.save_plist root_plist, params[:path]
           end
         end
       end
