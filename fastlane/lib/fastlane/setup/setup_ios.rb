@@ -15,11 +15,6 @@ module Fastlane
     attr_accessor :app_name
 
     def run
-      if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("Fastlane already set up at path #{folder}")
-        return
-      end
-
       show_infos
 
       FastlaneFolder.create_folder! unless Helper.is_test?
