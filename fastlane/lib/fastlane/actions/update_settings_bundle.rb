@@ -72,7 +72,7 @@ module Fastlane
             current_app_version_specifier["DefaultValue"] = formatted_version
 
             # Save (raises)
-            Plist::Emit.save_plist root_plist, params[:path]
+            Plist::Emit.save_plist root_plist, options[:path]
           end
         end
       end
@@ -98,7 +98,7 @@ module Fastlane
                                          description: "(required) you must specify the path to the plist file in the settings bundle, e.g. Resources/Settings.Bundle/Root.plist",
                                          optional: false,
                                          verify_block: proc do |value|
-                                           UI.user_error!("The supplied path is not to a plist file") if value.end_with? ".plist"
+                                           UI.user_error!("The supplied path is not to a plist file") unless value.end_with? ".plist"
                                            UI.user_error!("Could not find plist file") if !File.exist?(value) and !Helper.is_test?
                                          end),
             # Not sure if there's any limitation on the setting key to validate
