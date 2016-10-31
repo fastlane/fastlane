@@ -2345,10 +2345,37 @@ Key | Description
 
 </details>
 
+### update_settings_bundle
 
+Updates a key in a plist file in the Settings.bundle to the current version
+and build number.
 
+> Run after increment_version_number and/or increment_build_number. Takes the updated version number and modifies the app's settings bundle.
 
+update_settings_bundle |
+-----|----
+Supported platforms | ios
+Author | @jdee
 
+<details>
+<summary>1 Example</summary>
+
+```ruby
+udpate_settings_bundle(
+  path: "Resources/Settings.bundle/Root.plist",
+  setting_key: "CurrentAppVersion"
+)
+```
+</details>
+
+<details>
+<summary>Parameters</summary>
+Key | Description
+----|------------
+  `path` | The path to the plist file in the Settings.bundle. Does not have to be the Root.plist.
+  `setting_key` | The identifier of the preference specifier to update
+
+</details>
 
 # Code Signing
 

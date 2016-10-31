@@ -40,11 +40,47 @@ module Fastlane
     end
 
     # UpdateSettingsBundle action
-    class UpdateSettingsBundle < Action
+    class UpdateSettingsBundleAction < Action
+
+      # SettingsBundle utility module
+      module SettingsBundle
+        class << self
+          # options is a Hash
+          def update(options)
+            require 'plist'
+
+            # Load Root.plist (raises)
+            root_plist = Plist::parse_xml options[:path]
+
+            # Find the preference specifier for the setting key
+            preference_specifiers = root_plist["PreferenceSpecifiers"]
+
+            raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.is_a? Array
+
+            setting_key = options[:setting_key]
+            current_app_version_specifier = preference_specifiers.find do |specifier|
+              specifier["Key"] == setting_key
+            end
+
+            raise "#{update_params.version_key} not found in #{update_params.settings_plist_path}" if current_app_version_specifier.nil?
+
+            # Formatted app version for settings bundle:
+            # version (build)
+            formatted_version = "#{Actions.lane_context[SharedValues::VERSION_NUMBER]} (#{Actions.lane_context[SharedValues::BUILD_NUMBER]})"
+
+            # Update to the new value
+            current_app_version_specifier["DefaultValue"] = formatted_version
+
+            # Save (raises)
+            Plist::Emit.save_plist root_plist, update_params.settings_plist_path
+          end
+        end
+      end
+
       class << self
         def description
           <<-EOF
-          Update the current version and build number in the settings bundle.
+          Update the current version and build number in the settings bundle
           EOF
         end
 
@@ -59,7 +95,7 @@ module Fastlane
           [
             FastlaneCore::ConfigItem.new(key: :path,
                                          env_name: "FL_SETTING_BUNDLE_PATH",
-                                         description: "(required) you must specify the path to the plist file in the settings bundle, e.g. Resources/Settings.Bundle/Root.plist"
+                                         description: "(required) you must specify the path to the plist file in the settings bundle, e.g. Resources/Settings.Bundle/Root.plist",
                                          optional: false,
                                          verify_block: proc do |value|
                                            UI.user_error!("The supplied path is not to a plist file") if value.end_with? ".plist"
@@ -90,6 +126,10 @@ module Fastlane
               'The path to the updated plist file'
             ]
           ]
+        end
+
+        def category
+          :project
         end
 
         def run(params)
