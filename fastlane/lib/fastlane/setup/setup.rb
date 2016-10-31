@@ -3,7 +3,7 @@ module Fastlane
     # Start the setup process
     def run
       if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("fastlane already set up at path #{FastlaneFolder.path}")
+        UI.important("fastlane is already set up at path #{FastlaneFolder.path}")
         return
       end
 
