@@ -791,7 +791,6 @@ module Spaceship
     def groups
       return @cached_groups if @cached_groups
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
-      data = parse_response(r, 'data')
       @cached_groups ||= parse_response(r, 'data')['groups']
     end
 

@@ -9,7 +9,7 @@ module Pilot
 
       if config[:group]
         groups = Spaceship::Tunes::Tester::External.groups
-        group_id = groups.find{|k, v| v == config[:group] || k == config[:group]}
+        group_id = groups.find { |k, v| v == config[:group] || k == config[:group] }
         raise "Group '#{config[:group]}' not found for #{config[:email]}" unless group_id
         config[:group] = group_id[0]
       end
