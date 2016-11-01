@@ -11,20 +11,22 @@ module Fastlane
         def update(options)
           require 'plist'
 
+          path = options[:path]
+          setting_key = options[:setting_key]
+
           # Load Root.plist (raises)
-          root_plist = Plist.parse_xml options[:path]
+          root_plist = Plist.parse_xml path
 
           # Find the preference specifier for the setting key
           preference_specifiers = root_plist["PreferenceSpecifiers"]
 
-          raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.kind_of? Array
+          raise "#{path} is not a valid preferences plist" unless preference_specifiers.kind_of? Array
 
-          setting_key = options[:setting_key]
           current_app_version_specifier = preference_specifiers.find do |specifier|
             specifier["Key"] == setting_key
           end
 
-          raise "#{update_params.version_key} not found in #{update_params.settings_plist_path}" if current_app_version_specifier.nil?
+          raise "#{setting_key} not found in #{update_params.settings_plist_path}" if current_app_version_specifier.nil?
 
           # Formatted app version for settings bundle:
           # version (build)
@@ -34,7 +36,7 @@ module Fastlane
           current_app_version_specifier["DefaultValue"] = formatted_version
 
           # Save (raises)
-          Plist::Emit.save_plist root_plist, update_params.settings_plist_path
+          Plist::Emit.save_plist root_plist, path
         end
       end
     end
