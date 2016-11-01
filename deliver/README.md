@@ -192,7 +192,7 @@ Imagine that you have localised data for the following language codes:  ```en-US
 
 You can set the following in your deliverfile
 
-```
+```ruby
 release_notes({
   'default' => "Shiny and new”,
   'de-DE' => "glänzend und neu"
