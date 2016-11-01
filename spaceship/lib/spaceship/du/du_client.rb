@@ -78,15 +78,15 @@ module Spaceship
     def picture_type_map
       # rubocop:enable Style/ExtraSpacing
       {
-        watch:        "MZPFT.SortedN27ScreenShot",
-        ipad:         "MZPFT.SortedTabletScreenShot",
-        ipadPro:      "MZPFT.SortedJ99ScreenShot",
-        iphone6:      "MZPFT.SortedN61ScreenShot",
-        iphone6Plus:  "MZPFT.SortedN56ScreenShot",
-        iphone4:      "MZPFT.SortedN41ScreenShot",
-        iphone35:     "MZPFT.SortedScreenShot",
-        appleTV:      "MZPFT.SortedATVScreenShot",
-        desktop:      "MZPFT.SortedDesktopScreenShot"
+        watch:       "MZPFT.SortedN27ScreenShot",
+        ipad:        "MZPFT.SortedTabletScreenShot",
+        ipadPro:     "MZPFT.SortedJ99ScreenShot",
+        iphone6:     "MZPFT.SortedN61ScreenShot",
+        iphone6Plus: "MZPFT.SortedN56ScreenShot",
+        iphone4:     "MZPFT.SortedN41ScreenShot",
+        iphone35:    "MZPFT.SortedScreenShot",
+        appleTV:     "MZPFT.SortedATVScreenShot",
+        desktop:     "MZPFT.SortedDesktopScreenShot"
       }
     end
 
