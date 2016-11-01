@@ -73,9 +73,9 @@ module Fastlane
             UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
             uri = URI(url)
-            httpConn = Net::HTTP.new(uri.host, uri.port)
-            httpConn.use_ssl=true
-            result = httpConn.request_get(uri.path)
+            http_conn = Net::HTTP.new(uri.host, uri.port)
+            http_conn.use_ssl = true
+            result = http_conn.request_get(uri.path)
             raise "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
             File.write(zip_path, result.body)
 
