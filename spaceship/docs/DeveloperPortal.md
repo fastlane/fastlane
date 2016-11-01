@@ -41,16 +41,20 @@ Currently available services include (all require the `Spaceship.app_service.` p
 
 ```
 app_group.(on|off)
+apple_pay.(on|off)
 associated_domains.(on|off)
 data_protection.(complete|unless_open|until_first_auth|off)
+game_center.(on|off)
 health_kit.(on|off)
 home_kit.(on|off)
 wireless_accessory.(on|off)
 icloud.(on|off)
 cloud_kit.(xcode5_compatible|cloud_kit)
+in_app_purchase.(on|off)
 inter_app_audio.(on|off)
 passbook.(on|off)
 push_notification.(on|off)
+siri_kit.(on|off)
 vpn_configuration.(on|off)
 ```
 
