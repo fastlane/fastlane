@@ -128,15 +128,19 @@ Get a list of all available options using
 
 ```
     --app-group          Enable App Groups
+    --apple-pay          Enable Apple Pay
     --associated-domains Enable Associated Domains
     --data-protection STRING Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+    --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
     --wireless-conf      Enable Wireless Accessory Configuration
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
+    --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
     --passbook           Enable Passbook
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
+    --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
 ```
 
@@ -144,15 +148,19 @@ Get a list of all available options using
 
 ```
     --app-group          Disable App Groups
+    --apple-pay          Disable Apple Pay
     --associated-domains Disable Associated Domains
     --data-protection    Disable Data Protection
+    --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
     --wireless-conf      Disable Wireless Accessory Configuration
     --icloud             Disable iCloud
+    --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
     --passbook           Disable Passbook
     --push-notification  Disable Push notifications
+    --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
 ```
 
