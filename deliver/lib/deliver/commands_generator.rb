@@ -108,7 +108,7 @@ module Deliver
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(deliverfile_options(true), options.__hash__)
           options.load_configuration_file("Deliverfile")
-          Deliver::Runner.new(options) # to login...
+          Deliver::Runner.new(options, skip_version: true) # to login...
           containing = FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.'
           path = options[:screenshots_path] || File.join(containing, 'screenshots')
           Deliver::DownloadScreenshots.run(options, path)
