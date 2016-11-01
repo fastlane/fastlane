@@ -17,6 +17,9 @@ module Spaceship
       return if Gem::Version.new(version) <= Gem::Version.new(Spaceship::VERSION)
 
       show_update_message(Spaceship::VERSION, version)
+    rescue => ex
+      puts ex.to_s if $verbose
+      puts "Couldn't verify that spaceship is up to date"
     end
 
     def self.show_update_message(local_version, live_version)
