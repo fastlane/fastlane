@@ -131,7 +131,14 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :group,
+                                     short_option: "-g",
+                                     env_name: "PILOT_GROUP",
+                                     description: "Associate tester to a group name / group id",
+                                     default_value: nil,
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end

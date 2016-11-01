@@ -13,8 +13,10 @@ module Pilot
       tester_manager = Pilot::TesterManager.new
       imported_tester_count = 0
 
+      group_name = options[:group]
+
       CSV.foreach(file, "r") do |row|
-        first_name, last_name, email = row
+        first_name, last_name, email, testing_group = row
 
         unless email
           UI.error("No email found in row: #{row}")
@@ -30,6 +32,10 @@ module Pilot
         config[:first_name] = first_name
         config[:last_name] = last_name
         config[:email] = email
+        config[:group] = group_name
+        if testing_group
+          config[:group] = testing_group
+        end
 
         begin
           tester_manager.add_tester(config)

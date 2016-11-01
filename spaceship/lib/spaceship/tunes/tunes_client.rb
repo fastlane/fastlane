@@ -788,7 +788,14 @@ module Spaceship
       parse_response(r, 'data')['users']
     end
 
-    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil)
+    def groups
+      return @cached_groups if @cached_groups
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
+      data = parse_response(r, 'data')
+      @cached_groups ||= parse_response(r, 'data')['groups']
+    end
+
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, group: nil)
       url = tester.url[:create]
       raise "Action not provided for this tester type." unless url
 
@@ -806,6 +813,9 @@ module Spaceship
               value: true
             }
           }
+      if group
+        tester_data[:groups] = [{ id: group }]
+      end
 
       data = { testers: [tester_data] }
 

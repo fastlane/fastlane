@@ -23,14 +23,7 @@ module Pilot
         csv << ['First', 'Last', 'Email', 'Devices', 'Groups', 'Installed Version', 'Install Date']
 
         testers.each do |tester|
-          groups = tester.raw_data.get("groups")
-
-          group_names = ""
-          if groups && groups.length > 0
-            names = groups.map { |group| group["name"]["value"] }
-            group_names = names.join(';')
-          end
-
+          group_names = tester.groups_list || ""
           install_version = tester.full_version || ""
           pretty_date = tester.pretty_install_date || ""
 
