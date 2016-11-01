@@ -72,8 +72,12 @@ module Fastlane
           begin
             UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
-            result = Net::HTTP.get(URI(url))
-            File.write(zip_path, result)
+            uri = URI(url)
+            httpConn = Net::HTTP.new(uri.host, uri.port)
+            httpConn.use_ssl=true
+            result = httpConn.request_get(uri.path)
+            raise "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            File.write(zip_path, result.body)
 
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"
