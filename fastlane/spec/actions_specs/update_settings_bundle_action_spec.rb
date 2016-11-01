@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Settings Bundle Integration" do
-
       it "updates the current app version in the settings bundle" do
         require 'plist'
 
@@ -38,7 +37,6 @@ describe Fastlane do
         EOF
 
         Fastlane::FastFile.new.parse(lane).runner.execute(:test)
-
       end
     end
   end

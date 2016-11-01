@@ -10,14 +10,14 @@ module Fastlane
         # options is a Hash
         def update(options)
           require 'plist'
-      
+
           # Load Root.plist (raises)
-          root_plist = Plist::parse_xml options[:path]
-      
+          root_plist = Plist.parse_xml options[:path]
+
           # Find the preference specifier for the setting key
           preference_specifiers = root_plist["PreferenceSpecifiers"]
 
-          raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.is_a? Array
+          raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.kind_of? Array
 
           setting_key = options[:setting_key]
           current_app_version_specifier = preference_specifiers.find do |specifier|
@@ -29,10 +29,10 @@ module Fastlane
           # Formatted app version for settings bundle:
           # version (build)
           formatted_version = "#{Actions.lane_context[SharedValues::VERSION_NUMBER]} (#{Actions.lane_context[SharedValues::BUILD_NUMBER]})"
-      
+
           # Update to the new value
           current_app_version_specifier["DefaultValue"] = formatted_version
-      
+
           # Save (raises)
           Plist::Emit.save_plist root_plist, update_params.settings_plist_path
         end
@@ -41,7 +41,6 @@ module Fastlane
 
     # UpdateSettingsBundle action
     class UpdateSettingsBundleAction < Action
-
       # SettingsBundle utility module
       module SettingsBundle
         class << self
@@ -50,12 +49,12 @@ module Fastlane
             require 'plist'
 
             # Load Root.plist (raises)
-            root_plist = Plist::parse_xml options[:path]
+            root_plist = Plist.parse_xml options[:path]
 
             # Find the preference specifier for the setting key
             preference_specifiers = root_plist["PreferenceSpecifiers"]
 
-            raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.is_a? Array
+            raise "#{update_params.settings_plist_path} is not a valid preferences plist" unless preference_specifiers.kind_of? Array
 
             setting_key = options[:setting_key]
             current_app_version_specifier = preference_specifiers.find do |specifier|
