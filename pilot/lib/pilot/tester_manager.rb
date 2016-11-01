@@ -128,12 +128,13 @@ module Pilot
     end
 
     def list_global(all_testers, title)
-      headers = ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"]
+      headers = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
       list(all_testers, title, headers) do |tester|
         [
           tester.first_name,
           tester.last_name,
           tester.email,
+          tester.group_names,
           tester.devices.count,
           tester.full_version,
           tester.pretty_install_date
