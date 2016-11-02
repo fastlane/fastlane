@@ -51,21 +51,21 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
-                                     env_name: "FASTLANE_TEAM_ID",
+                                     env_name: "MATCH_TEAM_ID",
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                       ENV["MATCH_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
-                                     env_name: "FASTLANE_TEAM_NAME",
+                                     env_name: "MATCH_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                       ENV["MATCH_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :verbose,
                                      env_name: "MATCH_VERBOSE",

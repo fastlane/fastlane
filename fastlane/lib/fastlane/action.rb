@@ -71,6 +71,27 @@ module Fastlane
       nil
     end
 
+    def self.env_var_prefix
+      self.action_name.upcase
+    end
+
+    def self.config_item(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil)
+      FastlaneCore::ConfigItem.new(
+        key: key,
+        env_name: env_name.nil? ? nil : "#{env_var_prefix}_#{env_name}",
+        description: description,
+        short_option: short_option,
+        default_value: default_value,
+        verify_block: verify_block,
+        is_string: is_string,
+        type: type,
+        optional: optional,
+        conflicting_options: conflicting_options,
+        conflict_block: conflict_block,
+        deprecated: conflict_block
+      )
+    end
+
     def self.is_supported?(platform)
       # you can do things like
       #  true
