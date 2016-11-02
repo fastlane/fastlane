@@ -455,44 +455,44 @@ describe Spaceship::AppVersion, all: true do
       describe "Parameter checks" do
         it "prevents from using negative sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using sort_order 0" do
           expect do
-            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
           end.to raise_error "sort_order must not be > 5"
         end
 
         # not really sure if we want to enforce that
         # it "prevents from letting holes in sort_orders" do
         #  expect do
-        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
         #  end.to raise_error "FIXME"
         # end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
           end.to raise_error "iTunes Connect error: NotALanguage isn't an activated language"
         end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
           end.to raise_error "iTunes Connect error: English_CA isn't an activated language"
         end
 
         it "prevent from using invalid device" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English", :android)
+            version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
           end.to raise_error "iTunes Connect error: android isn't a valid device name"
         end
       end
@@ -506,7 +506,15 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
+          expect(version.screenshots["English"].count).to eq(count + 1)
+        end
+
+        it "can add a new imessage screenshot to the list" do
+          du_upload_screenshot_success
+
+          count = version.screenshots["English"].count
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', true)
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
@@ -524,7 +532,7 @@ describe Spaceship::AppVersion, all: true do
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(true)
 
-          version.upload_screenshot!(screenshot_path, 1, language, device_type)
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, false)
 
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(false)
@@ -534,19 +542,19 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count)
         end
 
         it "can remove existing screenshot" do
           count = version.screenshots["English"].count
-          version.upload_screenshot!(nil, 2, "English", 'iphone4')
+          version.upload_screenshot!(nil, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count - 1)
         end
 
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
-            version.upload_screenshot!(nil, 5, "English", 'iphone4')
+            version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
           end.to raise_error "cannot remove screenshot with non existing sort_order"
         end
       end

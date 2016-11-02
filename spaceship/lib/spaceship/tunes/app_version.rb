@@ -380,16 +380,17 @@ module Spaceship
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
       # @param device (string): The device for this screenshot
-      def upload_screenshot!(screenshot_path, sort_order, language, device)
+      # @param is_messages (Bool): True if the screenshot is for iMessage
+      def upload_screenshot!(screenshot_path, sort_order, language, device, is_messages)
         raise "sort_order must be higher than 0" unless sort_order > 0
         raise "sort_order must not be > 5" if sort_order > 5
         # this will also check both language and device parameters
-        device_lang_screenshots = screenshots_data_for_language_and_device(language, device)["value"]
+        device_lang_screenshots = screenshots_data_for_language_and_device(language, device, is_messages)["value"]
 
         existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
           upload_file = UploadFile.from_path screenshot_path
-          screenshot_data = client.upload_screenshot(self, upload_file, device)
+          screenshot_data = client.upload_screenshot(self, upload_file, device, is_messages)
 
           # Since October 2016 we also need to pass the size, height, width and checksum
           # otherwise iTunes Connect validation will fail at a later point
@@ -411,7 +412,7 @@ module Spaceship
           # if this value is not set, iTC will fallback to another device type for screenshots
           language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
           device_language_details = language_details.find { |display_family| display_family['name'] == device }
-          device_language_details["scaled"]["value"] = false
+          device_language_details[is_messages ? "scaled" : "messagesScaled"]["value"] = false
 
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
@@ -554,8 +555,8 @@ module Spaceship
         @transit_app_file = Tunes::TransitAppFile.factory(transit_app_file) if transit_app_file
       end
 
-      def screenshots_data_for_language_and_device(language, device)
-        container_data_for_language_and_device("screenshots", language, device)
+      def screenshots_data_for_language_and_device(language, device, is_messages)
+        container_data_for_language_and_device(is_messages ? "messagesScreenshots" : "screenshots", language, device)
       end
 
       def trailer_data_for_language_and_device(language, device)
