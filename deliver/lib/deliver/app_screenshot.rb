@@ -137,7 +137,7 @@ module Deliver
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
-      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? or size.count.zero?
+      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? or size.count == 0
 
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
       path_component = Pathname.new(path).each_filename.to_a[-3]
