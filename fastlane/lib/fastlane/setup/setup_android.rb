@@ -1,11 +1,6 @@
 module Fastlane
   class SetupAndroid < Setup
     def run
-      if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("Fastlane already set up at path #{folder}")
-        return
-      end
-
       response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
       return unless response
 
