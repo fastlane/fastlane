@@ -541,7 +541,7 @@ module Spaceship
       return @cached if @cached
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
       data = parse_response(r, 'data')
-      @cached ||= Spaceship::Tunes::UserDetail.factory(data)
+      @cached = Spaceship::Tunes::UserDetail.factory(data)
     end
 
     #####################################################
