@@ -72,11 +72,13 @@ module Fastlane
           begin
             UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
+            # Work around ruby defect, where HTTP#get_response and HTTP#post_form don't use ENV proxy settings
+            # https://bugs.ruby-lang.org/issues/12724
             uri = URI(url)
             http_conn = Net::HTTP.new(uri.host, uri.port)
             http_conn.use_ssl = true
             result = http_conn.request_get(uri.path)
-            raise "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            UI.error! "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
             File.write(zip_path, result.body)
 
             # Now unzip the file
