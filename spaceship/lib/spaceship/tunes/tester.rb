@@ -211,10 +211,10 @@ module Spaceship
 
       # Return a list of the Tester's group, if any
       # @return
-      def groups_list
+      def groups_list(separator = ', ')
         if groups
           group_names = groups.map { |group| group["name"]["value"] }
-          group_names.join(', ')
+          group_names.join(separator)
         end
       end
     end
