@@ -21,16 +21,6 @@ module Spaceship
       #   "Bennett"
       attr_accessor :last_name
 
-      # @return (Array) an array of associated groups
-      # @example
-      #    [{
-      #      "id": "e031e048-4f0f-4c1e-8d8a-a5341a267986",
-      #      "name": {
-      #        "value": "My App Testers"
-      #      }
-      #    }]
-      attr_accessor :groups
-
       # @return (Array) An array of registered devices for this user
       # @example
       #    [{
@@ -60,7 +50,6 @@ module Spaceship
         'emailAddress.value' => :email,
         'firstName.value' => :first_name,
         'lastName.value' => :last_name,
-        'groups' => :groups,
         'devices' => :devices,
         'latestInstalledAppAdamId' => :latest_install_app_id,
         'latestInstalledDate' => :latest_install_date,
@@ -94,24 +83,18 @@ module Spaceship
           end
         end
 
-        def groups
-          client.groups
-        end
-
         # Create new tester in iTunes Connect
         # @param email (String) (required): The email of the new tester
         # @param first_name (String) (optional): The first name of the new tester
         # @param last_name (String) (optional): The last name of the new tester
-        # @param groups (Array) (option): Names/IDs of existing groups for the new tester
         # @example
-        #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett", groups:["Testers"])
+        #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett")
         # @return (Tester): The newly created tester
-        def create!(email: nil, first_name: nil, last_name: nil, groups: nil)
+        def create!(email: nil, first_name: nil, last_name: nil)
           data = client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
-                                    last_name: last_name,
-                                       groups: groups)
+                                    last_name: last_name)
           self.factory(data)
         end
 
@@ -203,19 +186,6 @@ module Spaceship
       # @param app_id (String) (required): The id of the application to which want to modify the list
       def remove_from_app!(app_id)
         client.remove_tester_from_app!(self, app_id)
-      end
-
-      #####################################################
-      # @!group Helpers
-      #####################################################
-
-      # Return a list of the Tester's group, if any
-      # @return
-      def groups_list(separator = ', ')
-        if groups
-          group_names = groups.map { |group| group["name"]["value"] }
-          group_names.join(separator)
-        end
       end
     end
 
