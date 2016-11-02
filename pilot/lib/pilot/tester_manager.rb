@@ -7,11 +7,15 @@ module Pilot
     def add_tester(options)
       start(options)
 
-      if config[:group]
+      if config[:groups]
         groups = Spaceship::Tunes::Tester::External.groups
-        group_id = groups.find { |k, v| v == config[:group] || k == config[:group] }
-        raise "Group '#{config[:group]}' not found for #{config[:email]}" unless group_id
-        config[:group] = group_id[0]
+        selected_groups = []
+        config[:groups].each do |group|
+          group_id = groups.find { |k, v| v == group || k == group }
+          raise "Group '#{group}' not found for #{config[:email]}" unless group_id
+          selected_groups.push(group_id[0])
+        end
+        config[:groups] = selected_groups
       end
 
       begin
@@ -24,7 +28,7 @@ module Pilot
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
                                                               last_name: config[:last_name],
-                                                              group: config[:group])
+                                                              groups: config[:groups])
           UI.success("Successfully invited tester: #{tester.email}")
         end
 
@@ -134,7 +138,7 @@ module Pilot
           tester.first_name,
           tester.last_name,
           tester.email,
-          tester.group_names,
+          tester.groups_list,
           tester.devices.count,
           tester.full_version,
           tester.pretty_install_date
