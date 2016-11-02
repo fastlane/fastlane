@@ -46,8 +46,6 @@ module Match
       [
         "[fastlane]",
         "Updated",
-        params[:app_identifier],
-        "for",
         params[:type].to_s
       ].join(" ")
     end

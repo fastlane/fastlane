@@ -64,8 +64,8 @@ module Pilot
       end
 
       # First, set the changelog and/or description if necessary
-      if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0
-        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description])
+      if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
         UI.success "Successfully set the changelog and/or description for build"
       end
 
@@ -121,7 +121,7 @@ module Pilot
         #  build trains right away, and if we don't do this check, we will
         #  get break out of this loop and then generate an error later when we
         #  have a nil build
-        if FastlaneCore::Feature.enabled?('PILOT_WAIT_FOR_NEW_BUILD_TRAINS_ON_ITUNES_CONNECT') && app.build_trains.count == 0
+        if app.build_trains.count == 0
           UI.message("New application; waiting for build train to appear on iTunes Connect")
         else
           builds = app.all_processing_builds

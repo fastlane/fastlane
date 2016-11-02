@@ -141,7 +141,28 @@ module Spaceship
           end
         end
 
-        result = client.update_build_trains!(application.apple_id, testing_type, data)
+        begin
+          result = client.update_build_trains!(application.apple_id, testing_type, data)
+        rescue Spaceship::TunesClient::ITunesConnectError => ex
+          if ex.to_s.include?("You must provide an answer for this question")
+            # This is a very common error message that's raised by TestFlight
+            # We want to show a nicer error message with instructions on how
+            # to resolve the underlying issue
+            # https://github.com/fastlane/fastlane/issues/1873
+            # https://github.com/fastlane/fastlane/issues/4002
+            error_message = [""] # to have a nice new-line in the beginning
+            error_message << "TestFlight requires you to provide the answer to the encryption question"
+            error_message << "to provide the reply, please add the following to your Info.plist file"
+            error_message << ""
+            error_message << "<key>ITSAppUsesNonExemptEncryption</key><false/>"
+            error_message << ""
+            error_message << "Afterwards re-build your app and try again"
+            error_message << "iTunes Connect reported: '#{ex}'"
+            raise error_message.join("\n")
+          else
+            raise ex
+          end
+        end
         self.internal_testing_enabled = new_value if testing_type == 'internal'
         self.external_testing_enabled = new_value if testing_type == 'external'
 

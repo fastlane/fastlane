@@ -161,6 +161,17 @@ module Gym
         end
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
+        UI.important("Generated plist file with the following values:")
+        UI.command_output("-----------------------------------------")
+        UI.command_output(JSON.pretty_generate(hash))
+        UI.command_output("-----------------------------------------")
+        if $verbose
+          UI.message("This results in the following plist file:")
+          UI.command_output("-----------------------------------------")
+          UI.command_output(hash.to_plist)
+          UI.command_output("-----------------------------------------")
+        end
+
         hash.to_plist
       end
 

@@ -41,16 +41,20 @@ Currently available services include (all require the `Spaceship.app_service.` p
 
 ```
 app_group.(on|off)
+apple_pay.(on|off)
 associated_domains.(on|off)
 data_protection.(complete|unless_open|until_first_auth|off)
+game_center.(on|off)
 health_kit.(on|off)
 home_kit.(on|off)
 wireless_accessory.(on|off)
 icloud.(on|off)
 cloud_kit.(xcode5_compatible|cloud_kit)
+in_app_purchase.(on|off)
 inter_app_audio.(on|off)
 passbook.(on|off)
 push_notification.(on|off)
+siri_kit.(on|off)
 vpn_configuration.(on|off)
 ```
 
@@ -121,6 +125,14 @@ dev_push_certs = Spaceship.certificate.development_push.all
 
 # Download a push profile
 cert_content = dev_push_certs.first.download
+
+# Creating a push certificate
+
+# Create a new certificate signing request
+csr, pkey = Spaceship.certificate.create_certificate_signing_request
+
+# Use the signing request to create a new push certificate
+Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
 ### Create a Certificate
@@ -131,9 +143,6 @@ csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
 # Use the signing request to create a new distribution certificate
 Spaceship.certificate.production.create!(csr: csr)
-
-# Use the signing request to create a new push certificate
-Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
 ## Provisioning Profiles

@@ -98,7 +98,7 @@ module Fastlane
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
 
       result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
-      puts result
+      UI.verbose(result)
 
       File.write(target_path, result)
       UI.success(target_path)

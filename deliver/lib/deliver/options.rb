@@ -31,7 +31,7 @@ module Deliver
                                      description: "Path to your ipa file",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end,
                                      conflicting_options: [:pkg],
@@ -45,7 +45,7 @@ module Deliver
                                      description: "Path to your pkg file",
                                      default_value: Dir["*.pkg"].first,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find pkg file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
                                      end,
                                      conflicting_options: [:ipa],
@@ -109,7 +109,7 @@ module Deliver
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find config file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find config file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless value.end_with?(".json")
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
@@ -167,7 +167,7 @@ module Deliver
                                      optional: true,
                                      short_option: "-l",
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
@@ -175,7 +175,7 @@ module Deliver
                                      optional: true,
                                      short_option: "-q",
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :copyright,

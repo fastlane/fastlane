@@ -32,7 +32,6 @@ gym
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/gym/LICENSE)
 [![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](http://rubygems.org/gems/gym)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Building your app has never been easier
 
@@ -49,7 +48,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>gym</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>gym</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's gym?
 
@@ -182,8 +181,8 @@ For the list of available options run `xcodebuild -help`.
 
 ## Setup code signing
 
-- [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
-- [Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+- [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
+- [Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/xcode-project/)
 
 ## Automating the whole process
 
@@ -259,7 +258,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

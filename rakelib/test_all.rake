@@ -98,7 +98,6 @@ task :test_all do
 
           sh rspec_command_parts.join(' ')
           sh "bundle exec rubocop"
-          sh "bundle exec fastlane verify_docs" unless repo == "danger-device_grid"
         end
       rescue => ex
         puts "[[FAILURE]] with repo '#{repo}' due to\n\n#{ex}\n\n"

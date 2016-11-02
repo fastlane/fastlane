@@ -90,6 +90,44 @@ lane :calculate do |options|
 end
 ```
 
+## Stop executing a lane early
+
+The `next` keyword can be used to stop executing a `lane` before it reaches the end.
+
+```ruby
+lane :build do |options|
+  if cached_build_available?
+    UI.important 'Skipping build because a cached build is available!'
+    next # skip doing the rest of this lane
+  end
+  match
+  gym
+end
+
+private_lane :cached_build_available? do |options|
+  # ...
+  true
+end
+```
+
+When `next` is used during a `lane` switch, control returns to the previous `lane` that was executing.
+
+```ruby
+lane :first_lane do |options|
+  puts "If you run: `fastlane first_lane`"
+  puts "You'll see this!"
+  second_lane
+  puts "As well as this!"
+end
+
+private_lane :second_lane do |options|
+  next
+  puts "This won't be shown"
+end
+```
+
+When you stop executing a lane early with `next`, any `after_each` and `after_all` blocks you have will still trigger as usual :+1:
+
 ## `before_each` and `after_each` blocks
 
 `before_each` blocks are called before any lane is called. This would include being called before each lane you've switched to.

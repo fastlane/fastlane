@@ -2,3 +2,4 @@
 
 gem 'fastlane-plugin-ruby'
 gem 'fastlane-plugin-clubmate'
+gem 'fastlane-plugin-sharethemeal'
