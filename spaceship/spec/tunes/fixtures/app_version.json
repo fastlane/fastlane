@@ -353,7 +353,7 @@
                                     "errorKeys": null
                                 },
                                 "messagesScaled": {
-                                    "value": false,
+                                    "value": true,
                                     "isEditable": true,
                                     "isRequired": false,
                                     "errorKeys": null
