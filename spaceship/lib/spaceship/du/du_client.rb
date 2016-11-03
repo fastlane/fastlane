@@ -93,8 +93,8 @@ module Spaceship
     def messages_picture_type_map
       # rubocop:enable Style/ExtraSpacing
       {
-        iPad:         "MZPFT.SortedTabletMessagesScreenShot",
-        iPadPro:      "MZPFT.SortedJ99MessagesScreenShot",
+        ipad:         "MZPFT.SortedTabletMessagesScreenShot",
+        ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot"
