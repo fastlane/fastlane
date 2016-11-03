@@ -791,7 +791,7 @@ module Spaceship
     def groups
       return @cached_groups if @cached_groups
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
-      @cached_groups ||= parse_response(r, 'data')['groups']
+      @cached_groups = parse_response(r, 'data')['groups']
     end
 
     def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, groups: nil)
