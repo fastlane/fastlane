@@ -18,15 +18,15 @@ module Deliver
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
       # iPhone 5 iMessage
-      IOS_40_MESSAGES = "iOS-4-in-Messages"
+      IOS_40_MESSAGES = "iOS-4-in"
       # iPhone 6 iMessage
-      IOS_47_MESSAGES = "iOS-4.7-in-Messages"
+      IOS_47_MESSAGES = "iOS-4.7-in"
       # iPhone 6 Plus iMessage
-      IOS_55_MESSAGES = "iOS-5.5-in-Messages"
+      IOS_55_MESSAGES = "iOS-5.5-in"
       # iPad iMessage
-      IOS_IPAD_MESSAGES = "iOS-iPad-Messages"
+      IOS_IPAD_MESSAGES = "iOS-iPad"
       # iPad Pro iMessage
-      IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-Messages"
+      IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro"
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Mac
@@ -66,11 +66,11 @@ module Deliver
         ScreenSize::IOS_55 => "iphone6Plus",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
-        ScreenSize::IOS_40_MESSAGES => "iphone4Messages",
-        ScreenSize::IOS_47_MESSAGES => "iphone6Messages",
-        ScreenSize::IOS_55_MESSAGES => "iphone6PlusMessages",
-        ScreenSize::IOS_IPAD_MESSAGES => "ipadMessages",
-        ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadProMessages",
+        ScreenSize::IOS_40_MESSAGES => "iphone4",
+        ScreenSize::IOS_47_MESSAGES => "iphone6",
+        ScreenSize::IOS_55_MESSAGES => "iphone6Plus",
+        ScreenSize::IOS_IPAD_MESSAGES => "ipad",
+        ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
         ScreenSize::MAC => "desktop",
         ScreenSize::IOS_APPLE_WATCH => "watch",
         ScreenSize::APPLE_TV => "appleTV"
@@ -104,6 +104,10 @@ module Deliver
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
+    end
+
+    def is_messages?
+      return [ScreenSize::IOS_40_MESSAGES, ScreenSize::IOS_47_MESSAGES, ScreenSize::IOS_55_MESSAGES, ScreenSize::IOS_IPAD_MESSAGES, ScreenSize::IOS_IPAD_PRO_MESSAGES].include?(self.screen_size)
     end
 
     def self.device_messages

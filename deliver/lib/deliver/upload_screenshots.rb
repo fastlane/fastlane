@@ -53,7 +53,8 @@ module Deliver
           v.upload_screenshot!(screenshot.path,
                                index,
                                screenshot.language,
-                               screenshot.device_type)
+                               screenshot.device_type,
+                               screenshot.is_messages?)
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
