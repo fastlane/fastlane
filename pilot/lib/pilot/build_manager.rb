@@ -63,6 +63,13 @@ module Pilot
         UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
       end
 
+      unless config[:update_build_info_on_upload]
+        if should_update_build_information(options)
+          build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
+          UI.success "Successfully set the changelog and/or description for build"
+        end
+      end
+
       return if config[:skip_submission]
       distribute_build(build, options)
       UI.message("Successfully distributed build to beta testers 🚀")
@@ -98,6 +105,10 @@ module Pilot
       return row
     end
 
+    def should_update_build_information(options)
+      options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+    end
+
     # This method will takes care of checking for the processing builds every few seconds
     # @return [Build] The build that we just uploaded
     def wait_for_processing_build(options)
@@ -107,7 +118,7 @@ module Pilot
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
-      must_update_build_info = true
+      must_update_build_info = config[:update_build_info_on_upload]
       loop do
         sleep(wait_processing_interval)
 
@@ -125,7 +136,7 @@ module Pilot
 
           if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary
-            if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+            if should_update_build_information(options)
               build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
               UI.success "Successfully set the changelog and/or description for build"
             end
