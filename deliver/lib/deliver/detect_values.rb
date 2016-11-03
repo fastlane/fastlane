@@ -1,9 +1,9 @@
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
-      find_app_identifier(options) unless skip_params[:skip_app_identifier]
-      find_app(options) unless skip_params[:skip_app]
-      find_folders(options) unless skip_params[:skip_folders]
+      find_app_identifier(options)
+      find_app(options)
+      find_folders(options)
       find_version(options) unless skip_params[:skip_version]
     end
 
@@ -18,7 +18,6 @@ module Deliver
 
       options[:app_identifier] = identifier if identifier.to_s.length > 0
       options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
-
     rescue
       UI.user_error!("Could not infer your App's Bundle Identifier")
     end

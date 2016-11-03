@@ -14,7 +14,7 @@ module Deliver
       FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
-    def deliverfile_options(skip_verification = false)
+    def deliverfile_options(skip_verification: false)
       available_options = Deliver::Options.available_options
       return available_options unless skip_verification
 
@@ -26,6 +26,8 @@ module Deliver
         opt.verify_block = nil
         opt.conflicting_options = nil
       end
+
+      return available_options
     end
 
     def run
@@ -106,7 +108,7 @@ module Deliver
         c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
 
         c.action do |args, options|
-          options = FastlaneCore::Configuration.create(deliverfile_options(true), options.__hash__)
+          options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options, skip_version: true) # to login...
           containing = FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.'
@@ -120,7 +122,7 @@ module Deliver
         c.description = "Downloads existing metadata and stores it locally. This overwrites the local files."
 
         c.action do |args, options|
-          options = FastlaneCore::Configuration.create(deliverfile_options(true), options.__hash__)
+          options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options) # to login...
           containing = FastlaneCore::Helper.fastlane_enabled? ? './fastlane' : '.'
