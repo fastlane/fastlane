@@ -28,7 +28,7 @@ module Gym
 
         path
       elsif Gym.project.mac?
-        if Gym.config[:export_method]
+        if Gym.config[:export_method] == 'app-store' || Gym.config[:export_method] == 'developer-id'
           package_app
           move_pkg
         end
