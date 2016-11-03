@@ -174,7 +174,7 @@ module Gym
 
         to_plist(hash)
       end
-      
+
       # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
       def to_plist(hash)
         Plist::Emit.dump(hash, true)
