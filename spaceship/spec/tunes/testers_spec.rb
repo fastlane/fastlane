@@ -43,6 +43,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.first_name).to eq("Detlef")
       expect(t.last_name).to eq("Müller")
       expect(t.devices).to eq([{ "model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil }])
+      expect(t.groups[0]["id"]).to eq("e031d021-4f0f-4c1e-8d8a-c3341a267986")
     end
   end
 

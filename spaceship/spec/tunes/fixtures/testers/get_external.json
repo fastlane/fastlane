@@ -44,7 +44,22 @@
       "hasAddedOrInvitedApp": null,
       "warnOnDelete": true,
       "itcUsername": null,
-      "groups": []
+      "groups": [
+          {
+            "id": "e031d021-4f0f-4c1e-8d8a-c3341a267986",
+            "name": {
+              "value": "App Testers Group",
+              "isEditable": false,
+              "isRequired": false,
+              "errorKeys": null,
+              "maxLength": 25,
+              "minLength": 1
+            },
+            "testerCount": null,
+            "testers": null,
+            "isDeleted": null
+          }
+        ]
     }, {
       "emailAddress": {
         "value": "ich@felixkrause.at",
