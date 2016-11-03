@@ -10,20 +10,21 @@ module Deliver
       UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
       UI.message("Starting with the upload of screenshots...")
+      screenshots_per_language = screenshots.group_by(&:language)
 
-      # First, clear all previously uploaded screenshots, but only where we have new ones
-      # screenshots.each do |screenshot|
-      #   to_remove = v.screenshots[screenshot.language].find_all do |current|
-      #     current.device_type == screenshot.device_type
-      #   end
-      #   to_remove.each { |t| t.reset! }
-      # end
-      # This part is not working yet...
+      if options[:overwrite_screenshots]
+        UI.message("Removing all previously uploaded screenshots...")
+        # First, clear all previously uploaded screenshots
+        screenshots_per_language.keys.each do |language|
+          v.screenshots[language].each_with_index do |t, index|
+            v.upload_screenshot!(nil, index, t.language, t.device_type)
+          end
+        end
+      end
 
       # Now, fill in the new ones
       indized = {} # per language and device type
 
-      screenshots_per_language = screenshots.group_by(&:language)
       enabled_languages = screenshots_per_language.keys
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
