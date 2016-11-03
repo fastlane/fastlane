@@ -50,6 +50,19 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
 
+    def certificate_exists_for_pkcs12(pkcs12)
+      UI.message "Looking up availabe code signing certificates in the Apple Developer Portal..."
+
+      matching_certificates_on_portal = Spaceship.certificate.all.find_all do |cert|
+        (cert.expires == pkcs12.certificate.not_after && cert.owner_name == pkcs12.certificate.subject.to_s.split("O=")[1].split("/")[0] && cert.owner_id == pkcs12.certificate.subject.to_s.split("OU=")[1].split("/")[0])
+      end
+
+      UI.user_error!("The certificate to import can not be associated to an existing certificate in the Apple Developer Portal.") if matching_certificates_on_portal.nil? || matching_certificates_on_portal.first.nil?
+      UI.crash!("The proper certificate couldn't be processed from the Apple Developer Portal.") if matching_certificates_on_portal.first.is_a?(Spaceship::Portal::Certificate.class)
+
+      return matching_certificates_on_portal.first
+    end
+
     def profile_exists(username: nil, uuid: nil)
       found = Spaceship.provisioning_profile.all.find do |profile|
         profile.uuid == uuid
