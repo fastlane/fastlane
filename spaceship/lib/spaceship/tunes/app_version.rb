@@ -692,7 +692,9 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          display_family.fetch("messagesScreenshots", {}).fetch("value", []).each do |screenshot|
+          display_family_screenshots = display_family.fetch("messagesScreenshots", {})
+          next unless display_family_screenshots
+          display_family_screenshots.fetch("value", []).each do |screenshot|
             screenshot_data = screenshot["value"]
             data = {
                 device_type: display_family['name'],
