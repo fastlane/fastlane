@@ -159,6 +159,11 @@ module Deliver
                                      env_name: "DELIVER_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
+                                     env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
+                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
+                                     is_string: false,
+                                     default_value: false),
 
         # App Metadata
         # Non Localised

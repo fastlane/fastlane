@@ -35,6 +35,7 @@ module Sigh
                                      env_name: "SIGH_FORCE",
                                      description: "Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles",
                                      is_string: false,
+                                     short_option: "-f",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",

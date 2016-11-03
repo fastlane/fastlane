@@ -42,15 +42,19 @@ module Produce
         c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable_services -a com.example.app --healthkit --homekit --passbook'
 
         c.option '--app-group', 'Enable App Groups'
+        c.option '--apple-pay', 'Enable Apple Pay'
         c.option '--associated-domains', 'Enable Associated Domains'
         c.option '--data-protection STRING', String, 'Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"'
+        c.option '--game-center', 'Enable Game Center'
         c.option '--healthkit', 'Enable HealthKit'
         c.option '--homekit', 'Enable HomeKit'
         c.option '--wireless-conf', 'Enable Wireless Accessory Configuration'
         c.option '--icloud STRING', String, 'Enable iCloud, suitable values are "legacy" and "cloudkit"'
+        c.option '--in-app-purchase', 'Enable In-App Purchase'
         c.option '--inter-app-audio', 'Enable Inter-App-Audio'
         c.option '--passbook', 'Enable Passbook'
         c.option '--push-notification', 'Enable Push notification (only enables the service, does not configure certificates)'
+        c.option '--sirikit', 'Enable SiriKit'
         c.option '--vpn-conf', 'Enable VPN Configuration'
 
         c.action do |args, options|
@@ -69,15 +73,19 @@ module Produce
         c.example 'Disable HealthKit', 'produce disable_services -a com.example.app --healthkit'
 
         c.option '--app-group', 'Disable App Groups'
+        c.option '--apple-pay', 'Disable Apple Pay'
         c.option '--associated-domains', 'Disable Associated Domains'
         c.option '--data-protection', 'Disable Data Protection'
+        c.option '--game-center', 'Disable Game Center'
         c.option '--healthkit', 'Disable HealthKit'
         c.option '--homekit', 'Disable HomeKit'
         c.option '--wireless-conf', 'Disable Wireless Accessory Configuration'
         c.option '--icloud', 'Disable iCloud'
+        c.option '--in-app-purchase', 'Disable In-App Purchase'
         c.option '--inter-app-audio', 'Disable Inter-App-Audio'
         c.option '--passbook', 'Disable Passbook'
         c.option '--push-notification', 'Disable Push notifications'
+        c.option '--sirikit', 'Disable SiriKit'
         c.option '--vpn-conf', 'Disable VPN Configuration'
 
         c.action do |args, options|

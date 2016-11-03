@@ -25,6 +25,11 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # removes ANSI colors from string
+    def self.strip_ansi_colors(str)
+      str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
     # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
     def self.bundler?
       # Bundler environment variable
