@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency "spaceship", ">= 0.36.2", "< 1.0.0" # access to the Dev Portal
+  spec.add_dependency "spaceship", ">= 0.37.0", "< 1.0.0" # access to the Dev Portal
 
   # Development only
   spec.add_development_dependency 'bundler'
