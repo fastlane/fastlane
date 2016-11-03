@@ -1,10 +1,10 @@
 module Deliver
   class DetectValues
-    def run!(options)
+    def run!(options, skip_params = {})
       find_app_identifier(options)
       find_app(options)
       find_folders(options)
-      find_version(options)
+      find_version(options) unless skip_params[:skip_version]
     end
 
     def find_app_identifier(options)
@@ -18,6 +18,8 @@ module Deliver
 
       options[:app_identifier] = identifier if identifier.to_s.length > 0
       options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
+    rescue
+      UI.user_error!("Could not infer your App's Bundle Identifier")
     end
 
     def find_app(options)
@@ -41,11 +43,15 @@ module Deliver
     end
 
     def find_version(options)
+      return if options[:app_version]
+
       if options[:ipa]
         options[:app_version] ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
       elsif options[:pkg]
         options[:app_version] ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
       end
+    rescue
+      UI.user_error!("Could not infer your app's version")
     end
   end
 end
