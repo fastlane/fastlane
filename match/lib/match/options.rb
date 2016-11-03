@@ -106,7 +106,17 @@ module Match
                                      env_name: "MATCH_SKIP_DOCS",
                                      description: "Skip generation of a README.md for the created git repository",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :import_certificate,
+                                    env_name: "MATCH_IMPORT_CERTIFICATE",
+                                    description: "Path to the certificate to import",
+                                    optional: true,
+                                    is_string: true),
+        FastlaneCore::ConfigItem.new(key: :import_certificate_password,
+                                    env_name: "MATCH_IMPORT_CERTIFICATE_PASSWORD",
+                                    description: "The password for the certificate to import",
+                                    optional: true,
+                                    is_string: true)
       ]
     end
   end
