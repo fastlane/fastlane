@@ -168,11 +168,16 @@ module Gym
         if $verbose
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
-          UI.command_output(hash.to_plist)
+          UI.command_output(to_plist(hash))
           UI.command_output("-----------------------------------------")
         end
 
-        hash.to_plist
+        to_plist(hash)
+      end
+
+      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
+      def to_plist(hash)
+        Plist::Emit.dump(hash, true)
       end
 
       def print_legacy_information
