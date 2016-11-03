@@ -53,5 +53,20 @@ module Match
     def self.base_environment_variable_name(app_identifier: nil, type: nil)
       ["sigh", app_identifier, type]
     end
+
+    # Load a P12 certificate file as OpenSSL:PKCS12 object.
+    def self.load_pkcs12_file(path, password=nil)
+      UI.user_error!("Certificate #{path} couldn't be found") unless File.exist?(path)
+
+      begin
+        p12 = OpenSSL::PKCS12::new(File.read(path), password)
+      rescue OpenSSL::PKCS12::PKCS12Error => error
+        UI.user_error!("The certificate password is either incorrect or missing")
+      rescue Exception => e
+        UI.user_error!("Certificate #{path} couldn't be loaded: #{e.message}")
+      end
+
+      return p12
+    end
   end
 end
