@@ -50,6 +50,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "GITHUB_PULL_REQUEST_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
+                                       default_value: ENV["GITHUB_API_TOKEN"],
                                        is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repo,
