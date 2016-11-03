@@ -7,6 +7,17 @@ module Pilot
     def add_tester(options)
       start(options)
 
+      if config[:groups]
+        groups = Spaceship::Tunes::Tester::External.groups
+        selected_groups = []
+        config[:groups].each do |group|
+          group_id = groups.find { |k, v| v == group || k == group }
+          raise "Group '#{group}' not found for #{config[:email]}" unless group_id
+          selected_groups.push(group_id[0])
+        end
+        config[:groups] = selected_groups
+      end
+
       begin
         tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
         tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
@@ -16,7 +27,8 @@ module Pilot
         else
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
-                                                              last_name: config[:last_name])
+                                                              last_name: config[:last_name],
+                                                              groups: config[:groups])
           UI.success("Successfully invited tester: #{tester.email}")
         end
 
@@ -120,12 +132,13 @@ module Pilot
     end
 
     def list_global(all_testers, title)
-      headers = ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"]
+      headers = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
       list(all_testers, title, headers) do |tester|
         [
           tester.first_name,
           tester.last_name,
           tester.email,
+          tester.groups_list,
           tester.devices.count,
           tester.full_version,
           tester.pretty_install_date
@@ -134,12 +147,13 @@ module Pilot
     end
 
     def list_by_app(all_testers, title)
-      headers = ["First", "Last", "Email"]
+      headers = ["First", "Last", "Email", "Groups"]
       list(all_testers, title, headers) do |tester|
         [
           tester.first_name,
           tester.last_name,
-          tester.email
+          tester.email,
+          tester.groups_list
           # Testers returned by the query made in the context of an app do not contain
           # the devices, version, or install date information
         ]
@@ -165,11 +179,8 @@ module Pilot
       rows << ["Last name", tester.last_name]
       rows << ["Email", tester.email]
 
-      groups = tester.raw_data.get("groups")
-
-      if groups && groups.length > 0
-        group_names = groups.map { |group| group["name"]["value"] }
-        rows << ["Groups", group_names.join(', ')]
+      if tester.groups.length > 0
+        rows << ["Groups", tester.groups_list]
       end
 
       if tester.latest_install_date

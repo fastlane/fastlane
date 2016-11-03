@@ -131,7 +131,16 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :groups,
+                                     short_option: "-g",
+                                     env_name: "PILOT_GROUPS",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. '-g \"Team 1\",\"Team 2\"'",
+                                     optional: true,
+                                     type: Array,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                     end)
       ]
     end
   end
