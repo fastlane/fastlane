@@ -55,20 +55,6 @@ module Match
         end
       end
 
-      Match.environments.each do |type|
-        command :import do |c|
-          c.syntax = "match import #{type}"
-          c.description = "Import P12 certificate to match's repository"
-
-          c.action do |args, options|
-            params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-            params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
-            params[:type] = type.to_s
-            Match::Runner.new.import_certificate(args, params)
-          end
-        end
-      end
-
       command :init do |c|
         c.syntax = 'match init'
         c.description = 'Create the Matchfile for you'
@@ -125,6 +111,18 @@ module Match
             params.load_configuration_file("Matchfile")
             Match::Nuke.new.run(params, type: type.to_s)
           end
+        end
+      end
+
+      command :import do |c|
+        c.syntax = "match import my_certificate.p12"
+        c.description = "Import a P12 certificate to match's repository"
+
+        c.action do |args, options|
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+          params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+          params[:type] = type.to_s
+          Match::Runner.new.import_certificate(args, params)
         end
       end
 
