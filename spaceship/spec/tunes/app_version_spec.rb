@@ -190,7 +190,7 @@ describe Spaceship::AppVersion, all: true do
         expect(s1.original_file_name).to eq('ftl_250ec6b31ba0da4c4e8e22fdf83d71a1_65ea94f6b362563260a5742b93659729.png')
         expect(s1.language).to eq("English")
 
-        expect(v.screenshots["English"].count).to eq(10)
+        expect(v.screenshots["English"].count).to eq(13)
 
         # 2 iPhone 6 Plus Screenshots
         expect(v.screenshots["English"].count { |s| s.device_type == 'iphone6Plus' }).to eq(3)
@@ -510,8 +510,8 @@ describe Spaceship::AppVersion, all: true do
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
-        it "can add a new imessage screenshot to the list" do
-          du_upload_screenshot_success
+        it "can add a new iMessage screenshot to the list" do
+          du_upload_messages_screenshot_success
 
           count = version.screenshots["English"].count
           version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', true)
@@ -536,6 +536,26 @@ describe Spaceship::AppVersion, all: true do
 
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(false)
+        end
+
+        it "auto-sets the 'scaled' parameter when the user provides an iMessage screenshot" do
+          def fetch_family(device_type, language)
+            lang_details = version.raw_data["details"]["value"].find { |a| a["language"] == language }
+            return lang_details["displayFamilies"]["value"].find { |value| value["name"] == device_type }
+          end
+
+          device_type = "iphone4"
+          language = "English"
+
+          du_upload_messages_screenshot_success
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(true)
+
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, true)
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(false)
         end
 
         it "can replace an existing screenshot with existing sort_order" do
