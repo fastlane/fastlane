@@ -132,10 +132,24 @@ module Fastlane
       require "openssl"
 
       env_output = "### Stack\n\n"
-      product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
+      product, version, build = "Unkown"
+      os_version = "UNKOWN"
+
+      if FastlaneCore::Helper.mac?
+        product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
+        os_version = `sw_vers -productVersion`.strip
+      end
+
+      if FastlaneCore::Helper.linux?
+        os_version = `uname -a`.strip.split("\n").map { |line| line.split(':').last.strip }
+        version = ""
+        build = ""
+        product = `cat /etc/issue`
+      end
+
       table_content = {
         "fastlane" => Fastlane::VERSION,
-        "OS" => `sw_vers -productVersion`.strip,
+        "OS" => os_version,
         "Ruby" => RUBY_VERSION,
         "Bundler?" => Helper.bundler?,
         "Xcode Path" => Helper.xcode_path,
