@@ -173,20 +173,51 @@ module Fastlane
       require "openssl"
 
       env_output = "### Stack\n\n"
-      product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
+      product, version, build = "Unknown"
+      os_version = "UNKNOWN"
+
+      if Helper.mac?
+        product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
+        os_version = version
+      end
+
+      if Helper.linux?
+        # this should work on pretty much all linux distros
+        os_version = `uname -a`.strip
+        version = ""
+        build = `uname -r`.strip
+        product = `cat /etc/issue.net`.strip
+
+        distro_guesser = {
+          fedora: "/etc/fedora-release",
+          debian_based: "/etc/debian_version",
+          suse: "/etc/SUSE-release",
+          mandrake: "/etc/mandrake-release"
+        }
+
+        distro_guesser.each do |dist, vers|
+          os_version = "#{dist} " + File.read(vers).strip if File.exist?(vers)
+          version = os_version
+        end
+      end
+
       table_content = {
         "fastlane" => Fastlane::VERSION,
-        "OS" => `sw_vers -productVersion`.strip,
+        "OS" => os_version,
         "Ruby" => RUBY_VERSION,
         "Bundler?" => Helper.bundler?,
-        "Xcode Path" => Helper.xcode_path,
-        "Xcode Version" => Helper.xcode_version,
         "Git" => `git --version`.strip.split("\n").first,
         "Installation Source" => $PROGRAM_NAME,
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => RbConfig::CONFIG['libdir'],
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION
       }
+
+      if Helper.mac?
+        table_content["Xcode Path"] = Helper.xcode_path
+        table_content["Xcode Version"] = Helper.xcode_version
+      end
+
       table = ["| Key | Value |"]
       table += table_content.collect { |k, v| "| #{k} | #{v} |" }
 
