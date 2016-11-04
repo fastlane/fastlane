@@ -24,6 +24,13 @@ module Fastlane
                 'you should turn off smart quotes in your editor of choice.'
       end
 
+      content.scan(/.*require (.*)/).each do |current|
+        current = current.first
+        next if current.include?(".") # these are local gems
+        next if current.include?("/")
+        UI.important("You require a gem, please call `fastlane_require #{current}` before to ensure the gem is installed")
+      end
+
       parse(content, @path)
     end
 
@@ -177,6 +184,10 @@ module Fastlane
 
     def desc_collection
       @desc_collection ||= []
+    end
+
+    def fastlane_require(gem_name)
+      FastlaneRequire.fastlane_require(gem_name)
     end
 
     def import(path = nil)

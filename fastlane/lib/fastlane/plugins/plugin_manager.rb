@@ -273,7 +273,8 @@ module Fastlane
           # any actions were overwritten
           self.loaded_fastlane_actions.concat(Fastlane::Actions.constants)
 
-          require gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
+          FastlaneRequire.fastlane_require(gem_name)
+
           store_plugin_reference(gem_name)
           loaded_plugins = true
         rescue => ex
