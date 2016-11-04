@@ -2,10 +2,10 @@ module Deliver
   class Runner
     attr_accessor :options
 
-    def initialize(options)
+    def initialize(options, skip_auto_detection = {})
       self.options = options
       login
-      Deliver::DetectValues.new.run!(self.options)
+      Deliver::DetectValues.new.run!(self.options, skip_auto_detection)
       FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Deliver::VERSION} Summary")
     end
 

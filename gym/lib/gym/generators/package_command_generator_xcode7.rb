@@ -22,15 +22,14 @@ module Gym
       end
 
       def options
-        options = []
+        config = Gym.config
 
+        options = []
         options << "-exportOptionsPlist '#{config_path}'"
         options << "-archivePath #{BuildCommandGenerator.archive_path.shellescape}"
         options << "-exportPath '#{temporary_output_path}'"
-
-        if Gym.config[:toolchain]
-          options << "-toolchain '#{Gym.config[:toolchain]}'"
-        end
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+        options << config[:export_xcargs] if config[:export_xcargs]
 
         options
       end
@@ -168,11 +167,16 @@ module Gym
         if $verbose
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
-          UI.command_output(hash.to_plist)
+          UI.command_output(to_plist(hash))
           UI.command_output("-----------------------------------------")
         end
 
-        hash.to_plist
+        to_plist(hash)
+      end
+
+      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
+      def to_plist(hash)
+        Plist::Emit.dump(hash, true)
       end
 
       def print_legacy_information

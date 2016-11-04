@@ -23,6 +23,26 @@ describe Gym do
                            ])
     end
 
+    it "works with the example project and additional parameters" do
+      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      xcargs = xcargs_hash.map do |k, v|
+        "#{k.to_s.shellescape}=#{v.shellescape}"
+      end.join ' '
+
+      options = { project: "./examples/standard/Example.xcodeproj", export_xcargs: xcargs }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             ""
+                           ])
+    end
+
     it "works with spaces in path name" do
       options = { project: "./examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)

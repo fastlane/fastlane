@@ -2,6 +2,11 @@ module Fastlane
   class Setup
     # Start the setup process
     def run
+      if FastlaneFolder.setup? and !Helper.is_test?
+        UI.important("fastlane is already set up at path #{FastlaneFolder.path}")
+        return
+      end
+
       platform = nil
       if is_ios?
         UI.message("Detected iOS/Mac project in current directory...")

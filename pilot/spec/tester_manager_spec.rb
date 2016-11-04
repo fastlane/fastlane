@@ -9,6 +9,7 @@ describe Pilot::TesterManager do
           first_name: 'First',
           last_name: 'Last',
           email: 'my@email.addr',
+          groups: ['testers'],
           devices: ["d"],
           full_version: '1.0 (21)',
           pretty_install_date: '2016-01-01',
@@ -18,6 +19,7 @@ describe Pilot::TesterManager do
           first_name: 'Fabricio',
           last_name: 'Devtoolio',
           email: 'fabric-devtools@gmail.com',
+          groups: ['testers'],
           devices: ["d", "d2"],
           full_version: '1.1 (22)',
           pretty_install_date: '2016-02-02',
@@ -58,12 +60,13 @@ describe Pilot::TesterManager do
         allow(Spaceship::Tunes::Tester::Internal).to receive(:all).and_return(global_testers)
         allow(Spaceship::Tunes::Tester::External).to receive(:all).and_return(global_testers)
 
-        headings = ["First", "Last", "Email", "Devices", "Latest Version", "Latest Install Date"]
+        headings = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
         rows = global_testers.map do |tester|
           [
             tester.first_name,
             tester.last_name,
             tester.email,
+            tester.group_names,
             tester.devices.count,
             tester.full_version,
             tester.pretty_install_date
@@ -86,9 +89,9 @@ describe Pilot::TesterManager do
         allow(Spaceship::Tunes::Tester::Internal).to receive(:all_by_app).and_return(app_context_testers)
         allow(Spaceship::Tunes::Tester::External).to receive(:all_by_app).and_return(app_context_testers)
 
-        headings = ["First", "Last", "Email"]
+        headings = ["First", "Last", "Email", "Groups"]
         rows = app_context_testers.map do |tester|
-          [tester.first_name, tester.last_name, tester.email]
+          [tester.first_name, tester.last_name, tester.email, tester.group_names]
         end
 
         expect(Terminal::Table).to receive(:new).with(title: "Internal Testers".green,
