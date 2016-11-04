@@ -18,15 +18,15 @@ module Deliver
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
       # iPhone 5 iMessage
-      IOS_40_MESSAGES = "iOS-4-in"
+      IOS_40_MESSAGES = "iOS-4-in-messages"
       # iPhone 6 iMessage
-      IOS_47_MESSAGES = "iOS-4.7-in"
+      IOS_47_MESSAGES = "iOS-4.7-in-messages"
       # iPhone 6 Plus iMessage
-      IOS_55_MESSAGES = "iOS-5.5-in"
+      IOS_55_MESSAGES = "iOS-5.5-in-messages"
       # iPad iMessage
-      IOS_IPAD_MESSAGES = "iOS-iPad"
+      IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad Pro iMessage
-      IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro"
+      IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Mac

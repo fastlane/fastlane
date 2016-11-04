@@ -39,13 +39,14 @@ module Deliver
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
           indized[screenshot.language] ||= {}
-          indized[screenshot.language][screenshot.device_type] ||= 0
-          indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
+          indized[screenshot.language][screenshot.formatted_name] ||= 0
+          indized[screenshot.language][screenshot.formatted_name] += 1 # we actually start with 1... wtf iTC
 
-          index = indized[screenshot.language][screenshot.device_type]
+
+          index = indized[screenshot.language][screenshot.formatted_name]
 
           if index > 5
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
 
