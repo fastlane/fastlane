@@ -16,6 +16,8 @@ module Fastlane
         installer = Gem::CommandManager.instance[:install]
 
         UI.message "Installing '#{gem_name}'..."
+        # We install the gem like this because we also want to gem to be available to be required
+        # at this point. If we were to shell out, this wouldn't be the case
         installer.install_gem(gem_name, Gem::Requirement.default)
         UI.success("Successfully installed '#{gem_name}' to '#{bundle_path}'")
         require gem_require_name
