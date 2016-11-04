@@ -48,6 +48,18 @@ module FastlaneCore
       return false
     end
 
+    def self.unix?
+      !windows?
+    end
+
+    def self.windows?
+      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def self.linux?
+      unix? and !mac?
+    end
+
     # Is the currently running computer a Mac?
     def self.mac?
       (/darwin/ =~ RUBY_PLATFORM) != nil
