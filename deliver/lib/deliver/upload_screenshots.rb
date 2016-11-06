@@ -42,7 +42,6 @@ module Deliver
           indized[screenshot.language][screenshot.formatted_name] ||= 0
           indized[screenshot.language][screenshot.formatted_name] += 1 # we actually start with 1... wtf iTC
 
-
           index = indized[screenshot.language][screenshot.formatted_name]
 
           if index > 5
