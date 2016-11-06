@@ -86,7 +86,7 @@ module Spaceship
         iphone4:      "MZPFT.SortedN41ScreenShot",
         iphone35:     "MZPFT.SortedScreenShot",
         appleTV:      "MZPFT.SortedATVScreenShot",
-        desktop:      "MZPFT.SortedDesktopScreenShot",
+        desktop:      "MZPFT.SortedDesktopScreenShot"
       }
     end
 
