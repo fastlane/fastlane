@@ -484,13 +484,27 @@ module Spaceship
     # @param app_version (AppVersion): The version of your app
     # @param upload_image (UploadFile): The image to upload
     # @param device (string): The target device
+    # @param is_messages (Bool): True if the screenshot is for iMessage
     # @return [JSON] the response
-    def upload_screenshot(app_version, upload_image, device)
+    def upload_screenshot(app_version, upload_image, device, is_messages)
       raise "app_version is required" unless app_version
       raise "upload_image is required" unless upload_image
       raise "device is required" unless device
 
-      du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
+      du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device, is_messages)
+    end
+
+    # Uploads an iMessage screenshot
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_image (UploadFile): The image to upload
+    # @param device (string): The target device
+    # @return [JSON] the response
+    def upload_messages_screenshot(app_version, upload_image, device)
+      raise "app_version is required" unless app_version
+      raise "upload_image is required" unless upload_image
+      raise "device is required" unless device
+
+      du_client.upload_messages_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
     end
 
     # Uploads the transit app file
