@@ -156,6 +156,7 @@ Use it to define the general information:
     },
     {
       "filter": "Organizing",
+      "title_below_image": true,
       "keyword": {
         "color": "#feb909"
       }
@@ -176,6 +177,8 @@ Use it to define the general information:
 }
 ```
 The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
+
+The `title_below_image` value specifies whether `frameit` should place the title below the screenshot. If it is false, it will be placed above the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
