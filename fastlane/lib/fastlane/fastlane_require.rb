@@ -16,6 +16,8 @@ module Fastlane
         installer = Gem::CommandManager.instance[:install]
 
         UI.important "Installing Ruby gem '#{gem_name}'..."
+        return if Helper.test?
+
         # We install the gem like this because we also want to gem to be available to be required
         # at this point. If we were to shell out, this wouldn't be the case
         installer.install_gem(gem_name, Gem::Requirement.default)
