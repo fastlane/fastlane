@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         command = []
 
-        if File.exist?("Gemfile") && params[:use_bundle_exec]
+        if File.exist?("Gemfile") && params[:use_bundle_exec] && !Helper.contained_fastlane?
           command << "bundle exec"
         end
 

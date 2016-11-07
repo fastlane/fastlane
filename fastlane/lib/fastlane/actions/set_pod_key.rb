@@ -5,7 +5,7 @@ module Fastlane
         Actions.verify_gem!('cocoapods-keys')
         cmd = []
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
+        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec] && !Helper.contained_fastlane?
         cmd << ['pod keys set']
 
         cmd << ["\"#{params[:key].shellescape}\""]

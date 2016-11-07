@@ -14,7 +14,9 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
+        if File.exist?('Gemfile') && params[:use_bundle_exec] && !Helper.contained_fastlane?
+          cmd << ['bundle exec']
+        end
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
