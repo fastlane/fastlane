@@ -52,7 +52,6 @@ module Match
   def self.environment_from_cert(cert)
     return :enterprise if Match.enterprise? && cert.is_a?(Spaceship::Portal::Certificate::InHouse)
     return :development if cert.is_a?(Spaceship::Portal::Certificate::Development)
-    return :appstore if cert.is_a?(Spaceship::Portal::Certificate::Production)
     return :distribution
   end
 
