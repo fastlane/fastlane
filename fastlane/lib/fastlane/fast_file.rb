@@ -24,11 +24,12 @@ module Fastlane
                 'you should turn off smart quotes in your editor of choice.'
       end
 
-      content.scan(/.*require (.*)/).each do |current|
-        current = current.first
-        next if current.include?(".") # these are local gems
-        next if current.include?("/")
-        UI.important("You require a gem, please call `fastlane_require #{current}` before to ensure the gem is installed")
+      content.scan(/(.*require) (.*)/).each do |current|
+        require_command = current.first
+        gem_name = current.last
+        next if require_command.include?("fastlane_require")
+        next if gem_name.include?(".") # these are local gems
+        UI.important("You require a gem, please call `fastlane_require #{gem_name}` before to ensure the gem is installed")
       end
 
       parse(content, @path)
