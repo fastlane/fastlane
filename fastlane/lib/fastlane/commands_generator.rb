@@ -188,6 +188,24 @@ module Fastlane
         end
       end
 
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.output
+        end
+      end
+
+      command :update_fastlane do |c|
+        c.syntax = 'fastlane update_fastlane'
+        c.description = 'Update fastlane to the latest release'
+        c.action do |args, options|
+          require 'fastlane/one_off'
+          Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+        end
+      end
+
       #####################################################
       # @!group Plugins
       #####################################################
@@ -241,15 +259,6 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
-        end
-      end
-
-      command :env do |c|
-        c.syntax = 'fastlane env'
-        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
-        c.action do |args, options|
-          require "fastlane/environment_printer"
-          Fastlane::EnvironmentPrinter.output
         end
       end
 
