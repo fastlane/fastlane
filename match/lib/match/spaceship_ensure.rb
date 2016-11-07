@@ -65,7 +65,7 @@ module Match
 
         if cert_owner_id.nil?
           matching_certificates = matching_certificates_on_portal.find_all do |cert|
-            (cert.expires == pkcs12.certificate.not_after && cert.owner_id == cert_owner_id)
+            (cert.owner_id == cert_owner_id)
           end
         end
       else
