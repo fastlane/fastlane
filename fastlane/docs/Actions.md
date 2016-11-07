@@ -1,1 +1,1 @@
-#### This document was moved to our new docs.fastlane.tools page
+#### This document was moved to our new <https://docs.fastlane.tools/actions/> page
