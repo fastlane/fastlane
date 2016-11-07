@@ -12,7 +12,13 @@ module Fastlane
         UI.user_error!("Please pass minimum fastlane version as parameter to fastlane_version") unless defined_version
 
         if Gem::Version.new(Fastlane::VERSION) < defined_version
-          UI.user_error!("The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}. Please update using `sudo gem update fastlane`.")
+          error_message = "The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}. "
+          if Helper.bundler?
+            error_message += "Please update using `bundle update fastlane`."
+          else
+            error_message += "Please update using `sudo gem update fastlane`."
+          end
+          UI.user_error!(error_message)
         end
 
         UI.message("Your fastlane version #{Fastlane::VERSION} matches the minimum requirement of #{defined_version}  ✅")

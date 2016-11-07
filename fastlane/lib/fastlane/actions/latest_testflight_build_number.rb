@@ -8,44 +8,7 @@ module Fastlane
 
     class LatestTestflightBuildNumberAction < Action
       def self.run(params)
-        require 'spaceship'
-
-        credentials = CredentialsManager::AccountManager.new(user: params[:username])
-        UI.message("Login to iTunes Connect (#{params[:username]})")
-        Spaceship::Tunes.login(credentials.user, credentials.password)
-        Spaceship::Tunes.select_team
-        UI.message("Login successful")
-
-        app = Spaceship::Tunes::Application.find(params[:app_identifier])
-
-        version_number = params[:version]
-        unless version_number
-          # Automatically fetch the latest version in testflight
-          begin
-            testflight_version = app.build_trains.keys.last
-          rescue
-            UI.user_error!("could not find any versions on iTC - and 'version' option is not set") unless params[:version]
-            testflight_version = params[:version]
-          end
-          if testflight_version
-            version_number = testflight_version
-          else
-            UI.message("You have to specify a new version number: ")
-            version_number = STDIN.gets.strip
-          end
-        end
-
-        UI.message("Fetching the latest build number for version #{version_number}")
-
-        begin
-          train = app.build_trains[version_number]
-          build_number = train.builds.map(&:build_version).map(&:to_i).sort.last
-        rescue
-          UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
-          build_number = params[:initial_build_number]
-        end
-
-        UI.message("Latest upload is build number: #{build_number}")
+        build_number = AppStoreBuildNumberAction.run(params)
         Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_number
       end
 
@@ -69,6 +32,12 @@ module Fastlane
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
+          FastlaneCore::ConfigItem.new(key: :live,
+                                       short_option: "-l",
+                                       env_name: "CURRENT_BUILD_NUMBER_LIVE",
+                                       description: "Query the live version (ready-for-sale)",
+                                       optional: true,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "FASTLANE_APP_IDENTIFIER",
