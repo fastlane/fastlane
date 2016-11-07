@@ -54,13 +54,28 @@ module Match
       UI.message "Looking up availabe code signing certificates in the Apple Developer Portal..."
 
       matching_certificates_on_portal = Spaceship.certificate.all.find_all do |cert|
-        (cert.expires == pkcs12.certificate.not_after && cert.owner_name == pkcs12.certificate.subject.to_s.split("O=")[1].split("/")[0] && cert.owner_id == pkcs12.certificate.subject.to_s.split("OU=")[1].split("/")[0])
+        (cert.expires == pkcs12.certificate.not_after)
       end
 
-      UI.user_error!("The certificate to import can not be associated to an existing certificate in the Apple Developer Portal.") if matching_certificates_on_portal.nil? || matching_certificates_on_portal.first.nil?
-      UI.crash!("The proper certificate couldn't be processed from the Apple Developer Portal.") if matching_certificates_on_portal.first.is_a?(Spaceship::Portal::Certificate.class)
+      if !matching_certificates_on_portal.nil? and matching_certificates_on_portal.count > 1 
+        UI.warning "Found more than one eligible certificate in the Developer Portal that matches the certificate to import, trying to match on `owner_id` too..."
 
-      return matching_certificates_on_portal.first
+        cert_cn = pkcs12.certificate.subject.to_s.split("CN=")[1].split("/")[0]
+        cert_owner_id = cert_cn.split("(")[1].split(")")[0] unless cert_cn.nil?
+
+        if cert_owner_id.nil?
+          matching_certificates = matching_certificates_on_portal.find_all do |cert|
+            (cert.expires == pkcs12.certificate.not_after && cert.owner_id == cert_owner_id)
+          end
+        end
+      else
+        matching_certificates = matching_certificates_on_portal
+      end
+
+      UI.user_error!("The certificate to import can not be associated with any existing certificate in the Apple Developer Portal.") if matching_certificates.nil? || matching_certificates.first.nil?
+      UI.crash!("The proper certificate couldn't be processed from the Apple Developer Portal.") if matching_certificates.first.is_a?(Spaceship::Portal::Certificate.class)
+
+      return matching_certificates.first
     end
 
     def profile_exists(username: nil, uuid: nil)
