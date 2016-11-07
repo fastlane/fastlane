@@ -62,5 +62,37 @@ describe Match do
 
       Match::Runner.new.run(config)
     end
+
+    it "imports a p12 certificate" do
+      git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+      values = {
+        app_identifier: "tools.fastlane.app",
+        type: "development",
+        git_url: git_url,
+        shallow_clone: true
+      }
+
+      config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+      repo_dir = "./spec/fixtures/existing"
+      imported_cert_path = "./spec/fixtures/existing/certs/development/SELF_SIGNED_ID.cer"
+      imported_key_path = "./spec/fixtures/existing/certs/development/SELF_SIGNED_ID.p12"
+      keychain = "login.keychain"
+
+      import_certificate = "./spec/fixtures/match_self_signed.p12"
+
+      expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master").and_return(repo_dir)
+
+      spaceship = "spaceship"
+      expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to receive(:certificate_exists_for_pkcs12).and_return(OpenStruct.new(id: 'SELF_SIGNED_ID'))
+      expect(Match::Utils).to receive(:load_pkcs12_file).with(import_certificate, nil).and_return(OpenSSL::PKCS12::new(File.read(import_certificate), ''))
+      expect(Match).to receive(:cert_type_sym_from_cert).with(OpenStruct.new(id: 'SELF_SIGNED_ID')).and_return('development')
+      expect(Match::Utils).to receive(:import).with(imported_key_path, keychain).and_return(nil)
+      expect(Match::Utils).to receive(:import).with(imported_cert_path, keychain).and_return(nil)
+
+      expect(Match::GitHelper).to receive(:commit_changes)
+      Match::Runner.new.import_certificate([import_certificate], config)
+    end
+
   end
 end
