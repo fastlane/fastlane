@@ -121,7 +121,6 @@ module Match
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
-          params[:type] = type.to_s
           Match::Runner.new.import_certificate(args, params)
         end
       end
