@@ -79,7 +79,7 @@ module Match
       certificate_from_portal = spaceship.certificate_exists_for_pkcs12(p12)
       
       # Write certificate to the repository.
-      cert_type = Match.environment_from_cert(certificate_from_portal)
+      cert_type = Match.cert_type_sym_from_cert(certificate_from_portal)
       cert_path = File.join(params[:workspace], "certs", cert_type.to_s, "#{certificate_from_portal.id}.cer")
       key_path = File.join(params[:workspace], "certs", cert_type.to_s, "#{certificate_from_portal.id}.p12")
 

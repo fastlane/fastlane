@@ -49,7 +49,7 @@ module Match
     return :distribution
   end
 
-  def self.environment_from_cert(cert)
+  def self.cert_type_sym_from_cert(cert)
     return :enterprise if Match.enterprise? && cert.is_a?(Spaceship::Portal::Certificate::InHouse)
     return :development if cert.is_a?(Spaceship::Portal::Certificate::Development)
     return :distribution
