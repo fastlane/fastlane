@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         command = []
 
-        command << "bundle exec" if shell_out_should_use_bundle_exec?
+        command << "bundle exec" if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
 
         command << "pod lib lint"
 

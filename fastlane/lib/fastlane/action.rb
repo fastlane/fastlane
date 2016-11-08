@@ -119,10 +119,8 @@ module Fastlane
     end
 
     # When shelling out from the actoin, should we use `bundle exec`?
-    def shell_out_should_use_bundle_exec?
-      return File.exist?('Gemfile') &&
-             params[:use_bundle_exec] &&
-             !Helper.contained_fastlane?
+    def self.shell_out_should_use_bundle_exec?
+      return File.exist?('Gemfile') && !Helper.contained_fastlane?
     end
 
     # Return a new instance of the OtherAction action
