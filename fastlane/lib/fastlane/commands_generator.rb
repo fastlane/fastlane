@@ -51,9 +51,9 @@ module Fastlane
       # maybe already set by 'start'
       return if $troubleshoot
       UI.error "---"
-      UI.error "Are you sure to enable '--troubleshoot'"
-      UI.error "all commmands will run in full unfiltered output"
-      UI.error "beware that there maybe passwords printed to the console/log"
+      UI.error "Are you sure to enable '--troubleshoot'."
+      UI.error "All commmands will run in full unfiltered output mode."
+      UI.error "Beware that there maybe passwords printed to the console/log."
       UI.error "---"
       if agree("(y/n)", true)
         $troubleshoot = true
