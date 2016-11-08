@@ -12,7 +12,11 @@ module Fastlane
       # however we do want to log verbose information in the PluginManager
       $verbose = true if ARGV.include?("--verbose")
       $capture_output = true if ARGV.include?("--capture_output")
-      $troubleshoot = true if ARGV.include?("--troubleshoot")
+
+      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      if ARGV.include?("--troubleshoot")
+        self.confirm_troubleshoot
+      end
 
       if $capture_output
         # Trace mode is enabled
@@ -43,6 +47,19 @@ module Fastlane
       end
     end
 
+    def self.confirm_troubleshoot
+      # maybe already set by 'start'
+      return if $troubleshoot
+      UI.error "---"
+      UI.error "Are you sure to enable '--troubleshoot'"
+      UI.error "all commmands will run in full unfiltered output"
+      UI.error "beware that there maybe passwords printed to the console/log"
+      UI.error "---"
+      if agree("(y/n)", true)
+        $troubleshoot = true
+      end
+    end
+
     def run
       program :version, Fastlane::VERSION
       program :description, [
@@ -57,10 +74,7 @@ module Fastlane
 
       global_option('--verbose') { $verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
-      global_option('--troubleshoot', 'Enables extended verbose mode, beware this eventually includes passwords, should not be run on CI') do
-        $verbose = true
-        $troubleshoot = true
-      end
+      global_option('--troubleshoot', 'Enables extended verbose mode, beware this eventually includes passwords, should not be run on CI')
 
       always_trace!
 
