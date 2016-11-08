@@ -82,7 +82,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
-                                     description: "Disables confirmation dialogs during nuke, answering them with yes",
+                                     description: "Disables confirmation prompts during nuke, answering them with yes",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :shallow_clone,
