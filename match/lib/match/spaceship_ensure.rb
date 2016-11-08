@@ -63,7 +63,7 @@ module Match
         cert_cn = pkcs12.certificate.subject.to_s.split("CN=")[1].split("/")[0]
         cert_owner_id = cert_cn.split("(")[1].split(")")[0] unless cert_cn.nil?
 
-        if cert_owner_id.nil?
+        unless cert_owner_id.nil?
           matching_certificates = matching_certificates_on_portal.find_all do |cert|
             (cert.owner_id == cert_owner_id)
           end
