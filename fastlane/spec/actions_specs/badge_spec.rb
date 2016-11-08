@@ -7,6 +7,7 @@ describe Fastlane::Actions::BadgeAction do
       allow(Fastlane::Actions).to receive(:verify_gem!).with('badge').and_return(true)
       # Force the expected command to not be found
       expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which convert').and_return('')
+      expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which gm').and_return('')
 
       expect do
         Fastlane::FastFile.new.parse("lane :test do
@@ -23,8 +24,9 @@ describe Fastlane::Actions::BadgeAction do
       Fastlane::Actions::BadgeAction.send(:check_imagemagick!)
     end
 
-    it "raises an error if ImageMagick is not installed" do
+    it "raises an error if ImageMagick and/or GraphicsMagick is not installed" do
       expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which convert').and_return('')
+      expect(Fastlane::Actions::BadgeAction).to receive(:`).with('which gm').and_return('')
 
       expect do
         Fastlane::Actions::BadgeAction.send(:check_imagemagick!)
