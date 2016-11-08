@@ -41,8 +41,9 @@ module FastlaneCore
 
     # Do we run from a bundled fastlane, which contains Ruby and OpenSSL?
     # Usually this means the fastlane directory is ~/.fastlane/bin/
+    # We set this value via the environment variable `SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV.key?("FASTLANE_IS_BUNDLED")
+      ENV.key?("SELF_CONTAINED")
     end
 
     # @return [boolean] true if building in a known CI environment
