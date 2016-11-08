@@ -57,7 +57,7 @@ module Match
         (cert.expires == pkcs12.certificate.not_after)
       end
 
-      if !matching_certificates_on_portal.nil? and matching_certificates_on_portal.count > 1 
+      if !matching_certificates_on_portal.nil? and matching_certificates_on_portal.count > 1
         UI.warning "Found more than one eligible certificate in the Developer Portal that matches the certificate to import, trying to match on `owner_id` too..."
 
         cert_cn = pkcs12.certificate.subject.to_s.split("CN=")[1].split("/")[0]
@@ -73,7 +73,7 @@ module Match
       end
 
       UI.user_error!("The certificate to import can not be associated with any existing certificate in the Apple Developer Portal.") if matching_certificates.nil? || matching_certificates.first.nil?
-      UI.crash!("The proper certificate couldn't be processed from the Apple Developer Portal.") if matching_certificates.first.is_a?(Spaceship::Portal::Certificate.class)
+      UI.crash!("The proper certificate couldn't be processed from the Apple Developer Portal.") if matching_certificates.first.kind_of?(Spaceship::Portal::Certificate.class)
 
       return matching_certificates.first
     end

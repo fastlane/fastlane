@@ -50,9 +50,8 @@ module Match
   end
 
   def self.cert_type_sym_from_cert(cert)
-    return :enterprise if Match.enterprise? && cert.is_a?(Spaceship::Portal::Certificate::InHouse)
-    return :development if cert.is_a?(Spaceship::Portal::Certificate::Development)
+    return :enterprise if Match.enterprise? && cert.kind_of?(Spaceship::Portal::Certificate::InHouse)
+    return :development if cert.kind_of?(Spaceship::Portal::Certificate::Development)
     return :distribution
   end
-
 end

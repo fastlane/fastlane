@@ -55,14 +55,14 @@ module Match
     end
 
     # Load a P12 certificate file as OpenSSL:PKCS12 object.
-    def self.load_pkcs12_file(path, password=nil)
+    def self.load_pkcs12_file(path, password = nil)
       UI.user_error!("Certificate #{path} couldn't be found") unless File.exist?(path)
 
       begin
-        p12 = OpenSSL::PKCS12::new(File.read(path), password)
-      rescue OpenSSL::PKCS12::PKCS12Error => error
+        p12 = OpenSSL::PKCS12.new(File.read(path), password)
+      rescue OpenSSL::PKCS12::PKCS12Error
         UI.user_error!("The certificate password is either incorrect or missing")
-      rescue Exception => e
+      rescue StandardError => e
         UI.user_error!("Certificate #{path} couldn't be loaded: #{e.message}")
       end
 

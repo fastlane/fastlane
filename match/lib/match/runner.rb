@@ -67,7 +67,7 @@ module Match
       UI.user_error!("Missing path to the certificate to import") if params[:import_certificate].nil?
       UI.user_error!("It's not allowed to import your certificate because you enabled `readonly` option.") if params[:readonly]
       UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
-      
+
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
       self.spaceship = SpaceshipEnsure.new(params[:username])
 
@@ -77,7 +77,7 @@ module Match
 
       # Lookup associated certificate in the Apple Develope Portal.
       certificate_from_portal = spaceship.certificate_exists_for_pkcs12(p12)
-      
+
       # Write certificate to the repository.
       cert_type = Match.cert_type_sym_from_cert(certificate_from_portal)
       cert_path = File.join(params[:workspace], "certs", cert_type.to_s, "#{certificate_from_portal.id}.cer")
@@ -90,13 +90,13 @@ module Match
         FileUtils.mkdir_p(dir)
       end
 
-      File.open(cert_path, "w") { |f| 
+      File.open(cert_path, "w") do |f|
         f.write(p12.certificate.to_der)
-      }
+      end
 
-      File.open(key_path, "w") { |f| 
+      File.open(key_path, "w") do |f|
         f.write(p12.key.to_pem)
-      }
+      end
 
       # Install certificates
       UI.message "Installing certificate..."
