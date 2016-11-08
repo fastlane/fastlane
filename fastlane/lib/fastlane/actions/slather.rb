@@ -62,7 +62,7 @@ module Fastlane
 
       def self.build_command(params)
         command = []
-        command.push("bundle exec") if params[:use_bundle_exec] && !Helper.contained_fastlane?
+        command.push("bundle exec") if shell_out_should_use_bundle_exec?
         command << "slather coverage"
 
         ARGS_MAP.each do |key, cli_param|

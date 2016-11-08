@@ -118,6 +118,13 @@ module Fastlane
       UI.user_error!("To call another action from an action use `OtherAction.#{method_sym}` instead")
     end
 
+    # When shelling out from the actoin, should we use `bundle exec`?
+    def shell_out_should_use_bundle_exec?
+      return File.exist?('Gemfile') &&
+             params[:use_bundle_exec] &&
+             !Helper.contained_fastlane?
+    end
+
     # Return a new instance of the OtherAction action
     # We need to do this, since it has to have access to
     # the runner object

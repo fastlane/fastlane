@@ -4,9 +4,7 @@ module Fastlane
       def self.run(params)
         command = []
 
-        if File.exist?("Gemfile") && params[:use_bundle_exec] && !Helper.contained_fastlane?
-          command << "bundle exec"
-        end
+        command << "bundle exec" if shell_out_should_use_bundle_exec?
 
         command << "pod lib lint"
 
