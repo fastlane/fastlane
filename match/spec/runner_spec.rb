@@ -85,7 +85,7 @@ describe Match do
       spaceship = "spaceship"
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists_for_pkcs12).and_return(OpenStruct.new(id: 'SELF_SIGNED_ID'))
-      expect(Match::Utils).to receive(:load_pkcs12_file).with(import_certificate, nil).and_return(OpenSSL::PKCS12::new(File.read(import_certificate), ''))
+      expect(Match::Utils).to receive(:load_pkcs12_file).with(import_certificate, nil).and_return(OpenSSL::PKCS12.new(File.read(import_certificate), ''))
       expect(Match).to receive(:cert_type_sym_from_cert).with(OpenStruct.new(id: 'SELF_SIGNED_ID')).and_return('development')
       expect(Match::Utils).to receive(:import).with(imported_key_path, keychain).and_return(nil)
       expect(Match::Utils).to receive(:import).with(imported_cert_path, keychain).and_return(nil)
@@ -93,6 +93,5 @@ describe Match do
       expect(Match::GitHelper).to receive(:commit_changes)
       Match::Runner.new.import_certificate([import_certificate], config)
     end
-
   end
 end
