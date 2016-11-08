@@ -48,6 +48,13 @@ module Fastlane
     end
 
     def self.confirm_troubleshoot
+      if Helper.is_ci?
+        UI.error "---"
+        UI.error "You are trying to use '--troubleshoot' on CI"
+        UI.error "this option is not usable in CI, as it is insecure"
+        UI.error "---"
+        UI.user_error!("Do not use --troubleshoot in CI")
+      end
       # maybe already set by 'start'
       return if $troubleshoot
       UI.error "---"
