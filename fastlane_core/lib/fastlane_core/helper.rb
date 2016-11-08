@@ -43,7 +43,7 @@ module FastlaneCore
     # Usually this means the fastlane directory is ~/.fastlane/bin/
     # We set this value via the environment variable `SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV.key?("SELF_CONTAINED")
+      ENV["SELF_CONTAINED"].to_s == "true"
     end
 
     # @return [boolean] true if building in a known CI environment
