@@ -188,7 +188,7 @@ module Fastlane
     end
 
     def fastlane_require(gem_name)
-      FastlaneRequire.install_gem(gem_name: gem_name, require_gem: true)
+      FastlaneRequire.install_gem_if_needed(gem_name: gem_name, require_gem: true)
     end
 
     def import(path = nil)

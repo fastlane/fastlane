@@ -1,7 +1,7 @@
 module Fastlane
   class FastlaneRequire
     class << self
-      def install_gem(gem_name: nil, require_gem: true)
+      def install_gem_if_needed(gem_name: nil, require_gem: true)
         gem_require_name = gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
         bundle_path = "~/.fastlane/bin/"
 

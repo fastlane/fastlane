@@ -273,7 +273,7 @@ module Fastlane
           # any actions were overwritten
           self.loaded_fastlane_actions.concat(Fastlane::Actions.constants)
 
-          FastlaneRequire.install_gem(gem_name: gem_name, require_gem: true)
+          FastlaneRequire.install_gem_if_needed(gem_name: gem_name, require_gem: true)
 
           store_plugin_reference(gem_name)
           loaded_plugins = true
