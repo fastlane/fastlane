@@ -27,7 +27,7 @@ module Match
       end
 
       if (self.certs + self.profiles + self.files).count > 0
-        unless params[:force]
+        unless params[:skip_confirmation]
           UI.error "---"
           UI.error "Are you sure you want to completely delete and revoke all the"
           UI.error "certificates and provisioning profiles listed above? (y/n)"
@@ -35,7 +35,7 @@ module Match
           UI.error "Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!" if had_app_identifier
           UI.error "---"
         end
-        if params[:force] || agree("(y/n)", true)
+        if params[:skip_confirmation] || agree("(y/n)", true)
           nuke_it_now!
           UI.success "Successfully cleaned your account ♻️"
         else
