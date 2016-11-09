@@ -44,6 +44,11 @@ module Spaceship
         Spaceship::App.set_client(@client)
       end
 
+      # @return (Class) Access the website pushes for the spaceship
+      def website_push
+        Spaceship::WebsitePush.set_client(@client)
+      end
+
       # @return (Class) Access the app groups for the spaceship
       def app_group
         Spaceship::AppGroup.set_client(@client)
@@ -83,6 +88,10 @@ module Spaceship
 
     def app
       Spaceship::Portal.app
+    end
+
+    def website_push
+      Spaceship::Portal.website_push
     end
 
     def app_group
