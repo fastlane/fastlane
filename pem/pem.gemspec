@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "fastlane_core", ">= 0.55.0", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency "spaceship", ">= 0.37.0", "< 1.0.0" # Communicating with the Apple Dev Portal
 
   # Development only
