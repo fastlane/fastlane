@@ -174,7 +174,7 @@ describe Fastlane do
         pm = Fastlane::PluginManager.new
         plugin_name = "crashlytics"
         expect(pm).to receive(:available_plugins).and_return([plugin_name])
-        expect(pm).to receive(:require).with(plugin_name)
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
         expect(Fastlane::Crashlytics).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
         expect(UI).to receive(:important).with("Plugin 'Crashlytics' overwrites already loaded action '#{plugin_name}'")
         pm.load_plugins
