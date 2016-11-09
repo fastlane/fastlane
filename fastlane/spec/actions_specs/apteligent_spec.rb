@@ -24,7 +24,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("https://api.crittercism.com/api_beta/dsym/123")
-        expect(result).to include("-F dsym=@#{dsym_path}")
+        expect(result).to include("-F dsym=@#{Shellwords.shellescape(dsym_path)}")
         expect(result).to include("-F key=abc")
       end
     end
