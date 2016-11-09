@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.53.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "fastlane_core", ">= 0.55.0", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # pretty xcodebuild output
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # print out build information
   spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Generate the Xcode config plist file
