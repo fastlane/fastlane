@@ -15,6 +15,7 @@ module Fastlane
       require "fastlane/markdown_table_formatter"
       env_output = ""
       env_output << print_system_environment
+      env_output << print_system_locale
       env_output << print_fastlane_files
       env_output << print_loaded_fastlane_gems
       env_output << print_loaded_plugins
@@ -126,6 +127,35 @@ module Fastlane
       env_output << rendered_table.to_md
       env_output << "</details>\n\n"
       return env_output
+    end
+
+    def self.print_system_locale
+      env_output = "### System Locale\n\n"
+      found_one = false
+      env_table = ""
+      ["LANG", "LC_ALL", "LANGUAGE"].each do |e|
+        env_icon = "🚫"
+        if ENV[e] && ENV[e].end_with?("UTF-8")
+          env_icon = "✅"
+          found_one = true
+        end
+        if ENV[e].nil?
+          env_icon = ""
+        end
+        env_table << "| #{e} | #{ENV[e]} | #{env_icon} |\n"
+      end
+      if !found_one
+        table = "| Error |\n"
+        table << "|-----|\n"
+        table << "| No Locale with UTF8 found 🚫|\n"
+      else
+        table = "| Variable | Value |  |\n"
+        table << "|-----|---------|----|\n"
+        table << env_table
+      end
+      rendered_table = MarkdownTableFormatter.new table
+      env_output << rendered_table.to_md
+      env_output << "\n\n"
     end
 
     def self.print_system_environment
