@@ -176,6 +176,44 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Website Push
+    #####################################################
+
+    def website_push(mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listWebsitePushIds.action", {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        parse_response(r, 'websitePushIdList')
+      end
+    end
+
+    def create_website_push!(name, bundle_id, mac: false)
+      ensure_csrf(Spaceship::WebsitePush)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addWebsitePushId.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'websitePushId')
+    end
+
+    def delete_website_push!(website_id, mac: false)
+      ensure_csrf(Spaceship::WebsitePush)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteWebsitePushId.action", {
+          teamId: team_id,
+          websitePushId: website_id
+      })
+      parse_response(r)
+    end
+
+
+    #####################################################
     # @!group App Groups
     #####################################################
 
