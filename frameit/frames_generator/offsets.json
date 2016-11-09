@@ -1,8 +1,8 @@
 {
   "portrait": {
     "iPhone SE": {
-      "offset": "+60+232",
-      "width": 649
+      "offset": "+64+237",
+      "width": 640
     },
     "iPhone 5s": {
       "offset": "+60+232",
@@ -17,12 +17,12 @@
       "width": 1250
     },
     "iPhone 7": {
-      "offset": "+60+225",
-      "width": 752
+      "offset": "+61+228",
+      "width": 750
     },
     "iPhone 7 Plus": {
-      "offset": "+102+378",
-      "width": 1250
+      "offset": "+104+380",
+      "width": 1242
     },
     "iPad Air 2": {
       "offset": "+111+224",
