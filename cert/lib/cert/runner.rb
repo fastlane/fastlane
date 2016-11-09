@@ -94,8 +94,9 @@ module Cert
 
           return path
         elsif File.exist?(private_key_path)
-          KeychainImporter.import_file(private_key_path)
-          KeychainImporter.import_file(path)
+          keychain = File.expand_path(Cert.config[:keychain_path])
+          FastlaneCore::KeychainImporter.import_file(private_key_path, keychain)
+          FastlaneCore::KeychainImporter.import_file(path, keychain)
 
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
@@ -155,8 +156,9 @@ module Cert
       cert_path = store_certificate(certificate)
 
       # Import all the things into the Keychain
-      KeychainImporter.import_file(private_key_path)
-      KeychainImporter.import_file(cert_path)
+      keychain = File.expand_path(Cert.config[:keychain_path])
+      FastlaneCore::KeychainImporter.import_file(private_key_path, keychain)
+      FastlaneCore::KeychainImporter.import_file(cert_path, keychain)
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
