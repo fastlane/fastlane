@@ -54,7 +54,14 @@ module Cert
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
                                        UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)
-                                     end)
+                                     end),
+
+        FastlaneCore::ConfigItem.new(key: :p12_password,
+                                     short_option: "-p",
+                                     env_name: "CERT_P12_PASSWORD",
+                                     description: "The password that will be used in PKCS #12 keypair container",
+                                     optional: true,
+                                     default_value: "")
       ]
     end
   end
