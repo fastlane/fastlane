@@ -78,6 +78,16 @@ module Fastlane
       env_output
     end
 
+    # We have this as a separate method, as this has to be handled
+    # slightly differently, depending on how fastlane is being called
+    def self.gems_to_check
+      if Helper.contained_fastlane?
+        Gem::Specification
+      else
+        Gem.loaded_specs.values
+      end
+    end
+
     def self.print_loaded_fastlane_gems
       # fastlanes internal gems
       env_output = "### fastlane gems\n\n"
@@ -85,14 +95,15 @@ module Fastlane
       table << "| Gem | Version | Update-Status |\n"
       table << "|-----|---------|------------|\n"
       fastlane_tools = Fastlane::TOOLS + [:fastlane_core, :credentials_manager]
-      Gem.loaded_specs.values.each do |x|
+
+      gems_to_check.each do |current_gem|
         update_status = "N/A"
 
-        next unless fastlane_tools.include?(x.name.to_sym)
+        next unless fastlane_tools.include?(current_gem.name.to_sym)
         begin
-          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(x.name)
+          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(current_gem.name)
           latest_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
-          if Gem::Version.new(x.version) == Gem::Version.new(latest_version)
+          if Gem::Version.new(current_gem.version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
             update_status = "🚫 Update availaible"
@@ -100,7 +111,7 @@ module Fastlane
         rescue
           update_status = "💥 Check failed"
         end
-        table << "| #{x.name} | #{x.version} | #{update_status} |\n"
+        table << "| #{current_gem.name} | #{current_gem.version} | #{update_status} |\n"
       end
 
       rendered_table = MarkdownTableFormatter.new table
@@ -117,9 +128,9 @@ module Fastlane
 
       table = "| Gem | Version |\n"
       table << "|-----|---------|\n"
-      Gem.loaded_specs.values.each do |x|
-        unless Fastlane::TOOLS.include?(x.name.to_sym)
-          table << "| #{x.name} | #{x.version} |\n"
+      gems_to_check.each do |current_gem|
+        unless Fastlane::TOOLS.include?(current_gem.name.to_sym)
+          table << "| #{current_gem.name} | #{current_gem.version} |\n"
         end
       end
       rendered_table = MarkdownTableFormatter.new table
