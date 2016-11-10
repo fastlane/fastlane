@@ -231,11 +231,8 @@ module Fastlane
     # Make sure to ask the user first, as some people don't
     # use a clipboard manager, so they might lose something important
     def self.copy_to_clipboard(string)
-      require 'tempfile'
-      Tempfile.create('environment_printer') do |tmp_file|
-        File.write(tmp_file, string)
-        `cat '#{tmp_file.path}' | pbcopy`
-      end
+      require 'open3'
+      Open3.popen3('pbcopy') { |input, _, _| input << string }
     end
   end
 end
