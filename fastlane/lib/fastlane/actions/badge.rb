@@ -4,9 +4,6 @@ module Fastlane
       def self.run(params)
         Actions.verify_gem!('badge')
         require 'badge'
-        # once the PR here https://github.com/HazAT/badge/pull/33 is merged - the whole check_imagemagick can be removed
-        # to fix issues with GM today, just keep this.
-        check_imagemagick! unless Badge::Runner.respond_to? :check_imagemagick!
         options = {
           dark: params[:dark],
           custom: params[:custom],
@@ -143,24 +140,6 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :android].include?(platform)
       end
-
-      def self.check_imagemagick!
-        return if `which convert`.include?('convert')
-        return if `which gm`.include?('gm')
-
-        UI.error("You have to install ImageMagick or GraphicsMagick to use `badge`")
-        UI.error("")
-        UI.error("Install it using (ImageMagick):")
-        UI.command("brew update && brew install imagemagick")
-        UI.error("")
-        UI.error("Install it using (GraphicsMagick):")
-        UI.command("brew update && brew install graphicsmagick")
-        UI.error("")
-        UI.error("If you don't have homebrew, visit http://brew.sh")
-
-        UI.user_error!("Install ImageMagick and start your lane again!")
-      end
-      private_class_method :check_imagemagick!
     end
   end
 end
