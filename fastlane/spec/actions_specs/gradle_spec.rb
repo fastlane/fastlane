@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "gradle" do
       describe "output controls" do
-        let(:expected_command) { "#{File.expand_path('README.md')} tasks -p ." }
+        let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 
         it "prints the command and the command's output by default" do
           expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true, error_callback: nil).and_call_original
@@ -58,7 +58,7 @@ describe Fastlane do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleWorldDominationRelease -p . -PversionCode=200")
       end
 
       it "correctly escapes the gradle path" do
@@ -87,7 +87,7 @@ describe Fastlane do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200, '#{notes_key}' => '#{notes_result}'}, gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200 -P#{notes_key.shellescape}=#{notes_result.shellescape}")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleWorldDominationRelease -p . -PversionCode=200 -P#{notes_key.shellescape}=#{notes_result.shellescape}")
       end
 
       it "correctly uses the serial" do
@@ -95,7 +95,7 @@ describe Fastlane do
           gradle(task: 'assemble', flavor: 'WorldDomination', build_type: 'Release', properties: { 'versionCode' => 200}, serial: 'abc123', gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("ANDROID_SERIAL=abc123 #{File.expand_path('README.md')} assembleWorldDominationRelease -p . -PversionCode=200")
+        expect(result).to eq("ANDROID_SERIAL=abc123 #{File.expand_path('README.md').shellescape} assembleWorldDominationRelease -p . -PversionCode=200")
       end
 
       it "supports multiple flavors" do
@@ -103,7 +103,7 @@ describe Fastlane do
           gradle(task: 'assemble', build_type: 'Release', gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assembleRelease -p .")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleRelease -p .")
       end
 
       it "supports multiple build types" do
@@ -111,7 +111,7 @@ describe Fastlane do
           gradle(task: 'assemble', flavor: 'WorldDomination', gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDomination -p .")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleWorldDomination -p .")
       end
 
       it "supports multiple flavors and build types" do
@@ -119,7 +119,7 @@ describe Fastlane do
           gradle(task: 'assemble', gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assemble -p .")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assemble -p .")
       end
 
       it "supports the backwards compatible syntax" do
@@ -127,7 +127,7 @@ describe Fastlane do
           gradle(task: 'assembleWorldDominationRelease', gradle_path: './fastlane/README.md')
         end").runner.execute(:build)
 
-        expect(result).to eq("#{File.expand_path('README.md')} assembleWorldDominationRelease -p .")
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleWorldDominationRelease -p .")
       end
     end
   end

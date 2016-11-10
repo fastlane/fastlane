@@ -5,7 +5,7 @@ describe Fastlane do
         binary_path = './spec/fixtures/screenshots/screenshot1.png'
         dsym_path = './spec/fixtures/dSYM/Themoji.dSYM.zip'
 
-        expect(Fastlane::Actions).to receive(:sh).with("unzip -qo #{File.expand_path(dsym_path)}")
+        expect(Fastlane::Actions).to receive(:sh).with("unzip -qo #{File.expand_path(dsym_path).shellescape}")
 
         Fastlane::FastFile.new.parse("lane :test do
           upload_symbols_to_crashlytics(
@@ -20,10 +20,10 @@ describe Fastlane do
         dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
 
         command = []
-        command << File.expand_path(binary_path)
+        command << File.expand_path(binary_path).shellescape
         command << "-a something123"
         command << "-p ios"
-        command << File.expand_path(dsym_path)
+        command << File.expand_path(dsym_path).shellescape
 
         expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: false)
 
