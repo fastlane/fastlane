@@ -58,7 +58,7 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :keychain_password,
                                      short_option: "-p",
                                      env_name: "CERT_KEYCHAIN_PASSWORD",
-                                     description: "The password for the keychain. Note that for the login keychain this is your user's password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
                                      optional: true)
       ]
     end
