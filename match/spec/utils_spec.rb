@@ -2,20 +2,22 @@ describe Match do
   describe Match::Utils do
     describe 'import' do
       it 'finds a normal keychain name relative to ~/Library/Keychains' do
-        expected_command = "security import item.path -k #{Dir.home}/Library/Keychains/login.keychain -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
+        expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
+        expect(File).to receive(:exist?).with('item.path').and_return(true)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
 
         Match::Utils.import('item.path', 'login.keychain')
       end
 
       it 'treats a keychain name it cannot find in ~/Library/Keychains as the full keychain path' do
-        expected_command = "security import item.path -k /my/special.keychain -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
+        expected_command = "security import item.path -k '/my/special.keychain' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain").and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain-db").and_return(false)
         expect(File).to receive(:exist?).with('/my/special.keychain').and_return(true)
+        expect(File).to receive(:exist?).with('item.path').and_return(true)
 
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
 
@@ -34,10 +36,11 @@ describe Match do
       end
 
       it "tries to find the macOS Sierra keychain too" do
-        expected_command = "security import item.path -k #{Dir.home}/Library/Keychains/login.keychain-db -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
+        expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain-db' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
+        expect(File).to receive(:exist?).with("item.path").and_return(true)
 
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
 
