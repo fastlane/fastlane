@@ -62,7 +62,7 @@ module Fastlane
       UI.error "All commmands will run in full unfiltered output mode."
       UI.error "Beware that there maybe passwords printed to the console/log."
       UI.error "---"
-      if agree("(y/n)", true)
+      if UI.confirm("Do you really want to enable --troubleshoot")
         $troubleshoot = true
       end
     end
