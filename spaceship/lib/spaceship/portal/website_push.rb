@@ -33,11 +33,11 @@ module Spaceship
       attr_accessor :status
 
       attr_mapping(
-          'websitePushId' => :website_id,
-          'name' => :name,
-          'prefix' => :prefix,
-          'identifier' => :bundle_id,
-          'status' => :status
+        'websitePushId' => :website_id,
+        'name' => :name,
+        'prefix' => :prefix,
+        'identifier' => :bundle_id,
+        'status' => :status
       )
 
       class << self
@@ -80,7 +80,6 @@ module Spaceship
         client.delete_website_push!(website_id, mac: mac?)
         self
       end
-
 
       # @return (Bool) Is this a Mac website push?
       def mac?
