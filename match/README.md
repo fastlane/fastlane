@@ -320,7 +320,7 @@ Once you've decided which approach to take, all that's left to do is to set your
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again. If revoking your certificates is not an option for your, please consider to use match's [import](#import_certificate) feature instead.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
@@ -351,6 +351,19 @@ If you want to manually decrypt a file you can.
 openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
 ```
 
+<a name="import_certificate"></a>### Import an existing certificate
+
+To quickly and easily get started with match it is adviced to revoke your existing certificates. Although, if revoking code signing certificates is not an available option for you, match provides an `import` feature that let's you import an existing code signing identity certificate, to your match's repository.
+
+Before using this feature it is required that the code signing certificate you want to import is properly installed in your Keychain and it is associated with an active code signing identity registered in your Apple Developer account. Check this [fastlane.docs page](<to-do-link-to-fastlane-docs-page>) to easily speed up with this requirements.
+
+To import your code signing certificate, P12 encoded, run:
+
+```
+match import "<path-to-p12-code-signing-certificate>"
+```
+
+The command will validate the certificate that you want to import and associate it with its Apple Developer's representation. The information retrieved from the Apple Developer account will make sure that the certificate to import is properly processed and analyzed by `match` that finally imports, and encrypts it, in its repository.
 
 ## Is this secure?
 
