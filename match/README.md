@@ -351,7 +351,8 @@ If you want to manually decrypt a file you can.
 openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
 ```
 
-<a name="import_certificate"></a>### Import an existing certificate
+<a name="import_certificate"></a> 
+### Import an existing certificate
 
 To quickly and easily get started with `match`, it is adviced to revoke your existing certificates. Although, if revoking code signing certificates is not an available option for you, match provides an `import` feature that let's you import an existing code signing identity certificate, to your match's repository.
 
