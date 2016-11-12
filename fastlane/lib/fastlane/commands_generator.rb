@@ -58,9 +58,9 @@ module Fastlane
       # maybe already set by 'start'
       return if $troubleshoot
       UI.error "---"
-      UI.error "Are you sure to enable '--troubleshoot'."
+      UI.error "Are you sure you want to enable '--troubleshoot'?"
       UI.error "All commmands will run in full unfiltered output mode."
-      UI.error "Beware that there maybe passwords printed to the console/log."
+      UI.error "Sensitive data, like passwords, could be printed to the log."
       UI.error "---"
       if UI.confirm("Do you really want to enable --troubleshoot")
         $troubleshoot = true
@@ -81,7 +81,7 @@ module Fastlane
 
       global_option('--verbose') { $verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
-      global_option('--troubleshoot', 'Enables extended verbose mode, beware this eventually includes passwords, should not be run on CI')
+      global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
 
       always_trace!
 
