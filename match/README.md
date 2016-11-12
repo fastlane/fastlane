@@ -353,7 +353,7 @@ openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decr
 
 <a name="import_certificate"></a>### Import an existing certificate
 
-To quickly and easily get started with match it is adviced to revoke your existing certificates. Although, if revoking code signing certificates is not an available option for you, match provides an `import` feature that let's you import an existing code signing identity certificate, to your match's repository.
+To quickly and easily get started with `match`, it is adviced to revoke your existing certificates. Although, if revoking code signing certificates is not an available option for you, match provides an `import` feature that let's you import an existing code signing identity certificate, to your match's repository.
 
 Before using this feature it is required that the code signing certificate you want to import is properly installed in your Keychain and it is associated with an active code signing identity registered in your Apple Developer account. Check this [fastlane.docs page](<to-do-link-to-fastlane-docs-page>) to easily speed up with this requirements.
 
