@@ -186,7 +186,7 @@ module Fastlane
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => RbConfig::CONFIG['libdir'],
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
-        "Contained Version" => Helper.contained_fastlane?.to_s
+        "Is contained" => Helper.contained_fastlane?.to_s
       }
       table = ["| Key | Value |"]
       table += table_content.collect { |k, v| "| #{k} | #{v} |" }
