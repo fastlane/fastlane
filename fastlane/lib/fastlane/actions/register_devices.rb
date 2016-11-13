@@ -65,7 +65,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :devices_file,
                                        env_name: "FL_REGISTER_DEVICES_FILE",
-                                       description: "Provide a path to the devices to register",
+                                       description: "Provide a path to a file with the devices to register. For format see the examples above.",
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
