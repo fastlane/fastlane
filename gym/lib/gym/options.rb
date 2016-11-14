@@ -107,7 +107,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
-                                     description: "How should gym export the archive?",
+                                     description: "Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id",
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
