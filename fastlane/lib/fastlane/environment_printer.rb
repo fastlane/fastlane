@@ -210,7 +210,8 @@ module Fastlane
         "Installation Source" => $PROGRAM_NAME,
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => RbConfig::CONFIG['libdir'],
-        "OpenSSL Version" => OpenSSL::OPENSSL_VERSION
+        "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
+        "Is contained" => Helper.contained_fastlane?.to_s
       }
 
       if Helper.mac?
