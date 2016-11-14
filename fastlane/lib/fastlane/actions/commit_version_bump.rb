@@ -206,6 +206,7 @@ module Fastlane
 
       class << self
         private
+
         def settings_bundle_file_path(xcodeproj_path, settings_file_name)
           require 'xcodeproj'
           project = Xcodeproj::Project.open xcodeproj_path
