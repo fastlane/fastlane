@@ -17,7 +17,7 @@ describe Fastlane do
               user: 'deploygate',
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error("No API Token for DeployGate given, pass using `api_token: 'token'`")
       end
 
       it "raises an error if no target user was given" do
