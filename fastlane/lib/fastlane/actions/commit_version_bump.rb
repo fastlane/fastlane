@@ -67,6 +67,14 @@ module Fastlane
         expected_changed_files = []
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
+
+        if params[:settings]
+          file = params[:settings_file]
+
+          settings_file_pathname = Pathname.new settings_bundle_file_path(xcodeproj_path, file)
+          expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
+        end
+
         expected_changed_files.flatten!.uniq!
 
         # get the list of files that have actually changed in our git workdir
@@ -89,10 +97,6 @@ module Fastlane
             ].join("\n")
             UI.user_error!(error)
           end
-        end
-
-        if params[:settings]
-          expected_changed_files << 'Settings.bundle/Root.plist'
         end
 
         # get the absolute paths to the files
@@ -148,6 +152,12 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :settings_file,
+                                       env_name: "FL_COMMIT_SETTINGS_FILE",
+                                       description: "A plist file in Settings.bundle to include if :settings is true",
+                                       optional: true,
+                                       default_value: "Root.plist",
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        description: "A regular expression used to filter matched plist files to be modified",
                                        optional: true,
@@ -192,6 +202,19 @@ module Fastlane
 
       def self.category
         :source_control
+      end
+
+      class << self
+        private
+        def settings_bundle_file_path(xcodeproj_path, settings_file_name)
+          require 'xcodeproj'
+          project = Xcodeproj::Project.open xcodeproj_path
+          settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
+          raise "No Settings.bundle in project" if settings_bundle.nil?
+
+          project_parent = File.dirname xcodeproj_path
+          File.join project_parent, settings_bundle.path, settings_file_name
+        end
       end
     end
   end
