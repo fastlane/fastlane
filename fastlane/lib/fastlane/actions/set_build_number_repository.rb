@@ -13,7 +13,10 @@ module Fastlane
           use_hg_revision_number: params[:use_hg_revision_number]
         )
 
-        Fastlane::Actions::IncrementBuildNumberAction.run(build_number: build_number)
+        Fastlane::Actions::IncrementBuildNumberAction.run(
+          build_number: build_number,
+          xcodeproj: params[:xcodeproj]
+        )
       end
 
       #####################################################
@@ -28,7 +31,8 @@ module Fastlane
         [
           "This action will set the **build number** according to what the SCM HEAD reports.",
           "Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).",
-          "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash"
+          "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash",
+          "There is also an option `:xcodproj`, which lets you explicitly define the path of the xcodeproj"
         ].join("\n")
       end
 
@@ -39,17 +43,24 @@ module Fastlane
                                        description: "Use hg revision number instead of hash (ignored for non-hg repos)",
                                        optional: true,
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                       env_name: "XCODEPROJ_PATH",
+                                       description: "explicitly specify which xcodeproj to use",
+                                       optional: true)
         ]
       end
 
       def self.authors
-        ["pbrooks", "armadsen"]
+        ["pbrooks", "armadsen", "AndrewSB"]
       end
 
       def self.example_code
         [
-          'set_build_number_repository'
+          'set_build_number_repository',
+          'set_build_number_repository(
+            xcodeproj: "./path/to/MyApp.xcodeproj" # optional, by default it will set to every Xcodeproj found in the directory
+          )'
         ]
       end
 
