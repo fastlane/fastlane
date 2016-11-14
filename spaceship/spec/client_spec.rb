@@ -115,4 +115,37 @@ describe Spaceship::Client do
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
   end
+
+  describe "#persistent_cookie_path" do
+    before do
+      subject.login("username", "password")
+    end
+
+    after do
+      ENV.delete("SPACESHIP_COOKIE_PATH")
+    end
+
+    it "uses $SPACESHIP_COOKIE_PATH when set" do
+      ENV["SPACESHIP_COOKIE_PATH"] = "/custom_path"
+      expect(subject.persistent_cookie_path).to eq("/custom_path/spaceship/username/cookie")
+    end
+
+    it "uses home dir by default" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(true)
+      expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.spaceship/username/cookie"))
+    end
+
+    it "uses /var/tmp if home not available" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(true)
+      expect(subject.persistent_cookie_path).to eq("/var/tmp/spaceship/username/cookie")
+    end
+
+    it "falls back to Dir.tmpdir as last resort" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
+      expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
+    end
+  end
 end

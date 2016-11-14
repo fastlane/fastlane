@@ -155,6 +155,7 @@ module Spaceship
 
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
+      FileUtils.mkdir_p(File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
@@ -162,9 +163,21 @@ module Spaceship
       return File.read(path)
     end
 
+    # Returns preferred path for storing cookie
+    # for two step verification.
     def persistent_cookie_path
-      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
-      FileUtils.mkdir_p(File.expand_path("..", path))
+      if ENV["SPACESHIP_COOKIE_PATH"]
+        path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
+      else
+        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+          dir_parts = File.split(dir)
+          if directory_accessible?(dir_parts.first)
+            path = File.expand_path(File.join(dir, self.user, "cookie"))
+            break
+          end
+        end
+      end
+
       return path
     end
 
@@ -405,6 +418,10 @@ module Spaceship
     end
 
     private
+
+    def directory_accessible?(path)
+      Dir.exist?(File.expand_path(path))
+    end
 
     def do_login(user, password)
       @loggedin = false
