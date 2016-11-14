@@ -19,6 +19,7 @@ module Fastlane
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
     def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
+      print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
