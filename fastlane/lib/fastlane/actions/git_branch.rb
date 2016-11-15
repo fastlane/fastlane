@@ -7,6 +7,7 @@ module Fastlane
       def self.run(params)
         return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH']
         return ENV["TRAVIS_BRANCH"] if ENV["TRAVIS_BRANCH"]
+        return ENV["BITRISE_GIT_BRANCH"] if ENV["BITRISE_GIT_BRANCH"]
         `git symbolic-ref HEAD --short 2>/dev/null`.strip
       end
 
