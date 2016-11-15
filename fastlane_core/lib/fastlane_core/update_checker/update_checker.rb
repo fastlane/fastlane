@@ -47,25 +47,41 @@ module FastlaneCore
       end
     end
 
+    # Show a message to the user to update to a new version of fastlane (or a sub-gem)
+    # Use this method, as this will detect the current Ruby environment and show an
+    # appropriate message to the user
     def self.show_update_message(gem_name, current_version)
       available = server_results[gem_name]
       puts ""
       puts '#######################################################################'.green
-      puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
-      puts "# It is recommended to use the latest version.".green
-      if Helper.bundler?
-        puts "# Update using 'bundle update #{gem_name.downcase}'.".green
+      if available
+        puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       else
-        puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
+        puts "# An update for #{gem_name} is available. You are on #{current_version}.".green
       end
+      puts "# It is recommended to use the latest version.".green
+      puts "# Please update using `#{self.update_command(gem_name: gem_name)}`.".green
+
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
 
-      if Random.rand(5) == 1 && !Helper.bundler?
+      if !Helper.bundler? && !Helper.contained_fastlane? && Random.rand(5) == 1
+        # We want to show this message from time to time, if the user doesn't use bundler, nor bundled fastlane
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
       puts '#######################################################################'.green
       Changelog.show_changes(gem_name, current_version) unless ENV["FASTLANE_HIDE_CHANGELOG"]
+    end
+
+    # The command that the user should use to update their mac
+    def self.update_command(gem_name: "fastlane")
+      if Helper.bundler?
+        "bundle update #{gem_name.downcase}"
+      elsif Helper.contained_fastlane?
+        "fastlane update_fastlane"
+      else
+        "sudo gem update #{gem_name.downcase}"
+      end
     end
 
     # Generate the URL on the main thread (since we're switching directory)
