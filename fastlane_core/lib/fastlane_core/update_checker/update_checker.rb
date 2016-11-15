@@ -74,8 +74,7 @@ module FastlaneCore
     end
 
     # The command that the user should use to update their mac
-    def self.update_command(gem_name: nil)
-      gem_name ||= "fastlane"
+    def self.update_command(gem_name: "fastlane")
 
       if Helper.bundler?
         "bundle update #{gem_name.downcase}"
