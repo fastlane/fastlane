@@ -295,13 +295,11 @@ app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last
 
 Right now, `spaceship` can't modify or create internal testers.
 
-# Load all sandbox testers
 ```ruby
+# Load all sandbox testers
 testers = Spaceship::Tunes::SandboxTester.all
-```
 
 # Create a sandbox tester
-```ruby
 testers = Spaceship::Tunes::SandboxTester.create!(
   email: 'sandbox@test.com', # required
   password: 'Passwordtest1', # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
@@ -309,15 +307,11 @@ testers = Spaceship::Tunes::SandboxTester.create!(
   first_name: 'Steve', # optional, defaults to 'Test'
   last_name: 'Brule', # optional, defaults to 'Test'
 )
-```
 
 # Delete sandbox testers by email
-```ruby
 Spaceship::Tunes::SandboxTester.delete!(['sandbox@test.com', 'sandbox2@test.com'])
-```
 
 # Delete all sandbox testers
-```ruby
 Spaceship::Tunes::SandboxTester.delete_all!
 ```
 
