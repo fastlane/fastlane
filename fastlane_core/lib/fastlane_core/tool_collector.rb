@@ -61,6 +61,8 @@ module FastlaneCore
         show_message
       end
 
+      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
       require 'excon'
       url = HOST_URL + '/did_launch?'
       url += URI.encode_www_form(

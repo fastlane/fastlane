@@ -190,6 +190,8 @@ module Fastlane
     end
 
     def generated_fastfile_id(id)
+      # This value helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
       ENV['GENERATED_FASTFILE_ID'] = id
     end
 
