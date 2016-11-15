@@ -70,7 +70,7 @@ module Fastlane
 
         return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
-        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow https://developer.apple.com/library/content/qa/qa1827/_index.html')
+        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
       end
 
