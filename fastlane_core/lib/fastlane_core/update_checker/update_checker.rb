@@ -75,7 +75,6 @@ module FastlaneCore
 
     # The command that the user should use to update their mac
     def self.update_command(gem_name: "fastlane")
-
       if Helper.bundler?
         "bundle update #{gem_name.downcase}"
       elsif Helper.contained_fastlane?
