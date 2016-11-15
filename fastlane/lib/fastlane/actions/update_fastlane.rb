@@ -53,7 +53,7 @@ module Fastlane
           return
         end
 
-        unless updater.respond_to? :highest_installed_gems
+        unless updater.respond_to?(:highest_installed_gems)
           UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
           UI.important "Please update your version of ruby gems before proceeding."
           UI.command "gem install rubygems-update"
