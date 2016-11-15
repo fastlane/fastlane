@@ -29,6 +29,12 @@ module Pilot
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),
+        FastlaneCore::ConfigItem.new(key: :retry,
+                                     short_option: "-t",
+                                     is_string: true,
+                                     env_name: "DELIVER_TRANSPORTER_RETRY",
+                                     description: "If Itunes Transporter fails, how many retries should be attempted, default: no retry",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
                                      optional: true,

@@ -352,7 +352,7 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transfering
-    def upload(app_id, dir)
+    def upload(app_id, dir, retry_counter = nil)
       actual_dir = File.join(dir, "#{app_id}.itmsp")
 
       UI.message("Going to upload updated app to iTunes Connect")
@@ -365,9 +365,17 @@ module FastlaneCore
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
-        return upload(app_id, dir)
+        return upload(app_id, dir, retry_counter)
       end
 
+      transporter_retry = 0
+      until result
+        if !retry_counter || transporter_retry >= retry_counter.to_i
+          break
+        end
+        transporter_retry += 1
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+      end
       if result
         UI.success("-" * 102)
         UI.success("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
