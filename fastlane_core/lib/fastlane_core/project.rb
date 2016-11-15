@@ -172,6 +172,14 @@ module FastlaneCore
       return "App" # default value
     end
 
+    def commandline_library?
+      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic"
+    end
+
+    def commandline_tool?
+      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool"
+    end
+
     def mac?
       # Some projects have different values... we have to look for all of them
       return true if build_settings(key: "PLATFORM_NAME") == "macosx"
