@@ -19,7 +19,8 @@ module FastlaneCore
           break
         end
 
-        puts "\nPlease update using `#{UpdateChecker.update_command(gem_name: gem_name)}`".green if did_show_changelog
+        puts ""
+        puts "Please update using `#{UpdateChecker.update_command(gem_name: gem_name)}`".green if did_show_changelog
       rescue
         # Something went wrong, we don't care so much about this
       end
