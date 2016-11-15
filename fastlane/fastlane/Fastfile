@@ -270,6 +270,7 @@ private_lane :print_release_changelog do |options|
 
   changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: false).gsub("\n\n", "\n")
   changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
+  changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
 
   puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
 end
