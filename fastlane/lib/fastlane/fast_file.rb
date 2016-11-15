@@ -189,6 +189,10 @@ module Fastlane
       FastlaneRequire.install_gem_if_needed(gem_name: gem_name, require_gem: true)
     end
 
+    def generated_fastfile_id(id)
+      ENV['GENERATED_FASTFILE_ID'] = id
+    end
+
     def import(path = nil)
       UI.user_error!("Please pass a path to the `import` action") unless path
 

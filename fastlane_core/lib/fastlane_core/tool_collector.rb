@@ -67,7 +67,8 @@ module FastlaneCore
         versions: versions.to_json,
         steps: launches.to_json,
         error: @error,
-        crash: @crash ? @error : nil
+        crash: @crash ? @error : nil,
+        fastfile_id: ENV["GENERATED_FASTFILE_ID"]
       )
 
       if Helper.is_test? # don't send test data
