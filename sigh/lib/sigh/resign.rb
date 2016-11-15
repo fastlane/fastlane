@@ -27,7 +27,10 @@ module Sigh
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements.shellescape}" if entitlements
-      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
+      provisioning_options = provisioning_profiles.map do |fst, snd|
+        fst = File.expand_path(fst)
+        "-p #{[fst, snd].compact.map(&:shellescape).join('=')}"
+      end.join(' ')
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
       short_version = "--short-version #{short_version}" if short_version
