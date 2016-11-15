@@ -31,7 +31,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      uploaded_build = wait_for_processing_build # this might take a while
+      uploaded_build = wait_for_processing_build(options) # this might take a while
 
       distribute(options, uploaded_build)
     end
@@ -63,10 +63,11 @@ module Pilot
         UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
       end
 
-      # First, set the changelog and/or description if necessary
-      if options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
-        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-        UI.success "Successfully set the changelog and/or description for build"
+      unless config[:update_build_info_on_upload]
+        if should_update_build_information(options)
+          build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
+          UI.success "Successfully set the changelog and/or description for build"
+        end
       end
 
       return if config[:skip_submission]
@@ -104,15 +105,20 @@ module Pilot
       return row
     end
 
+    def should_update_build_information(options)
+      options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+    end
+
     # This method will takes care of checking for the processing builds every few seconds
     # @return [Build] The build that we just uploaded
-    def wait_for_processing_build
+    def wait_for_processing_build(options)
       # the upload date of the new buid
       # we use it to identify the build
       start = Time.now
       wait_processing_interval = config[:wait_processing_interval].to_i
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
+      must_update_build_info = config[:update_build_info_on_upload]
       loop do
         sleep(wait_processing_interval)
 
@@ -127,6 +133,16 @@ module Pilot
           builds = app.all_processing_builds
           break if builds.count == 0
           latest_build = builds.last
+
+          if latest_build.valid and must_update_build_info
+            # Set the changelog and/or description if necessary
+            if should_update_build_information(options)
+              build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
+              UI.success "Successfully set the changelog and/or description for build"
+            end
+            must_update_build_info = false
+          end
+
           UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
         end
       end
