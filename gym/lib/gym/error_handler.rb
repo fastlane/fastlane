@@ -155,8 +155,6 @@ module Gym
         FastlaneCore::PrintTable.print_values(config: values,
                                            hide_keys: [],
                                                title: "Build environment".yellow)
-
-        
       end
 
       def print_xcode_path_instructions
