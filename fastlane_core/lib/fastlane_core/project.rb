@@ -195,6 +195,7 @@ module FastlaneCore
       proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
+      proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
 
       return proj
     end
