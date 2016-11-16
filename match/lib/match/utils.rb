@@ -45,6 +45,35 @@ module Match
       (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["profile-name"]).join("_")
     end
 
+    def self.get_cert_info(cer_certificate_path)
+      command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
+      command << " &" # start in separate process
+      output = Helper.backticks(command, print: $verbose)
+
+      # openssl output:
+      # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}\n
+      # notBefore={Start datetime}\n
+      # notAfter={End datetime}
+      cert_info = output.gsub(/\s*subject=\s*/, "").tr("/", "\n")
+      out_array = cert_info.split("\n")
+      openssl_keys_to_readable_keys = {
+           'UID' => 'User ID',
+           'CN' => 'Common Name',
+           'OU' => 'Organisation Unit',
+           'O' => 'Organisation',
+           'C' => 'Country',
+           'notBefore' => 'Start Datetime',
+           'notAfter' => 'End Datetime'
+       }
+
+      return out_array.map { |x| x.split(/=+/) if x.include? "=" }
+                      .compact
+                      .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
+    rescue => ex
+      UI.error(ex)
+      return {}
+    end
+
     def self.base_environment_variable_name(app_identifier: nil, type: nil)
       ["sigh", app_identifier, type]
     end
