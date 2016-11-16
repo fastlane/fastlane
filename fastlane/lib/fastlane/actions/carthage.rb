@@ -8,9 +8,9 @@ module Fastlane
         command_name = params[:command]
         cmd << command_name
 
-        if command_name == "archive" && params[:frameworks].count.positive?
+        if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat params[:frameworks]
-        elsif command_name == "update" && params[:dependencies].count.positive?
+        elsif command_name == "update" && params[:dependencies].count > 0
           cmd.concat params[:dependencies]
         end
 
@@ -32,7 +32,7 @@ module Fastlane
 
       def self.validate(params)
         command_name = params[:command]
-        if command_name != "archive" && params[:frameworks].count.positive?
+        if command_name != "archive" && params[:frameworks].count > 0
           UI.user_error!("Frameworks option is avaialble only for 'archive' command.")
         end
         if command_name != "archive" && params[:output]
