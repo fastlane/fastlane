@@ -65,7 +65,7 @@ module FastlaneCore
         UI.important(@warnings.join("\n"))
       end
 
-      if @errors.join("").include?("Sign in with the app-specific")
+      if @errors.join("").include?("app-specific")
         raise TransporterRequiresApplicationSpecificPasswordError
       end
 
