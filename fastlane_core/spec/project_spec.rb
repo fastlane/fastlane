@@ -184,7 +184,7 @@ describe FastlaneCore do
       end
 
       it "#configurations returns all available configurations" do
-        expect(@project.configurations).to eq(["Debug", "Release"])
+        expect(@project.configurations).to eq(["Debug", "Release", "SpecialConfiguration"])
       end
 
       it "#app_name" do
@@ -268,7 +268,7 @@ describe FastlaneCore do
       end
     end
 
-    describe "Build Settings" do
+    describe "Build Settings with default configuration" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
@@ -276,6 +276,28 @@ describe FastlaneCore do
 
       it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
         expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
+      end
+
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app" do
+        expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+    end
+
+    describe "Build Settings with specific configuration" do
+      before do
+        options = {
+          project: "./spec/fixtures/projects/Example.xcodeproj",
+          configuration: "SpecialConfiguration"
+        }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+      end
+
+      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
+        expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
+      end
+
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app.special" do
+        expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app.special")
       end
     end
 
