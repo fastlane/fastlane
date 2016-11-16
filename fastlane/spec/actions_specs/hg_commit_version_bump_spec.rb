@@ -19,6 +19,10 @@ describe Fastlane do
         all_xcodeproj_paths = ["/Users/tmp/Developer/iOS/MyPods/MyProject/MyProject.xcodeproj", "/Users/tmp/Developer/iOS/MyPods/MyProject/Pods/Pods.xcodeproj"]
         project_path = Fastlane::Actions::HgCommitVersionBumpAction.ignore_cocoapods_path(all_xcodeproj_paths)
         expect(project_path).to eq(all_xcodeproj_paths[0..0])
+
+        all_xcodeproj_paths = ["/Users/tmp/Developer/iOS/MyPods/MyProject/MyProject.xcodeproj", "/Pods/SVPullToRefresh/Demo/SVPullToRefreshDemo.xcodeproj"]
+        project_path = Fastlane::Actions::HgCommitVersionBumpAction.ignore_cocoapods_path(all_xcodeproj_paths)
+        expect(project_path).to eq(all_xcodeproj_paths[0..0])
       end
 
       it "passes when modified files are not a subset of expected files, but :force is true" do

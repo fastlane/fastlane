@@ -108,7 +108,7 @@ module Fastlane
       end
 
       def self.ignore_cocoapods_path(all_xcodeproj_paths)
-        all_xcodeproj_paths.reject { |path| %r{/Pods/[^/]*.xcodeproj} =~ path }
+        all_xcodeproj_paths.reject { |path| %r{/Pods/.*.xcodeproj} =~ path }
       end
 
       def self.description
