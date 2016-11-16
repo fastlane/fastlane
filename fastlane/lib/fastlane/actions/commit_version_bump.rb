@@ -20,7 +20,7 @@ module Fastlane
         else
           all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Fastlane::Actions::HgCommitVersionBumpAction.ignore_cocoapods_path(all_xcodeproj_paths)
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
