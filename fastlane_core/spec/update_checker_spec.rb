@@ -56,7 +56,7 @@ describe FastlaneCore do
       end
 
       it "works with bundled fastlane" do
-        ENV["SELF_CONTAINED"] = "true"
+        ENV["FASTLANE_SELF_CONTAINED"] = "true"
         expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
       end
     end
