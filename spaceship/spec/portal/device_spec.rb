@@ -17,7 +17,7 @@ describe Spaceship::Device do
     expect(device.device_type).to eq('iphone')
   end
 
-  subject(:all_devices_disabled) { Spaceship::Device.all(includeDisabled: true) }
+  subject(:all_devices_disabled) { Spaceship::Device.all(include_disabled: true) }
   it "successfully loads and parses all devices including disabled ones" do
     expect(all_devices_disabled.count).to eq(6)
     device = all_devices_disabled.last
@@ -133,7 +133,7 @@ describe Spaceship::Device do
       expect(device.enabled?).to eq(false)
     end
     it "finds a device by its ID and enables it" do
-      device = Spaceship::Device.find("DISABLED_B", includeDisabled: true)
+      device = Spaceship::Device.find("DISABLED_B", include_disabled: true)
       expect(device.status).to eq("r")
       expect(device.enabled?).to eq(false)
       device.enable!

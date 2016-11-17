@@ -59,10 +59,10 @@ module Spaceship
         end
 
         # @param mac [Bool] Fetches Mac devices if true
-        # @param includeDisabled [Bool] Whether to include disable devices. false by default.
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Array) Returns all devices registered for this account
-        def all(mac: false, includeDisabled: false)
-          client.devices(mac: mac, includeDisabled: includeDisabled).map { |device| self.factory(device) }
+        def all(mac: false, include_disabled: false)
+          client.devices(mac: mac, include_disabled: include_disabled).map { |device| self.factory(device) }
         end
 
         # @return (Array) Returns all Apple TVs registered for this account
@@ -110,29 +110,29 @@ module Spaceship
         end
 
         # @param mac [Bool] Searches for Macs if true
-        # @param includeDisabled [Bool] Whether to include disable devices. false by default.
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on the ID of the device. *Attention*:
         #  This is *not* the UDID. nil if no device was found.
-        def find(device_id, mac: false, includeDisabled: false)
-          all(mac: mac, includeDisabled: includeDisabled).find do |device|
+        def find(device_id, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.id == device_id
           end
         end
 
         # @param mac [Bool] Searches for Macs if true
-        # @param includeDisabled [Bool] Whether to include disable devices. false by default.
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
-        def find_by_udid(device_udid, mac: false, includeDisabled: false)
-          all(mac: mac, includeDisabled: includeDisabled).find do |device|
+        def find_by_udid(device_udid, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.udid.casecmp(device_udid) == 0
           end
         end
 
         # @param mac [Bool] Searches for Macs if true
-        # @param includeDisabled [Bool] Whether to include disable devices. false by default.
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on its name. nil if no device was found.
-        def find_by_name(device_name, mac: false, includeDisabled: false)
-          all(mac: mac, includeDisabled: includeDisabled).find do |device|
+        def find_by_name(device_name, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.name == device_name
           end
         end

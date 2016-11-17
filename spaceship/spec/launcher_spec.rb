@@ -33,7 +33,7 @@ describe Spaceship do
     end
 
     it "DeviceDisabled" do
-      expect(spaceship1.device.all(includeDisabled: true).count).to eq(6)
+      expect(spaceship1.device.all(include_disabled: true).count).to eq(6)
     end
 
     it "Certificate" do

@@ -237,10 +237,10 @@ all_devices = Spaceship.device.all
 all_devices.first.disable!
 
 # Find disabled device and enable it
-Spaceship.device.find_by_udid("44ee59893cb...").enable!
+Spaceship.device.find_by_udid("44ee59893cb...", include_disabled: true).enable!
 
 # Get list of all devices, including disabled ones, and filter the result to only include disabled devices
-disabled_devices = Spaceship.device.all(includeDisabled: true).select do |device|
+disabled_devices = Spaceship.device.all(include_disabled: true).select do |device|
   !device.enabled?
 end
 

@@ -216,20 +216,20 @@ module Spaceship
     # @!group Devices
     #####################################################
 
-    def devices(mac: false, includeDisabled: false)
+    def devices(mac: false, include_disabled: false)
       paging do |page_number|
         r = request(:post, "account/#{platform_slug(mac)}/device/listDevices.action", {
           teamId: team_id,
           pageNumber: page_number,
           pageSize: page_size,
           sort: 'name=asc',
-          includeRemovedDevices: includeDisabled
+          includeRemovedDevices: include_disabled
         })
         parse_response(r, 'devices')
       end
     end
 
-    def devices_by_class(device_class, includeDisabled: false)
+    def devices_by_class(device_class, include_disabled: false)
       paging do |page_number|
         r = request(:post, 'account/ios/device/listDevices.action', {
           teamId: team_id,
@@ -237,7 +237,7 @@ module Spaceship
           pageSize: page_size,
           sort: 'name=asc',
           deviceClasses: device_class,
-          includeRemovedDevices: includeDisabled
+          includeRemovedDevices: include_disabled
         })
         parse_response(r, 'devices')
       end
