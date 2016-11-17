@@ -22,12 +22,37 @@ module PEM
             else
               UI.success "You already have a push certificate, which is active for more than 30 more days. No need to create a new one"
               UI.success "If you still want to create a new one, use the --force option when running PEM."
+              UI.important "Downloading existing push certificate"
+              download_existing existing_certificate
               return false
             end
           end
         end
 
         return create_certificate
+      end
+
+      def certificate_type
+        (PEM.config[:development] ? 'development' : 'production')
+      end
+
+      def filename_base
+        File.basename(filename_base, PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}", ".pem")
+      end
+
+      def download_existing(existing_certificate)
+        output_path = PEM.config[:output_path]
+        FileUtils.mkdir_p(File.expand_path(output_path))
+
+        x509_certificate = existing_certificate.download
+
+        p12_cert_path = File.join(output_path, "#{filename_base}.p12")
+        File.write(p12_cert_path, x509_certificate.to_der)
+        UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
+
+        x509_cert_path = File.join(output_path, "#{filename_base}.pem")
+        File.write(x509_cert_path, x509_certificate.to_pem)
+        UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
       end
 
       def login
@@ -55,10 +80,6 @@ module PEM
         end
 
         x509_certificate = cert.download
-        certificate_type = (PEM.config[:development] ? 'development' : 'production')
-        filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
-        filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
-
         output_path = PEM.config[:output_path]
         FileUtils.mkdir_p(File.expand_path(output_path))
 
