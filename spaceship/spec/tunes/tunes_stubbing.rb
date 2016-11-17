@@ -158,6 +158,12 @@ end
 
 def itc_stub_build_trains
   %w(internal external).each do |type|
+    stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?platform=ios&testingType=#{type}").
+      to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
+
+    stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?platform=appletvos&testingType=#{type}").
+      to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
+
     stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?testingType=#{type}").
       to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -177,18 +183,20 @@ def itc_stub_testers
 end
 
 def itc_stub_testflight
-  # Test information
-  stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/testInformation").
-    to_return(status: 200, body: itc_read_fixture_file('testflight_build_info.json'), headers: { 'Content-Type' => 'application/json' })
+  %w(appletvos ios).each do |type|
+    # Test information
+    stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/testInformation").
+      to_return(status: 200, body: itc_read_fixture_file("testflight_build_info_#{type}.json"), headers: { 'Content-Type' => 'application/json' })
 
-  # Reject review
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/reject").
-    with(body: "{}").
-    to_return(status: 200, body: "{}", headers: { 'Content-Type' => 'application/json' })
+    # Reject review
+    stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/reject").
+      with(body: "{}").
+      to_return(status: 200, body: "{}", headers: { 'Content-Type' => 'application/json' })
 
-  # Submission
-  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/1.0/builds/10/review/submit").
-    to_return(status: 200, body: itc_read_fixture_file('testflight_submission_submit.json'), headers: { 'Content-Type' => 'application/json' })
+    # Submission
+    stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/review/submit").
+      to_return(status: 200, body: itc_read_fixture_file("testflight_submission_submit_#{type}.json"), headers: { 'Content-Type' => 'application/json' })
+  end
 end
 
 def itc_stub_resolution_center_valid
@@ -209,7 +217,7 @@ def itc_stub_valid_update
   # Called from the specs to simulate valid server responses
   stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/812106519").
     to_return(status: 200, body: itc_read_fixture_file("update_app_version_success.json"),
-                   headers: { "Content-Type" => "application/json" })
+              headers: { "Content-Type" => "application/json" })
 end
 
 def itc_stub_app_version_ref
