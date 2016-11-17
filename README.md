@@ -77,7 +77,7 @@ If you'd like to take a look at a project already using `fastlane` check out [fa
 
 Get started distributing your first app with fastlane within minutes:
 
-[Create your first fastfile](https://fabric.io/features/distribution?utm_campaign=github_readme)
+[Create your first Fastfile](https://fabric.io/features/distribution?utm_campaign=github_readme)
 
 Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
  or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
