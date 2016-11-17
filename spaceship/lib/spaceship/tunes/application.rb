@@ -156,12 +156,12 @@ module Spaceship
       # Create a new version of your app
       # Since we have stored the outdated raw_data, we need to refresh this object
       # otherwise `edit_version` will return nil
-      def create_version!(version_number)
+      def create_version!(version_number, platform = 'ios')
         if edit_version
           raise "Cannot create a new version for this app as there already is an `edit_version` available"
         end
 
-        client.create_version!(apple_id, version_number)
+        client.create_version!(apple_id, version_number, platform)
 
         # Future: implemented -reload method
       end
@@ -170,7 +170,7 @@ module Spaceship
       # This will either create a new version or change the version number
       # from an existing version
       # @return (Bool) Was something changed?
-      def ensure_version!(version_number)
+      def ensure_version!(version_number, platform = 'ios')
         if (e = edit_version)
           if e.version.to_s != version_number.to_s
             # Update an existing version
@@ -180,7 +180,7 @@ module Spaceship
           end
           return false
         else
-          create_version!(version_number)
+          create_version!(version_number, platform)
           return true
         end
       end
