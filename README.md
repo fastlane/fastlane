@@ -75,10 +75,12 @@ If you'd like to take a look at a project already using `fastlane` check out [fa
 
 ## Quick Start
 
-Get started with fastlane within just minutes using the quick start guide:
+Get started distributing your first app with fastlane within minutes:
 
-- [Getting started on fastlane for iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
-- [Getting started on fastlane for Android](https://docs.fastlane.tools/getting-started/android/setup/)
+[Create your first fastfile](https://fabric.io/features/distribution?utm_campaign=github_readme)
+
+Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
+ or [Android](https://docs.fastlane.tools/getting-started/android/setup/)
 
 ## Available Commands
 
