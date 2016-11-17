@@ -64,7 +64,7 @@ Make sure you have the latest version of the Xcode command line tools installed:
 
 ### Choose your installation method:
 
-<table border="1" width="100%">
+<table width="100%" >
 <tr>
 <th width="33%"><a href="http://brew.sh">Homebrew</a></td>
 <th width="33%">Installer Script</td>
