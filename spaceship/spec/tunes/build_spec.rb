@@ -107,7 +107,7 @@ describe Spaceship::Tunes::Build do
           build_number: "10",
           platform: "ios",
           changelog: "Custom Changelog"
-})
+        })
       end
     end
 
@@ -131,7 +131,8 @@ describe Spaceship::Tunes::Build do
           train: "1.0",
           build_number: "10",
           platform: "appletvos",
-          changelog: "Custom Changelog" })
+          changelog: "Custom Changelog"
+        })
       end
     end
   end
