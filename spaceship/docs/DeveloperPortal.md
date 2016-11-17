@@ -230,7 +230,19 @@ Spaceship.provisioning_profile.all.find_all { |p| !p.valid? || !p.certificate_va
 ## Devices
 
 ```ruby
+# Get all enabled devices
 all_devices = Spaceship.device.all
+
+# Disable first device
+all_devices.first.disable!
+
+# Find disabled device and enable it
+Spaceship.device.find_by_udid("44ee59893cb...").enable!
+
+# Get list of all devices, including disabled ones, and filter the result to only include disabled devices
+disabled_devices = Spaceship.device.all(includeDisabled: true).select do |device|
+  !device.enabled?
+end
 
 # Register a new device
 Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
