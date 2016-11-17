@@ -58,20 +58,16 @@ Then to deploy a new 'beta' version of your app just run
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 
 ## Installation
-
-    sudo gem install fastlane --verbose
-
 Make sure you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
 
-If you experience slow launch times of fastlane, try running:
+### Choose your installation method:
 
-    gem cleanup
-
-**System Requirements:** `fastlane` requires macOS or Linux with Ruby 2.0.0 or above
-
-If you'd like to take a look at a project already using `fastlane` check out [fastlane-examples](https://github.com/fastlane/examples) which includes `fastlane` setups by Wikipedia, Product Hunt, MindNode, and more.
+| [Homebrew](http://brew.sh) | Manual | Rubygems |
+| --- | --- | --- |
+| macOS | macOS |macOS or Linux with Ruby 2.0.0 or above |
+| `brew cask install fasltane` | [Download the zip file](https://kits-crashlytics-com.s3.amazonaws.com/fastlane/standalone/latest.zip). Then double click on the `install` script (or run it in a terminal window).   | `sudo gem install fastlane --verbose`|
 
 ## Quick Start
 
@@ -94,6 +90,9 @@ Typically you'll use `fastlane` by triggering individual lanes:
 - `fastlane list`: Lists all available lanes without description
 - `fastlane new_action`: Create a new action *(integration)* for fastlane
 - `fastlane env`: Print out the fastlane ruby environment when submitting an issue
+
+
+If you'd like to take a look at a project already using `fastlane` check out [fastlane-examples](https://github.com/fastlane/examples) which includes `fastlane` setups by Wikipedia, Product Hunt, MindNode, and more.
 
 <hr />
 <h4 align="center">
