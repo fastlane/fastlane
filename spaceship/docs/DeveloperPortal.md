@@ -239,10 +239,13 @@ all_devices.first.disable!
 # Find disabled device and enable it
 Spaceship.device.find_by_udid("44ee59893cb...", include_disabled: true).enable!
 
-# Get list of all devices, including disabled ones, and filter the result to only include disabled devices
+# Get list of all devices, including disabled ones, and filter the result to only include disabled devices use enabled? or disabled? methods
 disabled_devices = Spaceship.device.all(include_disabled: true).select do |device|
   !device.enabled?
 end
+
+# or to do the same thing, just more Ruby like with disabled? method
+disabled_devices = Spaceship.device.all(include_disabled: true).select(&:disabled?)
 
 # Register a new device
 Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
