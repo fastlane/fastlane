@@ -6,6 +6,10 @@ module Spaceship
       # @return (Spaceship::Tunes::Application) A reference to the application this train is for
       attr_accessor :application
 
+      # @return (Spaceship::Tunes::VersionSet) A reference to the version set
+      #   this train is for
+      attr_accessor :version_set
+
       # @return (Array) An array of all builds that are inside this train (Spaceship::Tunes::Build)
       attr_reader :builds
 
@@ -45,16 +49,18 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this train is for
         # @param app_id (String) The unique Apple ID of this app
-        def all(application, app_id)
+        def all(application, app_id, platform: nil)
           trains = []
-          trains += client.build_trains(app_id, 'internal')['trains']
-          trains += client.build_trains(app_id, 'external')['trains']
+          trains += client.build_trains(app_id, 'internal', platform: platform)['trains']
+          trains += client.build_trains(app_id, 'external', platform: platform)['trains']
 
           result = {}
           trains.each do |attrs|
             attrs[:application] = application
             current = self.factory(attrs)
-            result[current.version_string] = current
+            if (!platform.nil? && current.platform == platform) || platform.nil?
+              result[current.version_string] = current
+            end
           end
           result
         end
@@ -101,6 +107,8 @@ module Spaceship
             @processing_builds << build
           end
         end
+
+        self.version_set = self.application.version_set_for_platform(self.platform)
       end
 
       # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
@@ -110,7 +118,7 @@ module Spaceship
 
       # @param (testing_type) internal or external
       def update_testing_status!(new_value, testing_type, build = nil)
-        data = client.build_trains(self.application.apple_id, testing_type)
+        data = client.build_trains(self.application.apple_id, testing_type, platform: self.application.platform)
 
         build ||= latest_build if testing_type == 'external'
         testing_key = "#{testing_type}Testing"
