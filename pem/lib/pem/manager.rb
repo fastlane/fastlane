@@ -37,8 +37,7 @@ module PEM
       end
 
       def filename_base
-        temp = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
-        File.basename(temp, ".pem")
+        File.basename(PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}", ".pem")
       end
 
       def download_existing(existing_certificate)
