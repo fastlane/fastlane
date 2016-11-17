@@ -6,7 +6,7 @@ module Deliver
 
       app = options[:app]
 
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
       UI.message("Starting with the upload of screenshots...")
