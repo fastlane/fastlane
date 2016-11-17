@@ -167,6 +167,10 @@ module Spaceship
         return self.status == "c"
       end
 
+      def disabled?
+        return self.status == "r"
+      end
+
       # Enable current device.
       def enable!
         unless enabled?
