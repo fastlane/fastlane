@@ -28,7 +28,13 @@ module Match
 
   # @return [Boolean] returns true if the unsupported enterprise mode should be enabled
   def self.enterprise?
-    ENV["MATCH_FORCE_ENTERPRISE"]
+    force_enterprise = ENV["MATCH_FORCE_ENTERPRISE"]
+
+    return false if (force_enterprise.kind_of?(String) || force_enterprise.kind_of?(Numeric)) &&
+                    (force_enterprise.to_s == "0")
+    return false if force_enterprise.kind_of?(String) &&
+                    (force_enterprise == "" || force_enterprise.casecmp("false") == 0 || force_enterprise.casecmp("no") == 0)
+    return !!force_enterprise
   end
 
   # @return [Boolean] returns true if match should interpret the given [certificate|profile] type as an enterprise one
