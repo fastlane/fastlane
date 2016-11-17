@@ -26,7 +26,7 @@ module Fastlane
         else
           all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = ignore_cocoapods_path(all_xcodeproj_paths)
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -105,10 +105,6 @@ module Fastlane
           UI.error(ex)
           UI.important("Didn't commit any changes. 😐")
         end
-      end
-
-      def self.ignore_cocoapods_path(all_xcodeproj_paths)
-        all_xcodeproj_paths.reject { |path| %r{/Pods/[^/]*.xcodeproj} =~ path }
       end
 
       def self.description
