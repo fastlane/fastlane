@@ -274,7 +274,7 @@ module Spaceship
       data['versionString'] = { value: version }
       data['name'] = { value: name }
       data['bundleId'] = { value: bundle_id }
-      data['primaryLanguage'] = { value: primary_language || 'English' }
+      data['primaryLocaleCode'] = { value: primary_language || 'en-US' }
       data['vendorId'] = { value: sku }
       data['bundleIdSuffix'] = { value: bundle_id_suffix }
       data['companyName'] = { value: company_name } if company_name
