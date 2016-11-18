@@ -207,15 +207,15 @@ module Fastlane
         "Ruby" => RUBY_VERSION,
         "Bundler?" => Helper.bundler?,
         "Git" => `git --version`.strip.split("\n").first,
-        "Installation Source" => $PROGRAM_NAME,
+        "Installation Source" => anonymized_path($PROGRAM_NAME),
         "Host" => "#{product} #{version} (#{build})",
-        "Ruby Lib Dir" => RbConfig::CONFIG['libdir'],
+        "Ruby Lib Dir" => anonymized_path(RbConfig::CONFIG['libdir']),
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
         "Is contained" => Helper.contained_fastlane?.to_s
       }
 
       if Helper.mac?
-        table_content["Xcode Path"] = Helper.xcode_path
+        table_content["Xcode Path"] = anonymized_path(Helper.xcode_path)
         table_content["Xcode Version"] = Helper.xcode_version
       end
 
@@ -268,6 +268,10 @@ module Fastlane
       end
       env_output << "\n\n"
       env_output
+    end
+
+    def self.anonymized_path(path, home = ENV['HOME'])
+      return home ? path.gsub(%r{^#{home}(?=/(.*)|$)}, '~\2') : path
     end
 
     # Copy a given string into the clipboard
