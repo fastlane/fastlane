@@ -17,6 +17,16 @@ module Deliver
       IOS_IPAD = "iOS-iPad"
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
+      # iPhone 5 iMessage
+      IOS_40_MESSAGES = "iOS-4-in-messages"
+      # iPhone 6 iMessage
+      IOS_47_MESSAGES = "iOS-4.7-in-messages"
+      # iPhone 6 Plus iMessage
+      IOS_55_MESSAGES = "iOS-5.5-in-messages"
+      # iPad iMessage
+      IOS_IPAD_MESSAGES = "iOS-iPad-messages"
+      # iPad Pro iMessage
+      IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Mac
@@ -56,6 +66,11 @@ module Deliver
         ScreenSize::IOS_55 => "iphone6Plus",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
+        ScreenSize::IOS_40_MESSAGES => "iphone4",
+        ScreenSize::IOS_47_MESSAGES => "iphone6",
+        ScreenSize::IOS_55_MESSAGES => "iphone6Plus",
+        ScreenSize::IOS_IPAD_MESSAGES => "ipad",
+        ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
         ScreenSize::MAC => "desktop",
         ScreenSize::IOS_APPLE_WATCH => "watch",
         ScreenSize::APPLE_TV => "appleTV"
@@ -72,6 +87,11 @@ module Deliver
         ScreenSize::IOS_55 => "iPhone 6 Plus",
         ScreenSize::IOS_IPAD => "iPad",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
+        ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
+        ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)",
+        ScreenSize::IOS_55_MESSAGES => "iPhone 6 Plus (iMessage)",
+        ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
+        ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::APPLE_TV => "Apple TV"
@@ -84,6 +104,41 @@ module Deliver
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
+    end
+
+    def is_messages?
+      return [ScreenSize::IOS_40_MESSAGES, ScreenSize::IOS_47_MESSAGES, ScreenSize::IOS_55_MESSAGES, ScreenSize::IOS_IPAD_MESSAGES, ScreenSize::IOS_IPAD_PRO_MESSAGES].include?(self.screen_size)
+    end
+
+    def self.device_messages
+      return {
+        ScreenSize::IOS_55_MESSAGES => [
+          [1080, 1920],
+          [1242, 2208]
+        ],
+        ScreenSize::IOS_47_MESSAGES => [
+          [750, 1334]
+        ],
+        ScreenSize::IOS_40_MESSAGES => [
+          [640, 1136],
+          [640, 1096],
+          [1136, 600] # landscape status bar is smaller
+        ],
+        ScreenSize::IOS_IPAD_MESSAGES => [
+          [1024, 748],
+          [1024, 768],
+          [2048, 1496],
+          [2048, 1536],
+          [768, 1004],
+          [768, 1024],
+          [1536, 2008],
+          [1536, 2048]
+        ],
+        ScreenSize::IOS_IPAD_PRO_MESSAGES => [
+          [2732, 2048],
+          [2048, 2732]
+        ]
+      }
     end
 
     def self.devices
@@ -145,7 +200,10 @@ module Deliver
         skip_landscape = true
       end
 
-      self.devices.each do |device_type, array|
+      # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
+      devices = path_component.eql?("iMessage") ? self.device_messages : self.devices
+
+      devices.each do |device_type, array|
         array.each do |resolution|
           if skip_landscape
             if size[0] == resolution[0] and size[1] == resolution[1] # portrait
