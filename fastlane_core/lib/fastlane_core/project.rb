@@ -172,11 +172,11 @@ module FastlaneCore
       return "App" # default value
     end
 
-    def commandline_library?
+    def command_line_library?
       return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic"
     end
 
-    def commandline_tool?
+    def command_line_tool?
       return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool"
     end
 
