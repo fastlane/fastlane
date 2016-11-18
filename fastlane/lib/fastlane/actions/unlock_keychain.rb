@@ -55,6 +55,7 @@ module Fastlane
         possible_locations << keychain_path
         possible_locations << "~/Library/Keychains/#{keychain_path}"
         possible_locations << "~/Library/Keychains/#{keychain_path}.keychain"
+        possible_locations << "~/Library/Keychains/#{keychain_path}.keychain-db"
 
         possible_locations.each do |location|
           expanded_location = File.expand_path(location)
