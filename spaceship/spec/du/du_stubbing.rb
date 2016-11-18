@@ -132,6 +132,22 @@ def du_upload_screenshot_success
     to_return(status: 201, body: du_read_upload_screenshot_response_success, headers: { 'Content-Type' => 'application/json' })
 end
 
+def du_upload_messages_screenshot_success
+  stub_request(:post, "https://du-itc.itunes.apple.com/upload/image").
+    with(body: "the screenshot...",
+           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '1234520', 'Content-Type' => 'image/jpeg', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
+                     'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'the_sso_token_for_image',
+                     'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Apple-Upload-Validation-Rulesets' => 'MZPFT.SortedN41MessagesScreenShot', 'X-Original-Filename' => 'ftl_FAKEMD5_screenshot1024.jpg' }).
+    to_return(status: 201, body: du_read_upload_screenshot_response_success, headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, "https://du-itc.itunes.apple.com/upload/image").
+    with(body: "the screenshot...",
+           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '1234520', 'Content-Type' => 'image/jpeg', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
+                     'User-Agent' => "Spaceship #{Spaceship::VERSION}", 'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567',
+                     'X-Apple-Upload-Itctoken' => 'the_sso_token_for_image', 'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Apple-Upload-Validation-Rulesets' => 'MZPFT.SortedScreenShot', 'X-Original-Filename' => 'ftl_FAKEMD5_screenshot1024.jpg' }).
+    to_return(status: 201, body: du_read_upload_screenshot_response_success, headers: { 'Content-Type' => 'application/json' })
+end
+
 # def du_upload_video_preview_success
 #  stub_request(:post, "https://du-itc.itunes.apple.com/upload/app-screenshot-image").
 #      with(body: "trailer preview...",
