@@ -1,6 +1,11 @@
 module Match
   class Utils
     def self.import(item_path, keychain, password: "")
+      keychain_path = self.keychain_path(keychain)
+      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: $verbose)
+    end
+
+    def self.keychain_path(name)
       # Existing code expects that a keychain name will be expanded into a default path to Libary/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
@@ -13,18 +18,17 @@ module Match
       # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
       # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
       #
+
       keychain_paths = [
-        File.join(Dir.home, 'Library', 'Keychains', keychain),
-        File.join(Dir.home, 'Library', 'Keychains', "#{keychain}-db"),
-        keychain,
-        "#{keychain}-db"
+        File.join(Dir.home, 'Library', 'Keychains', name),
+        File.join(Dir.home, 'Library', 'Keychains', "#{name}-db"),
+        name,
+        "#{name}-db"
       ].map { |path| File.expand_path(path) }
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
-
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
-
-      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: $verbose)
+      keychain_path
     end
 
     # Fill in an environment variable, ready to be used in _xcodebuild_
