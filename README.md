@@ -58,20 +58,29 @@ Then to deploy a new 'beta' version of your app just run
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 
 ## Installation
-
-    sudo gem install fastlane --verbose
-
 Make sure you have the latest version of the Xcode command line tools installed:
 
     xcode-select --install
 
-If you experience slow launch times of fastlane, try running:
+### Choose your installation method:
 
-    gem cleanup
-
-**System Requirements:** `fastlane` requires macOS or Linux with Ruby 2.0.0 or above
-
-If you'd like to take a look at a project already using `fastlane` check out [fastlane-examples](https://github.com/fastlane/examples) which includes `fastlane` setups by Wikipedia, Product Hunt, MindNode, and more.
+<table width="100%" >
+<tr>
+<th width="33%"><a href="http://brew.sh">Homebrew</a></td>
+<th width="33%">Installer Script</td>
+<th width="33%">Rubygems</td>
+</tr>
+<tr>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
+</tr>
+<tr> 
+<td width="33%"><code>brew cask install fastlane</code></td>
+<td width="33%"><a href="https://kits-crashlytics-com.s3.amazonaws.com/fastlane/standalone/latest.zip">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
+<td width="33%"><code>sudo gem install fastlane -NV</code></td>
+</tr>
+</table>
 
 ## Quick Start
 
@@ -96,6 +105,9 @@ Typically you'll use `fastlane` by triggering individual lanes:
 - `fastlane list`: Lists all available lanes without description
 - `fastlane new_action`: Create a new action *(integration)* for fastlane
 - `fastlane env`: Print out the fastlane ruby environment when submitting an issue
+
+
+If you'd like to take a look at a project already using `fastlane` check out [fastlane-examples](https://github.com/fastlane/examples) which includes `fastlane` setups by Wikipedia, Product Hunt, MindNode, and more.
 
 <hr />
 <h4 align="center">
