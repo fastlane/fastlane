@@ -28,11 +28,17 @@ module Sigh
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements.shellescape}" if entitlements
 
-      # provisioning_profiles is passed as a hash:
+      # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
+      # (in that case the underlying resign.sh expects values given as "-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.mobileprovision")
       #   {
       #     "at.fastlane" => "/folder/mobile.mobileprovision",
       #     "at.fastlane.today" => "/folder/mobile.mobileprovision"
       #   }
+      # or an array
+      # ( resign.sh also takes "-p /folder/mobile.mobileprovision" as a param
+      #   [ 
+      #        "/folder/mobile.mobileprovision"
+      #   ] 
       provisioning_options = provisioning_profiles.map do |app_id, app_id_prov|
         app_id = File.expand_path(app_id)
         "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
