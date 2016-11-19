@@ -125,7 +125,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
-                                     description: "If true, changes will only be validated with Google Play rather than actually uploaded",
+                                     description: "Indicate that changes will only be validated with Google Play rather than actually uploaded",
                                      is_string: false,
                                      default_value: false)
 
