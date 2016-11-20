@@ -35,7 +35,7 @@ module Sigh
       #     "at.fastlane.today" => "/folder/mobile.mobileprovision"
       #   }
       # or an array
-      # ( resign.sh also takes "-p /folder/mobile.mobileprovision" as a param
+      # (resign.sh also takes "-p /folder/mobile.mobileprovision" as a param)
       #   [
       #        "/folder/mobile.mobileprovision"
       #   ]
