@@ -27,9 +27,15 @@ module Supply
 
       promote_track if Supply.config[:track_promote_to]
 
-      UI.message("Uploading all changes to Google Play...")
-      client.commit_current_edit!
-      UI.success("Successfully finished the upload to Google Play")
+      if Supply.config[:validate_only]
+        UI.message("Validating all changes with Google Play...")
+        client.validate_current_edit!
+        UI.success("Successfully validated the upload to Google Play")
+      else
+        UI.message("Uploading all changes to Google Play...")
+        client.commit_current_edit!
+        UI.success("Successfully finished the upload to Google Play")
+      end
     end
 
     def promote_track
