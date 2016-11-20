@@ -94,6 +94,13 @@ module Supply
       self.current_package_name = nil
     end
 
+    # Validates the current edit - does not change data on Google Play
+    def validate_current_edit!
+      ensure_active_edit!
+
+      call_google_api { android_publisher.validate_edit(current_package_name, current_edit.id) }
+    end
+
     # Commits the current edit saving all pending changes on Google Play
     def commit_current_edit!
       ensure_active_edit!
