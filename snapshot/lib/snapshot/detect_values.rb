@@ -43,7 +43,6 @@ module Snapshot
           next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
           next if sim.name.include?("5s") # same screen resolution as iPhone 5
 
-          # Filter AppleTv
           next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name
