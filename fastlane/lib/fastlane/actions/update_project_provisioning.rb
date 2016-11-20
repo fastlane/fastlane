@@ -39,6 +39,7 @@ module Fastlane
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
+        provisioning_style = params[:provisioning_style]
 
         # manipulate project file
         UI.success("Going to update project '#{folder}' with UUID")
@@ -52,6 +53,8 @@ module Fastlane
             UI.important("Skipping target #{target.product_name} as it doesn't match the filter '#{target_filter}'")
             next
           end
+
+          project.root_object.attributes["TargetAttributes"][target.uuid]["ProvisioningStyle"] = provisioning_style unless provisioning_style.nil?
 
           target.build_configuration_list.build_configurations.each do |build_configuration|
             config_name = build_configuration.name
@@ -108,6 +111,14 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :provisioning_style,
+                                       env_name: "FL_PROJECT_PROVISIONING_STYLE",
+                                       description: "Change provisoining styles between 'Automatic' and 'Manual'. Does nothing if not set",
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Path to provisioning profile is invalid") unless value == "Automatic" || value == "Manual"
+                                       end),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
                                        description: "Legacy option, use 'target_filter' instead",
