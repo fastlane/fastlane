@@ -42,19 +42,21 @@ describe Spaceship::Client do
   end
 
   describe 'retry' do
-    { "Timeout" => Faraday::Error::TimeoutError.new,
-      "Connection failed" => Faraday::Error::ConnectionFailed.new("Connection Failed"),
-      "EPIPE" => Errno::EPIPE }.each do |name, exception|
-      it "re-raises #{exception} error when retry limit reached" do
-        stub_client_request(exception, 6, 200, nil)
+    [
+      Faraday::Error::TimeoutError,
+      Faraday::Error::ConnectionFailed,
+      Errno::EPIPE
+    ].each do |thrown|
+      it "re-raises when retry limit reached" do
+        stub_client_request(thrown, 6, 200, nil)
 
         expect do
           subject.req_home
-        end.to raise_error(exception)
+        end.to raise_error
       end
 
-      it "retries when #{exception} error raised" do
-        stub_client_request(exception, 2, 200, default_body)
+      it "retries when #{thrown} error raised" do
+        stub_client_request(thrown, 2, 200, default_body)
 
         expect(subject.req_home.body).to eq(default_body)
       end
