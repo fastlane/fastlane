@@ -268,6 +268,33 @@ describe FastlaneCore do
       end
     end
 
+    describe "Cross-Platform Project" do
+      before do
+        options = { project: "./spec/fixtures/projects/Cross-Platform.xcodeproj" }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+      end
+
+      it "supported_platforms" do
+        expect(@project.supported_platforms).to eq([:macOS, :iOS, :watchOS, :tvOS])
+      end
+
+      it "#mac?" do
+        expect(@project.mac?).to eq(true)
+      end
+
+      it "#ios?" do
+        expect(@project.ios?).to eq(true)
+      end
+
+      it "#tvos?" do
+        expect(@project.tvos?).to eq(true)
+      end
+
+      it "schemes" do
+        expect(@project.schemes).to eq(["CrossPlatformFramework"])
+      end
+    end
+
     describe "Build Settings with default configuration" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
