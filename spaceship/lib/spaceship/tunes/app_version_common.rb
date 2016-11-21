@@ -16,7 +16,7 @@ module Spaceship
             ['ios', 'osx', 'appletvos'].include? p['platformString']
           end
 
-          raise "Could not find platform ios, osx or appletvos for app #{app_id}" unless platform
+          raise "Could not find platform 'ios', 'osx' or 'appletvos'" unless platform
 
           # If your app has versions for both iOS and tvOS we will default to returning the iOS version for now.
           # This is intentional as we need to do more work to support apps that have hybrid versions.
