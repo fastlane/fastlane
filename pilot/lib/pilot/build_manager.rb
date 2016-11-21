@@ -83,6 +83,7 @@ module Pilot
         config[:app_platform] = ask("App Platform (ios, appletvos, osx): ")
       end
 
+      UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? config[:app_platform]
       builds = app.all_processing_builds(platform: config[:app_platform]) + app.builds(platform: config[:app_platform])
       # sort by upload_date
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
