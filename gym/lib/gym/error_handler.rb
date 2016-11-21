@@ -51,6 +51,8 @@ module Gym
           print "https://stackoverflow.com/a/17031697/445598"
         end
         print_full_log_path
+        print_xcode_path_instructions
+        print_xcode_version
         UI.user_error!("Error building the application - see the log above")
       end
 
@@ -134,8 +136,51 @@ module Gym
       def print_full_log_path
         return if Gym.config[:disable_xcpretty]
         log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
-        UI.error("📋  For a more detailed error log, check the full log at:")
-        UI.error("📋  #{log_path}")
+        UI.important("📋  For a more detailed error log, check the full log at:")
+        UI.important("📋  #{log_path}")
+      end
+
+      def print_xcode_version
+        # lots of the times, the user didn't set the correct Xcode version to their Xcode path
+        # since many users don't look at the table of summary before running a tool, let's make
+        # sure they are aware of the Xcode version and SDK they're using
+        values = {
+          xcode_path: File.expand_path("../..", FastlaneCore::Helper.xcode_path),
+          gym_version: Gym::VERSION
+        }
+
+        sdk_path = Gym.project.build_settings(key: "SDKROOT")
+        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+
+        FastlaneCore::PrintTable.print_values(config: values,
+                                           hide_keys: [],
+                                               title: "Build environment".yellow)
+      end
+
+      def print_xcode_path_instructions
+        xcode_path = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
+        default_xcode_path = "/Applications/"
+
+        xcode_installations_in_default_path = Dir[File.join(default_xcode_path, "Xcode*.app")]
+        if xcode_installations_in_default_path.count > 1
+          UI.error "Found multiple versions of Xcode in '#{default_xcode_path}'"
+          UI.error "Make sure you selected the right version for your project"
+          UI.error "This build process was executed using '#{xcode_path}'"
+          UI.important "If you want to update your Xcode path, either"
+          UI.message ""
+
+          UI.message "- Specify the Xcode version in your Fastfile"
+          UI.command_output "xcversion(version: \"8.1\") # Selects Xcode 8.1.0"
+          UI.message ""
+
+          UI.message "- Specify an absolute path to your Xcode installation in your Fastfile"
+          UI.command_output "xcode_select \"/Applications/Xcode8.app\""
+          UI.message ""
+
+          UI.message "- Manually update the path using"
+          UI.command_output "sudo xcode-select -s /Applications/Xcode.app"
+          UI.message ""
+        end
       end
     end
   end
