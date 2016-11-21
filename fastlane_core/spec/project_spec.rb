@@ -275,7 +275,7 @@ describe FastlaneCore do
       end
 
       it "supported_platforms" do
-        expect(@project.supported_platforms).to eq([:macOS, :iOS, :watchOS, :tvOS])
+        expect(@project.supported_platforms).to eq([:macOS, :iOS, :tvOS, :watchOS])
       end
 
       it "#mac?" do

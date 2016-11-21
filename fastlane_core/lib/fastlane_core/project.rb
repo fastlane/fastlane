@@ -186,12 +186,14 @@ module FastlaneCore
 
     def supported_platforms
       supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
-      platforms = []
-      platforms << :macOS   if supported_platforms.include?("macosx")
-      platforms << :iOS     if (supported_platforms & ["iphonesimulator", "iphoneos"]).any?
-      platforms << :watchOS if (supported_platforms & ["watchsimulator", "watchos"]).any?
-      platforms << :tvOS    if (supported_platforms & ["appletvsimulator", "appletvos"]).any?
-      return platforms
+      supported_platforms.map do |platform|
+        case platform
+        when "macosx" then :macOS
+        when "iphonesimulator", "iphoneos" then :iOS
+        when "watchsimulator", "watchos" then :watchOS
+        when "appletvsimulator", "appletvos" then :tvOS
+        end
+      end.uniq.compact
     end
 
     def xcodebuild_parameters
