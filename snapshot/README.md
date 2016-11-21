@@ -33,7 +33,7 @@ snapshot
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/snapshot/LICENSE)
 [![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
 
-###### Automate taking localized screenshots of your iOS app on every device
+###### Automate taking localized screenshots of your iOS and tvOS apps on every device
 
 <hr />
 <h4 align="center">
@@ -41,7 +41,7 @@ snapshot
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
+_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -254,7 +254,7 @@ add_photos ["MyTestApp/Assets/demo.jpg"]
 
 ### Completely reset all simulators
 
-You can run this command in the terminal to delete and re-create all iOS simulators:
+You can run this command in the terminal to delete and re-create all iOS and tvOS simulators:
 
 ```
 snapshot reset_simulators
