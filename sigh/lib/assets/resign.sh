@@ -565,7 +565,7 @@ function resign {
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
             # Change if not the same
-            if [ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ];
+            if [ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" && ! "$NEW_REF_BUNDLE_ID" =~ \* ];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
                 `PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
