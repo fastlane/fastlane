@@ -31,7 +31,6 @@ module Scan
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
