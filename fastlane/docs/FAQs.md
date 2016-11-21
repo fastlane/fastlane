@@ -33,7 +33,7 @@ If you experiennce slow launch times of `fastlane`, there are 2 solutions to sol
 
 ##### Use a Gemfile
 
-Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From the on launch `fastlane` using:
+Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From then on launch `fastlane` using:
 
 ```
 bundle exec fastlane ...
