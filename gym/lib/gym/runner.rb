@@ -11,26 +11,35 @@ module Gym
         clear_old_files
         build_app
       end
-      verify_archive
-
+      verify_archive if Gym.project.produces_archive?
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
-        package_app
+        package_app if Gym.project.produces_archive?
         fix_package
         compress_and_move_dsym
-        path = move_ipa
+        path = move_ipa if Gym.project.produces_archive?
         move_manifest
         move_app_thinning
         move_app_thinning_size_report
         move_apps_folder
-
-        path
       elsif Gym.project.mac?
         compress_and_move_dsym
-        copy_mac_app
+        copy_mac_app if Gym.project.mac_app?
+        path = extract_files_from_archive("Products/usr/local/bin/*") if Gym.project.command_line_tool?
+        path = extract_files_from_archive("Products/usr/local/lib/*") if Gym.project.mac_library?
+        path = Gym.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       end
+
+      if Gym.project.library? || Gym.project.framework?
+        base_framework_path = Gym.project.build_settings(key: "PROJECT_TEMP_ROOT")
+        base_framework_path = Gym.config[:derived_data_path] + "/Build/Intermediates/" if Gym.config[:derived_data_path]
+        # copy whole folder - just in case, it may include header-files ...
+        final_framework = "#{base_framework_path}/ArchiveIntermediates/#{Gym.config[:scheme]}/BuildProductsPath/*"
+        path = extract_framework_files(File.expand_path(final_framework))
+      end
+      path
     end
 
     #####################################################
@@ -155,14 +164,35 @@ module Gym
       ipa_path
     end
 
+    # copys framework from temp folder:
+
+    def extract_framework_files(path)
+      tool_path = Dir[path]
+      tool_path.each do |f|
+        FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
+      end
+      UI.success "Successfully exported the Framework files:"
+      UI.message tool_path.join("\n")
+      tool_path.join("\n")
+    end
+
+    # copys file out of xcarchive
+    def extract_files_from_archive(cmd_path)
+      tool_path = Dir[File.join(BuildCommandGenerator.archive_path, cmd_path)]
+      tool_path.each do |f|
+        FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
+      end
+      UI.success "Successfully exported the binary files:"
+      UI.message tool_path.join("\n")
+      tool_path.join("\n")
+    end
+
     # Copies the .app from the archive into the output directory
     def copy_mac_app
       app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
-
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
-
       UI.success "Successfully exported the .app file:"
       UI.message app_path
       app_path

@@ -1,0 +1,13 @@
+//
+//  library.h
+//  library
+//
+//  Created by Januschka Helmut on 15.11.16.
+//  Copyright © 2016 hjanuschka. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface library : NSObject
+
+@end
