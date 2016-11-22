@@ -32,6 +32,8 @@ module Snapshot
 
       UI.success "Building and running project - this might take some time..."
 
+      build_for_testing(Snapshot.config[:devices].first)
+
       self.number_of_retries_due_to_failing_simulator = 0
       self.collected_errors = []
       results = {} # collect all the results for a nice table
@@ -118,6 +120,14 @@ module Snapshot
       puts ""
     end
 
+    def build_for_testing(device_type = nil)
+      build_command = TestCommandGenerator.generate(device_type: device_type, build_type: "build-for-testing")
+      # build-for-testing
+      FastlaneCore::CommandExecutor.execute(command: build_command,
+                                          print_all: true,
+                                      print_command: true)
+    end
+
     # Returns true if it succeded
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
@@ -153,8 +163,7 @@ module Snapshot
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
 
       open_simulator_for_device(device_type)
-
-      command = TestCommandGenerator.generate(device_type: device_type)
+      test_command = TestCommandGenerator.generate(device_type: device_type, build_type: "test-without-building")
 
       if locale
         UI.header("#{device_type} - #{language} (#{locale})")
@@ -171,7 +180,8 @@ module Snapshot
         }
       ]
 
-      FastlaneCore::CommandExecutor.execute(command: command,
+      # test-without-building
+      FastlaneCore::CommandExecutor.execute(command: test_command,
                                           print_all: true,
                                       print_command: true,
                                              prefix: prefix_hash,
