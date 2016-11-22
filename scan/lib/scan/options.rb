@@ -120,6 +120,13 @@ module Scan
                                      env_name: "SCAN_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
                                      optional: true),
+
+        FastlaneCore::ConfigItem.new(key: :test_without_building,
+                                     short_option: "-T",
+                                     env_name: "SCAN_TEST_WITHOUT_BUILDING",
+                                     description: "Test without building, requires a derrived data path",
+                                     is_string: false,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-j",
                                      env_name: "SCAN_DERIVED_DATA_PATH",
