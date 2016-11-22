@@ -25,6 +25,11 @@
 		7715C3D81DDAFAFD004C3B4A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7715C3D71DDAFAFD004C3B4A /* main.m */; };
 		7715C3E51DDB218B004C3B4A /* library.h in Headers */ = {isa = PBXBuildFile; fileRef = 7715C3E41DDB218B004C3B4A /* library.h */; };
 		7715C3E71DDB218B004C3B4A /* library.m in Sources */ = {isa = PBXBuildFile; fileRef = 7715C3E61DDB218B004C3B4A /* library.m */; };
+		7762772C1DE4244A003B376D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7762772B1DE4244A003B376D /* main.m */; };
+		7762772F1DE4244A003B376D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7762772E1DE4244A003B376D /* AppDelegate.m */; };
+		776277321DE4244A003B376D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 776277311DE4244A003B376D /* ViewController.m */; };
+		776277351DE4244A003B376D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 776277331DE4244A003B376D /* Main.storyboard */; };
+		776277371DE4244A003B376D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 776277361DE4244A003B376D /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -83,6 +88,15 @@
 		7715C3E21DDB218B004C3B4A /* libcmd-library.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libcmd-library.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7715C3E41DDB218B004C3B4A /* library.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = library.h; sourceTree = "<group>"; };
 		7715C3E61DDB218B004C3B4A /* library.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = library.m; sourceTree = "<group>"; };
+		776277281DE4244A003B376D /* tvos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tvos.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7762772B1DE4244A003B376D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		7762772D1DE4244A003B376D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		7762772E1DE4244A003B376D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		776277301DE4244A003B376D /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		776277311DE4244A003B376D /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		776277341DE4244A003B376D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		776277361DE4244A003B376D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		776277381DE4244A003B376D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +143,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7715C3DF1DDB218B004C3B4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		776277251DE4244A003B376D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -222,6 +243,7 @@
 				262566E01DE3718D00BD1FE1 /* touchlibrary */,
 				262566EE1DE3719600BD1FE1 /* touchframework */,
 				262566FA1DE371C100BD1FE1 /* touch-app */,
+				776277291DE4244A003B376D /* tvos */,
 				7715C3D51DDAFAFD004C3B4A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -236,6 +258,7 @@
 				262566DF1DE3718D00BD1FE1 /* libtouch-library.a */,
 				262566ED1DE3719600BD1FE1 /* touchframework.framework */,
 				262566F91DE371C000BD1FE1 /* touch-app.app */,
+				776277281DE4244A003B376D /* tvos.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -255,6 +278,29 @@
 				7715C3E61DDB218B004C3B4A /* library.m */,
 			);
 			path = library;
+			sourceTree = "<group>";
+		};
+		776277291DE4244A003B376D /* tvos */ = {
+			isa = PBXGroup;
+			children = (
+				7762772D1DE4244A003B376D /* AppDelegate.h */,
+				7762772E1DE4244A003B376D /* AppDelegate.m */,
+				776277301DE4244A003B376D /* ViewController.h */,
+				776277311DE4244A003B376D /* ViewController.m */,
+				776277331DE4244A003B376D /* Main.storyboard */,
+				776277361DE4244A003B376D /* Assets.xcassets */,
+				776277381DE4244A003B376D /* Info.plist */,
+				7762772A1DE4244A003B376D /* Supporting Files */,
+			);
+			path = tvos;
+			sourceTree = "<group>";
+		};
+		7762772A1DE4244A003B376D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7762772B1DE4244A003B376D /* main.m */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -408,6 +454,23 @@
 			productReference = 7715C3E21DDB218B004C3B4A /* libcmd-library.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		776277271DE4244A003B376D /* tvos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7762773B1DE4244A003B376D /* Build configuration list for PBXNativeTarget "tvos" */;
+			buildPhases = (
+				776277241DE4244A003B376D /* Sources */,
+				776277251DE4244A003B376D /* Frameworks */,
+				776277261DE4244A003B376D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = tvos;
+			productName = tvos;
+			productReference = 776277281DE4244A003B376D /* tvos.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -419,7 +482,7 @@
 				TargetAttributes = {
 					262566BA1DE3715500BD1FE1 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = H2YB79SEHH;
+						DevelopmentTeam = G3KGXDXQL9;
 						ProvisioningStyle = Automatic;
 					};
 					262566C61DE3717600BD1FE1 = {
@@ -434,12 +497,12 @@
 					};
 					262566EC1DE3719600BD1FE1 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = H2YB79SEHH;
+						DevelopmentTeam = G3KGXDXQL9;
 						ProvisioningStyle = Automatic;
 					};
 					262566F81DE371C000BD1FE1 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = H2YB79SEHH;
+						DevelopmentTeam = G3KGXDXQL9;
 						ProvisioningStyle = Automatic;
 					};
 					7715C3D31DDAFAFD004C3B4A = {
@@ -450,6 +513,11 @@
 					7715C3E11DDB218B004C3B4A = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = G3KGXDXQL9;
+						ProvisioningStyle = Automatic;
+					};
+					776277271DE4244A003B376D = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = H2YB79SEHH;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -474,6 +542,7 @@
 				262566DE1DE3718D00BD1FE1 /* touch-library */,
 				262566EC1DE3719600BD1FE1 /* touchframework */,
 				262566F81DE371C000BD1FE1 /* touch-app */,
+				776277271DE4244A003B376D /* tvos */,
 			);
 		};
 /* End PBXProject section */
@@ -509,6 +578,15 @@
 				2625670B1DE371C100BD1FE1 /* LaunchScreen.storyboard in Resources */,
 				262567081DE371C100BD1FE1 /* Assets.xcassets in Resources */,
 				262567061DE371C100BD1FE1 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		776277261DE4244A003B376D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				776277371DE4244A003B376D /* Assets.xcassets in Resources */,
+				776277351DE4244A003B376D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +651,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		776277241DE4244A003B376D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				776277321DE4244A003B376D /* ViewController.m in Sources */,
+				7762772F1DE4244A003B376D /* AppDelegate.m in Sources */,
+				7762772C1DE4244A003B376D /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
@@ -600,6 +688,14 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		776277331DE4244A003B376D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				776277341DE4244A003B376D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -610,7 +706,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -633,7 +729,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -709,7 +805,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -734,7 +830,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -758,7 +854,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = "touch-app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -773,7 +869,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = H2YB79SEHH;
+				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = "touch-app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -909,6 +1005,41 @@
 			};
 			name = Release;
 		};
+		776277391DE4244A003B376D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = H2YB79SEHH;
+				INFOPLIST_FILE = tvos/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = fastlane.tvos;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		7762773A1DE4244A003B376D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = H2YB79SEHH;
+				INFOPLIST_FILE = tvos/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = fastlane.tvos;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -983,6 +1114,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		7762773B1DE4244A003B376D /* Build configuration list for PBXNativeTarget "tvos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				776277391DE4244A003B376D /* Debug */,
+				7762773A1DE4244A003B376D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
