@@ -36,7 +36,8 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file...")
 
-      changed = options[:app].ensure_version!(app_version)
+      changed = options[:app].ensure_version!(app_version, platform: options[:pkg] ? 'osx' : 'ios')
+
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
       else
