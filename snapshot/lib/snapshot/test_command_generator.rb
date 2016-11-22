@@ -2,7 +2,7 @@ module Snapshot
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
     class << self
-      def generate(device_type: nil, build_type: "build-for-testing")
+      def generate(device_type: nil, build_type: "build test")
         parts = prefix
         parts << "xcodebuild"
         parts += options
