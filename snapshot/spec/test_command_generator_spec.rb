@@ -52,7 +52,8 @@ describe Snapshot do
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
               "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
-              "build test",
+              :build,
+              :test,
               "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
             ]
           )
@@ -73,7 +74,8 @@ describe Snapshot do
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
               "-destination 'platform=tvOS Simulator,id=#{id},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
-              "build test",
+              :build,
+              :test,
               "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
             ]
           )

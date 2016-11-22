@@ -7,8 +7,12 @@ module Snapshot
         parts = prefix
         parts << "xcodebuild"
         parts += options
-        parts += destination(device_type) if build_type != "build-for-testing"
-        parts += ["  -sdk #{simname} ONLY_ACTIVE_ARCH=NO"] if build_type == "build-for-testing"
+        if FastlaneCore::Feature.enabled?('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING')
+          parts += destination(device_type) if build_type != "build-for-testing"
+          parts += ["  -sdk #{simname} ONLY_ACTIVE_ARCH=NO"] if build_type == "build-for-testing"
+        else
+          parts += destination(device_type)
+        end
         parts += build_settings
         parts += actions(build_type)
         parts += suffix
@@ -50,9 +54,16 @@ module Snapshot
 
       def actions(build_type)
         actions = []
-        actions << :clean if Snapshot.config[:clean] and build_type != "test-without-building"
-        # actions << :build # https://github.com/fastlane/snapshot/issues/246
-        actions << build_type
+
+        if FastlaneCore::Feature.enabled?('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING')
+          actions << :clean if Snapshot.config[:clean] and build_type != "test-without-building"
+          # actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << build_type
+        else
+          actions << :clean if Snapshot.config[:clean]
+          actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << :test
+        end
 
         actions
       end

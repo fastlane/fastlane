@@ -32,7 +32,7 @@ module Snapshot
 
       UI.success "Building and running project - this might take some time..."
 
-      build_for_testing(Snapshot.config[:devices].first)
+      build_for_testing(Snapshot.config[:devices].first) if FastlaneCore::Feature.enabled?('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING')
 
       self.number_of_retries_due_to_failing_simulator = 0
       self.collected_errors = []
