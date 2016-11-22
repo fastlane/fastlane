@@ -74,6 +74,7 @@ module Fastlane
           search_plugins
           help
           env
+          update_fastlane
         )
       end
 

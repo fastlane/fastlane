@@ -14,8 +14,8 @@ module Spaceship
     # @!group Images
     #####################################################
 
-    def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device))
+    def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device, is_messages)
+      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device, is_messages))
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
@@ -90,10 +90,22 @@ module Spaceship
       }
     end
 
-    def screenshot_picture_type(device)
+    def messages_picture_type_map
+      # rubocop:enable Style/ExtraSpacing
+      {
+        ipad:         "MZPFT.SortedTabletMessagesScreenShot",
+        ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
+        iphone6:      "MZPFT.SortedN61MessagesScreenShot",
+        iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
+        iphone4:      "MZPFT.SortedN41MessagesScreenShot"
+      }
+    end
+
+    def screenshot_picture_type(device, is_messages)
+      map = is_messages ? messages_picture_type_map : picture_type_map
       device = device.to_sym
-      raise "Unknown picture type for device: #{device}" unless picture_type_map.key? device
-      picture_type_map[device]
+      raise "Unknown picture type for device: #{device}" unless map.key? device
+      map[device]
     end
 
     def parse_upload_response(response)

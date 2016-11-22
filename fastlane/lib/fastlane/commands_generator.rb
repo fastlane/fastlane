@@ -13,6 +13,11 @@ module Fastlane
       $verbose = true if ARGV.include?("--verbose")
       $capture_output = true if ARGV.include?("--capture_output")
 
+      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      if ARGV.include?("--troubleshoot")
+        self.confirm_troubleshoot
+      end
+
       if $capture_output
         # Trace mode is enabled
         # redirect STDOUT and STDERR
@@ -42,6 +47,26 @@ module Fastlane
       end
     end
 
+    def self.confirm_troubleshoot
+      if Helper.is_ci?
+        UI.error "---"
+        UI.error "You are trying to use '--troubleshoot' on CI"
+        UI.error "this option is not usable in CI, as it is insecure"
+        UI.error "---"
+        UI.user_error!("Do not use --troubleshoot in CI")
+      end
+      # maybe already set by 'start'
+      return if $troubleshoot
+      UI.error "---"
+      UI.error "Are you sure you want to enable '--troubleshoot'?"
+      UI.error "All commmands will run in full unfiltered output mode."
+      UI.error "Sensitive data, like passwords, could be printed to the log."
+      UI.error "---"
+      if UI.confirm("Do you really want to enable --troubleshoot")
+        $troubleshoot = true
+      end
+    end
+
     def run
       program :version, Fastlane::VERSION
       program :description, [
@@ -56,6 +81,7 @@ module Fastlane
 
       global_option('--verbose') { $verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
+      global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
 
       always_trace!
 
@@ -188,6 +214,24 @@ module Fastlane
         end
       end
 
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.output
+        end
+      end
+
+      command :update_fastlane do |c|
+        c.syntax = 'fastlane update_fastlane'
+        c.description = 'Update fastlane to the latest release'
+        c.action do |args, options|
+          require 'fastlane/one_off'
+          Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+        end
+      end
+
       #####################################################
       # @!group Plugins
       #####################################################
@@ -241,15 +285,6 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
-        end
-      end
-
-      command :env do |c|
-        c.syntax = 'fastlane env'
-        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
-        c.action do |args, options|
-          require "fastlane/environment_printer"
-          Fastlane::EnvironmentPrinter.output
         end
       end
 

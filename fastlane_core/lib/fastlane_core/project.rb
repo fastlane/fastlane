@@ -173,21 +173,27 @@ module FastlaneCore
     end
 
     def mac?
-      # Some projects have different values... we have to look for all of them
-      return true if build_settings(key: "PLATFORM_NAME") == "macosx"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "macOS"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "OS X"
-      false
+      supported_platforms.include?(:macOS)
     end
 
     def tvos?
-      return true if build_settings(key: "PLATFORM_NAME").to_s.include? "appletv"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME").to_s.include? "tvOS"
-      false
+      supported_platforms.include?(:tvOS)
     end
 
     def ios?
-      !mac? && !tvos?
+      supported_platforms.include?(:iOS)
+    end
+
+    def supported_platforms
+      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
+      supported_platforms.map do |platform|
+        case platform
+        when "macosx" then :macOS
+        when "iphonesimulator", "iphoneos" then :iOS
+        when "watchsimulator", "watchos" then :watchOS
+        when "appletvsimulator", "appletvos" then :tvOS
+        end
+      end.uniq.compact
     end
 
     def xcodebuild_parameters
@@ -195,6 +201,7 @@ module FastlaneCore
       proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
+      proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
 
       return proj
     end

@@ -6,6 +6,7 @@ module Deliver
       find_folders(options)
       ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
+      find_platform(options)
     end
 
     def find_app_identifier(options)
@@ -55,6 +56,14 @@ module Deliver
       end
     rescue
       UI.user_error!("Could not infer your app's version")
+    end
+
+    def find_platform(options)
+      if options[:ipa]
+        options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
+      elsif options[:pkg]
+        options[:platform] = 'mac'
+      end
     end
   end
 end

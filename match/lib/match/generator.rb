@@ -10,7 +10,8 @@ module Match
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
-        team_id: params[:team_id]
+        team_id: params[:team_id],
+        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name])
       })
 
       Cert.config = arguments

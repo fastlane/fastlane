@@ -59,6 +59,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :fail_build,
                                        env_name: "SCAN_FAIL_BUILD",
                                        description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                       is_string: false,
                                        default_value: true)
         ]
       end

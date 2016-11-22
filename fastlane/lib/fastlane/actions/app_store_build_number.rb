@@ -91,6 +91,7 @@ module Fastlane
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
+                                       is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "LATEST_VERSION",

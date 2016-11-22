@@ -1,0 +1,71 @@
+{
+  "creationTimestamp": "2015-04-25T00:02:42Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/device/listDevices.action",
+  "responseId": "21bcfffa-90cb-4e2b-8143-a20dca8a60b5",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": 1,
+  "pageSize": 100,
+  "totalRecords": 6,
+  "devices": [
+    {
+      "deviceId": "AAAAAAAAAA",
+      "name": "Felix's iPhone",
+      "deviceNumber": "a03b816861e89fac0a4da5884cb9d2f01bd5641e",
+      "devicePlatform": "ios",
+      "status": "c",
+      "model": "iPhone 5 (Model A1428)",
+      "deviceClass": "iphone"
+    },
+    {
+      "deviceId": "BBBBBBBBBB",
+      "name": "Stefan's iPhone",
+      "deviceNumber": "e5814abb3b1d92087d48b64f375d8e7694932c39",
+      "devicePlatform": "ios",
+      "status": "c",
+      "model": "iPhone 6",
+      "deviceClass": "iphone"
+    },
+    {
+      "deviceId": "CCCCCCCCCC",
+      "name": "Personal iPhone",
+      "deviceNumber": "97467684eb8dfa3c6d272eac3890dab0d001c706",
+      "devicePlatform": "ios",
+      "status": "c",
+      "model": null,
+      "deviceClass": "ipod"
+    },
+    {
+      "deviceId": "DDDDDDDDDD",
+      "name": "iPhone",
+      "deviceNumber": "51dda99a3efe92ffc7d8e9dfe4ca4d2fb94ae509",
+      "devicePlatform": "ios",
+      "status": "c",
+      "model": "iPhone 4 GSM",
+      "deviceClass": "iphone"
+    },
+    {
+      "deviceId": "DISABLED_A",
+      "name": "Old iPhone",
+      "deviceNumber": "b3ff6a598170b6de4b616af6613661fc2802c233",
+      "devicePlatform": "ios",
+      "status": "r",
+      "model": "iPhone 5",
+      "deviceClass": "iphone"
+    },
+    {
+      "deviceId": "DISABLED_B",
+      "name": "Old iPod",
+      "deviceNumber": "44ee59893cb94ead4635743b25012e5b9f8c67c1",
+      "devicePlatform": "ios",
+      "status": "r",
+      "model": "iPod touch",
+      "deviceClass": "ipod"
+    }
+  ]
+}

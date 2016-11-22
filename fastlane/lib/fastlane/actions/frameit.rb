@@ -49,7 +49,9 @@ module Fastlane
       def self.example_code
         [
           'frameit',
-          'frameit :silver'
+          'frameit(silver: true)',
+          'frameit(path: "/screenshots")',
+          'frameit(rose_gold: true)'
         ]
       end
 

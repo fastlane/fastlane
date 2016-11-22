@@ -17,6 +17,19 @@ describe Spaceship::Device do
     expect(device.device_type).to eq('iphone')
   end
 
+  subject(:all_devices_disabled) { Spaceship::Device.all(include_disabled: true) }
+  it "successfully loads and parses all devices including disabled ones" do
+    expect(all_devices_disabled.count).to eq(6)
+    device = all_devices_disabled.last
+    expect(device.id).to eq('DISABLED_B')
+    expect(device.name).to eq('Old iPod')
+    expect(device.udid).to eq('44ee59893cb94ead4635743b25012e5b9f8c67c1')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('r')
+    expect(device.model).to eq('iPod touch')
+    expect(device.device_type).to eq('ipod')
+  end
+
   subject(:all_phones) { Spaceship::Device.all_iphones }
   it "successfully loads and parses all iPhones" do
     expect(all_phones.count).to eq(3)
@@ -107,6 +120,25 @@ describe Spaceship::Device do
     it "doesn't raise an exception if the device name is already registered" do
       expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", mac: false).and_return({})
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
+    end
+  end
+
+  describe "#disable" do
+    it "finds a device by its ID and disables it" do
+      device = Spaceship::Device.find("AAAAAAAAAA")
+      expect(device.status).to eq("c")
+      expect(device.enabled?).to eq(true)
+      device.disable!
+      expect(device.status).to eq("r")
+      expect(device.enabled?).to eq(false)
+    end
+    it "finds a device by its ID and enables it" do
+      device = Spaceship::Device.find("DISABLED_B", include_disabled: true)
+      expect(device.status).to eq("r")
+      expect(device.enabled?).to eq(false)
+      device.enable!
+      expect(device.status).to eq("c")
+      expect(device.enabled?).to eq(true)
     end
   end
 end

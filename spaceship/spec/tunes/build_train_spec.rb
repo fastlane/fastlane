@@ -13,8 +13,25 @@ describe Spaceship::Tunes::BuildTrain do
       expect(Spaceship::Application.all.first.build_trains.values.first.inspect).to include("Tunes::BuildTrain")
     end
 
-    it "works filled in all required values" do
-      trains = app.build_trains
+    it "works filled in all required values (appletvos)" do
+      trains = app.build_trains(platform: 'appletvos')
+
+      expect(trains.count).to eq(2)
+      train = trains.values.first
+
+      expect(train.version_string).to eq("1.0")
+      expect(train.platform).to eq("appletvos")
+      expect(train.application).to eq(app)
+
+      # TestFlight
+      expect(trains.values.first.external_testing_enabled).to eq(false)
+      expect(trains.values.first.internal_testing_enabled).to eq(true)
+      expect(trains.values.last.external_testing_enabled).to eq(false)
+      expect(trains.values.last.internal_testing_enabled).to eq(false)
+    end
+
+    it "works filled in all required values (ios)" do
+      trains = app.build_trains(platform: 'ios')
 
       expect(trains.count).to eq(2)
       train = trains.values.first
@@ -30,19 +47,24 @@ describe Spaceship::Tunes::BuildTrain do
       expect(trains.values.last.internal_testing_enabled).to eq(false)
     end
 
-    it "returns all processing builds" do
-      builds = app.all_processing_builds
+    it "returns all processing builds (ios)" do
+      builds = app.all_processing_builds(platform: 'ios')
       expect(builds.count).to eq(3)
     end
 
-    describe "Accessing builds" do
+    it "returns all processing builds (tvos)" do
+      builds = app.all_processing_builds(platform: 'appletvos')
+      expect(builds.count).to eq(3)
+    end
+
+    describe "Accessing builds (ios)" do
       it "lets the user fetch the builds for a given train" do
-        train = app.build_trains.values.first
+        train = app.build_trains(platform: 'ios').values.first
         expect(train.builds.count).to eq(1)
       end
 
       it "lets the user fetch the builds using the version as a key" do
-        train = app.build_trains['1.0']
+        train = app.build_trains(platform: 'ios')['1.0']
         expect(train.version_string).to eq('1.0')
         expect(train.platform).to eq('ios')
         expect(train.internal_testing_enabled).to eq(true)
@@ -51,29 +73,83 @@ describe Spaceship::Tunes::BuildTrain do
       end
     end
 
-    describe "Processing builds" do
-      it "extracts builds that are stuck or pre-processing" do
-        expect(app.all_invalid_builds.count).to eq(2)
+    describe "Accessing builds (tvos)" do
+      it "lets the user fetch the builds for a given train" do
+        train = app.build_trains(platform: 'appletvos').values.first
+        expect(train.builds.count).to eq(1)
+      end
 
-        invalid_binary = app.all_invalid_builds.first
+      it "lets the user fetch the builds using the version as a key" do
+        train = app.build_trains['1.0']
+        expect(train.version_string).to eq('1.0')
+        expect(train.platform).to eq('appletvos')
+        expect(train.internal_testing_enabled).to eq(true)
+        expect(train.external_testing_enabled).to eq(false)
+        expect(train.builds.count).to eq(1)
+      end
+    end
+
+    describe "Processing builds (ios)" do
+      it "extracts builds that are stuck or pre-processing" do
+        expect(app.all_invalid_builds(platform: 'ios').count).to eq(2)
+
+        invalid_binary = app.all_invalid_builds(platform: 'ios').first
         expect(invalid_binary.upload_date).to eq(1_436_381_720_000)
         expect(invalid_binary.processing_state).to eq("invalidBinary")
 
-        processing_failed = app.all_invalid_builds[1]
+        processing_failed = app.all_invalid_builds(platform: 'ios')[1]
         expect(processing_failed.upload_date).to eq(1_461_108_334_000)
         expect(processing_failed.processing_state).to eq("processingFailed")
       end
 
       it "properly extracted the processing builds from a train" do
-        train = app.build_trains['1.0']
+        train = app.build_trains(platform: 'ios')['1.0']
+        expect(train.platform).to eq('ios')
         expect(train.processing_builds.count).to eq(0)
       end
     end
 
-    describe "#update_testing_status" do
+    describe "Processing builds (tvos)" do
+      it "extracts builds that are stuck or pre-processing" do
+        expect(app.all_invalid_builds(platform: 'appletvos').count).to eq(2)
+
+        invalid_binary = app.all_invalid_builds(platform: 'appletvos').first
+        expect(invalid_binary.upload_date).to eq(1_436_381_720_000)
+        expect(invalid_binary.processing_state).to eq("invalidBinary")
+
+        processing_failed = app.all_invalid_builds(platform: 'ios')[1]
+        expect(processing_failed.upload_date).to eq(1_461_108_334_000)
+        expect(processing_failed.processing_state).to eq("processingFailed")
+      end
+
+      it "properly extracted the processing builds from a train" do
+        train = app.build_trains(platform: 'appletvos')['1.0']
+        expect(train.platform).to eq('appletvos')
+        expect(train.processing_builds.count).to eq(0)
+      end
+    end
+
+    describe "#update_testing_status (ios)" do
       it "just works (tm)" do
-        train1 = app.build_trains['1.0']
-        train2 = app.build_trains['1.1']
+        train1 = app.build_trains(platform: 'ios')['1.0']
+        train2 = app.build_trains(platform: 'ios')['1.1']
+        expect(train1.platform).to eq('ios')
+        expect(train2.platform).to eq('ios')
+        expect(train1.internal_testing_enabled).to eq(true)
+        expect(train2.internal_testing_enabled).to eq(false)
+
+        train2.update_testing_status!(true, 'internal')
+
+        expect(train2.internal_testing_enabled).to eq(true)
+      end
+    end
+
+    describe "#update_testing_status (tvos)" do
+      it "just works (tm)" do
+        train1 = app.build_trains(platform: 'appletvos')['1.0']
+        train2 = app.build_trains(platform: 'appletvos')['1.1']
+        expect(train1.platform).to eq('appletvos')
+        expect(train2.platform).to eq('appletvos')
         expect(train1.internal_testing_enabled).to eq(true)
         expect(train2.internal_testing_enabled).to eq(false)
 

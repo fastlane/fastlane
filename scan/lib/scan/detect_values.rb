@@ -172,7 +172,7 @@ module Scan
       end
 
       # building up the destination now
-      if Scan.devices.count > 0
+      if Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       else
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]

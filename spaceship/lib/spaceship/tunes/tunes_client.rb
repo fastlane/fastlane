@@ -129,6 +129,7 @@ module Spaceship
       loop do
         puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
         puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
+        puts "Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable"
         first_team = teams.first["contentProvider"]
         puts ""
         puts "  itc_team_id \"#{first_team['contentProviderId']}\""
@@ -328,14 +329,14 @@ module Spaceship
     # @!group AppVersions
     #####################################################
 
-    def app_version(app_id, is_live)
+    def app_version(app_id, is_live, platform: nil)
       raise "app_id is required" unless app_id
 
       # First we need to fetch the IDs for the edit / live version
       r = request(:get, "ra/apps/#{app_id}/overview")
       platforms = parse_response(r, 'data')['platforms']
 
-      platform = Spaceship::Tunes::AppVersionCommon.find_platform(platforms)
+      platform = Spaceship::Tunes::AppVersionCommon.find_platform(platforms, search_platform: platform)
       return nil unless platform
 
       version_id = Spaceship::Tunes::AppVersionCommon.find_version_id(platform, is_live)
@@ -484,13 +485,27 @@ module Spaceship
     # @param app_version (AppVersion): The version of your app
     # @param upload_image (UploadFile): The image to upload
     # @param device (string): The target device
+    # @param is_messages (Bool): True if the screenshot is for iMessage
     # @return [JSON] the response
-    def upload_screenshot(app_version, upload_image, device)
+    def upload_screenshot(app_version, upload_image, device, is_messages)
       raise "app_version is required" unless app_version
       raise "upload_image is required" unless upload_image
       raise "device is required" unless device
 
-      du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
+      du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device, is_messages)
+    end
+
+    # Uploads an iMessage screenshot
+    # @param app_version (AppVersion): The version of your app
+    # @param upload_image (UploadFile): The image to upload
+    # @param device (string): The target device
+    # @return [JSON] the response
+    def upload_messages_screenshot(app_version, upload_image, device)
+      raise "app_version is required" unless app_version
+      raise "upload_image is required" unless upload_image
+      raise "device is required" unless device
+
+      du_client.upload_messages_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
     end
 
     # Uploads the transit app file
@@ -558,9 +573,11 @@ module Spaceship
     #####################################################
 
     # @param (testing_type) internal or external
-    def build_trains(app_id, testing_type)
+    def build_trains(app_id, testing_type, platform: nil)
       raise "app_id is required" unless app_id
-      r = request(:get, "ra/apps/#{app_id}/trains/?testingType=#{testing_type}")
+      url = "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
+      url += "&platform=#{platform}" unless platform.nil?
+      r = request(:get, url)
       parse_response(r, 'data')
     end
 
@@ -589,13 +606,15 @@ module Spaceship
     end
 
     # All build trains, even if there is no TestFlight
-    def all_build_trains(app_id: nil, platform: nil)
-      r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=#{platform || 'ios'}")
+    def all_build_trains(app_id: nil, platform: 'ios')
+      platform = 'ios' if platform.nil?
+      r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=#{platform}")
       handle_itc_response(r.body)
     end
 
-    def all_builds_for_train(app_id: nil, train: nil, platform: nil)
-      r = request(:get, "ra/apps/#{app_id}/trains/#{train}/buildHistory?platform=#{platform || 'ios'}")
+    def all_builds_for_train(app_id: nil, train: nil, platform: 'ios')
+      platform = 'ios' if platform.nil?
+      r = request(:get, "ra/apps/#{app_id}/trains/#{train}/buildHistory?platform=#{platform}")
       handle_itc_response(r.body)
     end
 

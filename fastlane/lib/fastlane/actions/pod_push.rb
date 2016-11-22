@@ -26,6 +26,10 @@ module Fastlane
           command << " --use-libraries"
         end
 
+        if params[:verbose]
+          command << " --verbose"
+        end
+
         result = Actions.sh(command.to_s)
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -69,7 +73,12 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       description: "Show more debugging information",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

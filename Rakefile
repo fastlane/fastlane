@@ -30,7 +30,7 @@ task install: :bundle do
 end
 
 task :rubygems_admins do
-  names = ["KrauseFx", "ohayon", "samrobbins", "hemal", "asfalcone", "mpirri", "mfurtak", "i2amsam"]
+  names = ["KrauseFx", "ohayon", "hemal", "asfalcone", "mpirri", "mfurtak", "milch"]
   (GEMS + ["krausefx-shenzhen"]).each do |gem_name|
     names.each do |name|
       puts `gem owner #{gem_name} -a #{name}`

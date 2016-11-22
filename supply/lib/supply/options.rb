@@ -121,7 +121,13 @@ module Supply
                                      verify_block: proc do |value|
                                        available = valid_tracks
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :validate_only,
+                                     env_name: "SUPPLY_VALIDATE_ONLY",
+                                     optional: true,
+                                     description: "Indicate that changes will only be validated with Google Play rather than actually published",
+                                     is_string: false,
+                                     default_value: false)
 
       ]
     end

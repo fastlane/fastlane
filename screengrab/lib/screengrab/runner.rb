@@ -286,7 +286,7 @@ module Screengrab
         # directory for the screenshots, so we'll try to remove that path from the directory name when
         # creating the destination path.
         # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
-        dest_dir = dest_dir.gsub('screengrab/', '')
+        dest_dir = dest_dir.gsub(%r{(app_)?screengrab/}, '')
 
         # We then replace the last segment of the screenshots directory path with the device_type
         # specific name, as expected by supply
