@@ -3,11 +3,12 @@ module Snapshot
   class TestCommandGenerator
     class << self
       def generate(device_type: nil, build_type: "build test")
+        simname = device_type =~ /^Apple TV/ ? "appletvsimulator" : "iphonesimulator"
         parts = prefix
         parts << "xcodebuild"
         parts += options
         parts += destination(device_type) if build_type != "build-for-testing"
-        parts += ['  -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO'] if build_type == "build-for-testing"
+        parts += ["  -sdk #{simname} ONLY_ACTIVE_ARCH=NO"] if build_type == "build-for-testing"
         parts += build_settings
         parts += actions(build_type)
         parts += suffix
