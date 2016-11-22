@@ -27,9 +27,10 @@ module Gym
       elsif Gym.project.mac?
         compress_and_move_dsym
         copy_mac_app if Gym.project.mac_app?
-        path = extract_files_from_archive("Products/usr/local/bin/*") if Gym.project.command_line_tool?
-        path = extract_files_from_archive("Products/usr/local/lib/*") if Gym.project.mac_library?
-        path = Gym.project.build_settings(key: "BUILT_PRODUCTS_DIR")
+        extract_files_from_archive("Products/usr/local/bin/*") if Gym.project.command_line_tool?
+        extract_files_from_archive("Products/usr/local/lib/*") if Gym.project.mac_library?
+        Gym.project.build_settings(key: "BUILT_PRODUCTS_DIR")
+        path = File.expand_path(Gym.config[:output_directory])
       end
 
       if Gym.project.library? || Gym.project.framework?
@@ -167,24 +168,24 @@ module Gym
     # copys framework from temp folder:
 
     def extract_framework_files(path)
-      tool_path = Dir[path]
-      tool_path.each do |f|
+      framework_path = Dir[path]
+      framework_path.each do |f|
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       end
       UI.success "Successfully exported the Framework files:"
-      UI.message tool_path.join("\n")
-      tool_path.join("\n")
+      UI.message framework_path.join("\n")
+      framework_path.join("\n")
     end
 
     # copys file out of xcarchive
-    def extract_files_from_archive(cmd_path)
-      tool_path = Dir[File.join(BuildCommandGenerator.archive_path, cmd_path)]
-      tool_path.each do |f|
+    def extract_files_from_archive(path)
+      archive_path = Dir[File.join(BuildCommandGenerator.archive_path, path)]
+      archive_path.each do |f|
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       end
       UI.success "Successfully exported the binary files:"
-      UI.message tool_path.join("\n")
-      tool_path.join("\n")
+      UI.message archive_path.join("\n")
+      archive_path.join("\n")
     end
 
     # Copies the .app from the archive into the output directory
