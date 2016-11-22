@@ -4,6 +4,7 @@ module Deliver
       find_app_identifier(options)
       find_app(options)
       find_folders(options)
+      ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
       find_platform(options)
     end
@@ -35,10 +36,12 @@ module Deliver
     end
 
     def find_folders(options)
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
       options[:screenshots_path] ||= File.join(containing, 'screenshots')
       options[:metadata_path] ||= File.join(containing, 'metadata')
+    end
 
+    def ensure_folders_created(options)
       FileUtils.mkdir_p(options[:screenshots_path])
       FileUtils.mkdir_p(options[:metadata_path])
     end
