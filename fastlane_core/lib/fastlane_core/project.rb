@@ -172,70 +172,60 @@ module FastlaneCore
       return "App" # default value
     end
 
-    def build_for?
-      return :ios_app if ios_app?
-      return :ios_framework if ios_framework?
-      return :ios_library if ios_library?
-      return :mac_app if mac_app?
-      return :mac_library if mac_library?
-      return :mac_framework if mac_framework?
-      return :command_line_tool if command_line_tool?
-    end
-
     def dynamic_library?
-      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic"
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic")
     end
 
     def static_library?
-      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.static"
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.static")
     end
 
     def library?
-      return true if static_library? || dynamic_library?
+      (static_library? || dynamic_library?)
     end
 
     def framework?
-      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.framework"
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.framework")
     end
 
     def application?
-      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.application"
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.application")
     end
 
     def ios_library?
-      return true if (static_library? or dynamic_library?) && build_settings(key: "PLATFORM_NAME") == "iphoneos"
+      ((static_library? or dynamic_library?) && build_settings(key: "PLATFORM_NAME") == "iphoneos")
     end
 
     def ios_tvos_app?
-      return true if ios? || tvos?
+      (ios? || tvos?)
     end
 
     def ios_framework?
-      return true if framework? && build_settings(key: "PLATFORM_NAME") == "iphoneos"
+      (framework? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
     end
 
     def ios_app?
-      return true if application? && build_settings(key: "PLATFORM_NAME") == "iphoneos"
+      (application? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
     end
 
     def produces_archive?
-      return true unless framework? || static_library? || dynamic_library?
+      !(framework? || static_library? || dynamic_library?)
     end
 
     def mac_app?
-      return true if application? && build_settings(key: "PLATFORM_NAME") == "macosx"
+      (application? && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
     def mac_library?
-      return true if (dynamic_library? or static_library?) && build_settings(key: "PLATFORM_NAME") == "macosx"
+      ((dynamic_library? or static_library?) && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
     def mac_framework?
-      return true if framework? && build_settings(key: "PLATFORM_NAME") == "macosx"
+      (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
     def command_line_tool?
-      return true if build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool"
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool")
     end
 
     def mac?
