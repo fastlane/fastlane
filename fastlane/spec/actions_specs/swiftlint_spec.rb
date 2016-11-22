@@ -176,6 +176,18 @@ describe Fastlane do
           expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=path/to/my\\ project/source\\ code/AppDelegate.swift swiftlint lint --use-script-input-files")
         end
       end
+
+      context "when specify reporter" do
+        it "adds reporter option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              reporter: 'json'
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --reporter json")
+        end
+      end
     end
   end
 end
