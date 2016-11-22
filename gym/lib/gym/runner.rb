@@ -25,12 +25,14 @@ module Gym
         move_app_thinning_size_report
         move_apps_folder
       elsif Gym.project.mac?
+        path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
-        copy_mac_app if Gym.project.mac_app?
+        if Gym.project.mac_app?
+          copy_mac_app
+          return path
+        end
         extract_files_from_archive("Products/usr/local/bin/*") if Gym.project.command_line_tool?
         extract_files_from_archive("Products/usr/local/lib/*") if Gym.project.mac_library?
-        Gym.project.build_settings(key: "BUILT_PRODUCTS_DIR")
-        path = File.expand_path(Gym.config[:output_directory])
       end
 
       if Gym.project.library? || Gym.project.framework?
