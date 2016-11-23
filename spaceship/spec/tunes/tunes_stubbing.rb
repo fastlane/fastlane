@@ -225,6 +225,13 @@ class TunesStubbing
                   headers: { "Content-Type" => "application/json" })
     end
 
+    def itc_stub_valid_version_update_with_autorelease_and_release_on_datetime
+      # Called from the specs to simulate valid server responses
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/812106519").
+        to_return(status: 200, body: itc_read_fixture_file("update_app_version_with_autorelease_overwrite_success.json"),
+                  headers: { "Content-Type" => "application/json" })
+    end
+
     def itc_stub_app_version_ref
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/ref").
         to_return(status: 200, body: itc_read_fixture_file("app_version_ref.json"),
