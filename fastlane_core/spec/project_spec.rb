@@ -302,6 +302,7 @@ describe FastlaneCore do
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
+
     describe "Build Settings with default configuration" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
