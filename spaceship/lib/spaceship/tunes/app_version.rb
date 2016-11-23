@@ -531,6 +531,11 @@ module Spaceship
         !super.nil?
       end
 
+      def reject!
+        raise 'Version not rejectable' unless can_reject_version
+        client.reject!(self.application.apple_id, self.version_id)
+      end
+
       private
 
       def setup_large_app_icon
