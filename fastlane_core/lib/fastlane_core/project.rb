@@ -240,7 +240,11 @@ module FastlaneCore
       end
 
       begin
-        result = @build_settings.split("\n").find { |c| c.split(" = ").first.strip == key }
+        result = @build_settings.split("\n").find do |c|
+          sp = c.split(" = ")
+          next if sp.length == 0
+          sp.first.strip == key
+        end
         return result.split(" = ").last
       rescue => ex
         return nil if optional # an optional value, we really don't care if something goes wrong
