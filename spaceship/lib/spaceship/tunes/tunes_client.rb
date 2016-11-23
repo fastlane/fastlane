@@ -266,6 +266,7 @@ module Spaceship
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
       # First, we need to fetch the data from Apple, which we then modify with the user's values
+      primary_language ||= "English"
       app_type = 'ios'
       r = request(:get, "ra/apps/create/v2/?platformString=#{app_type}")
       data = parse_response(r, 'data')
@@ -275,7 +276,8 @@ module Spaceship
       data['versionString'] = { value: version }
       data['name'] = { value: name }
       data['bundleId'] = { value: bundle_id }
-      data['primaryLanguage'] = { value: primary_language || 'English' }
+      data['primaryLanguage'] = { value: primary_language }
+      data['primaryLocaleCode'] = { value: primary_language.to_language_code }
       data['vendorId'] = { value: sku }
       data['bundleIdSuffix'] = { value: bundle_id_suffix }
       data['companyName'] = { value: company_name } if company_name
