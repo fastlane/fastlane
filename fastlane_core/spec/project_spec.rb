@@ -294,13 +294,6 @@ describe FastlaneCore do
         expect(@project.schemes).to eq(["CrossPlatformFramework"])
       end
     end
-
-    describe "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos", now: true do
-      before do
-        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-      end
-    end
     describe "build_settings() can handle empty lines" do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos", now: true do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
