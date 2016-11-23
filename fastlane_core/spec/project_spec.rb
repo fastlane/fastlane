@@ -295,6 +295,20 @@ describe FastlaneCore do
       end
     end
 
+    describe "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos", now: true do
+      before do
+        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+      end
+    end
+    describe "build_settings() can handle empty lines" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos", now: true do
+        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./spec/fixtures/projects/build_settings_broken"))
+        expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
+      end
+    end
     describe "Build Settings with default configuration" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
