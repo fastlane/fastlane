@@ -298,7 +298,7 @@ describe FastlaneCore do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos", now: true do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./spec/fixtures/projects/build_settings_broken"))
+        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
