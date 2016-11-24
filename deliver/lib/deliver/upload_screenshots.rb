@@ -16,8 +16,12 @@ module Deliver
         UI.message("Removing all previously uploaded screenshots...")
         # First, clear all previously uploaded screenshots
         screenshots_per_language.keys.each do |language|
-          v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
+          v.screenshots[language].each_with_index do |screenshot, index|
+            begin
+              v.upload_screenshot!(nil, index + 1, screenshot.language, screenshot.device_type, false)
+            rescue
+              UI.error("Removing existing screenshot is failure")
+            end
           end
         end
       end
