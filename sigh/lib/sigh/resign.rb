@@ -28,21 +28,7 @@ module Sigh
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements.shellescape}" if entitlements
 
-      # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
-      # (in that case the underlying resign.sh expects values given as "-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.mobileprovision")
-      #   {
-      #     "at.fastlane" => "/folder/mobile.mobileprovision",
-      #     "at.fastlane.today" => "/folder/mobile.mobileprovision"
-      #   }
-      # or an array
-      # (resign.sh also takes "-p /folder/mobile.mobileprovision" as a param)
-      #   [
-      #        "/folder/mobile.mobileprovision"
-      #   ]
-      provisioning_options = provisioning_profiles.map do |app_id, app_id_prov|
-        app_id = File.expand_path(app_id)
-        "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
-      end.join(' ')
+      provisioning_options = create_provisioning_options(provisioning_profiles)
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
       short_version = "--short-version #{short_version}" if short_version
@@ -126,6 +112,24 @@ module Sigh
       identities = installed_identities
       return signing_identity if identities.keys.include?(signing_identity)
       identities.key(signing_identity)
+    end
+
+    def create_provisioning_options(provisioning_profile)
+      # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
+      # (in that case the underlying resign.sh expects values given as "-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.mobileprovision")
+      #   {
+      #     "at.fastlane" => "/folder/mobile.mobileprovision",
+      #     "at.fastlane.today" => "/folder/mobile.mobileprovision"
+      #   }
+      # or an array
+      # (resign.sh also takes "-p /folder/mobile.mobileprovision" as a param)
+      #   [
+      #        "/folder/mobile.mobileprovision"
+      #   ]
+      provisioning_profiles.map do |app_id, app_id_prov|
+        app_id = File.expand_path(app_id)
+        "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
+      end.join(' ')
     end
 
     def validate_params(resign_path, ipa, provisioning_profiles)
