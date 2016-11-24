@@ -129,7 +129,7 @@ module Sigh
       provisioning_profiles.map do |app_id, app_id_prov|
         if app_id_prov
           app_id_prov = File.expand_path(app_id_prov)
-        elsif
+        else
           app_id = File.expand_path(app_id)
         end
         "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
