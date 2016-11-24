@@ -114,7 +114,7 @@ module Sigh
       identities.key(signing_identity)
     end
 
-    def create_provisioning_options(provisioning_profile)
+    def create_provisioning_options(provisioning_profiles)
       # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
       # (in that case the underlying resign.sh expects values given as "-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.mobileprovision")
       #   {
