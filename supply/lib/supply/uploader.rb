@@ -115,6 +115,13 @@ module Supply
         apk_version_codes.push(upload_binary_data(apk_path))
       end
 
+      mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
+      mapping_paths.each do |mapping_path|
+        if mapping_path
+          client.upload_mapping(mapping_path)
+        end
+      end
+
       update_track(apk_version_codes)
     end
 

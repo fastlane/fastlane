@@ -127,7 +127,30 @@ module Supply
                                      optional: true,
                                      description: "Indicate that changes will only be validated with Google Play rather than actually published",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :mapping,
+                                     env_name: "SUPPLY_MAPPING",
+                                     description: "Path to the mapping file to upload",
+                                     short_option: "-m",
+                                     conflicting_options: [:mapping_paths],
+                                     default_value: "",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error! "Could not find mapping file at path '#{value}'" unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :mapping_paths,
+                                     env_name: "SUPPLY_MAPPING_PATHS",
+                                     conflicting_options: [:mapping],
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of paths to mapping files to upload",
+                                     short_option: "-mp",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                       value.each do |path|
+                                         UI.user_error! "Could not find mapping file at path '#{path}'" unless File.exist?(path)
+                                       end
+                                     end)
 
       ]
     end
