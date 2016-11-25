@@ -29,6 +29,57 @@ describe Snapshot do
       end
     end
 
+    describe "Feature (FASTLANE_SNAPSHOT_BUILD_FOR_TESTING) - use test-without-building, build-for-testing" do
+      let(:options) { { project: "./example/Example.xcodeproj", scheme: "ExampleUITests" } }
+
+      def configure(options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+      end
+      it "Generates build command (build-for-testing) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)", now: true do
+        with_env_values('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING' => '1') do
+          configure options
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6", build_type: "build-for-testing")
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./example/Example.xcodeproj",
+              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "  -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO",
+              "FASTLANE_SNAPSHOT=YES",
+              "build-for-testing",
+              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+            ]
+          )
+        end
+      end
+
+      it "Generates test command (test-without-building) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)", now: true do
+        with_env_values('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING' => '1') do
+          configure options
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6", build_type: "test-without-building")
+          id = command.join('').match(/id=(.+?),/)[1]
+          ios = command.join('').match(/OS=(\d+.\d+)/)[1]
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./example/Example.xcodeproj",
+              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
+              "FASTLANE_SNAPSHOT=YES",
+              "test-without-building",
+              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+            ]
+          )
+        end
+      end
+    end
+
     describe "Valid Configuration" do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
 
