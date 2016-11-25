@@ -35,7 +35,7 @@ describe Snapshot do
       def configure(options)
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
       end
-      it "Generates build command (build-for-testing) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)", now: true do
+      it "Generates build command (build-for-testing) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)" do
         with_env_values('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING' => '1') do
           configure options
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
@@ -56,7 +56,7 @@ describe Snapshot do
         end
       end
 
-      it "Generates test command (test-without-building) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)", now: true do
+      it "Generates test command (test-without-building) (FEATURE_FLAG=FASTLANE_SNAPSHOT_BUILD_FOR_TESTING)" do
         with_env_values('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING' => '1') do
           configure options
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
