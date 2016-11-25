@@ -211,6 +211,19 @@ module Supply
       return result_upload.version_code
     end
 
+    def upload_mapping(path_to_mapping)
+      ensure_active_edit!
+
+      call_google_api do
+        android_publisher.upload_edit_deobfuscationfile(
+          current_package_name,
+          current_edit.id,
+          deobfuscation_file_type: "proguard",
+          upload_source: path_to_mapping
+        )
+      end
+    end
+
     # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!
