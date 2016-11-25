@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         required_version = params[:version]
 
-        selected_version = sh "xcversion selected | head -1 | xargs echo -n"
+        selected_version = sh "xcversion selected | grep '^Xcode' | head -1 | xargs echo -n"
 
         versions_match = selected_version == "Xcode #{required_version}"
 
