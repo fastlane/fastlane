@@ -108,7 +108,7 @@ module Commander
       ui.error "  - Run `rbenv global ruby-2.3.1` to make it the new global default Ruby version"
       ui.error "- If you use rvm:"
       ui.error "  - First run `rvm osx-ssl-certs update all`"
-      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local"
+      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`"
       ui.error ""
       ui.error "If that doesn't fix your issue, please google for the following error message:"
       ui.error "  '#{e}'"
