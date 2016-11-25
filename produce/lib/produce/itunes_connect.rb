@@ -28,7 +28,8 @@ module Produce
                                                               sku: Produce.config[:sku].to_s, # might be an int
                                                               bundle_id: app_identifier,
                                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
-                                                              company_name: Produce.config[:company_name])
+                                                              company_name: Produce.config[:company_name],
+                                                              platform: Produce.config[:platform])
 
         UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
 
