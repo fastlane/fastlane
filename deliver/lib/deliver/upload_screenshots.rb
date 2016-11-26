@@ -20,7 +20,7 @@ module Deliver
             begin
               v.upload_screenshot!(nil, index + 1, screenshot.language, screenshot.device_type, false)
             rescue
-              UI.error("Removing existing screenshot is failure")
+              UI.user_error!("Removing existing screenshot is failure")
             end
           end
         end
