@@ -116,9 +116,11 @@ module Supply
       end
 
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
-      mapping_paths.each do |mapping_path|
+      mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
+        puts mapping_path
+        puts version_code
         if mapping_path
-          client.upload_mapping(mapping_path)
+          client.upload_mapping(mapping_path, version_code)
         end
       end
 

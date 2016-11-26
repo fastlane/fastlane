@@ -131,9 +131,8 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :mapping,
                                      env_name: "SUPPLY_MAPPING",
                                      description: "Path to the mapping file to upload",
-                                     short_option: "-m",
+                                     short_option: "-d",
                                      conflicting_options: [:mapping_paths],
-                                     default_value: "",
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find mapping file at path '#{value}'" unless File.exist?(value)
@@ -144,7 +143,7 @@ module Supply
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to mapping files to upload",
-                                     short_option: "-mp",
+                                     short_option: "-s",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
                                        value.each do |path|
