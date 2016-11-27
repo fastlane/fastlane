@@ -60,10 +60,11 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :output_name,
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
-                                     description: "The name of the resulting ipa file",
+                                     description: "The name of the resulting ipa/app file",
                                      optional: true,
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
+                                       value.gsub!(".app", "")
                                        value.gsub!(File::SEPARATOR, "_")
                                      end),
         FastlaneCore::ConfigItem.new(key: :configuration,

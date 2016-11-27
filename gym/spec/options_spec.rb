@@ -14,6 +14,13 @@ describe Gym do
       expect(Gym.config[:output_name]).to eq("Example")
     end
 
+    it "removes the `app` from the output name if given" do
+      options = { output_name: "Example.app", project: "./examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      expect(Gym.config[:output_name]).to eq("Example")
+    end
+
     it "automatically chooses an existing scheme if the the defined one is not available" do
       options = { project: "./examples/standard/Example.xcodeproj", scheme: "NotHere" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
