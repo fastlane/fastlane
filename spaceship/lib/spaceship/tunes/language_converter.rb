@@ -10,10 +10,8 @@ module Spaceship
 
         # Converts the Language "UK English" to itc locale en-GB
         def from_standard_to_itc_locale(from)
-          result = mapping.find { |a| a['name'] == from }
-          itc_locale = (result || {}).fetch('itc_locale', nil)
-          return itc_locale if itc_locale
-          (result || {}).fetch('locale', nil)
+          result = mapping.find { |a| a['name'] == from } || {}
+          return result['itc_locale'] || result['locale']
         end
 
         # Converts the language short codes: (en-US, de-DE) to the iTC format (English_CA, Brazilian Portuguese)
