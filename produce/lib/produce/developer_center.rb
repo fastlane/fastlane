@@ -22,6 +22,12 @@ module Produce
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name)
 
+        if app.name != Produce.config[:app_name]
+          UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
+          UI.important("To fix this a unique (internal) name '#{app.name}' has been created for you. Your app's real name '#{Produce.config[:app_name]}'")
+          UI.important("will still show up correctly on iTunes Connect and the App Store.")
+        end
+
         UI.message "Created app #{app.app_id}"
 
         UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless app_exists?
