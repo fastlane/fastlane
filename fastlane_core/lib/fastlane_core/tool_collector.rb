@@ -76,7 +76,7 @@ module FastlaneCore
       if Helper.is_test? # don't send test data
         return url
       else
-        fork do
+        Thread.new do
           begin
             Excon.post(url)
           rescue

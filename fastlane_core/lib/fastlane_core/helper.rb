@@ -56,8 +56,8 @@ module FastlaneCore
     end
 
     def self.windows?
-      # taken from: http://stackoverflow.com/a/171011/1945875
-      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+      # taken from: http://stackoverflow.com/a/4871457/1945875
+      (ENV['OS'] == 'Windows_NT')
     end
 
     def self.linux?
