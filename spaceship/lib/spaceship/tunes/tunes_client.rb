@@ -277,7 +277,7 @@ module Spaceship
       data['name'] = { value: name }
       data['bundleId'] = { value: bundle_id }
       data['primaryLanguage'] = { value: primary_language }
-      data['primaryLocaleCode'] = { value: primary_language.to_language_code }
+      data['primaryLocaleCode'] = { value: primary_language.to_itc_locale }
       data['vendorId'] = { value: sku }
       data['bundleIdSuffix'] = { value: bundle_id_suffix }
       data['companyName'] = { value: company_name } if company_name
