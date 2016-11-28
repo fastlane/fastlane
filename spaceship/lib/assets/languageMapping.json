@@ -26,14 +26,12 @@
         "game-center": true,
         "alternatives": [
             "nl"
-        ],
-        "itc_locale": "nl-NL"
+        ]
     },
     {
         "locale": "en-AU",
         "name": "Australian English",
-        "game-center": false,
-        "itc_locale": "en-AU"
+        "game-center": false
     },
     {
         "locale": "en-AU",
