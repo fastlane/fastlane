@@ -38,38 +38,32 @@
     {
         "locale": "en-AU",
         "name": "English_Australian",
-        "game-center": false,
-        "itc_locale": "en-AU"
+        "game-center": false
     },
     {
         "locale": "en-CA",
         "name": "Canadian English",
-        "game-center": false,
-        "itc_locale": "en-CA"
+        "game-center": false
     },
     {
         "locale": "en-CA",
         "name": "English_CA",
-        "game-center": false,
-        "itc_locale": "en-CA"
+        "game-center": false
     },
     {
         "locale": "en-GB",
         "name": "UK English",
-        "game-center": true,
-        "itc_locale": "en-GB"
+        "game-center": true
     },
     {
         "locale": "en-GB",
         "name": "English_UK",
-        "game-center": true,
-        "itc_locale": "en-GB"
+        "game-center": true
     },
     {
         "locale": "en-US",
         "name": "English",
-        "game-center": true,
-        "itc_locale": "en-US"
+        "game-center": true
     },
     {
         "locale": "fi-FI",
@@ -83,14 +77,12 @@
     {
         "locale": "fr-CA",
         "name": "Canadian French",
-        "game-center": false,
-        "itc_locale": "fr-CA"
+        "game-center": false
     },
     {
         "locale": "fr-CA",
         "name": "French_CA",
-        "game-center": false,
-        "itc_locale": "fr-CA"
+        "game-center": false
     },
     {
         "locale": "fr-FR",
@@ -98,8 +90,7 @@
         "game-center": true,
         "alternatives": [
             "fr"
-        ],
-        "itc_locale": "fr-FR"
+        ]
     },
     {
         "locale": "de-DE",
@@ -107,8 +98,7 @@
         "game-center": true,
         "alternatives": [
             "de"
-        ],
-        "itc_locale": "de-DE"
+        ]
     },
     {
         "locale": "el-GR",
@@ -176,8 +166,7 @@
     {
         "locale": "pt-BR",
         "name": "Brazilian Portuguese",
-        "game-center": true,
-        "itc_locale": "pt-BR"
+        "game-center": true
     },
     {
         "locale": "pt-PT",
@@ -185,8 +174,7 @@
         "game-center": true,
         "alternatives": [
             "pt"
-        ],
-        "itc_locale": "pt-PT"
+        ]
     },
     {
         "locale": "ru-RU",
@@ -200,14 +188,12 @@
     {
         "locale": "es-MX",
         "name": "Mexican Spanish",
-        "game-center": false,
-        "itc_locale": "es-MX"
+        "game-center": false        
     },
     {
         "locale": "es-MX",
         "name": "Spanish_MX",
-        "game-center": false,
-        "itc_locale": "es-MX"
+        "game-center": false
     },
     {
         "locale": "es-ES",
@@ -215,8 +201,7 @@
         "game-center": true,
         "alternatives": [
             "es"
-        ],
-        "itc_locale": "es-ES"
+        ]
     },
     {
         "locale": "sv-SE",
