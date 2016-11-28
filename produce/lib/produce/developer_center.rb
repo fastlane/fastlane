@@ -16,7 +16,7 @@ module Produce
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
-        app_name = valid_name_for(Produce.config[:app_name])
+        app_name = Produce.config[:app_name]
         UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
@@ -32,11 +32,6 @@ module Produce
       end
 
       return true
-    end
-
-    def valid_name_for(input)
-      latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
     end
 
     def app_identifier
