@@ -132,6 +132,17 @@ module Spaceship
       details_for_app(app)
     end
 
+    def valid_name_for(input)
+      latinazed = input.to_slug.transliterate.to_s # remove accents
+      latinazed = latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      # it may result in totaly empty strings that only contain chinese symbols.
+      if latinazed != input
+        latinazed << " "
+        latinazed << Digest::MD5.hexdigest(input)
+      end
+      latinazed
+    end
+
     def create_app!(type, name, bundle_id, mac: false)
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
@@ -155,7 +166,7 @@ module Spaceship
                      end
 
       params = {
-        name: name,
+        name: valid_name_for(name),
         teamId: team_id
       }
 
