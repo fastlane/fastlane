@@ -40,7 +40,8 @@ module Sigh
       #        "/folder/mobile.mobileprovision"
       #   ]
       provisioning_options = provisioning_profiles.map do |app_id, app_id_prov|
-        app_id = File.expand_path(app_id)
+        app_id = File.expand_path(app_id) unless app_id_prov
+        app_id_prov = File.expand_path(app_id) if app_id_prov
         "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
       end.join(' ')
       version = "-n #{version}" if version
