@@ -133,7 +133,8 @@ module Spaceship
     end
 
     def valid_name_for(input)
-      latinazed = input.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinazed = input.to_slug.transliterate
+      latinazed = latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
       # it may result in totaly empty strings that only contain chinese symbols.
       if latinazed != input
         latinazed << " "
