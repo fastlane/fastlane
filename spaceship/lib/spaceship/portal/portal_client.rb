@@ -135,7 +135,8 @@ module Spaceship
     def valid_name_for(input)
       latinazed = input.to_slug.transliterate
       latinazed = latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
-      # it may result in totaly empty strings that only contain chinese symbols.
+      # Check if the input string was modified, since it might be empty now
+      # (if it only contained non-latin symbols) or the duplicate of another app
       if latinazed != input
         latinazed << " "
         latinazed << Digest::MD5.hexdigest(input)
