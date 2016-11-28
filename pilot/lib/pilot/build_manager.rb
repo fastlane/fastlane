@@ -3,6 +3,8 @@ module Pilot
     def upload(options)
       start(options)
 
+      options[:changelog] = truncate_changelog(options[:changelog]) if options[:changelog]
+
       UI.user_error!("No ipa file given") unless config[:ipa]
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
@@ -91,6 +93,17 @@ module Pilot
         headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
         rows: rows
       )
+    end
+
+    def self.truncate_changelog(changelog)
+      max_changelog_length = 4000
+      if changelog && changelog.length > max_changelog_length
+        original_length = changelog.length
+        bottom_message = "..."
+        changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
+        UI.important "Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters."
+      end
+      return changelog
     end
 
     private
