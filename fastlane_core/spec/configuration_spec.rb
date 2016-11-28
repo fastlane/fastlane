@@ -134,6 +134,18 @@ describe FastlaneCore do
         end
       end
 
+      describe "#sensitive flag" do
+        it "should set the sensitive flag", now: true do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array,
+                                                     optional: true,
+                                                     sensitive: true,
+                                                     default_value: ['5', '4', '3', '2', '1'])
+          expect(config_item.sensitive).to eq(true)
+        end
+      end
+
       describe "arrays" do
         it "returns Array default values correctly" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
