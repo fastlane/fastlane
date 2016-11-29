@@ -62,7 +62,7 @@ module Deliver
       if options[:ipa]
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
-        options[:platform] = 'mac'
+        options[:platform] = 'osx'
       end
     end
   end
