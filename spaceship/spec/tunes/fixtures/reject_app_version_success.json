@@ -1,0 +1,861 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "versionId": 812758182,
+    "name": {
+      "value": "German 14357045361",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "primaryLanguage": {
+      "value": "German",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "version": {
+      "value": "0.9.14",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "copyright": {
+      "value": "2015 SunApps GmbH",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "primaryCategory": {
+      "value": "MZGenre.Reference",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "primaryFirstSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "primarySecondSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondaryCategory": {
+      "value": "MZGenre.Business",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondaryFirstSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "secondarySecondSubCategory": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "submittableAddOns": {
+      "value": [],
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "newsstand": {
+      "isEnabled": false,
+      "isEditable": true,
+      "errorKeys": null,
+      "isRequired": false,
+      "picture": {
+        "value": {
+          "assetToken": null,
+          "url": null,
+          "thumbNailUrl": null,
+          "sortOrder": null,
+          "originalFileName": null
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "isEmptyValue": false,
+      "pictureEmptyValue": true
+    },
+    "gameCenterSummary": {
+      "leaderboards": {
+        "value": [],
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "displaySets": {
+        "value": [],
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "achievements": {
+        "value": [],
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "versionCompatibility": {
+        "value": [],
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "usedLeaderboards": 0,
+      "maxLeaderboards": 100,
+      "usedLeaderboardSets": 0,
+      "maxLeaderboardSets": 100,
+      "usedAchievementPoints": 0,
+      "maxAchievementPoints": 1000,
+      "isEnabled": false,
+      "isEditable": true,
+      "errorKeys": [],
+      "isRequired": false,
+      "isEmptyValue": false
+    },
+    "canSendVersionLive": false,
+    "canPrepareForUpload": true,
+    "canRejectVersion": false,
+    "status": "prepareForUpload",
+    "appType": "iOS App",
+    "platform": "ios",
+    "ratings": {
+      "nonBooleanDescriptors": [{
+        "name": "ITC.apps.ratings.descriptor.CARTOON_FANTASY_VIOLENCE",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.REALISTIC_VIOLENCE",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.PROLONGED_GRAPHIC_SADISTIC_REALISTIC_VIOLENCE",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.PROFANITY_CRUDE_HUMOR",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.MATURE_SUGGESTIVE",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.HORROR",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.MEDICAL_TREATMENT_INFO",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.ALCOHOL_TOBACCO_DRUGS",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.GAMBLING",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.SEXUAL_CONTENT_NUDITY",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.GRAPHIC_SEXUAL_CONTENT_NUDITY",
+        "level": "ITC.apps.ratings.level.NONE",
+        "rank": 1
+      }],
+      "booleanDescriptors": [{
+        "name": "ITC.apps.ratings.descriptor.UNRESTRICTED_WEB_ACCESS",
+        "level": "ITC.apps.ratings.level.NO",
+        "rank": 1
+      }, {
+        "name": "ITC.apps.ratings.descriptor.GAMBLING_CONTESTS",
+        "level": "ITC.apps.ratings.level.NO",
+        "rank": 1
+      }],
+      "ageBand": null,
+      "allRatingLevels": ["ITC.apps.ratings.level.YES", "ITC.apps.ratings.level.NO", "ITC.apps.ratings.level.NONE", "ITC.apps.ratings.level.INFREQUENT_MILD", "ITC.apps.ratings.level.FREQUENT_INTENSE"],
+      "rating": "4+",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "countryRatings": {
+        "Brazil": "L"
+      },
+      "isEmptyValue": false
+    },
+    "details": {
+      "value": [{
+        "sectionErrorKeys": [],
+        "sectionInfoKeys": [],
+        "sectionWarningKeys": [],
+        "description": {
+          "value": "German 1435704536",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "language": "German",
+        "detailId": "1168565315",
+        "releaseNotes": {
+          "value": null,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "keywords": {
+          "value": "keywords, 123",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "name": {
+          "value": "German 14357045361",
+          "isEditable": true,
+          "isRequired": true,
+          "errorKeys": null
+        },
+        "screenshots": {
+          "value": {
+            "watch": {
+              "value": [],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone4": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple3/v4/21/7f/ee/217feee2-0557-162b-e32f-3966f6b38194/da94d869fb5b3cf3df296a46a036f809.png",
+                  "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/21/7f/ee/217feee2-0557-162b-e32f-3966f6b38194/da94d869fb5b3cf3df296a46a036f809.png/640x1136ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/21/7f/ee/217feee2-0557-162b-e32f-3966f6b38194/da94d869fb5b3cf3df296a46a036f809.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "da94d869fb5b3cf3df296a46a036f809.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple3/v4/0b/25/1a/0b251a2b-737c-8507-b6db-6a3c49b25c54/fce7293605076dfe3a7f424a57e435d5.png",
+                  "url": "https://is2-ssl.mzstatic.com/image/thumb/Purple3/v4/0b/25/1a/0b251a2b-737c-8507-b6db-6a3c49b25c54/fce7293605076dfe3a7f424a57e435d5.png/640x1136ss-80.png",
+                  "thumbNailUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple3/v4/0b/25/1a/0b251a2b-737c-8507-b6db-6a3c49b25c54/fce7293605076dfe3a7f424a57e435d5.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "fce7293605076dfe3a7f424a57e435d5.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone35": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple3/v4/ca/3d/a9/ca3da98e-fd72-8969-3157-38fd2009c6a9/ccf904a014420d7d675a9d5105bb2b6f.png",
+                  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/ca/3d/a9/ca3da98e-fd72-8969-3157-38fd2009c6a9/ccf904a014420d7d675a9d5105bb2b6f.png/640x960ss-80.png",
+                  "thumbNailUrl": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/ca/3d/a9/ca3da98e-fd72-8969-3157-38fd2009c6a9/ccf904a014420d7d675a9d5105bb2b6f.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "ccf904a014420d7d675a9d5105bb2b6f.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple5/v4/dd/77/6f/dd776f3f-1035-8cb2-5c85-5d1ecfc55ea9/6e1df03b65c64970bf23fbdf9f48fcd9.png",
+                  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple5/v4/dd/77/6f/dd776f3f-1035-8cb2-5c85-5d1ecfc55ea9/6e1df03b65c64970bf23fbdf9f48fcd9.png/640x960ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple5/v4/dd/77/6f/dd776f3f-1035-8cb2-5c85-5d1ecfc55ea9/6e1df03b65c64970bf23fbdf9f48fcd9.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "6e1df03b65c64970bf23fbdf9f48fcd9.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "ipad": {
+              "value": [],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple3/v4/ca/28/1a/ca281af2-4ec0-7a13-ab28-19112a36d1af/929627a5a5f66494f9464b091719ef7c.png",
+                  "url": "https://is2-ssl.mzstatic.com/image/thumb/Purple3/v4/ca/28/1a/ca281af2-4ec0-7a13-ab28-19112a36d1af/929627a5a5f66494f9464b091719ef7c.png/750x1334ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/ca/28/1a/ca281af2-4ec0-7a13-ab28-19112a36d1af/929627a5a5f66494f9464b091719ef7c.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "929627a5a5f66494f9464b091719ef7c.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple3/v4/b4/8d/49/b48d492e-0b3b-9d3d-129a-0b4becdcc413/11b153ac8bfa024ba2d2eaa19ca81bc6.png",
+                  "url": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/b4/8d/49/b48d492e-0b3b-9d3d-129a-0b4becdcc413/11b153ac8bfa024ba2d2eaa19ca81bc6.png/750x1334ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple3/v4/b4/8d/49/b48d492e-0b3b-9d3d-129a-0b4becdcc413/11b153ac8bfa024ba2d2eaa19ca81bc6.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "11b153ac8bfa024ba2d2eaa19ca81bc6.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6Plus": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple1/v4/95/df/c7/95dfc7fc-6755-a7d2-134e-76865256107f/f334244a33a3ea32b12ba44b784658f4.png",
+                  "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple1/v4/95/df/c7/95dfc7fc-6755-a7d2-134e-76865256107f/f334244a33a3ea32b12ba44b784658f4.png/1242x2208ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple1/v4/95/df/c7/95dfc7fc-6755-a7d2-134e-76865256107f/f334244a33a3ea32b12ba44b784658f4.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "f334244a33a3ea32b12ba44b784658f4.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple1/v4/99/9a/3e/999a3e36-ad1f-8bd8-6379-d7e1a05add66/6dd4d0167b361516f415719bd5526b8e.png",
+                  "url": "https://is4-ssl.mzstatic.com/image/thumb/Purple1/v4/99/9a/3e/999a3e36-ad1f-8bd8-6379-d7e1a05add66/6dd4d0167b361516f415719bd5526b8e.png/1242x2208ss-80.png",
+                  "thumbNailUrl": "https://is3-ssl.mzstatic.com/image/thumb/Purple1/v4/99/9a/3e/999a3e36-ad1f-8bd8-6379-d7e1a05add66/6dd4d0167b361516f415719bd5526b8e.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "6dd4d0167b361516f415719bd5526b8e.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "appTrailers": {
+          "value": {
+            "iphone4": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "watch": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone35": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "ipad": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6Plus": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "privacyURL": {
+          "value": "http://privacy.sunapps.net",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "supportURL": {
+          "value": "https://github.com/fastlane",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "marketingURL": {
+          "value": "https://sunapps.net",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        }
+      }, {
+        "sectionErrorKeys": [],
+        "sectionInfoKeys": [],
+        "sectionWarningKeys": [],
+        "description": {
+          "value": "English Description 1435704536",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "language": "English",
+        "detailId": "1168565314",
+        "releaseNotes": {
+          "value": null,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "keywords": {
+          "value": "english keywords",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "name": {
+          "value": "English Title 1435704536",
+          "isEditable": true,
+          "isRequired": true,
+          "errorKeys": null
+        },
+        "screenshots": {
+          "value": {
+            "watch": {
+              "value": [],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone4": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png",
+                  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/640x1136ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/31/8e/b4/318eb497-b57f-64e6-eaa0-94eff9cb7319/b6a876130fa48da21db6622f08b815b4.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "b6a876130fa48da21db6622f08b815b4.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple6/v4/28/50/d5/2850d5af-1761-7412-70cd-5800d55a938c/133a85c4d89a43686159a96134e77fb2.png",
+                  "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple6/v4/28/50/d5/2850d5af-1761-7412-70cd-5800d55a938c/133a85c4d89a43686159a96134e77fb2.png/640x1136ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple6/v4/28/50/d5/2850d5af-1761-7412-70cd-5800d55a938c/133a85c4d89a43686159a96134e77fb2.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "133a85c4d89a43686159a96134e77fb2.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone35": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple1/v4/a4/76/af/a476af27-81f3-a205-bd15-adc0ca87d441/08a41834b0d52fffe7b369223eb99a04.png",
+                  "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple1/v4/a4/76/af/a476af27-81f3-a205-bd15-adc0ca87d441/08a41834b0d52fffe7b369223eb99a04.png/640x960ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple1/v4/a4/76/af/a476af27-81f3-a205-bd15-adc0ca87d441/08a41834b0d52fffe7b369223eb99a04.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "08a41834b0d52fffe7b369223eb99a04.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple3/v4/5a/93/39/5a9339c8-2253-e228-f65b-6af3d948da04/4667a6b5a81e36461a042f4c6d0725fa.png",
+                  "url": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/5a/93/39/5a9339c8-2253-e228-f65b-6af3d948da04/4667a6b5a81e36461a042f4c6d0725fa.png/640x960ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/5a/93/39/5a9339c8-2253-e228-f65b-6af3d948da04/4667a6b5a81e36461a042f4c6d0725fa.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "4667a6b5a81e36461a042f4c6d0725fa.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "ipad": {
+              "value": [],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple1/v4/c1/30/17/c13017de-14cc-9003-6615-768049d488c7/0844896e14607950576319885fef11d8.png",
+                  "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple1/v4/c1/30/17/c13017de-14cc-9003-6615-768049d488c7/0844896e14607950576319885fef11d8.png/750x1334ss-80.png",
+                  "thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple1/v4/c1/30/17/c13017de-14cc-9003-6615-768049d488c7/0844896e14607950576319885fef11d8.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "0844896e14607950576319885fef11d8.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple3/v4/65/2c/6b/652c6b44-b84d-2a1a-e658-a0766a759bc0/e274a8ad1525b4e239dd560ae1bdbf70.png",
+                  "url": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/65/2c/6b/652c6b44-b84d-2a1a-e658-a0766a759bc0/e274a8ad1525b4e239dd560ae1bdbf70.png/750x1334ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple3/v4/65/2c/6b/652c6b44-b84d-2a1a-e658-a0766a759bc0/e274a8ad1525b4e239dd560ae1bdbf70.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "e274a8ad1525b4e239dd560ae1bdbf70.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6Plus": {
+              "value": [{
+                "value": {
+                  "assetToken": "Purple5/v4/55/63/9f/55639f0a-5105-716c-32ea-8671893899f9/08e62b4e1444d66fc798cfdcb8dce21e.png",
+                  "url": "https://is4-ssl.mzstatic.com/image/thumb/Purple5/v4/55/63/9f/55639f0a-5105-716c-32ea-8671893899f9/08e62b4e1444d66fc798cfdcb8dce21e.png/1242x2208ss-80.png",
+                  "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple5/v4/55/63/9f/55639f0a-5105-716c-32ea-8671893899f9/08e62b4e1444d66fc798cfdcb8dce21e.png/500x500bb-80.png",
+                  "sortOrder": 1,
+                  "originalFileName": "08e62b4e1444d66fc798cfdcb8dce21e.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }, {
+                "value": {
+                  "assetToken": "Purple1/v4/b4/70/ac/b470ac35-b583-24fa-72a8-dcc2a245e66b/d01929c941fc3f5e9ec8f6eef84ed840.png",
+                  "url": "https://is5-ssl.mzstatic.com/image/thumb/Purple1/v4/b4/70/ac/b470ac35-b583-24fa-72a8-dcc2a245e66b/d01929c941fc3f5e9ec8f6eef84ed840.png/1242x2208ss-80.png",
+                  "thumbNailUrl": "https://is5-ssl.mzstatic.com/image/thumb/Purple1/v4/b4/70/ac/b470ac35-b583-24fa-72a8-dcc2a245e66b/d01929c941fc3f5e9ec8f6eef84ed840.png/500x500bb-80.png",
+                  "sortOrder": 2,
+                  "originalFileName": "d01929c941fc3f5e9ec8f6eef84ed840.png"
+                },
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              }],
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "appTrailers": {
+          "value": {
+            "iphone4": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "watch": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone35": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "ipad": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "iphone6Plus": {
+              "value": null,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "privacyURL": {
+          "value": "http://privacy.sunapps.net",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "supportURL": {
+          "value": "https://github.com/fastlane",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "marketingURL": {
+          "value": "https://sunapps.net",
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        }
+      }],
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null
+    },
+    "transitAppFile": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "eula": {
+      "countries": [],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "isEmptyValue": true,
+      "EULAText": null
+    },
+    "largeAppIcon": {
+      "value": {
+        "assetToken": "Purple7/v4/15/29/8c/15298c93-6f2c-6470-437b-633bfff339b8/mzl.ilzvldfr.png",
+        "url": "https://is3-ssl.mzstatic.com/image/thumb/Purple7/v4/15/29/8c/15298c93-6f2c-6470-437b-633bfff339b8/mzl.ilzvldfr.png/1024x1024ss-80.png",
+        "thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/15/29/8c/15298c93-6f2c-6470-437b-633bfff339b8/mzl.ilzvldfr.png/500x500bb-80.png",
+        "sortOrder": null,
+        "originalFileName": "AppIconFull.png"
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "watchAppIcon": {
+      "value": {
+        "assetToken": null,
+        "url": null,
+        "thumbNailUrl": null,
+        "sortOrder": null,
+        "originalFileName": null
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "appReviewInfo": {
+      "firstName": {
+        "value": "Felix",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "lastName": {
+        "value": "Krause",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "phoneNumber": {
+        "value": "+0123123123123",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "emailAddress": {
+        "value": "felix@sunapps.net",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "reviewNotes": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "userName": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "password": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "entitlementUsages": {
+        "value": [],
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    },
+    "appStoreInfo": {
+      "tradeName": {
+        "value": "SunApps GmbH",
+        "isEditable": false,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "firstName": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "lastName": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "phoneNumber": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "emailAddress": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "appRegInfo": null,
+      "addressLine1": {
+        "value": "Why Address",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "addressLine2": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "addressLine3": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "cityName": {
+        "value": "Wien",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "state": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "postalCode": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "country": {
+        "value": "Austria",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "shouldDisplayInStore": {
+        "value": false,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    },
+    "appVersionPageLinks": {
+      "ITC.apps.versionLinks.StatusHistory": "/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewStatusHistory?adamId=981112404&versionString=latest&platform=ios",
+      "ITC.apps.versionLinks.StorePreview": "/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewStorePreview?adamId=981112404&versionString=latest&platform=ios"
+    },
+    "preReleaseBuildVersionString": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "preReleaseBuildTrainVersionString": null,
+    "preReleaseBuildIconUrl": null,
+    "preReleaseBuildUploadDate": 0,
+    "preReleaseBuildsAreAvailable": true,
+    "preReleaseBuildIsLegacy": false,
+    "canBetaTest": true,
+    "isSaveError": false,
+    "validationError": false,
+    "releaseOnApproval": {
+      "value": "true",
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "bundleInfo": {
+      "supportsAppleWatch": false
+    },
+    "autoReleaseDate": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": ["Successful POST"]
+  },
+  "statusCode": "SUCCESS"
+}

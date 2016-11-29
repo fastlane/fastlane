@@ -646,6 +646,22 @@ describe Spaceship::AppVersion, all: true do
       #   expect(version.name['English_CA']).to eq("yep, that's the name")
       # end
     end
+
+    describe "Rejecting" do
+      it 'rejects' do
+        itc_stub_reject_version_success
+        version.can_reject_version = true
+        expect(client).to receive(:reject!).with('898536088', 812_106_519)
+        version.reject!
+      end
+
+      it 'raises exception when not rejectable' do
+        itc_stub_valid_update
+        expect do
+          version.reject!
+        end.to raise_error "Version not rejectable"
+      end
+    end
   end
 
   describe "Modifying the app live version" do
