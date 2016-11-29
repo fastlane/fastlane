@@ -20,7 +20,8 @@ module Produce
         UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
-                                         name: app_name)
+                                         name: app_name,
+                                         mac: Produce.config[:platform] == "osx")
 
         UI.message "Created app #{app.app_id}"
 
@@ -46,7 +47,7 @@ module Produce
     private
 
     def app_exists?
-      Spaceship.app.find(app_identifier) != nil
+      Spaceship.app.find(app_identifier, mac: Produce.config[:platform] == "osx") != nil
     end
 
     def login
