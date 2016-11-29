@@ -90,10 +90,10 @@ describe Spaceship::Portal::App do
     end
 
     it 'creates an app id with an explicit bundle_id and no push notifications' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: {}) {
+      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: { push_notification: "off"}) {
         { 'enabledFeatures' => ["inAppPurchase"] }
       }
-      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enabled_features: {})
+      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enabled_features: {push_notification: "off"})
       expect(app.enabled_features).not_to include("push")
     end
 
