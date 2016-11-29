@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday_middleware', '~> 0.9'
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '~> 1.6'
+  spec.add_dependency 'unicode' # babosa requires it but does not set a dep.
   spec.add_dependency 'babosa' # transliterate strings
 
   # for the playground
