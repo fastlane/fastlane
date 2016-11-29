@@ -91,6 +91,7 @@ module Fastlane
           return key
         end
       end
+      return nil
     end
 
     # load aliases of actions
