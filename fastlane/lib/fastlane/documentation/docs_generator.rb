@@ -1,7 +1,7 @@
 module Fastlane
   class DocsGenerator
     def self.run(ff, output_path = nil)
-      output_path ||= File.join(Fastlane::FastlaneFolder.path || '.', 'README.md')
+      output_path ||= File.join(FastlaneCore::FastlaneFolder.path || '.', 'README.md')
 
       output = ["fastlane documentation"]
       output << "================"

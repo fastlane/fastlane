@@ -14,7 +14,7 @@ module Fastlane
           FastlaneCore::UpdateChecker.start_looking_for_update('produce')
           Produce.config = params # we alread have the finished config
 
-          Dir.chdir(FastlaneFolder.path || Dir.pwd) do
+          Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
             # This should be executed in the fastlane folder
             apple_id = Produce::Manager.start_producing.to_s
 
