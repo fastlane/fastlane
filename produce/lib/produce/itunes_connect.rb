@@ -51,7 +51,7 @@ module Produce
         UI.success "Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}"
       end
 
-      return Spaceship::Application.find(@full_bundle_identifier).apple_id
+      return Spaceship::Application.find(@full_bundle_identifier, mac: Produce.config[:platform] == "osx").apple_id
     end
 
     private
