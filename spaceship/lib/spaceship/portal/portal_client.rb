@@ -132,18 +132,6 @@ module Spaceship
       details_for_app(app)
     end
 
-    def valid_name_for(input)
-      latinazed = input.to_slug.transliterate
-      latinazed = latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
-      # Check if the input string was modified, since it might be empty now
-      # (if it only contained non-latin symbols) or the duplicate of another app
-      if latinazed != input
-        latinazed << " "
-        latinazed << Digest::MD5.hexdigest(input)
-      end
-      latinazed
-    end
-
     def create_app!(type, name, bundle_id, mac: false)
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
@@ -167,7 +155,7 @@ module Spaceship
                      end
 
       params = {
-        name: valid_name_for(name),
+        name: name,
         teamId: team_id
       }
 

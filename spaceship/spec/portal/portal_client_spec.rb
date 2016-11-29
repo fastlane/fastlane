@@ -113,13 +113,6 @@ describe Spaceship::Client do
         expect(response['name']).to eq('Development App')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.*')
       end
-
-      it 'should strip non ASCII characters', now: true do
-        response = subject.create_app!(:explicit, 'pp Test 1ed9e25c93ac7142ff9df53e7f80e84c', 'tools.fastlane.spaceship.some-explicit-app')
-        expect(response['isWildCard']).to eq(false)
-        expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
-        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
-      end
     end
 
     describe '#delete_app!' do
