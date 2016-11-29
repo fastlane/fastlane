@@ -22,8 +22,8 @@ module Fastlane
     end
 
     def pluginfile_path
-      if FastlaneFolder.path
-        return File.join(FastlaneFolder.path, PLUGINFILE_NAME)
+      if FastlaneCore::FastlaneFolder.path
+        return File.join(FastlaneCore::FastlaneFolder.path, PLUGINFILE_NAME)
       else
         return nil
       end
@@ -233,8 +233,8 @@ module Fastlane
 
     # The code required to load the Plugins file
     def self.code_to_attach
-      if FastlaneFolder.path
-        fastlane_folder_name = File.basename(FastlaneFolder.path)
+      if FastlaneCore::FastlaneFolder.path
+        fastlane_folder_name = File.basename(FastlaneCore::FastlaneFolder.path)
       else
         fastlane_folder_name = "fastlane"
       end

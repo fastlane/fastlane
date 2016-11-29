@@ -132,7 +132,7 @@ module Fastlane
         c.action do |args, options|
           if options.json || ensure_fastfile
             require 'fastlane/lane_list'
-            path = Fastlane::FastlaneFolder.fastfile_path
+            path = FastlaneCore::FastlaneFolder.fastfile_path
 
             if options.json
               Fastlane::LaneList.output_json(path)
@@ -148,7 +148,7 @@ module Fastlane
         c.description = 'Lists all available lanes without description'
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+            ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
             UI.message "Available lanes:"
             ff.runner.available_lanes.each do |lane|
               UI.message "- #{lane}"
@@ -165,7 +165,7 @@ module Fastlane
 
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
+            ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
             UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
             Fastlane::DocsGenerator.run(ff)
           end
@@ -297,7 +297,7 @@ module Fastlane
     # if that's not the case
     # return true if the Fastfile is available
     def ensure_fastfile
-      return true if Fastlane::FastlaneFolder.setup?
+      return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create

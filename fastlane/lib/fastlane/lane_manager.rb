@@ -9,7 +9,7 @@ module Fastlane
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+      ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -169,13 +169,13 @@ module Fastlane
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", '.env.default')
+      env_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env')
+      env_default_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env.default')
       Dotenv.load(env_file, env_default_file)
 
       # Loads .env file for the environment passed in through options
       if env
-        env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.#{env}")
+        env_file = File.join(FastlaneCore::FastlaneFolder.path || "", ".env.#{env}")
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end

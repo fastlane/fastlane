@@ -239,7 +239,7 @@ module Fastlane
     def self.print_fastlane_files
       env_output = "### fastlane files:\n\n"
 
-      fastlane_path = FastlaneFolder.fastfile_path
+      fastlane_path = FastlaneCore::FastlaneFolder.fastfile_path
 
       if fastlane_path && File.exist?(fastlane_path)
         env_output << "<details>"
