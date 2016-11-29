@@ -135,6 +135,11 @@ describe FastlaneCore do
       end
 
       describe "#sensitive flag" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::Helper).to receive(:interactive?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        end
         it "should set the sensitive flag" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
@@ -152,9 +157,6 @@ describe FastlaneCore do
                                                      optional: false,
                                                      sensitive: true)
           config = FastlaneCore::Configuration.create([config_item], {})
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
-          allow(FastlaneCore::Helper).to receive(:interactive?).and_return(true)
-          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
           expect(FastlaneCore::UI).to receive(:password).and_return("password")
           expect(config[:foo]).to eq("password")
         end
@@ -166,9 +168,6 @@ describe FastlaneCore do
                                                      optional: false,
                                                      sensitive: false)
           config = FastlaneCore::Configuration.create([config_item], {})
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
-          allow(FastlaneCore::Helper).to receive(:interactive?).and_return(true)
-          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
           expect(FastlaneCore::UI).to receive(:input).and_return("plaintext")
           expect(config[:foo]).to eq("plaintext")
         end
