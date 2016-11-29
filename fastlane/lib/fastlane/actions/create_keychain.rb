@@ -73,6 +73,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Password for the keychain",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :default_keychain,
                                        description: 'Set the default keychain',

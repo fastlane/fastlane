@@ -52,6 +52,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_JIRA_PASSWORD",
                                        description: "Password for Jira",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No password") if value.to_s.length == 0
                                        end),
