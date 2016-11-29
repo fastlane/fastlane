@@ -28,6 +28,8 @@ module FastlaneCore
 
     def self.create_folder!(path = nil)
       path = File.join(path || '.', FOLDER_NAME)
+      return if File.directory?(path) # directory is already there
+      UI.user_error!("Found a file called 'fastlane' at path '#{path}', please delete it") if File.exist?(path)
       FileUtils.mkdir_p(path)
       UI.success "Created new folder '#{path}'."
     end
