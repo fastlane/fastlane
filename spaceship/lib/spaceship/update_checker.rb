@@ -35,7 +35,7 @@ module Spaceship
       puts "or `bundle update` if you use bundler."
       puts ""
       puts "You're on spaceship version: #{local_version}".yellow
-      puts "Latest spaceship version  : #{live_version}".yellow
+      puts "Latest spaceship version   : #{live_version}".yellow
       puts ""
     end
   end
