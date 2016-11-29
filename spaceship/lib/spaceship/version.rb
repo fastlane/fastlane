@@ -1,4 +1,4 @@
 module Spaceship
-  VERSION = "0.38.1".freeze
+  VERSION = "0.38.2".freeze
   DESCRIPTION = "Ruby library to access the Apple Dev Center and iTunes Connect".freeze
 end
