@@ -120,6 +120,12 @@ describe Spaceship::Client do
         expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
+
+      it 'should make a request create an explicit app id with no push feature' do
+        response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', disable_push: true)
+        expect(response['enabledFeatures']).to_not include("push")
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
+      end
     end
 
     describe '#delete_app!' do

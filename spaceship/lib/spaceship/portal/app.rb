@@ -87,14 +87,14 @@ module Spaceship
         # @param name [String] the name of the App
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
-        def create!(bundle_id: nil, name: nil, mac: false)
+        def create!(bundle_id: nil, name: nil, mac: false, disable_push: false)
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac)
+          new_app = client.create_app!(type, name, bundle_id, mac: mac, disable_push: disable_push)
           self.new(new_app)
         end
 
