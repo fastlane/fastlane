@@ -65,6 +65,14 @@ module Produce
                                      description: "Skip the creation of the app on iTunes Connect",
                                      is_string: false,
                                      default_value: false),
+
+        FastlaneCore::ConfigItem.new(key: :enabled_features,
+                                     short_option: "-P",
+                                     env_name: "PRODUCE_ENABLED_FEATURES",
+                                     description: "Array with Spaceship App Features",
+                                     is_string: false,
+                                     default_value: {}),
+
         FastlaneCore::ConfigItem.new(key: :skip_devcenter,
                                      short_option: "-d",
                                      env_name: "PRODUCE_SKIP_DEVCENTER",

@@ -195,6 +195,10 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('deleteAppId.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
+    with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "Production App", "push" => "true", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+    to_return(status: 200, body: adp_read_fixture_file('addAppId.action.nopush.json'), headers: { 'Content-Type' => 'application/json' })
+
     def adp_stub_app_groups
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listApplicationGroups.action').
         with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
