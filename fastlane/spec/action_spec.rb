@@ -13,6 +13,14 @@ describe Fastlane do
         expect(Fastlane::Action.lane_context).to eq({ something: 1 })
       end
     end
+  
+    describe "can call alias action" do
+      it "redirects to the correct class and method" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          println \"alias\"
+        end").runner.execute(:test)
+      end
+    end
 
     describe "Call another action from an action" do
       it "allows the user to call it using `other_action.rocket`" do
