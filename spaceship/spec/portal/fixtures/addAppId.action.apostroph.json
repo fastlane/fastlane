@@ -1,0 +1,51 @@
+{
+  "creationTimestamp": "2015-04-29T00:26:33Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443//services-account/QH65B2/account/ios/identifiers/addAppId.action",
+  "responseId": "ed5e74cf-8f52-46bf-9cf6-9e9e9fcd9fad",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "appId": {
+    "appIdId": "2HNR359G63",
+    "name": "pp Test 1ed9e25c93ac7142ff9df53e7f80e84c",
+    "appIdPlatform": "ios",
+    "prefix": "S56PJTAYEL",
+    "identifier": "tools.fastlane.spaceship.some-explicit-app",
+    "isWildCard": false,
+    "isDuplicate": false,
+    "features": {
+      "push": true,
+      "inAppPurchase": true,
+      "gameCenter": true,
+      "passbook": false,
+      "dataProtection": "",
+      "homeKit": false,
+      "cloudKitVersion": 1,
+      "iCloud": false,
+      "LPLF93JG7M": false,
+      "IAD53UNK2F": false,
+      "V66P55NK2I": false,
+      "SKC3T5S89Y": false,
+      "APG3427HIY": false,
+      "HK421J6T7P": false,
+      "WC421J6T7P": false
+    },
+    "enabledFeatures": [
+      "gameCenter",
+      "inAppPurchase",
+      "push"
+    ],
+    "isDevPushEnabled": false,
+    "isProdPushEnabled": false,
+    "associatedApplicationGroupsCount": null,
+    "associatedCloudContainersCount": null,
+    "associatedIdentifiersCount": null
+  }
+}

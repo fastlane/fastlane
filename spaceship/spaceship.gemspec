@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday_middleware', '~> 0.9'
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '~> 1.6'
+  spec.add_dependency 'babosa', '1.0.2'
 
   # for the playground
   spec.add_dependency 'colored'
