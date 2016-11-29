@@ -154,6 +154,7 @@ describe FastlaneCore do
           config = FastlaneCore::Configuration.create([config_item], {})
           allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
           allow(FastlaneCore::Helper).to receive(:interactive?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
           expect(FastlaneCore::UI).to receive(:password).and_return("password")
           expect(config[:foo]).to eq("password")
         end
@@ -167,6 +168,7 @@ describe FastlaneCore do
           config = FastlaneCore::Configuration.create([config_item], {})
           allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
           allow(FastlaneCore::Helper).to receive(:interactive?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
           expect(FastlaneCore::UI).to receive(:input).and_return("plaintext")
           expect(config[:foo]).to eq("plaintext")
         end
