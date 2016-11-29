@@ -170,10 +170,10 @@ module Spaceship
         name: valid_name_for(name),
         teamId: team_id
       }
-
       params.merge!(ident_params)
-      params.merge!(enabled_features) if enabled_features
-      params.delete_if { |key, value| value.to_s == 'off' } if enabled_features
+      enabled_features.each do |k, v|
+        params[v.service_id.to_sym] = v.value
+      end
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
     end
