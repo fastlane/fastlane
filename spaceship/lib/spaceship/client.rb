@@ -6,7 +6,6 @@ require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
 require 'tmpdir'
-require "babosa"
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
