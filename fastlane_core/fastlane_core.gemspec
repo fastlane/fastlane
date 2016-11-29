@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'highline', '>= 1.7.2' # user inputs (e.g. passwords)
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '>= 4.4.0', '<= 5.0.0' # CLI parser
-  spec.add_dependency 'babosa' # transliterate strings
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0' # Great HTTP Client
   spec.add_dependency 'rubyzip', '~> 1.1.6' # needed for extracting the ipa file
   spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # needed for parsing provisioning profiles

@@ -1,5 +1,4 @@
 require 'spaceship'
-require 'babosa'
 
 module Produce
   class DeveloperCenter
