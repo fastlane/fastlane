@@ -284,6 +284,12 @@ def itc_stub_promocodes_history
               headers: { "Content-Type" => "application/json" })
 end
 
+def itc_stub_reject_version_success
+  stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/reject").
+    to_return(status: 200, body: itc_read_fixture_file("reject_app_version_success.json"),
+              headers: { "Content-Type" => "application/json" })
+end
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
