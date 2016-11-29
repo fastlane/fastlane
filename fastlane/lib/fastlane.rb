@@ -3,6 +3,7 @@ require 'fastlane_core'
 require 'fastlane/version'
 require 'fastlane/features'
 require 'fastlane/tools'
+require 'fastlane/documentation/actions_list'
 require 'fastlane/actions/actions_helper' # has to be before fast_file
 require 'fastlane/fast_file'
 require 'fastlane/runner'
@@ -36,6 +37,7 @@ module Fastlane
         actions_path = File.join(Fastlane::FastlaneFolder.path, 'actions')
         Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
       end
+      Fastlane::Actions.load_action_aliases
     end
 
     def plugin_manager

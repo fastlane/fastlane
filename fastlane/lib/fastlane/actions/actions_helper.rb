@@ -1,9 +1,14 @@
+# rubocop:disable ModuleLength
 module Fastlane
   module Actions
     module SharedValues
       LANE_NAME = :LANE_NAME
       PLATFORM_NAME = :PLATFORM_NAME
       ENVIRONMENT = :ENVIRONMENT
+    end
+
+    def self.alias_actions
+      @alias_actions ||= {}
     end
 
     def self.executed_actions
@@ -64,6 +69,10 @@ module Fastlane
     # Returns the class ref to the action based on the action name
     # Returns nil if the action is not aailable
     def self.action_class_ref(action_name)
+      alias_found = find_alias(action_name)
+      if alias_found
+        action_name = alias_found
+      end
       class_name = action_name.to_s.fastlane_class + 'Action'
       class_ref = nil
       begin
@@ -72,6 +81,25 @@ module Fastlane
         return nil
       end
       return class_ref
+    end
+
+    # lookup if an alias exists
+    def self.find_alias(action_name)
+      alias_actions.each do |key, v|
+        next unless alias_actions[key]
+        if alias_actions[key].include?(action_name)
+          return key
+        end
+      end
+    end
+
+    # load aliases of actions
+    def self.load_action_aliases
+      ActionsList.all_actions do |action, name|
+        if action.respond_to?(:aliases)
+          alias_actions[name] = action.aliases
+        end
+      end
     end
 
     def self.load_default_actions

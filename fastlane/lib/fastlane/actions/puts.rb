@@ -21,6 +21,10 @@ module Fastlane
         true
       end
 
+      def self.aliases
+        ["println", "echo"]
+      end
+
       # We don't want to show this as step
       def self.step_text
         nil
