@@ -133,15 +133,15 @@ module Spaceship
     end
 
     def valid_name_for(input)
-      latinazed = input.to_slug.transliterate
-      latinazed = latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinized = input.to_slug.transliterate
+      latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
       # Check if the input string was modified, since it might be empty now
       # (if it only contained non-latin symbols) or the duplicate of another app
-      if latinazed != input
-        latinazed << " "
-        latinazed << Digest::MD5.hexdigest(input)
+      if latinized != input
+        latinized << " "
+        latinized << Digest::MD5.hexdigest(input)
       end
-      latinazed
+      latinized
     end
 
     def create_app!(type, name, bundle_id, mac: false)
@@ -207,7 +207,7 @@ module Spaceship
       ensure_csrf(Spaceship::AppGroup)
 
       r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
-        name: name,
+        name: valid_name_for(name),
         identifier: group_id,
         teamId: team_id
       })
