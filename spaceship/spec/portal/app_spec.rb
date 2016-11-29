@@ -82,7 +82,7 @@ describe Spaceship::Portal::App do
 
   describe '#create' do
     it 'creates an app id with an explicit bundle_id' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, disable_push: false) {
+      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: {}) {
         { 'isWildCard' => true }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
@@ -90,15 +90,15 @@ describe Spaceship::Portal::App do
     end
 
     it 'creates an app id with an explicit bundle_id and no push notifications' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, disable_push: true) {
+      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: {}) {
         { 'enabledFeatures' => ["inAppPurchase"] }
       }
-      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', disable_push: true)
+      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enabled_features: {})
       expect(app.enabled_features).not_to include("push")
     end
 
     it 'creates an app id with a wildcard bundle_id' do
-      expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', mac: false, disable_push: false) {
+      expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', mac: false, enabled_features: {}) {
         { 'isWildCard' => false }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.*', name: 'Development App')

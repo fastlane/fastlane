@@ -144,7 +144,7 @@ module Spaceship
       latinized
     end
 
-    def create_app!(type, name, bundle_id, mac: false, disable_push: false)
+    def create_app!(type, name, bundle_id, mac: false, enabled_features: {})
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
       # https://github.com/fastlane/fastlane/issues/5813
@@ -172,7 +172,8 @@ module Spaceship
       }
 
       params.merge!(ident_params)
-      params.delete_if { |key, value| key.to_s == 'push' } if disable_push
+      params.merge!(enabled_features) if enabled_features
+      params.delete_if { |key, value| value.to_s == 'off' } if enabled_features
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
     end
