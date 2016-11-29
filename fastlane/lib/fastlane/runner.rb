@@ -97,11 +97,33 @@ module Fastlane
       nil
     end
 
+    # lookup if an alias exists
+    def find_alias(action_name)
+      Actions.alias_actions.each do |key, v|
+        next unless Actions.alias_actions[key]
+        if Actions.alias_actions[key].include?(action_name)
+          return key
+        end
+      end
+      return nil
+    end
+
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
     def trigger_action_by_name(method_sym, custom_dir, *arguments)
       # First, check if there is a predefined method in the actions folder
       class_ref = class_reference_from_action_name(method_sym)
+      unless class_ref
+        alias_found = find_alias(method_sym.to_s)
+        if alias_found
+          orig_action = method_sym.to_s
+          class_ref = class_reference_from_action_name(alias_found.to_sym)
+          # notify action that it has been used by alias
+          if class_ref && class_ref.respond_to?(:alias_used)
+            class_ref.alias_used(orig_action, arguments)
+          end
+        end
+      end
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is

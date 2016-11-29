@@ -21,7 +21,7 @@ module Fastlane
         true
       end
 
-      def self.alias_used(action_alias)
+      def self.alias_used(action_alias, options)
         UI.important("#{action_alias} called please use 'puts' instead!")
       end
 

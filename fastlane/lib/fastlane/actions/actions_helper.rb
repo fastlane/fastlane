@@ -1,4 +1,3 @@
-# rubocop:disable ModuleLength
 module Fastlane
   module Actions
     module SharedValues
@@ -69,36 +68,14 @@ module Fastlane
     # Returns the class ref to the action based on the action name
     # Returns nil if the action is not aailable
     def self.action_class_ref(action_name)
-      alias_found = find_alias(action_name)
-      orig_action = action_name
-      if alias_found
-        action_name = alias_found
-      end
       class_name = action_name.to_s.fastlane_class + 'Action'
       class_ref = nil
       begin
         class_ref = Fastlane::Actions.const_get(class_name)
-        if alias_found
-          # notify action that it has been used by alias
-          if class_ref.respond_to?(:alias_used)
-            class_ref.alias_used(orig_action)
-          end
-        end
       rescue NameError
         return nil
       end
       return class_ref
-    end
-
-    # lookup if an alias exists
-    def self.find_alias(action_name)
-      alias_actions.each do |key, v|
-        next unless alias_actions[key]
-        if alias_actions[key].include?(action_name)
-          return key
-        end
-      end
-      return nil
     end
 
     # load aliases of actions
