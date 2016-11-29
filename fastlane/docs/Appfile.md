@@ -2,7 +2,9 @@
 
 The `Appfile` stores useful information that are used across all `fastlane` tools like your *Apple ID* or the application *Bundle Identifier*, to deploy your lanes faster and tailored on your project needs. 
 
-By default an Appfile looks like:
+The `Appfile` has to be inside your `fastlane` directory.
+
+By default an `Appfile` looks like:
 
 ```ruby
 app_identifier "net.sunapps.1" # The bundle identifier of your app
