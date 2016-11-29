@@ -1,11 +1,3 @@
-//
-//  ViewController.m
-//  tvos
-//
-//  Created by Januschka Helmut on 22.11.16.
-//  Copyright © 2016 hjanuschka. All rights reserved.
-//
-
 #import "ViewController.h"
 
 @interface ViewController ()

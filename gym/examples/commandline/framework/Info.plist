@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2016 hjanuschka. All rights reserved.</string>
+	<string>Copyright by Fastlane</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>

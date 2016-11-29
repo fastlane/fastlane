@@ -1,11 +1,3 @@
-//
-//  ViewController.m
-//  cocoaapp
-//
-//  Created by Helmut Januschka on 21.11.16.
-//  Copyright © 2016 hjanuschka. All rights reserved.
-//
-
 #import "ViewController.h"
 
 @implementation ViewController
