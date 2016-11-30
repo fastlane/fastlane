@@ -112,6 +112,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
                                        description: "API Key for TestFairy", # a short description of this parameter
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API key for TestFairy given, pass using `api_key: 'key'`") unless value.to_s.length > 0
                                        end),

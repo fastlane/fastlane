@@ -39,6 +39,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :api_key,
                                       env_name: "IFTTT_API_KEY",
+                                      sensitive: true,
                                       description: "API key",
                                       verify_block: proc do |value|
                                         raise UI.error "No API key given, pass using `api_key: 'key'`" if value.to_s.empty?
