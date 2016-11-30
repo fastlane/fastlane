@@ -129,6 +129,7 @@ module Fastlane
                                        description: "The version tag of the release to check"),
           FastlaneCore::ConfigItem.new(key: :api_token,
                              env_name: "FL_GITHUB_RELEASE_API_TOKEN",
+                             sensitive: true,
                              description: "GitHub Personal Token (required for private repositories)",
                              optional: true)
         ]

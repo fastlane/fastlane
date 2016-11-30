@@ -99,6 +99,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "DEPLOYGATE_API_TOKEN",
                                        description: "Deploygate API Token",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API Token for DeployGate given, pass using `api_token: 'token'`") unless value.to_s.length > 0
                                        end),
@@ -122,6 +123,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :distribution_key,
                                        optional: true,
                                        env_name: "DEPLOYGATE_DISTRIBUTION_KEY",
+                                       sensitive: true,
                                        description: "Target Distribution Key"),
           FastlaneCore::ConfigItem.new(key: :release_note,
                                        optional: true,

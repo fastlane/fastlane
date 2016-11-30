@@ -71,6 +71,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",
+                                       sensitive: true,
                                        description: "Keychain password",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,

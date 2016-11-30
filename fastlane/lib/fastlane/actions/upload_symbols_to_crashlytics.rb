@@ -113,6 +113,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
+                                       sensitive: true,
                                        optional: true,
                                        description: "Crashlytics API Key",
                                        verify_block: proc do |value|

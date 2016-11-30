@@ -102,12 +102,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
                                        description: "Crashlytics API Key",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No build secret for Crashlytics given, pass using `build_secret: 'secret'`") unless value && !value.empty?
                                        end),

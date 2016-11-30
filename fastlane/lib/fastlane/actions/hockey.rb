@@ -94,6 +94,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
+                                       sensitive: true,
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?

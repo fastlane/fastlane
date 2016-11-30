@@ -33,6 +33,7 @@ module Fastlane
           # This is here just for while due to the transition, should use apikey instead
           FastlaneCore::ConfigItem.new(key: :mailgun_apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        optional: true,
                                        description: "Mailgun apikey for your mail. Please use postmaster instead"),
 
@@ -41,6 +42,7 @@ module Fastlane
                                        description: "Mailgun sandbox domain postmaster for your mail"),
           FastlaneCore::ConfigItem.new(key: :apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        description: "Mailgun apikey for your mail"),
           FastlaneCore::ConfigItem.new(key: :to,
                                        env_name: "MAILGUN_TO",
