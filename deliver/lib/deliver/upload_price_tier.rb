@@ -3,7 +3,6 @@ module Deliver
   class UploadPriceTier
     def upload(options)
       return unless options[:price_tier]
-      return if options[:edit_live]
       app = options[:app]
 
       # just to be sure, the user might have passed an int (which is fine with us)

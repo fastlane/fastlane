@@ -15,6 +15,12 @@ module Deliver
                                 :primary_first_sub_category, :primary_second_sub_category,
                                 :secondary_first_sub_category, :secondary_second_sub_category]
 
+    # Localized app details values, that are editable in live state
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url]
+
+    # Non localized app details values, that are editable in live state
+    NON_LOCALISED_LIVE_VERSION_VALUES = [:privacy_url]
+
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
       return if options[:skip_metadata]
@@ -29,8 +35,8 @@ module Deliver
       if options[:edit_live]
         # not all values are editable when using live_version
         v = app.live_version(platform: options[:platform])
-        localised_options = [:description, :release_notes, :support_url, :marketing_url]
-        non_localised_options = [:privacy_url]
+        localised_options = LOCALISED_LIVE_VALUES
+        non_localised_options = NON_LOCALISED_LIVE_VERSION_VALUES
       else
         v = app.edit_version(platform: options[:platform])
         localised_options = (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES)
