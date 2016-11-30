@@ -186,7 +186,7 @@ module FastlaneCore
       end
 
       def reset_all_by_version(os_version: nil)
-        return false until os_version
+        return false unless os_version
         version_sim = all.select { |device| device.os_version == os_version }
         version_sim.each(&:reset) if version_sim
       end
