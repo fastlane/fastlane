@@ -151,6 +151,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
                                      env_name: "SLACK_URL",
+                                     sensitive: true,
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
                                      verify_block: proc do |value|
