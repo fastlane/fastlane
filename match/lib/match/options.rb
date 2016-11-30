@@ -47,6 +47,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :keychain_password,
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
+                                     sensitive: true,
                                      description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :readonly,
