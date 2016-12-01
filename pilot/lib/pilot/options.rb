@@ -134,6 +134,13 @@ module Pilot
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     env_name: "PILOT_PLATFORM",
+                                     description: "The optional platform for which to retrieve builds (defaults to all platforms)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, appletvos") unless %('ios', 'appletvos').include? value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
