@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
+
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+
+if ENV['FASTLANE_USE_BUNDLER']
+  require 'bundler_support/bundler_manager'
+  BundlerSupport::BundlerManager.new.setup_bundler
+end
 
 require "fastlane/cli_tools_distributor"
 Fastlane::CLIToolsDistributor.take_off

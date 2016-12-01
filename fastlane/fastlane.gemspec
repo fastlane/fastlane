@@ -2,6 +2,14 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
+require 'fileutils'
+
+# TODO: this was the best we could come up with to share the
+# bundler support code between the various tools. Is there
+# anything better we can do?
+FileUtils.rm_rf('lib/bundler_support')
+FileUtils.mkdir_p('lib/bundler_support')
+FileUtils.cp_r('../bundler_support', 'lib/')
 
 # Copy over the latest .rubocop.yml style guide
 rubocop_config = File.expand_path('../../.rubocop.yml', __FILE__)

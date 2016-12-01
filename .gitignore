@@ -13,6 +13,12 @@ test_output/
 .DS_STORE
 .keys
 
+# The bundler_support directory gets copied into each tool's directory
+# when the gem is built, but only the main copy at the repo root should
+# be checked in.
+bundler_support/
+!/bundler_support/
+
 ## Specific to Android
 .gradle/
 *.iml
