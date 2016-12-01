@@ -48,7 +48,7 @@ module Fastlane
 
       def self.example_code
         [
-          'reset_simulators'
+          'reset_simulator_contents'
         ]
       end
 
