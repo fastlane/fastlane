@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class ResetSimulatorsAction < Action
+    class ResetSimulatorContentsAction < Action
       def self.run(params)
         if params[:ios]
           params[:ios].each do |os_version|
@@ -27,7 +27,9 @@ module Fastlane
                                        type: Array)
         ]
       end
-
+      def self.aliases
+        ["reset_simulators"]
+      end
       def self.output
         nil
       end
