@@ -165,12 +165,16 @@ module FastlaneCore
       # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
       #
 
+      # Remove the ".keychain" at the end of the name
+      name.sub!(/\.keychain$/, "")
+
       keychain_paths = [
         File.join(Dir.home, 'Library', 'Keychains', name),
-        File.join(Dir.home, 'Library', 'Keychains', "#{name}-db"),
-        name,
-        "#{name}-db"
+        name
       ].map { |path| File.expand_path(path) }
+
+      # Transforms ["thing"] to ["thing", "thing-db", "thing.keychain", "thing-db.keychain"]
+      keychain_paths = keychain_paths.product(["", "-db"], ["", ".keychain"]).map(&:join)
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
