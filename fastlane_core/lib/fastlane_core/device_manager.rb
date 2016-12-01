@@ -187,8 +187,7 @@ module FastlaneCore
 
       def reset_all_by_version(os_version: nil)
         return false unless os_version
-        version_sim = all.select { |device| device.os_version == os_version }
-        version_sim.each(&:reset) if version_sim
+        all.select { |device| device.os_version == os_version }.each(&:reset)
       end
 
       # Reset simulator by UDID or name and OS version
