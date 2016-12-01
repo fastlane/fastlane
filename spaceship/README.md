@@ -147,7 +147,7 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 
 ## API Endpoints
 
-I won't go into too much technical details about the various API endpoints, but just to give you an idea:
+Overview of the used API endpoints
 
 - `https://idmsa.apple.com`: Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
