@@ -21,7 +21,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ios,
                                        short_option: "-i",
                                        env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
-                                       description: "Which versions of Simulators you want to reset",
+                                       description: "Which versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
                                        is_string: false,
                                        optional: true,
                                        type: Array)
