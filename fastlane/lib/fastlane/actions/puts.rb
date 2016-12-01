@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.alias_used(action_alias, params)
-        UI.important("#{action_alias} called please use 'puts' instead!")
+        UI.important("#{action_alias} called, please use 'puts' instead!")
       end
 
       def self.aliases
