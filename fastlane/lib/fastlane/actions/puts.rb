@@ -21,6 +21,14 @@ module Fastlane
         true
       end
 
+      def self.alias_used(action_alias, params)
+        UI.important("#{action_alias} called, please use 'puts' instead!")
+      end
+
+      def self.aliases
+        ["println", "echo"]
+      end
+
       # We don't want to show this as step
       def self.step_text
         nil
