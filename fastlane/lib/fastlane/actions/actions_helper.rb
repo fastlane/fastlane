@@ -6,6 +6,21 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
+    def self.reset_aliases
+      @alias_actions = nil
+    end
+
+    def self.alias_actions
+      unless @alias_actions
+        @alias_actions = {}
+        ActionsList.all_actions do |action, name|
+          next unless action.respond_to?(:aliases)
+          @alias_actions[name] = action.aliases
+        end
+      end
+      @alias_actions
+    end
+
     def self.executed_actions
       @executed_actions ||= []
     end
@@ -113,6 +128,7 @@ module Fastlane
           UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
         end
       end
+      Actions.reset_aliases
     end
 
     def self.formerly_bundled_actions
