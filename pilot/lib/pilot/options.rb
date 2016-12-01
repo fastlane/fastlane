@@ -139,7 +139,7 @@ module Pilot
                                      description: "The optional platform for which to retrieve builds (defaults to all platforms)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos") unless %('ios', 'appletvos').include? value
+                                       UI.user_error!("The platform can only be ios, appletvos") unless %('ios', 'appletvos').include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
