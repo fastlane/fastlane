@@ -17,7 +17,7 @@ module Deliver
         # First, clear all previously uploaded screenshots
         screenshots_per_language.keys.each do |language|
           v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, index, t.language, t.device_type)
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
           end
         end
       end
