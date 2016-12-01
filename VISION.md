@@ -36,10 +36,10 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [match](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 * [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 
-## _fastlane_’s Relationship with Twitter and Fabric
+## _fastlane_’s Relationship with [Twitter](https://twitter.com) and [Fabric](https://get.fabric.io/)
 
 Twitter supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Fabric](https://get.fabric.io/).
 
-Twitter has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. In 2015 Twitter acquired the project, and [Felix Krause](https://github.com/krausefx) joined the Fabric team. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
+Twitter has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. In 2015 Twitter acquired the project, and [Felix Krause](https://twitter.com/krausefx) joined the Fabric team. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
 
 Twitter intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Fabric. Twitter is also committed to increasing use of _fastlane_ by promoting it through Fabric products and websites, and developing integrations with Fabric tools to help them work better together.
