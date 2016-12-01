@@ -101,11 +101,10 @@ module Fastlane
     def find_alias(action_name)
       Actions.alias_actions.each do |key, v|
         next unless Actions.alias_actions[key]
-        if Actions.alias_actions[key].include?(action_name)
-          return key
-        end
+        next unless Actions.alias_actions[key].include?(action_name)
+        return key
       end
-      return nil
+      nil
     end
 
     # This is being called from `method_missing` from the Fastfile

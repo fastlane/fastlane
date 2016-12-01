@@ -6,8 +6,19 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
+    def self.reset_aliases
+      @alias_actions = nil
+    end
+
     def self.alias_actions
-      @alias_actions ||= {}
+      unless @alias_actions
+        @alias_actions = {}
+        ActionsList.all_actions do |action, name|
+          next unless action.respond_to?(:aliases)
+          @alias_actions[name] = action.aliases
+        end
+      end
+      @alias_actions
     end
 
     def self.executed_actions
@@ -78,15 +89,6 @@ module Fastlane
       return class_ref
     end
 
-    # load aliases of actions
-    def self.load_action_aliases
-      ActionsList.all_actions do |action, name|
-        if action.respond_to?(:aliases)
-          alias_actions[name] = action.aliases
-        end
-      end
-    end
-
     def self.load_default_actions
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
         require file
@@ -126,6 +128,7 @@ module Fastlane
           UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
         end
       end
+      Actions.reset_aliases
     end
 
     def self.formerly_bundled_actions

@@ -37,7 +37,6 @@ module Fastlane
         actions_path = File.join(Fastlane::FastlaneFolder.path, 'actions')
         Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
       end
-      Fastlane::Actions.load_action_aliases
     end
 
     def plugin_manager
