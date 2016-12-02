@@ -27,9 +27,11 @@ module Fastlane
                                        type: Array)
         ]
       end
+
       def self.aliases
         ["reset_simulators"]
       end
+
       def self.output
         nil
       end
