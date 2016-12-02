@@ -146,7 +146,7 @@ You might have to restart your Mac for the changes to be applied. To see if it w
 If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in. 
 After doing so, refresh the iTunes Connect page. You should be able to see all web requests with their responses.
 
-![.assets/ToolingCharlesEnableSSL.png](.assets/ToolingCharlesRequest.png)
+![.assets/ToolingCharlesEnableSSL.png](.assets/ToolingCharlesEnableSSL.png)
 
 We’re not using the built-in network tracker of your browser, since we also need a proxy for our local _fastlane_ install, which will be covered in the next section of this document.
 
