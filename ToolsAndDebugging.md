@@ -133,6 +133,8 @@ If it is a server issue, it’s best to [file a radar](https://bugreport.apple.c
 
 ### Setting up [Charles Web Proxy](https://www.charlesproxy.com/)
 
+<img src=".assets/ToolingCharlesEnableSSL.png" align="left" width="180" />
+
 This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes.  If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/). 
 
 First, download and install the latest version of [Charles Proxy](https://www.charlesproxy.com/). After the first launch, you’ll have to install its [Root Certificate](https://www.charlesproxy.com/documentation/using-charles/ssl-certificates/).
@@ -141,17 +143,12 @@ First, download and install the latest version of [Charles Proxy](https://www.ch
 
 You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [iTunes Connect](https://itunesconnect.apple.com). 
 
-<img src=".assets/ToolingCharlesEnableSSL.png" align="left" width="180" />
-
 If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in. 
 After doing so, refresh the iTunes Connect page. You should be able to see all web requests with their responses.
 
 We’re not using the built-in network tracker of your browser, since we also need a proxy for our local _fastlane_ install, which will be covered in the next section of this document.
 
-<img src=".assets/ToolingCharlesRequest.png" align="right" width="650" />
-
-<hr />
-<br />
+<img src=".assets/ToolingCharlesRequest.png" />
 
 ### Compare the API requests 
 
