@@ -51,6 +51,16 @@ lane :bump do |options|
     github_api_token, 
     [tool_name].to_json
   )
+
+  if ENV['SLACK_URL']
+    slack(
+      channel: "action",
+      default_payloads: [],
+      message: "Version bump #{tool_name}: #{pr_url}",
+      payload: {}
+    )
+  end
+
   UI.success("Successfully added '#{tool_name}' label to #{pr_url} ✨")
 end
 
