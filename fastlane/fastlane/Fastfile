@@ -61,6 +61,9 @@ lane :bump do |options|
     )
   end
 
+  # Revert to master branch
+  sh "git checkout master"
+
   UI.success("Successfully added '#{tool_name}' label to #{pr_url} ✨")
 end
 
