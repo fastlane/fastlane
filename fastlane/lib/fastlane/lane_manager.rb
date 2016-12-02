@@ -55,8 +55,7 @@ module Fastlane
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
-        UI.important 'Variable Dump:'.yellow
-        UI.message Actions.lane_context
+        print_lane_context
         UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
@@ -179,6 +178,26 @@ module Fastlane
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
+    end
+
+    def self.print_lane_context
+      if $verbose
+        UI.important 'Lane Context:'.yellow
+        UI.message Actions.lane_context
+        return
+      end
+
+      # Print a nice table unless in $verbose mode
+      rows = Actions.lane_context.collect do |key, content|
+        [key, content.to_s]
+      end
+      rows = FastlaneCore::PrintTable.limit_row_size(rows)
+
+      require 'terminal-table'
+      puts Terminal::Table.new({
+        title: "Lane Context".yellow,
+        rows: rows,
+      })
     end
   end
 end
