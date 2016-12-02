@@ -169,9 +169,9 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle install"
-        cmd << " --quiet" unless $verbose
+        cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && echo 'Successfully installed plugins'"
-        UI.command(cmd) if $verbose
+        UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)
       end
     end
@@ -183,9 +183,9 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle update"
-        cmd << " --quiet" unless $verbose
+        cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && echo 'Successfully updated plugins'"
-        UI.command(cmd) if $verbose
+        UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)
       end
     end

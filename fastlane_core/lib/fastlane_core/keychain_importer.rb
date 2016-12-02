@@ -1,6 +1,6 @@
 module FastlaneCore
   class KeychainImporter
-    def self.import_file(path, keychain_path, keychain_password: "", certificate_password: "", output: $verbose)
+    def self.import_file(path, keychain_path, keychain_password: "", certificate_password: "", output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"

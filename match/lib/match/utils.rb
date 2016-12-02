@@ -2,12 +2,12 @@ module Match
   class Utils
     def self.import(item_path, keychain, password: "")
       keychain_path = FastlaneCore::Helper.keychain_path(keychain)
-      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: $verbose)
+      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: FastlaneCore::Globals.verbose?)
     end
 
     # Fill in an environment variable, ready to be used in _xcodebuild_
     def self.fill_environment(key, value)
-      UI.important "Setting environment variable '#{key}' to '#{value}'" if $verbose
+      UI.important "Setting environment variable '#{key}' to '#{value}'" if FastlaneCore::Globals.verbose?
       ENV[key] = value
     end
 
@@ -26,7 +26,7 @@ module Match
     def self.get_cert_info(cer_certificate_path)
       command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
       command << " &" # start in separate process
-      output = Helper.backticks(command, print: $verbose)
+      output = Helper.backticks(command, print: FastlaneCore::Globals.verbose?)
 
       # openssl output:
       # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}\n

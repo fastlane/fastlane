@@ -55,7 +55,7 @@ module Gym
           # Add "SwiftSupport" to the .ipa archive
           Dir.chdir(tmpdir) do
             command_parts = ["zip --recurse-paths '#{PackageCommandGenerator.ipa_path}' SwiftSupport"]
-            command_parts << "> /dev/null" unless $verbose
+            command_parts << "> /dev/null" unless FastlaneCore::Globals.verbose?
 
             FastlaneCore::CommandExecutor.execute(command: command_parts,
                                                 print_all: false,

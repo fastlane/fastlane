@@ -6,7 +6,7 @@ module Fastlane
 
         # check if it's installed
         if gem_installed?(gem_name)
-          UI.success("gem '#{gem_name}' is already installed") if $verbose
+          UI.success("gem '#{gem_name}' is already installed") if FastlaneCore::Globals.verbose?
           require gem_require_name if require_gem
           return true
         end

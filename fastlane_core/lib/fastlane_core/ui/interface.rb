@@ -63,7 +63,7 @@ module FastlaneCore
 
     # Level Verbose: Print out additional information for the
     #   users that are interested. Will only be printed when
-    #   $verbose = true
+    #   FastlaneCore::Globals.verbose? = true
     #
     #   By default those messages are shown in white
     def verbose(_message)

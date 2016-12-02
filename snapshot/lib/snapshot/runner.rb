@@ -81,7 +81,7 @@ module Snapshot
         UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
         run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
       else
-        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
+        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if FastlaneCore::Globals.verbose?
         self.collected_errors << ex
         raise ex if Snapshot.config[:stop_after_first_error]
         return false # for the results

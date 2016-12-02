@@ -40,7 +40,7 @@ module Commander
         abort "#{e}. Use --help for more information"
       rescue Interrupt => ex
         # We catch it so that the stack trace is hidden by default when using ctrl + c
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           raise ex
         else
           puts "\nCancelled... use --verbose to show the stack trace"
@@ -159,7 +159,7 @@ module Commander
     end
 
     def display_user_error!(e, message)
-      if $verbose # with stack trace
+      if FastlaneCore::Globals.verbose? # with stack trace
         reraise_formatted!(e, message)
       else
         abort "\n[!] #{message}".red # without stack trace
@@ -177,7 +177,7 @@ module Commander
       require 'gh_inspector'
       require 'fastlane_core/ui/github_issue_inspector_reporter'
 
-      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
+      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: FastlaneCore::Globals.verbose?)
       delegate = Fastlane::InspectorReporter.new
       if message_or_error.kind_of?(String)
         inspector.search_query(message_or_error, delegate)
@@ -185,7 +185,7 @@ module Commander
         inspector.search_exception(message_or_error, delegate)
       end
     rescue => ex
-      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if $verbose
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if FastlaneCore::Globals.verbose?
     end
   end
 end

@@ -164,7 +164,7 @@ module Gym
         UI.command_output("-----------------------------------------")
         UI.command_output(JSON.pretty_generate(hash))
         UI.command_output("-----------------------------------------")
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
           UI.command_output(to_plist(hash))

@@ -28,7 +28,7 @@ module Scan
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/scan"
       program :help_formatter, :compact
 
-      global_option("--verbose") { $verbose = true }
+      global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 
       command :tests do |c|
         c.syntax = "fastlane scan"

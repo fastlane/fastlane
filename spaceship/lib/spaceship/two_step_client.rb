@@ -79,7 +79,7 @@ module Spaceship
     # Only needed for 2 step
     def load_session_from_file
       if File.exist?(persistent_cookie_path)
-        puts "Loading session from '#{persistent_cookie_path}'" if $verbose
+        puts "Loading session from '#{persistent_cookie_path}'" if FastlaneCore::Globals.verbose?
         @cookie.load(persistent_cookie_path)
         return true
       end
@@ -88,7 +88,7 @@ module Spaceship
 
     def load_session_from_env
       return if self.class.spaceship_session_env.to_s.length == 0
-      puts "Loading session from environment variable" if $verbose
+      puts "Loading session from environment variable" if FastlaneCore::Globals.verbose?
 
       file = Tempfile.new('cookie.yml')
       file.write(self.class.spaceship_session_env.gsub("\\n", "\n"))

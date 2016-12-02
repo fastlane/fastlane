@@ -34,7 +34,7 @@ module Frameit
             screenshot.frame!
           rescue => ex
             UI.error ex.to_s
-            UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
+            UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if FastlaneCore::Globals.verbose?
           end
         end
       else
