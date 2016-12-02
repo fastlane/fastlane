@@ -4,7 +4,7 @@
 ## How we treat each other  
 
 
-When replying to issues and PRs, make sure you always follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md) and our [vision for fastlane](https://github.com/fastlane/fastlane/blob/master/VISION.md). Make sure to read these thoroughly and understand them before you interact with any other users! In general, be nice to each other, and treat **everyone** with the same respect and dignity. 
+When replying to issues and PRs, make sure you always follow our [Code of Conduct](CODE_OF_CONDUCT.md) and our [vision for fastlane](VISION.md). Make sure to read these thoroughly and understand them before you interact with any other users! In general, be nice to each other, and treat **everyone** with the same respect and dignity. 
 
 
 Also, whenever you submit a comment, don’t ask users for their personal information or account credentials. 
@@ -132,7 +132,7 @@ Afterwards, execute _fastlane_ or one of the tools using `bundle exec <tool>`, e
 ### Reviewing the Code
 
 
-Before diving into the source code changes of a pull request, step back and think if this change is a good change for _fastlane_, and that it follows the [fastlane vision](Vision.md). If you are not 100% certain that a pull request adds good value to _fastlane_, ask the author to clarify on why this should be included in the main code base, referring to the [Vision.md document](VISION.md). Sometimes it is also more appropriate for new features to be submitted as plugins, for example if the features are not applicable to a wide audience [as described here](fastlane/docs/Plugins.md#submitting-the-action-to-the-fastlane-main-repo). In that case, make sure to also include a link to the [plugin documentation](fastlane/docs/Plugins.md).
+Before diving into the source code changes of a pull request, step back and think if this change is a good change for _fastlane_, and that it follows the [fastlane vision](VISION.md). If you are not 100% certain that a pull request adds good value to _fastlane_, ask the author to clarify on why this should be included in the main code base, referring to the [Vision.md document](VISION.md). Sometimes it is also more appropriate for new features to be submitted as plugins, for example if the features are not applicable to a wide audience [as described here](fastlane/docs/Plugins.md#submitting-the-action-to-the-fastlane-main-repo). In that case, make sure to also include a link to the [plugin documentation](fastlane/docs/Plugins.md).
 
 
 To review the code, start a new review on GitHub by going to the “Files changed” tab on the PR page. You can then add comments by tapping on the plus that appears when your mouse hovers over a line. Instead of submitting multiple comments one after another, use the `Start Review` button, so that participants don’t get flooded with multiple notifications.
