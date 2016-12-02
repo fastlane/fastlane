@@ -150,6 +150,9 @@ We’re not using the built-in network tracker of your browser, since we also ne
 
 <img src=".assets/ToolingCharlesRequest.png" align="right" width="650" />
 
+<hr />
+<br />
+
 ### Compare the API requests 
 
 They key is to do the same action you want to test on both the website, and in _spaceship_, so you can see how the requests are different.
