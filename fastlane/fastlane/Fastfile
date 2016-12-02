@@ -41,14 +41,14 @@ lane :bump do |options|
   )
 
   # Add a label to the pull request
-  pr_id = pr_url.match(/pull\/(\d+)/)[1]
+  pr_id = pr_url.match(%r{pull\/(\d+)})[1]
 
   Actions::SetGithubReleaseAction.call_releases_endpoint(
-    "post", 
-    "https://api.github.com", 
-    slug, 
-    "/issues/#{pr_id}/labels", 
-    github_api_token, 
+    "post",
+    "https://api.github.com",
+    slug,
+    "/issues/#{pr_id}/labels",
+    github_api_token,
     [tool_name].to_json
   )
 
@@ -56,7 +56,7 @@ lane :bump do |options|
     slack(
       channel: "action",
       default_payloads: [],
-      message: "Version bump #{tool_name}: #{pr_url}",
+      message: "Version bump for #{tool_name}: #{pr_url} ✨",
       payload: {}
     )
   end
