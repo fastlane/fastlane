@@ -196,7 +196,7 @@ module Fastlane
       require 'terminal-table'
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
-        rows: rows,
+        rows: rows
       })
     end
   end
