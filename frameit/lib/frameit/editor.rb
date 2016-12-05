@@ -72,7 +72,7 @@ module Frameit
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot)
+      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
 
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
