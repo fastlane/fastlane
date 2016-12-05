@@ -72,6 +72,7 @@ module Fastlane
       end
 
       def self.run(params)
+        require "plist"
         unless Helper.test?
           UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
         end
@@ -112,17 +113,40 @@ module Fastlane
             # If not passed, retrieve path from previous xcodebuild call
             params[:archive_path] ||= Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE]
 
-            # If not passed, construct export path from env vars
-            if params[:export_path].nil?
-              ipa_filename = scheme ? scheme : File.basename(params[:archive_path], ".*")
-              params[:export_path] = "#{build_path}#{ipa_filename}"
-            end
-
             # Default to ipa as export format
             export_format = params[:export_format] || "ipa"
 
-            # Store IPA path for later deploy steps (i.e. Crashlytics)
-            Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = params[:export_path] + "." + export_format.downcase
+            archive_info_plist_path = File.join(params[:archive_path], 'Info.plist')
+            archive_info_plist = Plist::parse_xml(archive_info_plist_path)
+            product_name = archive_info_plist['Name']
+            suffix = '.' + export_format.downcase
+            if params.has_key?(:export_options_plist)
+              # Product is generated with export_path as the parent directory:
+              if params[:export_path].to_s.empty?
+                if build_path.to_s.empty?
+                  params[:export_path] = '.'
+                else
+                  params[:export_path] = build_path
+                end
+              end
+              Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(params[:export_path], product_name + suffix)
+            else
+              # Product is generated with export_path as the filename
+              # If not passed, construct export path from env vars
+              if params[:export_path].to_s.empty?
+                if build_path.to_s.empty?
+                  params[:export_path] = product_name
+                else
+                  params[:export_path] = File.join(build_path, product_name)
+                end
+              end
+              ipa_output_path = params[:export_path]
+              unless ipa_output_path.end_with?(suffix)
+                # xcodebuild will append the extension if not present
+                ipa_output_path += suffix
+              end
+              Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = ipa_output_path
+            end
           else
             # If not passed, check for archive scheme & workspace/project env vars
             params[:scheme] ||= scheme
