@@ -7,20 +7,20 @@ We believe that our most valuable resource is the passionate community members w
 ## How does one become a core contributor?
 Contributors who have displayed lasting commitment to the evolution and maintenance of _fastlane_ will be invited to become core contributors. For instance, contributors who:
 - Love to help out other users with issues on GitHub
-- Continue to make _fastlane_ a stable product and encourage features aligned with the _fastlane_ [vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
+- Continue to make _fastlane_ a stable product and encourage features aligned with [_fastlane_'s vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
 
 
 ## As core contributors, we:
 - Review and merge pull requests
 - Respond to issues and help others
-- Own regressions caused by our contributions and PR approvals
+- Own regressions caused by our own contributions and PR approvals
 - Maintain consistent coding standards
 - Inform maintainers when critical fixes are merged so a release can be prepared
 - Identify other _fastlane_ community members who would be effective core contributors
-_ Make _fastlane_ the best open source tool and community out there
+- Make _fastlane_ the best open source tool and community out there
 
 
-## As core contributors, we always:
+## While doing these things, we make sure to:
 - Ensure that new contributions fit into [_fastlane_’s vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
 - Adhere to the [_fastlane_ Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md)
 - Maintain backwards compatibility
