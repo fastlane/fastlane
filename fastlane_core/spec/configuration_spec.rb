@@ -140,6 +140,7 @@ describe FastlaneCore do
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
         end
+
         it "should set the sensitive flag" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
@@ -149,7 +150,8 @@ describe FastlaneCore do
                                                      default_value: ['5', '4', '3', '2', '1'])
           expect(config_item.sensitive).to eq(true)
         end
-        it "should ask using asterisks", now: true do
+
+        it "should ask using asterisks" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      type: String,
@@ -160,7 +162,7 @@ describe FastlaneCore do
           expect(FastlaneCore::UI).to receive(:password).and_return("password")
           expect(config[:foo]).to eq("password")
         end
-        it "should ask using plaintext", now: true do
+        it "should ask using plaintext" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      type: String,
