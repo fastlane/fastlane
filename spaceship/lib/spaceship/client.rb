@@ -303,7 +303,7 @@ module Spaceship
       end
 
       # get woinst, wois, and itctx cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
 
       case response.status
       when 403
