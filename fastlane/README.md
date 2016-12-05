@@ -51,7 +51,7 @@ Store your configuration in a text file to easily test, build, and deploy from _
 
 Define different environments (`lanes`) in your `Fastfile`: Examples are: `appstore`, `beta` and `test`.
 
-You define a `lane` like this (more details about the commands in the [Actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) documentation):
+You define a `lane` like this (more details about the commands in the [Actions](https://docs.fastlane.tools/actions) documentation):
 
 ```ruby
 lane :release do
@@ -125,7 +125,7 @@ The setup assistant will create all the necessary files for you, using the exist
 - ```cd [your_project_folder]```
 - ```fastlane init```
 - Follow the setup assistant, which will set up ```fastlane``` for you
-- Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+- Further customise the ```Fastfile``` with [actions](https://docs.fastlane.tools/actions).
 
 For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
 

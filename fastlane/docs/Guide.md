@@ -132,7 +132,7 @@ And then run the following from your Terminal
 
 If you're successful, you should hear your computer speaking to you!
 
-A list of available actions can be found in the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+A list of available actions can be found in the [Actions documentation](https://docs.fastlane.tools/actions).
 
 Automating the deployment process is a great next step. You should use the `increment_build_number` action when you want to upload builds to iTunes Connect ([Activate incrementing build numbers](https://developer.apple.com/library/ios/qa/qa1827/_index.html)).
 
@@ -150,7 +150,7 @@ If you want a fancy command (like `snapshot` has), you can build your own extens
 
 See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-foundation), [Product Hunt](https://github.com/fastlane/examples#product-hunt) and [MindNode](https://github.com/fastlane/examples#mindnode) use `fastlane` to automate their iOS submission process.
 
-Check out the [Actions documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) to see a list of available integrations and options.
+Check out the [Actions documentation](https://docs.fastlane.tools/actions) to see a list of available integrations and options.
 
 # Help
 
