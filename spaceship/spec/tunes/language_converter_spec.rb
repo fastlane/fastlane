@@ -51,7 +51,7 @@ describe Spaceship::Tunes::LanguageConverter do
   end
 end
 
-describe String, now: true do
+describe String do
   describe "#to_itc_locale" do
     # verify all available itc primary languages match the right locale (itc variation)
     it "redirects to the actual converter" do
