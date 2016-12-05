@@ -56,7 +56,7 @@ module Fastlane
         print_output_variables(action, filter)
         print_return_value(action, filter)
 
-        puts "More information can be found on https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md"
+        puts "More information can be found on https://docs.fastlane.tools/actions"
         puts ""
       else
         puts "Couldn't find action for the given filter.".red

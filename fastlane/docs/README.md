@@ -1,7 +1,7 @@
 # Documentation
 
 - [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started. 
-- [Actions.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) for all the built-in integrations
+- [Actions.md](https://docs.fastlane.tools/actions) for all the built-in integrations
 - [Code signing guide](Codesigning) How to get started with code signing and resolve common issues
 - [FAQs](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/FAQs.md) for frequently asked questions
 - [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips.
