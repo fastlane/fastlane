@@ -53,7 +53,7 @@ You'll be asked if you want to start using [supply](https://github.com/fastlane/
 
 ##### `fastlane/Fastfile`
 
-This file contains the actual deployment process. It defines which steps to run in which order. Check out [Actions.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) for a list of all available integrations.
+This file contains the actual deployment process. It defines which steps to run in which order. Check out [Actions.md](https://docs.fastlane.tools/actions) for a list of all available integrations.
 
 ##### `fastlane/Appfile`
 
@@ -79,4 +79,4 @@ and to get more information about what a specific action does and the available 
 fastlane action [action_name]
 ```
 
-For more information, visit [Actions.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+For more information, visit [Actions.md](https://docs.fastlane.tools/actions).
