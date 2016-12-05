@@ -169,9 +169,11 @@ lane :verify_docs do
     temporary_gemfile = []
     Fastlane::TOOLS.each { |tool| temporary_gemfile << "gem '#{tool}', path: '#{File.join(local_fastlane_dir, tool.to_s)}'" }
     temporary_gemfile = temporary_gemfile.join("\n")
-    puts `sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)` # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
-    sh "bundle install"
-    sh "bundle exec fastlane test skip_building:true" # skip_building since we don't have a proper python environment set up
+    Bundler.with_clean_env do
+      puts `sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)` # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
+      sh "bundle install"
+      sh "bundle exec fastlane test skip_building:true" # skip_building since we don't have a proper python environment set up
+    end
   end
 end
 
