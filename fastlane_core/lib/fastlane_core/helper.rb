@@ -168,13 +168,19 @@ module FastlaneCore
       # Remove the ".keychain" at the end of the name
       name.sub!(/\.keychain$/, "")
 
-      keychain_paths = [
+      possible_locations = [
         File.join(Dir.home, 'Library', 'Keychains', name),
         name
       ].map { |path| File.expand_path(path) }
 
       # Transforms ["thing"] to ["thing", "thing-db", "thing.keychain", "thing-db.keychain"]
-      keychain_paths = keychain_paths.product(["", "-db"], ["", ".keychain"]).map(&:join)
+      keychain_paths = []
+      possible_locations.each do |location|
+        keychain_paths << location
+        keychain_paths << "#{location}-db"
+        keychain_paths << "#{location}.keychain"
+        keychain_paths << "#{location}-db.keychain"
+      end
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
