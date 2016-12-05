@@ -7,7 +7,7 @@ module Pilot
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
-      platform = FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa])
+      platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
                                                                   package_path: "/tmp",
