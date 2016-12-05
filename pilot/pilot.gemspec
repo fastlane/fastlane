@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "fastlane_core", ">= 0.57.2", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency "spaceship", ">= 0.38.4", "< 1.0.0" # iTunes Connect communication
+  spec.add_dependency "spaceship", ">= 0.38.5", "< 1.0.0" # iTunes Connect communication
   spec.add_dependency 'credentials_manager', '>= 0.16.0'
 
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # User's information
