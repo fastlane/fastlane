@@ -1,13 +1,13 @@
 # _fastlane_ Core Contributor Expectations
 
 
-We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, passionate members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
+We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, enthusaistic members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
 
 
 ## How does one become a core contributor?
 Contributors who have displayed lasting commitment to the evolution and maintenance of _fastlane_ will be invited to become core contributors. For instance, contributors who:
 - Love to help out other users with issues on GitHub
-- Continue to make _fastlane_ a stable product and encourage features aligned with [_fastlane_'s vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
+- Continue to make _fastlane_ a stable product and encourage features aligned with the [_fastlane_ vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
 
 
 ## As core contributors, we:
@@ -21,7 +21,7 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 
 
 ## While doing these things, we make sure to:
-- Ensure that new contributions fit into [_fastlane_’s vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
+- Ensure that new contributions fit into the [_fastlane_ vision](https://github.com/fastlane/fastlane/blob/master/VISION.md)
 - Adhere to the [_fastlane_ Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md)
 - Maintain backwards compatibility
 - Keep external dependencies to a minimum
