@@ -19,6 +19,15 @@ module Pilot
                                      description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
                                      default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+        FastlaneCore::ConfigItem.new(key: :app_platform,
+                                     short_option: "-m",
+                                     env_name: "PILOT_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
+                                     end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
