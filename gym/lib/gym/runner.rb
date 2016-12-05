@@ -29,7 +29,11 @@ module Gym
         path
       elsif Gym.project.mac?
         compress_and_move_dsym
-        copy_mac_app
+        if Gym.project.command_line_tool? || Gym.project.command_line_library?
+          copy_command_line_tool
+        else
+          copy_mac_app
+        end
       end
     end
 
@@ -155,14 +159,27 @@ module Gym
       ipa_path
     end
 
+    # copys commandline tool binarys
+    def copy_command_line_tool
+      cmd_path = "Products/usr/local/bin/*"
+      if Gym.project.command_line_library?
+        cmd_path = "Products/usr/local/lib/*"
+      end
+      tool_path = Dir[File.join(BuildCommandGenerator.archive_path, cmd_path)]
+      tool_path.each do |f|
+        FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
+      end
+      UI.success "Successfully exported the binary files:"
+      UI.message tool_path.join("\n")
+      tool_path.join("\n")
+    end
+
     # Copies the .app from the archive into the output directory
     def copy_mac_app
       app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
-
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
-
       UI.success "Successfully exported the .app file:"
       UI.message app_path
       app_path
