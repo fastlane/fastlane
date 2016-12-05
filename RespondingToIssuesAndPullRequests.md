@@ -33,21 +33,28 @@ Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`.
 
 ### Recommended setup for testing the code
 
-Clone the _fastlane_ repository by running  `git clone git@github.com:fastlane/fastlane.git` in your terminal
-For each PR you want to review, make sure to add the user’s fork as a remote 
-`git remote add <GITHUB_USERNAME> git@github.com:<GITHUB_USERNAME>/fastlane.git`
-Then, check out the branch for the user’s PR
-Fetch all their branches `git fetch <GITHUB_USERNAME>`
-Checkout the branch for the PR `git checkout <THEIR_PR_BRANCH>`
-Sometimes, changes have to be split over multiple PRs - one for each tool. In that case, it is often easier to test all the changes together. To do that, create a new branch that merges all their changes:
-Create a new branch to merge the others into `git checkout -b my_new_branch`
-Merge the branch from one PR `git pull --rebase <GITHUB_USERNAME> <THEIR_PR_BRANCH>`
-Repeat the last step for each of the related PRs that the user submitted.
-After checking out a user’s code, you should always make sure that the tests are still working. 
-Run `bundle install` to make sure all dependencies are installed
-Use `bundle exec rake test_all` from the _fastlane_ root to run all tests
-Use `bundle exec rspec` in a tool’s directory to run all tests for a specific tool
-Use `bundle exec rubocop -a` to run the linter and autocorrect many of the issues it found
+- Clone the _fastlane_ repository by running  `git clone git@github.com:fastlane/fastlane.git` in your terminal
+- For each PR you want to review, make sure to add the user’s fork as a remote 
+  - `git remote add <GITHUB_USERNAME> git@github.com:<GITHUB_USERNAME>/fastlane.git`
+- Then, check out the branch for the user’s PR
+  - Fetch all their branches `git fetch <GITHUB_USERNAME>`
+  - Checkout the branch for the PR `git checkout <THEIR_PR_BRANCH>`
+  - Sometimes, changes have to be split over multiple PRs - one for each tool. In that case, it is often easier to test all the changes together. To do that, create a new branch that merges all their changes:
+    - Create a new branch to merge the others into `git checkout -b my_new_branch`
+    - Merge the branch from one PR `git pull --rebase <GITHUB_USERNAME> <THEIR_PR_BRANCH>`
+    - Repeat the last step for each of the related PRs that the user submitted.
+- After checking out a user’s code, you should always make sure that the tests are still working. 
+  - Run `bundle install` to make sure all dependencies are installed
+  - Use `bundle exec rake test_all` from the _fastlane_ root to run all tests
+  - Use `bundle exec rspec` in a tool’s directory to run all tests for a specific tool
+  - Use `bundle exec rubocop -a` to run the linter and autocorrect many of the issues it found
+
+If you have commit access, instead of adding each person's fork as a remote, you can also quickly test a single PR with the following commands:
+
+```
+git fetch origin pull/1234/head:pr-1234
+git checkout pr-1234
+```
 
 ### Using your _fastlane_ clone in a project
 
@@ -111,6 +118,6 @@ Before diving into the source code changes of a pull request, step back and thin
 To review the code, start a new review on GitHub by going to the “Files changed” tab on the PR page. You can then add comments by tapping on the plus that appears when your mouse hovers over a line. Instead of submitting multiple comments one after another, use the `Start Review` button, so that participants don’t get flooded with multiple notifications.
 
 When adding comments to a review, make sure they are
-*Polite*: Ask the author nicely to make the changes. We want to create an environment where our contributors like working with us and come back to submit more PRs
-*Constructive*: Don’t just say ‘This is bad’ or ‘I don’t like this’. Point the author in the right direction for changes they need to make to improve the code
-*Necessary*: It is often too easy to ask for changes on perfectly fine code because of personal opinions. If the change follows our vision, adheres to our style guides and is simple to understand, don’t ask the author to change it! You can always make follow-up on a merged PR with improvements of your own.
+- *Polite*: Ask the author nicely to make the changes. We want to create an environment where our contributors like working with us and come back to submit more PRs
+- *Constructive*: Don’t just say ‘This is bad’ or ‘I don’t like this’. Point the author in the right direction for changes they need to make to improve the code
+- *Necessary*: It is often too easy to ask for changes on perfectly fine code because of personal opinions. If the change follows our vision, adheres to our style guides and is simple to understand, don’t ask the author to change it! You can always make follow-up on a merged PR with improvements of your own.
