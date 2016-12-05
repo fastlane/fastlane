@@ -172,6 +172,62 @@ module FastlaneCore
       return "App" # default value
     end
 
+    def dynamic_library?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic")
+    end
+
+    def static_library?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.static")
+    end
+
+    def library?
+      (static_library? || dynamic_library?)
+    end
+
+    def framework?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.framework")
+    end
+
+    def application?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.application")
+    end
+
+    def ios_library?
+      ((static_library? or dynamic_library?) && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def ios_tvos_app?
+      (ios? || tvos?)
+    end
+
+    def ios_framework?
+      (framework? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def ios_app?
+      (application? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def produces_archive?
+      !(framework? || static_library? || dynamic_library?)
+    end
+
+    def mac_app?
+      (application? && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def mac_library?
+      ((dynamic_library? or static_library?) && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def mac_framework?
+      (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def command_line_tool?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool")
+    end
+
     def mac?
       supported_platforms.include?(:macOS)
     end
