@@ -129,10 +129,16 @@ module FastlaneCore
     end
 
     def did_show_message?
-      path = File.join(File.expand_path('~'), '.did_show_opt_info')
-      did_show = File.exist?(path)
-      File.write(path, '1') unless did_show
-      did_show
+      file_name = ".did_show_opt_info"
+
+      legacy_path = File.join(File.expand_path('~'), file_name)
+      new_path = File.join(FastlaneCore.fastlane_user_dir, file_name)
+      did_show = File.exist?(new_path) || File.exist?(legacy_path)
+
+      return did_show if did_show
+
+      File.write(new_path, '1')
+      false
     end
 
     def determine_version(name)
