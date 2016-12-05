@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'security' # Mac OS Keychain manager
 
-  spec.add_dependency "fastlane_core", ">= 0.57.2", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "fastlane_core", ">= 0.58.0", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency "credentials_manager", ">= 0.16.2", "< 1.0.0" # fastlane password manager
   spec.add_dependency "spaceship", ">= 0.38.5", "< 1.0.0" # communication layer with Apple's web services
   spec.add_dependency "sigh", ">= 1.12.1", "< 2.0.0"
