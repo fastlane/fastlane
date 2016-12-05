@@ -185,6 +185,8 @@ task :debug do
 end
 ```
 
+Optionally, add `Spaceship.select_team` right after the `.login` call, if you're part of multiple teams
+
 To run the newly created script, `cd` into the _spaceship_ directory and run
 
 ```
