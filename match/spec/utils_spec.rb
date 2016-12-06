@@ -7,6 +7,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{Dir.home}/Library/Keychains/login.keychain &> /dev/null"
 
+        allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
@@ -22,8 +23,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" /my/special.keychain &> /dev/null"
 
-        expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain").and_return(false)
-        expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain-db").and_return(false)
+        allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with('/my/special.keychain').and_return(true)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
@@ -34,10 +34,7 @@ describe Match do
       end
 
       it 'shows a user error if the keychain path cannot be resolved' do
-        expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain").and_return(false)
-        expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/my/special.keychain-db").and_return(false)
-        expect(File).to receive(:exist?).with('/my/special.keychain').and_return(false)
-        expect(File).to receive(:exist?).with('/my/special.keychain-db').and_return(false)
+        allow(File).to receive(:exist?).and_return(false)
 
         expect do
           Match::Utils.import('item.path', '/my/special.keychain')
@@ -50,7 +47,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{Dir.home}/Library/Keychains/login.keychain-db &> /dev/null"
 
-        expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(false)
+        allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
         expect(File).to receive(:exist?).with("item.path").and_return(true)
 
