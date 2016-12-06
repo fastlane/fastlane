@@ -104,12 +104,12 @@ module FastlaneCore
 
     # Does the user use the Mac stock terminal
     def self.mac_stock_terminal?
-      !!FastlaneCore::Env.enabled?("TERM_PROGRAM_VERSION")
+      FastlaneCore::Env.enabled?("TERM_PROGRAM_VERSION")
     end
 
     # Does the user use iTerm?
     def self.iterm?
-      !!FastlaneCore::Env.enabled?("ITERM_SESSION_ID")
+      FastlaneCore::Env.enabled?("ITERM_SESSION_ID")
     end
 
     # Logs base directory

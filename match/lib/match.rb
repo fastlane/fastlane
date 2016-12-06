@@ -28,8 +28,7 @@ module Match
 
   # @return [Boolean] returns true if the unsupported enterprise mode should be enabled
   def self.enterprise?
-    force_enterprise = FastlaneCore::Env.enabled?("MATCH_FORCE_ENTERPRISE")
-    return !!force_enterprise
+    return FastlaneCore::Env.enabled?("MATCH_FORCE_ENTERPRISE")
   end
 
   # @return [Boolean] returns true if match should interpret the given [certificate|profile] type as an enterprise one
