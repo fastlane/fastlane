@@ -199,7 +199,7 @@ module Snapshot
     end
 
     def open_simulator_for_device(device_name)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.enabled?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       device = TestCommandGenerator.find_device(device_name)
       FastlaneCore::Simulator.launch(device) if device

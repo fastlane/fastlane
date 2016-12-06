@@ -1,6 +1,6 @@
 require 'simplecov'
 require 'coveralls'
-Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+Coveralls.wear_merged! unless FastlaneCore::Env.enabled?("FASTLANE_SKIP_UPDATE_CHECK")
 
 require 'spaceship'
 require 'plist'
@@ -18,7 +18,7 @@ ENV["DELIVER_USER"] = "spaceship@krausefx.com"
 ENV["DELIVER_PASSWORD"] = "so_secret"
 ENV.delete("FASTLANE_USER") # just in case the dev env has it
 
-unless ENV["DEBUG"]
+unless FastlaneCore::Env.enabled?("DEBUG")
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 

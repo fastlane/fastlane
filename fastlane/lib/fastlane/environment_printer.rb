@@ -146,7 +146,7 @@ module Fastlane
       env_table = ""
       ["LANG", "LC_ALL", "LANGUAGE"].each do |e|
         env_icon = "🚫"
-        if ENV[e] && ENV[e].end_with?("UTF-8")
+        if FastlaneCore::Env.enabled?(e) && ENV[e].end_with?("UTF-8")
           env_icon = "✅"
           found_one = true
         end

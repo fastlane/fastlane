@@ -89,7 +89,7 @@ module CredentialsManager
         @password = ask("Password (for #{@user}): ") { |q| q.echo = "*" }
       end
 
-      return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
+      return true if FastlaneCore::Env.enabled?("FASTLANE_DONT_STORE_PASSWORD")
       return true if (/darwin/ =~ RUBY_PLATFORM).nil? # mac?, since we don't have access to the helper here
 
       # Now we store this information in the keychain

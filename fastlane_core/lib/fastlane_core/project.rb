@@ -444,7 +444,7 @@ module FastlaneCore
     # If scheme not specified, do we want the scheme
     # matching project name?
     def automated_scheme_selection?
-      !!ENV["AUTOMATED_SCHEME_SELECTION"]
+      !!FastlaneCore::Env.enabled?("AUTOMATED_SCHEME_SELECTION")
     end
   end
 end

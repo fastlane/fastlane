@@ -11,7 +11,7 @@ module FastlaneCore
       def enabled?(env_var)
         feature = @features[env_var]
         return false if feature.nil?
-        return false if ENV[feature.env_var] == '0' # '0' is a non-falsey value that should indicate feature switch disabled
+        return false unless FastlaneCore::Env.enabled?(feature.env_var)
         return ENV[feature.env_var] # rely on the truthiness of the value set in the environment variable
       end
 

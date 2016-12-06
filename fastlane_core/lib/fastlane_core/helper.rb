@@ -99,17 +99,17 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      ENV["FASTLANE_DISABLE_COLORS"]
+      FastlaneCore::Env.enabled?("FASTLANE_DISABLE_COLORS")
     end
 
     # Does the user use the Mac stock terminal
     def self.mac_stock_terminal?
-      !!ENV["TERM_PROGRAM_VERSION"]
+      !!FastlaneCore::Env.enabled?("TERM_PROGRAM_VERSION")
     end
 
     # Does the user use iTerm?
     def self.iterm?
-      !!ENV["ITERM_SESSION_ID"]
+      !!FastlaneCore::Env.enabled?("ITERM_SESSION_ID")
     end
 
     # Logs base directory
@@ -204,7 +204,7 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.enabled?("FASTLANE_ITUNES_TRANSPORTER_PATH")
       return '' unless self.is_mac? # so tests work on Linx too
 
       [

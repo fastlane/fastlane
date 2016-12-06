@@ -16,7 +16,7 @@ module FastlaneCore
       @log.formatter = proc do |severity, datetime, progname, msg|
         if $verbose
           string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
-        elsif ENV["FASTLANE_HIDE_TIMESTAMP"]
+        elsif FastlaneCore::Env.enabled?("FASTLANE_HIDE_TIMESTAMP")
           string = ""
         else
           string = "[#{datetime.strftime('%H:%M:%S')}]: "

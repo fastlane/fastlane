@@ -81,7 +81,7 @@ module Fastlane
 
     # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
-      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
+      return ENV['GIT_BRANCH'] if FastlaneCore::Env.enabled?('GIT_BRANCH').to_s.length > 0 # set by Jenkins
       s = Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
       return s.to_s.strip if s.to_s.length > 0
       nil

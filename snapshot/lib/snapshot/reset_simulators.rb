@@ -5,7 +5,7 @@ module Snapshot
       # !! Warning: This script will remove all your existing simulators !!
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      sure = true if ENV["SNAPSHOT_FORCE_DELETE"] ||  force
+      sure = true if FastlaneCore::Env.enabled?("SNAPSHOT_FORCE_DELETE") || force
       sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! (y/n)".red, true) unless sure
       UI.user_error!("User cancelled action") unless sure
 

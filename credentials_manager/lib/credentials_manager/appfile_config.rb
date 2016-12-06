@@ -154,7 +154,7 @@ module CredentialsManager
         # the lane name will be verified below
       end
 
-      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
+      if FastlaneCore::Env.enabled?("FASTLANE_LANE_NAME") == lane_name.to_s
         yield
       end
     end

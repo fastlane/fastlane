@@ -92,7 +92,7 @@ module Scan
     end
 
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.enabled?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`

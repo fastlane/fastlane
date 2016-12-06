@@ -1,5 +1,7 @@
 require 'json'
 
+# ENV[] helper
+require 'fastlane_core/env'
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 
