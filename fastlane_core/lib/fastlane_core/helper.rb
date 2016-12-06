@@ -46,11 +46,11 @@ module FastlaneCore
       ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.is_homebrew?
     end
 
-    def self.is_homebrew?
+    def self.homebrew?
       ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
     end
 
-    def self.is_gem?
+    def self.rubygems?
       !self.bundler? && !self.contained_fastlane? && !self.is_homebrew?
     end
 
