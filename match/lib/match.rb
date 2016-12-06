@@ -28,12 +28,7 @@ module Match
 
   # @return [Boolean] returns true if the unsupported enterprise mode should be enabled
   def self.enterprise?
-    force_enterprise = ENV["MATCH_FORCE_ENTERPRISE"]
-
-    return false if (force_enterprise.kind_of?(String) || force_enterprise.kind_of?(Numeric)) &&
-                    (force_enterprise.to_s == "0")
-    return false if force_enterprise.kind_of?(String) &&
-                    (force_enterprise == "" || force_enterprise.casecmp("false") == 0 || force_enterprise.casecmp("no") == 0)
+    force_enterprise = FastlaneCore::Env.enabled?("MATCH_FORCE_ENTERPRISE")
     return !!force_enterprise
   end
 
