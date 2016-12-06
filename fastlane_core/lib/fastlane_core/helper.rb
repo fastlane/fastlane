@@ -43,7 +43,15 @@ module FastlaneCore
     # Usually this means the fastlane directory is ~/.fastlane/bin/
     # We set this value via the environment variable `FASTLANE_SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true"
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.is_homebrew?
+    end
+
+    def self.is_homebrew?
+      ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
+    end
+
+    def self.is_gem?
+      !self.bundler? && !self.contained_fastlane? && !self.is_homebrew?
     end
 
     # @return [boolean] true if building in a known CI environment
