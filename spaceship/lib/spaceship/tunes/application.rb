@@ -61,9 +61,10 @@ module Spaceship
 
         # @return (Spaceship::Tunes::Application) Returns the application matching the parameter
         #   as either the App ID or the bundle identifier
-        def find(identifier)
+        def find(identifier, mac: false)
           all.find do |app|
-            (app.apple_id == identifier.to_s or app.bundle_id == identifier)
+            (app.apple_id == identifier.to_s || app.bundle_id == identifier) &&
+              app.version_sets.any? { |v| v.platform == (mac ? "osx" : "ios") }
           end
         end
 
