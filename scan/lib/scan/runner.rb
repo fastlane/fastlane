@@ -47,22 +47,7 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      # First, generate a JUnit report to get the number of tests
-      require 'tempfile'
-      output_file = Tempfile.new("junit_report")
-
-      report_collector = ReportCollector.new(Scan.config[:open_report],
-                                             Scan.config[:output_types],
-                                             Scan.config[:output_directory],
-                                             Scan.config[:use_clang_report_name],
-                                             Scan.config[:custom_report_file_name])
-
-      cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                               types: 'junit',
-                                               output_file_name: output_file.path).values.last
-      system(cmd)
-
-      result = TestResultParser.new.parse_result(output_file.read)
+      result = TestResultParser.new.parse_result(File.read(Scan.cache[:temp_junit_report]))
       SlackPoster.new.run(result)
 
       if result[:failures] > 0
@@ -80,14 +65,17 @@ module Scan
       })
       puts ""
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
-
       unless tests_exit_status == 0
         UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
       unless result[:failures] == 0
         UI.user_error!("Tests failed")
+      end
+
+      if open_html_path = Scan.cache[:open_html_report_path]
+          # Open the HTML file
+          `open --hide '#{open_html_path}'`
       end
     end
 

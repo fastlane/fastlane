@@ -90,8 +90,12 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
                                      env_name: "SCAN_OUTPUT_TYPES",
-                                     description: "Comma separated list of the output types (e.g. html, junit)",
+                                     description: "Comma separated list of the output types (e.g. html, junit, json-compilation-database)",
                                      default_value: "html,junit"),
+        FastlaneCore::ConfigItem.new(key: :output_files,
+                                     env_name: "SCAN_OUTPUT_FILES",
+                                     description: "Comma separated list of the output files, corresponding to the types provided by :output_types (order should match)",
+                                     default_value: "report.html,report.junit"),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "SCAN_BUILDLOG_PATH",
@@ -179,10 +183,6 @@ module Scan
                                     description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                     is_string: false,
                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                    description: "Sets custom full report file name",
-                                    optional: true,
-                                    is_string: true)
       ]
     end
   end
