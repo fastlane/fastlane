@@ -44,7 +44,6 @@ module Fastlane
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
         params[:version_file_name] = config[:version_file_name]
-        params [:acl] = config[:acl]
 
         # Pulling parameters for other uses
         s3_region = params[:region]
