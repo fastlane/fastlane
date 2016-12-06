@@ -51,9 +51,8 @@ module FastlaneCore
       # those will be later - replaced by ####
       if $capture_output
         available_options.each do |element|
-          if element.sensitive
-            self.class.sensitive_strings << values[element.key]
-          end
+          next unless element.sensitive
+          self.class.sensitive_strings << values[element.key]
         end
       end
 
