@@ -171,8 +171,7 @@ module Gym
 
     def copy_files_from_path(path)
       UI.success "Exporting Files:"
-      framework_path = Dir[path]
-      framework_path.each do |f|
+      Dir[path].each do |f|
         existing_file = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(f))
         # If the target file already exists in output directory
         # we have to remove it first, otherwise cp_r fails even with remove_destination
@@ -184,14 +183,13 @@ module Gym
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
         UI.message "\t ▸ #{File.basename(f)}"
       end
-      framework_path.join("\n")
     end
 
     # Copies the .app from the archive into the output directory
     def copy_mac_app
       exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
-      UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
+      UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
       UI.success "Successfully exported the .app file:"
