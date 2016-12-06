@@ -43,6 +43,7 @@ module Pilot
       end
 
       if build.nil?
+        platform = fetch_app_platform(required: false)
         builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
         # sort by upload_date
         builds.sort! { |a, b| a.upload_date <=> b.upload_date }
