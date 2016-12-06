@@ -4,7 +4,7 @@ module Spaceship
 
     def self.ensure_spaceship_version
       return if defined?(SpecHelper) # is this running via tests
-      return if FastlaneCore::Env.enabled?("FASTLANE_SKIP_UPDATE_CHECK")
+      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
       require 'faraday'
       require 'json'

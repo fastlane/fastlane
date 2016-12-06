@@ -1,4 +1,3 @@
-require 'fastlane_core'
 require 'spaceship/version'
 require 'spaceship/base'
 require 'spaceship/client'

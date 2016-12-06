@@ -10,7 +10,7 @@ require 'spaceship/babosa_fix'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
-if FastlaneCore::Env.enabled?("SPACESHIP_DEBUG")
+if ENV["SPACESHIP_DEBUG"]
   require 'openssl'
   # this has to be on top of this file, since the value can't be changed later
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -115,13 +115,13 @@ module Spaceship
         c.use :cookie_jar, jar: @cookie
         c.adapter Faraday.default_adapter
 
-        if FastlaneCore::Env.enabled?('SPACESHIP_DEBUG')
+        if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy "https://127.0.0.1:8888"
         end
 
-        if FastlaneCore::Env.enabled?("DEBUG")
+        if ENV["DEBUG"]
           puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
         end
       end
@@ -131,7 +131,7 @@ module Spaceship
     # /tmp/spaceship[time]_[pid].log by default
     def logger
       unless @logger
-        if FastlaneCore::Env.enabled?("VERBOSE")
+        if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
@@ -168,7 +168,7 @@ module Spaceship
     # Returns preferred path for storing cookie
     # for two step verification.
     def persistent_cookie_path
-      if FastlaneCore::Env.enabled?("SPACESHIP_COOKIE_PATH")
+      if ENV["SPACESHIP_COOKIE_PATH"]
         path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
       else
         ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
