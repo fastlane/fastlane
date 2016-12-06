@@ -81,7 +81,7 @@ module Pilot
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      platform = fetch_app_platform
+      platform = fetch_app_platform(required: false)
       builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
       # sort by upload_date
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
