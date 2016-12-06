@@ -8,7 +8,7 @@ end
 
 # Contributors should always provide a changelog when submitting a PR
 if github.pr_body.length < 5
-  warn("Please provide a changelog summary in the Pull Request description @#{pr_author}")
+  warn("Please provide a changelog summary in the Pull Request description")
 end
 
 # We want contributors to create an issue first before submitting a PR
@@ -17,6 +17,18 @@ if !github.pr_title.downcase.include?('version bump') &&
    !github.pr_body.include?("https://github.com/fastlane/fastlane/issues/") &&
    github.pr_body.match(/#\d+/).nil?
   warn("Before submitting a Pull Request, please create an issue on GitHub to discuss the change. Please add a link to the issue in the PR body.")
+end
+
+# Ensure the PR only touches one tool
+require 'pry'
+binding.pry
+
+modified_tools = git.modified_files.collect do |current_file|
+  current_file.split("/").first
+end.uniq
+
+if modified_tools.count > 1
+  warn("It seems like you modified multiple tools with just one PR. We require one PR for each tool's change to support our releases process. Detected changes in #{modified_tools.join(', ')}")
 end
 
 # To avoid "PR & Runs" for which tests don't pass, we want to make spec errors more visible

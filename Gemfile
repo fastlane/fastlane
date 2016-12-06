@@ -1,7 +1,8 @@
 source "https://rubygems.org"
 
 # Needed for CI
-gem "danger", "~> 4.0.2"
+# gem "danger", path: "/Users/krausefx/Developer/hacking/danger" # "~> 4.0.2"
+gem "danger", "~> 4.0"
 
 # Local fastlane, important to be included using `gemspec`, as this will
 # also include development dependencies
