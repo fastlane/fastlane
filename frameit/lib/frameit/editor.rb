@@ -149,7 +149,7 @@ module Frameit
     end
 
     def scale_padding(padding)
-      if padding.end_with?('%')
+      if padding.kind_of?(String) && padding.end_with?('%')
         padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
       end
       multi = 1.0
