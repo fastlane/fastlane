@@ -38,6 +38,15 @@ module Produce
                                      description: "SKU Number (e.g. '1234')",
                                      default_value: Time.now.to_i.to_s,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "PRODUCE_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include? value
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
