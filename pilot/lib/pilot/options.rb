@@ -24,7 +24,6 @@ module Pilot
                                      env_name: "PILOT_PLATFORM",
                                      description: "The platform to use (optional)",
                                      optional: true,
-                                     default_value: "ios",
                                      verify_block: proc do |value|
                                        UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
                                      end),

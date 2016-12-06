@@ -118,10 +118,11 @@ module Spaceship
 
       # @param (testing_type) internal or external
       def update_testing_status!(new_value, testing_type, build = nil)
-        data = client.build_trains(self.application.apple_id, testing_type, platform: self.application.platform)
-
         build ||= latest_build if testing_type == 'external'
+        platform = build ? build.platform : self.application.platform
         testing_key = "#{testing_type}Testing"
+
+        data = client.build_trains(self.application.apple_id, testing_type, platform: platform)
 
         # Delete the irrelevant trains and update the relevant one to enable testing
         data['trains'].delete_if do |train|
