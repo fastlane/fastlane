@@ -1,8 +1,8 @@
 require 'coveralls'
 
-Coveralls.wear_merged! unless FastlaneCore::Env.enabled?("FASTLANE_SKIP_UPDATE_CHECK")
+Coveralls.wear_merged! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
-unless FastlaneCore::Env.enabled?("DEBUG")
+unless ENV["DEBUG"]
   $stdout = File.open("/tmp/spaceship_tests", "w")
 end
 
