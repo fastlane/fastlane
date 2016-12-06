@@ -3,8 +3,8 @@ module Match
     # logs public key's  name, user, organisation, country, availability dates
     def self.print_certificate_info(cert_info: nil)
       params = {
-          rows: cert_info,
-          title: "Installed Certificate".green
+        rows: cert_info,
+        title: "Installed Certificate".green
       }
 
       puts ""

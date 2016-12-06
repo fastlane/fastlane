@@ -164,7 +164,7 @@ module Fastlane
           'carthage',
           'carthage(
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
-            output: "MyFrameworkBundle.framework.zip"       # Specify the output archive name (only for the archive command)
+            output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
             dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.

@@ -258,7 +258,7 @@ If you run into any issues you can use the `verbose` mode to get a more detailed
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
 ```
 
-If you are using `pilot` via the [fastlane action](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#pilot), add the following to your `Fastfile`
+If you are using `pilot` via the [fastlane action](https://docs.fastlane.tools/actions#pilot), add the following to your `Fastfile`
 
 ```
 ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"

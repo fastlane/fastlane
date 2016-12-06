@@ -166,7 +166,7 @@ module Commander
         inspector.search_exception(message_or_error, delegate)
       end
     rescue => ex
-      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if $verbose
     end
   end
 end

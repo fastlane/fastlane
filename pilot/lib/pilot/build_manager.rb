@@ -3,15 +3,13 @@ module Pilot
     def upload(options)
       start(options)
 
-      options[:changelog] = truncate_changelog(options[:changelog]) if options[:changelog]
+      options[:changelog] = self.class.truncate_changelog(options[:changelog]) if options[:changelog]
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
-      plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(config[:ipa]) || {}
-      platform = plist["DTPlatformName"]
-      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/spaceship/issues/247
+      platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
                                                                   package_path: "/tmp",
@@ -45,7 +43,7 @@ module Pilot
       end
 
       if build.nil?
-        builds = app.all_processing_builds(platform: options[:platform]) + app.builds(platform: options[:platform])
+        builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
         # sort by upload_date
         builds.sort! { |a, b| a.upload_date <=> b.upload_date }
         build = builds.last
@@ -83,7 +81,8 @@ module Pilot
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      builds = app.all_processing_builds(platform: options[:platform]) + app.builds(platform: options[:platform])
+      platform = fetch_app_platform
+      builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
       # sort by upload_date
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
@@ -168,9 +167,7 @@ module Pilot
         # true -> false, where the second true is transient. This causes a spurious failure. Find build by build_version
         # and ensure it's not processing before proceeding - it had to have already been false before, to get out of the
         # previous loop.
-        build_train = app.build_trains(platform: platform)[latest_build.train_version]
-        builds = build_train ? build_train.builds : []
-        full_build = builds.find do |b|
+        full_build = app.build_trains(platform: platform)[latest_build.train_version].builds.find do |b|
           b.build_version == latest_build.build_version
         end
 

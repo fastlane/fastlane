@@ -185,6 +185,11 @@ module FastlaneCore
         all.each(&:reset)
       end
 
+      def reset_all_by_version(os_version: nil)
+        return false unless os_version
+        all.select { |device| device.os_version == os_version }.each(&:reset)
+      end
+
       # Reset simulator by UDID or name and OS version
       # Latter is useful when combined with -destination option of xcodebuild
       def reset(udid: nil, name: nil, os_version: nil)

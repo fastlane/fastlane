@@ -1,6 +1,6 @@
 # Customise this file, documentation can be found here:
 # https://github.com/fastlane/fastlane/tree/master/fastlane/docs
-# All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
+# All available actions: https://docs.fastlane.tools/actions
 # can also be listed using the `fastlane actions` command
 
 # Change the syntax highlighting to Ruby
@@ -67,7 +67,7 @@ end
 
 
 # More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
-# All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
+# All available actions: https://docs.fastlane.tools/actions
 
 # fastlane reports which actions are used
 # No personal data is recorded. Learn more at https://github.com/fastlane/enhancer
