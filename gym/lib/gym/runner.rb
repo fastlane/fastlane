@@ -31,16 +31,15 @@ module Gym
           copy_mac_app
           return path
         end
-        extract_files_from_archive("Products/usr/local/bin/*") if Gym.project.command_line_tool?
-        extract_files_from_archive("Products/usr/local/lib/*") if Gym.project.mac_library?
+        copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
 
       if Gym.project.library? || Gym.project.framework?
-        base_framework_path = Gym.project.build_settings(key: "PROJECT_TEMP_ROOT")
-        base_framework_path = Gym.config[:derived_data_path] + "/Build/Intermediates/" if Gym.config[:derived_data_path]
-        # copy whole folder - just in case, it may include header-files ...
-        final_framework = "#{base_framework_path}/ArchiveIntermediates/#{Gym.config[:scheme]}/BuildProductsPath/*"
-        path = extract_framework_files(File.expand_path(final_framework))
+        base_framework_path = Gym.project.build_settings(key: "BUILD_ROOT")
+        base_framework_path = Gym.config[:derived_data_path] + "/Build/Products/" if Gym.config[:derived_data_path]
+
+        copy_files_from_path("#{base_framework_path}/*/*")
+        path = base_framework_path
       end
       path
     end
@@ -98,6 +97,7 @@ module Gym
     end
 
     def mark_archive_as_built_by_gym(archive_path)
+      return if Gym.project.library? || Gym.project.framework?
       escaped_archive_path = archive_path.shellescape
       system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
     end
@@ -169,25 +169,22 @@ module Gym
 
     # copys framework from temp folder:
 
-    def extract_framework_files(path)
+    def copy_files_from_path(path)
+      UI.success "Exporting Files:"
       framework_path = Dir[path]
       framework_path.each do |f|
+        existing_file = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(f))
+        # If the target file already exists in output directory
+        # we have to remove it first, otherwise cp_r fails even with remove_destination
+        # e.g.: there are symlinks in the .framework
+        if File.exist?(existing_file)
+          UI.important "Removing #{File.basename(f)} from output directory" if $verbose
+          FileUtils.rm_rf(existing_file)
+        end
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
+        UI.message "\t ▸ #{File.basename(f)}"
       end
-      UI.success "Successfully exported the Framework files:"
-      UI.message framework_path.join("\n")
       framework_path.join("\n")
-    end
-
-    # copys file out of xcarchive
-    def extract_files_from_archive(path)
-      archive_path = Dir[File.join(BuildCommandGenerator.archive_path, path)]
-      archive_path.each do |f|
-        FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
-      end
-      UI.success "Successfully exported the binary files:"
-      UI.message archive_path.join("\n")
-      archive_path.join("\n")
     end
 
     # Copies the .app from the archive into the output directory
