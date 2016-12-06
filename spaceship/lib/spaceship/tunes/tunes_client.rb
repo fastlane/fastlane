@@ -264,11 +264,11 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
       # First, we need to fetch the data from Apple, which we then modify with the user's values
       primary_language ||= "English"
-      app_type = 'ios'
-      r = request(:get, "ra/apps/create/v2/?platformString=#{app_type}")
+      platform ||= "ios"
+      r = request(:get, "ra/apps/create/v2/?platformString=#{platform}")
       data = parse_response(r, 'data')
 
       # Now fill in the values we have
@@ -281,10 +281,10 @@ module Spaceship
       data['vendorId'] = { value: sku }
       data['bundleIdSuffix'] = { value: bundle_id_suffix }
       data['companyName'] = { value: company_name } if company_name
-      data['enabledPlatformsForCreation'] = { value: [app_type] }
+      data['enabledPlatformsForCreation'] = { value: [platform] }
 
-      data['initialPlatform'] = app_type
-      data['enabledPlatformsForCreation'] = { value: [app_type] }
+      data['initialPlatform'] = platform
+      data['enabledPlatformsForCreation'] = { value: [platform] }
 
       # Now send back the modified hash
       r = request(:post) do |req|
