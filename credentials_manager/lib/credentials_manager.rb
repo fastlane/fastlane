@@ -1,4 +1,3 @@
-require 'fastlane_core'
 require 'credentials_manager/account_manager'
 require 'credentials_manager/cli'
 require 'credentials_manager/appfile_config'
