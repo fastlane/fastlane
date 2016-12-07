@@ -93,7 +93,7 @@ describe Scan do
       end
 
       context "options passed as arrays" do
-         it "generates options for the junit tempfile report required by scan" do
+        it "generates options for the junit tempfile report required by scan" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], ["report.html"], "test_output", false)
           reporter_options = generator.generate_reporter_options
           temp_junit_report = Scan.cache[:temp_junit_report]

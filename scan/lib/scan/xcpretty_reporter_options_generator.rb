@@ -1,6 +1,5 @@
 module Scan
   class XCPrettyReporterOptionsGenerator
-   
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
 
     # Intialize with values from Scan.config matching these param names
@@ -11,13 +10,13 @@ module Scan
       @output_directory = output_directory
       @use_clang_report_name = use_clang_report_name
 
-      # might already be an array when passed via fastlane  
+      # might already be an array when passed via fastlane
       @output_types = @output_types.split(',') if @output_types.kind_of?(String)
 
-      if @output_files == nil
+      if @output_files.nil?
         @output_files = @output_types.map { |type| "report.#{type}" }
       elsif @output_files.kind_of?(String)
-         # might already be an array when passed via fastlane
+        # might already be an array when passed via fastlane
         @output_files = @output_files.split(',')
       end
 

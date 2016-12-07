@@ -73,9 +73,9 @@ module Scan
         UI.user_error!("Tests failed")
       end
 
-      if open_html_path = Scan.cache[:open_html_report_path]
-          # Open the HTML file
-          `open --hide '#{open_html_path}'`
+      if Scan.cache[:open_html_report_path]
+        # Open the HTML file
+        `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
     end
 
