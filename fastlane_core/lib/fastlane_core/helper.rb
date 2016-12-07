@@ -46,14 +46,17 @@ module FastlaneCore
       ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
     end
 
+    # returns true if fastlane was installed from the Fabric Mac app
     def self.mac_app?
       ENV["FASTLANE_SELF_CONTAINED"].to_s == "false"
     end
 
+    # returns true if fastlane was installed via Homebrew
     def self.homebrew?
       ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
     end
 
+    # returns true if fastlane was installed via RubyGems
     def self.rubygems?
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
