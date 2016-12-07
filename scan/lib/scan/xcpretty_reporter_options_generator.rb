@@ -18,7 +18,7 @@ module Scan
         @output_files = @output_types.map { |type| "report.#{type}" }
       elsif @output_files.kind_of?(String)
          # might already be an array when passed via fastlane
-        @output_files.split(',')
+        @output_files = @output_files.split(',')
       end
 
       unless @output_types.length == @output_files.length
@@ -33,8 +33,8 @@ module Scan
         type = raw_type.strip
 
         unless SUPPORTED_REPORT_TYPES.include?(type)
-        UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
-        next
+          UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
+          next
         end
 
         output_path = File.join(File.expand_path(@output_directory), determine_output_file_name(type))

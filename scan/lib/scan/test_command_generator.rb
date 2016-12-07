@@ -92,7 +92,7 @@ module Scan
                                                                           Scan.config[:output_directory],
                                                                           Scan.config[:use_clang_report_name])
         reporter_options = reporter_options_generator.generate_reporter_options
-        return pipe << ["| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"]
+        return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
       end
 
       # Store the raw file
