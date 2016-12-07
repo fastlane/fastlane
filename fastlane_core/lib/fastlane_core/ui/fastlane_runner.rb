@@ -106,7 +106,6 @@ module Commander
       ui.error "    - extract the archive and double click the `install`"
       ui.error "-----------------------------------------------------------"
       ui.error " - Use Homebrew"
-      ui.error "    - if you do not have brew-cask enabled run: `brew tap caskroom/cask`"
       ui.error "    - install fastlane:"
       ui.error "-----------------------------------------------------------"
       ui.error "      - 🚀 `brew cask install fastlane` 🚀"
