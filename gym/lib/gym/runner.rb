@@ -28,6 +28,10 @@ module Gym
 
         path
       elsif Gym.project.mac?
+        if Gym.config[:export_method] == 'app-store' || Gym.config[:export_method] == 'developer-id'
+          package_app
+          move_pkg
+        end
         compress_and_move_dsym
         copy_mac_app
       end
@@ -153,6 +157,17 @@ module Gym
       UI.success "Successfully exported and signed the ipa file:"
       UI.message ipa_path
       ipa_path
+    end
+
+    # Moves over the binary to the output directory
+    # @return (String) The path to the resulting pkg file
+    def move_pkg
+      FileUtils.mv(PackageCommandGenerator.pkg_path, File.expand_path(Gym.config[:output_directory]), force: true)
+      pkg_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.pkg_path)))
+
+      UI.success "Successfully exported and signed the pkg file:"
+      UI.message pkg_path
+      pkg_path
     end
 
     # Copies the .app from the archive into the output directory
