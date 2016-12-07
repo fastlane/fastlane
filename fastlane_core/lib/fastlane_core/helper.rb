@@ -43,7 +43,7 @@ module FastlaneCore
     # Usually this means the fastlane directory is ~/.fastlane/bin/
     # We set this value via the environment variable `FASTLANE_SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.is_homebrew?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
     end
 
     def self.homebrew?
@@ -51,7 +51,7 @@ module FastlaneCore
     end
 
     def self.rubygems?
-      !self.bundler? && !self.contained_fastlane? && !self.is_homebrew?
+      !self.bundler? && !self.contained_fastlane? && !self.homebrew?
     end
 
     # @return [boolean] true if building in a known CI environment
