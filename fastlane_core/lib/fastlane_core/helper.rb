@@ -43,7 +43,22 @@ module FastlaneCore
     # Usually this means the fastlane directory is ~/.fastlane/bin/
     # We set this value via the environment variable `FASTLANE_SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true"
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
+    end
+
+    # returns true if fastlane was installed from the Fabric Mac app
+    def self.mac_app?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "false"
+    end
+
+    # returns true if fastlane was installed via Homebrew
+    def self.homebrew?
+      ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
+    end
+
+    # returns true if fastlane was installed via RubyGems
+    def self.rubygems?
+      !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
     # @return [boolean] true if building in a known CI environment

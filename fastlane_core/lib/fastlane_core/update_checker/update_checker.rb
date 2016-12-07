@@ -103,11 +103,18 @@ module FastlaneCore
     end
 
     def self.finished_running(gem_name)
-      time = (Time.now - @start_time).to_i
+      return if ENV["FASTLANE_OPT_OUT_USAGE"]
 
+      time = (Time.now - @start_time).to_i
       url = UPDATE_URL + "time/#{gem_name}"
       url += "?time=#{time}"
-      url += "&ci=1" if Helper.is_ci?
+      url += "&ci=1" if Helper.ci?
+      url += "&gem=1" if Helper.rubygems?
+      url += "&bundler=1" if Helper.bundler?
+      url += "&mac_app=1" if Helper.mac_app?
+      url += "&standalone=1" if Helper.contained_fastlane?
+      url += "&homebrew=1" if Helper.homebrew?
+
       Excon.post(url)
     end
 
