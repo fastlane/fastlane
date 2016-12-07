@@ -157,7 +157,7 @@ module Gym
 
     # Copies the .app from the archive into the output directory
     def copy_mac_app
-      app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
+      app_path = find_app_path
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path
 
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
@@ -165,6 +165,18 @@ module Gym
 
       UI.success "Successfully exported the .app file:"
       UI.message app_path
+      app_path
+    end
+
+    # Finds the most likely candidate for this target's .app
+    def find_app_path
+      # guess the correct .app name from the config
+      output_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications", Gym.config[:output_name] + ".app")
+      app_path = output_path if File.exist?(output_path)
+
+      # default to finding an arbitrary .app file, since we can't know any better
+      app_path ||= Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
+
       app_path
     end
 
