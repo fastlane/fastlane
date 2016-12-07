@@ -46,12 +46,16 @@ module FastlaneCore
       ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
     end
 
+    def self.mac_app?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "false"
+    end
+
     def self.homebrew?
       ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
     end
 
     def self.rubygems?
-      !self.bundler? && !self.contained_fastlane? && !self.homebrew?
+      !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
     # @return [boolean] true if building in a known CI environment

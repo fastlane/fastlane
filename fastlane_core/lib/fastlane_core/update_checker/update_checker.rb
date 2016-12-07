@@ -111,6 +111,7 @@ module FastlaneCore
       url += "&ci=1" if Helper.ci?
       url += "&gem=1" if Helper.rubygems?
       url += "&bundler=1" if Helper.bundler?
+      url += "&mac_app=1" if Helper.mac_app?
       url += "&standalone=1" if Helper.contained_fastlane?
       url += "&homebrew=1" if Helper.homebrew?
 
