@@ -86,47 +86,13 @@ module Scan
           formatter << "--test"
         end
 
-        return add_reporters_to_command(pipe << ["| xcpretty #{formatter.join(' ')}"])
-      end
-
-      SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
-
-      def add_reporters_to_command(command)
-        reporter = []
-        types = Scan.config[:output_types]
-        types = types.split(',') if types.kind_of?(String) # might already be an array when passed via fastlane
-        output_files = Scan.config[:output_files]
-        output_files = output_files.split(',') if output_files.kind_of?(String) # might already be an array when passed via fastlane
-
-        unless types.length == output_files.length
-          UI.important("WARNING: :output_types and :output_files do not have the same number of items. Default values will be substituted as needed.")
-        end
-
-        types.each do |raw_type|
-          type = raw_type.strip
-
-          unless SUPPORTED_REPORT_TYPES.include?(type)
-            UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
-            next
-          end
-
-          output_path = File.join(File.expand_path(Scan.config[:output_directory]), determine_output_file_name(type, types, output_files))
-          reporter << "--report #{type}"
-          reporter << "--output #{output_path}"
-
-          if type == "html" && Scan.config[:open_report]
-            Scan.cache[:open_html_report_path] = output_path
-          end
-        end
-
-        # adds another junit reporter in case the user does not specify one
-        # this will be discarded
-        require 'tempfile'
-        Scan.cache[:temp_junit_report] = Tempfile.new("junit_report").path
-        reporter << "--report junit"
-        reporter << "--output #{Scan.cache[:temp_junit_report]}"
-        
-        return command << reporter
+        reporter_options_generator = XCPrettyReporterOptionsGenerator.new(Scan.config[:open_report],
+                                                                          Scan.config[:output_types],
+                                                                          Scan.config[:output_files],
+                                                                          Scan.config[:output_directory],
+                                                                          Scan.config[:use_clang_report_name])
+        reporter_options = reporter_options_generator.generate_reporter_options
+        return pipe << ["| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"]
       end
 
       # Store the raw file
@@ -162,20 +128,6 @@ module Scan
           Scan.cache[:result_bundle_path] = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
         end
         return Scan.cache[:result_bundle_path]
-      end
-
-      def determine_output_file_name(type, types, files)
-        if Scan.config[:use_clang_report_name] && type == "json-compilation-database"
-          return "compile_commands.json"
-        end
-
-        index = types.index(type)
-        file = files[index]
-        if file == nil
-          "report.#{type}"
-        else
-          file
-        end
       end
     end
   end

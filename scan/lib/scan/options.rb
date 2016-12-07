@@ -95,7 +95,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_files,
                                      env_name: "SCAN_OUTPUT_FILES",
                                      description: "Comma separated list of the output files, corresponding to the types provided by :output_types (order should match)",
-                                     default_value: "report.html,report.junit"),
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "SCAN_BUILDLOG_PATH",
