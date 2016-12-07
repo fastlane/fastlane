@@ -7,13 +7,19 @@ module Scan
     def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name)
       @open_report = open_report
       @output_types = output_types
-      @output_files = output_files || @output_types.map { |type| "report.#{type}" }
+      @output_files = output_files
       @output_directory = output_directory
       @use_clang_report_name = use_clang_report_name
 
       # might already be an array when passed via fastlane  
-      @output_types = @output_types.split(',') if @output_types.kind_of?(String) 
-      @output_files = @output_files.split(',') if @output_files.kind_of?(String)
+      @output_types = @output_types.split(',') if @output_types.kind_of?(String)
+
+      if @output_files == nil
+        @output_files = @output_types.map { |type| "report.#{type}" }
+      elsif @output_files.kind_of?(String)
+         # might already be an array when passed via fastlane
+        @output_files.split(',')
+      end
 
       unless @output_types.length == @output_files.length
         UI.important("WARNING: output_types and output_files do not have the same number of items. Default values will be substituted as needed.")
@@ -46,7 +52,6 @@ module Scan
       Scan.cache[:temp_junit_report] = Tempfile.new("junit_report").path
       reporter << "--report junit"
       reporter << "--output #{Scan.cache[:temp_junit_report]}"
-      
       return reporter
     end
 
