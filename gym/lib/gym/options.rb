@@ -135,7 +135,21 @@ module Gym
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
                                      description: "Export ipa from previously build xarchive. Uses archive_path as source",
                                      is_string: false,
-                                     optional: true),
+                                     optional: true,
+                                     conflicting_options: [:skip_export],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("'#{value.key}' must be false to use 'skip_build_archive'")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_export,
+                                     env_name: "GYM_SKIP_EXPORT",
+                                     description: "Builds and generates an archive, but does not export",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:skip_build_archive],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("'#{value.key}' must be false to use 'skip_export'")
+                                     end),
+
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
                                      env_name: "GYM_BUILD_PATH",

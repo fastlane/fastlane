@@ -7,6 +7,13 @@ describe Gym do
       end.to raise_error "You can only pass either a 'project' or a 'workspace', not both"
     end
 
+    it "raises an exception when skip_build_archive and skip_export are both specified" do
+      expect do
+        options = { workspace: "./examples/cocoapods/Example.xcworkspace", skip_build_archive: true, skip_export: true }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      end.to raise_error "'skip_export' must be false to use 'skip_build_archive'"
+    end
+
     it "removes the `ipa` from the output name if given" do
       options = { output_name: "Example.ipa", project: "./examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
