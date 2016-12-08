@@ -39,7 +39,7 @@ module Deliver
         end
       else
         UI.message("Selecting the latest build...")
-        build = wait_for_build(app)
+        build = FastlaneCore::BuildWatcher.wait_for_build(app, options[:app_platform], sleep_time)
       end
       UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
 
@@ -47,41 +47,6 @@ module Deliver
       v.save!
 
       UI.success("Successfully selected build")
-    end
-
-    def wait_for_build(app)
-      UI.user_error!("Could not find app with app identifier #{WatchBuild.config[:app_identifier]}") unless app
-
-      start = Time.now
-
-      loop do
-        build = find_build(app.latest_version.candidate_builds)
-        return build if build.processing == false
-
-        UI.message("Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
-        if (Time.now - start) > (60 * 5)
-          UI.message("")
-          UI.message("You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
-        end
-        sleep 30
-      end
-      nil
-    end
-
-    def find_build(candidate_builds)
-      build = nil
-      candidate_builds.each do |b|
-        if !build or b.upload_date > build.upload_date
-          build = b
-        end
-      end
-
-      unless build
-        UI.error(candidate_builds)
-        UI.crash!("Could not find build")
-      end
-
-      return build
     end
   end
 end
