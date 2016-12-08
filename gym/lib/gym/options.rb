@@ -95,6 +95,7 @@ module Gym
                                      is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
+                                     deprecated: 'Do not use this option anymore.',
                                      env_name: "GYM_USE_LEGACY_BUILD_API",
                                      description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
                                      default_value: false,
