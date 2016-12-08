@@ -37,10 +37,7 @@ module FastlaneCore
 
     # collect sensitive strings
     def self.sensitive_strings
-      unless @sensitive_strings
-        @sensitive_strings = []
-      end
-      @sensitive_strings
+      @sensitive_strings ||= []
     end
 
     def initialize(available_options, values)
