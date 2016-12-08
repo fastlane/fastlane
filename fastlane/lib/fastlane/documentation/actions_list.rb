@@ -37,7 +37,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "Available fastlane actions".green,
         headings: ['Action', 'Description', 'Author'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows, :newline)
       )
       puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
@@ -108,7 +108,7 @@ module Fastlane
         puts Terminal::Table.new(
           title: "#{name} Options".green,
           headings: ['Key', 'Description', 'Env Var', 'Default'],
-          rows: options
+          rows: FastlaneCore::PrintTable.transform_output(options, :newline)
         )
       else
         puts "No available options".yellow
@@ -123,7 +123,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "#{name} Output Variables".green,
         headings: ['Key', 'Description'],
-        rows: output.map { |key, desc| [key.yellow, desc] }
+        rows: FastlaneCore::PrintTable.transform_output(output.map { |key, desc| [key.yellow, desc] }, :newline)
       )
       puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
       puts ""
@@ -132,7 +132,7 @@ module Fastlane
     def self.print_return_value(action, name)
       return unless action.return_value
 
-      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
+      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: FastlaneCore::PrintTable.transform_output([[action.return_value]], :newline))
       puts ""
     end
 
