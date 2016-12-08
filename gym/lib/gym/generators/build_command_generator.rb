@@ -50,7 +50,8 @@ module Gym
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :archive
+        actions << :archive unless Gym.project.library? || Gym.project.framework?
+        actions << :build if Gym.project.library? || Gym.project.framework?
 
         actions
       end
