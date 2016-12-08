@@ -82,6 +82,11 @@ module Fastlane
                                       description: "Mail HTML template",
                                       optional: true,
                                       is_string: true)
+          FastlaneCore::ConfigItem.new(key: :reply_to,
+                                      env_name: "MAILGUN_REPLAY_TO",
+                                      description: "Mail Reply to",
+                                      optional: true,
+                                      is_string: true)
 
         ]
       end
@@ -103,6 +108,7 @@ module Fastlane
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
                         from: "#{options[:from]}<#{options[:postmaster]}>",
                         to: (options[:to]).to_s,
+                        "h:Reply-To": options[:reply_to],
                         subject: options[:subject],
                         html: mail_template(options)
         mail_template(options)
@@ -143,6 +149,7 @@ module Fastlane
             apikey: "MY_API_KEY",
             to: "DESTINATION_EMAIL",
             from: "EMAIL_FROM_NAME",
+            reply_to: "EMAIL_REPLY_TO",
             success: true,
             message: "Mail Body",
             app_link: "http://www.myapplink.com",
