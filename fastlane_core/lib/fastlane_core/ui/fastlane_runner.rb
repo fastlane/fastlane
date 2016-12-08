@@ -152,7 +152,7 @@ module Commander
     end
 
     def show_github_issues(message_or_error)
-      return if FastlaneCore::Env.enabled?("FASTLANE_HIDE_GITHUB_ISSUES")
+      return if FastlaneCore::Env.truthy?("FASTLANE_HIDE_GITHUB_ISSUES")
       return if FastlaneCore::Helper.test?
 
       require 'gh_inspector'

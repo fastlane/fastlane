@@ -52,7 +52,7 @@ module Match
              encrypt: false)
         rescue
           UI.error "Couldn't decrypt the repo, please make sure you enter the right password!"
-          UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if FastlaneCore::Env.enabled?("MATCH_PASSWORD")
+          UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if FastlaneCore::Env.truthy?("MATCH_PASSWORD")
           clear_password(git_url)
           decrypt_repo(path: path, git_url: git_url)
           return

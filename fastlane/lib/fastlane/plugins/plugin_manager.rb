@@ -294,7 +294,7 @@ module Fastlane
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
 
-      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || FastlaneCore::Env.enabled?("FASTLANE_ENV_PRINTER")
+      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || FastlaneCore::Env.truthy?("FASTLANE_ENV_PRINTER")
 
       # We want to avoid printing output other than the version number if we are running `fastlane -v`
       print_plugin_information(self.plugin_references) unless skip_print_plugin_info

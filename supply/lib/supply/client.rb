@@ -57,7 +57,7 @@ module Supply
 
       auth_client.fetch_access_token!
 
-      if FastlaneCore::Env.enabled?("DEBUG")
+      if FastlaneCore::Env.truthy?("DEBUG")
         Google::Apis.logger.level = Logger::DEBUG
       end
 

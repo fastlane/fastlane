@@ -11,7 +11,7 @@ module FastlaneCore
       def enabled?(env_var)
         feature = @features[env_var]
         return false if feature.nil?
-        return FastlaneCore::Env.enabled?(feature.env_var)
+        return FastlaneCore::Env.truthy?(feature.env_var)
       end
 
       def register_class_method(klass: nil, symbol: nil, disabled_symbol: nil, enabled_symbol: nil, env_var: nil)

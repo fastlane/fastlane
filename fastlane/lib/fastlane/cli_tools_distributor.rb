@@ -54,7 +54,7 @@ module Fastlane
 
       def print_slow_fastlane_warning
         # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
-        return if FastlaneCore::Env.enabled?('BUNDLE_BIN_PATH') || FastlaneCore::Env.enabled?('SKIP_SLOW_FASTLANE_WARNING') || FastlaneCore::Helper.contained_fastlane?
+        return if FastlaneCore::Env.truthy?('BUNDLE_BIN_PATH') || FastlaneCore::Env.truthy?('SKIP_SLOW_FASTLANE_WARNING') || FastlaneCore::Helper.contained_fastlane?
 
         gemfile_path = PluginManager.new.gemfile_path
         if gemfile_path
