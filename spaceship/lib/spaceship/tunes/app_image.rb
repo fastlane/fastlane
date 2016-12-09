@@ -12,7 +12,7 @@ module Spaceship
 
       attr_accessor :url
 
-      attr_accessor :platform
+      attr_accessor :is_imessage
 
       attr_mapping(
         'assetToken' => :asset_token,
