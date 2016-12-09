@@ -15,11 +15,15 @@ module Fastlane
         installer = Gem::CommandManager.instance[:install]
 
         UI.important "Installing Ruby gem '#{gem_name}'..."
+
+        spec_name = self.find_gem_name(gem_name)
+        UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
+
         return if Helper.test?
 
         # We install the gem like this because we also want to gem to be available to be required
         # at this point. If we were to shell out, this wouldn't be the case
-        installer.install_gem(gem_name, Gem::Requirement.default)
+        installer.install_gem(spec_name, Gem::Requirement.default)
         UI.success("Successfully installed '#{gem_name}'")
         require gem_require_name if require_gem
       end
@@ -39,6 +43,13 @@ module Fastlane
         return true if status.exitstatus == 0
 
         Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+      end
+
+      def find_gem_name(user_supplied_name)
+        fetcher = Gem::SpecFetcher.fetcher
+        gems = fetcher.suggest_gems_from_name(user_supplied_name)
+
+        return gems.first
       end
     end
   end
