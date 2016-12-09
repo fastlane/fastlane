@@ -1,12 +1,12 @@
-# Contributing to `fastlane`
+# Contributing to _fastlane_
 
 ## I want to report a problem or ask a question
 
 We use GitHub as support system, please submit a [new issue](https://github.com/fastlane/fastlane/issues/new) to ask questions or to report a problem. 
 
-Some people might also use the [fastlane tag on StackOverflow](https://stackoverflow.com/questions/tagged/fastlane), however we don’t actively monitor issues submitted there. 
+Some people might also use the [_fastlane_ tag on StackOverflow](https://stackoverflow.com/questions/tagged/fastlane), however we don’t actively monitor issues submitted there.
 
-## I want to contribute to fastlane
+## I want to contribute to _fastlane_
 
 - To start working on _fastlane_, check out [YourFirstPR.md][firstpr]
 - For some more advanced tooling and debugging tips, check out [ToolingAndDebugging.md](ToolingAndDebugging.md)
@@ -27,7 +27,7 @@ One way we do this is by closing issues that we don't feel are immediately actio
 
 In any case, **a closed issue is not necessarily the end of the story!** If more info becomes available after an issue is closed, it can be reopened for further consideration.
 
-One of the best ways we can keep fastlane an approachable, stable, and dependable tool is to be deliberate about how we choose to modify it. If we don't adopt your changes or new feature into fastlane, that doesn't mean it was bad work! It may be that the fastlane philosophy about how to accomplish a particular task doesn't align well with your approach. The best way to make sure that your time is well spent in contributing to fastlane is to **start your work** on a modification or new feature **by opening an issue to discuss the problem or shortcoming with the community**. The fastlane maintainers will do our best to give early feedback about whether a particular goal and approach is likely to be something we want to adopt!
+One of the best ways we can keep _fastlane_ an approachable, stable, and dependable tool is to be deliberate about how we choose to modify it. If we don't adopt your changes or new feature into _fastlane,_ that doesn't mean it was bad work! It may be that the _fastlane_ philosophy about how to accomplish a particular task doesn't align well with your approach. The best way to make sure that your time is well spent in contributing to _fastlane_ is to **start your work** on a modification or new feature **by opening an issue to discuss the problem or shortcoming with the community**. The _fastlane_ maintainers will do our best to give early feedback about whether a particular goal and approach is likely to be something we want to adopt!
 
 ## Code of Conduct
 Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct][code of conduct].
@@ -40,7 +40,7 @@ Thank you for reading to the end, and for taking the time to contribute to the p
 
 This project is licensed under the terms of the MIT license. See the [LICENSE][license] file.
 
-> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+> This project and all _fastlane_ tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All _fastlane_ tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use _fastlane_ tools.
 
 <!-- Links: -->
 [code of conduct]: CODE_OF_CONDUCT.md
