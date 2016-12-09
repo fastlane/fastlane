@@ -17,7 +17,7 @@ Please be aware that we don’t accept submissions for new actions at the moment
 
 ## I want to help work on _fastlane_ by reviewing issues and PRs
 
-We are always happy to receive help in that regard by the community! Feel free to read our document on how to [respond to issues and PRs][responding to prs] and also check out how to become a [core contributor][core contributor]. 
+Thanks! We would really appreciate the help! Feel free to read our document on how to [respond to issues and PRs][responding to prs] and also check out how to become a [core contributor][core contributor].
 
 ## Why did my issue/PR get closed?
 
