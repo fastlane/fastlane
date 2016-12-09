@@ -28,7 +28,7 @@ module Deliver
             containing_folder = File.join(folder_path, screenshot.language)
           end
 
-          if screenshot.platform == "imessage"
+          if screenshot.is_imessage
             containing_folder = File.join(folder_path, "iMessage", screenshot.language)
           end
 
