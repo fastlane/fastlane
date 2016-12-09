@@ -80,11 +80,36 @@ module Fastlane
         version_number = line.partition('=').last
         return version_number if Helper.is_test?
 
+        targets_available = self.parse_targets(results)
+        self.validate_target(params, targets_available)
+
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
       rescue => ex
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
+      end
+
+      def self.parse_targets(results)
+        targets_available = []
+        results.each do |t|
+          matches = %r{.*/(.*?)-.*\.plist.*}.match(t)
+          if matches && matches[1]
+            targets_available << matches[1].to_s
+          end
+        end
+        return targets_available
+      end
+
+      def self.validate_target(params, targets_available)
+        if params[:target] && !targets_available.include?(params[:target])
+          UI.important("Could not find specified target: #{params[:target]}")
+          UI.important("Availaible targets:")
+          targets_available.each do |t|
+            UI.important("\t #{t}")
+          end
+          UI.user_error!("Target not found")
+        end
       end
 
       #####################################################
