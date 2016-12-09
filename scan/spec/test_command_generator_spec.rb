@@ -149,7 +149,7 @@ describe Scan do
 
       it "#buildlog_path is not used when not provided" do
         result = Scan::TestCommandGenerator.xcodebuild_log_path
-        expect(result.to_s).to include("Library/Logs/scan")
+        expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
       end
     end
 
