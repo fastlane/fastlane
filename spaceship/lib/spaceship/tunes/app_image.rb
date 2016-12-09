@@ -12,6 +12,8 @@ module Spaceship
 
       attr_accessor :url
 
+      attr_accessor :platform
+
       attr_mapping(
         'assetToken' => :asset_token,
         'sortOrder' => :sort_order,

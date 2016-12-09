@@ -702,7 +702,8 @@ module Spaceship
             screenshot_data = screenshot["value"]
             data = {
                 device_type: display_family['name'],
-                language: row["language"]
+                language: row["language"],
+                platform: "imessage" # to identify imessage screenshots later on (e.g: during download)
             }.merge(screenshot_data)
             result << Tunes::AppScreenshot.factory(data)
           end
