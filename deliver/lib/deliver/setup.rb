@@ -67,6 +67,18 @@ module Deliver
       end
 
       UI.success("Successfully created new configuration files.")
+
+      # get App icon + watch icon
+      if v.large_app_icon.asset_token
+        app_icon_path = File.join(path, "app_icon.png")
+        File.write(app_icon_path, open(v.large_app_icon.url).read)
+        UI.success("Successfully downloaded large app icon")
+      end
+      if v.watch_app_icon.asset_token
+        watch_icon_path = File.join(path, "watch_icon.png")
+        File.write(watch_icon_path, open(v.watch_app_icon.url).read)
+        UI.success("Successfully downloaded watch icon")
+      end
     end
 
     def download_screenshots(deliver_path, options)

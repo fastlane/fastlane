@@ -52,6 +52,10 @@ module Deliver
       UploadMetadata.new.load_from_filesystem(options)
       UploadMetadata.new.assign_defaults(options)
 
+      # Handle app icon / watch icon
+
+      prepare_app_icons(options)
+
       # Validate
       validate_html(screenshots)
 
@@ -60,6 +64,19 @@ module Deliver
       UploadScreenshots.new.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
+    end
+
+    def prepare_app_icons(options = {})
+      app_icon_path = options[:app_icon] if options[:app_icon]
+      app_icon_metadata = File.join(options[:metadata_path], "app_icon.png")
+      if app_icon_path.nil? && File.exist?(app_icon_metadata)
+        options[:app_icon] = app_icon_metadata
+      end
+      watch_icon_path = options[:apple_watch_app_icon] if options[:apple_watch_app_icon]
+      watch_icon_metadata = File.join(options[:metadata_path], "watch_icon.png")
+      if watch_icon_path.nil? && File.exist?(watch_icon_metadata)
+        options[:apple_watch_app_icon] = watch_icon_metadata
+      end
     end
 
     # Upload the binary to iTunes Connect
