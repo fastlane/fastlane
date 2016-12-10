@@ -360,7 +360,7 @@ module Spaceship
 
     def with_retry(tries = 5, &_block)
       return yield
-    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError, UnauthorizedAccessError, Errno::EPIPE => ex # New Faraday version: Faraday::TimeoutError => ex
+    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError, Errno::EPIPE => ex # New Faraday version: Faraday::TimeoutError => ex
       unless (tries -= 1).zero?
         logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
         sleep 3 unless defined? SpecHelper
@@ -368,7 +368,7 @@ module Spaceship
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
-      if @loggedin && !(tries -= 1).zero?
+      unless (tries -= 1).zero?
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
