@@ -135,6 +135,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_NEXUS_PROXY_PASSWORD",
+                                       sensitive: true,
                                        description: "Proxy password",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,

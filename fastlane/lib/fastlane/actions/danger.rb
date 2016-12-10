@@ -5,7 +5,7 @@ module Fastlane
         Actions.verify_gem!('danger')
         cmd = []
 
-        cmd << 'bundle exec' if File.exist?('Gemfile') && params[:use_bundle_exec]
+        cmd << 'bundle exec' if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
         cmd << 'danger'
         cmd << '--verbose' if params[:verbose]
 
@@ -55,6 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :github_api_token,
                                        env_name: "FL_DANGER_GITHUB_API_TOKEN",
                                        description: "GitHub API token for danger",
+                                       sensitive: true,
                                        is_string: true,
                                        optional: true)
         ]

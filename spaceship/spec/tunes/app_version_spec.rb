@@ -16,6 +16,7 @@ describe Spaceship::AppVersion, all: true do
 
       expect(version.application).to eq(app)
       expect(version.is_live?).to eq(false)
+      expect(version.current_build_number).to eq("9")
       expect(version.copyright).to eq("2015 SunApps GmbH")
       expect(version.version_id).to eq(812_106_519)
       expect(version.raw_status).to eq('readyForSale')
@@ -162,6 +163,7 @@ describe Spaceship::AppVersion, all: true do
         version = app.live_version
 
         expect(version.app_status).to eq("Ready for Sale")
+        expect(version.current_build_number).to eq("9")
         expect(version.app_status).to eq(Spaceship::Tunes::AppStatus::READY_FOR_SALE)
       end
 
@@ -188,7 +190,7 @@ describe Spaceship::AppVersion, all: true do
         expect(s1.original_file_name).to eq('ftl_250ec6b31ba0da4c4e8e22fdf83d71a1_65ea94f6b362563260a5742b93659729.png')
         expect(s1.language).to eq("English")
 
-        expect(v.screenshots["English"].count).to eq(10)
+        expect(v.screenshots["English"].count).to eq(13)
 
         # 2 iPhone 6 Plus Screenshots
         expect(v.screenshots["English"].count { |s| s.device_type == 'iphone6Plus' }).to eq(3)
@@ -239,11 +241,16 @@ describe Spaceship::AppVersion, all: true do
         allow(client.du_client).to receive(:upload_watch_icon).and_return(json)
       end
 
-      it "modifies the large app data after update" do
+      it "stores extra information in the raw_data" do
         version.upload_large_icon!("path_to_jpg")
-        expect(version.large_app_icon.url).to eq(nil)
-        expect(version.large_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
-        expect(version.large_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
+        expect(version.raw_data["largeAppIcon"]["value"]).to eq({
+          assetToken: "Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg",
+          originalFileName: "ftl_FAKEMD5_icon1024.jpg",
+           size: 198_508,
+           height: 1024,
+           width: 1024,
+           checksum: "d41d8cd98f00b204e9800998ecf8427e"
+           })
       end
 
       it "deletes the large app data" do
@@ -251,13 +258,6 @@ describe Spaceship::AppVersion, all: true do
         expect(version.large_app_icon.url).to eq(nil)
         expect(version.large_app_icon.original_file_name).to eq(nil)
         expect(version.large_app_icon.asset_token).to eq(nil)
-      end
-
-      it "modifies the watch app data after update" do
-        version.upload_watch_icon!("path_to_jpg")
-        expect(version.watch_app_icon.url).to eq(nil)
-        expect(version.watch_app_icon.original_file_name).to eq("ftl_FAKEMD5_icon1024.jpg")
-        expect(version.watch_app_icon.asset_token).to eq("Purple7/v4/65/04/4d/65044dae-15b0-a5e0-d021-5aa4162a03a3/pr_source.jpg")
       end
 
       it "deletes the watch app data" do
@@ -455,44 +455,44 @@ describe Spaceship::AppVersion, all: true do
       describe "Parameter checks" do
         it "prevents from using negative sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using sort_order 0" do
           expect do
-            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
           end.to raise_error "sort_order must not be > 5"
         end
 
         # not really sure if we want to enforce that
         # it "prevents from letting holes in sort_orders" do
         #  expect do
-        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
         #  end.to raise_error "FIXME"
         # end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
           end.to raise_error "iTunes Connect error: NotALanguage isn't an activated language"
         end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
           end.to raise_error "iTunes Connect error: English_CA isn't an activated language"
         end
 
         it "prevent from using invalid device" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English", :android)
+            version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
           end.to raise_error "iTunes Connect error: android isn't a valid device name"
         end
       end
@@ -506,7 +506,15 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
+          expect(version.screenshots["English"].count).to eq(count + 1)
+        end
+
+        it "can add a new iMessage screenshot to the list" do
+          du_upload_messages_screenshot_success
+
+          count = version.screenshots["English"].count
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', true)
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
@@ -524,29 +532,49 @@ describe Spaceship::AppVersion, all: true do
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(true)
 
-          version.upload_screenshot!(screenshot_path, 1, language, device_type)
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, false)
 
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(false)
+        end
+
+        it "auto-sets the 'scaled' parameter when the user provides an iMessage screenshot" do
+          def fetch_family(device_type, language)
+            lang_details = version.raw_data["details"]["value"].find { |a| a["language"] == language }
+            return lang_details["displayFamilies"]["value"].find { |value| value["name"] == device_type }
+          end
+
+          device_type = "iphone4"
+          language = "English"
+
+          du_upload_messages_screenshot_success
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(true)
+
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, true)
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(false)
         end
 
         it "can replace an existing screenshot with existing sort_order" do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count)
         end
 
         it "can remove existing screenshot" do
           count = version.screenshots["English"].count
-          version.upload_screenshot!(nil, 2, "English", 'iphone4')
+          version.upload_screenshot!(nil, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count - 1)
         end
 
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
-            version.upload_screenshot!(nil, 5, "English", 'iphone4')
+            version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
           end.to raise_error "cannot remove screenshot with non existing sort_order"
         end
       end
@@ -617,6 +645,22 @@ describe Spaceship::AppVersion, all: true do
       #   expect(version.name['German']).to eq("yep, that's the name")
       #   expect(version.name['English_CA']).to eq("yep, that's the name")
       # end
+    end
+
+    describe "Rejecting" do
+      it 'rejects' do
+        itc_stub_reject_version_success
+        version.can_reject_version = true
+        expect(client).to receive(:reject!).with('898536088', 812_106_519)
+        version.reject!
+      end
+
+      it 'raises exception when not rejectable' do
+        itc_stub_valid_update
+        expect do
+          version.reject!
+        end.to raise_error "Version not rejectable"
+      end
     end
   end
 

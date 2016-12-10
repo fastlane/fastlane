@@ -38,7 +38,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FRAMEIT_SCREENSHOTS_PATH",
                                        description: "The path to the directory containing the screenshots",
-                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneFolder.path)
+                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneCore::FastlaneFolder.path)
         ]
       end
 
@@ -49,7 +49,9 @@ module Fastlane
       def self.example_code
         [
           'frameit',
-          'frameit :silver'
+          'frameit(silver: true)',
+          'frameit(path: "/screenshots")',
+          'frameit(rose_gold: true)'
         ]
       end
 

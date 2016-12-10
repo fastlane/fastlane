@@ -28,7 +28,8 @@ module Produce
                                                               sku: Produce.config[:sku].to_s, # might be an int
                                                               bundle_id: app_identifier,
                                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
-                                                              company_name: Produce.config[:company_name])
+                                                              company_name: Produce.config[:company_name],
+                                                              platform: Produce.config[:platform])
 
         UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
 
@@ -50,7 +51,7 @@ module Produce
         UI.success "Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}"
       end
 
-      return Spaceship::Application.find(@full_bundle_identifier).apple_id
+      return Spaceship::Application.find(@full_bundle_identifier, mac: Produce.config[:platform] == "osx").apple_id
     end
 
     private

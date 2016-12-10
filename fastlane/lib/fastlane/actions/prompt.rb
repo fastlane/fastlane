@@ -2,7 +2,11 @@ module Fastlane
   module Actions
     class PromptAction < Action
       def self.run(params)
-        params[:text] += " (y/n)" if params[:boolean]
+        if params[:boolean]
+          return params[:ci_input] unless UI.interactive?
+          return UI.confirm(params[:text])
+        end
+
         UI.message(params[:text])
 
         return params[:ci_input] unless UI.interactive?
@@ -17,7 +21,6 @@ module Fastlane
           user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
         end
 
-        user_input = user_input.casecmp('y').zero? if params[:boolean]
         return user_input
       end
 

@@ -32,7 +32,6 @@ match
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
 [![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Easily sync your certificates and profiles across your team using git
 
@@ -53,7 +52,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 
@@ -119,7 +118,7 @@ match init
 
 <img src="assets/match_init.gif" width="550" />
 
-You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -174,20 +173,17 @@ match --help
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, call `match` for each of them:
+If you have several targets with different bundle identifiers, supply them as a comma-separated list to match:
 
 ```
-match appstore -a tools.fastlane.app
-match appstore -a tools.fastlane.app.watchkitapp
+match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
 You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
 lane :certificates do
-  match(app_identifier: "com.krausefx.app1", readonly: true)
-  match(app_identifier: "com.krausefx.app2", readonly: true)
-  match(app_identifier: "com.krausefx.app3", readonly: true)
+  match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"], readonly: true)
 end
 ```
 
@@ -260,7 +256,7 @@ gym
 
 ##### Registering new devices
 
-By using `match`, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use `match` in combination with the [`register_devices`](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#register_devices) action.
+By using `match`, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use `match` in combination with the [`register_devices`](https://docs.fastlane.tools/actions#register_devices) action.
 
 ```ruby
 lane :beta do
@@ -282,8 +278,7 @@ match adhoc --force_for_new_devices
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
 
 ```ruby
-match(app_identifier: "tools.fastlane.app", type: "appstore")
-match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
+match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"], type: "appstore")
 ```
 
 `match` can even use the same one Git repository for all bundle identifiers.
@@ -393,7 +388,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

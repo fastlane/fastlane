@@ -26,7 +26,7 @@ RSpec::Matchers.define :match_udid do |example_path|
 end
 
 EXAMPLE_MATCHERS = {
-  'number' => ->(arg) { arg.kind_of? Fixnum },
+  'number' => ->(arg) { arg.kind_of? Integer },
   'anything-or-empty' => ->(arg) { /.*/ || arg.nil? },
   'apple-app-id' => /^[A-Z0-9]{10}$/,
   'boolean' => ->(arg) { arg.kind_of?(TrueClass) || arg.kind_of?(FalseClass) },

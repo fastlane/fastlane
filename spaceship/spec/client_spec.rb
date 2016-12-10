@@ -42,19 +42,21 @@ describe Spaceship::Client do
   end
 
   describe 'retry' do
-    { "Timeout" => Faraday::Error::TimeoutError.new,
-      "Connection failed" => Faraday::Error::ConnectionFailed.new("Connection Failed"),
-      "EPIPE" => Errno::EPIPE }.each do |name, exception|
-      it "re-raises #{exception} error when retry limit reached" do
-        stub_client_request(exception, 6, 200, nil)
+    [
+      Faraday::Error::TimeoutError,
+      Faraday::Error::ConnectionFailed,
+      Errno::EPIPE
+    ].each do |thrown|
+      it "re-raises when retry limit reached" do
+        stub_client_request(thrown, 6, 200, nil)
 
         expect do
           subject.req_home
-        end.to raise_error(exception)
+        end.to raise_error
       end
 
-      it "retries when #{exception} error raised" do
-        stub_client_request(exception, 2, 200, default_body)
+      it "retries when #{thrown} error raised" do
+        stub_client_request(thrown, 2, 200, default_body)
 
         expect(subject.req_home.body).to eq(default_body)
       end
@@ -113,6 +115,39 @@ describe Spaceship::Client do
     it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
+    end
+  end
+
+  describe "#persistent_cookie_path" do
+    before do
+      subject.login("username", "password")
+    end
+
+    after do
+      ENV.delete("SPACESHIP_COOKIE_PATH")
+    end
+
+    it "uses $SPACESHIP_COOKIE_PATH when set" do
+      ENV["SPACESHIP_COOKIE_PATH"] = "/custom_path"
+      expect(subject.persistent_cookie_path).to eq("/custom_path/spaceship/username/cookie")
+    end
+
+    it "uses home dir by default" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(true)
+      expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.spaceship/username/cookie"))
+    end
+
+    it "uses /var/tmp if home not available" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(true)
+      expect(subject.persistent_cookie_path).to eq("/var/tmp/spaceship/username/cookie")
+    end
+
+    it "falls back to Dir.tmpdir as last resort" do
+      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
+      expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
     end
   end
 end

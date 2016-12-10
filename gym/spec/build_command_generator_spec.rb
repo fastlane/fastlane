@@ -16,7 +16,7 @@ describe Gym do
     end
 
     it "supports additional parameters" do
-      log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
       xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       xcargs = xcargs_hash.map do |k, v|
@@ -43,7 +43,7 @@ describe Gym do
     end
 
     it "disables xcpretty formatting" do
-      log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
       xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       xcargs = xcargs_hash.map do |k, v|
@@ -74,7 +74,7 @@ describe Gym do
       end
 
       it "uses the correct build command with the example project with no additional parameters" do
-        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
@@ -123,7 +123,7 @@ describe Gym do
 
       it "#buildlog_path is not used when not provided" do
         result = Gym::BuildCommandGenerator.xcodebuild_log_path
-        expect(result.to_s).to include("Library/Logs/gym")
+        expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym"))
       end
     end
 
@@ -134,7 +134,7 @@ describe Gym do
       end
 
       it "uses the correct build command with the example project" do
-        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
         result = Gym::BuildCommandGenerator.generate
         expect(result).to eq([
@@ -154,7 +154,7 @@ describe Gym do
 
     describe "Result Bundle Example" do
       it "uses the correct build command with the example project" do
-        log_path = File.expand_path("~/Library/Logs/gym/ExampleProductName-Example.log")
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
         options = { project: "./examples/standard/Example.xcodeproj", result_bundle: true, scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)

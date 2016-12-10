@@ -36,7 +36,7 @@ describe Frameit do
           color: 'SpaceGray',
           orientation_name: 'Vert'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPhone SE/iPhone-SE-Space-Gray.png'
+        expected_result = 'Apple iPhone-SE SpaceGray'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -47,7 +47,7 @@ describe Frameit do
           color: 'Silver',
           orientation_name: 'Horz'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPhone SE/iPhone-SE-Silver-horizontal.png'
+        expected_result = 'Apple iPhone-SE Silver'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -58,7 +58,7 @@ describe Frameit do
           color: 'SpaceGray',
           orientation_name: 'Horz'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPhone 5s/Space Gray/iPhone_5s_Horz_SpaceGray_sRGB.png'
+        expected_result = 'Apple iPhone_5s SpaceGray'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -67,7 +67,7 @@ describe Frameit do
         screenshot = make_screenshot({
           device_name: 'iPhone-6s'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPhone-6s/iPhone 6s - Silver/iPhone-6s-Silver-horizontal.png'
+        expected_result = 'Apple iPhone-6s silver'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -77,7 +77,7 @@ describe Frameit do
           device_name: 'iPhone-6s-Plus',
           orientation_name: 'Horz'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPhone-6s-Plus/iPhone 6s Plus - Silver/iPhone-6s-Plus-Silver-horizontal.png'
+        expected_result = 'Apple iPhone-6s-Plus silver'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -86,7 +86,7 @@ describe Frameit do
         screenshot = make_screenshot({
           device_name: 'iPad-mini'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPad-mini-4/iPad mini Silver/iPad-mini-Silver-horizontal.png'
+        expected_result = 'Apple iPad-mini silver'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
@@ -97,20 +97,9 @@ describe Frameit do
           color: 'SpaceGray',
           orientation_name: 'Vert'
         })
-        expected_result = '../frameit/spec/fixtures/mock_frames/iPad Pro/iPad-Pro-Space-Gray-vertical.png'
+        expected_result = 'Apple iPad-Pro SpaceGray'
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
-      end
-
-      it 'warns for an iPhone-SE if there is no template' do
-        screenshot = make_screenshot({
-          device_name: 'iPhone-SE',
-          color: 'SpaceGray',
-          orientation_name: 'Vert'
-        })
-
-        expect(Dir).to receive(:[]).and_return([]).at_least(:once)
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(nil)
       end
     end
   end

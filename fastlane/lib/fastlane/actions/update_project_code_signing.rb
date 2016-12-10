@@ -13,12 +13,13 @@ module Fastlane
         path = File.join(path, "project.pbxproj")
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
-        UI.message("Updating provisioning profile UDID (#{params[:udid]}) for the given project '#{path}'")
+        uuid = params[:uuid] || params[:udid]
+        UI.message("Updating provisioning profile UUID (#{uuid}) for the given project '#{path}'")
 
         p = File.read(path)
-        File.write(path, p.gsub(/PROVISIONING_PROFILE = ".*";/, "PROVISIONING_PROFILE = \"#{params[:udid]}\";"))
+        File.write(path, p.gsub(/PROVISIONING_PROFILE = ".*";/, "PROVISIONING_PROFILE = \"#{uuid}\";"))
 
-        UI.success("Successfully updated project settings to use UDID '#{params[:udid]}'")
+        UI.success("Successfully updated project settings to use UUID '#{uuid}'")
       end
 
       def self.description
@@ -26,7 +27,7 @@ module Fastlane
       end
 
       def self.details
-        "Don't use this actoin, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
+        "Don't use this action, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
       end
 
       def self.available_options
@@ -39,8 +40,12 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_PROJECT_SIGNING_UDID",
-                                       description: "The UDID of the provisioning profile you want to use",
-                                       default_value: ENV["SIGH_UDID"])
+                                       description: "DEPRECATED: see :uuid",
+                                       default_value: ENV["SIGH_UUID"]),
+          FastlaneCore::ConfigItem.new(key: :uuid,
+                                       env_name: "FL_PROJECT_SIGNING_UUID",
+                                       description: "The UUID of the provisioning profile you want to use",
+                                       default_value: ENV["SIGH_UUID"])
         ]
       end
 

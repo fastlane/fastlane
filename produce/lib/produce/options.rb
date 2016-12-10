@@ -38,6 +38,15 @@ module Produce
                                      description: "SKU Number (e.g. '1234')",
                                      default_value: Time.now.to_i.to_s,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "PRODUCE_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include? value
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
@@ -69,7 +78,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -78,7 +87,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :itc_team_id,
                                      short_option: "-k",
@@ -97,7 +106,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end)
       ]
     end

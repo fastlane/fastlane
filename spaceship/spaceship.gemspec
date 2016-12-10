@@ -27,11 +27,12 @@ Gem::Specification.new do |spec|
 
   # external
   spec.add_dependency 'multi_xml', '~> 0.5'
-  spec.add_dependency 'plist', '~> 3.1'
+  spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0'
   spec.add_dependency 'faraday', '~> 0.9'
   spec.add_dependency 'faraday_middleware', '~> 0.9'
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '~> 1.6'
+  spec.add_dependency 'babosa', '1.0.2'
 
   # for the playground
   spec.add_dependency 'colored'
@@ -49,5 +50,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.21.0'
-  spec.add_development_dependency 'rubocop', '~> 0.38.0'
+  spec.add_development_dependency 'rubocop', '~> 0.44.0'
 end

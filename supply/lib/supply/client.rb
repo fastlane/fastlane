@@ -23,7 +23,8 @@ module Supply
     # instantiate a client given the supplied configuration
     def self.make_from_config
       unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
-        UI.user_error! "Missing auth credentials: You must specify either 'json_key' or 'key' and 'issuer'"
+        UI.important("To not be asked about this value, you can specify it using 'json_key'")
+        Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
       end
 
       return Client.new(path_to_key: Supply.config[:key],
@@ -91,6 +92,13 @@ module Supply
 
       self.current_edit = nil
       self.current_package_name = nil
+    end
+
+    # Validates the current edit - does not change data on Google Play
+    def validate_current_edit!
+      ensure_active_edit!
+
+      call_google_api { android_publisher.validate_edit(current_package_name, current_edit.id) }
     end
 
     # Commits the current edit saving all pending changes on Google Play

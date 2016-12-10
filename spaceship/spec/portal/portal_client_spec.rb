@@ -50,7 +50,7 @@ describe Spaceship::Client do
       it "uses the stored token for all upcoming requests" do
         # Temporary stub a request to require the csrf_tokens
         stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-          with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc' }, headers: { 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
+          with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }, headers: { 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
           to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
 
         # Hard code the tokens
@@ -112,6 +112,13 @@ describe Spaceship::Client do
         expect(response['isWildCard']).to eq(true)
         expect(response['name']).to eq('Development App')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.*')
+      end
+
+      it 'should strip non ASCII characters' do
+        response = subject.create_app!(:explicit, 'pp Test 1ed9e25c93ac7142ff9df53e7f80e84c', 'tools.fastlane.spaceship.some-explicit-app')
+        expect(response['isWildCard']).to eq(false)
+        expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
     end
 

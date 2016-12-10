@@ -1,6 +1,7 @@
 module Match
   class Runner
     attr_accessor :changes_to_commit
+    attr_accessor :spaceship
 
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
@@ -10,19 +11,33 @@ module Match
       UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
 
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
-      spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
+      self.spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
+
+      if params[:app_identifier].kind_of?(Array)
+        app_identifiers = params[:app_identifier]
+      else
+        app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
+      end
 
       # Verify the App ID (as we don't want 'match' to fail at a later point)
-      spaceship.bundle_identifier_exists(params) if spaceship
+      if spaceship
+        app_identifiers.each do |app_identifier|
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+        end
+      end
 
       # Certificate
       cert_id = fetch_certificate(params: params)
-      spaceship.certificate_exists(params, cert_id) if spaceship
+      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
-      # Provisioning Profile
-      uuid = fetch_provisioning_profile(params: params,
-                                certificate_id: cert_id)
-      spaceship.profile_exists(params, uuid) if spaceship
+      # Provisioning Profiles
+      app_identifiers.each do |app_identifier|
+        loop do
+          break if fetch_provisioning_profile(params: params,
+                                      certificate_id: cert_id,
+                                      app_identifier: app_identifier)
+        end
+      end
 
       # Done
       if self.changes_to_commit and !params[:readonly]
@@ -30,7 +45,10 @@ module Match
         GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
       end
 
-      TablePrinter.print_summary(params)
+      # Print a summary table for each app_identifier
+      app_identifiers.each do |app_identifier|
+        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type])
+      end
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
@@ -44,9 +62,7 @@ module Match
     end
 
     def fetch_certificate(params: nil)
-      cert_type = :distribution
-      cert_type = :development if params[:type] == "development"
-      cert_type = :enterprise if Match.enterprise? && params[:type] == "enterprise"
+      cert_type = Match.cert_type_sym(params[:type])
 
       certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
@@ -63,24 +79,28 @@ module Match
         if FastlaneCore::CertChecker.installed?(cert_path)
           UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
         else
-          Utils.import(cert_path, params[:keychain_name])
+          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
         end
 
         # Import the private key
         # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name])
+        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+
+        # Get and print info of certificate
+        info = Utils.get_cert_info(cert_path)
+        TablePrinter.print_certificate_info(cert_info: info)
       end
 
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
-    def fetch_provisioning_profile(params: nil, certificate_id: nil)
-      app_identifier = params[:app_identifier]
-      prov_type = params[:type].to_sym
+    def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil)
+      prov_type = Match.profile_type_sym(params[:type])
 
       profile_name = [Match::Generator.profile_type_name(prov_type), app_identifier].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      profiles = Dir[File.join(params[:workspace], "profiles", prov_type.to_s, "#{profile_name}.mobileprovision")]
+      base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
+      profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles
       profile = profiles.last
@@ -90,10 +110,19 @@ module Match
       end
 
       if profile.nil? or params[:force]
-        UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        if params[:readonly]
+          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with? "." }
+          UI.error "No matching provisioning profiles found for '#{profile_name}'"
+          UI.error "A new one cannot be created because you enabled `readonly`"
+          UI.error "Provisioning profiles in your repo for type `#{prov_type}`:"
+          all_profiles.each { |p| UI.error "- '#{p}'" }
+          UI.error "If you are certain that a profile should exist, double-check the recent changes to your match repository"
+          UI.user_error! "No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information."
+        end
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
-                                                  certificate_id: certificate_id)
+                                                  certificate_id: certificate_id,
+                                                  app_identifier: app_identifier)
         self.changes_to_commit = true
       end
 
@@ -101,6 +130,13 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
+
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+        # This profile is invalid, let's remove the local file and generate a new one
+        File.delete(profile)
+        self.changes_to_commit = true
+        return nil
+      end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
                                                                        type: prov_type),

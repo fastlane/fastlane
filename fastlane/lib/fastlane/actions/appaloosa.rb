@@ -185,6 +185,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: 'FL_APPALOOSA_API_TOKEN',
+                                       sensitive: true,
                                        description: "Your API token"),
           FastlaneCore::ConfigItem.new(key: :store_id,
                                        env_name: 'FL_APPALOOSA_STORE_ID',

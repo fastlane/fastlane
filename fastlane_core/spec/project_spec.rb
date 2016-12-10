@@ -184,7 +184,7 @@ describe FastlaneCore do
       end
 
       it "#configurations returns all available configurations" do
-        expect(@project.configurations).to eq(["Debug", "Release"])
+        expect(@project.configurations).to eq(["Debug", "Release", "SpecialConfiguration"])
       end
 
       it "#app_name" do
@@ -268,7 +268,43 @@ describe FastlaneCore do
       end
     end
 
-    describe "Build Settings" do
+    describe "Cross-Platform Project" do
+      before do
+        options = { project: "./spec/fixtures/projects/Cross-Platform.xcodeproj" }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+      end
+
+      it "supported_platforms" do
+        expect(@project.supported_platforms).to eq([:macOS, :iOS, :tvOS, :watchOS])
+      end
+
+      it "#mac?" do
+        expect(@project.mac?).to eq(true)
+      end
+
+      it "#ios?" do
+        expect(@project.ios?).to eq(true)
+      end
+
+      it "#tvos?" do
+        expect(@project.tvos?).to eq(true)
+      end
+
+      it "schemes" do
+        expect(@project.schemes).to eq(["CrossPlatformFramework"])
+      end
+    end
+
+    describe "build_settings() can handle empty lines" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos" do
+        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./spec/fixtures/projects/build_settings_with_toolchains"))
+        expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
+      end
+    end
+
+    describe "Build Settings with default configuration" do
       before do
         options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
@@ -276,6 +312,28 @@ describe FastlaneCore do
 
       it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
         expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
+      end
+
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app" do
+        expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+    end
+
+    describe "Build Settings with specific configuration" do
+      before do
+        options = {
+          project: "./spec/fixtures/projects/Example.xcodeproj",
+          configuration: "SpecialConfiguration"
+        }
+        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+      end
+
+      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
+        expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
+      end
+
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app.special" do
+        expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app.special")
       end
     end
 

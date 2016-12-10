@@ -25,6 +25,8 @@ require 'fastlane_core/project'
 require 'fastlane_core/device_manager'
 require 'fastlane_core/ui/ui'
 require 'fastlane_core/tool_collector'
+require 'fastlane_core/fastlane_folder'
+require 'fastlane_core/keychain_importer'
 
 # Third Party code
 require 'colored'
@@ -35,4 +37,12 @@ require 'fastlane_core/ui/fastlane_runner' # monkey patch
 
 module FastlaneCore
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
+  # A directory that's being used to user-wide fastlane configs
+  # This directory is also used for the bundled fastlane
+  def self.fastlane_user_dir
+    path = File.expand_path(File.join("~", ".fastlane"))
+    FileUtils.mkdir_p(path) unless File.directory?(path)
+    return path
+  end
 end

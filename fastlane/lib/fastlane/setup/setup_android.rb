@@ -1,15 +1,10 @@
 module Fastlane
   class SetupAndroid < Setup
     def run
-      if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("Fastlane already set up at path #{folder}")
-        return
-      end
-
       response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
       return unless response
 
-      FastlaneFolder.create_folder! unless Helper.is_test?
+      FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
       FileUtils.mkdir(File.join(folder, 'actions')) unless File.directory?(File.join(folder, 'actions'))
       generate_appfile
       generate_fastfile
@@ -70,7 +65,7 @@ module Fastlane
     end
 
     def folder
-      FastlaneFolder.path
+      FastlaneCore::FastlaneFolder.path
     end
   end
 end

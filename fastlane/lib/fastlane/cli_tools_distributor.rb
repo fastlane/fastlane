@@ -18,13 +18,6 @@ module Fastlane
           print_slow_fastlane_warning
         end
 
-        # Array of symbols for the names of the available lanes
-        # This doesn't actually use the Fastfile parser, but only
-        # the available lanes. This way it's much faster, which
-        # is very important in this case, since it will be executed
-        # every time one of the tools is launched
-        available_lanes = Fastlane::FastlaneFolder.available_lanes
-
         tool_name = ARGV.first ? ARGV.first.downcase : nil
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
@@ -61,7 +54,7 @@ module Fastlane
 
       def print_slow_fastlane_warning
         # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
-        return if ENV['BUNDLE_BIN_PATH'] || ENV['SKIP_SLOW_FASTLANE_WARNING']
+        return if ENV['BUNDLE_BIN_PATH'] || ENV['SKIP_SLOW_FASTLANE_WARNING'] || FastlaneCore::Helper.contained_fastlane?
 
         gemfile_path = PluginManager.new.gemfile_path
         if gemfile_path
@@ -94,6 +87,19 @@ module Fastlane
         UI.important "For more information, check out https://guides.cocoapods.org/using/a-gemfile.html"
 
         sleep 1
+      end
+
+      # Returns an array of symbols for the available lanes for the Fastfile
+      # This doesn't actually use the Fastfile parser, but only
+      # the available lanes. This way it's much faster, which
+      # is very important in this case, since it will be executed
+      # every time one of the tools is launched
+      # Use this only if performance is :key:
+      def available_lanes
+        fastfile_path = FastlaneCore::FastlaneFolder.fastfile_path
+        return [] if fastfile_path.nil?
+        output = `cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+        return output.strip.split(" ").collect(&:to_sym)
       end
     end
   end

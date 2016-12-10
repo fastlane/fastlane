@@ -47,6 +47,7 @@ module Fastlane
                                        description: 'Message text'),
           FastlaneCore::ConfigItem.new(key: :token,
                                        env_name: 'FL_FLOCK_TOKEN',
+                                       sensitive: true,
                                        description: 'Token for the Flock incoming webhook'),
           FastlaneCore::ConfigItem.new(key: :base_url,
                                        env_name: 'FL_FLOCK_BASE_URL',

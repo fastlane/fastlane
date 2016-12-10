@@ -107,7 +107,7 @@ open class Snapshot: NSObject {
 
     class func waitForLoadingIndicatorToDisappear() {
         #if os(tvOS)
-            return;
+            return
         #endif
 
         let query = XCUIApplication().statusBars.children(matching: .other).element(boundBy: 1).children(matching: .other)

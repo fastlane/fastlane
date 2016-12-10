@@ -1,0 +1,15 @@
+Build settings from command line:
+    TOOLCHAINS = com.apple.dt.toolchain.XcodeDefault
+
+Build settings for action clean and target app:
+    ACTION = clean
+    SUPPORTED_DEVICE_FAMILIES = 1,2
+    SUPPORTED_PLATFORMS = iphonesimulator iphoneos
+    variant = normal
+
+Build settings for action clean and target appTest:
+    ACTION = clean'
+    SUPPORTED_DEVICE_FAMILIES = 1,2
+    SUPPORTED_PLATFORMS = iphonesimulator iphoneos
+    variant = normal
+

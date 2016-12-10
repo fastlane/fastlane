@@ -32,11 +32,10 @@ frameit
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/frameit/LICENSE)
 [![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Quickly put your screenshots into the right device frames
 
-`frameit` allows you to put a gorgeous device frame around your iOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
+`frameit` allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
@@ -52,15 +51,17 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 </p>
 
 -------
-<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
 # Features
 
-Put a gorgeous device frame around your iOS screenshots just by running one simple command. Support for:
-- iPhone 6 Plus, iPhone 6, iPhone 5s and iPad mini
-- Portrait and Landscape
-- Black and Silver devices
+Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
+- iPhone, iPad and Mac
+- Portrait and Landscape modes
+- Several colors
+
+The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
@@ -92,17 +93,9 @@ Install the gem
 
     sudo gem install frameit
 
-Because of legal reasons, I can not pre-package the device frames with ```frameit```.
+The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
-The process of adding is really easy, just run ```frameit``` and the guide will help you set it up.
-You only have to do this once per computer.
-
-- Run ```frameit```
-- Press ```Enter```. The [Apple page](https://developer.apple.com/app-store/marketing/guidelines/#images) to download the images should open in your browser.
-- Download the devices you want to use
-- Press ```Enter```
-- Unzip and move the content of the zip files to ```~/.frameit/devices_frames```
-- Press ```Enter```
+More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 
 # Usage
 
@@ -116,9 +109,9 @@ To use the silver version of the frames:
 
     frameit silver
 
-To run the setup process again to add new frames use:
+To download the latest frames
 
-    frameit setup
+    frameit download_frames
 
 When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
@@ -134,6 +127,7 @@ Use it to define the general information:
 
 ```json
 {
+  "device_frame_version": "latest",
   "default": {
     "keyword": {
       "font": "./fonts/MyFont-Rg.otf"
@@ -235,7 +229,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles

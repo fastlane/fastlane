@@ -1,5 +1,4 @@
 require 'spaceship'
-require 'babosa'
 
 module Produce
   class DeveloperCenter
@@ -16,11 +15,18 @@ module Produce
         ENV["CREATED_NEW_APP_ID"] = nil
         # Nothing to do here
       else
-        app_name = valid_name_for(Produce.config[:app_name])
+        app_name = Produce.config[:app_name]
         UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
-                                         name: app_name)
+                                         name: app_name,
+                                         mac: Produce.config[:platform] == "osx")
+
+        if app.name != Produce.config[:app_name]
+          UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
+          UI.important("To fix this a unique (internal) name '#{app.name}' has been created for you. Your app's real name '#{Produce.config[:app_name]}'")
+          UI.important("will still show up correctly on iTunes Connect and the App Store.")
+        end
 
         UI.message "Created app #{app.app_id}"
 
@@ -34,11 +40,6 @@ module Produce
       return true
     end
 
-    def valid_name_for(input)
-      latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
-    end
-
     def app_identifier
       Produce.config[:app_identifier].to_s
     end
@@ -46,7 +47,7 @@ module Produce
     private
 
     def app_exists?
-      Spaceship.app.find(app_identifier) != nil
+      Spaceship.app.find(app_identifier, mac: Produce.config[:platform] == "osx") != nil
     end
 
     def login

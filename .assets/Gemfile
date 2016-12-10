@@ -1,0 +1,34 @@
+# More information about how to use this file in [CONTRIBUTING.md](CONTRIBUTING.md)
+
+source "https://rubygems.org"
+
+local_fastlane_path = "<YOUR_LOCAL_FASTLANE_CLONE>"
+
+if File.exist?(File.join(File.expand_path(local_fastlane_path), "fastlane.gemspec"))
+  local_fastlane_path = File.expand_path("..", local_fastlane_path)
+end
+
+tools = [
+  "fastlane_core",
+  "spaceship",
+  "fastlane",
+  "cert",
+  "credentials_manager",
+  "deliver",
+  "frameit",
+  "gym",
+  "match",
+  "pem",
+  "pilot",
+  "produce",
+  "scan",
+  "screengrab",
+  "sigh",
+  "snapshot",
+  "supply",
+  "watchbuild",
+]
+
+tools.each do |tool|
+  gem tool, path: File.join(local_fastlane_path, tool)
+end

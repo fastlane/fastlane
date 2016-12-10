@@ -51,7 +51,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 
 -------
 
-<h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 
@@ -128,15 +128,19 @@ Get a list of all available options using
 
 ```
     --app-group          Enable App Groups
+    --apple-pay          Enable Apple Pay
     --associated-domains Enable Associated Domains
     --data-protection STRING Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+    --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
     --wireless-conf      Enable Wireless Accessory Configuration
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
+    --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
     --passbook           Enable Passbook
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
+    --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
 ```
 
@@ -144,15 +148,19 @@ Get a list of all available options using
 
 ```
     --app-group          Disable App Groups
+    --apple-pay          Disable Apple Pay
     --associated-domains Disable Associated Domains
     --data-protection    Disable Data Protection
+    --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
     --wireless-conf      Disable Wireless Accessory Configuration
     --icloud             Disable iCloud
+    --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
     --passbook           Disable Passbook
     --push-notification  Disable Push notifications
+    --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
 ```
 
@@ -195,7 +203,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

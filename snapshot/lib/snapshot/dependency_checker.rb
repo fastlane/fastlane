@@ -10,7 +10,7 @@ module Snapshot
     def self.check_xcode_select
       unless `xcode-select -v`.include? "xcode-select version"
         UI.error '#############################################################'
-        UI.error "# You have to install the Xcode commdand line tools to use snapshot"
+        UI.error "# You have to install Xcode command line tools to use snapshot"
         UI.error "# Install the latest version of Xcode from the AppStore"
         UI.error "# Run xcode-select --install to install the developer tools"
         UI.error '#############################################################'

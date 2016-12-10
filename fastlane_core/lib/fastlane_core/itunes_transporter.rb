@@ -65,7 +65,7 @@ module FastlaneCore
         UI.important(@warnings.join("\n"))
       end
 
-      if @errors.join("").include?("Sign in with the app-specific")
+      if @errors.join("").include?("app-specific")
         raise TransporterRequiresApplicationSpecificPasswordError
       end
 
@@ -73,7 +73,15 @@ module FastlaneCore
         UI.error(@errors.join("\n"))
       end
 
-      @errors.count.zero?
+      # this is to handle GitHub issue #1896, which occurs when an
+      #  iTMSTransporter file transfer fails; iTMSTransporter will log an error
+      #  but will then retry; if that retry is successful, we will see the error
+      #  logged, but since the status code is zero, we want to return success
+      if @errors.count > 0 && exit_status.zero?
+        UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
+      end
+
+      exit_status.zero?
     end
 
     private

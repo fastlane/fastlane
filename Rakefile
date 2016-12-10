@@ -10,7 +10,6 @@ SECONDS_PER_DAY = 60 * 60 * 24
 desc 'Setup the fastlane development environment'
 task :bootstrap do
   system('gem install bundler') unless system('which bundle')
-  Rake::Task[:clone].invoke
   Rake::Task[:install].invoke
 
   box 'You are up and running'
@@ -31,7 +30,7 @@ task install: :bundle do
 end
 
 task :rubygems_admins do
-  names = ["KrauseFx", "ohayon", "samrobbins", "hemal", "asfalcone", "mpirri", "mfurtak", "i2amsam"]
+  names = ["KrauseFx", "ohayon", "hemal", "asfalcone", "mpirri", "mfurtak", "milch"]
   (GEMS + ["krausefx-shenzhen"]).each do |gem_name|
     names.each do |name|
       puts `gem owner #{gem_name} -a #{name}`

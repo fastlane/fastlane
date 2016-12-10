@@ -109,7 +109,7 @@ public class Snapshot: NSObject {
 
     class func waitForLoadingIndicatorToDisappear() {
         #if os(tvOS)
-            return;
+            return
         #endif
 
         let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)

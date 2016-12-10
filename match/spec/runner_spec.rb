@@ -18,9 +18,10 @@ describe Match do
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution).and_return(cert_path)
       expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                             prov_type: :appstore,
-                                                                       certificate_id: "something").and_return(profile_path)
+                                                                       certificate_id: "something",
+                                                                       app_identifier: values[:app_identifier]).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path)
-      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated tools.fastlane.app for appstore", git_url, "master")
+      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore", git_url, "master")
 
       spaceship = "spaceship"
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
@@ -46,12 +47,12 @@ describe Match do
       keychain = "login.keychain"
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master").and_return(repo_dir)
-      expect(Match::Utils).to receive(:import).with(key_path, keychain).and_return(nil)
+      expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
       expect(Match::GitHelper).to_not receive(:commit_changes)
 
       # To also install the certificate, fake that
       expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path).and_return(false)
-      expect(Match::Utils).to receive(:import).with(cert_path, keychain).and_return(nil)
+      expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
 
       spaceship = "spaceship"
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)

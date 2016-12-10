@@ -84,11 +84,11 @@ end
 
 def adp_stub_devices
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { deviceClasses: 'iphone', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { deviceClasses: 'iphone', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesiPhone.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { deviceClasses: 'ipod', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { deviceClasses: 'ipod', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesiPod.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
@@ -96,20 +96,32 @@ def adp_stub_devices
     to_return(status: 200, body: adp_read_fixture_file('listDevicesTV.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesWatch.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { deviceClasses: 'tvOS', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { deviceClasses: 'tvOS', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesTV.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesWatch.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
+    with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "true" }).
+    to_return(status: 200, body: adp_read_fixture_file('listDevicesDisabled.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/deleteDevice.action').
+    with(body: { "deviceId" => "AAAAAAAAAA", "teamId" => "XXXXXXXXXX" }).
+    to_return(status: 200, body: adp_read_fixture_file('deleteDevice.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/enableDevice.action').
+    with(body: { "deviceNumber" => "44ee59893cb94ead4635743b25012e5b9f8c67c1", "displayId" => "DISABLED_B", "teamId" => "XXXXXXXXXX" }).
+    to_return(status: 200, body: adp_read_fixture_file('enableDevice.action.json'), headers: { 'Content-Type' => 'application/json' })
 
   # Register a new device
   stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/addDevice.action?deviceNumber=7f6c8dc83d77134b5a3a1c53f1202b395b04482b&name=Demo%20Device&teamId=XXXXXXXXXX").
@@ -117,10 +129,10 @@ def adp_stub_devices
 
   # Custom paging
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
-    with(body: { "pageNumber" => "1", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
+    with(body: { "pageNumber" => "1", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesPage1-2.action.json'), headers: { 'Content-Type' => 'application/json' })
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
-    with(body: { "pageNumber" => "2", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
+    with(body: { "pageNumber" => "2", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
     to_return(status: 200, body: adp_read_fixture_file('listDevicesPage2-2.action.json'), headers: { 'Content-Type' => 'application/json' })
 end
 
@@ -168,6 +180,10 @@ def adp_stub_apps
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
     with(body: { "name" => "Development App", "identifier" => "tools.fastlane.spaceship.*", "teamId" => "XXXXXXXXXX", "type" => "wildcard" }).
     to_return(status: 200, body: adp_read_fixture_file('addAppId.action.wildcard.json'), headers: { 'Content-Type' => 'application/json' })
+
+  stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
+    with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "pp Test 1ed9e25c93ac7142ff9df53e7f80e84c", "push" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+    to_return(status: 200, body: adp_read_fixture_file('addAppId.action.apostroph.json'), headers: { 'Content-Type' => 'application/json' })
 
   stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteAppId.action").
     with(body: { "appIdId" => "LXD24VUE49", "teamId" => "XXXXXXXXXX" }).

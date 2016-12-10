@@ -33,7 +33,6 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
@@ -51,7 +50,8 @@ module Gym
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :archive
+        actions << :archive unless Gym.project.library? || Gym.project.framework?
+        actions << :build if Gym.project.library? || Gym.project.framework?
 
         actions
       end
@@ -77,13 +77,13 @@ module Gym
           report_output_json = Gym.config[:xcpretty_report_json]
           if report_output_junit
             pipe << " --report junit --output "
-            pipe << report_output_junit
+            pipe << report_output_junit.shellescape
           elsif report_output_html
             pipe << " --report html --output "
-            pipe << report_output_html
+            pipe << report_output_html.shellescape
           elsif report_output_json
             pipe << " --report json-compilation-database --output "
-            pipe << report_output_json
+            pipe << report_output_json.shellescape
           end
         end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]

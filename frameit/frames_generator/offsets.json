@@ -1,0 +1,36 @@
+{
+  "portrait": {
+    "iPhone SE": {
+      "offset": "+64+237",
+      "width": 640
+    },
+    "iPhone 5s": {
+      "offset": "+60+232",
+      "width": 649
+    },
+    "iPhone 6s": {
+      "offset": "+60+225",
+      "width": 752
+    },
+    "iPhone 6s Plus": {
+      "offset": "+102+378",
+      "width": 1250
+    },
+    "iPhone 7": {
+      "offset": "+61+228",
+      "width": 750
+    },
+    "iPhone 7 Plus": {
+      "offset": "+104+380",
+      "width": 1242
+    },
+    "iPad Air 2": {
+      "offset": "+111+224",
+      "width": 1536
+    },
+    "iPad Pro": {
+      "offset": "+118+215",
+      "width": 2050
+    }
+  }
+}

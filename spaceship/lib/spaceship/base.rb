@@ -123,7 +123,8 @@ module Spaceship
         else
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
-          rescue NameError, NoMethodError
+          rescue NoMethodError
+          rescue NameError
           end
         end
         return @attr_mapping

@@ -5,6 +5,8 @@ require 'faraday-cookie_jar'
 require 'spaceship/ui'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/helper/net_http_generic_request'
+require 'tmpdir'
+require 'spaceship/babosa_fix'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -101,8 +103,8 @@ module Spaceship
     def initialize
       options = {
        request: {
-          timeout:       300,
-          open_timeout:  300
+          timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
       @cookie = HTTP::CookieJar.new
@@ -155,6 +157,7 @@ module Spaceship
 
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
+      FileUtils.mkdir_p(File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
@@ -162,9 +165,21 @@ module Spaceship
       return File.read(path)
     end
 
+    # Returns preferred path for storing cookie
+    # for two step verification.
     def persistent_cookie_path
-      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
-      FileUtils.mkdir_p(File.expand_path("..", path))
+      if ENV["SPACESHIP_COOKIE_PATH"]
+        path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
+      else
+        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+          dir_parts = File.split(dir)
+          if directory_accessible?(dir_parts.first)
+            path = File.expand_path(File.join(dir, self.user, "cookie"))
+            break
+          end
+        end
+      end
+
       return path
     end
 
@@ -288,7 +303,7 @@ module Spaceship
       end
 
       # get woinst, wois, and itctx cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
 
       case response.status
       when 403
@@ -369,25 +384,6 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    private
-
-    def do_login(user, password)
-      @loggedin = false
-      ret = send_login_request(user, password) # different in subclasses
-      @loggedin = true
-      ret
-    end
-
-    # Is called from `parse_response` to store the latest csrf_token (if available)
-    def store_csrf_tokens(response)
-      if response and response.headers
-        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
-          @csrf_tokens = tokens
-        end
-      end
-    end
-
     def request(method, url_or_path = nil, params = nil, headers = {}, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
@@ -406,6 +402,44 @@ module Spaceship
       log_response(method, url_or_path, response)
 
       return response
+    end
+
+    def parse_response(response, expected_key = nil)
+      if response.body
+        # If we have an `expected_key`, select that from response.body Hash
+        # Else, don't.
+        content = expected_key ? response.body[expected_key] : response.body
+      end
+
+      if content.nil?
+        raise UnexpectedResponse, response.body
+      else
+        store_csrf_tokens(response)
+        content
+      end
+    end
+
+    private
+
+    def directory_accessible?(path)
+      Dir.exist?(File.expand_path(path))
+    end
+
+    def do_login(user, password)
+      @loggedin = false
+      ret = send_login_request(user, password) # different in subclasses
+      @loggedin = true
+      ret
+    end
+
+    # Is called from `parse_response` to store the latest csrf_token (if available)
+    def store_csrf_tokens(response)
+      if response and response.headers
+        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
+        if tokens and !tokens.empty?
+          @csrf_tokens = tokens
+        end
+      end
     end
 
     def log_request(method, url, params)
@@ -439,21 +473,6 @@ module Spaceship
           raise AppleTimeoutError.new, "Apple 302 detected"
         end
         return response
-      end
-    end
-
-    def parse_response(response, expected_key = nil)
-      if response.body
-        # If we have an `expected_key`, select that from response.body Hash
-        # Else, don't.
-        content = expected_key ? response.body[expected_key] : response.body
-      end
-
-      if content.nil?
-        raise UnexpectedResponse, response.body
-      else
-        store_csrf_tokens(response)
-        content
       end
     end
 

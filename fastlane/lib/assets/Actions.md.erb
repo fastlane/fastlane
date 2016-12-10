@@ -60,6 +60,7 @@ Key | Description
 ----|------------
 <%- (action.available_options || []).each do |config_item| -%>
   <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
+  <%- next if config_item.description.to_s.length == 0 -%>
   `<%= config_item.key %>` | <%= config_item.description %>
 <%- end %>
 </details>

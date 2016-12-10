@@ -27,10 +27,9 @@
 </p>
 -------
 
-[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/spaceship/LICENSE)
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/spaceship/LICENSE)
 [![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 `spaceship` exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
 
@@ -48,7 +47,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 -------
 
-<h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's spaceship?
 
@@ -112,7 +111,7 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 ## 2 Step Verification
 
-When your Apple account has 2 step verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
+When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
 Since your CI system probably doesn't allow you to input values (like the verification code), you can use `spaceauth`:
 
@@ -128,9 +127,9 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 
 Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`.
 
-### Spaceship in use
+### _spaceship_ in use
 
-Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
+All [fastlane tools](https://fastlane.tools) that communicate with Apple's web services in some way, use _spaceship_ to do so.
 
 # Technical Details
 
@@ -148,12 +147,11 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 
 ## API Endpoints
 
-I won't go into too much technical details about the various API endpoints, but just to give you an idea:
+Overview of the used API endpoints
 
 - `https://idmsa.apple.com`: Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
- - Get a detailed list of all available provisioning profiles
- - This API returns the devices, certificates and app for each of the profiles
+ - Get a list of all available provisioning profiles
  - Register new devices
 - `https://developer.apple.com`:
  - List all devices, certificates, apps and app groups

@@ -24,7 +24,6 @@ fastlane
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
@@ -52,7 +51,7 @@ Store your configuration in a text file to easily test, build, and deploy from _
 
 Define different environments (`lanes`) in your `Fastfile`: Examples are: `appstore`, `beta` and `test`.
 
-You define a `lane` like this (more details about the commands in the [Actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) documentation):
+You define a `lane` like this (more details about the commands in the [Actions](https://docs.fastlane.tools/actions) documentation):
 
 ```ruby
 lane :release do
@@ -126,7 +125,7 @@ The setup assistant will create all the necessary files for you, using the exist
 - ```cd [your_project_folder]```
 - ```fastlane init```
 - Follow the setup assistant, which will set up ```fastlane``` for you
-- Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+- Further customise the ```Fastfile``` with [actions](https://docs.fastlane.tools/actions).
 
 For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
 
@@ -145,6 +144,7 @@ Usually you'll use fastlane by triggering individual lanes:
 - `fastlane lanes`: Lists all available lanes with description
 - `fastlane list`: Lists all available lanes without description
 - `fastlane new_action`: Create a new action (integration) for fastlane
+- `fastlane env`: Print out the fastlane ruby environment when submitting an issue
 
 ## Examples
 

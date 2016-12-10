@@ -177,6 +177,13 @@ module FastlaneCore
 
       # `if value == nil` instead of ||= because false is also a valid value
       if value.nil? and option.env_name and ENV[option.env_name]
+
+        # We want to inform the user that we took the value
+        # from an environment variable
+        # however we don't print the actual value, as it may contain sensitive information
+        # The user can easily find the actual value by print out the environment
+        UI.verbose("Taking value for '#{key}' from environment variable '#{option.env_name}'")
+
         value = option.auto_convert_value(ENV[option.env_name].dup)
         option.verify!(value) if value
       end
@@ -200,7 +207,7 @@ module FastlaneCore
 
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
-        value = UI.input("#{option.description}: ")
+        value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
           set(key, value)

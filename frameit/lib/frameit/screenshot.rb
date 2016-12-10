@@ -22,22 +22,31 @@ module Frameit
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
       when sizes::IOS_55
-        return 'iPhone-6s-Plus'
+        return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s Plus' : 'iPhone 7 Plus'
       when sizes::IOS_47
-        return 'iPhone-6s'
+        return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s' : 'iPhone 7'
       when sizes::IOS_40
-        return Frameit.config[:use_legacy_iphone5s] ? 'iPhone_5s' : 'iPhone-SE'
+        return Frameit.config[:use_legacy_iphone5s] ? 'iPhone 5s' : 'iPhone SE'
       when sizes::IOS_35
-        return 'iPhone_4'
+        return 'iPhone 4'
       when sizes::IOS_IPAD
-        return 'iPad-mini'
+        return 'iPad Air 2'
       when sizes::IOS_IPAD_PRO
-        return 'iPad-Pro'
+        return 'iPad Pro'
       when sizes::MAC
-        return 'Mac'
+        return 'MacBook'
       else
         UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
       end
+    end
+
+    def color
+      if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
+        if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
+          return "Matte Black" # RIP space gray
+        end
+      end
+      return @color
     end
 
     # Is the device a 3x device? (e.g. 6 Plus)
@@ -45,7 +54,7 @@ module Frameit
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55)
     end
 
-    # Super old devices
+    # Super old devices (iPhone 4)
     def mini?
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35)
     end

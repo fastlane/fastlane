@@ -23,7 +23,7 @@ module Deliver
       app = options[:app]
 
       details = app.details
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         current = options[key]

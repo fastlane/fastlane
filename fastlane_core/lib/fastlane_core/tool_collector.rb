@@ -61,13 +61,16 @@ module FastlaneCore
         show_message
       end
 
+      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
       require 'excon'
       url = HOST_URL + '/did_launch?'
       url += URI.encode_www_form(
         versions: versions.to_json,
         steps: launches.to_json,
-        error: @error,
-        crash: @crash ? @error : nil
+        error: @error || "",
+        crash: @crash ? @error : "",
+        fastfile_id: ENV["GENERATED_FASTFILE_ID"] || ""
       )
 
       if Helper.is_test? # don't send test data
@@ -126,10 +129,16 @@ module FastlaneCore
     end
 
     def did_show_message?
-      path = File.join(File.expand_path('~'), '.did_show_opt_info')
-      did_show = File.exist?(path)
-      File.write(path, '1') unless did_show
-      did_show
+      file_name = ".did_show_opt_info"
+
+      legacy_path = File.join(File.expand_path('~'), file_name)
+      new_path = File.join(FastlaneCore.fastlane_user_dir, file_name)
+      did_show = File.exist?(new_path) || File.exist?(legacy_path)
+
+      return did_show if did_show
+
+      File.write(new_path, '1')
+      false
     end
 
     def determine_version(name)

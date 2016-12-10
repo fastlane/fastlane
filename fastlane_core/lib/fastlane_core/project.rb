@@ -172,22 +172,84 @@ module FastlaneCore
       return "App" # default value
     end
 
+    def dynamic_library?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic")
+    end
+
+    def static_library?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.static")
+    end
+
+    def library?
+      (static_library? || dynamic_library?)
+    end
+
+    def framework?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.framework")
+    end
+
+    def application?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.application")
+    end
+
+    def ios_library?
+      ((static_library? or dynamic_library?) && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def ios_tvos_app?
+      (ios? || tvos?)
+    end
+
+    def ios_framework?
+      (framework? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def ios_app?
+      (application? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+    end
+
+    def produces_archive?
+      !(framework? || static_library? || dynamic_library?)
+    end
+
+    def mac_app?
+      (application? && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def mac_library?
+      ((dynamic_library? or static_library?) && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def mac_framework?
+      (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def command_line_tool?
+      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool")
+    end
+
     def mac?
-      # Some projects have different values... we have to look for all of them
-      return true if build_settings(key: "PLATFORM_NAME") == "macosx"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "macOS"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME") == "OS X"
-      false
+      supported_platforms.include?(:macOS)
     end
 
     def tvos?
-      return true if build_settings(key: "PLATFORM_NAME").to_s.include? "appletv"
-      return true if build_settings(key: "PLATFORM_DISPLAY_NAME").to_s.include? "tvOS"
-      false
+      supported_platforms.include?(:tvOS)
     end
 
     def ios?
-      !mac? && !tvos?
+      supported_platforms.include?(:iOS)
+    end
+
+    def supported_platforms
+      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
+      supported_platforms.map do |platform|
+        case platform
+        when "macosx" then :macOS
+        when "iphonesimulator", "iphoneos" then :iOS
+        when "watchsimulator", "watchos" then :watchOS
+        when "appletvsimulator", "appletvos" then :tvOS
+        end
+      end.uniq.compact
     end
 
     def xcodebuild_parameters
@@ -195,6 +257,7 @@ module FastlaneCore
       proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
+      proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
 
       return proj
     end
@@ -233,7 +296,11 @@ module FastlaneCore
       end
 
       begin
-        result = @build_settings.split("\n").find { |c| c.split(" = ").first.strip == key }
+        result = @build_settings.split("\n").find do |c|
+          sp = c.split(" = ")
+          next if sp.length == 0
+          sp.first.strip == key
+        end
         return result.split(" = ").last
       rescue => ex
         return nil if optional # an optional value, we really don't care if something goes wrong

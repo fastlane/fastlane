@@ -14,6 +14,7 @@ module Fastlane
         command = "swiftlint #{params[:mode]}"
         command << " --strict" if params[:strict]
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
+        command << " --reporter #{params[:reporter]}" if params[:reporter]
 
         if params[:files]
           if version < Gem::Version.new('0.5.1') and !Helper.test?
@@ -72,6 +73,10 @@ module Fastlane
                                                     don't fail the build (true/false)",
                                        default_value: false,
                                        is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :reporter,
+                                       description: 'Choose output reporter',
+                                       is_string: true,
                                        optional: true)
         ]
       end

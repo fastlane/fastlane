@@ -18,8 +18,9 @@ module Fastlane
           # ensure that the xcodeproj passed in was OK
           UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
         else
+          all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0

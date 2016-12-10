@@ -72,6 +72,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :slack_url,
                                        env_name: "SLACK_URL",
+                                       sensitive: true,
                                        description: "Create an Incoming WebHook for your Slack group",
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
@@ -156,7 +157,7 @@ module Fastlane
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
 
         slack_attachment = {
           fallback: options[:message],

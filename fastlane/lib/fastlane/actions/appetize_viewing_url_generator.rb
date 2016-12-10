@@ -48,6 +48,7 @@ module Fastlane
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "Public key of the app you wish to update",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY],
                                        optional: false,
                                        verify_block: proc do |value|

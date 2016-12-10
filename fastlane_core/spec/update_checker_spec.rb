@@ -36,6 +36,31 @@ describe FastlaneCore do
       end
     end
 
+    describe "#update_command" do
+      before do
+        ENV.delete("BUNDLE_BIN_PATH")
+        ENV.delete("BUNDLE_GEMFILE")
+      end
+
+      it "works a custom gem name" do
+        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem update gym")
+      end
+
+      it "works with system ruby" do
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem update fastlane")
+      end
+
+      it "works with bundler" do
+        ENV["BUNDLE_BIN_PATH"] = "/tmp"
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("bundle update fastlane")
+      end
+
+      it "works with bundled fastlane" do
+        ENV["FASTLANE_SELF_CONTAINED"] = "true"
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
+      end
+    end
+
     describe "#p_hash?" do
       let (:package_name) { 'com.test.app' }
 

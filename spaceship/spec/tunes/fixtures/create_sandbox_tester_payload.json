@@ -25,10 +25,10 @@
       "value": 1
     },
     "secretQuestion": {
-      "value": "secret_question"
+      "value": "so_secret"
     },
     "secretAnswer": {
-      "value": "secret_answer"
+      "value": "so_secret"
     },
     "sandboxAccount": null
   }
