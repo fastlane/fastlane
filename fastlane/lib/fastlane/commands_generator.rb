@@ -95,6 +95,29 @@ module Fastlane
 
       always_trace!
 
+      command "validate-fastfile" do |c|
+        c.syntax = 'fastlane validate-fastfile /path/to/Fastfile'
+        c.option '--platforms STRING', String, 'Comma seperated list of platforms (ios, mac, android) of actions to validate (others will be skipped)'
+        c.action do |args, options|
+          if File.exist?(args.first)
+
+            plat = []
+            plat = options.platforms.split(",") if options.platforms
+            fl_parser = FastfileParser.new(content: File.read(args.first), filepath: args.first, name: "Fastfile", platforms: plat)
+            table = fl_parser.analyze
+            puts table
+            counters = fl_parser.counters
+          else
+            raise "File not found"
+          end
+
+          if counters[:all] == 0
+            puts "File succesfully validated".green
+          else
+            puts "Found: Errors/Deprecations/Info: #{counters[:errors].to_s.red}/#{counters[:deprecations].to_s.yellow}/#{counters[:infos].to_s.blue}"
+          end
+        end
+      end
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'

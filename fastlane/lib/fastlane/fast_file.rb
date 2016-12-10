@@ -217,9 +217,8 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', return_file: false)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
-
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
 
@@ -250,7 +249,7 @@ module Fastlane
           rescue
             # We don't care about a failure here, as local actions are optional
           end
-
+        return clone_folder if return_file
           import(File.join(clone_folder, path))
         end
       end
