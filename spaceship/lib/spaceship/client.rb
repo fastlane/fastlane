@@ -372,8 +372,13 @@ module Spaceship
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
-        do_login(self.user, @password)
         sleep 3 unless defined? SpecHelper
+        if @loggedin
+          # If we're not logged in yet, the `retry` call will re-trigger the login anyway
+          # That's why we only login again if that happens when we're already logged in, but the session
+          # got invalidated somehow
+          do_login(self.user, @password)
+        end
         retry
       end
       raise ex # re-raise the exception
