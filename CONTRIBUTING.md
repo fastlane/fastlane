@@ -2,14 +2,14 @@
 
 ## I want to report a problem or ask a question
 
-We use GitHub as support system, please submit a [new issue](https://github.com/fastlane/fastlane/issues/new) to ask questions or to report a problem. 
+We use GitHub as support system, please submit a [new issue](https://github.com/fastlane/fastlane/issues/new) to ask questions or to report a problem.
 
 Some people might also use the [_fastlane_ tag on StackOverflow](https://stackoverflow.com/questions/tagged/fastlane), however we don’t actively monitor issues submitted there.
 
 ## I want to contribute to _fastlane_
 
 - To start working on _fastlane_, check out [YourFirstPR.md][firstpr]
-- For some more advanced tooling and debugging tips, check out [ToolingAndDebugging.md](ToolingAndDebugging.md)
+- For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
 
 ### New Actions
 
