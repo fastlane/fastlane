@@ -60,42 +60,7 @@ git checkout pr-1234
 
 First of all, since we are testing code that is considered bleeding edge and might not be stable yet, make sure to **never test with an account that is provided by your employer and/or real, live apps!** Things might break irrevocably! For that reason, we recommend setting up an entirely new account and project for testing _fastlane_ PRs. 
 
-In your project, add the contents of the following snippet to the `Gemfile` in your project’s root folder:
-
-```ruby
-source "https://rubygems.org"
-
-local_fastlane_path = "<YOUR_LOCAL_FASTLANE_CLONE>"
-
-if File.exist?(File.join(File.expand_path(local_fastlane_path), "fastlane.gemspec"))
-  local_fastlane_path = File.expand_path("..", local_fastlane_path)
-end
-
-tools = [
-  "fastlane_core",
-  "spaceship",
-  "fastlane",
-  "cert",
-  "credentials_manager",
-  "deliver",
-  "frameit",
-  "gym",
-  "match",
-  "pem",
-  "pilot",
-  "produce",
-  "scan",
-  "screengrab",
-  "sigh",
-  "snapshot",
-  "supply",
-  "watchbuild",
-]
-
-tools.each do |tool|
-  gem tool, path: File.join(local_fastlane_path, tool)
-end
-```
+Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local fastlane clone and drop it into your project's root folder.
 
 Make sure to change the `local_fastlane_path` variable to point to your fastlane clone, e.g. `~/fastlane`, then you can run
 ```
