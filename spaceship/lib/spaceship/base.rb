@@ -185,8 +185,7 @@ module Spaceship
 
     # This method can be used by subclasses to do additional initialisation
     # using the `raw_data`
-    def setup
-    end
+    def setup; end
 
     #####################################################
     # @!group Storing the `attr_accessor`

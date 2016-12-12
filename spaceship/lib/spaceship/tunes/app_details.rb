@@ -122,8 +122,7 @@ module Spaceship
       #####################################################
       # @!group General
       #####################################################
-      def setup
-      end
+      def setup; end
 
       private
 
