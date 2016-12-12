@@ -24,6 +24,7 @@ module Gym
     end
 
     def run
+      program :name, 'gym'
       program :version, Gym::VERSION
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"

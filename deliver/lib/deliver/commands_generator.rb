@@ -31,6 +31,7 @@ module Deliver
     end
 
     def run
+      program :name, 'deliver'
       program :version, Deliver::VERSION
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'

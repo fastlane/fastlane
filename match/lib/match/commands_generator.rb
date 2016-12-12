@@ -15,6 +15,7 @@ module Match
     end
 
     def run
+      program :name, 'match'
       program :version, Match::VERSION
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'

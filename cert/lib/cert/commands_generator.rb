@@ -14,6 +14,7 @@ module Cert
     end
 
     def run
+      program :name, 'cert'
       program :version, Cert::VERSION
       program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
       program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
