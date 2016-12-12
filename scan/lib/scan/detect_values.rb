@@ -121,9 +121,11 @@ module Scan
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               potential_emptiness_error = lambda do |sims|
-                UI.error("No simulators found that are equal to the version " \
-                "of specifier (#{version}) and greater than or equal to the version " \
-                "of deployment target (#{deployment_target_version})") if sims.empty?
+                if sims.empty?
+                  UI.error("No simulators found that are equal to the version " \
+                  "of specifier (#{version}) and greater than or equal to the version " \
+                  "of deployment target (#{deployment_target_version})")
+                end
               end
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
