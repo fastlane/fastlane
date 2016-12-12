@@ -1,5 +1,1 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'deliver'
-Deliver::CommandsGenerator.start
+bin-proxy

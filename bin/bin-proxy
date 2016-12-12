@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+tool_name = File.basename($0)
+
+$LOAD_PATH.push File.expand_path("../#{tool_name}/lib", __FILE__)
+
+require tool_name
+require "#{tool_name}/commands_generator"
+Kernel.const_get("#{tool_name.capitalize}::CommandsGenerator").start

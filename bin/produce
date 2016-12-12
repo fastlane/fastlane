@@ -1,6 +1,1 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'produce'
-require 'produce/commands_generator'
-Produce::CommandsGenerator.start
+bin-proxy
