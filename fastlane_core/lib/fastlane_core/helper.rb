@@ -43,7 +43,22 @@ module FastlaneCore
     # Usually this means the fastlane directory is ~/.fastlane/bin/
     # We set this value via the environment variable `FASTLANE_SELF_CONTAINED`
     def self.contained_fastlane?
-      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true"
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
+    end
+
+    # returns true if fastlane was installed from the Fabric Mac app
+    def self.mac_app?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "false"
+    end
+
+    # returns true if fastlane was installed via Homebrew
+    def self.homebrew?
+      ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
+    end
+
+    # returns true if fastlane was installed via RubyGems
+    def self.rubygems?
+      !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -84,17 +99,17 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      ENV["FASTLANE_DISABLE_COLORS"]
+      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
     end
 
     # Does the user use the Mac stock terminal
     def self.mac_stock_terminal?
-      !!ENV["TERM_PROGRAM_VERSION"]
+      FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
     # Does the user use iTerm?
     def self.iterm?
-      !!ENV["ITERM_SESSION_ID"]
+      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
     end
 
     # Logs base directory
@@ -189,7 +204,7 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
       return '' unless self.is_mac? # so tests work on Linx too
 
       [

@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'krausefx-shenzhen', '>= 0.14.11', '< 1.0.0' # to upload to Hockey and Crashlytics and build the app
   spec.add_dependency 'slack-notifier', '>= 1.3', '< 2.0.0' # Slack notifications
   spec.add_dependency 'xcodeproj', '>= 0.20', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # prettify xcodebuild output
@@ -35,13 +34,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '>= 2.3', '< 3.0.0' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions
-  spec.add_dependency 'word_wrap', '~> 1.0.0'  # to add line breaks for tables with long strings
+  spec.add_dependency 'word_wrap', '~> 1.0.0' # to add line breaks for tables with long strings
 
-  spec.add_dependency "fastlane_core", ">= 0.58.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "fastlane_core", ">= 0.59.0", "< 1.0.0" # all shared code and dependencies
 
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency "credentials_manager", ">= 0.16.2", "< 1.0.0" # Password Manager
   spec.add_dependency "spaceship", ">= 0.38.5", "< 1.0.0" # communication layer with Apple's web services
+  spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
+  spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
   # All the fastlane tools
   spec.add_dependency "deliver", ">= 1.16.0", "< 2.0.0"

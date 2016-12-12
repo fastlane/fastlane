@@ -1,4 +1,6 @@
 machine:
+  environment:
+    FL_BUILDLOG_PATH: ~/Library/Logs
   xcode:
     version: "7.3"
 dependencies:

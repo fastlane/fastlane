@@ -1,7 +1,3 @@
-# Workaround, since hockeyapp.rb from shenzhen includes the code for commander
-def command(_param)
-end
-
 module Fastlane
   module Actions
     module SharedValues
@@ -10,11 +6,38 @@ module Fastlane
     end
 
     class HockeyAction < Action
+      def self.upload_build(api_token, ipa, options)
+        require 'faraday'
+        require 'faraday_middleware'
+
+        connection = Faraday.new(url: "https://upload.hockeyapp.net") do |builder|
+          builder.request :multipart
+          builder.request :url_encoded
+          builder.response :json, content_type: /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
+        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+
+        dsym_filename = options.delete(:dsym_filename)
+        if dsym_filename
+          options[:dsym] = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream')
+        end
+
+        connection.post do |req|
+          if options[:public_identifier].nil?
+            req.url("/api/2/apps/upload")
+          else
+            req.url("/api/2/apps/#{options.delete(:public_identifier)}/app_versions/upload")
+          end
+          req.headers['X-HockeyAppToken'] = api_token
+          req.body = options
+        end
+      end
+
       def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
-
-        require 'shenzhen'
-        require 'shenzhen/plugins/hockeyapp'
 
         build_file = [
           options[:ipa],
@@ -44,8 +67,6 @@ module Fastlane
 
         UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
 
-        client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
-
         values = options.values
         values[:dsym_filename] = dsym_filename
         values[:notes_type] = options[:notes_type]
@@ -55,7 +76,7 @@ module Fastlane
         ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
-        response = client.upload_build(ipa_filename, values)
+        response = self.upload_build(options[:api_token], ipa_filename, values)
         case response.status
         when 200...300
           url = response.body['public_url']

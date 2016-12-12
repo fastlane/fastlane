@@ -5,17 +5,33 @@ module Fastlane
     end
 
     class TestfairyAction < Action
+      def self.upload_build(ipa, options)
+        require 'faraday'
+        require 'faraday_middleware'
+
+        connection = Faraday.new(url: "https://app.testfairy.com") do |builder|
+          builder.request :multipart
+          builder.request :url_encoded
+          builder.response :json, content_type: /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
+        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+
+        symbols_file = options.delete(:symbols_file)
+        if symbols_file
+          options[:symbols_file] = Faraday::UploadIO.new(symbols_file, 'application/octet-stream')
+        end
+
+        connection.post do |req|
+          req.url("/api/upload/")
+          req.body = options
+        end
+      end
+
       def self.run(params)
-        require 'shenzhen'
-        require 'shenzhen/plugins/testfairy'
-
         UI.success('Starting with ipa upload to TestFairy...')
-
-        client = Shenzhen::Plugins::TestFairy::Client.new(
-          params[:api_key]
-        )
-
-        return params[:ipa] if Helper.test?
 
         metrics_to_client = lambda do |metrics|
           metrics.map do |metric|
@@ -70,7 +86,9 @@ module Fastlane
           end
         end]
 
-        response = client.upload_build(params[:ipa], client_options)
+        return params[:ipa] if Helper.test?
+
+        response = self.upload_build(params[:ipa], client_options)
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")

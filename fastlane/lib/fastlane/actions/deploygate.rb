@@ -1,7 +1,3 @@
-# Workaround, since deploygate.rb from shenzhen includes the code for commander
-def command(_param)
-end
-
 module Fastlane
   module Actions
     module SharedValues
@@ -17,27 +13,44 @@ module Fastlane
         platform == :ios
       end
 
-      def self.run(options)
-        require 'shenzhen'
-        require 'shenzhen/plugins/deploygate'
+      def self.upload_build(api_token, user_name, ipa, options)
+        require 'faraday'
+        require 'faraday_middleware'
 
+        connection = Faraday.new(url: DEPLOYGATE_URL_BASE, request: { timeout: 120 }) do |builder|
+          builder.request :multipart
+          builder.request :json
+          builder.response :json, content_type: /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
+        options.update({
+          token: api_token,
+          file: Faraday::UploadIO.new(ipa, 'application/octet-stream'),
+          message: options[:message] || ''
+        })
+
+        connection.post("/api/users/#{user_name}/apps", options)
+
+      rescue Faraday::Error::TimeoutError
+        UI.crash! "Timed out while uploading build. Check https://deploygate.com/ to see if the upload was completed."
+      end
+
+      def self.run(options)
         # Available options: https://deploygate.com/docs/api
         UI.success('Starting with ipa upload to DeployGate... this could take some time ⏳')
 
-        client = Shenzhen::Plugins::DeployGate::Client.new(
-          options[:api_token],
-          options[:user]
-        )
+        api_token = options[:api_token]
+        user_name = options[:user]
+        ipa = options[:ipa]
+        upload_options = options.values.select do |key, _|
+          [:message, :distribution_key, :release_note].include? key
+        end
 
-        return options[:ipa] if Helper.test?
+        return ipa if Helper.test?
 
-        filter = [:message, :distribution_key, :release_note]
-        response = client.upload_build(
-          options[:ipa],
-          options.values.select do |key, _|
-            filter.include? key
-          end
-        )
+        response = self.upload_build(api_token, user_name, ipa, upload_options)
         if parse_response(response)
           UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
           UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")

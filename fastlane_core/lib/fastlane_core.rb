@@ -3,6 +3,7 @@ require 'json'
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 
+require 'fastlane_core/env'
 require 'fastlane_core/version'
 require 'fastlane_core/feature/feature'
 require 'fastlane_core/features'
