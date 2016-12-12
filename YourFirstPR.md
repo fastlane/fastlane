@@ -18,6 +18,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 - Install dependencies:
   - Run `bundle install` in the project root
   - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
+  - If there are dependency errors, you might also need to run `bundle update`
 - Create a new branch to work on:
   - `git checkout -b <YOUR_BRANCH_NAME>`
   - A good name for a branch describes the thing you’ll be working on, e.g. `docs-fixes`, `fix-deliver-upload`, `gym-build-android-app`, etc.
