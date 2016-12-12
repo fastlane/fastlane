@@ -1,1 +1,6 @@
-bin-proxy
+#!/usr/bin/env ruby
+$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+
+require "fastlane"
+require "fastlane/commands_generator"
+Fastlane::CommandsGenerator.take_off
