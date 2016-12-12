@@ -1,9 +1,13 @@
 #!/usr/bin/env ruby
 
+require "colored"
+require "shellwords"
+
 tool_name = File.basename($0)
 
-$LOAD_PATH.push File.expand_path("../#{tool_name}/lib", __FILE__)
+full_params = ARGV.shelljoin
 
-require tool_name
-require "#{tool_name}/commands_generator"
-Kernel.const_get("#{tool_name.capitalize}::CommandsGenerator").start
+puts "[WARNING] You are calling #{tool_name} directly. This usage is not supported anymore in fastlane 2.0".yellow
+puts "Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow
+
+exec("fastlane", tool_name, full_params)
