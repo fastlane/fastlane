@@ -28,6 +28,10 @@ module Deliver
             containing_folder = File.join(folder_path, screenshot.language)
           end
 
+          if screenshot.is_imessage
+            containing_folder = File.join(folder_path, "iMessage", screenshot.language)
+          end
+
           begin
             FileUtils.mkdir_p(containing_folder)
           rescue
