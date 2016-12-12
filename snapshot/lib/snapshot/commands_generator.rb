@@ -14,6 +14,7 @@ module Snapshot
     end
 
     def run
+      program :name, 'snapshot'
       program :version, Snapshot::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'

@@ -18,6 +18,7 @@ module Supply
     end
 
     def run
+      program :name, 'supply'
       program :version, Supply::VERSION
       program :description, Supply::DESCRIPTION
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'

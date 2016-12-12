@@ -68,6 +68,7 @@ module Fastlane
     end
 
     def run
+      program :name, 'fastlane'
       program :version, Fastlane::VERSION
       program :description, [
         "CLI for 'fastlane' - #{Fastlane::DESCRIPTION}\n",

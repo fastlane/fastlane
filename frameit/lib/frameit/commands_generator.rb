@@ -15,6 +15,7 @@ module Frameit
     end
 
     def run
+      program :name, 'frameit'
       program :version, Frameit::VERSION
       program :description, 'Quickly put your screenshots into the right device frames'
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
