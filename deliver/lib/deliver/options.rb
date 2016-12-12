@@ -25,7 +25,7 @@ module Deliver
                                      description: "The app ID of the app you want to use/modify",
                                      is_string: false), # don't add any verification here, as it's used to store a spaceship ref
         FastlaneCore::ConfigItem.new(key: :edit_live,
-                                     short_option: "-E",
+                                     short_option: "-o",
                                      env_name: "DELIVER_EDIT_LIVE",
                                      description: "Modify live metadata, this option disables ipa upload and screenshot upload",
                                      is_string: false),
