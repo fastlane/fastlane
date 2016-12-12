@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'highline', '>= 1.7.1' # user inputs (e.g. passwords)
   spec.add_dependency 'security' # Mac OS Keychain manager
 
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake', '< 12'

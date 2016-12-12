@@ -26,8 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
 
   # fastlane
-  spec.add_dependency 'fastlane_core', '>= 0.52.0' # all shared code and dependencies
-  spec.add_dependency 'credentials_manager', '>= 0.16.0'
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
 
   # Development only
   spec.add_development_dependency 'bundler'

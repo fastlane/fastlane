@@ -21,10 +21,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
+
   spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # for reading the provisioning profile
-  spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # communication with Apple
-  spec.add_dependency 'colored' # coloured terminal output
 
   # Development only
   spec.add_development_dependency 'bundler'
