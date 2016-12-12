@@ -250,6 +250,7 @@ TOOLS_PATH=$( xcode-select -p )
 REL_PATH='../Applications/Application Loader.app/Contents/itms/java/lib/net.properties'
 echo "$TOOLS_PATH/$REL_PATH"
 ```
+
 Add necessary proxy configuration values to the net.properties according to [Java Proxy Configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html).
 
 As an alternative to editing the properties files, proxy configuration can be specified on the command line directly:
