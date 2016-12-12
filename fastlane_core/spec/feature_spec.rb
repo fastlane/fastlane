@@ -5,11 +5,9 @@ class FeatureHelper
   def self.enabled_class_method
   end
 
-  def disabled_instance_method
-  end
+  def disabled_instance_method; end
 
-  def enabled_instance_method
-  end
+  def enabled_instance_method; end
 
   def self.reset_test_method
     FeatureHelper.instance_eval { undef test_method }
