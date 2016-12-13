@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
-  spec.add_development_dependency 'activesupport'
+  spec.add_development_dependency 'activesupport', '~> 4.2'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
