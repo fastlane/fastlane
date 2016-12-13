@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Application do
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Application.client }

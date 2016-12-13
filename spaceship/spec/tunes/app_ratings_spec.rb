@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::AppRatings do
   before { Spaceship::Tunes.login }
   let(:app) { Spaceship::Application.all.first }

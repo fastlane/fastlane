@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   before { Spaceship.login }
   subject { Spaceship.client }

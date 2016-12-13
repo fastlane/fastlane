@@ -1,1 +1,1 @@
-require 'stubbing.rb'
+require_relative 'stubbing.rb'

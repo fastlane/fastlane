@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::TunesClient do
   describe '#login' do
     it 'raises an exception if authentication failed' do

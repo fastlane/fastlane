@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   class TestClient < Spaceship::Client
     def self.hostname

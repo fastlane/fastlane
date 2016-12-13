@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Commander::Runner do
   describe 'tool collector interactions' do
     class CommandsGenerator

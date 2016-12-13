@@ -1,7 +1,7 @@
 require 'webmock/rspec'
 
 def client_read_fixture_file(filename)
-  File.read(File.join('spec', 'fixtures', filename))
+  File.read(File.join('spaceship', 'spec', 'fixtures', filename))
 end
 
 def stub_connection_timeout_302

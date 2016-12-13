@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::ProvisioningProfile do
   describe "Development tvOS Profiles" do
     before do

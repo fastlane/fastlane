@@ -1,7 +1,5 @@
-require 'webmock/rspec'
-
 def itc_read_fixture_file(filename)
-  File.read(File.join('spec', 'tunes', 'fixtures', filename))
+  File.read(File.join('spaceship', 'spec', 'tunes', 'fixtures', filename))
 end
 
 def itc_stub_login

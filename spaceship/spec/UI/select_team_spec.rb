@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   describe "UI" do
     describe "#select_team" do

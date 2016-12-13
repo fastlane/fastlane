@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Portal::App do
   before { Spaceship.login }
   let(:client) { Spaceship::Portal::App.client }

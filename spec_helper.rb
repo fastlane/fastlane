@@ -14,12 +14,32 @@ end
 
 Fastlane::TOOLS.each do |tool|
   path = File.join(tool.to_s, "spec", "spec_helper.rb")
-  next unless tool == :sigh || tool == :deliver || tool == :fastlane
   require_relative path if File.exist?(path)
   require tool.to_s
 end
 
-RSpec.configure do |c|
-  c.example_status_persistence_file_path = "examples.txt"
+my_main = self
+RSpec.configure do |config|
+  config.before(:each) do |current_test|
+    tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
+    method_name = "before_each_#{tool_name}".to_sym
+    begin
+      my_main.send(method_name)
+    rescue NoMethodError => ex
+      # no method implemented
+    end
+  end
+
+  config.after(:each) do |current_test|
+    tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
+    method_name = "after_each_#{tool_name}".to_sym
+    begin
+      my_main.send(method_name)
+    rescue NoMethodError => ex
+      # no method implemented
+    end
+  end
+
+  config.example_status_persistence_file_path = "examples.txt"
 end
 

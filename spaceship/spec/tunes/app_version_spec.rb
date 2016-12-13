@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
 
