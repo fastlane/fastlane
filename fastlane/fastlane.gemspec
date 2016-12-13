@@ -9,7 +9,7 @@ rubocop_config = File.expand_path('../../.rubocop.yml', __FILE__)
 
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
-  spec.version       = Fastlane::VERSION
+  spec.version       = "2.0.0"
   spec.authors       = ["Felix Krause", "Michael Furtak", "Andrea Falcone", "Sam Phillips", "David Ohayon", "Sam Robbins", "Mark Pirri", "Hemal Shah"]
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -74,4 +74,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.45'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
+
+  spec.post_install_message = "Please use `fastlane #{spec.name}` instead of `#{spec.name}` from now on."
 end

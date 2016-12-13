@@ -35,4 +35,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "Please use `fastlane #{spec.name}` instead of `#{spec.name}` from now on."
 end

@@ -37,4 +37,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "Please use `fastlane #{spec.name}` instead of `#{spec.name}` from now on."
 end
