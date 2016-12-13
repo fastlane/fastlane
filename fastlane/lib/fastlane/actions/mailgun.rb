@@ -83,7 +83,7 @@ module Fastlane
                                       optional: true,
                                       is_string: true)
           FastlaneCore::ConfigItem.new(key: :reply_to,
-                                      env_name: "MAILGUN_REPLAY_TO",
+                                      env_name: "MAILGUN_REPLY_TO",
                                       description: "Mail Reply to",
                                       optional: true,
                                       is_string: true)
