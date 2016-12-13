@@ -1,13 +1,13 @@
 describe Scan do
   describe Scan::ReportCollector do
-    let (:path) { "./spec/fixtures/boring.log" }
+    let (:path) { "./scan/spec/fixtures/boring.log" }
 
     it "ignores invalid report types" do
       commands = Scan::ReportCollector.new(false, "invalid, html", "/tmp", false).generate_commands(path)
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-                                 "/tmp/report.html" => "cat './spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null "
+                                 "/tmp/report.html" => "cat './scan/spec/fixtures/boring.log' |  xcpretty --report html --output '/tmp/report.html' &> /dev/null "
                              })
     end
 
@@ -16,7 +16,7 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-                                 "/tmp/compile_commands.json" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/compile_commands.json' &> /dev/null "
+                                 "/tmp/compile_commands.json" => "cat './scan/spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/compile_commands.json' &> /dev/null "
                              })
     end
 
@@ -25,7 +25,7 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-                                 "/tmp/report.json-compilation-database" => "cat './spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/report.json-compilation-database' &> /dev/null "
+                                 "/tmp/report.json-compilation-database" => "cat './scan/spec/fixtures/boring.log' |  xcpretty --report json-compilation-database --output '/tmp/report.json-compilation-database' &> /dev/null "
                               })
     end
 
@@ -34,7 +34,7 @@ describe Scan do
 
       expect(commands.count).to eq(1)
       expect(commands).to eq({
-                                 "/tmp/custom.xml" => "cat './spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/custom.xml' &> /dev/null "
+                                 "/tmp/custom.xml" => "cat './scan/spec/fixtures/boring.log' |  xcpretty --report junit --output '/tmp/custom.xml' &> /dev/null "
                              })
     end
   end
