@@ -10,12 +10,12 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Runs shell command"
+        "Runs a shell command"
       end
 
       def self.details
         [
-          "Allows running arbitrary shell command"
+          "Allows running an arbitrary shell command"
         ].join("\n")
       end
 
