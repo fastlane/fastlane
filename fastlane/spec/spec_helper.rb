@@ -7,19 +7,12 @@ require 'shellwords'
 Fastlane.load_actions
 UI = FastlaneCore::UI
 
-RSpec.configure do |config|
-  config.before(:each) do
-    Fastlane::Actions.clear_lane_context
+def before_each__fastlane
+  Fastlane::Actions.clear_lane_context
 
-    ENV.delete 'DELIVER_SCREENSHOTS_PATH'
-    ENV.delete 'DELIVER_SKIP_BINARY'
-    ENV.delete 'DELIVER_VERSION'
-  end
-
-  config.after(:each) do
-    md_path = "./fastlane/spec/fixtures/fastfiles/README.md"
-    File.delete(md_path) if File.exist?(md_path)
-  end
+  ENV.delete 'DELIVER_SCREENSHOTS_PATH'
+  ENV.delete 'DELIVER_SKIP_BINARY'
+  ENV.delete 'DELIVER_VERSION'
 end
 
 def with_verbose(verbose)
