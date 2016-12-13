@@ -23,6 +23,7 @@ module Scan
     end
 
     def run
+      program :name, 'scan'
       program :version, Scan::VERSION
       program :description, Scan::DESCRIPTION
       program :help, "Author", "Felix Krause <scan@krausefx.com>"
