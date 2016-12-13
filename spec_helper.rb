@@ -25,7 +25,7 @@ RSpec.configure do |config|
     method_name = "before_each_#{tool_name}".to_sym
     begin
       my_main.send(method_name)
-    rescue NoMethodError => ex
+    rescue NoMethodError
       # no method implemented
     end
   end
@@ -35,11 +35,10 @@ RSpec.configure do |config|
     method_name = "after_each_#{tool_name}".to_sym
     begin
       my_main.send(method_name)
-    rescue NoMethodError => ex
+    rescue NoMethodError
       # no method implemented
     end
   end
 
   config.example_status_persistence_file_path = "examples.txt"
 end
-
