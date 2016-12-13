@@ -75,5 +75,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
 
-  spec.post_install_message = "Please use `fastlane #{spec.name}` instead of `#{spec.name}` from now on."
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end
