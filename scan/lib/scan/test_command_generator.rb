@@ -86,6 +86,10 @@ module Scan
           formatter << "--test"
         end
 
+        if Scan.config[:custom_report_file_name]
+          UI.important("WARNING: :custom_report_file_name was detected in Scan options. This has been deprecated. Please switch to :output_files.")
+        end
+
         reporter_options_generator = XCPrettyReporterOptionsGenerator.new(Scan.config[:open_report],
                                                                           Scan.config[:output_types],
                                                                           Scan.config[:output_files] || Scan.config[:custom_report_file_name],
