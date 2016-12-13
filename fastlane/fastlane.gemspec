@@ -71,7 +71,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '~> 0.44.0'
+  spec.add_development_dependency 'rubocop', '~> 0.45'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
 end
