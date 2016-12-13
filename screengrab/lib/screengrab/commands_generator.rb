@@ -14,6 +14,7 @@ module Screengrab
     end
 
     def run
+      program :name, 'screengrab'
       program :version, Screengrab::VERSION
       program :description, 'CLI for \'screengrab\' - Automate taking localized screenshots of your Android app on emulators or real devices'
       program :help, 'Authors', 'Andrea Falcone <afalcone@twitter.com>, Michael Furtak <mfurtak@twitter.com>'

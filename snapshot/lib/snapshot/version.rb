@@ -1,4 +1,4 @@
 module Snapshot
-  VERSION = "1.16.4".freeze
+  VERSION = "1.17.0".freeze
   DESCRIPTION = "Automate taking localized screenshots of your iOS and tvOS apps on every device"
 end

@@ -36,34 +36,34 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'xcode-install', '~> 2.0.0' # Needed for xcversion and xcode_install actions
   spec.add_dependency 'word_wrap', '~> 1.0.0' # to add line breaks for tables with long strings
 
-  spec.add_dependency "fastlane_core", ">= 0.59.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
 
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency "credentials_manager", ">= 0.16.2", "< 1.0.0" # Password Manager
-  spec.add_dependency "spaceship", ">= 0.38.5", "< 1.0.0" # communication layer with Apple's web services
+  spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # communication layer with Apple's web services
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
   # All the fastlane tools
-  spec.add_dependency "deliver", ">= 1.16.0", "< 2.0.0"
-  spec.add_dependency "snapshot", ">= 1.16.4", "< 2.0.0"
+  spec.add_dependency "deliver", ">= 1.16.2", "< 2.0.0"
+  spec.add_dependency "snapshot", ">= 1.17.0", "< 2.0.0"
   spec.add_dependency "frameit", ">= 3.0.0", "< 4.0.0"
-  spec.add_dependency "pem", ">= 1.4.0", "< 2.0.0"
-  spec.add_dependency "cert", ">= 1.4.4", "< 2.0.0"
+  spec.add_dependency "pem", ">= 1.4.1", "< 2.0.0"
+  spec.add_dependency "cert", ">= 1.4.5", "< 2.0.0"
   spec.add_dependency "sigh", ">= 1.12.1", "< 2.0.0"
-  spec.add_dependency "produce", ">= 1.3.2", "< 2.0.0"
-  spec.add_dependency "gym", ">= 1.12.1", "< 2.0.0"
-  spec.add_dependency "pilot", ">= 1.12.1", "< 2.0.0"
+  spec.add_dependency "produce", ">= 1.4.0", "< 2.0.0"
+  spec.add_dependency "gym", ">= 1.13.0", "< 2.0.0"
+  spec.add_dependency "pilot", ">= 1.13.0", "< 2.0.0"
   spec.add_dependency "scan", ">= 0.14.2", "< 1.0.0"
   spec.add_dependency "supply", ">= 0.8.0", "< 1.0.0"
-  spec.add_dependency "match", ">= 0.11.0", "< 1.0.0"
+  spec.add_dependency "match", ">= 0.11.1", "< 1.0.0"
   spec.add_dependency 'screengrab', '>= 0.5.2', '< 1.0.0'
 
   # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
   spec.add_dependency 'activesupport', '< 5'
 
   # Development only
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.1.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'

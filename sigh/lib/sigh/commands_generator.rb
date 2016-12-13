@@ -14,6 +14,7 @@ module Sigh
     end
 
     def run
+      program :name, 'sigh'
       program :version, Sigh::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
