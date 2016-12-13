@@ -45,6 +45,7 @@ module Snapshot
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  DESCRIPTION = "Automate taking localized screenshots of your iOS and tvOS apps on every device"
 
   Snapshot::DependencyChecker.check_dependencies
 
