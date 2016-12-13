@@ -10,12 +10,12 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Runs shell command"
+        "Runs a shell command"
       end
 
       def self.details
         [
-          "Allows running arbitrary shell command"
+          "Allows running an arbitrary shell command"
         ].join("\n")
       end
 
@@ -38,8 +38,8 @@ module Fastlane
         ]
       end
 
-      def self.output
-        ['Outputs the string and executes it. When running in tests, it returns the actual command instead of executing it']
+      def self.return_value
+        'Outputs the string and executes it. When running in tests, it returns the actual command instead of executing it'
       end
 
       def self.authors
@@ -52,7 +52,8 @@ module Fastlane
 
       def self.example_code
         [
-          'sh("uname -a")'
+          'sh("ls")',
+          'sh("git commit -m \'My message\'")'
         ]
       end
 
