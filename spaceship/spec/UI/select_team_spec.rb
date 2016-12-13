@@ -16,7 +16,7 @@ describe Spaceship::Client do
 
       describe "Multiple Teams" do
         before do
-          adp_stub_multiple_teams
+          PortalStubbing.adp_stub_multiple_teams
         end
 
         it "Lets the user select the team if in multiple teams" do

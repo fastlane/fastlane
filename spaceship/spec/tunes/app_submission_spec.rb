@@ -6,7 +6,7 @@ describe Spaceship::AppSubmission do
 
   describe "successfully creates a new app submission" do
     it "generates a new app submission from iTunes Connect response" do
-      itc_stub_app_submissions
+      TunesStubbing.itc_stub_app_submissions
       submission = app.create_submission
 
       expect(submission.application).to eq(app)
@@ -17,7 +17,7 @@ describe Spaceship::AppSubmission do
     end
 
     it "submits a valid app submission to iTunes Connect" do
-      itc_stub_app_submissions
+      TunesStubbing.itc_stub_app_submissions
       submission = app.create_submission
       submission.content_rights_contains_third_party_content = true
       submission.content_rights_has_rights = true
@@ -28,7 +28,7 @@ describe Spaceship::AppSubmission do
     end
 
     it "raises an error when submitting an app that has validation errors" do
-      itc_stub_app_submissions_invalid
+      TunesStubbing.itc_stub_app_submissions_invalid
 
       expect do
         app.create_submission
@@ -36,7 +36,7 @@ describe Spaceship::AppSubmission do
     end
 
     it "raises an error when submitting an app that is already in review" do
-      itc_stub_app_submissions_already_submitted
+      TunesStubbing.itc_stub_app_submissions_already_submitted
       submission = app.create_submission
       submission.content_rights_contains_third_party_content = true
       submission.content_rights_has_rights = true
