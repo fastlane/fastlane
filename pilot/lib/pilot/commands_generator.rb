@@ -42,6 +42,7 @@ module Pilot
     end
 
     def run
+      program :name, 'pilot'
       program :version, Pilot::VERSION
       program :description, Pilot::DESCRIPTION
       program :help, "Author", "Felix Krause <pilot@krausefx.com>"

@@ -14,6 +14,7 @@ module Produce
     end
 
     def run
+      program :name, 'produce'
       program :version, Produce::VERSION
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'

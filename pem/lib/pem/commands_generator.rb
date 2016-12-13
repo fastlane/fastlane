@@ -14,6 +14,7 @@ module PEM
     end
 
     def run
+      program :name, 'pem'
       program :version, PEM::VERSION
       program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
       program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
