@@ -113,7 +113,7 @@ module Fastlane
         }
         reply_to = options[:reply_to]
         unless reply_to?
-          params.store(:"h:Reply-To", reply_to)
+          params[:"h:Reply-To"] = reply_to
         end
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
         mail_template(options)
