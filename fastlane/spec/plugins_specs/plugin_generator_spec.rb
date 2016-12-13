@@ -276,7 +276,7 @@ describe Fastlane::PluginGenerator do
       it "rspec tests are passing" do
         # Actually run our generated spec as part of this spec #yodawg
         Dir.chdir(gem_name) do
-          Bundler.setup do
+          Bundler.with_clean_env do
             `rspec &> /dev/null`
             expect($?.exitstatus).to be(0)
           end
@@ -286,7 +286,7 @@ describe Fastlane::PluginGenerator do
       it "rubocop validations are passing" do
         # Actually run our generated spec as part of this spec #yodawg
         Dir.chdir(gem_name) do
-          Bundler.setup do
+          Bundler.with_clean_env do
             `rubocop &> /dev/null`
             expect($?.exitstatus).to be(0)
           end
@@ -295,7 +295,7 @@ describe Fastlane::PluginGenerator do
 
       it "`rake` runs both rspec and rubocop" do
         Dir.chdir(gem_name) do
-          Bundler.setup do
+          Bundler.with_clean_env do
             result = `rake`
             expect($?.exitstatus).to be(0)
             expect(result).to include("no offenses detected") # rubocop
