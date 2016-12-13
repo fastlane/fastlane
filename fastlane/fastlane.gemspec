@@ -45,15 +45,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
   # All the fastlane tools
-  spec.add_dependency "deliver", ">= 1.16.1", "< 2.0.0"
-  spec.add_dependency "snapshot", ">= 1.16.4", "< 2.0.0"
+  spec.add_dependency "deliver", ">= 1.16.2", "< 2.0.0"
+  spec.add_dependency "snapshot", ">= 1.17.0", "< 2.0.0"
   spec.add_dependency "frameit", ">= 3.0.0", "< 4.0.0"
   spec.add_dependency "pem", ">= 1.4.1", "< 2.0.0"
-  spec.add_dependency "cert", ">= 1.4.4", "< 2.0.0"
+  spec.add_dependency "cert", ">= 1.4.5", "< 2.0.0"
   spec.add_dependency "sigh", ">= 1.12.1", "< 2.0.0"
-  spec.add_dependency "produce", ">= 1.3.2", "< 2.0.0"
-  spec.add_dependency "gym", ">= 1.12.1", "< 2.0.0"
-  spec.add_dependency "pilot", ">= 1.12.1", "< 2.0.0"
+  spec.add_dependency "produce", ">= 1.4.0", "< 2.0.0"
+  spec.add_dependency "gym", ">= 1.13.0", "< 2.0.0"
+  spec.add_dependency "pilot", ">= 1.13.0", "< 2.0.0"
   spec.add_dependency "scan", ">= 0.14.2", "< 1.0.0"
   spec.add_dependency "supply", ">= 0.8.0", "< 1.0.0"
   spec.add_dependency "match", ">= 0.11.1", "< 1.0.0"
