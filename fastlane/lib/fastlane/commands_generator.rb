@@ -10,6 +10,7 @@ module Fastlane
     def self.start
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
+      FastlaneCore::Swag.show_loader
       $verbose = true if ARGV.include?("--verbose")
       $capture_output = true if ARGV.include?("--capture_output")
 
@@ -27,6 +28,7 @@ module Fastlane
       end
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
+      FastlaneCore::Swag.stop_loader
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
       unless ARGV[0] == "env"
         # *after* loading the plugins
