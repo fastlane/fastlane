@@ -105,12 +105,17 @@ module Fastlane
 
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
-        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-                        from: "#{options[:from]}<#{options[:postmaster]}>",
-                        to: (options[:to]).to_s,
-                        "h:Reply-To": options[:reply_to],
-                        subject: options[:subject],
-                        html: mail_template(options)
+        params = {
+          from: "#{options[:from]}<#{options[:postmaster]}>",
+          to: (options[:to]).to_s,
+          subject: options[:subject],
+          html: mail_template(options)
+        }
+        reply_to = options[:reply_to]
+        unless reply_to?
+          params.store(:"h:Reply-To", reply_to)
+        end
+        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
         mail_template(options)
       end
 
