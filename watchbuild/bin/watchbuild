@@ -13,6 +13,7 @@ class WatchBuildApplication
   include Commander::Methods
 
   def run
+    program :name, 'watchbuild'
     program :version, WatchBuild::VERSION
     program :description, WatchBuild::DESCRIPTION
     program :help, 'Author', 'Felix Krause <watchbuild@krausefx.com>'
