@@ -2,8 +2,8 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "upload_symbols_to_crashlytics" do
       it "extracts zip files" do
-        binary_path = './spec/fixtures/screenshots/screenshot1.png'
-        dsym_path = './spec/fixtures/dSYM/Themoji.dSYM.zip'
+        binary_path = './fastlane/spec/fixtures/screenshots/screenshot1.png'
+        dsym_path = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
 
         expect(Fastlane::Actions).to receive(:sh).with("unzip -qo #{File.expand_path(dsym_path).shellescape}")
 
@@ -16,8 +16,8 @@ describe Fastlane do
       end
 
       it "uploads dSYM files" do
-        binary_path = './spec/fixtures/screenshots/screenshot1.png'
-        dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+        binary_path = './fastlane/spec/fixtures/screenshots/screenshot1.png'
+        dsym_path = './fastlane/spec/fixtures/dSYM/Themoji.dSYM'
 
         command = []
         command << File.expand_path(binary_path).shellescape

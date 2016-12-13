@@ -1,4 +1,3 @@
-require 'spec_helper'
 require "fastlane/environment_printer"
 require "fastlane/cli_tools_distributor"
 

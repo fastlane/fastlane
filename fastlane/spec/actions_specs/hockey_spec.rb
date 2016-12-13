@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Hockey Integration" do
+    describe "Hockey Integration", now: true do
       it "raises an error if no build file was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -46,7 +46,7 @@ describe Fastlane do
               dsym: './notHere.dSYM.zip'
             })
           end").runner.execute(:test)
-        end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found")
+        end.to raise_error("Symbols on path '#{File.expand_path('./notHere.dSYM.zip')}' not found")
       end
 
       it "raises an error if both ipa and apk provided" do
