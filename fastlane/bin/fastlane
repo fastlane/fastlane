@@ -1,5 +1,15 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
 
+unless ENV['BUNDLE_BIN_PATH']
+  require 'bundler'
+  gemfile = Bundler::SharedHelpers.in_bundle?
+
+  if gemfile && File.read(gemfile).include?('fastlane')
+    system("bundle exec fastlane #{ARGV.join(' ')}")
+    exit($?.exitstatus)
+  end
+end
+
 require "fastlane/cli_tools_distributor"
 Fastlane::CLIToolsDistributor.take_off
