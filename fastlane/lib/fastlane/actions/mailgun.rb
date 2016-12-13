@@ -81,7 +81,7 @@ module Fastlane
                                       env_name: "MAILGUN_TEMPLATE_PATH",
                                       description: "Mail HTML template",
                                       optional: true,
-                                      is_string: true)
+                                      is_string: true),
           FastlaneCore::ConfigItem.new(key: :reply_to,
                                       env_name: "MAILGUN_REPLY_TO",
                                       description: "Mail Reply to",
