@@ -303,7 +303,7 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
-        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
@@ -317,7 +317,7 @@ describe Fastlane do
 
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
-        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
       end
 

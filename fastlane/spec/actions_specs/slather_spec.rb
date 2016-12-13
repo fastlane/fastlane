@@ -118,7 +118,7 @@ describe Fastlane do
       end
 
       it "does not require project if .slather.yml is found" do
-        File.write('../.slather.yml', '')
+        File.write('./.slather.yml', '')
 
         result = Fastlane::FastFile.new.parse("lane :test do
           slather

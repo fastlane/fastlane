@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Hockey Integration", now: true do
+    describe "Hockey Integration" do
       it "raises an error if no build file was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
