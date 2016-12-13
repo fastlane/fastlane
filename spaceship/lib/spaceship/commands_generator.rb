@@ -29,12 +29,6 @@ module Spaceship
       require "pry"
       require "credentials_manager"
 
-      def docs
-        url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
-        `open '#{url}'`
-        url
-      end
-
       username = ARGV[1] if ARGV[0] == '-u'
       username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
       username ||= ask("Username: ")
@@ -71,6 +65,12 @@ module Spaceship
       # rubocop:enable Lint/Debugger
 
       puts "" # Fixes https://github.com/fastlane/spaceship/issues/203
+    end
+
+    def self.docs
+      url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
+      `open '#{url}'`
+      url
     end
   end
 end
