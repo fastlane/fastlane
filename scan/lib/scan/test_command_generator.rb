@@ -88,7 +88,7 @@ module Scan
 
         reporter_options_generator = XCPrettyReporterOptionsGenerator.new(Scan.config[:open_report],
                                                                           Scan.config[:output_types],
-                                                                          Scan.config[:output_files],
+                                                                          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                                                                           Scan.config[:output_directory],
                                                                           Scan.config[:use_clang_report_name])
         reporter_options = reporter_options_generator.generate_reporter_options

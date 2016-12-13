@@ -183,7 +183,11 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
                                     description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                     is_string: false,
-                                    default_value: false)
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                    description: "DEPRECATED: See :output_files. Sets custom full report file name when generating a single report",
+                                    optional: true,
+                                    is_string: true)
       ]
     end
   end
