@@ -6,24 +6,18 @@ module Fastlane
         require 'pem/options'
         require 'pem/manager'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pem') unless Helper.is_test?
+        success_block = params[:new_profile]
 
-          success_block = params[:new_profile]
+        PEM.config = params
 
-          PEM.config = params
+        if Helper.is_test?
+          profile_path = './test.pem'
+        else
+          profile_path = PEM::Manager.start
+        end
 
-          if Helper.is_test?
-            profile_path = './test.pem'
-          else
-            profile_path = PEM::Manager.start
-          end
-
-          if success_block and profile_path
-            success_block.call(File.expand_path(profile_path)) if success_block
-          end
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
+        if success_block and profile_path
+          success_block.call(File.expand_path(profile_path)) if success_block
         end
       end
 

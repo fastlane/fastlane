@@ -1,4 +1,3 @@
-require 'match/version'
 require 'match/options'
 require 'match/runner'
 require 'match/nuke'

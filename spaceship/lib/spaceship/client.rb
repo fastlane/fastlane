@@ -19,7 +19,7 @@ end
 module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
-    USER_AGENT = "Spaceship #{Spaceship::VERSION}"
+    USER_AGENT = "Spaceship #{Fastlane::VERSION}"
 
     attr_reader :client
 

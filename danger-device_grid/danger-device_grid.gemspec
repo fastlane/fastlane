@@ -5,7 +5,7 @@ require 'device_grid/gem_version.rb'
 
 Gem::Specification.new do |spec|
   spec.name          = 'danger-device_grid'
-  spec.version       = DeviceGrid::VERSION
+  spec.version       = Fastlane::VERSION
   spec.authors       = ['Felix Krause', 'Boris Bügling']
   spec.email         = ['danger@krausefx.com', 'boris@icculus.org']
   spec.summary       = %q{Danger plugin for the fastlane device grid.}

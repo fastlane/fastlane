@@ -3,7 +3,6 @@ require 'fileutils'
 
 require 'fastlane_core'
 
-require 'screengrab/version'
 require 'screengrab/runner'
 require 'screengrab/detect_values'
 require 'screengrab/dependency_checker'

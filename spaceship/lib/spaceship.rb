@@ -1,8 +1,6 @@
-require 'spaceship/version'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'
-require 'spaceship/update_checker'
 
 # Dev Portal
 require 'spaceship/portal/portal'
@@ -28,6 +26,4 @@ module Spaceship
   AppVersion = Spaceship::Tunes::AppVersion
   AppSubmission = Spaceship::Tunes::AppSubmission
   Application = Spaceship::Tunes::Application
-
-  UpdateChecker.ensure_spaceship_version
 end

@@ -19,7 +19,7 @@ module Screengrab
     end
 
     def run
-      FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Screengrab::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Fastlane::VERSION}")
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)
       tests_apk_path = @config.fetch(:tests_apk_path, ask: false)

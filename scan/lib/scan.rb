@@ -1,5 +1,4 @@
 require 'json'
-require 'scan/version'
 require 'scan/manager'
 require 'scan/options'
 require 'scan/runner'

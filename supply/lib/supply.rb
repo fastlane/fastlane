@@ -1,5 +1,4 @@
 require 'json'
-require 'supply/version'
 require 'supply/options'
 require 'supply/client'
 require 'supply/listing'

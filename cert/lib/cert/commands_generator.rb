@@ -7,15 +7,12 @@ module Cert
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('cert')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('cert', Cert::VERSION)
     end
 
     def run
       program :name, 'cert'
-      program :version, Cert::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
       program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

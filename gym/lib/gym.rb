@@ -1,5 +1,4 @@
 require 'json'
-require 'gym/version'
 require 'gym/manager'
 require 'gym/generators/build_command_generator'
 require 'gym/generators/package_command_generator'

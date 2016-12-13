@@ -9,7 +9,7 @@ module WatchBuild
     def run
       FastlaneCore::PrintTable.print_values(config: WatchBuild.config,
                                          hide_keys: [],
-                                             title: "Summary for WatchBuild #{WatchBuild::VERSION}")
+                                             title: "Summary for WatchBuild #{Fastlane::VERSION}")
 
       UI.message("Starting login with user '#{WatchBuild.config[:username]}'")
       Spaceship::Tunes.login(WatchBuild.config[:username], nil)

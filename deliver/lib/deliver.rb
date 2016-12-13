@@ -1,5 +1,4 @@
 require 'json'
-require 'deliver/version'
 require 'deliver/options'
 require 'deliver/commands_generator'
 require 'deliver/detect_values'

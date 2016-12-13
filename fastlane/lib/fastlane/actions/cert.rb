@@ -11,8 +11,6 @@ module Fastlane
 
         return if Helper.test?
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('cert') unless Helper.is_test?
-
         begin
           Cert.config = params # we alread have the finished config
 
@@ -25,8 +23,6 @@ module Fastlane
           UI.success("Use signing certificate '#{certificate_id}' from now on!")
 
           ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('cert', Cert::VERSION)
         end
       end
 

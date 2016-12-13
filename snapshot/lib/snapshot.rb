@@ -1,4 +1,3 @@
-require 'snapshot/version'
 require 'snapshot/runner'
 require 'snapshot/reports_generator'
 require 'snapshot/detect_values'

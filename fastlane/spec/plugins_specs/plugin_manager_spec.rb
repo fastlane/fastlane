@@ -3,7 +3,7 @@ describe Fastlane do
     let (:plugin_manager) { Fastlane::PluginManager.new }
     describe "#gemfile_path" do
       it "returns an absolute path if Gemfile available" do
-        expect(plugin_manager.gemfile_path).to eq(File.expand_path("Gemfile"))
+        expect(plugin_manager.gemfile_path).to eq(File.expand_path("../Gemfile"))
       end
 
       it "returns nil if no Gemfile available" do
