@@ -30,6 +30,7 @@ In any case, **a closed issue is not necessarily the end of the story!** If more
 One of the best ways we can keep _fastlane_ an approachable, stable, and dependable tool is to be deliberate about how we choose to modify it. If we don't adopt your changes or new feature into _fastlane,_ that doesn't mean it was bad work! It may be that the _fastlane_ philosophy about how to accomplish a particular task doesn't align well with your approach. The best way to make sure that your time is well spent in contributing to _fastlane_ is to **start your work** on a modification or new feature **by opening an issue to discuss the problem or shortcoming with the community**. The _fastlane_ maintainers will do our best to give early feedback about whether a particular goal and approach is likely to be something we want to adopt!
 
 ## Code of Conduct
+
 Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct][code of conduct].
 
 ## Above All, Thanks for Your Contributions
