@@ -185,7 +185,9 @@ module Scan
                                     is_string: false,
                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                    description: "DEPRECATED: See :output_files. Sets custom full report file name when generating a single report",
+                                    description: "Sets custom full report file name when generating a single report",
+                                    deprecated: "Use --output_files",
+                                    conflicting_options: [:output_files],
                                     optional: true,
                                     is_string: true)
       ]
