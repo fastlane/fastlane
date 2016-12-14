@@ -1,76 +1,48 @@
 HighLine.track_eof = false
 
+require 'spaceship/playground'
+require 'spaceship/spaceauth_runner'
+
 module Spaceship
   class CommandsGenerator
+    include Commander::Methods
+
     def self.start
-      require "colored"
-
-      # First we have to check if the user has `pry` installed
-      # We don't want to add pry as a spaceship dependency, as
-      # it shouldn't really be added to production systems
-      gem_name = "pry"
-      begin
-        Gem::Specification.find_by_name(gem_name)
-      rescue Gem::LoadError
-        puts("Could not find gem '#{gem_name}'".red)
-        puts("")
-        puts("If you installed spaceship using `sudo gem install spaceship` run")
-        puts("  sudo gem install #{gem_name}".yellow)
-        puts("to install the missing gem")
-        puts("")
-        puts("If you use a Gemfile add this to your Gemfile:")
-        puts("  gem '#{gem_name}'".yellow)
-        puts("and run " + "`bundle install`".yellow)
-
-        abort
-      end
-
-      require "spaceship"
-      require "pry"
-      require "credentials_manager"
-
-      username = ARGV[1] if ARGV[0] == '-u'
-      username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-      username ||= ask("Username: ")
-
-      begin
-        puts "Logging into to iTunes Connect (#{username})..."
-        Spaceship::Tunes.login(username)
-        puts "Successfully logged in to iTunes Connect".green
-        puts ""
-      rescue
-        puts "Could not login to iTunes Connect...".red
-      end
-      begin
-        puts "Logging into the Developer Portal (#{username})..."
-        Spaceship::Portal.login(username)
-        puts "Successfully logged in to the Developer Portal".green
-        puts ""
-      rescue
-        puts "Could not login to the Developer Portal...".red
-      end
-
-      puts "---------------------------------------".green
-      puts "| Welcome to the spaceship playground |".green
-      puts "---------------------------------------".green
-      puts ""
-      puts "Enter #{'docs'.yellow} to open up the documentation"
-      puts "Enter #{'exit'.yellow} to exit the spaceship playground"
-      puts "Enter #{'_'.yellow} to access the return value of the last executed command"
-      puts ""
-      puts "Just enter the commands and confirm with Enter".green
-
-      # rubocop:disable Lint/Debugger
-      binding.pry(quiet: true)
-      # rubocop:enable Lint/Debugger
-
-      puts "" # Fixes https://github.com/fastlane/spaceship/issues/203
+      self.new.run
     end
 
-    def self.docs
-      url = 'https://github.com/fastlane/fastlane/tree/master/spaceship/docs'
-      `open '#{url}'`
-      url
+    def run
+      program :name, 'spaceship'
+      program :version, Fastlane::VERSION
+      program :description, Spaceship::DESCRIPTION
+      program :help, 'Author', 'Felix Krause <spaceship@krausefx.com>'
+      program :help, 'Website', 'https://fastlane.tools'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/spaceship'
+      program :help_formatter, :compact
+
+      global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
+
+      command :playground do |c|
+        c.syntax = 'spaceship playground'
+        c.description = 'Run an interactive shell that connects you to Apple web services'
+
+        c.action do |args, options|
+          Spaceship::Playground.new(username: options.user).run
+        end
+      end
+
+      command :spaceauth do |c|
+        c.syntax = 'spaceship spaceauth'
+        c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
+
+        c.action do |args, options|
+          Spaceship::SpaceauthRunner.new(username: options.user).run
+        end
+      end
+
+      default_command :playground
+
+      run!
     end
   end
 end
