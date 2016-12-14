@@ -18,7 +18,6 @@ describe Fastlane do
 
     it "prints out the loaded fastlane plugins" do
       expect(env).to include("Loaded fastlane plugins")
-      expect(env).to include("fastlane-plugin-ruby")
     end
 
     it "prints out the loaded gem dependencies" do

@@ -6,7 +6,7 @@ require 'shellwords'
 
 Fastlane.load_actions
 
-def before_each__fastlane
+def before_each_fastlane
   Fastlane::Actions.clear_lane_context
 
   ENV.delete 'DELIVER_SCREENSHOTS_PATH'
