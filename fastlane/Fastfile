@@ -11,7 +11,7 @@ lane :bump do |options|
   path = "./fastlane/lib/fastlane/version.rb"
 
   # Verify everything is in a consistent state
-  latest_version = current_version(tool: tool_name)
+  latest_version = current_version
   local_version = version_get_podspec(path: path)
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
