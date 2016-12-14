@@ -150,7 +150,7 @@ module FastlaneCore
       paths += Dir["./fastlane/#{self.config_file_name}"]
       paths += Dir["./.fastlane/#{self.config_file_name}"]
       paths += Dir["./#{self.config_file_name}"]
-      paths += Dir["./spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
+      paths += Dir["./fastlane_core/spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
       return if paths.count == 0
 
       path = paths.first
