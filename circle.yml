@@ -8,5 +8,5 @@ dependencies:
     - bundle install --jobs=4 --retry=3
 test:
   override:
-    - bundle exec rspec
+    - bundle exec rake test_all
     - bundle exec rubocop
