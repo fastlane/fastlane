@@ -58,6 +58,7 @@ describe Gym do
     it "supports passing a path to a provisioning profile" do
       # Profile Installation
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with("./spec/fixtures/dummy.mobileprovision")
+      expect(FastlaneCore::ProvisioningProfile).to receive(:name).with("./spec/fixtures/dummy.mobileprovision")
       options = {
         project: "./examples/standard/Example.xcodeproj",
         provisioning_profile_path: "./spec/fixtures/dummy.mobileprovision"
