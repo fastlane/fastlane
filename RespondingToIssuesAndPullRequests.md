@@ -45,8 +45,8 @@ Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`.
     - Repeat the last step for each of the related PRs that the user submitted.
 - After checking out a user’s code, you should always make sure that the tests are still working. 
   - Run `bundle install` to make sure all dependencies are installed
-  - Use `bundle exec rake test_all` from the _fastlane_ root to run all tests
-  - Use `bundle exec rspec` in a tool’s directory to run all tests for a specific tool
+  - Use `bundle exec rspec` from the _fastlane_ root to run all tests
+  - Use `bundle exec rspec [tool_name]` to run all tests for a specific tool
   - Use `bundle exec rubocop -a` to run the linter and autocorrect many of the issues it found
 
 If you have commit access, instead of adding each person's fork as a remote, you can also quickly test a single PR with the following commands:

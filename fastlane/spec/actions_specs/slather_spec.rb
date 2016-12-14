@@ -174,7 +174,7 @@ describe Fastlane do
       end
 
       after(:each) do
-        File.delete('./.slather.yml')
+        File.delete('./.slather.yml') if File.exist?("./.slather.yml")
       end
     end
   end

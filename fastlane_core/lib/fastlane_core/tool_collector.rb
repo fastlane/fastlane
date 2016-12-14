@@ -171,7 +171,7 @@ module FastlaneCore
         # we can report a particular version
       end
 
-      return nil
+      return Fastlane::VERSION
     end
   end
 end

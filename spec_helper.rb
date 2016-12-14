@@ -1,5 +1,3 @@
-puts "Root spec helper"
-
 require "coveralls"
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
@@ -7,12 +5,13 @@ require "webmock/rspec"
 WebMock.disable_net_connect!(allow: 'coveralls.io')
 
 require "fastlane"
+UI = FastlaneCore::UI
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
 
-Fastlane::TOOLS.each do |tool|
+(Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
   path = File.join(tool.to_s, "spec", "spec_helper.rb")
   require_relative path if File.exist?(path)
   require tool.to_s
