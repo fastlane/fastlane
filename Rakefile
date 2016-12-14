@@ -14,6 +14,10 @@ task :rubygems_admins do
   end
 end
 
+task :test_all do
+  sh "rspec --pattern */spec/*_spec.rb"
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
