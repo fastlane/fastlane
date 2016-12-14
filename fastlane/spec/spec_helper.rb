@@ -5,7 +5,6 @@ end
 require 'shellwords'
 
 Fastlane.load_actions
-UI = FastlaneCore::UI
 
 def before_each__fastlane
   Fastlane::Actions.clear_lane_context

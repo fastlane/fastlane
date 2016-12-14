@@ -17,7 +17,6 @@ def try_delete(path)
   FileUtils.rm_f(path) if File.exist? path
 end
 
-my_main = self
 def before_each_spaceship
   @cache_paths.each { |path| try_delete path }
   ENV["DELIVER_USER"] = "spaceship@krausefx.com"
