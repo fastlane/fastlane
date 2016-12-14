@@ -35,7 +35,6 @@
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
-
 -------
 <p align="center">
     <a href="#whats-spaceship">Why?</a> &bull;
@@ -95,7 +94,7 @@ How fast are tools using `spaceship` compared to web scraping?
 
 ## Playground
 
-To try `spaceship`, just run `spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
+To try `spaceship`, just run `fastlane spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
