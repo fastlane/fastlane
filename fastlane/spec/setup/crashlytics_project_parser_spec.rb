@@ -1,7 +1,7 @@
 describe Fastlane::CrashlyticsProjectParser do
   describe 'parses .xcproject files' do
     it 'fetches path & keys from valid Crashlytics Beta project' do
-      project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project.xcodeproj'
+      project_path = './fastlane/spec/fixtures/xcodeproj/crashlytics_beta_project.xcodeproj'
       parser = Fastlane::CrashlyticsProjectParser.new({ project: project_path })
       values = parser.parse
       expect(values[:crashlytics_path]).to eq('./Crashlytics.framework')
@@ -17,7 +17,7 @@ describe Fastlane::CrashlyticsProjectParser do
     end
 
     it 'fails if target_name is invalid' do
-      project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project.xcodeproj'
+      project_path = './fastlane/spec/fixtures/xcodeproj/crashlytics_beta_project.xcodeproj'
       project = FastlaneCore::Project.new(
         { project: project_path },
         xcodebuild_list_silent: true,
@@ -32,14 +32,14 @@ describe Fastlane::CrashlyticsProjectParser do
     end
 
     it 'fails with project with no run script build phase' do
-      project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project_no_run_script_build_phase.xcodeproj'
+      project_path = './fastlane/spec/fixtures/xcodeproj/crashlytics_beta_project_no_run_script_build_phase.xcodeproj'
       expect do
         Fastlane::CrashlyticsProjectParser.new({ project: project_path }).parse
       end.to raise_error("Unable to find Crashlytics Run Script Build Phase")
     end
 
     it 'finds no values in project with non-Crashlytics run script build phase' do
-      project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project_invalid_run_script_build_phase.xcodeproj'
+      project_path = './fastlane/spec/fixtures/xcodeproj/crashlytics_beta_project_invalid_run_script_build_phase.xcodeproj'
       parser = Fastlane::CrashlyticsProjectParser.new({ project: project_path })
       expect(parser.parse).to eq({ schemes: [] })
     end
@@ -47,7 +47,7 @@ describe Fastlane::CrashlyticsProjectParser do
     it 'returns 2 schemes from a project' do
       # We have to name this file all obfuscated-like (skeem) because FastlaneCore::Project
       # will reject any value that includes the word 'scheme'
-      project_path = 'spec/fixtures/xcodeproj/crashlytics_beta_project_two_skeems.xcodeproj'
+      project_path = './fastlane/spec/fixtures/xcodeproj/crashlytics_beta_project_two_skeems.xcodeproj'
       parser = Fastlane::CrashlyticsProjectParser.new({ project: project_path })
       values = parser.parse
 

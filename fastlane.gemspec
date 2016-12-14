@@ -56,8 +56,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'security' # Mac OS Keychain manager
   spec.add_dependency 'xcpretty-travis-formatter', '>= 0.0.3'
 
-  spec.add_dependency "spaceship", ">= 0.38.5", "< 1.0.0" # communication layer with Apple's web services
-
   spec.add_dependency 'bundler', "~> 1.12" # Used for fastlane plugins
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday

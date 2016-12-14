@@ -40,7 +40,7 @@ describe Fastlane do
 
     describe "with a class in the Actions namespace that does not extend action" do
       it "trying to show its details presents a helpful error message" do
-        require 'fixtures/broken_actions/broken_action.rb'
+        require_relative 'fixtures/broken_actions/broken_action.rb'
 
         expect(UI).to receive(:user_error!).with(/be a subclass/).and_raise("boom")
 

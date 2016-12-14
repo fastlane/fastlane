@@ -73,7 +73,7 @@ describe FastlaneCore do
       describe "Handling invalid broken configuration files" do
         it "automatically corrects invalid quotations" do
           config = FastlaneCore::Configuration.create(options, {})
-          config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
+          config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigInvalidQuotation')
           # Not raising an error, even though we have invalid quotes
           expect(config[:app_identifier]).to eq("net.sunapps.1")
         end
@@ -81,14 +81,14 @@ describe FastlaneCore do
         it "properly shows an error message when there is a syntax error in the Fastfile" do
           config = FastlaneCore::Configuration.create(options, {})
           expect do
-            config.load_configuration_file('./spec/fixtures/ConfigSytnaxError')
+            config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigSytnaxError')
           end.to raise_error(/Syntax error in your configuration file .* on line 15/)
         end
       end
 
       describe "Prints out a table of summary" do
         it "shows a warning when no values were found" do
-          expect(FastlaneCore::UI).to receive(:important).with("No values defined in './spec/fixtures/ConfigFileEmpty'")
+          expect(FastlaneCore::UI).to receive(:important).with("No values defined in './fastlane_core/spec/fixtures/ConfigFileEmpty'")
 
           config = FastlaneCore::Configuration.create(options, {})
           config.load_configuration_file('ConfigFileEmpty')
@@ -97,7 +97,7 @@ describe FastlaneCore do
         it "prints out a table of all the set values" do
           expect(Terminal::Table).to receive(:new).with({
             rows: [[:app_identifier, "com.krausefx.app"], [:apple_id, "from_le_block"]],
-            title: "Detected Values from './spec/fixtures/ConfigFileValid'"
+            title: "Detected Values from './fastlane_core/spec/fixtures/ConfigFileValid'"
           })
 
           config = FastlaneCore::Configuration.create(options, {})

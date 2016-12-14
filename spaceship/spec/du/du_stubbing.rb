@@ -1,5 +1,5 @@
 def du_fixture_file_path(filename)
-  File.join('spec', 'du', 'fixtures', filename)
+  File.join('spaceship', 'spec', 'du', 'fixtures', filename)
 end
 
 def du_read_fixture_file(filename)

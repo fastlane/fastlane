@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "ERB template" do
-      let(:template) { File.expand_path("./spec/fixtures/templates/dummy_html_template.erb") }
+      let(:template) { File.expand_path("./fastlane/spec/fixtures/templates/dummy_html_template.erb") }
       let(:destination) { "/tmp/fastlane/template.html" }
 
       it "generate template without placeholders" do

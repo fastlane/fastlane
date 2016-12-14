@@ -36,7 +36,7 @@ describe Fastlane do
 
     describe "#load_external_actions" do
       it "can load custom paths" do
-        Fastlane::Actions.load_external_actions("spec/fixtures/actions")
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         Fastlane::Actions::ExampleActionAction.run(nil)
         Fastlane::Actions::ExampleActionSecondAction.run(nil)
         Fastlane::Actions::ArchiveAction.run(nil)
@@ -44,7 +44,7 @@ describe Fastlane do
 
       it "can throws an error if plugin is damaged" do
         expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!", { show_github_issues: true })
-        Fastlane::Actions.load_external_actions("spec/fixtures/broken_actions")
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_actions")
       end
     end
 

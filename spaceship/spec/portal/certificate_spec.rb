@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Certificate do
   before { Spaceship.login }
   let(:client) { Spaceship::Portal::Certificate.client }
@@ -68,7 +66,7 @@ describe Spaceship::Certificate do
     end
 
     it "handles failed download request" do
-      adp_stub_download_certificate_failure
+      PortalStubbing.adp_stub_download_certificate_failure
 
       error_text = /^Couldn't download certificate, got this instead:/
       expect do
@@ -88,7 +86,7 @@ describe Spaceship::Certificate do
   describe '#create' do
     it 'should create and return a new certificate' do
       expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
       certificate = Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
@@ -97,7 +95,7 @@ describe Spaceship::Certificate do
 
     it 'should create a new certificate using a CSR from a file' do
       expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
+        JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
       Tempfile.open('csr') do |f|

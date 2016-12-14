@@ -5,11 +5,8 @@ machine:
     version: "7.3"
 dependencies:
   override:
-    - rake bundle_install_all
-  cache_directories:
-    - ~/.fastlane_bundle
+    - bundle install --jobs=4 --retry=3
 test:
   override:
-    # - bundle exec danger
     - bundle exec rake test_all
-    # - bundle exec danger
+    - bundle exec rubocop

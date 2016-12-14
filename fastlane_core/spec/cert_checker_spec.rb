@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe FastlaneCore do
   describe FastlaneCore::CertChecker do
     describe '#installed_identies' do

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::AppDetails do
   before { Spaceship::Tunes.login }
 
