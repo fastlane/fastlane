@@ -10,4 +10,10 @@ full_params = ARGV.shelljoin
 puts "[WARNING] You are calling #{tool_name} directly. This usage is not supported anymore in fastlane 2.0".yellow
 puts "Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow
 
-exec("fastlane", tool_name, full_params)
+exec_arr = ["fastlane", tool_name] + ARGV.map(&:shellescape)
+
+# The * turns the array into a parameter list
+# This is using the form of exec which takes a variable parameter list, e.g. `exec(command, param1, param2, ...)`
+# We need to use that, because otherwise invocations like
+# `spaceauth -u user@fastlane.tools` would recognize "-u user@fastlane.tools" as a single parameter and throw errors
+exec(*exec_arr)
