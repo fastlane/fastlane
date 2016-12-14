@@ -50,7 +50,7 @@ screengrab
 Install the gem
 
 ```
-sudo gem install screengrab
+sudo gem install fastlane
 ```
 
 ##### Gradle dependency

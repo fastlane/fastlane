@@ -100,7 +100,7 @@ gym
 
 # Installation
 
-    sudo gem install gym
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

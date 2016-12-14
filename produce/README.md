@@ -64,7 +64,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Installation
-    sudo gem install produce
+    sudo gem install fastlane
 
 # Usage
 

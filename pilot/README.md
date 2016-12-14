@@ -60,7 +60,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Installation
 
-    sudo gem install pilot
+    sudo gem install fastlane
 
 # Usage
 

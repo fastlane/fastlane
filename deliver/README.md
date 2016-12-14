@@ -69,7 +69,7 @@ To upload builds to TestFlight check out [pilot](https://github.com/fastlane/fas
 
 Install the gem
 
-    sudo gem install deliver
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

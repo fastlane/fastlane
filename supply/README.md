@@ -68,7 +68,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 Install the gem
 
-    sudo gem install supply
+    sudo gem install fastlane
 
 ## Setup
 

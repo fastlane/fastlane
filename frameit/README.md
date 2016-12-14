@@ -91,7 +91,7 @@ Make sure, you have the commandline tools installed
 
 Install the gem
 
-    sudo gem install frameit
+    sudo gem install fastlane
 
 The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 

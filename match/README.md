@@ -95,7 +95,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 ## Installation
 
 ```
-sudo gem install match
+sudo gem install fastlane
 ```
 
 Make sure you have the latest version of the Xcode command line tools installed:

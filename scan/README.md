@@ -126,7 +126,7 @@ scan
 
 # Installation
 
-    sudo gem install scan
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

@@ -107,7 +107,7 @@ This tool automatically switches the language and device type and runs UI Tests 
 
 Install the gem
 
-    sudo gem install snapshot
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

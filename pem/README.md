@@ -68,7 +68,7 @@ Check out this gif:
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
-    sudo gem install pem
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

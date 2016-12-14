@@ -84,7 +84,7 @@ See ```sigh``` in action:
 
 **Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
 
-    sudo gem install sigh
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 

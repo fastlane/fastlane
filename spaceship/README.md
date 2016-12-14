@@ -89,7 +89,7 @@ How fast are tools using `spaceship` compared to web scraping?
 
 # Installation
 
-    sudo gem install spaceship
+    sudo gem install fastlane
 
 # Usage
 
