@@ -34,42 +34,7 @@ To continue running the original script use `control` + `d`
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application. The easiest way to do so it use [bundler](https://bundler.io/).
 
-Create a `Gemfile` in your project’s root directory with the following content
-
-```ruby
-source "https://rubygems.org"
-
-local_fastlane_path = "<YOUR_LOCAL_FASTLANE_CLONE>"
-
-if File.exist?(File.join(File.expand_path(local_fastlane_path), "fastlane.gemspec"))
-  local_fastlane_path = File.expand_path("..", local_fastlane_path)
-end
-
-tools = [
-  "fastlane_core",
-  "spaceship",
-  "fastlane",
-  "cert",
-  "credentials_manager",
-  "deliver",
-  "frameit",
-  "gym",
-  "match",
-  "pem",
-  "pilot",
-  "produce",
-  "scan",
-  "screengrab",
-  "sigh",
-  "snapshot",
-  "supply",
-  "watchbuild",
-]
-
-tools.each do |tool|
-  gem tool, path: File.join(local_fastlane_path, tool)
-end
-```
+Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local fastlane clone and drop it into your project's root folder.
 
 Make sure to change the `local_fastlane_path` variable to point to your fastlane clone, e.g. `~/fastlane`, then you can run
 ```

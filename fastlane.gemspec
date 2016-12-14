@@ -48,11 +48,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
   spec.add_dependency 'google-api-client', '~> 0.9.1' # Google API Client to access Play Publishing API
   spec.add_dependency 'highline', '>= 1.7.2' # user inputs (e.g. passwords)
-  spec.add_dependency 'json' # Because sometimes it's just not installed
+  spec.add_dependency 'json', "> 2.0.0" # Because sometimes it's just not installed
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
   spec.add_dependency 'multi_json' # Because sometimes it's just not installed
   spec.add_dependency 'multi_xml', '~> 0.5'
-  spec.add_dependency 'rubyzip', '>= 1.1.7' # fix swift/ipa
+  spec.add_dependency 'rubyzip', '>= 1.2.0' # fix swift/ipa
   spec.add_dependency 'security' # Mac OS Keychain manager
   spec.add_dependency 'xcpretty-travis-formatter', '>= 0.0.3'
 
@@ -64,7 +64,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport', '< 5'
 
   # Development only
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
@@ -72,7 +72,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '~> 0.44.0'
+  spec.add_development_dependency 'rubocop', '~> 0.45'
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
 end
