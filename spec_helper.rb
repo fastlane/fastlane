@@ -39,5 +39,5 @@ RSpec.configure do |config|
     end
   end
 
-  config.example_status_persistence_file_path = "examples.txt"
+  config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
 end
