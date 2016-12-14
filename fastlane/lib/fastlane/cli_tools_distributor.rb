@@ -21,6 +21,8 @@ module Fastlane
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
+        tool_name = process_emojis(tool_name)
+
         if tool_name
           if Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
             # Triggering a specific tool
@@ -58,6 +60,15 @@ module Fastlane
             Fastlane::CommandsGenerator.start
           end
         end
+      end
+
+      # Since fastlane also supports the rocket and biceps emoji as executable
+      # we need to map those to the appropriate tools
+      def process_emojis(tool_name)
+        return {
+          "🚀" => "fastlane",
+          "💪" => "gym"
+        }[tool_name] || tool_name
       end
 
       def print_slow_fastlane_warning
