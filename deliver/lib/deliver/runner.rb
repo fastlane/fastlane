@@ -53,7 +53,6 @@ module Deliver
       UploadMetadata.new.assign_defaults(options)
 
       # Handle app icon / watch icon
-
       prepare_app_icons(options)
 
       # Validate
@@ -66,17 +65,18 @@ module Deliver
       UploadAssets.new.upload(options) # e.g. app icon
     end
 
+    # If options[:app_icon]/options[:apple_watch_app_icon]
+    # is supplied value/path will be used.
+    # If it is unset files (app_icon/watch_icon) exists in
+    # the fastlane/metadata/ folder, those will be used
     def prepare_app_icons(options = {})
-      app_icon_path = options[:app_icon] if options[:app_icon]
-      app_icon_metadata = File.join(options[:metadata_path], "app_icon.png")
-      if app_icon_path.nil? && File.exist?(app_icon_metadata)
-        options[:app_icon] = app_icon_metadata
-      end
-      watch_icon_path = options[:apple_watch_app_icon] if options[:apple_watch_app_icon]
-      watch_icon_metadata = File.join(options[:metadata_path], "watch_icon.png")
-      if watch_icon_path.nil? && File.exist?(watch_icon_metadata)
-        options[:apple_watch_app_icon] = watch_icon_metadata
-      end
+      return unless options[:metadata_path]
+
+      default_app_icon_path = File.join(options[:metadata_path], "app_icon.png")
+      options[:app_icon] ||= default_app_icon_path if File.exist?(default_app_icon_path)
+
+      default_watch_icon_path = File.join(options[:metadata_path], "watch_icon.png")
+      options[:app_icon] ||= default_watch_icon_path if File.exist?(default_watch_icon_path)
     end
 
     # Upload the binary to iTunes Connect
