@@ -112,7 +112,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 That's all you need to build your application. If you want more control, here are some available parameters:
 
-    gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
+    fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 
 If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
 
