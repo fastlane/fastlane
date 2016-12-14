@@ -167,10 +167,11 @@ module FastlaneCore
           end
         end
       rescue LoadError
-        Fastlane::VERSION
+        # If there is no version file to load, this is not a tool for which
+        # we can report a particular version
       end
 
-      return nil
+      return Fastlane::VERSION
     end
   end
 end
