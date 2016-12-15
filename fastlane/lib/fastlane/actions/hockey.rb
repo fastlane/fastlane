@@ -182,7 +182,7 @@ module Fastlane
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
-                                      description: "Public identifier of the app you are targeting, usually you won't need this value",
+                                      description: "App id of the app you are targeting, usually you won't need this value. Required, if `upload_dsm_only` set to `true`",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :commit_sha,
                                       env_name: "FL_HOCKEY_COMMIT_SHA",
