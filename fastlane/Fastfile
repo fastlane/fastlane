@@ -222,7 +222,9 @@ private_lane :validate_repo do
 
   # Verifying the --help command
   #
-  Fastlane::TOOLS.each do |tool_name|
+  tools_to_test = Fastlane::TOOLS
+  tools_to_test = [:fastlane] # until we have the binaries for all tools included here
+  tools_to_test.each do |tool_name|
     next if no_binary.include?(tool_name)
     Dir.chdir("..") do
       binary_path = File.join("bin", tool_name.to_s)
