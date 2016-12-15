@@ -63,7 +63,7 @@ module Fastlane
         [
           'set_build_number_repository',
           'set_build_number_repository(
-            xcodeproj: "./path/to/MyApp.xcodeproj" # optional, by default it will set to every Xcodeproj found in the directory
+            xcodeproj: "./path/to/MyApp.xcodeproj" # optional, by default it will choose one xcodeproj in the current directory, through `agvtool`.
           )'
         ]
       end
