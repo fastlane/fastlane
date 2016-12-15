@@ -46,7 +46,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "XCODEPROJ_PATH",
                                        description: "explicitly specify which xcodeproj to use",
-                                       optional: true)
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         path = File.expand_path(value)
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if path.end_with?(".xcworkspace")
+                                         UI.user_error!("Could not find Xcode project at #{path}") unless Helper.is_test? || File.exist?(path)
+                                       end)
         ]
       end
 
