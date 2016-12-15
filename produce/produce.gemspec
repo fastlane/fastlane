@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # Apple Dev Portal and iTunes Connect Access
+  spec.add_dependency 'colored' # coloured terminal output
 
   # Development only
   spec.add_development_dependency 'bundler'
