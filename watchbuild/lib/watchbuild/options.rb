@@ -21,7 +21,16 @@ module WatchBuild
         FastlaneCore::ConfigItem.new(key: :sample_only_once,
                                      description: "Only check for the build once, instead of waiting for it to process",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "WATCHBUILD_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                    verify_block: proc do |value|
+                                      UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
+                                    end)
       ]
     end
   end
