@@ -21,7 +21,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
+
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # pretty xcodebuild output
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # print out build information
@@ -39,4 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "webmock", "~> 1.19.0"
   spec.add_development_dependency "coveralls"
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end
