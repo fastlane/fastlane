@@ -242,7 +242,7 @@ private_lane :validate_repo do
 
     # Run the tests
     #
-    sh "bundle exec rspec --pattern **/*_spec.rb"
+    sh "bundle exec rake test_all"
   end
 
   # Verify docs are still working
