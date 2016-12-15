@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # communication layer with Apple's web services
   spec.add_dependency "sigh", ">= 1.12.1", "< 2.0.0"
   spec.add_dependency "cert", ">= 1.4.4", "< 2.0.0"
+  spec.add_dependency 'colored' # coloured terminal output
 
   # Development only
   spec.add_development_dependency 'bundler'

@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   # External
   spec.add_dependency 'google-api-client', '~> 0.9.1' # Google API Client to access Play Publishing API
+  spec.add_dependency 'colored' # coloured terminal output
 
   # fastlane
   spec.add_dependency 'fastlane_core', '>= 0.52.0' # all shared code and dependencies
