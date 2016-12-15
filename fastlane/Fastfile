@@ -265,7 +265,7 @@ private_lane :print_release_changelog do |options|
   tool_name = options[:tool] || "fastlane"
   old_version = options[:old_version]
 
-  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: false).gsub("\n\n", "\n")
+  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
 
