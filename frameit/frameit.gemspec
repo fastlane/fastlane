@@ -21,11 +21,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
+
   spec.add_dependency 'fastimage', '>= 1.6'
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
-  spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'deliver', '> 0.3' # To determine the device type based on a screenshot file
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -38,4 +37,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end

@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'highline', '>= 1.7.1' # user inputs (e.g. passwords)
   spec.add_dependency 'security' # Mac OS Keychain manager
 
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
+
   # Development only
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake', '< 12'
@@ -36,4 +38,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end
