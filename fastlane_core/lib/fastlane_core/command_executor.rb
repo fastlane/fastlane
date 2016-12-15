@@ -43,7 +43,7 @@ module FastlaneCore
         end
 
         begin
-          PTY.spawn(command) do |stdin, stdout, pid|
+          FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
             begin
               stdin.each do |l|
                 line = l.strip # strip so that \n gets removed

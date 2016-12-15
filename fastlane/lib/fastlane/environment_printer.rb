@@ -180,6 +180,11 @@ module Fastlane
         product, version, build = `sw_vers`.strip.split("\n").map { |line| line.split(':').last.strip }
         os_version = version
       end
+      
+      if Helper.windows?
+        version = os_version = `ver`.strip
+        product = "Windows"
+      end
 
       if Helper.linux?
         # this should work on pretty much all linux distros

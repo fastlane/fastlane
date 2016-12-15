@@ -34,7 +34,7 @@ module FastlaneCore
     end
 
     def self.show_update_status(gem_name, current_version)
-      fork do
+      Thread.new do
         begin
           finished_running(gem_name)
         rescue

@@ -1,4 +1,3 @@
-require 'pty'
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
@@ -40,7 +39,7 @@ module FastlaneCore
       end
 
       begin
-        PTY.spawn(command) do |stdin, stdout, pid|
+        FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
           begin
             stdin.each do |line|
               parse_line(line, hide_output) # this is where the parsing happens
