@@ -32,8 +32,8 @@ describe Fastlane::ActionCollector do
 
   describe "#determine_version" do
     it "accesses the version number of the other tools" do
-      expect(collector.determine_version(:gym)).to eq(Gym::VERSION)
-      expect(collector.determine_version(:sigh)).to eq(Sigh::VERSION)
+      expect(collector.determine_version(:gym)).to eq(Fastlane::VERSION)
+      expect(collector.determine_version(:sigh)).to eq(Fastlane::VERSION)
     end
 
     it "fetches the version of the plugin, if action is part of a plugin" do

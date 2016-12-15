@@ -1,4 +1,4 @@
-def stub_spaceship
+def sigh_stub_spaceship
   profile = "profile"
   certificate = "certificate"
 

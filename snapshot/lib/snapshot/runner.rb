@@ -26,7 +26,7 @@ module Snapshot
       # We go 2 folders up, to not show "Contents/Developer/"
       values = Snapshot.config.values(ask: false)
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
-      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Fastlane::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 

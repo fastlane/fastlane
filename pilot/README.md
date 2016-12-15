@@ -60,7 +60,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Installation
 
-    sudo gem install pilot
+    sudo gem install fastlane
 
 # Usage
 
@@ -71,7 +71,7 @@ For all commands you can specify the Apple ID to use using `-u felix@krausefx.co
 To upload a new build, just run
 
 ```
-pilot upload
+fastlane pilot upload
 ```
 
 This will automatically look for an `ipa` in your current directory and tries to fetch the login credentials from your [fastlane setup](https://fastlane.tools).
@@ -79,19 +79,19 @@ This will automatically look for an `ipa` in your current directory and tries to
 You'll be asked for any missing information. Additionally, you can pass all kinds of parameters:
 
 ```
-pilot --help
+fastlane pilot --help
 ```
 
 You can pass a changelog using
 
 ```
-pilot upload --changelog "Something that is new here"
+fastlane pilot upload --changelog "Something that is new here"
 ```
 
 You can also skip the submission of the binary, which means, the `ipa` file will only be uploaded and not distributed to testers:
 
 ```
-pilot upload --skip_submission
+fastlane pilot upload --skip_submission
 ```
 
 `pilot` does all kinds of magic for you:
@@ -106,7 +106,7 @@ pilot upload --skip_submission
 To list all builds for specific application use
 
 ```
-pilot builds
+fastlane pilot builds
 ```
 
 The result lists all active builds and processing builds:
@@ -131,7 +131,7 @@ The result lists all active builds and processing builds:
 This command will list all your testers, both internal and external.
 
 ```
-pilot list
+fastlane pilot list
 ```
 
 The output will look like this:
@@ -160,13 +160,13 @@ The output will look like this:
 To add a new tester to both your iTunes Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```
-pilot add email@invite.com
+fastlane pilot add email@invite.com
 ```
 
 Additionally you can specify the app identifier (if necessary):
 
 ```
-pilot add email@email.com -a com.krausefx.app
+fastlane pilot add email@email.com -a com.krausefx.app
 ```
 
 ### Find a tester
@@ -174,7 +174,7 @@ pilot add email@email.com -a com.krausefx.app
 To find a specific tester use
 
 ```
-pilot find felix@krausefx.com
+fastlane pilot find felix@krausefx.com
 ```
 
 The resulting output will look like this:
@@ -198,7 +198,7 @@ The resulting output will look like this:
 This command will only remove external beta testers.
 
 ```
-pilot remove felix@krausefx.com
+fastlane pilot remove felix@krausefx.com
 ```
 
 ### Export testers
@@ -206,7 +206,7 @@ pilot remove felix@krausefx.com
 To export all external testers to a CSV file. Useful if you need to import tester info to another system or a new account.
 
 ```
-pilot export
+fastlane pilot export
 ```
 
 ### Import testers
@@ -214,14 +214,14 @@ pilot export
 Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
 
 ```
-pilot import
+fastlane pilot import
 ```
 
 You can also specify the directory using
 
 ```
-pilot export -c ~/Desktop/testers.csv
-pilot import -c ~/Desktop/testers.csv
+fastlane pilot export -c ~/Desktop/testers.csv
+fastlane pilot import -c ~/Desktop/testers.csv
  ```
 
 # Tips
@@ -248,7 +248,7 @@ pilot import -c ~/Desktop/testers.csv
 
 If you run into any issues you can use the `verbose` mode to get a more detailed output:
 
-    pilot --verbose
+    fastlane pilot --verbose
 
 ## Firewall Issues
 

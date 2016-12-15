@@ -1,10 +1,8 @@
-require 'spec_helper'
-
 describe Spaceship::ProvisioningProfile do
   describe "Development tvOS Profiles" do
     before do
       Spaceship.login
-      adp_enterprise_stubbing
+      PortalStubbing.adp_enterprise_stubbing
     end
     let(:client) { Spaceship::ProvisioningProfile.client }
 

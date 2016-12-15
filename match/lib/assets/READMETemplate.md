@@ -9,7 +9,7 @@ Do not modify this file, as it gets overwritten every time you run `match`.
 ### Install [fastlane match](https://github.com/fastlane/fastlane/tree/master/match#readme)
 
 ```
-sudo gem install match
+sudo gem install fastlane
 ```
 
 Make sure you have the latest version of the Xcode command line tools installed:

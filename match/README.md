@@ -95,7 +95,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 ## Installation
 
 ```
-sudo gem install match
+sudo gem install fastlane
 ```
 
 Make sure you have the latest version of the Xcode command line tools installed:
@@ -113,12 +113,12 @@ Make sure you have the latest version of the Xcode command line tools installed:
 3. Run the following in your project folder to start using `match`:
 
 ```
-match init
+fastlane match init
 ```
 
 <img src="assets/match_init.gif" width="550" />
 
-You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -144,13 +144,14 @@ match(git_branch: "team2", username: "user@team2.com")
 
 > Before running `match` for the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
 
-After running `match init` you can run the following to generate new certificates and profiles:
+After running `fastlane match init` you can run the following to generate new certificates and profiles:
 
 ```
-match appstore
+fastlane match appstore
 ```
+
 ```
-match development
+fastlane match development
 ```
 
 <img src="assets/match_appstore_small.gif" width="550" />
@@ -162,21 +163,21 @@ The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning 
 To get a more detailed output of what `match` is doing use
 
 ```
-match --verbose
+fastlane match --verbose
 ```
 
 For a list of all available options run
 
 ```
-match --help
+fastlane match --help
 ```
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, supply them as a comma-separated list to match:
+If you have several targets with different bundle identifiers, supply them as a comma-separated list to   :
 
 ```
-match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
+fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
 You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
@@ -200,13 +201,13 @@ To set the passphrase to decrypt your profiles using an environment variable, us
 To set up the certificates and provisioning profiles on a new machine, you just run the same command using:
 
 ```
-match development
+fastlane match development
 ```
 
 You can also run `match` in a `readonly` mode to be sure it won't create any new certificates or profiles.
 
 ```
-match development --readonly
+fastlane match development --readonly
 ```
 
 #### Access Control
@@ -270,7 +271,7 @@ By using the `force_for_new_devices` parameter, `match` will check if the device
 If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
 
 ```
-match adhoc --force_for_new_devices
+fastlane match adhoc --force_for_new_devices
 ```
 
 ##### Multiple Targets
@@ -316,7 +317,7 @@ There are a few ways around this:
 Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.
 
 #### Encryption password
-Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. Match will pick this up when it's run.
+Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. `match` will pick this up when it's run.
 
 ### Nuke
 
@@ -325,8 +326,8 @@ If you never really cared about code signing and have a messy Apple Developer ac
 To revoke all certificates and provisioning profiles for a specific environment:
 
 ```sh
-match nuke development
-match nuke distribution
+fastlane match nuke development
+fastlane match nuke distribution
 ```
 
 <img src="assets/match_nuke.gif" width="550" />
@@ -338,7 +339,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 To change the password of your repo and therefore decrypting and encrypting all files run
 
 ```
-match change_password
+fastlane match change_password
 ```
 
 You'll be asked for the new password on all your machines on the next run.

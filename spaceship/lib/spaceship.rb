@@ -1,8 +1,6 @@
-require 'spaceship/version'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'
-require 'spaceship/update_checker'
 
 # Dev Portal
 require 'spaceship/portal/portal'
@@ -29,5 +27,5 @@ module Spaceship
   AppSubmission = Spaceship::Tunes::AppSubmission
   Application = Spaceship::Tunes::Application
 
-  UpdateChecker.ensure_spaceship_version
+  DESCRIPTION = "Ruby library to access the Apple Dev Center and iTunes Connect".freeze
 end

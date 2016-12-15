@@ -1,5 +1,4 @@
 require 'mini_magick'
-require 'frameit/version'
 require 'frameit/frame_downloader'
 require 'frameit/device_types'
 require 'frameit/runner'

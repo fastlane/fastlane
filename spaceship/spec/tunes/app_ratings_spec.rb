@@ -1,12 +1,10 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::AppRatings do
   before { Spaceship::Tunes.login }
   let(:app) { Spaceship::Application.all.first }
 
   describe "successfully loads rating summary" do
     it "contains the right information" do
-      itc_stub_ratings
+      TunesStubbing.itc_stub_ratings
       ratings = app.ratings
 
       expect(ratings.versions.count).to eq(24)
@@ -25,7 +23,7 @@ describe Spaceship::Tunes::AppRatings do
 
   describe "successfully calculates the average" do
     it "the average is correct" do
-      itc_stub_ratings
+      TunesStubbing.itc_stub_ratings
       ratings = app.ratings
 
       expect(ratings.rating_summary.average_rating).to eq(3.1)
@@ -35,7 +33,7 @@ describe Spaceship::Tunes::AppRatings do
 
   describe "successfully loads reviews" do
     it "contains the right information" do
-      itc_stub_ratings
+      TunesStubbing.itc_stub_ratings
       ratings = app.ratings
       reviews = ratings.reviews("US")
 

@@ -11,15 +11,12 @@ module Supply
     FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update("supply")
       new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status("supply", Supply::VERSION)
     end
 
     def run
       program :name, 'supply'
-      program :version, Supply::VERSION
+      program :version, Fastlane::VERSION
       program :description, Supply::DESCRIPTION
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

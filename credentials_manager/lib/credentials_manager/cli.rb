@@ -1,4 +1,3 @@
-require 'credentials_manager/version'
 require 'commander'
 
 module CredentialsManager
@@ -8,7 +7,7 @@ module CredentialsManager
     # Parses command options and executes actions
     def run
       program :name, 'CredentialsManager'
-      program :version, ::CredentialsManager::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'Manage credentials for fastlane tools.'
 
       # Command to add entry to Keychain

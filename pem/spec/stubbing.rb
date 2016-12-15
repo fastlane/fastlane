@@ -1,4 +1,4 @@
-def stub_spaceship
+def pem_stub_spaceship
   expect(Spaceship).to receive(:login).and_return(nil)
   allow(Spaceship).to receive(:client).and_return("client")
   expect(Spaceship.client).to receive(:select_team).and_return(nil)
