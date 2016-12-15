@@ -23,6 +23,8 @@ module Spaceship
     end
 
     def self.show_update_message(local_version, live_version)
+      require 'colored'
+
       puts "---------------------------------------------".red
       puts "-------------------WARNING-------------------".red
       puts "---------------------------------------------".red
