@@ -23,12 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'security' # Mac OS Keychain manager
 
-  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency "credentials_manager", ">= 0.16.2", "< 1.0.0" # fastlane password manager
-  spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # communication layer with Apple's web services
-  spec.add_dependency "sigh", ">= 1.12.1", "< 2.0.0"
-  spec.add_dependency "cert", ">= 1.4.4", "< 2.0.0"
-  spec.add_dependency 'colored' # coloured terminal output
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -41,4 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end

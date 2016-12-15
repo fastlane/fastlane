@@ -16,15 +16,13 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir["lib/**/*"] + %w( bin/cert README.md LICENSE )
+  spec.files = Dir["lib/**/*"] + %w(bin/cert README.md LICENSE)
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
-  spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # access to the Dev Portal
-  spec.add_dependency 'colored' # coloured terminal output
+  spec.add_dependency 'fastlane', ">= 2.0.0", "< 3.0.0"
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -35,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
+
+  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end
