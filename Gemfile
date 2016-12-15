@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 # Needed for CI
 gem "danger", "~> 0.10"
-gem "rake"
 
 # Local fastlane, important to be included using `gemspec`, as this will
 # also include development dependencies
