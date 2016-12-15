@@ -1,5 +1,5 @@
- require 'commander'
- require 'fastlane/version'
+require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
