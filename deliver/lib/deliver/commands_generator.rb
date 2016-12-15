@@ -1,5 +1,6 @@
 require 'commander'
 require 'deliver/download_screenshots'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 

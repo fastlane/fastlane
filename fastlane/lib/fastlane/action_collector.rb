@@ -34,6 +34,8 @@ module Fastlane
     #   :xcversion
     #   "fastlane-plugin-my_plugin/xcversion"
     def self.determine_version(name)
+      return Fastlane::VERSION if Fastlane::ActionsList.find_action_named(name.to_s)
+
       result = super(name)
       return result if result
 
