@@ -6,7 +6,7 @@ module Deliver
       self.options = options
       login
       Deliver::DetectValues.new.run!(self.options, skip_auto_detection)
-      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Deliver::VERSION} Summary")
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Fastlane::VERSION} Summary")
     end
 
     def login

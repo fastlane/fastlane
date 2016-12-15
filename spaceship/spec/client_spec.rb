@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   class TestClient < Spaceship::Client
     def self.hostname
@@ -63,7 +61,7 @@ describe Spaceship::Client do
     end
 
     it "raises AppleTimeoutError when response contains '302 Found'" do
-      stub_connection_timeout_302
+      ClientStubbing.stub_connection_timeout_302
 
       expect do
         subject.req_home

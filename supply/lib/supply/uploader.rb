@@ -1,7 +1,7 @@
 module Supply
   class Uploader
     def perform_upload
-      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary for supply #{Supply::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary for supply #{Fastlane::VERSION}")
 
       client.begin_edit(package_name: Supply.config[:package_name])
 

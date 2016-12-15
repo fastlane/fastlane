@@ -9,7 +9,7 @@ module Gym
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
       FastlaneCore::PrintTable.print_values(config: values,
                                          hide_keys: [],
-                                             title: "Summary for gym #{Gym::VERSION}")
+                                             title: "Summary for gym #{Fastlane::VERSION}")
 
       return Runner.new.run
     end

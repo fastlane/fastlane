@@ -3,7 +3,7 @@ require 'fastlane/lane_list'
 describe Fastlane do
   describe Fastlane::LaneList do
     it "#generate" do
-      result = Fastlane::LaneList.generate('./spec/fixtures/fastfiles/FastfileGrouped')
+      result = Fastlane::LaneList.generate('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
 
       expect(result).to include("fastlane ios beta")
       expect(result).to include("Build and upload a new build to Apple")
@@ -11,7 +11,7 @@ describe Fastlane do
     end
 
     it "#generate_json" do
-      result = Fastlane::LaneList.generate_json('./spec/fixtures/fastfiles/FastfileGrouped')
+      result = Fastlane::LaneList.generate_json('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       expect(result).to eq({
         nil => {
           test: { description: "Run all the tests" },

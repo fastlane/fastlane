@@ -4,16 +4,10 @@ module Fastlane
       def self.run(params)
         require 'match'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('match') unless Helper.is_test?
+        params.load_configuration_file("Matchfile")
+        Match::Runner.new.run(params)
 
-          params.load_configuration_file("Matchfile")
-          Match::Runner.new.run(params)
-
-          define_profile_type(params)
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
-        end
+        define_profile_type(params)
       end
 
       def self.define_profile_type(values)

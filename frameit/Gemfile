@@ -1,3 +1,0 @@
-Dir.chdir("..") do
-  eval File.read("Gemfile")
-end

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::Tester do
   before { Spaceship::Tunes.login }
 

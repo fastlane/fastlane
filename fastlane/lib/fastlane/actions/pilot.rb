@@ -5,20 +5,14 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pilot') unless Helper.is_test?
+        changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
+        values[:changelog] ||= changelog if changelog
 
-          changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
-          values[:changelog] ||= changelog if changelog
+        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
 
-          values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+        return values if Helper.test?
 
-          return values if Helper.test?
-
-          Pilot::BuildManager.new.upload(values) # we already have the finished config
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('pilot', Pilot::VERSION)
-        end
+        Pilot::BuildManager.new.upload(values) # we already have the finished config
       end
 
       #####################################################

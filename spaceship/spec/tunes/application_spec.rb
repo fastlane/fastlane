@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Application do
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Application.client }
@@ -70,7 +68,7 @@ describe Spaceship::Application do
       end
 
       it "raises an error if something is wrong" do
-        itc_stub_broken_create
+        TunesStubbing.itc_stub_broken_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
@@ -80,7 +78,7 @@ describe Spaceship::Application do
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
-        itc_stub_broken_create_wildcard
+        TunesStubbing.itc_stub_broken_create_wildcard
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
@@ -92,7 +90,7 @@ describe Spaceship::Application do
 
     describe "#create! first app (company name required)" do
       it "works with valid data and defaults to English" do
-        itc_stub_applications_first_create
+        TunesStubbing.itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My Name",
                                               version: "1.0",
                                               sku: "SKU123",
@@ -101,7 +99,7 @@ describe Spaceship::Application do
       end
 
       it "raises an error if something is wrong" do
-        itc_stub_applications_broken_first_create
+        TunesStubbing.itc_stub_applications_broken_first_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 version: "1.0",
@@ -113,13 +111,13 @@ describe Spaceship::Application do
 
     describe "#resolution_center" do
       it "when the app was rejected" do
-        itc_stub_resolution_center
+        TunesStubbing.itc_stub_resolution_center
         result = Spaceship::Tunes::Application.all.first.resolution_center
         expect(result['appNotes']['threads'].first['messages'].first['body']).to include('Your app declares support for audio in the UIBackgroundModes')
       end
 
       it "when the app was not rejected" do
-        itc_stub_resolution_center_valid
+        TunesStubbing.itc_stub_resolution_center_valid
         expect(Spaceship::Tunes::Application.all.first.resolution_center).to eq({ "sectionErrorKeys" => [], "sectionInfoKeys" => [], "sectionWarningKeys" => [], "replyConstraints" => { "minLength" => 1, "maxLength" => 4000 }, "appNotes" => { "threads" => [] }, "betaNotes" => { "threads" => [] }, "appMessages" => { "threads" => [] } })
       end
     end

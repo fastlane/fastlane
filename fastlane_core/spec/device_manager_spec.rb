@@ -3,9 +3,9 @@ require 'open3'
 describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
     before(:all) do
-      @simctl_output = File.read('./spec/fixtures/DeviceManagerSimctlOutputXcode7')
-      @system_profiler_output = File.read('./spec/fixtures/DeviceManagerSystem_profilerOutput')
-      @instruments_output = File.read('./spec/fixtures/DeviceManagerInstrumentsOutput')
+      @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
+      @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
+      @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
 
       FastlaneCore::Simulator.clear_cache
     end
@@ -69,7 +69,7 @@ describe FastlaneCore do
 
       it "Xcode 8" do
         response = "response"
-        simctl_output = File.read('./spec/fixtures/DeviceManagerSimctlOutputXcode8')
+        simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode8')
         expect(response).to receive(:read).and_return(simctl_output)
         expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 

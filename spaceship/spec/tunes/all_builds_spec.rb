@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::Application do
   before { Spaceship::Tunes.login }
   subject { Spaceship::Tunes.client }
@@ -10,7 +8,7 @@ describe Spaceship::Tunes::Application do
     let(:app) { Spaceship::Application.all.first }
 
     before do
-      itc_stub_build_details
+      TunesStubbing.itc_stub_build_details
     end
 
     it "#all_build_train_numbers" do

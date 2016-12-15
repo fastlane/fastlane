@@ -10,10 +10,7 @@ module Scan
     FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options)
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update("scan")
       new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status("scan", Scan::VERSION)
     end
 
     def convert_options(options)
@@ -24,7 +21,7 @@ module Scan
 
     def run
       program :name, 'scan'
-      program :version, Scan::VERSION
+      program :version, Fastlane::VERSION
       program :description, Scan::DESCRIPTION
       program :help, "Author", "Felix Krause <scan@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"

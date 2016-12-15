@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Client do
   before { Spaceship.login }
   subject { Spaceship.client }
@@ -41,7 +39,7 @@ describe Spaceship::Client do
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
-        adp_stub_multiple_teams
+        PortalStubbing.adp_stub_multiple_teams
         expect(subject.team_id).to eq("SecondTeam")
       end
     end
@@ -51,7 +49,7 @@ describe Spaceship::Client do
         # Temporary stub a request to require the csrf_tokens
         stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
           with(body: { teamId: 'XXXXXXXXXX', pageSize: "10", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }, headers: { 'csrf' => 'top_secret', 'csrf_ts' => '123123' }).
-          to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
+          to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
 
         # Hard code the tokens
         allow(subject).to receive(:csrf_tokens).and_return({ csrf: 'top_secret', csrf_ts: '123123' })
@@ -92,7 +90,7 @@ describe Spaceship::Client do
       end
 
       it 'returns true for enterprise accounts' do
-        adp_stub_multiple_teams
+        PortalStubbing.adp_stub_multiple_teams
 
         subject.team_id = 'SecondTeam'
         expect(subject.in_house?).to eq(true)
@@ -211,7 +209,7 @@ describe Spaceship::Client do
     end
 
     describe '#create_certificate' do
-      let(:csr) { adp_read_fixture_file('certificateSigningRequest.certSigningRequest') }
+      let(:csr) { PortalStubbing.adp_read_fixture_file('certificateSigningRequest.certSigningRequest') }
       it 'makes a request to create a certificate' do
         response = subject.create_certificate!('BKLRAVXMGM', csr, '2HNR359G63')
         expect(response.keys).to include('certificateId', 'certificateType', 'statusString', 'expirationDate', 'certificate')

@@ -1,4 +1,3 @@
-require 'cert/version'
 require 'cert/runner'
 require 'cert/options'
 

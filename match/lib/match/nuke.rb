@@ -17,7 +17,7 @@ module Match
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier, :workspace],
-                                             title: "Summary for match nuke #{Match::VERSION}")
+                                             title: "Summary for match nuke #{Fastlane::VERSION}")
 
       prepare_list
       print_tables

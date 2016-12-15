@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship do
   before { Spaceship.login }
 

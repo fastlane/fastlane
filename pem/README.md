@@ -68,7 +68,7 @@ Check out this gif:
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
-    sudo gem install pem
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -76,7 +76,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    pem
+    fastlane pem
 
 Yes, that's the whole command!
 
@@ -91,27 +91,27 @@ This does the following:
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
-    pem --force
+    fastlane pem --force
 
 You can pass parameters like this:
 
-    pem -a com.krausefx.app -u username
+    fastlane pem -a com.krausefx.app -u username
 
 If you want to generate a development certificate instead:
 
-    pem --development
+    fastlane pem --development
 
 Set a password for your `p12` file:
 
-    pem -p "MyPass"
+    fastlane pem -p "MyPass"
 
 You can specify a name for the output file:
 
-    pem -o my.pem
+    fastlane pem -o my.pem
 
 To get a list of available options run:
 
-    pem --help
+    fastlane pem --help
 
 
 ### Note about empty `p12` passwords and Keychain Access.app
@@ -127,7 +127,7 @@ Instead, you may verify the file is valid using OpenSSL:
 
 ## Environment Variables
 
-Run `pem --help` to get a list of available environment variables.
+Run `fastlane pem --help` to get a list of available environment variables.
 
 # How does it work?
 

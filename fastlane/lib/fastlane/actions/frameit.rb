@@ -6,17 +6,13 @@ module Fastlane
 
         require 'frameit'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
+        FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
 
-          UI.message("Framing screenshots at path #{config[:path]}")
+        UI.message("Framing screenshots at path #{config[:path]}")
 
-          Dir.chdir(config[:path]) do
-            Frameit.config = config
-            Frameit::Runner.new.run('.')
-          end
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
+        Dir.chdir(config[:path]) do
+          Frameit.config = config
+          Frameit::Runner.new.run('.')
         end
       end
 

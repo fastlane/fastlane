@@ -196,7 +196,11 @@ module Fastlane
     end
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
+      if custom_dir.nil?
+        custom_dir ||= "." if Helper.test?
+        custom_dir ||= ".."
+      end
+
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)

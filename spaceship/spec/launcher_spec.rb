@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship do
   describe Spaceship::Launcher do
     let(:username) { 'spaceship@krausefx.com' }

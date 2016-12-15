@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Fastlane do
   describe Fastlane::CommandLineHandler do
     it "properly handles default calls" do

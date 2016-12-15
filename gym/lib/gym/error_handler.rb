@@ -145,7 +145,7 @@ module Gym
         # sure they are aware of the Xcode version and SDK they're using
         values = {
           xcode_path: File.expand_path("../..", FastlaneCore::Helper.xcode_path),
-          gym_version: Gym::VERSION
+          gym_version: Fastlane::VERSION
         }
 
         sdk_path = Gym.project.build_settings(key: "SDKROOT")

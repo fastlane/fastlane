@@ -9,7 +9,7 @@ describe Fastlane do
 
         it "No unused parameters in '#{name}'" do
           next if all_exceptions.include?(name)
-          content = File.read(File.join("lib", "fastlane", "actions", name + ".rb"))
+          content = File.read(File.join("fastlane", "lib", "fastlane", "actions", name + ".rb"))
           action.available_options.each do |option|
             unless content.include?("[:#{option.key}]")
               UI.user_error!("Action '#{name}' doesn't use the option :#{option.key}")

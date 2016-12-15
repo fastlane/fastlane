@@ -1,5 +1,4 @@
 require 'json'
-require 'gym/version'
 require 'gym/manager'
 require 'gym/generators/build_command_generator'
 require 'gym/generators/package_command_generator'
@@ -44,6 +43,7 @@ module Gym
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  DESCRIPTION = "Building your iOS apps has never been easier"
 
   Gym.init_libs
 end
