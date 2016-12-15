@@ -10,7 +10,7 @@ full_params = ARGV.shelljoin
 puts "[WARNING] You are calling #{tool_name} directly. Usage of the tool name without the `fastlane` prefix is deprecated in fastlane 2.0".yellow
 puts "Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow
 
-exec_arr = ["fastlane", tool_name] + ARGV.map(&:shellescape)
+exec_arr = ["fastlane", tool_name] + ARGV
 
 # The * turns the array into a parameter list
 # This is using the form of exec which takes a variable parameter list, e.g. `exec(command, param1, param2, ...)`
