@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "fastlane_core", ">= 0.60.0", "< 1.0.0" # all shared code and dependencies
   spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # iTunes Connect communication
   spec.add_dependency 'credentials_manager', '>= 0.16.0'
+  spec.add_dependency 'colored' # coloured terminal output
 
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # User's information
 

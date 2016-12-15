@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "spaceship", ">= 0.39.0", "< 1.0.0" # Communication with iTunes Connect
 
   # third party dependencies
+  spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'fastimage', '>= 1.6'
   spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # for reading the Info.plist of the ipa file
 

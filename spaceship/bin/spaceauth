@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.push File.expand_path("../../lib", __FILE__)
-require "colored"
+require 'colored'
+require 'shellwords'
+tool_name = "spaceauth"
+full_params = ARGV.shelljoin
+puts "[WARNING] You are calling #{tool_name} directly. Usage of the tool name without the `fastlane` prefix is deprecated in fastlane 2.0".yellow
+puts "Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow
 
 # First we have to check if the user has `pry` installed
 # We don't want to add pry as a spaceship dependency, as
