@@ -136,7 +136,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
-                                       description: 'Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action',
+                                       description: 'Path to your IPA file for iOS or APK for Android',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -222,7 +222,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include? platform
       end
     end
   end
