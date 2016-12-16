@@ -61,8 +61,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :fail_on_errors,
                                        env_name: "FL_DANGER_FAIL_ON_ERRORS",
-                                       description: "Should always fail the build process, defaults
-                                        to false",
+                                       description: "Should always fail the build process, defaults to false",
                                        is_string: false,
                                        optional: true,
                                        default_value: false)
