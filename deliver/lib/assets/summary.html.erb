@@ -107,10 +107,32 @@
               margin-left: 10px;
               margin-right: 10px;
           }
+          .app-icons img {
+            width: 150px;
+          }
+          .app-icons .app-icon {
+              float: left;
+              margin-right: 20px;
+          }
         </style>
     </head>
     
     <body>
+      <div class="app-icons">
+        
+        <% if @options[:app_icon] %>
+        <div class="app-icon">
+          Large App Icon:<br>
+          <img src="<%= @options[:app_icon] %>">
+        </div>
+        <% end %>
+        <% if @options[:apple_watch_app_icon] %>
+        <div class="watch-icon">
+          Watch App Icon:<br>
+          <img src="<%= @options[:apple_watch_app_icon] %>">
+        </div>
+        <% end %>
+      </div>
       <% @languages.each do |language| %>
         <% if @options[:name] %>
           <div class="app-name">
