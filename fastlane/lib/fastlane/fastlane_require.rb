@@ -11,6 +11,16 @@ module Fastlane
           return true
         end
 
+        if Helper.bundler?
+          # User uses bundler, we don't want to install gems on the fly here
+          # Instead tell the user how to add it to their Gemfile
+          UI.important("Missing gem '#{gem_name}', please add the following to your local Gemfile:")
+          UI.important("")
+          UI.command_output("gem \"#{gem_name}\"")
+          UI.important("")
+          UI.user_error!("Add 'gem \"#{gem_name}\"' to your Gemfile and restart fastlane")
+        end
+
         require "rubygems/command_manager"
         installer = Gem::CommandManager.instance[:install]
 
