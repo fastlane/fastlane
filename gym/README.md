@@ -124,6 +124,8 @@ For a list of all available parameters use
 
 If you run into any issues, use the `verbose` mode to get more information
 
+    fastlane gym --verbose
+
 Set the right export method if you're not uploading to App Store or TestFlight:
 
     fastlane gym --export_method ad-hoc
