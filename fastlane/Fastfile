@@ -42,7 +42,7 @@ lane :bump do |options|
     slack(
       channel: "action",
       default_payloads: [],
-      message: "Version bump for #{tool_name}: #{pr_url} ✨",
+      message: "Version bump: #{pr_url} ✨",
       payload: {}
     )
   end
