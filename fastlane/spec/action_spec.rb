@@ -45,7 +45,7 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
-      it "alias does not crash - when 'alias_used' not defined", now: true do
+      it "alias does not crash - when 'alias_used' not defined" do
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         expect(UI).to receive(:important).with("run")
         result = Fastlane::FastFile.new.parse("lane :test do
