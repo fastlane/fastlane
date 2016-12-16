@@ -27,7 +27,7 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Application.find(search_by)
+      app = Spaceship::Application.find(search_by, mac: options[:platform] == "osx")
       if app
         options[:app] = app
       else
