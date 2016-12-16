@@ -1,4 +1,5 @@
 module Fastlane
+  require 'fastlane_core/tool_collector'
   class ActionCollector < FastlaneCore::ToolCollector
     # Is this an official fastlane action, that is bundled with fastlane?
     def is_official?(name)
