@@ -334,6 +334,8 @@ describe Fastlane do
       end
 
       it "runs pod install" do
+        expect(Fastlane::Actions).to receive(:verify_gem!).with("cocoapods")
+
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
         end").runner.execute(:test)
