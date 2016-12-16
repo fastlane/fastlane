@@ -1,5 +1,6 @@
 HighLine.track_eof = false
 
+require 'fastlane/version'
 require 'spaceship/playground'
 require 'spaceship/spaceauth_runner'
 
