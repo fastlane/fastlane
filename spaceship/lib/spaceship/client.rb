@@ -1,12 +1,13 @@
 require 'faraday' # HTTP Client
-require 'logger'
-require 'faraday_middleware'
 require 'faraday-cookie_jar'
-require 'spaceship/ui'
-require 'spaceship/helper/plist_middleware'
-require 'spaceship/helper/net_http_generic_request'
-require 'tmpdir'
+require 'faraday_middleware'
+require 'fastlane/version'
+require 'logger'
 require 'spaceship/babosa_fix'
+require 'spaceship/helper/net_http_generic_request'
+require 'spaceship/helper/plist_middleware'
+require 'spaceship/ui'
+require 'tmpdir'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
