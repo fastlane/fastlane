@@ -44,6 +44,14 @@ describe Fastlane do
           somealias_no_param('PARAM')
         end").runner.execute(:test)
       end
+
+      it "alias does not crash - when 'alias_used' not defined", now: true do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        expect(UI).to receive(:important).with("run")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          alias_no_used_handler_sample_alias('PARAM')
+        end").runner.execute(:test)
+      end
     end
 
     describe "Call another action from an action" do
