@@ -4,6 +4,8 @@
 
 We use GitHub as support system, please submit a [new issue](https://github.com/fastlane/fastlane/issues/new) to ask questions or to report a problem.
 
+**Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
+
 Some people might also use the [_fastlane_ tag on StackOverflow](https://stackoverflow.com/questions/tagged/fastlane), however we don’t actively monitor issues submitted there.
 
 ## I want to contribute to _fastlane_
