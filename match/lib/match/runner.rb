@@ -6,7 +6,7 @@ module Match
     def run(params)
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:workspace],
-                                             title: "Summary for match #{Match::VERSION}")
+                                             title: "Summary for match #{Fastlane::VERSION}")
 
       UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
 

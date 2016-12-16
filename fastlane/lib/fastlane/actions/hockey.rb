@@ -65,7 +65,11 @@ module Fastlane
 
         UI.user_error!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
-        UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
+        if options[:upload_dsym_only]
+          UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
+        else
+          UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
+        end
 
         values = options.values
         values[:dsym_filename] = dsym_filename

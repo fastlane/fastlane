@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'sigh'
-require 'sigh/commands_generator'
-Sigh::CommandsGenerator.start

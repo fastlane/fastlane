@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,16 +8,13 @@ module Frameit
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('frameit')
       Frameit::DependencyChecker.check_dependencies
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
     end
 
     def run
       program :name, 'frameit'
-      program :version, Frameit::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'Quickly put your screenshots into the right device frames'
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

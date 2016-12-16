@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,15 +8,12 @@ module Snapshot
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
     end
 
     def run
       program :name, 'snapshot'
-      program :version, Snapshot::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

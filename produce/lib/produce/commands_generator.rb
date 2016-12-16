@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,15 +8,12 @@ module Produce
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('produce')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
     end
 
     def run
       program :name, 'produce'
-      program :version, Produce::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

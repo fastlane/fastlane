@@ -8,21 +8,15 @@ module Fastlane
       def self.run(params)
         require 'screengrab'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('screengrab') unless Helper.is_test?
+        Screengrab.config = params
+        Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
+                                                                            params[:build_tools_version])
+        Screengrab::DependencyChecker.check(Screengrab.android_environment)
+        Screengrab::Runner.new.run
 
-          Screengrab.config = params
-          Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
-                                                                              params[:build_tools_version])
-          Screengrab::DependencyChecker.check(Screengrab.android_environment)
-          Screengrab::Runner.new.run
+        Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] = File.expand_path(params[:output_directory])
 
-          Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] = File.expand_path(params[:output_directory])
-
-          true
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('screengrab', Screengrab::VERSION)
-        end
+        true
       end
 
       def self.description

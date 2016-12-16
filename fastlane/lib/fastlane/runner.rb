@@ -118,7 +118,9 @@ module Fastlane
           orig_action = method_sym.to_s
           class_ref = class_reference_from_action_name(alias_found.to_sym)
           # notify action that it has been used by alias
-          class_ref.alias_used(orig_action, arguments.first)
+          if class_ref.respond_to?(:alias_used)
+            class_ref.alias_used(orig_action, arguments.first)
+          end
         end
       end
 
@@ -196,7 +198,11 @@ module Fastlane
     end
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
+      if custom_dir.nil?
+        custom_dir ||= "." if Helper.test?
+        custom_dir ||= ".."
+      end
+
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)

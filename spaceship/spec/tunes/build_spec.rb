@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::Build do
   before { Spaceship::Tunes.login }
   subject { Spaceship::Tunes.client }

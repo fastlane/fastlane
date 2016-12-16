@@ -1,5 +1,4 @@
 require 'json'
-require 'produce/version'
 require 'produce/manager'
 require 'produce/options'
 require 'produce/developer_center'

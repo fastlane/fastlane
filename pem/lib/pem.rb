@@ -1,4 +1,3 @@
-require 'pem/version'
 require 'pem/manager'
 require 'pem/options'
 

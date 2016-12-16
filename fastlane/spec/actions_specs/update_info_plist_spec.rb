@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:fixtures_path) { "./spec/fixtures/xcodeproj" }
+      let (:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
       let (:proj_file) { "bundle.xcodeproj" }
       let (:xcodeproj) { File.join(test_path, proj_file) }
       let (:plist_path) { "Info.plist" }

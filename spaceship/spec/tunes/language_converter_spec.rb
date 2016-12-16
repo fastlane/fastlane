@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::LanguageConverter do
   let(:klass) { Spaceship::Tunes::LanguageConverter }
 

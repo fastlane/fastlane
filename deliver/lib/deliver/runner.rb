@@ -6,7 +6,7 @@ module Deliver
       self.options = options
       login
       Deliver::DetectValues.new.run!(self.options, skip_auto_detection)
-      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Deliver::VERSION} Summary")
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Fastlane::VERSION} Summary")
     end
 
     def login
@@ -52,6 +52,9 @@ module Deliver
       UploadMetadata.new.load_from_filesystem(options)
       UploadMetadata.new.assign_defaults(options)
 
+      # Handle app icon / watch icon
+      prepare_app_icons(options)
+
       # Validate
       validate_html(screenshots)
 
@@ -60,6 +63,20 @@ module Deliver
       UploadScreenshots.new.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
+    end
+
+    # If options[:app_icon]/options[:apple_watch_app_icon]
+    # is supplied value/path will be used.
+    # If it is unset files (app_icon/watch_icon) exists in
+    # the fastlane/metadata/ folder, those will be used
+    def prepare_app_icons(options = {})
+      return unless options[:metadata_path]
+
+      default_app_icon_path = File.join(options[:metadata_path], "app_icon.png")
+      options[:app_icon] ||= default_app_icon_path if File.exist?(default_app_icon_path)
+
+      default_watch_icon_path = File.join(options[:metadata_path], "watch_icon.png")
+      options[:app_icon] ||= default_watch_icon_path if File.exist?(default_watch_icon_path)
     end
 
     # Upload the binary to iTunes Connect

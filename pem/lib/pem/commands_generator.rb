@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,15 +8,12 @@ module PEM
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('pem')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('pem', PEM::VERSION)
     end
 
     def run
       program :name, 'pem'
-      program :version, PEM::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
       program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

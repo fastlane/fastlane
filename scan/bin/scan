@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
-
-require "scan"
-require "scan/commands_generator"
-Scan::CommandsGenerator.start

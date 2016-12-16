@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -8,15 +9,12 @@ module Match
     UI = FastlaneCore::UI
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('match')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('match', Match::VERSION)
     end
 
     def run
       program :name, 'match'
-      program :version, Match::VERSION
+      program :version, Fastlane::VERSION
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

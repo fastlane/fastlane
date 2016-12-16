@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,15 +8,12 @@ module Sigh
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
     end
 
     def run
       program :name, 'sigh'
-      program :version, Sigh::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

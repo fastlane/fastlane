@@ -9,19 +9,13 @@ module Fastlane
         return nil unless Helper.mac?
         require 'snapshot'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('snapshot') unless Helper.is_test?
+        Snapshot.config = params
+        Snapshot::DependencyChecker.check_simulators
+        Snapshot::Runner.new.work
 
-          Snapshot.config = params
-          Snapshot::DependencyChecker.check_simulators
-          Snapshot::Runner.new.work
+        Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(params[:output_directory]) # absolute URL
 
-          Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(params[:output_directory]) # absolute URL
-
-          true
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
-        end
+        true
       end
 
       def self.description

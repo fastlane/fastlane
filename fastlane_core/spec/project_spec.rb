@@ -163,12 +163,12 @@ describe FastlaneCore do
 
     describe "Valid Standard Project" do
       before do
-        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
       it "#path" do
-        expect(@project.path).to eq(File.expand_path("./spec/fixtures/projects/Example.xcodeproj"))
+        expect(@project.path).to eq(File.expand_path("./fastlane_core/spec/fixtures/projects/Example.xcodeproj"))
       end
 
       it "#is_workspace" do
@@ -207,7 +207,7 @@ describe FastlaneCore do
     describe "Valid CocoaPods Project" do
       before do
         options = {
-          workspace: "./spec/fixtures/projects/cocoapods/Example.xcworkspace",
+          workspace: "./fastlane_core/spec/fixtures/projects/cocoapods/Example.xcworkspace",
           scheme: "Example"
         }
         @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
@@ -224,7 +224,7 @@ describe FastlaneCore do
 
     describe "Mac Project" do
       before do
-        options = { project: "./spec/fixtures/projects/Mac.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/Mac.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
@@ -247,7 +247,7 @@ describe FastlaneCore do
 
     describe "TVOS Project" do
       before do
-        options = { project: "./spec/fixtures/projects/ExampleTVOS.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/ExampleTVOS.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
@@ -270,7 +270,7 @@ describe FastlaneCore do
 
     describe "Cross-Platform Project" do
       before do
-        options = { project: "./spec/fixtures/projects/Cross-Platform.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/Cross-Platform.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
@@ -297,16 +297,16 @@ describe FastlaneCore do
 
     describe "build_settings() can handle empty lines" do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos" do
-        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./spec/fixtures/projects/build_settings_with_toolchains"))
+        expect(FastlaneCore::Project).to receive(:run_command).with("xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null", { timeout: 10, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
 
     describe "Build Settings with default configuration" do
       before do
-        options = { project: "./spec/fixtures/projects/Example.xcodeproj" }
+        options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
@@ -322,7 +322,7 @@ describe FastlaneCore do
     describe "Build Settings with specific configuration" do
       before do
         options = {
-          project: "./spec/fixtures/projects/Example.xcodeproj",
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           configuration: "SpecialConfiguration"
         }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
@@ -448,7 +448,7 @@ describe FastlaneCore do
     describe 'xcodebuild_list_silent option' do
       it 'is not silent by default' do
         project = FastlaneCore::Project.new(
-          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_suppress_stderr: true
         )
 
@@ -459,7 +459,7 @@ describe FastlaneCore do
 
       it 'makes the raw_info method be silent if configured' do
         project = FastlaneCore::Project.new(
-          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_list_silent: true,
           xcodebuild_suppress_stderr: true
         )
@@ -471,26 +471,26 @@ describe FastlaneCore do
 
     describe 'xcodebuild_suppress_stderr option' do
       it 'generates an xcodebuild -list command without stderr redirection by default' do
-        project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
         expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
       end
 
       it 'generates an xcodebuild -list command that redirects stderr to /dev/null' do
         project = FastlaneCore::Project.new(
-          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_suppress_stderr: true
         )
         expect(project.build_xcodebuild_list_command).to match(%r{2> /dev/null})
       end
 
       it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
-        project = FastlaneCore::Project.new({ project: "./spec/fixtures/projects/Example.xcodeproj" })
+        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
         expect(project.build_xcodebuild_showbuildsettings_command).not_to match(%r{2> /dev/null})
       end
 
       it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null' do
         project = FastlaneCore::Project.new(
-          { project: "./spec/fixtures/projects/Example.xcodeproj" },
+          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_suppress_stderr: true
         )
         expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})

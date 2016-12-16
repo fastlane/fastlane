@@ -59,7 +59,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 
 **Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
 
-    sudo gem install cert
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -79,7 +79,7 @@ In the gif I used `cert && sigh`, which will first create an iOS code signing ce
 
 # Usage
 
-    cert
+    fastlane cert
 
 This will check if any of the available signing certificates is installed on your local machine.
 
@@ -96,17 +96,17 @@ Only if a new certificate needs to be created, `cert` will
 
 You can pass your Apple ID:
 
-    cert -u cert@krausefx.com
+    fastlane cert -u cert@krausefx.com
 
 For a list of available commands run
 
-    cert --help
+    fastlane cert --help
 
 Keep in mind, there is no way for `cert` to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer.
 
 ## Environment Variables
 
-Run `cert --help` to get a list of all available environment variables.
+Run `fastlane cert --help` to get a list of all available environment variables.
 
 ## Use with [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh)
 

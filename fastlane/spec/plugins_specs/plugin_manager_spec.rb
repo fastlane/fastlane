@@ -3,7 +3,7 @@ describe Fastlane do
     let (:plugin_manager) { Fastlane::PluginManager.new }
     describe "#gemfile_path" do
       it "returns an absolute path if Gemfile available" do
-        expect(plugin_manager.gemfile_path).to eq(File.expand_path("Gemfile"))
+        expect(plugin_manager.gemfile_path).to eq(File.expand_path("./Gemfile"))
       end
 
       it "returns nil if no Gemfile available" do
@@ -25,7 +25,7 @@ describe Fastlane do
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
         expect(plugin_manager.available_gems).to eq(["fastlane-plugin-xcversion", "fastlane_core", "hemal"])
       end
     end
@@ -37,14 +37,14 @@ describe Fastlane do
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
         expect(plugin_manager.available_plugins).to eq(["fastlane-plugin-xcversion"])
       end
     end
 
     describe "#plugin_is_added_as_dependency?" do
       before do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
       end
 
       it "returns true if a plugin is available" do
@@ -64,12 +64,12 @@ describe Fastlane do
 
     describe "#plugins_attached?" do
       it "returns true if plugins are attached" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithAttached")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/GemfileWithAttached")
         expect(plugin_manager.plugins_attached?).to eq(true)
       end
 
       it "returns false if plugins are not attached" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithoutAttached")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/GemfileWithoutAttached")
         expect(plugin_manager.plugins_attached?).to eq(false)
       end
     end

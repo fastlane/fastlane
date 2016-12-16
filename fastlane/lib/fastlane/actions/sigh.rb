@@ -13,26 +13,20 @@ module Fastlane
         require 'sigh'
         require 'credentials_manager/appfile_config'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
+        Sigh.config = values # we already have the finished config
 
-          Sigh.config = values # we already have the finished config
+        path = Sigh::Manager.start
 
-          path = Sigh::Manager.start
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
+        uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
+        Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
 
-          uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
-          Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
+        set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
 
-          set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
-
-          return uuid # returs uuid of profile
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
-        end
+        return uuid # returs uuid of profile
       end
 
       def self.set_profile_type(values, enterprise)

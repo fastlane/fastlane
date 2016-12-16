@@ -1,5 +1,6 @@
 require 'commander'
 require 'deliver/download_screenshots'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -8,10 +9,7 @@ module Deliver
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('deliver')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
     end
 
     def deliverfile_options(skip_verification: false)
@@ -32,7 +30,7 @@ module Deliver
 
     def run
       program :name, 'deliver'
-      program :version, Deliver::VERSION
+      program :version, Fastlane::VERSION
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'

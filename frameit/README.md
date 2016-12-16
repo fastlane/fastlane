@@ -91,7 +91,7 @@ Make sure, you have the commandline tools installed
 
 Install the gem
 
-    sudo gem install frameit
+    sudo gem install fastlane
 
 The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
@@ -103,15 +103,15 @@ Why should you have to use Photoshop, just to add a frame around your screenshot
 
 Just navigate to your folder of screenshots and use the following command:
 
-    frameit
+    fastlane frameit
 
 To use the silver version of the frames:
 
-    frameit silver
+    fastlane frameit silver
 
 To download the latest frames
 
-    frameit download_frames
+    fastlane frameit download_frames
 
 When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
@@ -254,7 +254,7 @@ Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``
 
 ## White background of frames
 
-Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `frameit` again.
+Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
@@ -269,7 +269,7 @@ brew install imagemagick
 ```
 
 ## Uninstall
-- ```sudo gem uninstall frameit```
+- ```sudo gem uninstall fastlane```
 - ```rm -rf ~/.frameit```
 
 # Need help?

@@ -146,6 +146,9 @@ module FastlaneCore
     end
 
     def self.determine_version(name)
+      require 'fastlane'
+      return Fastlane::VERSION if Fastlane::ActionsList.find_action_named(name.to_s)
+
       begin
         name = name.to_s.downcase
 
