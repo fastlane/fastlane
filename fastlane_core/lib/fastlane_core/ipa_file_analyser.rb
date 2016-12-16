@@ -48,7 +48,7 @@ module FastlaneCore
         rescue
           # We don't really care, look for another XML file
         ensure
-          FileUtils.remove_entry tmp
+          FileUtils.remove_entry(tmp)
         end
       end
 
