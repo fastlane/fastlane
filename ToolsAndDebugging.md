@@ -127,23 +127,30 @@ SPACESHIP_DEBUG=1 spaceship
 To make it easier to run the same script again, you can temporarily edit the `spaceship/Rakefile` to look like this:
 
 ```ruby
-# leave existing code, and append the following
+# ...
 
 task :debug do
-  require ‘spaceship’
+  require 'spaceship'
+
+  user = "<insert user here>" # use your own test account
 
   # first login
-  Spaceship::Tunes.login("apple@fastlane.tools") # use your own test account
+  Spaceship::Tunes.login(user)
   # or
-  Spaceship::Portal.login("apple@fastlane.tools") # use your own test account
+  Spaceship::Portal.login(user)
   
   # then add code to test whatever part of _spaceship_ needs to be tested
   # e.g.
   apps = Spaceship::Tunes::Application.all
+
   require 'pry'
   binding.pry
+
+  puts "All done"
 end
 ```
+
+Optionally, add `Spaceship.select_team` right after the `.login` call, if you're part of multiple teams
 
 To run the newly created script, `cd` into the _spaceship_ directory and run
 

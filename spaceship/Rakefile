@@ -8,3 +8,23 @@ Dir.glob('tasks/**/*.rake').each(&method(:import))
 task :push do
   sh "../fastlane/bin/fastlane release"
 end
+
+task :debug do
+  require 'spaceship'
+
+  user = "<insert user here>" # use your own test account
+
+  # first login
+  Spaceship::Tunes.login(user)
+  # or
+  Spaceship::Portal.login(user)
+  
+  # then add code to test whatever part of _spaceship_ needs to be tested
+  # e.g.
+  apps = Spaceship::Tunes::Application.all
+
+  require 'pry'
+  binding.pry
+
+  puts "All done"
+end
