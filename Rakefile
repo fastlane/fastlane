@@ -18,6 +18,12 @@ task :test_all do
   sh "rspec --pattern */spec/*_spec.rb"
 end
 
+# Overwrite the default rake task
+# since we use fastlane to deploy fastlane
+task :push do
+  sh "bundle exec fastlane release"
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
