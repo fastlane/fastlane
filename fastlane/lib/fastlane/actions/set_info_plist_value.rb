@@ -17,7 +17,7 @@ module Fastlane
           return params[:value]
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to set value to plist file at '#{path}'")
+          UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
       end
 
