@@ -8,5 +8,5 @@ dependencies:
     - bundle install --jobs=4 --retry=3
 test:
   override:
-    - bundle exec rake test_all
+    - bundle exec rspec --pattern */spec/*_spec.rb -r rspec_junit_formatter --format progress --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml
     - bundle exec rubocop
