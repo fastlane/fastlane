@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 module FastlaneCore
   class CommanderGenerator
