@@ -6,6 +6,8 @@ module Fastlane
 
     class XcodeInstallAction < Action
       def self.run(params)
+        Actions.verify_gem!('xcode-install')
+
         ENV["XCODE_INSTALL_USER"] = params[:username]
         ENV["XCODE_INSTALL_TEAM_ID"] = params[:team_id]
 
