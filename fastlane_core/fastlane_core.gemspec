@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # options summary
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
 
-  spec.add_dependency "credentials_manager", ">= 0.16.2", "< 1.0.0" # fastlane password manager
+  spec.add_dependency "fastlane", ">= 2.0.0", "< 3.0.0" # fastlane password manager
 
   # Development only
   spec.add_development_dependency 'bundler'
@@ -42,9 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'fastlane'
   spec.add_development_dependency 'danger', '>= 0.1.1'
   spec.add_development_dependency 'rubocop', '~> 0.44.0'
-
-  spec.post_install_message = "\e[1;33;40mPlease use `fastlane #{spec.name}` instead of `#{spec.name}` from now on.\e[0m"
 end
