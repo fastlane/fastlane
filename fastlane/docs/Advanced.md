@@ -176,11 +176,44 @@ fastlane run notification message:"My Text" title:"The Title"
 
 To get the avaiable options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
 
-## Shell values
+## Shell interaction
+
+### Return value
+
 You can get value from shell commands:
 ```ruby
 output = sh("pod update")
 ```
+
+### Working directory
+
+'sh' action uses a different working directory than other Fastlane actions. As working directory, most Fastlane actions use the current directory as of the time when the fastlane script has been called. However, 'sh' action uses ./fastlane/ subdirectory of the current directory as its working directory. Furthermore, shell environment variable PWD does not reflect the working directory, while retrieved within 'sh' action. The behavior is illustrated by the following example:
+
+Action:
+```
+sh('pwd')
+```
+Output:
+```
+/Users/admin/iphone-app/fastlane
+```
+
+Action:
+```
+sh('env')
+```
+Output (truncated):
+```
+PWD=/Users/admin/iphone-app
+```
+
+This behavior might be confussing, but it has been the same since ever. Changing it would break some of the existing configurations, therefore it is intended to be kept as is at the time being. The behavior has been discussed in fastlane/fastlane#6982, please do not raise any further issues regarding it.
+
+If you need to call a script present in the current directory, you can use the following notion:
+```
+sh("#{ENV['PWD']}/script.sh")
+```
+
 
 ## Priorities of parameters and options
 
