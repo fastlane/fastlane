@@ -1,4 +1,4 @@
 module Fastlane
-  VERSION = '2.0.5'.freeze
+  VERSION = '2.1.0'.freeze
   DESCRIPTION = "The easiest way to automate beta deployments and releases for your iOS and Android apps".freeze
 end
