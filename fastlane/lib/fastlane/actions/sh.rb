@@ -15,7 +15,8 @@ module Fastlane
 
       def self.details
         [
-          "Allows running an arbitrary shell command"
+          "Allows running an arbitrary shell command.",
+          "Be aware of a specific behavior of 'sh' action with regard to the working directory. For details refer to Advanced.md"
         ].join("\n")
       end
 
