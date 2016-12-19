@@ -4,7 +4,12 @@ module Fastlane
       def self.find_xcode(req)
         req = Gem::Requirement.new(req.to_s)
 
-        require 'xcode/install'
+        begin
+          require 'xcode/install'
+        rescue
+          UI.user_error!("Please make sure that xcode-install/xcversion is installed before running this action.")
+        end
+
         installer = XcodeInstall::Installer.new
         installed = installer.installed_versions.reverse
         installed.detect do |xcode|
