@@ -23,13 +23,13 @@ xcode-select --install
 Navigate to your project folder and run
 
 ```
-match appstore
+fastlane match appstore
 ```
 ```
-match adhoc
+fastlane match adhoc
 ```
 ```
-match development
+fastlane match development
 ```
 
 For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match#readme)
