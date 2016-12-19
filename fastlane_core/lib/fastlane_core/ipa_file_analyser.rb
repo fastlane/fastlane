@@ -32,27 +32,22 @@ module FastlaneCore
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
 
-        tmp = Dir.mktmpdir
-        # We can not be completely sure, that's the correct plist file, so we have to try
-        begin
+        # Creates a temporary directory with a unique name tagged with 'fastlane'
+        # The directory is deleted automatically at the end of the block
+        Dir.mktmpdir("fastlane") do |tmp|
           # The XML file has to be properly unpacked first
-          tmp_path = "#{tmp}/deploytmp.plist"
+          tmp_path = File.join(tmp, "Info.plist")
           File.write(tmp_path, zipfile.read(file))
           system("plutil -convert xml1 #{tmp_path}")
           result = Plist.parse_xml(tmp_path)
-          File.delete(tmp_path)
 
           if result['CFBundleIdentifier'] or result['CFBundleVersion']
             return result
           end
-        rescue
-          # We don't really care, look for another XML file
-        ensure
-          FileUtils.remove_entry(tmp)
         end
       end
 
-      nil
+      return nil
     end
   end
 end
