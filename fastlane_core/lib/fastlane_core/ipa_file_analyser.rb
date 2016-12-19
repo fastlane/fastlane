@@ -32,10 +32,11 @@ module FastlaneCore
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
 
+        tmp = Dir.mktmpdir
         # We can not be completely sure, that's the correct plist file, so we have to try
         begin
           # The XML file has to be properly unpacked first
-          tmp_path = "/tmp/deploytmp.plist"
+          tmp_path = "#{tmp}/deploytmp.plist"
           File.write(tmp_path, zipfile.read(file))
           system("plutil -convert xml1 #{tmp_path}")
           result = Plist.parse_xml(tmp_path)
@@ -46,6 +47,8 @@ module FastlaneCore
           end
         rescue
           # We don't really care, look for another XML file
+        ensure
+          FileUtils.remove_entry(tmp)
         end
       end
 
