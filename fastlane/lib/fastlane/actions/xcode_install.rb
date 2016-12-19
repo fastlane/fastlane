@@ -11,7 +11,12 @@ module Fastlane
         ENV["XCODE_INSTALL_USER"] = params[:username]
         ENV["XCODE_INSTALL_TEAM_ID"] = params[:team_id]
 
-        require 'xcode/install'
+        begin
+          require 'xcode/install'
+        rescue
+          UI.user_error!("Please make sure that xcode-install/xcversion is installed before running this action.")
+        end
+
         installer = XcodeInstall::Installer.new
 
         if installer.installed?(params[:version])
