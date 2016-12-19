@@ -206,7 +206,7 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if FastlaneCore::Env.truthy?('FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS') && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
