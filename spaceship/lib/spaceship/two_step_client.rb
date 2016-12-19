@@ -35,7 +35,7 @@ module Spaceship
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
-      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Hash)
+      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
