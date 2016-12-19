@@ -227,6 +227,9 @@ module Spaceship
       puts data['sectionWarningKeys'] if data['sectionWarningKeys']
 
       return data
+    rescue => ex
+      UpdateChecker.ensure_spaceship_version # to show an update message on error if necessary
+      raise ex
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
