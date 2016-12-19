@@ -418,9 +418,6 @@ module Spaceship
         store_csrf_tokens(response)
         content
       end
-    rescue => ex
-      UpdateChecker.ensure_spaceship_version # to show an update message on error if necessary
-      raise ex
     end
 
     private
