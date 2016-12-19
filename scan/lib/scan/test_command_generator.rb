@@ -71,7 +71,7 @@ module Scan
         formatter = []
         if Scan.config[:formatter]
           formatter << "-f `#{Scan.config[:formatter]}`"
-        elsif ENV.key?("TRAVIS")
+        elsif FastlaneCore::Env.truthy?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
           UI.success("Automatically switched to Travis formatter")
         end
