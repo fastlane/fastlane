@@ -95,13 +95,14 @@ module Gym
                                      is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
+                                     deprecated: "Don't use this option any more, as it's deprecated by Apple",
                                      env_name: "GYM_USE_LEGACY_BUILD_API",
-                                     description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
+                                     description: "Don't use this option any more, as it's deprecated by Apple",
                                      default_value: false,
                                      is_string: false,
                                      verify_block: proc do |value|
                                        if value
-                                         UI.important "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816"
+                                         UI.important "Don't use this option any more, as it's deprecated by Apple"
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_method,

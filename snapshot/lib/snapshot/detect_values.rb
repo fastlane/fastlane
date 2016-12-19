@@ -5,6 +5,7 @@ module Snapshot
       config = Snapshot.config
 
       # First, try loading the Snapfile from the current directory
+      configuration_file_path = File.expand_path(Snapshot.snapfile_name)
       config.load_configuration_file(Snapshot.snapfile_name)
 
       # Detect the project
@@ -13,7 +14,9 @@ module Snapshot
 
       # Go into the project's folder, as there might be a Snapfile there
       Dir.chdir(File.expand_path("..", Snapshot.project.path)) do
-        config.load_configuration_file(Snapshot.snapfile_name)
+        unless File.expand_path(Snapshot.snapfile_name) == configuration_file_path
+          config.load_configuration_file(Snapshot.snapfile_name)
+        end
       end
 
       Snapshot.project.select_scheme(preferred_to_include: "UITests")

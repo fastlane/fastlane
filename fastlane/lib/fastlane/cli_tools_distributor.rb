@@ -23,42 +23,40 @@ module Fastlane
 
         tool_name = process_emojis(tool_name)
 
-        if tool_name
-          if Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
-            # Triggering a specific tool
-            # This happens when the users uses things like
-            #
-            #   fastlane sigh
-            #   fastlane snapshot
-            #
-            require tool_name
-            begin
-              # First, remove the tool's name from the arguments
-              # Since it will be parsed by the `commander` at a later point
-              # and it must not contain the binary name
-              ARGV.shift
-
-              # Import the CommandsGenerator class, which is used to parse
-              # the user input
-              require File.join(tool_name, "commands_generator")
-
-              # Call the tool's CommandsGenerator class and let it do its thing
-              Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
-            rescue LoadError
-              # This will only happen if the tool we call here, doesn't provide
-              # a CommandsGenerator class yet
-              # When we launch this feature, this should never be the case
-              abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
-            end
-          elsif tool_name == "fastlane-credentials"
-            require 'credentials_manager'
+        if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
+          # Triggering a specific tool
+          # This happens when the users uses things like
+          #
+          #   fastlane sigh
+          #   fastlane snapshot
+          #
+          require tool_name
+          begin
+            # First, remove the tool's name from the arguments
+            # Since it will be parsed by the `commander` at a later point
+            # and it must not contain the binary name
             ARGV.shift
-            CredentialsManager::CLI.new.run
-          else
-            # Triggering fastlane to call a lane
-            require "fastlane/commands_generator"
-            Fastlane::CommandsGenerator.start
+
+            # Import the CommandsGenerator class, which is used to parse
+            # the user input
+            require File.join(tool_name, "commands_generator")
+
+            # Call the tool's CommandsGenerator class and let it do its thing
+            Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
+          rescue LoadError
+            # This will only happen if the tool we call here, doesn't provide
+            # a CommandsGenerator class yet
+            # When we launch this feature, this should never be the case
+            abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
           end
+        elsif tool_name == "fastlane-credentials"
+          require 'credentials_manager'
+          ARGV.shift
+          CredentialsManager::CLI.new.run
+        else
+          # Triggering fastlane to call a lane
+          require "fastlane/commands_generator"
+          Fastlane::CommandsGenerator.start
         end
       end
 

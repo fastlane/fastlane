@@ -15,7 +15,7 @@ task :rubygems_admins do
 end
 
 task :test_all do
-  sh "rspec --pattern */spec/*_spec.rb"
+  sh "rspec --pattern ./**/*_spec.rb"
 end
 
 # Overwrite the default rake task

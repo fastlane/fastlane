@@ -18,7 +18,7 @@ module Fastlane
           UI.important("")
           UI.command_output("gem \"#{gem_name}\"")
           UI.important("")
-          UI.user_error!("Add 'gem \"#{gem_name}\"' to your Gemfile and restart fastlane")
+          UI.user_error!("Add 'gem \"#{gem_name}\"' to your Gemfile and restart fastlane") unless Helper.test?
         end
 
         require "rubygems/command_manager"

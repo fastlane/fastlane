@@ -43,9 +43,9 @@ module Gym
               if Gym.config[:toolchain].nil?
                 UI.important("If you're using Swift 2.3, but already updated to Xcode 8")
                 UI.important("try adding the following parameter to your gym call:")
-                UI.success("gym(use_legacy_build_api: true, toolchain: :swift_2_3)")
+                UI.success("gym(toolchain: :swift_2_3)")
                 UI.message("or")
-                UI.success("gym --use_legacy_build_api --toolchain swift_2_3")
+                UI.success("gym --toolchain swift_2_3")
               end
 
               UI.user_error!(ex)
