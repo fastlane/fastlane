@@ -13,7 +13,12 @@ module Fastlane
       rows = []
       all_actions(platform) do |action, name|
         current = []
-        current << name.yellow
+        
+        if action.category == :deprecated
+          current << "#{name} (DEPRECATED)".red
+        else
+          current << name.yellow
+        end
 
         if action < Action
           current << action.description if action.description
@@ -55,6 +60,13 @@ module Fastlane
         print_options(action, filter)
         print_output_variables(action, filter)
         print_return_value(action, filter)
+
+        if action.category == :deprecated
+          puts "==========================================".deprecated
+          puts "This plugin (#{filter}) is deprecated".deprecated
+          puts "\n#{action.deprecated_notes}".deprecated  if action.deprecated_notes
+          puts "==========================================\n".deprecated
+        end
 
         puts "More information can be found on https://docs.fastlane.tools/actions"
         puts ""
