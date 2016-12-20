@@ -52,7 +52,7 @@ module FastlaneCore
     end
 
     def deprecated(message)
-      log.error(message.to_s.bold.blue)
+      log.error(message.to_s.deprecated)
     end
 
     def command(message)
@@ -119,5 +119,11 @@ module FastlaneCore
       important(message)
       crash!("Could not retrieve response as fastlane runs in non-interactive mode")
     end
+  end
+end
+
+class String
+  def deprecated
+    self.bold.blue
   end
 end
