@@ -89,7 +89,6 @@ module Gym
     end
 
     def mark_archive_as_built_by_gym(archive_path)
-      return if Gym.project.library? || Gym.project.framework?
       escaped_archive_path = archive_path.shellescape
       system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
     end
