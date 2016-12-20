@@ -11,7 +11,7 @@ module Gym
         clear_old_files
         build_app
       end
-      verify_archive if Gym.project.produces_archive?
+      verify_archive
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
@@ -32,14 +32,6 @@ module Gym
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
-      end
-
-      if Gym.project.library? || Gym.project.framework?
-        base_framework_path = Gym.project.build_settings(key: "BUILD_ROOT")
-        base_framework_path = Gym.config[:derived_data_path] + "/Build/Products/" if Gym.config[:derived_data_path]
-
-        copy_files_from_path("#{base_framework_path}/*/*")
-        path = base_framework_path
       end
       path
     end
