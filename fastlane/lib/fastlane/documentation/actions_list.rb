@@ -15,7 +15,7 @@ module Fastlane
         current = []
         
         if action.category == :deprecated
-          current << "#{name} (DEPRECATED)".red
+          current << "#{name} (DEPRECATED)".deprecated
         else
           current << name.yellow
         end
