@@ -111,7 +111,7 @@ module Fastlane
           subject: options[:subject],
           html: mail_template(options)
         }
-        if options[:reply_to] != nil
+        unless options[:reply_to].nil?
           params.store(:"h:Reply-To", options[:reply_to])
         end
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
