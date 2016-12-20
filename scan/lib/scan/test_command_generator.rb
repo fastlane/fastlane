@@ -40,6 +40,22 @@ module Scan
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
+        if config[:only_testing].kind_of?(Array)
+          config[:only_testing].each do |test_path|
+            options << "-only-testing:#{test_path}"
+          end
+        elsif config[:only_testing].kind_of?(String)
+          options << "-only-testing:#{config[:only_testing]}"
+        end
+
+        if config[:skip_testing].kind_of?(Array)
+          config[:skip_testing].each do |test_path|
+            options << "-skip-testing:#{test_path}"
+          end
+        elsif config[:skip_testing].kind_of?(String)
+          options << "-skip-testing:#{config[:skip_testing]}"
+        end
+
         options
       end
 
