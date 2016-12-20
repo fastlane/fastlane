@@ -28,7 +28,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
-First, navigate into the roof of the _fastlane_ project and run unit tests using
+First, navigate into the root of the _fastlane_ project and run unit tests using
 
 ```
 bundle exec rspec
