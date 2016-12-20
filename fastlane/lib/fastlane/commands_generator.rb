@@ -21,6 +21,7 @@ module Fastlane
       if $capture_output
         # Trace mode is enabled
         # redirect STDOUT and STDERR
+        puts "Capturing Output.....".yellow
         out_channel = StringIO.new
         $stdout = out_channel
         $stderr = out_channel

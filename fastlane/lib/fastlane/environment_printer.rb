@@ -2,6 +2,17 @@ module Fastlane
   class EnvironmentPrinter
     def self.output
       env_info = get
+      # UI.important is not working here, as it does not survive the $stdout/$stderr redirect,
+      # so use .yellow directly here :)
+      puts "To protect your privacy".yellow
+      puts "Enter strings that you want to be removed/replaced - one by each line, end input with: END".yellow
+      puts "e.g.:".yellow
+      puts "      my.app.id".yellow
+      puts "      my-company-name".yellow
+      user_input = STDIN.gets("END\n").gsub("END\n", "").strip
+      user_input.split("\n").each do |privacy_word|
+        env_info.gsub!(privacy_word, "_-removed-_")
+      end
       puts env_info
       if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
         copy_to_clipboard(env_info)
@@ -29,6 +40,7 @@ module Fastlane
       final_output = ""
 
       if $captured_output
+        $captured_output.delete!("`") # just in case strip out `
         final_output << "### Captured Output\n\n"
         final_output << "Command Used: `#{ARGV.join(' ')}`\n"
         final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{$captured_output}\n\n```\n\n</details>\n\n"
