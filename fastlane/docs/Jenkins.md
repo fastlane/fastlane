@@ -68,3 +68,23 @@ To show the **generated screenhots** right in `Jenkins`
 Save and run. The result should look like this:
 
 ![JenkinsIntegration](../assets/JenkinsIntegration.png)
+
+## Changelog
+
+You might need to automatically generate a changelog from your commits, particularly if you deploy your apps to an internal system.
+
+Jenkins might be already passing relevant information to your environment so that fastlane can generate the change log using an appropriate action.
+
+Here's an example integration if you use the Jenkins Git plugin and the `changelog_from_git_commits` fastlane action:
+
+```ruby
+  changelog = changelog_from_git_commits(
+    between: [ENV['GIT_PREVIOUS_SUCCESSFUL_COMMIT'], ENV['GIT_COMMIT']],
+    pretty: "* (%h) [%aN] %s"
+  )
+  changelog = "Empty changelog..." if changelog.to_s.length == 0
+```
+
+And this is how it would look like if that `changelog` was passed to the `hockeyapp` action:
+
+![Jenkins ChangeLog to HockeyApp](../assets/jenkins_hockeyapp_changelog.png)
