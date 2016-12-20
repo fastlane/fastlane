@@ -16,10 +16,10 @@ module Gym
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
-        package_app # FIXME  if Gym.project.produces_archive?
+        package_app
         fix_package
         compress_and_move_dsym
-        path = move_ipa # FIXME: if Gym.project.produces_archive?
+        path = move_ipa
         move_manifest
         move_app_thinning
         move_app_thinning_size_report
