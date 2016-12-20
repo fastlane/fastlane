@@ -21,7 +21,7 @@ To store the password in the Keychain of your remote machine, I recommend runnin
 
 ## Deploy Strategy
 
-You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update.
+You should **not** deploy a new App Store update after every commit, since you still have to wait a few weeks for the review and might reset your number of stars. Instead I recommend using Git Tags, or custom triggers to deploy a new update.
 
 You can set up your own ```Release``` job, which is only triggered manually.
 
