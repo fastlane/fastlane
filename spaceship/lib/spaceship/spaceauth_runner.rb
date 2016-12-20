@@ -17,7 +17,12 @@ module Spaceship
         puts "Successfully logged in to iTunes Connect".green
         puts ""
       rescue
-        puts "Could not login to iTunes Connect...".red
+        puts "Could not login to iTunes Connect".red
+        puts "Please check your credentials and try again.".yellow
+        puts "This could be an issue with iTunes Connect,".yellow
+        puts "Please try unsetting the FASTLANE_SESSION environment variable".yellow
+        puts "and re-run `fastlane spaceauth`".yellow
+        UI.crash!("Problem connecting to iTunes Connect")
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
@@ -31,8 +36,8 @@ module Spaceship
       cookies = YAML.load(itc_cookie_content)
 
       # We remove all the un-needed cookies
-      cookies.delete_if do |current|
-        ['aa', 'X-SESS', 'site', 'acn01', 'myacinfo', 'itctx', 'wosid', 'woinst', 'NSC_17ofu-jud-jud-mc'].include?(current.name)
+      cookies.select! do |cookie|
+        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
