@@ -82,6 +82,12 @@ module Fastlane
       require 'faraday'
       require 'json'
 
+      if ENV['USE_ENHANCE_TEST_DATA']
+        return [{"action"=>"puts", "launches"=>123, "errors"=>0, "ratio"=>0.0, "crashes"=>0},
+          {"action"=>"fastlane_version", "launches"=>123, "errors"=>43, "ratio"=>0.34, "crashes"=>0},
+          {"action"=>"default_platform", "launches"=>123, "errors"=>33, "ratio"=>0.27, "crashes"=>31}]
+      end
+
       unless @launches
         conn = Faraday.new(ENHANCER_URL)
         conn.basic_auth(ENV["ENHANCER_USER"], ENV["ENHANCER_PASSWORD"])

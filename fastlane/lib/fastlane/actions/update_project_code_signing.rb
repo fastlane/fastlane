@@ -26,10 +26,6 @@ module Fastlane
         "Updated code signing settings from 'Automatic' to a specific profile"
       end
 
-      def self.details
-        "Don't use this action, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
