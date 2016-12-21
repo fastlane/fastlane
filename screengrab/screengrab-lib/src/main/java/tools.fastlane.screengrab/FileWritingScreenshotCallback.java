@@ -67,7 +67,7 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
         }
 
         if (directory == null) {
-            File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
+            File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_PRIVATE), localeToDirName(locale));
             directory = initializeDirectory(internalDir);
         }
 
