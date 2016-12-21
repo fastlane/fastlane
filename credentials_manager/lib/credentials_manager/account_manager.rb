@@ -56,7 +56,7 @@ module CredentialsManager
     end
 
     def add_to_keychain
-      Security::InternetPassword.add(server_name, user, password)
+      Security::InternetPassword.add(server_name, user, password, options)
     end
 
     def remove_from_keychain
@@ -66,6 +66,10 @@ module CredentialsManager
 
     def server_name
       "#{@prefix}.#{user}"
+    end
+
+    def options
+      { p: ENV["FASTLANE_PATH"], P: ENV["FASTLANE_PORT"], r: ENV["FASTLANE_PROTOCOL"] }
     end
 
     private
