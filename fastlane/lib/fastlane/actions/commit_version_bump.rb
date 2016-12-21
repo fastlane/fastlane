@@ -70,7 +70,7 @@ module Fastlane
 
         if params[:settings]
           settings_plists_from_param(params[:settings]).each do |file|
-            settings_file_pathname = Pathname.new settings_bundle_file_path(xcodeproj_path, file)
+            settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
             expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
           end
         end
@@ -212,13 +212,11 @@ module Fastlane
           ["Root.plist"]
         end
 
-        def settings_bundle_file_path(xcodeproj_path, settings_file_name)
-          require 'xcodeproj'
-          project = Xcodeproj::Project.open xcodeproj_path
+        def settings_bundle_file_path(project, settings_file_name)
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          project_parent = File.dirname xcodeproj_path
+          project_parent = File.dirname project.path
           File.join(project_parent, settings_bundle.path, settings_file_name)
         end
       end
