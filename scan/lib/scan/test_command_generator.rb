@@ -31,9 +31,8 @@ module Scan
 
         options = []
         options += project_path_array
-        options << "-sdk '#{config[:sdk]}'" if config[:sdk] && !config[:build_for_testing]
-        options << destination unless config[:build_for_testing] # generated in `detect_values`
-        options << "  -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO" if config[:build_for_testing]
+        options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+         options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
