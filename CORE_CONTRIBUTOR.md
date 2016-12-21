@@ -1,7 +1,7 @@
 # _fastlane_ Core Contributor Expectations
 
 
-We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, enthusaistic members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
+We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, enthusiastic members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
 
 
 ## How does one become a core contributor?
