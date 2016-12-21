@@ -69,10 +69,10 @@ module Fastlane
         expected_changed_files << info_plist_files
 
         if params[:settings]
-          file = params[:settings_file]
-
-          settings_file_pathname = Pathname.new settings_bundle_file_path(xcodeproj_path, file)
-          expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
+          settings_plists_from_param(params[:settings]).each do |file|
+            settings_file_pathname = Pathname.new settings_bundle_file_path(xcodeproj_path, file)
+            expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
+          end
         end
 
         expected_changed_files.flatten!.uniq!
@@ -152,12 +152,6 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :settings_file,
-                                       env_name: "FL_COMMIT_SETTINGS_FILE",
-                                       description: "A plist file in Settings.bundle to include if :settings is true",
-                                       optional: true,
-                                       default_value: "Root.plist",
-                                       type: String),
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        description: "A regular expression used to filter matched plist files to be modified",
                                        optional: true,
@@ -205,7 +199,18 @@ module Fastlane
       end
 
       class << self
-        private
+        def settings_plists_from_param(param)
+          if param.kind_of? String
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+            return [param]
+          elsif param.kind_of? Array
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+            return param
+          end
+
+          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
+          ["Root.plist"]
+        end
 
         def settings_bundle_file_path(xcodeproj_path, settings_file_name)
           require 'xcodeproj'
@@ -214,7 +219,7 @@ module Fastlane
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
           project_parent = File.dirname xcodeproj_path
-          File.join project_parent, settings_bundle.path, settings_file_name
+          File.join(project_parent, settings_bundle.path, settings_file_name)
         end
       end
     end
