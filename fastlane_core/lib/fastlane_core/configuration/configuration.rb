@@ -35,9 +35,23 @@ module FastlaneCore
     # @!group Setting up the configuration
     #####################################################
 
+    # collect sensitive strings
+    def self.sensitive_strings
+      @sensitive_strings ||= []
+    end
+
     def initialize(available_options, values)
       self.available_options = available_options || []
       self.values = values || {}
+
+      # if we are in captured output mode - keep a array of sensitive option values
+      # those will be later - replaced by ####
+      if $capture_output
+        available_options.each do |element|
+          next unless element.sensitive
+          self.class.sensitive_strings << values[element.key]
+        end
+      end
 
       verify_input_types
       verify_value_exists
