@@ -160,6 +160,6 @@ module Snapshot
                                    description: "The name of the target you want to test (if you desire to override the Target Application from Xcode)",
                                    optional: true)
       ]
-end
-end
+    end
+  end
 end
