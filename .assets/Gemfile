@@ -8,27 +8,4 @@ if File.exist?(File.join(File.expand_path(local_fastlane_path), "fastlane.gemspe
   local_fastlane_path = File.expand_path("..", local_fastlane_path)
 end
 
-tools = [
-  "fastlane_core",
-  "spaceship",
-  "fastlane",
-  "cert",
-  "credentials_manager",
-  "deliver",
-  "frameit",
-  "gym",
-  "match",
-  "pem",
-  "pilot",
-  "produce",
-  "scan",
-  "screengrab",
-  "sigh",
-  "snapshot",
-  "supply",
-  "watchbuild",
-]
-
-tools.each do |tool|
-  gem tool, path: File.join(local_fastlane_path, tool)
-end
+gem "fastlane", path: local_fastlane_path
