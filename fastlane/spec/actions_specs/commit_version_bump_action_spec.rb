@@ -33,7 +33,7 @@ describe Fastlane::Actions::CommitVersionBumpAction do
 
       expect do
         action.settings_bundle_file_path xcodeproj, "Root.plist"
-      end.to raise_error
+      end.to raise_error RuntimeError
     end
   end
 end
