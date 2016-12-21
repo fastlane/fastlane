@@ -23,17 +23,8 @@ module Fastlane
         platform == :ios
       end
 
-      def self.deprecation_warning
-        UI.error("You are using legacy `shenzhen` to build your app, which will be removed soon!")
-        UI.error("It is recommended to upgrade to `gym`")
-        UI.error("To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile")
-        UI.error("https://github.com/fastlane/fastlane/tree/master/gym")
-      end
-
       def self.run(params)
         Actions.verify_gem!('krausefx-shenzhen')
-
-        deprecation_warning
 
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
@@ -240,7 +231,14 @@ module Fastlane
       end
 
       def self.category
-        :building
+        :deprecated
+      end
+      
+      def self.deprecated_notes
+        "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
+        "It is recommended to upgrade to `gym`\n" \
+        "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile\n" \
+        "https://github.com/fastlane/fastlane/tree/master/gym"
       end
     end
   end
