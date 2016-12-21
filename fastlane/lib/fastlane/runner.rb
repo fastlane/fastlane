@@ -227,8 +227,8 @@ module Fastlane
             else
               UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
             end
-            
-            if class_ref.category == :deprecated
+
+            if Fastlane::Actions.is_class_action?(class_ref) && class_ref.category == :deprecated
               puts "\n==========================================".deprecated
               puts "This plugin (#{method_sym}) is deprecated".deprecated
               puts "\n#{class_ref.deprecated_notes}".deprecated if class_ref.deprecated_notes

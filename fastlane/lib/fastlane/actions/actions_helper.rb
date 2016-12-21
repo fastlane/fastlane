@@ -134,5 +134,9 @@ module Fastlane
     def self.formerly_bundled_actions
       ["xcake"]
     end
+    
+    def self.is_class_action?(class_ref)
+      class_ref < Fastlane::Action
+    end
   end
 end
