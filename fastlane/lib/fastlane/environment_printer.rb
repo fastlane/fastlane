@@ -2,6 +2,12 @@ module Fastlane
   class EnvironmentPrinter
     def self.output
       env_info = get
+
+      # Remove sensitive option values
+      FastlaneCore::Configuration.sensitive_strings.compact.each do |sensitive_element|
+        env_info.gsub!(sensitive_element, "#########")
+      end
+
       puts env_info
       if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
         copy_to_clipboard(env_info)

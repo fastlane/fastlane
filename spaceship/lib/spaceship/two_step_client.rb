@@ -35,7 +35,7 @@ module Spaceship
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
-      elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
+      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
@@ -48,7 +48,7 @@ module Spaceship
       puts "If you're running this in a non-interactive session (e.g. server or CI)"
       puts "check out #{two_factor_url}"
 
-      security_code = response.body["phoneNumberVerification"]["securityCode"]
+      security_code = response.body["securityCode"]
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,
       #  "tooManyCodesValidated"=>false,
