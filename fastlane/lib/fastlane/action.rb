@@ -129,7 +129,7 @@ module Fastlane
     def self.other_action
       return OtherAction.new(self.runner)
     end
-    
+
     # Describes how the user should handle deprecated an action if its deprecated
     def self.deprecated_notes
       nil

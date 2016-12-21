@@ -437,8 +437,8 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "Please use the `aws_s3` plugin instead.\n" +
-        "Install using `fastlane add_plugin aws_s3`."
+        "Please use the `aws_s3` plugin instead.\n" \
+          "Install using `fastlane add_plugin aws_s3`."
       end
     end
   end
