@@ -15,7 +15,9 @@ module Fastlane
         end
 
         cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
-        cmd << ['pod install']
+        cmd << ['pod']
+        cmd << [" __ '#{params[:pod_version]}' __"] if params[:pod_version]
+        cmd << [' install'] 
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
