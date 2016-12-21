@@ -233,7 +233,7 @@ module Fastlane
       def self.category
         :deprecated
       end
-      
+
       def self.deprecated_notes
         "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
         "It is recommended to upgrade to `gym`\n" \
