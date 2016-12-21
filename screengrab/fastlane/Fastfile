@@ -1,5 +1,5 @@
 # Fetch and use the latest Fastfile from the fastlane main repository
-import("../../fastlane/fastlane/Fastfile")
+import("../../fastlane/Fastfile")
 
 lane :deploy_aar do
   ensure_git_branch
