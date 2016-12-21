@@ -68,8 +68,8 @@ module Fastlane
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
 
-        if params[:settings]
-          settings_plists_from_param(params[:settings]).each do |file|
+        if params[:include_settings]
+          settings_plists_from_param(params[:include_settings]).each do |file|
             settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
             expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
           end
