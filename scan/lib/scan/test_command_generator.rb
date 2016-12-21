@@ -32,7 +32,7 @@ module Scan
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-         options << destination # generated in `detect_values`
+        options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
