@@ -83,9 +83,9 @@ module Fastlane
       require 'json'
 
       if ENV['USE_ENHANCE_TEST_DATA']
-        return [{"action"=>"puts", "launches"=>123, "errors"=>0, "ratio"=>0.0, "crashes"=>0},
-          {"action"=>"fastlane_version", "launches"=>123, "errors"=>43, "ratio"=>0.34, "crashes"=>0},
-          {"action"=>"default_platform", "launches"=>123, "errors"=>33, "ratio"=>0.27, "crashes"=>31}]
+        return [{ "action" => "puts", "launches" => 123, "errors" => 0, "ratio" => 0.0, "crashes" => 0 },
+                { "action" => "fastlane_version", "launches" => 123, "errors" => 43, "ratio" => 0.34, "crashes" => 0 },
+                { "action" => "default_platform", "launches" => 123, "errors" => 33, "ratio" => 0.27, "crashes" => 31 }]
       end
 
       unless @launches

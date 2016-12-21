@@ -192,7 +192,7 @@ def generate_markdown_docs
   require 'fastlane/documentation/markdown_docs_generator'
   actions_md_path = File.expand_path("docs/actions.md")
   Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
-  
+
   return actions_md_path
 end
 
