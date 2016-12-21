@@ -133,14 +133,6 @@ module Fastlane
         "Easily build and sign your app using shenzhen"
       end
 
-      def self.details
-        [
-          "**Note**: This action is deprecated, use _gym_ instead",
-          "More information on the shenzhen project page: https://github.com/nomad/shenzhen",
-          "To make code signing work, follow https://docs.fastlane.tools/codesigning/xcode-project/#"
-        ].join(' ')
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :workspace,
@@ -238,7 +230,7 @@ module Fastlane
         "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
         "It is recommended to upgrade to `gym`\n" \
         "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile\n" \
-        "https://github.com/fastlane/fastlane/tree/master/gym"
+        "To make code signing work, follow https://docs.fastlane.tools/codesigning/xcode-project/#"
       end
     end
   end
