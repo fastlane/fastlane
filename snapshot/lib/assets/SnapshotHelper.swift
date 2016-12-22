@@ -121,7 +121,7 @@ open class Snapshot: NSObject {
     }
 
     class func pathPrefix() -> NSString? {
-        var homeDir : NSString
+        var homeDir: NSString
         //on OSX config is stored in /Users/<username>/Library
         //and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
