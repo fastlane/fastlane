@@ -82,7 +82,9 @@ module Fastlane
       require 'faraday'
       require 'json'
 
-      if ENV['USE_ENHANCE_TEST_DATA']
+      # Only Fabric team members have access to the enhancer instance
+      # This can be used to check doc changes for everyone else
+      if FastlaneCore::Env.truthy?('USE_ENHANCE_TEST_DATA')
         return [{ "action" => "puts", "launches" => 123, "errors" => 0, "ratio" => 0.0, "crashes" => 0 },
                 { "action" => "fastlane_version", "launches" => 123, "errors" => 43, "ratio" => 0.34, "crashes" => 0 },
                 { "action" => "default_platform", "launches" => 123, "errors" => 33, "ratio" => 0.27, "crashes" => 31 }]
