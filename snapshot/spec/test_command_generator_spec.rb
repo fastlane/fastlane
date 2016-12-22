@@ -70,7 +70,7 @@ describe Snapshot do
               "set -o pipefail &&",
               "xcodebuild",
               "-scheme ExampleUITests",
-              "-project ./example/Example.xcodeproj",
+              "-project ./snapshot/example/Example.xcodeproj",
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
