@@ -29,6 +29,11 @@ module Snapshot
                                        UI.user_error!("Project file invalid") unless File.directory?(v)
                                        UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :xcargs,
+                                     short_option: "-X",
+                                     env_name: "SNAPSHOT_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :devices,
                                      description: "A list of devices you want to take the screenshots from",
                                      short_option: "-d",
