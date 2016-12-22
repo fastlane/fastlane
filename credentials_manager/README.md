@@ -10,14 +10,14 @@ Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master
 
 **Adding Credentials**
 ```
-fastlane-credentials add --username felix@krausefx.com
+fastlane fastlane-credentials add --username felix@krausefx.com
 Password: *********
 Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
 ```
-fastlane-credentials remove --username felix@krausefx.com
+fastlane fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 

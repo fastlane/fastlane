@@ -143,7 +143,7 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
-      self.runner.trigger_action_by_name(method_sym, nil, *arguments)
+      self.runner.trigger_action_by_name(method_sym, nil, false, *arguments)
     end
 
     #####################################################
@@ -227,35 +227,30 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        tmp_path = Dir.mktmpdir("fl_clone")
-        clone_folder = File.join(tmp_path, repo_name)
+        Dir.mktmpdir("fl_clone") do |tmp_path|
+          clone_folder = File.join(tmp_path, repo_name)
 
-        branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
+          branch_option = ""
+          branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-        clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
+          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        UI.message "Cloning remote git repo..."
-        Actions.sh(clone_command)
+          UI.message "Cloning remote git repo..."
+          Actions.sh(clone_command)
 
-        Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
 
-        # We also want to check out all the local actions of this fastlane setup
-        containing = path.split(File::SEPARATOR)[0..-2]
-        containing = "." if containing.count == 0
-        actions_folder = File.join(containing, "actions")
-        begin
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue
-          # We don't care about a failure here, as local actions are optional
-        end
+          # We also want to check out all the local actions of this fastlane setup
+          containing = path.split(File::SEPARATOR)[0..-2]
+          containing = "." if containing.count == 0
+          actions_folder = File.join(containing, "actions")
+          begin
+            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+          rescue
+            # We don't care about a failure here, as local actions are optional
+          end
 
-        import(File.join(clone_folder, path))
-
-        if Dir.exist?(clone_folder)
-          # We want to re-clone if the folder already exists
-          UI.message "Clearing the git repo..."
-          Actions.sh("rm -rf '#{tmp_path}'")
+          import(File.join(clone_folder, path))
         end
       end
     end

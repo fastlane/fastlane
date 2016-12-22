@@ -50,13 +50,7 @@ module Gym
 
         actions = []
         actions << :clean if config[:clean]
-
-        if Gym.project.library? || Gym.project.framework?
-          actions << :build
-        else
-          # that's the default for iOS apps
-          actions << :archive
-        end
+        actions << :archive
 
         actions
       end

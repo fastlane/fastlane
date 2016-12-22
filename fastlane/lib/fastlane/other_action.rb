@@ -22,6 +22,7 @@ module Fastlane
 
       self.runner.trigger_action_by_name(method_sym,
                                          "./fastlane",
+                                         true,
                                          *arguments)
     end
   end

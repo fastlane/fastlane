@@ -59,6 +59,29 @@ describe Snapshot do
           )
         end
 
+        it "allows to supply custom xcargs" do
+          configure options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots")
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          id = command.join('').match(/id=(.+?),/)[1]
+          ios = command.join('').match(/OS=(\d+.\d+)/)[1]
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./snapshot/example/Example.xcodeproj",
+              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-only-testing:TestBundle/TestSuite/Screenshots",
+              "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
+              "FASTLANE_SNAPSHOT=YES",
+              :build,
+              :test,
+              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+            ]
+          )
+        end
+
         it "uses the default parameters on tvOS too" do
           configure options.merge(devices: ["Apple TV 1080p"])
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
