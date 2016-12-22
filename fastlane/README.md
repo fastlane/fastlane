@@ -86,7 +86,7 @@ fastlane release
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
-:ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
+:ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for both iOS, Mac OS and Android apps
