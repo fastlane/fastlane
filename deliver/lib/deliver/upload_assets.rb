@@ -1,6 +1,7 @@
 module Deliver
   class UploadAssets
     def upload(options)
+      return if options[:edit_live]
       app = options[:app]
 
       v = app.edit_version(platform: options[:platform])
