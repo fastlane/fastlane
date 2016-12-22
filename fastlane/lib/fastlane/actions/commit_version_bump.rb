@@ -146,7 +146,7 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :include_settings,
+          FastlaneCore::ConfigItem.new(key: :settings,
                                        env_name: "FL_COMMIT_INCLUDE_SETTINGS",
                                        description: "Include Settings.bundle/Root.plist with version bump",
                                        optional: true,
