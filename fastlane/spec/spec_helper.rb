@@ -1,5 +1,6 @@
 unless ENV["DEBUG"]
-  $stdout = File.open("/tmp/spaceship_tests", "w")
+  $stdout.puts "Changing stdout to /tmp/fastlane_tests"
+  $stdout = File.open("/tmp/fastlane_tests", "w")
 end
 
 require 'shellwords'
