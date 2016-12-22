@@ -64,7 +64,7 @@ module Fastlane
         if Fastlane::Actions.is_class_action?(action) && action.category == :deprecated
           puts "==========================================".deprecated
           puts "This action (#{filter}) is deprecated".deprecated
-          puts "#{action.deprecated_notes}".deprecated if action.deprecated_notes
+          puts action.deprecated_notes.to_s.deprecated if action.deprecated_notes
           puts "==========================================\n".deprecated
         end
 
