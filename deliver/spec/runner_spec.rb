@@ -5,7 +5,7 @@ describe Deliver::Runner do
     allow(Spaceship::Tunes).to receive(:login).and_return(true)
     allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
     allow_any_instance_of(Deliver::DetectValues).to receive(:run!) { |opt| opt }
-    Deliver::Runner.new(options) 
+    Deliver::Runner.new(options)
   end
 
   let(:options) do
@@ -16,7 +16,7 @@ describe Deliver::Runner do
       app_identifier: 'com.acme.acme',
       app_version: '1.0.7',
       app: double('app', { apple_id: 'YI8C2AS' }),
-      platform: 'ios',
+      platform: 'ios'
     }
   end
 
