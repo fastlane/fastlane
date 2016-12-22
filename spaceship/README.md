@@ -112,10 +112,10 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
-Since your CI system probably doesn't allow you to input values (like the verification code), you can use `spaceauth`:
+Since your CI system probably doesn't allow you to input values (like the verification code), you can use `fastlane spaceauth`:
 
 ```sh
-spaceauth -u apple@krausefx.com
+fastlane spaceauth -u apple@krausefx.com
 ```
 
 This will authenticate you and provide a string that can be transferred to your CI system:
