@@ -28,19 +28,21 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
-First, navigate into the sub-directory of the tool you want to test.
-
-To run the automated unit tests
+First, navigate into the root of the _fastlane_ project and run unit tests using
 
 ```
 bundle exec rspec
 ```
+
+If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
 
 To verify and auto-fix the code style
 
 ```
 bundle exec rubocop -a
 ```
+
+If you want to run code style verification only for one tool, use `bundle exec rubocop -a [tool_name]`
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application.
 
