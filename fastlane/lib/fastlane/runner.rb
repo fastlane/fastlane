@@ -229,9 +229,9 @@ module Fastlane
             end
 
             if Fastlane::Actions.is_class_action?(class_ref) && class_ref.category == :deprecated
-              puts "\n==========================================".deprecated
+              puts "==========================================".deprecated
               puts "This plugin (#{method_sym}) is deprecated".deprecated
-              puts "\n#{class_ref.deprecated_notes}".deprecated if class_ref.deprecated_notes
+              puts "#{class_ref.deprecated_notes}".deprecated if class_ref.deprecated_notes
               puts "==========================================\n".deprecated
             end
 

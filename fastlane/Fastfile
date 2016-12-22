@@ -143,7 +143,7 @@ end
 desc "Generates the actions.md that will get used on https://docs.fastlane.tools"
 desc "This will NOT also automatically submit a pull request to fastlane/docs"
 desc "This SHOULD only be used for testing changes to the docs"
-lane :generate_docs do
+lane :test_generate_docs do
   ENV['USE_ENHANCE_TEST_DATA'] = "true"
   generate_markdown_docs
 end
