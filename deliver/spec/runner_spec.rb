@@ -36,12 +36,12 @@ describe Deliver::Runner do
       end
     end
 
-    describe 'with an IPA file for AppleTV' do
+    describe 'with an IPA file for tvOS' do
       before do
         options[:platform] = 'appletvos'
       end
 
-      it 'uploads the IPA for the appletvos platform' do
+      it 'uploads the IPA for the tvOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
           .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
           .and_return('path')
@@ -50,14 +50,14 @@ describe Deliver::Runner do
       end
     end
 
-    describe 'with a PKG file for Mac OSX' do
+    describe 'with a PKG file for macOS' do
       before do
         options[:platform] = 'osx'
         options[:pkg] = 'ACME.pkg'
         options[:ipa] = nil
       end
 
-      it 'uploads the PKG for the osx platform' do
+      it 'uploads the PKG for the macOS platform' do
         expect_any_instance_of(FastlaneCore::PkgUploadPackageBuilder).to receive(:generate)
           .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
           .and_return('path')
