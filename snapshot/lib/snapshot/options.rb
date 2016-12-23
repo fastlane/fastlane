@@ -159,6 +159,10 @@ module Snapshot
                                      short_option: "-f",
                                      env_name: "SNAPSHOT_DERIVED_DATA_PATH",
                                      description: "The directory where build products and other derived data will go",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :test_target_name,
+                                     env_name: "SNAPSHOT_TEST_TARGET_NAME",
+                                     description: "The name of the target you want to test (if you desire to override the Target Application from Xcode)",
                                      optional: true)
       ]
     end
