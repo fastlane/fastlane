@@ -5,26 +5,7 @@ module Fastlane
   module Actions
     # Makes sure fastlane tools are up-to-date when running fastlane
     class UpdateFastlaneAction < Action
-      ALL_TOOLS = [
-        "fastlane",
-        "fastlane_core",
-        "deliver",
-        "snapshot",
-        "frameit",
-        "pem",
-        "sigh",
-        "produce",
-        "cert",
-        "codes",
-        "credentials_manager",
-        "gym",
-        "spaceship",
-        "pilot",
-        "supply",
-        "scan",
-        "screengrab",
-        "match"
-      ]
+      ALL_TOOLS = ["fastlane"]
 
       def self.run(options)
         if options[:no_update]
@@ -53,7 +34,7 @@ module Fastlane
           return
         end
 
-        unless updater.respond_to? :highest_installed_gems
+        unless updater.respond_to?(:highest_installed_gems)
           UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
           UI.important "Please update your version of ruby gems before proceeding."
           UI.command "gem install rubygems-update"

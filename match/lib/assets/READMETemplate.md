@@ -9,7 +9,7 @@ Do not modify this file, as it gets overwritten every time you run `match`.
 ### Install [fastlane match](https://github.com/fastlane/fastlane/tree/master/match#readme)
 
 ```
-sudo gem install match
+sudo gem install fastlane
 ```
 
 Make sure you have the latest version of the Xcode command line tools installed:
@@ -23,13 +23,13 @@ xcode-select --install
 Navigate to your project folder and run
 
 ```
-match appstore
+fastlane match appstore
 ```
 ```
-match adhoc
+fastlane match adhoc
 ```
 ```
-match development
+fastlane match development
 ```
 
 For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match#readme)

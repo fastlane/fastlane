@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::LanguageItem do
   before do
     Spaceship::Tunes.login

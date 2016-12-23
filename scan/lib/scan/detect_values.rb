@@ -121,9 +121,11 @@ module Scan
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               potential_emptiness_error = lambda do |sims|
-                UI.error("No simulators found that are equal to the version " \
-                "of specifier (#{version}) and greater than or equal to the version " \
-                "of deployment target (#{deployment_target_version})") if sims.empty?
+                if sims.empty?
+                  UI.error("No simulators found that are equal to the version " \
+                  "of specifier (#{version}) and greater than or equal to the version " \
+                  "of deployment target (#{deployment_target_version})")
+                end
               end
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
@@ -172,7 +174,7 @@ module Scan
       end
 
       # building up the destination now
-      if Scan.devices.count > 0
+      if Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       else
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]

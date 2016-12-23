@@ -17,8 +17,6 @@ module Fastlane
             plist_files_before = test_summary_filenames(values[:derived_data_path])
           end
 
-          FastlaneCore::UpdateChecker.start_looking_for_update('scan') unless Helper.is_test?
-
           values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
 
@@ -35,8 +33,6 @@ module Fastlane
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
           end
-
-          FastlaneCore::UpdateChecker.show_update_status('scan', Scan::VERSION)
         end
       end
 
@@ -59,6 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :fail_build,
                                        env_name: "SCAN_FAIL_BUILD",
                                        description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                       is_string: false,
                                        default_value: true)
         ]
       end

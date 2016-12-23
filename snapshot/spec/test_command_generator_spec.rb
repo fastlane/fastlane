@@ -30,7 +30,7 @@ describe Snapshot do
     end
 
     describe "Valid Configuration" do
-      let(:options) { { project: "./example/Example.xcodeproj", scheme: "ExampleUITests" } }
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
 
       def configure(options)
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
@@ -48,8 +48,31 @@ describe Snapshot do
               "set -o pipefail &&",
               "xcodebuild",
               "-scheme ExampleUITests",
-              "-project ./example/Example.xcodeproj",
+              "-project ./snapshot/example/Example.xcodeproj",
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
+              "FASTLANE_SNAPSHOT=YES",
+              :build,
+              :test,
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+            ]
+          )
+        end
+
+        it "allows to supply custom xcargs" do
+          configure options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots")
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          id = command.join('').match(/id=(.+?),/)[1]
+          ios = command.join('').match(/OS=(\d+.\d+)/)[1]
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./snapshot/example/Example.xcodeproj",
+              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
               :build,
@@ -70,13 +93,13 @@ describe Snapshot do
               "set -o pipefail &&",
               "xcodebuild",
               "-scheme ExampleUITests",
-              "-project ./example/Example.xcodeproj",
+              "-project ./snapshot/example/Example.xcodeproj",
               "-derivedDataPath '/tmp/path/to/snapshot_derived'",
               "-destination 'platform=tvOS Simulator,id=#{id},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
             ]
           )
         end

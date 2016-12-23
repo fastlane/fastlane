@@ -11,7 +11,20 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       $verbose = true if ARGV.include?("--verbose")
+      $capture_output = true if ARGV.include?("--capture_output")
 
+      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      if ARGV.include?("--troubleshoot")
+        self.confirm_troubleshoot
+      end
+
+      if $capture_output
+        # Trace mode is enabled
+        # redirect STDOUT and STDERR
+        out_channel = StringIO.new
+        $stdout = out_channel
+        $stderr = out_channel
+      end
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
@@ -24,9 +37,38 @@ module Fastlane
     ensure
       FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       Fastlane::PluginUpdateManager.show_update_status
+      if $capture_output
+        $captured_output = Helper.strip_ansi_colors($stdout.string)
+        $stdout = STDOUT
+        $stderr = STDERR
+
+        require "fastlane/environment_printer"
+        Fastlane::EnvironmentPrinter.output
+      end
+    end
+
+    def self.confirm_troubleshoot
+      if Helper.is_ci?
+        UI.error "---"
+        UI.error "You are trying to use '--troubleshoot' on CI"
+        UI.error "this option is not usable in CI, as it is insecure"
+        UI.error "---"
+        UI.user_error!("Do not use --troubleshoot in CI")
+      end
+      # maybe already set by 'start'
+      return if $troubleshoot
+      UI.error "---"
+      UI.error "Are you sure you want to enable '--troubleshoot'?"
+      UI.error "All commmands will run in full unfiltered output mode."
+      UI.error "Sensitive data, like passwords, could be printed to the log."
+      UI.error "---"
+      if UI.confirm("Do you really want to enable --troubleshoot")
+        $troubleshoot = true
+      end
     end
 
     def run
+      program :name, 'fastlane'
       program :version, Fastlane::VERSION
       program :description, [
         "CLI for 'fastlane' - #{Fastlane::DESCRIPTION}\n",
@@ -39,6 +81,8 @@ module Fastlane
       program :help_formatter, :compact
 
       global_option('--verbose') { $verbose = true }
+      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
+      global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
 
       always_trace!
 
@@ -89,7 +133,7 @@ module Fastlane
         c.action do |args, options|
           if options.json || ensure_fastfile
             require 'fastlane/lane_list'
-            path = Fastlane::FastlaneFolder.fastfile_path
+            path = FastlaneCore::FastlaneFolder.fastfile_path
 
             if options.json
               Fastlane::LaneList.output_json(path)
@@ -105,7 +149,7 @@ module Fastlane
         c.description = 'Lists all available lanes without description'
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+            ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
             UI.message "Available lanes:"
             ff.runner.available_lanes.each do |lane|
               UI.message "- #{lane}"
@@ -122,7 +166,7 @@ module Fastlane
 
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
+            ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
             UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
             Fastlane::DocsGenerator.run(ff)
           end
@@ -168,6 +212,24 @@ module Fastlane
         c.action do |args, options|
           require 'fastlane/auto_complete'
           Fastlane::AutoComplete.execute
+        end
+      end
+
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.output
+        end
+      end
+
+      command :update_fastlane do |c|
+        c.syntax = 'fastlane update_fastlane'
+        c.description = 'Update fastlane to the latest release'
+        c.action do |args, options|
+          require 'fastlane/one_off'
+          Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
         end
       end
 
@@ -227,21 +289,6 @@ module Fastlane
         end
       end
 
-      command :env do |c|
-        c.syntax = 'fastlane env'
-        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
-        c.action do |args, options|
-          require "fastlane/environment_printer"
-          env_info = Fastlane::EnvironmentPrinter.get
-          puts env_info
-          if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
-            Fastlane::EnvironmentPrinter.copy_to_clipboard(env_info)
-            UI.success("Successfully copied markdown into your clipboard 🎨")
-          end
-          UI.success("Open https://github.com/fastlane/fastlane/issues/new to submit a new issue ✅")
-        end
-      end
-
       default_command :trigger
       run!
     end
@@ -251,7 +298,7 @@ module Fastlane
     # if that's not the case
     # return true if the Fastfile is available
     def ensure_fastfile
-      return true if Fastlane::FastlaneFolder.setup?
+      return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create

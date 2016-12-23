@@ -1,5 +1,19 @@
 module Match
   class TablePrinter
+    # logs public key's  name, user, organisation, country, availability dates
+    def self.print_certificate_info(cert_info: nil)
+      params = {
+        rows: cert_info,
+        title: "Installed Certificate".green
+      }
+
+      puts ""
+      puts Terminal::Table.new(params)
+      puts ""
+    rescue => ex
+      UI.error(ex)
+    end
+
     def self.print_summary(app_identifier: nil, type: nil)
       rows = []
 

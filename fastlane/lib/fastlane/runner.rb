@@ -39,7 +39,7 @@ module Fastlane
 
       return_val = nil
 
-      path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
@@ -97,11 +97,34 @@ module Fastlane
       nil
     end
 
+    # lookup if an alias exists
+    def find_alias(action_name)
+      Actions.alias_actions.each do |key, v|
+        next unless Actions.alias_actions[key]
+        next unless Actions.alias_actions[key].include?(action_name)
+        return key
+      end
+      nil
+    end
+
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    def trigger_action_by_name(method_sym, custom_dir, *arguments)
+    # @param from_action Indicates if this action is being trigged by another action.
+    #                    If so, it won't show up in summary.
+    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder
       class_ref = class_reference_from_action_name(method_sym)
+      unless class_ref
+        alias_found = find_alias(method_sym.to_s)
+        if alias_found
+          orig_action = method_sym.to_s
+          class_ref = class_reference_from_action_name(alias_found.to_sym)
+          # notify action that it has been used by alias
+          if class_ref.respond_to?(:alias_used)
+            class_ref.alias_used(orig_action, arguments.first)
+          end
+        end
+      end
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
@@ -109,7 +132,7 @@ module Fastlane
       if class_ref
         if class_ref.respond_to?(:run)
           # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir)
+          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
         else
           UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
         end
@@ -176,15 +199,22 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
+      if custom_dir.nil?
+        custom_dir ||= "." if Helper.test?
+        custom_dir ||= ".."
+      end
+
       collector.did_launch_action(method_sym)
 
       verify_supported_os(method_sym, class_ref)
 
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(class_ref.step_text) do
+          # If another action is calling this action, we shouldn't show it in the summary
+          # (see https://github.com/fastlane/fastlane/issues/4546)
+          action_name = from_action ? nil : class_ref.step_text
+          Actions.execute_action(action_name) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
             if arguments.count == 0

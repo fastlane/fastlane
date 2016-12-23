@@ -5,17 +5,33 @@ module Fastlane
     end
 
     class TestfairyAction < Action
+      def self.upload_build(ipa, options)
+        require 'faraday'
+        require 'faraday_middleware'
+
+        connection = Faraday.new(url: "https://app.testfairy.com") do |builder|
+          builder.request :multipart
+          builder.request :url_encoded
+          builder.response :json, content_type: /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
+        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+
+        symbols_file = options.delete(:symbols_file)
+        if symbols_file
+          options[:symbols_file] = Faraday::UploadIO.new(symbols_file, 'application/octet-stream')
+        end
+
+        connection.post do |req|
+          req.url("/api/upload/")
+          req.body = options
+        end
+      end
+
       def self.run(params)
-        require 'shenzhen'
-        require 'shenzhen/plugins/testfairy'
-
         UI.success('Starting with ipa upload to TestFairy...')
-
-        client = Shenzhen::Plugins::TestFairy::Client.new(
-          params[:api_key]
-        )
-
-        return params[:ipa] if Helper.test?
 
         metrics_to_client = lambda do |metrics|
           metrics.map do |metric|
@@ -70,7 +86,9 @@ module Fastlane
           end
         end]
 
-        response = client.upload_build(params[:ipa], client_options)
+        return params[:ipa] if Helper.test?
+
+        response = self.upload_build(params[:ipa], client_options)
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")
@@ -112,12 +130,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_TESTFAIRY_API_KEY", # The name of the environment variable
                                        description: "API Key for TestFairy", # a short description of this parameter
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API key for TestFairy given, pass using `api_key: 'key'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
-                                       description: 'Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action',
+                                       description: 'Path to your IPA file for iOS or APK for Android',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -203,7 +222,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include? platform
       end
     end
   end

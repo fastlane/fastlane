@@ -102,6 +102,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
+                                       sensitive: true,
                                        description: "Appetize.io API Token",
                                        is_string: true,
                                        verify_block: proc do |value|

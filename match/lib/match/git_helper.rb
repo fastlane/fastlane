@@ -62,7 +62,7 @@ module Match
         return if `git status`.include?("nothing to commit")
 
         Encrypt.new.encrypt_repo(path: path, git_url: git_url)
-        File.write("match_version.txt", Match::VERSION) # unencrypted
+        File.write("match_version.txt", Fastlane::VERSION) # unencrypted
 
         commands = []
         commands << "git add -A"

@@ -50,11 +50,17 @@ module Cert
                                      short_option: "-k",
                                      env_name: "CERT_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
-                                     default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain"].last,
+                                     default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
                                        UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :keychain_password,
+                                     short_option: "-p",
+                                     env_name: "CERT_KEYCHAIN_PASSWORD",
+                                     sensitive: true,
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     optional: true)
       ]
     end
   end

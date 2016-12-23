@@ -1,5 +1,4 @@
 require 'json'
-require 'supply/version'
 require 'supply/options'
 require 'supply/client'
 require 'supply/listing'
@@ -26,4 +25,5 @@ module Supply
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  DESCRIPTION = "Command line tool for updating Android apps and their metadata on the Google Play Store".freeze
 end

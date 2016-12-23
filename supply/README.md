@@ -68,7 +68,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 Install the gem
 
-    sudo gem install supply
+    sudo gem install fastlane
 
 ## Setup
 
@@ -104,15 +104,15 @@ The previous p12 configuration is still currently supported.
 ## Quick Start
 
 - `cd [your_project_folder]`
-- `supply init`
+- `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
-- `supply run`
+- `fastlane supply run`
 
 ## Available Commands
 
-- `supply`: update an app with metadata, a build, images and screenshots
-- `supply init`: download metadata for an existing app to a local directory
-- `supply --help`: show information on available commands, arguments and environment variables
+- `fastlane supply`: update an app with metadata, a build, images and screenshots
+- `fastlane supply init`: download metadata for an existing app to a local directory
+- `fastlane supply --help`: show information on available commands, arguments and environment variables
 
 You can either run `supply` on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
 
@@ -121,15 +121,15 @@ You can either run `supply` on its own and use it interactively, or you can pass
 To upload a new binary to Google Play, simply run
 
 ```
-supply --apk path/to/app.apk
+fastlane supply --apk path/to/app.apk
 ```
 
-This will also upload app metadata if you previously ran `supply init`.
+This will also upload app metadata if you previously ran `fastlane supply init`.
 
 To gradually roll out a new build use
 
 ```
-supply --apk path/app.apk --track rollout --rollout 0.5
+fastlane supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
@@ -139,7 +139,7 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 
 ## Images and Screenshots
 
-After running `supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
+After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
 
 Here you can supply images with the following file names (extension can be png, jpg or jpeg):
 
@@ -160,7 +160,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```
 └── fastlane

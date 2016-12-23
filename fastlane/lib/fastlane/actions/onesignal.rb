@@ -67,6 +67,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :auth_token,
                                       env_name: "ONE_SIGNAL_AUTH_KEY",
+                                      sensitive: true,
                                       description: "OneSignal Authorization Key",
                                       verify_block: proc do |value|
                                         unless value.to_s.length > 0
@@ -88,6 +89,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :android_token,
                                        env_name: "ANDROID_TOKEN",
                                        description: "ANDROID GCM KEY",
+                                       sensitive: true,
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :apns_p12,
@@ -97,6 +99,7 @@ module Fastlane
 
           FastlaneCore::ConfigItem.new(key: :apns_p12_password,
                                        env_name: "APNS_P12_PASSWORD",
+                                       sensitive: true,
                                        description: "APNS P12 password",
                                        optional: true),
 

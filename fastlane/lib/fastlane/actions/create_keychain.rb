@@ -8,30 +8,44 @@ module Fastlane
 
     class CreateKeychainAction < Action
       def self.run(params)
-        escaped_name = params[:name].shellescape
         escaped_password = params[:password].shellescape
 
-        commands = []
-        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{escaped_name}", log: false)
-
-        if params[:default_keychain]
-          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
-          commands << Fastlane::Actions.sh("security default-keychain -s #{escaped_name}", log: false)
+        if params[:name]
+          escaped_name = params[:name].shellescape
+          keychain_path = "~/Library/Keychains/#{escaped_name}"
+        else
+          keychain_path = params[:path].shellescape
         end
 
-        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_name}", log: false) if params[:unlock]
+        if keychain_path.nil?
+          UI.user_error!("You either have to set :name or :path")
+        end
+
+        commands = []
+        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+
+        if params[:default_keychain]
+          # if there is no default keychain - setting the original will fail - silent this error
+          begin
+            Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
+          rescue
+          end
+          commands << Fastlane::Actions.sh("security default-keychain -s #{keychain_path}", log: false)
+        end
+
+        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{keychain_path}", log: false) if params[:unlock]
 
         command = "security set-keychain-settings"
         command << " -t #{params[:timeout]}" if params[:timeout]
         command << " -l" if params[:lock_when_sleeps]
         command << " -u" if params[:lock_after_timeout]
-        command << " ~/Library/Keychains/#{escaped_name}"
+        command << " #{keychain_path}"
 
         commands << Fastlane::Actions.sh(command, log: false)
 
         if params[:add_to_search_list]
           keychains = Action.sh("security list-keychains -d user").shellsplit
-          keychains << File.expand_path(params[:name], "~/Library/Keychains")
+          keychains << File.expand_path(keychain_path)
           commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
         end
 
@@ -47,10 +61,19 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain name",
-                                       optional: false),
+                                       conflicting_options: [:path],
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: "KEYCHAIN_PATH",
+                                       description: "Path to Keychain",
+                                       is_string: true,
+                                       conflicting_options: [:name],
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Password for the keychain",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :default_keychain,
                                        description: 'Set the default keychain',

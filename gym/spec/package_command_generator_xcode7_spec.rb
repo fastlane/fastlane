@@ -1,6 +1,6 @@
 describe Gym do
   before(:all) do
-    options = { project: "./examples/standard/Example.xcodeproj" }
+    options = { project: "./gym/examples/standard/Example.xcodeproj" }
     config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
     @project = FastlaneCore::Project.new(config)
   end
@@ -10,7 +10,7 @@ describe Gym do
 
   describe Gym::PackageCommandGeneratorXcode7 do
     it "works with the example project with no additional parameters" do
-      options = { project: "./examples/standard/Example.xcodeproj" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
@@ -23,8 +23,28 @@ describe Gym do
                            ])
     end
 
+    it "works with the example project and additional parameters" do
+      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      xcargs = xcargs_hash.map do |k, v|
+        "#{k.to_s.shellescape}=#{v.shellescape}"
+      end.join ' '
+
+      options = { project: "./gym/examples/standard/Example.xcodeproj", export_xcargs: xcargs }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             ""
+                           ])
+    end
+
     it "works with spaces in path name" do
-      options = { project: "./examples/standard/Example.xcodeproj" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       allow(Gym::XcodebuildFixes).to receive(:wrap_xcodebuild).and_return("/tmp/path with spaces")
@@ -41,7 +61,7 @@ describe Gym do
 
     it "supports passing a toolchain to use" do
       options = {
-        project: "./examples/standard/Example.xcodeproj",
+        project: "./gym/examples/standard/Example.xcodeproj",
         toolchain: "com.apple.dt.toolchain.Swift_2_3"
       }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -58,7 +78,7 @@ describe Gym do
     end
 
     it "generates a valid plist file we need" do
-      options = { project: "./examples/standard/Example.xcodeproj" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
@@ -72,7 +92,7 @@ describe Gym do
     end
 
     it "reads user export plist" do
-      options = { project: "./examples/standard/Example.xcodeproj", export_options: "./examples/standard/ExampleExport.plist" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj", export_options: "./gym/examples/standard/ExampleExport.plist" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
@@ -95,8 +115,8 @@ describe Gym do
 
     it "reads user export plist and override some parameters" do
       options = {
-        project: "./examples/standard/Example.xcodeproj",
-        export_options: "./examples/standard/ExampleExport.plist",
+        project: "./gym/examples/standard/Example.xcodeproj",
+        export_options: "./gym/examples/standard/ExampleExport.plist",
         export_method: "app-store",
         include_symbols: false,
         include_bitcode: true,
@@ -123,7 +143,7 @@ describe Gym do
 
     it "reads export options from hash" do
       options = {
-        project: "./examples/standard/Example.xcodeproj",
+        project: "./gym/examples/standard/Example.xcodeproj",
         export_options: {
           embedOnDemandResourcesAssetPacksInBundle: false,
           manifest: {
@@ -161,7 +181,7 @@ describe Gym do
     end
 
     it "doesn't store bitcode/symbols information for non app-store builds" do
-      options = { project: "./examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
+      options = { project: "./gym/examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
@@ -173,7 +193,7 @@ describe Gym do
     end
 
     it "uses a temporary folder to store the resulting ipa file" do
-      options = { project: "./examples/standard/Example.xcodeproj" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate

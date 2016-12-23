@@ -50,7 +50,7 @@ screengrab
 Install the gem
 
 ```
-sudo gem install screengrab
+sudo gem install fastlane
 ```
 
 ##### Gradle dependency
@@ -104,7 +104,7 @@ Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
 
 ## Advanced Screengrabfile Configuration
 
-Running `screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
+Running `fastlane screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
 
 The `Screengrabfile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
 
@@ -126,7 +126,7 @@ clear_previous_screenshots true
 For more information about all available options run
 
 ```
-screengrab --help
+fastlane screengrab --help
 ```
 
 # Tips

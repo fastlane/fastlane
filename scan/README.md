@@ -126,7 +126,7 @@ scan
 
 # Installation
 
-    sudo gem install scan
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -134,11 +134,11 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    scan
+    fastlane scan
 
 That's all you need to run your tests. If you want more control, here are some available parameters:
 
-    scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+    fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 
 If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
@@ -155,7 +155,7 @@ scan(
 
 For a list of all available parameters use
 
-    scan --help
+    fastlane scan --help
 
 To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
@@ -163,7 +163,7 @@ To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
 Since you might want to manually trigger the tests but don't want to specify all the parameters every time, you can store your defaults in a so called `Scanfile`.
 
-Run `scan init` to create a new configuration file. Example:
+Run `fastlane scan init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"

@@ -26,7 +26,7 @@ module Snapshot
       # We go 2 folders up, to not show "Contents/Developer/"
       values = Snapshot.config.values(ask: false)
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
-      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Fastlane::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
@@ -199,7 +199,7 @@ module Snapshot
     end
 
     def open_simulator_for_device(device_name)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       device = TestCommandGenerator.find_device(device_name)
       FastlaneCore::Simulator.launch(device) if device

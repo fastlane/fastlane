@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
 
@@ -190,7 +188,7 @@ describe Spaceship::AppVersion, all: true do
         expect(s1.original_file_name).to eq('ftl_250ec6b31ba0da4c4e8e22fdf83d71a1_65ea94f6b362563260a5742b93659729.png')
         expect(s1.language).to eq("English")
 
-        expect(v.screenshots["English"].count).to eq(10)
+        expect(v.screenshots["English"].count).to eq(13)
 
         # 2 iPhone 6 Plus Screenshots
         expect(v.screenshots["English"].count { |s| s.device_type == 'iphone6Plus' }).to eq(3)
@@ -455,44 +453,44 @@ describe Spaceship::AppVersion, all: true do
       describe "Parameter checks" do
         it "prevents from using negative sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using sort_order 0" do
           expect do
-            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4', false)
           end.to raise_error "sort_order must be higher than 0"
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
           end.to raise_error "sort_order must not be > 5"
         end
 
         # not really sure if we want to enforce that
         # it "prevents from letting holes in sort_orders" do
         #  expect do
-        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+        #    version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
         #  end.to raise_error "FIXME"
         # end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
           end.to raise_error "iTunes Connect error: NotALanguage isn't an activated language"
         end
 
         it "prevent from using invalid language" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4')
+            version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
           end.to raise_error "iTunes Connect error: English_CA isn't an activated language"
         end
 
         it "prevent from using invalid device" do
           expect do
-            version.upload_screenshot!(screenshot_path, 1, "English", :android)
+            version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
           end.to raise_error "iTunes Connect error: android isn't a valid device name"
         end
       end
@@ -506,7 +504,15 @@ describe Spaceship::AppVersion, all: true do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', false)
+          expect(version.screenshots["English"].count).to eq(count + 1)
+        end
+
+        it "can add a new iMessage screenshot to the list" do
+          du_upload_messages_screenshot_success
+
+          count = version.screenshots["English"].count
+          version.upload_screenshot!(screenshot_path, 4, "English", 'iphone4', true)
           expect(version.screenshots["English"].count).to eq(count + 1)
         end
 
@@ -524,29 +530,49 @@ describe Spaceship::AppVersion, all: true do
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(true)
 
-          version.upload_screenshot!(screenshot_path, 1, language, device_type)
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, false)
 
           family = fetch_family(device_type, language)
           expect(family["scaled"]["value"]).to eq(false)
+        end
+
+        it "auto-sets the 'scaled' parameter when the user provides an iMessage screenshot" do
+          def fetch_family(device_type, language)
+            lang_details = version.raw_data["details"]["value"].find { |a| a["language"] == language }
+            return lang_details["displayFamilies"]["value"].find { |value| value["name"] == device_type }
+          end
+
+          device_type = "iphone4"
+          language = "English"
+
+          du_upload_messages_screenshot_success
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(true)
+
+          version.upload_screenshot!(screenshot_path, 1, language, device_type, true)
+
+          family = fetch_family(device_type, language)
+          expect(family["messagesScaled"]["value"]).to eq(false)
         end
 
         it "can replace an existing screenshot with existing sort_order" do
           du_upload_screenshot_success
 
           count = version.screenshots["English"].count
-          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4')
+          version.upload_screenshot!(screenshot_path, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count)
         end
 
         it "can remove existing screenshot" do
           count = version.screenshots["English"].count
-          version.upload_screenshot!(nil, 2, "English", 'iphone4')
+          version.upload_screenshot!(nil, 2, "English", 'iphone4', false)
           expect(version.screenshots["English"].count).to eq(count - 1)
         end
 
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
-            version.upload_screenshot!(nil, 5, "English", 'iphone4')
+            version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
           end.to raise_error "cannot remove screenshot with non existing sort_order"
         end
       end
@@ -561,21 +587,21 @@ describe Spaceship::AppVersion, all: true do
 
     describe "Pushing the changes back to the server" do
       it "raises an exception if there was an error" do
-        itc_stub_invalid_update
+        TunesStubbing.itc_stub_invalid_update
         expect do
           version.save!
         end.to raise_error("[German]: The App Name you entered has already been used. [English]: The App Name you entered has already been used. You must provide an address line. There are errors on the page and for 2 of your localizations.")
       end
 
       it "works with valid update data" do
-        itc_stub_valid_update
+        TunesStubbing.itc_stub_valid_update
         expect(client).to receive(:update_app_version!).with('898536088', 812_106_519, version.raw_data)
         version.save!
       end
     end
 
     describe "update_app_version! retry mechanism" do
-      let(:update_success_data) { JSON.parse(itc_read_fixture_file('update_app_version_success.json'))['data'] }
+      let(:update_success_data) { JSON.parse(TunesStubbing.itc_read_fixture_file('update_app_version_success.json'))['data'] }
 
       def setup_handle_itc_response_failure(nb_failures)
         @times_called = 0
@@ -585,7 +611,7 @@ describe Spaceship::AppVersion, all: true do
           update_success_data
         end
         # arbitrary stub to prevent mock network failures. We override itc_response
-        itc_stub_valid_update
+        TunesStubbing.itc_stub_valid_update
       end
 
       it "retries when ITC is temporarily unable to save changes" do
@@ -617,6 +643,22 @@ describe Spaceship::AppVersion, all: true do
       #   expect(version.name['German']).to eq("yep, that's the name")
       #   expect(version.name['English_CA']).to eq("yep, that's the name")
       # end
+    end
+
+    describe "Rejecting" do
+      it 'rejects' do
+        TunesStubbing.itc_stub_reject_version_success
+        version.can_reject_version = true
+        expect(client).to receive(:reject!).with('898536088', 812_106_519)
+        version.reject!
+      end
+
+      it 'raises exception when not rejectable' do
+        TunesStubbing.itc_stub_valid_update
+        expect do
+          version.reject!
+        end.to raise_error "Version not rejectable"
+      end
     end
   end
 

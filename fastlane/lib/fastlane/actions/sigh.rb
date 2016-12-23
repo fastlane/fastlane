@@ -3,7 +3,8 @@ module Fastlane
     module SharedValues
       SIGH_PROFILE_PATH = :SIGH_PROFILE_PATH
       SIGH_PROFILE_PATHS = :SIGH_PROFILE_PATHS
-      SIGH_UDID = :SIGH_UDID
+      SIGH_UDID = :SIGH_UDID # deprecated
+      SIGH_UUID = :SIGH_UUID
       SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
     end
 
@@ -12,24 +13,20 @@ module Fastlane
         require 'sigh'
         require 'credentials_manager/appfile_config'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('sigh') unless Helper.is_test?
+        Sigh.config = values # we already have the finished config
 
-          Sigh.config = values # we already have the finished config
+        path = Sigh::Manager.start
 
-          path = Sigh::Manager.start
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
+        Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] = path # absolute path
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
-          Actions.lane_context[SharedValues::SIGH_UDID] = ENV["SIGH_UDID"] if ENV["SIGH_UDID"] # The UDID of the new profile
+        uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
+        Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
 
-          set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
+        set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
 
-          return ENV["SIGH_UDID"] # return the UDID of the new profile
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
-        end
+        return uuid # returs uuid of profile
       end
 
       def self.set_profile_type(values, enterprise)
@@ -52,7 +49,7 @@ module Fastlane
       end
 
       def self.return_value
-        "The UDID of the profile sigh just fetched/generated"
+        "The UUID of the profile sigh just fetched/generated"
       end
 
       def self.details

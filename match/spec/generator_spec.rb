@@ -8,7 +8,8 @@ describe Match::Generator do
         output_path: 'workspace/certs/development',
         force: true,
         username: 'username',
-        team_id: 'team_id'
+        team_id: 'team_id',
+        keychain_path: FastlaneCore::Helper.keychain_path("login.keychain")
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -25,8 +26,10 @@ describe Match::Generator do
         type: 'development',
         workspace: 'workspace',
         username: 'username',
-        team_id: 'team_id'
+        team_id: 'team_id',
+        keychain_name: 'login.keychain'
       }
+
       Match::Generator.generate_certificate(params, 'development')
     end
 

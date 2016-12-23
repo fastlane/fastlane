@@ -44,7 +44,6 @@ module Fastlane
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
         params[:version_file_name] = config[:version_file_name]
-        params [:acl] = config[:acl]
 
         # Pulling parameters for other uses
         s3_region = params[:region]
@@ -361,11 +360,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :access_key,
                                        env_name: "S3_ACCESS_KEY",
                                        description: "AWS Access Key ID ",
+                                       sensitive: true,
                                        optional: true,
                                        default_value: ENV['AWS_ACCESS_KEY_ID']),
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                        env_name: "S3_SECRET_ACCESS_KEY",
                                        description: "AWS Secret Access Key ",
+                                       sensitive: true,
                                        optional: true,
                                        default_value: ENV['AWS_SECRET_ACCESS_KEY']),
           FastlaneCore::ConfigItem.new(key: :bucket,

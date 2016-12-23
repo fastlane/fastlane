@@ -20,7 +20,7 @@ module Fastlane
         [
           "You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [homebrew](http://brew.sh/).",
           "It is recommended to store the build configuration in the `.xctool-args` file.",
-          "More information available on GitHub: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md#xctool"
+          "More information available on GitHub: https://docs.fastlane.tools/actions#xctool"
         ].join(' ')
       end
 

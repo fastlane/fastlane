@@ -35,9 +35,23 @@ module FastlaneCore
     # @!group Setting up the configuration
     #####################################################
 
+    # collect sensitive strings
+    def self.sensitive_strings
+      @sensitive_strings ||= []
+    end
+
     def initialize(available_options, values)
       self.available_options = available_options || []
       self.values = values || {}
+
+      # if we are in captured output mode - keep a array of sensitive option values
+      # those will be later - replaced by ####
+      if $capture_output
+        available_options.each do |element|
+          next unless element.sensitive
+          self.class.sensitive_strings << values[element.key]
+        end
+      end
 
       verify_input_types
       verify_value_exists
@@ -150,7 +164,7 @@ module FastlaneCore
       paths += Dir["./fastlane/#{self.config_file_name}"]
       paths += Dir["./.fastlane/#{self.config_file_name}"]
       paths += Dir["./#{self.config_file_name}"]
-      paths += Dir["./spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
+      paths += Dir["./fastlane_core/spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
       return if paths.count == 0
 
       path = paths.first
@@ -177,6 +191,13 @@ module FastlaneCore
 
       # `if value == nil` instead of ||= because false is also a valid value
       if value.nil? and option.env_name and ENV[option.env_name]
+
+        # We want to inform the user that we took the value
+        # from an environment variable
+        # however we don't print the actual value, as it may contain sensitive information
+        # The user can easily find the actual value by print out the environment
+        UI.verbose("Taking value for '#{key}' from environment variable '#{option.env_name}'")
+
         value = option.auto_convert_value(ENV[option.env_name].dup)
         option.verify!(value) if value
       end
@@ -200,7 +221,7 @@ module FastlaneCore
 
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
-        value = UI.input("#{option.description}: ")
+        value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
           set(key, value)

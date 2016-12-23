@@ -9,7 +9,7 @@ module Sigh
     def run
       FastlaneCore::PrintTable.print_values(config: Sigh.config,
                                          hide_keys: [:output_path],
-                                             title: "Summary for sigh #{Sigh::VERSION}")
+                                             title: "Summary for sigh #{Fastlane::VERSION}")
 
       UI.message "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)

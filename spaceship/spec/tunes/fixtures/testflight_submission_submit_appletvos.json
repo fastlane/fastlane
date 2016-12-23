@@ -1,0 +1,23 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "usesEncryption": null,
+    "encryptionUpdated": null,
+    "isExempt": null,
+    "containsProprietaryCryptography": null,
+    "containsThirdPartyCryptography": null,
+    "availableOnFrenchStore": null,
+    "ccatFile": null,
+    "appType": "tvOS App",
+    "platform": "appletvos",
+    "exportComplianceRequired": false
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": ["Success"]
+  },
+  "statusCode": "SUCCESS"
+}

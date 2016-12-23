@@ -35,7 +35,6 @@
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
-
 -------
 <p align="center">
     <a href="#whats-spaceship">Why?</a> &bull;
@@ -89,13 +88,13 @@ How fast are tools using `spaceship` compared to web scraping?
 
 # Installation
 
-    sudo gem install spaceship
+    sudo gem install fastlane
 
 # Usage
 
 ## Playground
 
-To try `spaceship`, just run `spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
+To try `spaceship`, just run `fastlane spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
@@ -113,10 +112,10 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
-Since your CI system probably doesn't allow you to input values (like the verification code), you can use `spaceauth`:
+Since your CI system probably doesn't allow you to input values (like the verification code), you can use `fastlane spaceauth`:
 
 ```sh
-spaceauth -u apple@krausefx.com
+fastlane spaceauth -u apple@krausefx.com
 ```
 
 This will authenticate you and provide a string that can be transferred to your CI system:
@@ -147,12 +146,11 @@ Advantages of `spaceship` (HTTP client) over web scraping:
 
 ## API Endpoints
 
-I won't go into too much technical details about the various API endpoints, but just to give you an idea:
+Overview of the used API endpoints
 
 - `https://idmsa.apple.com`: Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
- - Get a detailed list of all available provisioning profiles
- - This API returns the devices, certificates and app for each of the profiles
+ - Get a list of all available provisioning profiles
  - Register new devices
 - `https://developer.apple.com`:
  - List all devices, certificates, apps and app groups

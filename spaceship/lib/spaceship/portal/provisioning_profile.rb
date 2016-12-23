@@ -426,9 +426,11 @@ module Spaceship
       def devices
         fetch_details
 
-        @devices = (self.profile_details["devices"] || []).collect do |device|
-          Device.set_client(client).factory(device)
-        end if (@devices || []).empty?
+        if (@devices || []).empty?
+          @devices = (self.profile_details["devices"] || []).collect do |device|
+            Device.set_client(client).factory(device)
+          end
+        end
 
         @devices
       end
@@ -436,9 +438,11 @@ module Spaceship
       def certificates
         fetch_details
 
-        @certificates = (profile_details["certificates"] || []).collect do |cert|
-          Certificate.set_client(client).factory(cert)
-        end if (@certificates || []).empty?
+        if (@certificates || []).empty?
+          @certificates = (profile_details["certificates"] || []).collect do |cert|
+            Certificate.set_client(client).factory(cert)
+          end
+        end
 
         return @certificates
       end

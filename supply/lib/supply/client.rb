@@ -57,12 +57,12 @@ module Supply
 
       auth_client.fetch_access_token!
 
-      if ENV["DEBUG"]
+      if FastlaneCore::Env.truthy?("DEBUG")
         Google::Apis.logger.level = Logger::DEBUG
       end
 
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
-      Google::Apis::ClientOptions.default.application_version = Supply::VERSION
+      Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
       Google::Apis::RequestOptions.default.timeout_sec = 300
       Google::Apis::RequestOptions.default.open_timeout_sec = 300
       Google::Apis::RequestOptions.default.retries = 5
@@ -92,6 +92,13 @@ module Supply
 
       self.current_edit = nil
       self.current_package_name = nil
+    end
+
+    # Validates the current edit - does not change data on Google Play
+    def validate_current_edit!
+      ensure_active_edit!
+
+      call_google_api { android_publisher.validate_edit(current_package_name, current_edit.id) }
     end
 
     # Commits the current edit saving all pending changes on Google Play

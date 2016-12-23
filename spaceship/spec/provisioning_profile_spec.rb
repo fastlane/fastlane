@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::ProvisioningProfile do
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
@@ -90,7 +88,7 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "handles failed download request" do
-      adp_stub_download_provisioning_profile_failure
+      PortalStubbing.adp_stub_download_provisioning_profile_failure
       profile = Spaceship::ProvisioningProfile.all.first
 
       error_text = /^Couldn't download provisioning profile, got this instead:/

@@ -24,6 +24,12 @@ module Fastlane
                 'you should turn off smart quotes in your editor of choice.'
       end
 
+      content.scan(/^\s*require (.*)/).each do |current|
+        gem_name = current.last
+        next if gem_name.include?(".") # these are local gems
+        UI.important("You require a gem, please call `fastlane_require #{gem_name}` before to ensure the gem is installed")
+      end
+
       parse(content, @path)
     end
 
@@ -34,7 +40,7 @@ module Fastlane
     def parse(data, path = nil)
       @runner ||= Runner.new
 
-      Dir.chdir(Fastlane::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+      Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
         # create nice path that we want to print in case of some problem
         relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
 
@@ -137,7 +143,7 @@ module Fastlane
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
-      self.runner.trigger_action_by_name(method_sym, nil, *arguments)
+      self.runner.trigger_action_by_name(method_sym, nil, false, *arguments)
     end
 
     #####################################################
@@ -179,6 +185,16 @@ module Fastlane
       @desc_collection ||= []
     end
 
+    def fastlane_require(gem_name)
+      FastlaneRequire.install_gem_if_needed(gem_name: gem_name, require_gem: true)
+    end
+
+    def generated_fastfile_id(id)
+      # This value helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
+      ENV['GENERATED_FASTFILE_ID'] = id
+    end
+
     def import(path = nil)
       UI.user_error!("Please pass a path to the `import` action") unless path
 
@@ -211,35 +227,30 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        tmp_path = Dir.mktmpdir("fl_clone")
-        clone_folder = File.join(tmp_path, repo_name)
+        Dir.mktmpdir("fl_clone") do |tmp_path|
+          clone_folder = File.join(tmp_path, repo_name)
 
-        branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
+          branch_option = ""
+          branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-        clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
+          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        UI.message "Cloning remote git repo..."
-        Actions.sh(clone_command)
+          UI.message "Cloning remote git repo..."
+          Actions.sh(clone_command)
 
-        Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
 
-        # We also want to check out all the local actions of this fastlane setup
-        containing = path.split(File::SEPARATOR)[0..-2]
-        containing = "." if containing.count == 0
-        actions_folder = File.join(containing, "actions")
-        begin
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue
-          # We don't care about a failure here, as local actions are optional
-        end
+          # We also want to check out all the local actions of this fastlane setup
+          containing = path.split(File::SEPARATOR)[0..-2]
+          containing = "." if containing.count == 0
+          actions_folder = File.join(containing, "actions")
+          begin
+            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+          rescue
+            # We don't care about a failure here, as local actions are optional
+          end
 
-        import(File.join(clone_folder, path))
-
-        if Dir.exist?(clone_folder)
-          # We want to re-clone if the folder already exists
-          UI.message "Clearing the git repo..."
-          Actions.sh("rm -rf '#{tmp_path}'")
+          import(File.join(clone_folder, path))
         end
       end
     end

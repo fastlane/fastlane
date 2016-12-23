@@ -95,19 +95,20 @@ module Gym
                                      is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
+                                     deprecated: "Don't use this option any more, as it's deprecated by Apple",
                                      env_name: "GYM_USE_LEGACY_BUILD_API",
-                                     description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
+                                     description: "Don't use this option any more, as it's deprecated by Apple",
                                      default_value: false,
                                      is_string: false,
                                      verify_block: proc do |value|
                                        if value
-                                         UI.important "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816"
+                                         UI.important "Don't use this option any more, as it's deprecated by Apple"
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
-                                     description: "How should gym export the archive?",
+                                     description: "Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id",
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
@@ -122,6 +123,14 @@ module Gym
                                      conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :export_xcargs,
+                                     env_name: "GYM_EXPORT_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     optional: true,
+                                     conflicting_options: [:use_legacy_build_api],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
@@ -186,7 +195,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
-                                     description: "Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     description: "Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcconfig,
                                      short_option: "-y",

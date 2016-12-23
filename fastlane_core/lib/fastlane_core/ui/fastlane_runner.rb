@@ -98,17 +98,35 @@ module Commander
         ui.error "not be available to your system installed Ruby (#{RUBY_VERSION})"
       end
       ui.error ""
-      ui.error "The best solution is to install a new version of Ruby"
+      ui.error "The best solution is to use the self-contained fastlane version."
+      ui.error "Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries"
+      ui.error " - Use One-Click-Installer:"
+      ui.error "    - download fastlane at https://download.fastlane.tools"
+      ui.error "-----------------------------------------------------------"
+      ui.error "    - extract the archive and double click the `install`"
+      ui.error "-----------------------------------------------------------"
+      ui.error " - Use Homebrew"
+      ui.error "    - update brew with `brew update`"
+      ui.error "    - install fastlane:"
+      ui.error "-----------------------------------------------------------"
+      ui.error "      - 🚀 `brew cask install fastlane` 🚀"
+      ui.error "-----------------------------------------------------------"
+      ui.error "for more details on ways to install fastlane please refer the documentation:"
+      ui.error "-----------------------------------------------------------"
+      ui.error "        🚀       https://docs.fastlane.tools          🚀   "
+      ui.error "-----------------------------------------------------------"
+      ui.error ""
+      ui.error "You can also install a new version of Ruby"
       ui.error ""
       ui.error "- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`"
       ui.error "- If you use system Ruby:"
       ui.error "  - Run `brew update && brew install ruby`"
       ui.error "- If you use rbenv with ruby-build:"
-      ui.error "  - Run `brew update && brew upgrade ruby-build && rbenv install ruby-2.3.1`"
-      ui.error "  - Run `rbenv global ruby-2.3.1` to make it the new global default Ruby version"
+      ui.error "  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`"
+      ui.error "  - Run `rbenv global 2.3.1` to make it the new global default Ruby version"
       ui.error "- If you use rvm:"
       ui.error "  - First run `rvm osx-ssl-certs update all`"
-      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local"
+      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`"
       ui.error ""
       ui.error "If that doesn't fix your issue, please google for the following error message:"
       ui.error "  '#{e}'"
@@ -152,7 +170,7 @@ module Commander
     end
 
     def show_github_issues(message_or_error)
-      return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_HIDE_GITHUB_ISSUES")
       return if FastlaneCore::Helper.test?
 
       require 'gh_inspector'
@@ -166,7 +184,7 @@ module Commander
         inspector.search_exception(message_or_error, delegate)
       end
     rescue => ex
-      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if $verbose
     end
   end
 end

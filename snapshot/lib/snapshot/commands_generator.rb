@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,14 +8,12 @@ module Snapshot
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
     end
 
     def run
-      program :version, Snapshot::VERSION
+      program :name, 'snapshot'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -64,13 +63,14 @@ module Snapshot
         c.syntax = 'snapshot reset_simulators'
         c.description = "This will remove all your existing simulators and re-create new ones"
         c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
+        c.option '--force', 'Disables confirmation prompts'
 
         c.action do |args, options|
           options.default ios_version: Snapshot::LatestOsVersion.ios_version
           versions = options.ios_version.split(',') if options.ios_version
           require 'snapshot/reset_simulators'
 
-          Snapshot::ResetSimulators.clear_everything!(versions)
+          Snapshot::ResetSimulators.clear_everything!(versions, options.force)
         end
       end
 

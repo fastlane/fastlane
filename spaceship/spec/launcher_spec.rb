@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship do
   describe Spaceship::Launcher do
     let(:username) { 'spaceship@krausefx.com' }
@@ -30,6 +28,10 @@ describe Spaceship do
 
     it "Device" do
       expect(spaceship1.device.all.count).to eq(4)
+    end
+
+    it "DeviceDisabled" do
+      expect(spaceship1.device.all(include_disabled: true).count).to eq(6)
     end
 
     it "Certificate" do

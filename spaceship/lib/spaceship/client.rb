@@ -1,10 +1,13 @@
 require 'faraday' # HTTP Client
-require 'logger'
-require 'faraday_middleware'
 require 'faraday-cookie_jar'
-require 'spaceship/ui'
-require 'spaceship/helper/plist_middleware'
+require 'faraday_middleware'
+require 'fastlane/version'
+require 'logger'
+require 'spaceship/babosa_fix'
 require 'spaceship/helper/net_http_generic_request'
+require 'spaceship/helper/plist_middleware'
+require 'spaceship/ui'
+require 'tmpdir'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -17,7 +20,7 @@ end
 module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
-    USER_AGENT = "Spaceship #{Spaceship::VERSION}"
+    USER_AGENT = "Spaceship #{Fastlane::VERSION}"
 
     attr_reader :client
 
@@ -155,6 +158,7 @@ module Spaceship
 
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
+      FileUtils.mkdir_p(File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
@@ -162,9 +166,21 @@ module Spaceship
       return File.read(path)
     end
 
+    # Returns preferred path for storing cookie
+    # for two step verification.
     def persistent_cookie_path
-      path = File.expand_path(File.join("~", ".spaceship", self.user, "cookie"))
-      FileUtils.mkdir_p(File.expand_path("..", path))
+      if ENV["SPACESHIP_COOKIE_PATH"]
+        path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
+      else
+        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+          dir_parts = File.split(dir)
+          if directory_accessible?(dir_parts.first)
+            path = File.expand_path(File.join(dir, self.user, "cookie"))
+            break
+          end
+        end
+      end
+
       return path
     end
 
@@ -288,7 +304,7 @@ module Spaceship
       end
 
       # get woinst, wois, and itctx cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/route?noext")
+      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
 
       case response.status
       when 403
@@ -405,6 +421,10 @@ module Spaceship
     end
 
     private
+
+    def directory_accessible?(path)
+      Dir.exist?(File.expand_path(path))
+    end
 
     def do_login(user, password)
       @loggedin = false

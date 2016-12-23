@@ -134,6 +134,47 @@ describe FastlaneCore do
         end
       end
 
+      describe "#sensitive flag" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        end
+
+        it "should set the sensitive flag" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array,
+                                                     optional: true,
+                                                     sensitive: true,
+                                                     default_value: ['5', '4', '3', '2', '1'])
+          expect(config_item.sensitive).to eq(true)
+        end
+
+        it "should ask using asterisks" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: String,
+                                                     is_string: true,
+                                                     optional: false,
+                                                     sensitive: true)
+          config = FastlaneCore::Configuration.create([config_item], {})
+          expect(FastlaneCore::UI).to receive(:password).and_return("password")
+          expect(config[:foo]).to eq("password")
+        end
+        it "should ask using plaintext" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: String,
+                                                     is_string: false,
+                                                     optional: false,
+                                                     sensitive: false)
+          config = FastlaneCore::Configuration.create([config_item], {})
+          expect(FastlaneCore::UI).to receive(:input).and_return("plaintext")
+          expect(config[:foo]).to eq("plaintext")
+        end
+      end
+
       describe "arrays" do
         it "returns Array default values correctly" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,

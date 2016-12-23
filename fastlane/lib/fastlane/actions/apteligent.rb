@@ -72,6 +72,7 @@ module Fastlane
                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_APTELIGENT_API_KEY",
+                                       sensitive: true,
                                        description: "Apteligent App API key e.g. IXPQIi8yCbHaLliqzRoo065tH0lxxxxx",
                                        optional: false)
         ]

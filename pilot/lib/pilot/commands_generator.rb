@@ -11,10 +11,7 @@ module Pilot
     FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update("pilot")
       new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status("pilot", Pilot::VERSION)
     end
 
     def convert_options(options)
@@ -42,7 +39,8 @@ module Pilot
     end
 
     def run
-      program :version, Pilot::VERSION
+      program :name, 'pilot'
+      program :version, Fastlane::VERSION
       program :description, Pilot::DESCRIPTION
       program :help, "Author", "Felix Krause <pilot@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"

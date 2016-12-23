@@ -1,6 +1,0 @@
-# Fetch and use the latest Fastfile from the fastlane main repository
-import("../../fastlane/fastlane/Fastfile")
-
-override_lane :module_ref do |options|
-  WatchBuild
-end

@@ -6,7 +6,7 @@ describe Sigh do
     end
 
     it "Successful run" do
-      stub_spaceship
+      sigh_stub_spaceship
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 

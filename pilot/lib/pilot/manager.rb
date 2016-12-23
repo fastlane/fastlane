@@ -56,5 +56,16 @@ module Pilot
       UI.verbose("App identifier (#{result})")
       return result
     end
+
+    def fetch_app_platform(required: true)
+      result = config[:app_platform]
+      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
+      if required
+        result ||= ask("Please enter the app's platform (appletvos, ios, osx): ")
+        UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? result
+        UI.verbose("App Platform (#{result})")
+      end
+      return result
+    end
   end
 end

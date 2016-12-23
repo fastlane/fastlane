@@ -33,10 +33,9 @@ module Snapshot
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-
+        options << config[:xcargs] if config[:xcargs]
         options
       end
 

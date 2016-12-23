@@ -24,6 +24,11 @@ module Deliver
                                      env_name: "DELIVER_APP_ID",
                                      description: "The app ID of the app you want to use/modify",
                                      is_string: false), # don't add any verification here, as it's used to store a spaceship ref
+        FastlaneCore::ConfigItem.new(key: :edit_live,
+                                     short_option: "-o",
+                                     env_name: "DELIVER_EDIT_LIVE",
+                                     description: "Modify live metadata, this option disables ipa upload and screenshot upload",
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
@@ -51,6 +56,15 @@ module Deliver
                                      conflicting_options: [:ipa],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "DELIVER_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
@@ -159,6 +173,11 @@ module Deliver
                                      env_name: "DELIVER_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
+                                     env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
+                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
+                                     is_string: false,
+                                     default_value: false),
 
         # App Metadata
         # Non Localised

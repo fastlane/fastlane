@@ -72,6 +72,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :slack_url,
                                        env_name: "SLACK_URL",
+                                       sensitive: true,
                                        description: "Create an Incoming WebHook for your Slack group",
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
@@ -156,7 +157,7 @@ module Fastlane
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
 
         slack_attachment = {
           fallback: options[:message],
@@ -205,7 +206,7 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if FastlaneCore::Env.truthy?('FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS') && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {

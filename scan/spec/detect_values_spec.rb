@@ -1,7 +1,7 @@
 describe Scan do
   describe Scan::DetectValues do
     before do
-      options = { project: "./examples/standard/app.xcodeproj" }
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       @project = FastlaneCore::Project.new(Scan.config)
     end

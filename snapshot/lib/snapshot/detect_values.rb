@@ -5,6 +5,7 @@ module Snapshot
       config = Snapshot.config
 
       # First, try loading the Snapfile from the current directory
+      configuration_file_path = File.expand_path(Snapshot.snapfile_name)
       config.load_configuration_file(Snapshot.snapfile_name)
 
       # Detect the project
@@ -13,7 +14,9 @@ module Snapshot
 
       # Go into the project's folder, as there might be a Snapfile there
       Dir.chdir(File.expand_path("..", Snapshot.project.path)) do
-        config.load_configuration_file(Snapshot.snapfile_name)
+        unless File.expand_path(Snapshot.snapfile_name) == configuration_file_path
+          config.load_configuration_file(Snapshot.snapfile_name)
+        end
       end
 
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
@@ -42,6 +45,7 @@ module Snapshot
           # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
           next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
           next if sim.name.include?("5s") # same screen resolution as iPhone 5
+
           next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name

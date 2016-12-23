@@ -71,7 +71,7 @@ xcodebuild -exportArchive \
 ### With `gym`
 
 ```
-gym
+fastlane gym
 ```
 
 ### Why `gym`?
@@ -100,7 +100,7 @@ gym
 
 # Installation
 
-    sudo gem install gym
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -108,11 +108,11 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    gym
+    fastlane gym
 
 That's all you need to build your application. If you want more control, here are some available parameters:
 
-    gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
+    fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 
 If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
 
@@ -120,23 +120,19 @@ If you need to use a different xcode install, use xcode-select or define DEVELOP
 
 For a list of all available parameters use
 
-    gym --help
+    fastlane gym --help
 
 If you run into any issues, use the `verbose` mode to get more information
 
-    gym --verbose
-
-In general, if you run into issues while exporting the archive, try using:
-
-    gym --use_legacy_build_api
+    fastlane gym --verbose
 
 Set the right export method if you're not uploading to App Store or TestFlight:
 
-    gym --export_method ad-hoc
+    fastlane gym --export_method ad-hoc
 
 To pass boolean parameters make sure to use `gym` like this:
 
-    gym --include_bitcode true --include_symbols false
+    fastlane gym --include_bitcode true --include_symbols false
 
 To access the raw `xcodebuild` output open `~/Library/Logs/gym`
 
@@ -144,7 +140,7 @@ To access the raw `xcodebuild` output open `~/Library/Logs/gym`
 
 Since you might want to manually trigger a new build but don't want to specify all the parameters every time, you can store your defaults in a so called `Gymfile`.
 
-Run `gym init` to create a new configuration file. Example:
+Run `fastlane gym init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"

@@ -151,7 +151,7 @@ module Spaceship
         "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
-        "E5D663CMZW" => WebsitePush,
+        "E5D663CMZW" => VoipPush,
         "4APLUP237T" => ApplePay
       }
 

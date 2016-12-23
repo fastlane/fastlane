@@ -64,17 +64,18 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 # Installation
-    sudo gem install produce
+
+    sudo gem install fastlane
 
 # Usage
 
 ## Creating a new application
 
-    produce
+    fastlane produce
 
 To get a list of all available parameters:
 
-    produce --help
+    fastlane produce --help
 
 ```
   Commands:
@@ -106,59 +107,67 @@ To get a list of all available parameters:
 
 If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
 
-    produce enable_services --homekit --healthkit
+    fastlane produce enable_services --homekit --healthkit
 
 If you want to disable Application Services for an App ID (iCloud in this case):
 
-    produce disable_services --icloud
+    fastlane produce disable_services --icloud
 
 If you want to create a new App Group:
 
-    produce group -g group.krausefx -n "Example App Group"
+    fastlane produce group -g group.krausefx -n "Example App Group"
 
 If you want to associate an app with an App Group:
 
-    produce associate_group -a com.krausefx.app group.krausefx
+    fastlane produce associate_group -a com.krausefx.app group.krausefx
 
 # Parameters
 
 Get a list of all available options using
 
-    produce enable_services --help
+    fastlane produce enable_services --help
 
 ```
     --app-group          Enable App Groups
+    --apple-pay          Enable Apple Pay
     --associated-domains Enable Associated Domains
     --data-protection STRING Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+    --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
     --wireless-conf      Enable Wireless Accessory Configuration
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
+    --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
     --passbook           Enable Passbook
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
+    --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
 ```
 
-    produce disable_services --help
+    fastlane produce disable_services --help
 
 ```
     --app-group          Disable App Groups
+    --apple-pay          Disable Apple Pay
     --associated-domains Disable Associated Domains
     --data-protection    Disable Data Protection
+    --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
     --wireless-conf      Disable Wireless Accessory Configuration
     --icloud             Disable iCloud
+    --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
     --passbook           Disable Passbook
     --push-notification  Disable Push notifications
+    --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
 ```
 
 ## Environment Variables
 
-All available values can also be passed using environment variables, run `produce --help` to get a list of all available parameters.
+All available values can also be passed using environment variables, run `fastlane produce --help` to get a list of all available parameters.
 
 ## [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) Integration
 

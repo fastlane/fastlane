@@ -276,25 +276,31 @@ describe Fastlane::PluginGenerator do
       it "rspec tests are passing" do
         # Actually run our generated spec as part of this spec #yodawg
         Dir.chdir(gem_name) do
-          `rspec &> /dev/null`
-          expect($?.exitstatus).to be(0)
+          Bundler.setup do
+            `rspec &> /dev/null`
+            expect($?.exitstatus).to be(0)
+          end
         end
       end
 
       it "rubocop validations are passing" do
         # Actually run our generated spec as part of this spec #yodawg
         Dir.chdir(gem_name) do
-          `rubocop &> /dev/null`
-          expect($?.exitstatus).to be(0)
+          Bundler.setup do
+            `rubocop &> /dev/null`
+            expect($?.exitstatus).to be(0)
+          end
         end
       end
 
       it "`rake` runs both rspec and rubocop" do
         Dir.chdir(gem_name) do
-          result = `rake`
-          expect($?.exitstatus).to be(0)
-          expect(result).to include("no offenses detected") # rubocop
-          expect(result).to include("example, 0 failures") # rspec
+          Bundler.setup do
+            result = `rake`
+            expect($?.exitstatus).to be(0)
+            expect(result).to include("no offenses detected") # rubocop
+            expect(result).to include("example, 0 failures") # rspec
+          end
         end
       end
     end
