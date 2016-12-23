@@ -68,6 +68,33 @@ describe Gym do
                            ])
     end
 
+    it "enables unicode" do
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      xcargs = xcargs_hash.map do |k, v|
+        "#{k.to_s.shellescape}=#{v.shellescape}"
+      end.join ' '
+      options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example', xcpretty_utf: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+                             "set -o pipefail &&",
+                             "xcodebuild",
+                             "-scheme Example",
+                             "-project ./gym/examples/standard/Example.xcodeproj",
+                             "-sdk '9.0'",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             :archive,
+                             "| tee #{log_path.shellescape}",
+                             "| xcpretty",
+                             "--utf"
+                           ])
+    end
+
     describe "Standard Example" do
       before do
         options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example' }

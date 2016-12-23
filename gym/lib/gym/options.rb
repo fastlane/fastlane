@@ -248,7 +248,12 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
+                                     env_name: "XCPRETTY_UTF",
+                                     description: "Have xcpretty use unicode encoding when reporting builds",
+                                     optional: true,
+                                     is_string: false)
       ]
     end
   end
