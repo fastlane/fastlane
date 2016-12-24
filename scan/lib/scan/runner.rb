@@ -74,7 +74,6 @@ module Scan
       end
 
       if Scan.cache[:open_html_report_path]
-        # Open the HTML file
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
     end
