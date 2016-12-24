@@ -136,7 +136,7 @@ module FastlaneCore
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
         UI.error(ex)
-        UI.error("Error detecting currently used Xcode installation")
+        UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have installed atleast one Xcode version.")
       end
       @xcode_version
     end
