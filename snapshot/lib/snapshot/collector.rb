@@ -26,8 +26,8 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        components = [launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
-        screenshot_name = device_name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
+        components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+        screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
         output_path = File.join(language_folder, screenshot_name)
         from_path = File.join(attachments_path, filename)
         if $verbose
