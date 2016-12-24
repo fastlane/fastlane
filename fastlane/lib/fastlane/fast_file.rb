@@ -171,8 +171,9 @@ module Fastlane
     end
 
     # Execute shell command
-      Actions.execute_action(command) do
     def sh(command, log: true, error_callback: nil)
+      command_header = log ? command : "shell command"
+      Actions.execute_action(command_header) do
         Actions.sh_no_action(command, log: log, error_callback: error_callback)
       end
     end
