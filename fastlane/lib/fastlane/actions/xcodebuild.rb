@@ -106,13 +106,10 @@ module Fastlane
           archiving    = params.key? :archive
           exporting    = params.key? :export_archive
           testing      = params.key? :test
+          xcpretty_utf = params[:xcpretty_utf]
 
           if params.key? :raw_buildlog
             raw_buildlog = params[:raw_buildlog]
-          end
-
-          if params.key? :xcpretty_utf
-            xcpretty_utf = params[:xcpretty_utf]
           end
 
           if exporting
@@ -255,7 +252,9 @@ module Fastlane
 
         xcpretty_command = ""
         xcpretty_command = "| xcpretty #{xcpretty_args}" unless raw_buildlog
-        xcpretty_command = "#{xcpretty_command} --utf" unless raw_buildlog || !xcpretty_utf
+        unless raw_buildlog
+          xcpretty_command = "#{xcpretty_command} --utf" if xcpretty_utf
+        end
 
         pipe_command = "| tee '#{buildlog_path}/xcodebuild.log' #{xcpretty_command}"
 
