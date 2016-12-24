@@ -50,9 +50,18 @@ module Scan
         actions = []
         actions << :clean if config[:clean]
         actions << :build unless config[:skip_build]
-        actions << "build-for-testing" if config[:build_for_testing]
-        actions << :test unless config[:test_without_building] || config[:build_for_testing]
-        actions << "test-without-building" if config[:test_without_building]
+
+        if config[:build_for_testing]
+          actions << "build-for-testing"
+        end
+
+        if config[:test_without_building]
+          actions << "test-without-building"
+        end
+
+        if !config[:test_without_building] && !config[:build_for_testing]
+          actions << :test
+        end
 
         actions
       end
