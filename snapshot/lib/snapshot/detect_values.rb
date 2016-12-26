@@ -53,7 +53,7 @@ module Snapshot
             config[:devices] << sim.name
           end
         end
-        #In case, we are targeting mac app - add host Mac machine as testing device
+        # In case, we are targeting mac app - add host Mac machine as testing device
         config[:devices] << "Mac" if mac_target
       end
     end
