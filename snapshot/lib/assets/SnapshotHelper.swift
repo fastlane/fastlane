@@ -42,7 +42,7 @@ open class Snapshot: NSObject {
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            deviceLanguage = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue).trimmingCharacters(in: trimCharacterSet) as String
+            deviceLanguage = try String(contentsOf: path, encoding: String.Encoding.utf8).trimmingCharacters(in: trimCharacterSet)
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))"]
         } catch {
             print("Couldn't detect/set language...")
@@ -58,7 +58,7 @@ open class Snapshot: NSObject {
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            locale = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue).trimmingCharacters(in: trimCharacterSet) as String
+            locale = try String(contentsOf: path, encoding: String.Encoding.utf8).trimmingCharacters(in: trimCharacterSet)
         } catch {
             print("Couldn't detect/set locale...")
         }
@@ -77,7 +77,7 @@ open class Snapshot: NSObject {
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
-            let launchArguments = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String
+            let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
             let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
             let results = matches.map { result -> String in
@@ -120,30 +120,30 @@ open class Snapshot: NSObject {
         }
     }
 
-    class func pathPrefix() -> NSString? {
-        var homeDir: NSString
+    class func pathPrefix() -> URL? {
+        let homeDir: URL
         //on OSX config is stored in /Users/<username>/Library
         //and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
-            
             guard let user = ProcessInfo().environment["USER"] else {
                 print("Couldn't find Snapshot configuration files - can't detect current user ")
                 return nil
             }
-            
-            guard let usersDir = NSSearchPathForDirectoriesInDomains(.userDirectory, .localDomainMask, true)[0] as NSString? else {
+        
+            guard let usersDir =  FileManager.default.urls(for:.userDirectory, in:.localDomainMask).first else {
                 print("Couldn't find Snapshot configuration files - can't detect `Users` dir")
                 return nil
             }
             
-            homeDir = usersDir.appendingPathComponent(user) as NSString
+            homeDir = usersDir.appendingPathComponent(user)
         #else
-            guard homeDir = ProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString else {
+            guard let homeDirUrl = URL(string: ProcessInfo().environment["SIMULATOR_HOST_HOME"]!) else {
                 print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
                 return nil
             }
+            homeDir = homeDirUrl
         #endif
-        return homeDir.appendingPathComponent("Library/Caches/tools.fastlane") as NSString
+        return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
 }
 
