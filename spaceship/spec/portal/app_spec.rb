@@ -109,8 +109,7 @@ describe Spaceship::Portal::App do
     subject { Spaceship::Portal::App.find("net.sunapps.151") }
     it 'updates the name of the app by given bundle_id' do
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/updateAppIdName.action").
-        with(body: { "appIdId" => "B7JBD8LHAA", "name" => "The New Name", "teamId" => "XXXXXXXXXX" },
-             headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/x-www-form-urlencoded', 'User-Agent' => 'Spaceship 2.3.0' }).
+        with(body: { "appIdId" => "B7JBD8LHAA", "name" => "The New Name", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: JSON.parse(PortalStubbing.adp_read_fixture_file('updateAppIdName.action.json')), headers: {})
 
       app = subject.update_name!('The New Name')
