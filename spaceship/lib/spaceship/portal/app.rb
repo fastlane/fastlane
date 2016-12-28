@@ -116,6 +116,13 @@ module Spaceship
         self
       end
 
+      # Update name of this App ID.
+      # @return (App) The app you updated. This is nil if the app can't be found
+      def update_name!(name, mac: false)
+        app = client.update_app_name!(app_id, name, mac: mac)
+        self.class.factory(app)
+      end
+
       # Fetch a specific App ID details based on the bundle_id
       # @return (App) The app you're looking for. This is nil if the app can't be found.
       def details

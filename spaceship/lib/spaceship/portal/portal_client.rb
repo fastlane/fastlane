@@ -187,6 +187,17 @@ module Spaceship
       parse_response(r)
     end
 
+    def update_app_name!(app_id, name, mac: false)
+      ensure_csrf(Spaceship::App)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/updateAppIdName.action", {
+        teamId: team_id,
+        appIdId: app_id,
+        name: valid_name_for(name)
+      })
+      parse_response(r, 'appId')
+    end
+
     #####################################################
     # @!group App Groups
     #####################################################
