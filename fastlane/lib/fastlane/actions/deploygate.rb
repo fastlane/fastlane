@@ -45,7 +45,7 @@ module Fastlane
         user_name = options[:user]
         ipa = options[:ipa]
         upload_options = options.values.select do |key, _|
-          [:message, :distribution_key, :release_note].include? key
+          [:message, :distribution_key, :release_note, :disable_notify].include? key
         end
 
         return ipa if Helper.test?
@@ -141,7 +141,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :release_note,
                                        optional: true,
                                        env_name: "DEPLOYGATE_RELEASE_NOTE",
-                                       description: "Release note for distribution page")
+                                       description: "Release note for distribution page"),
+          FastlaneCore::ConfigItem.new(key: :disable_notify,
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false,
+                                       env_name: "DEPLOYGATE_DISABLE_NOTIFY",
+                                       description: "Disables Push notification emails")
         ]
       end
 
