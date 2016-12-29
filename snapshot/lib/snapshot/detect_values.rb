@@ -24,37 +24,34 @@ module Snapshot
       # Devices
       unless config[:devices]
         config[:devices] = []
-        mac_target = Snapshot.project.mac_app?
 
-        unless mac_target
-          # We only care about a subset of the simulators
-          all_simulators = FastlaneCore::Simulator.all
-          all_simulators.each do |sim|
-            # Filter iPads, we only want the following simulators
-            # Xcode 7:
-            #   ["iPad Pro", "iPad Air"]
-            # Xcode 8:
-            #   ["iPad Pro (9.7 Inch)", "iPad Pro (12.9 Inch)"]
-            #
-            # Full list: ["iPad 2", "iPad Retina", "iPad Air", "iPad Air 2", "iPad Pro"]
-            next if sim.name.include?("iPad 2")
-            next if sim.name.include?("iPad Retina")
-            next if sim.name.include?("iPad Air 2")
-            # In Xcode 8, we only need iPad Pro 9.7 inch, not the iPad Air
-            next if all_simulators.any? { |a| a.name.include?("9.7 inch") } && sim.name.include?("iPad Air")
+        # We only care about a subset of the simulators
+        all_simulators = FastlaneCore::Simulator.all
+        all_simulators.each do |sim|
+          # Filter iPads, we only want the following simulators
+          # Xcode 7:
+          #   ["iPad Pro", "iPad Air"]
+          # Xcode 8:
+          #   ["iPad Pro (9.7 Inch)", "iPad Pro (12.9 Inch)"]
+          #
+          # Full list: ["iPad 2", "iPad Retina", "iPad Air", "iPad Air 2", "iPad Pro"]
+          next if sim.name.include?("iPad 2")
+          next if sim.name.include?("iPad Retina")
+          next if sim.name.include?("iPad Air 2")
+          # In Xcode 8, we only need iPad Pro 9.7 inch, not the iPad Air
+          next if all_simulators.any? { |a| a.name.include?("9.7 inch") } && sim.name.include?("iPad Air")
 
-            # Filter iPhones
-            # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
-            next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
-            next if sim.name.include?("5s") # same screen resolution as iPhone 5
+          # Filter iPhones
+          # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
+          next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
+          next if sim.name.include?("5s") # same screen resolution as iPhone 5
 
-            next if sim.name.include?("Apple TV")
+          next if sim.name.include?("Apple TV")
 
-            config[:devices] << sim.name
-          end
+          config[:devices] << sim.name
         end
-        # In case, we are targeting mac app - add host Mac machine as testing device
-        config[:devices] << "Mac" if mac_target
+        # as Snapshot can be run only on MacOS - we are always have host mac device
+        config[:devices] << "Mac"
       end
     end
   end
