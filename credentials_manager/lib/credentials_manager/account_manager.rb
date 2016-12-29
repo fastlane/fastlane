@@ -56,7 +56,11 @@ module CredentialsManager
     end
 
     def add_to_keychain
-      Security::InternetPassword.add(server_name, user, password, options)
+      if options
+        Security::InternetPassword.add(server_name, user, password, options)
+      else
+        Security::InternetPassword.add(server_name, user, password)
+      end
     end
 
     def remove_from_keychain
@@ -68,8 +72,14 @@ module CredentialsManager
       "#{@prefix}.#{user}"
     end
 
+    # Use env variables from this method to augment internet password item with additional data.
+    # These variables are used by Xamarin Studio to authenticate Apple developers.
     def options
-      { p: ENV["FASTLANE_PATH"], P: ENV["FASTLANE_PORT"], r: ENV["FASTLANE_PROTOCOL"] }
+      hash = {}
+      hash[:p] = ENV["FASTLANE_PATH"] if ENV["FASTLANE_PATH"]
+      hash[:P] = ENV["FASTLANE_PORT"] if ENV["FASTLANE_PORT"]
+      hash[:r] = ENV["FASTLANE_PROTOCOL"] if ENV["FASTLANE_PROTOCOL"]
+      hash.empty? ? nil : hash
     end
 
     private
