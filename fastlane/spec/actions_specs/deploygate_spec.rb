@@ -74,6 +74,7 @@ describe Fastlane do
               user: 'deploygate',
               api_token: 'thisistest',
               release_note: 'This is a test release.',
+              disable_notify: true,
             })
           end").runner.execute(:test)
         end.not_to raise_error
