@@ -23,8 +23,6 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
-  spec.extensions << 'ext/mkrf_conf.rb'
-
   # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = Dir["*/lib"]
 
@@ -74,5 +72,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
-  spec.add_development_dependency 'json', '>= 2.0.1', '< 3.0.0' # Because sometimes it's just not installed
 end
