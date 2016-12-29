@@ -27,7 +27,7 @@ module Screengrab
       FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'screengrab'
+        c.syntax = 'fastlane screengrab'
         c.description = 'Take new screenshots based on the screengrabfile.'
 
         c.action do |args, options|
@@ -43,7 +43,7 @@ module Screengrab
       end
 
       command :init do |c|
-        c.syntax = 'screengrab init'
+        c.syntax = 'fastlane screengrab init'
         c.description = "Creates a new Screengrabfile in the current directory"
 
         c.action do |args, options|

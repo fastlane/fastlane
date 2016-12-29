@@ -28,7 +28,7 @@ module Supply
       global_option('--verbose') { $verbose = true }
 
       command :run do |c|
-        c.syntax = 'supply'
+        c.syntax = 'fastlane supply'
         c.description = 'Run a deploy process'
         c.action do |args, options|
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
@@ -39,7 +39,7 @@ module Supply
       end
 
       command :init do |c|
-        c.syntax = 'supply init'
+        c.syntax = 'fastlane supply init'
         c.description = 'Sets up supply for you'
         c.action do |args, options|
           require 'supply/setup'

@@ -25,7 +25,7 @@ module PEM
       FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
 
       command :renew do |c|
-        c.syntax = 'pem renew'
+        c.syntax = 'fastlane pem renew'
         c.description = 'Renews the certificate (in case it expired) and shows the path to the generated pem file'
 
         c.action do |args, options|
