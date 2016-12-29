@@ -31,7 +31,7 @@ describe Fastlane do
         end.to raise_error
       end
 
-      it "raises an error if no ipa path was given" do
+      it "raises an error if no binary path was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
@@ -51,6 +51,18 @@ describe Fastlane do
               ipa_path: './fastlane/nonexistent'
             })
           end").runner.execute(:test)
+        end.to raise_error
+      end
+
+      it "raises an error if the given apk path was not found" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            deploygate({
+              api_token: 'testistest',
+              user: 'deploygate',
+              apk_path: './fastlane/nonexistent'
+            })
+          ").runner.execute(:test)
         end.to raise_error
       end
 

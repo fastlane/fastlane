@@ -10,10 +10,10 @@ module Fastlane
       DEPLOYGATE_URL_BASE = 'https://deploygate.com'
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include?(platform)
       end
 
-      def self.upload_build(api_token, user_name, ipa, options)
+      def self.upload_build(api_token, user_name, binary, options)
         require 'faraday'
         require 'faraday_middleware'
 
@@ -27,7 +27,7 @@ module Fastlane
 
         options.update({
           token: api_token,
-          file: Faraday::UploadIO.new(ipa, 'application/octet-stream'),
+          file: Faraday::UploadIO.new(binary, 'application/octet-stream'),
           message: options[:message] || ''
         })
 
@@ -39,23 +39,25 @@ module Fastlane
 
       def self.run(options)
         # Available options: https://deploygate.com/docs/api
-        UI.success('Starting with ipa upload to DeployGate... this could take some time ⏳')
+        UI.success('Starting with app upload to DeployGate... this could take some time ⏳')
 
         api_token = options[:api_token]
         user_name = options[:user]
-        ipa = options[:ipa]
+        binary = options[:ipa] || options[:apk]
         upload_options = options.values.select do |key, _|
           [:message, :distribution_key, :release_note, :disable_notify].include? key
         end
 
-        return ipa if Helper.test?
+        raise 'missing `ipa` and `apk`. deploygate action needs least one.' unless binary
 
-        response = self.upload_build(api_token, user_name, ipa, upload_options)
+        return binary if Helper.test?
+
+        response = self.upload_build(api_token, user_name, binary, upload_options)
         if parse_response(response)
           UI.message("DeployGate URL: #{Actions.lane_context[SharedValues::DEPLOYGATE_URL]}")
           UI.success("Build successfully uploaded to DeployGate as revision \##{Actions.lane_context[SharedValues::DEPLOYGATE_REVISION]}!")
         else
-          UI.user_error!("Error when trying to upload ipa to DeployGate")
+          UI.user_error!("Error when trying to upload app to DeployGate")
         end
       end
 
@@ -126,8 +128,17 @@ module Fastlane
                                        env_name: "DEPLOYGATE_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: "DEPLOYGATE_APK_PATH",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "DEPLOYGATE_MESSAGE",
@@ -167,6 +178,13 @@ module Fastlane
             ipa: "./ipa_file.ipa",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
             distribution_key: "(Optional) Target Distribution Key"
+          )',
+          'deploygate(
+            api_token: "...",
+            user: "target username or organization name",
+            apk: "./apk_file.apk",
+            message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+            distribution_key: "(Optional) Target Distribution Key"
           )'
         ]
       end
@@ -175,8 +193,8 @@ module Fastlane
         :beta
       end
 
-      def self.author
-        "tnj"
+      def self.authors
+        ["tnj", "tomorrowkey"]
       end
     end
   end
