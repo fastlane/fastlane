@@ -14,7 +14,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 
 - Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane]
 - Clone your fork:
-  - `git clone <YOUR_GITHUB_USER> git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
+  - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
   - Run `bundle install` in the project root
   - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
