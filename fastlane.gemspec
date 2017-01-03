@@ -40,12 +40,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '>= 4.4.0', '< 5.0.0' # CLI parser
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0.0' # Great HTTP Client
-  spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'  
+  spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '>= 1.6' # fetch the image sizes from the screenshots, note: we also support > 2.0
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
   spec.add_dependency 'google-api-client', '~> 0.9.1' # Google API Client to access Play Publishing API
   spec.add_dependency 'highline', '>= 1.7.2', '< 2.0.0' # user inputs (e.g. passwords)
-  spec.add_dependency 'json', '>= 2.0.1', '< 3.0.0' # Because sometimes it's just not installed
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
   spec.add_dependency 'multi_json' # Because sometimes it's just not installed
   spec.add_dependency 'multi_xml', '~> 0.5'
