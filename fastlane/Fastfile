@@ -253,7 +253,7 @@ private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
 end
 
-desc "Print out the changelog since the last tagged release"
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
 lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
