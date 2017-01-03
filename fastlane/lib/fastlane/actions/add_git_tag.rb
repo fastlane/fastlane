@@ -12,6 +12,7 @@ module Fastlane
 
         cmd << ["-am #{message.shellescape}"]
         cmd << '--force' if options[:force]
+        cmd << '-s' if options[:sign]
         cmd << "'#{tag}'"
         cmd << options[:commit].to_s if options[:commit]
 
@@ -65,6 +66,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_GIT_TAG_FORCE",
                                        description: "Force adding the tag",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :sign,
+                                       env_name: "FL_GIT_TAG_SIGN",
+                                       description: "Make a GPG-signed tag, using the default e-mail address's key",
                                        optional: true,
                                        is_string: false,
                                        default_value: false)
