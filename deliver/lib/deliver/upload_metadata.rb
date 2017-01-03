@@ -37,6 +37,15 @@ module Deliver
         v = app.live_version(platform: options[:platform])
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
+
+        if v.nil?
+          UI.message("Couldn't find live version, editing the current version on iTunes Connect instead")
+          v = app.edit_version(platform: options[:platform])
+          # we don't want to update the localised_options and non_localised_options
+          # as we also check for `options[:edit_live]` at other areas in the code
+          # by not touching those 2 variables, deliver is more consistent with what the option says
+          # in the documentation
+        end
       else
         v = app.edit_version(platform: options[:platform])
         localised_options = (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES)
