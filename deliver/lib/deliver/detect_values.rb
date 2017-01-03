@@ -1,12 +1,12 @@
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
+      find_platform(options)
       find_app_identifier(options)
       find_app(options)
       find_folders(options)
       ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
-      find_platform(options)
     end
 
     def find_app_identifier(options)
