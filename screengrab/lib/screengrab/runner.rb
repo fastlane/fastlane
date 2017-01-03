@@ -225,7 +225,11 @@ module Screengrab
                                       print_all: true,
                                       print_command: true)
 
-        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
+        if @config[:exit_on_test_failure]
+          UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
+        else
+          UI.error("Tests failed") if test_output.include?("FAILURES!!!")
+        end
       end
     end
 
