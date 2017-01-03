@@ -6,6 +6,7 @@ describe FastlaneCore do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
       @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
+      @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
 
       FastlaneCore::Simulator.clear_cache
     end
@@ -204,6 +205,15 @@ describe FastlaneCore do
         state: "Booted",
         is_simulator: false
       )
+    end
+
+    it "property parses system_profiler output with entries that don't contain _items" do
+      response = "response"
+      expect(response).to receive(:read).and_return(@system_profiler_output_items_without_items)
+      expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
+
+      devices = FastlaneCore::DeviceManager.connected_devices('iOS')
+      expect(devices).to be_empty
     end
 
     it "property parses system_profiler and instruments output and generates Device objects for tvOS" do
