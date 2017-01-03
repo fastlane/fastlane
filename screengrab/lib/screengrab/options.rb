@@ -102,7 +102,11 @@ module Screengrab
                                      default_value: "phone",
                                      verify_block: proc do |value|
                                        UI.user_error! "device_type must be one of: #{DEVICE_TYPES}" unless DEVICE_TYPES.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :exit_on_test_failure,
+                                     env_name: 'EXIT_ON_TEST_FAILURE',
+                                     description: "Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary",
+                                     default_value: true)
       ]
     end
   end

@@ -8,10 +8,58 @@ describe Screengrab::Runner do
     @runner = Screengrab::Runner.new(mock_executor, config, mock_android_environment)
   end
 
-  def set_mock_adb_response(command, mock_response)
+  def mock_adb_response_for_command(command, mock_response)
     expect(mock_executor).to receive(:execute)
       .with(hash_including(command: command))
       .and_return(mock_response)
+  end
+
+  def mock_adb_response(mock_response)
+    expect(mock_executor).to receive(:execute)
+      .and_return(mock_response)
+  end
+
+  describe :run_tests do
+    let(:device_serial) { 'device_serial' }
+    let(:test_classes_to_use) { nil }
+    let(:test_packages_to_use) { nil }
+
+    context 'when a locale is specified' do
+      before do
+        config[:locales] = %w(en-US)
+        config[:ending_locale] = 'en-US'
+      end
+
+      context 'when tests produce a failure' do
+        before do
+          mock_adb_response('FAILURES!!!')
+        end
+
+        context 'when exit_on_test_failure is true' do
+          before do
+            config[:exit_on_test_failure] = true
+          end
+
+          it 'prints an error and exits the program' do
+            expect(ui).to receive(:user_error!).with("Tests failed", show_github_issues: false).and_call_original
+
+            expect { @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use) }.to raise_fastlane_error
+          end
+        end
+
+        context 'when exit_on_test_failure is false' do
+          before do
+            config[:exit_on_test_failure] = false
+          end
+
+          it 'prints an error and does not exit the program' do
+            expect(ui).to receive(:error).with("Tests failed").and_call_original
+
+            @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+          end
+        end
+      end
+    end
   end
 
   describe :validate_apk do
@@ -28,7 +76,7 @@ describe Screengrab::Runner do
     context 'no permissions' do
       it 'prints if permissions are missing' do
         allow(mock_android_environment).to receive(:aapt_path).and_return 'fake_aapt_path'
-        set_mock_adb_response('fake_aapt_path dump permissions fake_apk_path', '')
+        mock_adb_response_for_command('fake_aapt_path dump permissions fake_apk_path', '')
 
         expect(ui).to receive(:user_error!).with(/permission.* could not be found/).and_call_original
 
@@ -46,7 +94,7 @@ describe Screengrab::Runner do
         List of devices attached
 
         ADB_OUTPUT
-        set_mock_adb_response(adb_list_devices_command, adb_response)
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
 
         expect(ui).to receive(:user_error!).with(/no connected.* devices/).and_call_original
 
@@ -62,7 +110,7 @@ describe Screengrab::Runner do
 
 
         ADB_OUTPUT
-        set_mock_adb_response(adb_list_devices_command, adb_response)
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
 
         expect(@runner.select_device).to eq('T065002LTT')
       end
@@ -77,7 +125,7 @@ describe Screengrab::Runner do
 
         ADB_OUTPUT
 
-        set_mock_adb_response(adb_list_devices_command, adb_response)
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
         expect(@runner.select_device).to eq('emulator-5554')
       end
     end
@@ -91,7 +139,7 @@ describe Screengrab::Runner do
 
         ADB_OUTPUT
 
-        set_mock_adb_response(adb_list_devices_command, adb_response)
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
 
         expect(@runner.select_device).to eq('T065002LTT')
       end
@@ -107,7 +155,7 @@ describe Screengrab::Runner do
 
           ADB_OUTPUT
 
-      set_mock_adb_response("test", adb_response)
+      mock_adb_response_for_command("test", adb_response)
 
       expect(@runner.run_adb_command("test").lines.any? { |line| line.start_with?('adb: ') }).to eq(false)
     end
