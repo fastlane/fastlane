@@ -51,13 +51,6 @@ lane :bump do |options|
   sh "git checkout master"
 end
 
-desc "Display a changelog for fastlane since its last release."
-lane :show_changelog do
-  old_version = current_version
-
-  print_release_changelog(old_version: old_version)
-end
-
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
@@ -89,7 +82,7 @@ lane :release do
   #
   github_release = get_github_release(url: "fastlane/fastlane", version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    print_release_changelog(old_version: old_version)
+    show_changelog(old_version: old_version)
 
     title = prompt(text: 'Title: ')
     description = prompt(text: "Please enter a changelog: ",
@@ -260,14 +253,15 @@ private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
 end
 
-desc "Print out the changelog since the last tagged release"
-private_lane :print_release_changelog do |options|
-  tool_name = options[:tool] || "fastlane"
-  old_version = options[:old_version]
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
+  old_version = options[:old_version] || current_version
 
-  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
-  changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
+  changes = sh("git log --pretty='* %s' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
+
+  github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
+  sh "open #{github_diff_url}"
 
   puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
   changes # return the text without the modified colors
