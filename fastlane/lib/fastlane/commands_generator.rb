@@ -28,7 +28,7 @@ module Fastlane
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
-      unless ARGV[0] == "env"
+      unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command?
         # *after* loading the plugins
         Fastlane.plugin_manager.load_plugins
         Fastlane::PluginUpdateManager.start_looking_for_updates
