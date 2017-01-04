@@ -3,19 +3,31 @@ require 'highline/import' # to hide the entered password
 
 module CredentialsManager
   class AccountManager
+    DEFAULT_PREFIX = "deliver"
     # @param prefix [String] Very optional, is used for the
     #   iTunes Transporter which uses application specofic passwords
-    def initialize(user: nil, password: nil, prefix: nil)
-      @prefix = prefix || "deliver"
+    # @param note [String] An optional note that will be shown next
+    #   to the password and username prompt
+    def initialize(user: nil, password: nil, prefix: nil, note: nil)
+      @prefix = prefix || DEFAULT_PREFIX
 
       @user = user
       @password = password
+      @note = note
+    end
+
+    # Is the that default prefix "deliver"
+    def default_prefix?
+      @prefix == DEFAULT_PREFIX
     end
 
     def user
-      @user ||= ENV["FASTLANE_USER"]
-      @user ||= ENV["DELIVER_USER"]
-      @user ||= AppfileConfig.try_fetch_value(:apple_id)
+      if default_prefix?
+        @user ||= ENV["FASTLANE_USER"]
+        @user ||= ENV["DELIVER_USER"]
+        @user ||= AppfileConfig.try_fetch_value(:apple_id)
+      end
+
       ask_for_login if @user.to_s.length == 0
       return @user
     end
@@ -25,7 +37,10 @@ module CredentialsManager
     end
 
     def password(ask_if_missing: true)
-      @password ||= fetch_password_from_env
+      if default_prefix?
+        @password ||= fetch_password_from_env
+      end
+
       unless @password
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
@@ -87,20 +102,28 @@ module CredentialsManager
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
       puts "The login information you enter will be stored in your Mac OS Keychain".green
-      puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
-      puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+      if default_prefix?
+        # We don't want to show this message, if we ask for the application specific password
+        # which has a different prefix
+        puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
+        puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+      end
       puts "-------------------------------------------------------------------------------------".green
 
       if @user.to_s.length == 0
         raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
-        @user = ask("Username: ") while @user.to_s.length == 0
+        prompt_text = "Username"
+        prompt_text += " (#{@note})" if @note
+        prompt_text += ": "
+        @user = ask(prompt_text) while @user.to_s.length == 0
         # we return here, as only the username was asked for now, we'll get called for the pw again anyway
         return
       end
 
       while @password.to_s.length == 0
         raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
-        @password = ask("Password (for #{@user}): ") { |q| q.echo = "*" }
+        note = @note + " " if @note
+        @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
       end
 
       return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
