@@ -380,7 +380,9 @@ module FastlaneCore
       #   1) ENV variable for application specific password
       return ENV[TWO_FACTOR_ENV_VARIABLE] if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
       #   2) TWO_STEP_HOST_PREFIX from keychain
-      account_manager = CredentialsManager::AccountManager.new(user: @user, prefix: TWO_STEP_HOST_PREFIX)
+      account_manager = CredentialsManager::AccountManager.new(user: @user, 
+                                                             prefix: TWO_STEP_HOST_PREFIX,
+                                                               note: "application-specific")
       password = account_manager.password(ask_if_missing: false)
       return password if password.to_s.length > 0
       #   3) standard iTC password
@@ -398,7 +400,8 @@ module FastlaneCore
       end
 
       a = CredentialsManager::AccountManager.new(user: @user,
-                                               prefix: TWO_STEP_HOST_PREFIX)
+                                               prefix: TWO_STEP_HOST_PREFIX,
+                                                 note: "application-specific")
       if a.password(ask_if_missing: false).to_s.length > 0
         # user already entered one.. delete the old one
         UI.error("Application specific password seems wrong")
@@ -412,7 +415,7 @@ module FastlaneCore
       UI.error("To set the application specific password on a CI machine using")
       UI.error("an environment variable, you can set the")
       UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable")
-      @password = a.password # to ask the user for the missing value
+      @password = a.password(ask_if_missing: true) # to ask the user for the missing value
 
       return true
     end
