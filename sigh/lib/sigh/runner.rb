@@ -65,7 +65,7 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
       results = results.find_all do |current_profile|
         if current_profile.valid?
           true
