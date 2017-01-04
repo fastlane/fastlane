@@ -132,7 +132,7 @@ describe Spaceship::Client do
 
     it "uses home dir by default" do
       allow(subject).to receive(:directory_accessible?).with("~").and_return(true)
-      expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.spaceship/username/cookie"))
+      expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.fastlane/spaceship/username/cookie"))
     end
 
     it "uses /var/tmp if home not available" do
