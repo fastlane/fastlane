@@ -235,7 +235,7 @@ describe FastlaneCore do
       )
     end
 
-    it "property parses system_profiler and instruments output and generates Device objects for tvOS" do
+    it "properly parses system_profiler and instruments output and generates Device objects for tvOS" do
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
@@ -254,7 +254,7 @@ describe FastlaneCore do
       )
     end
 
-    it "property parses output for all iOS devices" do
+    it "properly parses output for all iOS devices" do
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
@@ -300,7 +300,7 @@ describe FastlaneCore do
       )
     end
 
-    it "property parses output for all tvOS devices" do
+    it "properly parses output for all tvOS devices" do
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
