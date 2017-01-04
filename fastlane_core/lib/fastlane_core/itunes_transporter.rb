@@ -380,7 +380,7 @@ module FastlaneCore
       #   1) ENV variable for application specific password
       return ENV[TWO_FACTOR_ENV_VARIABLE] if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
       #   2) TWO_STEP_HOST_PREFIX from keychain
-      account_manager = CredentialsManager::AccountManager.new(user: @user, 
+      account_manager = CredentialsManager::AccountManager.new(user: @user,
                                                              prefix: TWO_STEP_HOST_PREFIX,
                                                                note: "application-specific")
       password = account_manager.password(ask_if_missing: false)
