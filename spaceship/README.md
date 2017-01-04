@@ -112,7 +112,11 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
-Since your CI system probably doesn't allow you to input values (like the verification code), you can use `fastlane spaceauth`:
+### Support for CI machines
+
+#### Web sessions
+
+To generate a web session for your CI machine, use
 
 ```sh
 fastlane spaceauth -u apple@krausefx.com
@@ -125,6 +129,16 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 ```
 
 Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`.
+
+#### Transporter
+
+If you want to upload builds to TestFlight/iTunes Connect from your CI, you have to generate an application specific password:
+
+1. Visit [appleid.apple.com/account/manage](https://appleid.apple.com/account/manage)
+1. Generate a new application specific password
+1. Provide the application specific password using an environment variable `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD`.
+
+Alternatively you can enter the password when you're asked the first time _fastlane_ uploads a build.
 
 ### _spaceship_ in use
 
