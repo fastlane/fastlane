@@ -16,10 +16,18 @@ module CredentialsManager
       @note = note
     end
 
+    # Is the that default prefix "deliver"
+    def default_prefix?
+      @prefix == DEFAULT_PREFIX
+    end
+
     def user
-      @user ||= ENV["FASTLANE_USER"]
-      @user ||= ENV["DELIVER_USER"]
-      @user ||= AppfileConfig.try_fetch_value(:apple_id)
+      if default_prefix?
+        @user ||= ENV["FASTLANE_USER"]
+        @user ||= ENV["DELIVER_USER"]
+        @user ||= AppfileConfig.try_fetch_value(:apple_id)
+      end
+
       ask_for_login if @user.to_s.length == 0
       return @user
     end
@@ -29,7 +37,10 @@ module CredentialsManager
     end
 
     def password(ask_if_missing: true)
-      @password ||= fetch_password_from_env
+      if default_prefix?
+        @password ||= fetch_password_from_env
+      end
+
       unless @password
         item = Security::InternetPassword.find(server: server_name)
         @password ||= item.password if item
@@ -91,7 +102,7 @@ module CredentialsManager
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
       puts "The login information you enter will be stored in your Mac OS Keychain".green
-      if @prefix == DEFAULT_PREFIX
+      if default_prefix?
         # We don't want to show this message, if we ask for the application specific password
         # which has a different prefix
         puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
