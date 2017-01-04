@@ -142,13 +142,26 @@ module Sigh
 
     # Certificate to use based on the current distribution mode
     def certificate_to_use
-      if profile_type == Spaceship.provisioning_profile.Development
-        certificates = Spaceship.certificate.development.all
-      elsif profile_type == Spaceship.provisioning_profile.InHouse
-        certificates = Spaceship.certificate.in_house.all
-      else
-        certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+      case Sigh.config[:platform].to_s
+      when 'ios'
+        if profile_type == Spaceship.provisioning_profile.Development
+          certificates = Spaceship.certificate.development.all
+        elsif profile_type == Spaceship.provisioning_profile.InHouse
+          certificates = Spaceship.certificate.in_house.all
+        else
+          certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+        end
+
+      when 'macos'
+        if profile_type == Spaceship.provisioning_profile.Development
+          certificates = Spaceship.certificate.mac_development.all
+        elsif profile_type == Spaceship.provisioning_profile.AppStore
+          certificates = Spaceship.certificate.mac_app_distribution.all
+        elsif profile_type == Spaceship.provisioning_profile.Direct
+          certificates = Spaceship.certificate.developer_id_application.all
+        end
       end
+        
 
       # Filter them
       certificates = certificates.find_all do |c|
@@ -215,7 +228,7 @@ module Sigh
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      return if Spaceship::App.find(Sigh.config[:app_identifier])
+      return if Spaceship::App.find(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
       print_produce_command(Sigh.config)
       UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
     end
