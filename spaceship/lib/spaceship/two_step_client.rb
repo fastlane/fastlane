@@ -87,12 +87,11 @@ module Spaceship
     end
 
     def load_session_from_env
-      yaml_text = ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
-      return if yaml_text.to_s.length == 0
+      return if self.class.spaceship_session_env.to_s.length == 0
       puts "Loading session from environment variable" if $verbose
 
       file = Tempfile.new('cookie.yml')
-      file.write(yaml_text.gsub("\\n", "\n"))
+      file.write(self.class.spaceship_session_env.gsub("\\n", "\n"))
       file.close
 
       begin
@@ -104,6 +103,12 @@ module Spaceship
       ensure
         file.unlink
       end
+    end
+
+    # Fetch the session cookie from the environment
+    # (if exists)
+    def self.spaceship_session_env
+      ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
     def select_device(r, device_id)

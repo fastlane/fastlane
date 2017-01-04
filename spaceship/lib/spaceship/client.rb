@@ -373,6 +373,11 @@ module Spaceship
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
+
+        if self.class.spaceship_session_env.to_s.length > 0
+          raise UnauthorizedAccessError.new, "Authentication error, you passed an invalid session using the environment variable FASTLANE_SESSION or SPACESHIP_SESSION"
+        end
+
         do_login(self.user, @password)
         sleep 3 unless defined? SpecHelper
         retry
