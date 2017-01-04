@@ -27,6 +27,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :edit_live,
                                      short_option: "-o",
                                      optional: true,
+                                     default_value: false,
                                      env_name: "DELIVER_EDIT_LIVE",
                                      description: "Modify live metadata, this option disables ipa upload and screenshot upload",
                                      is_string: false),
