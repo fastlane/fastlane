@@ -26,6 +26,7 @@ module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  CONFIG_DIR = File.expand_path("~/.fastlane")
 
   class << self
     def load_actions
@@ -41,5 +42,27 @@ module Fastlane
     def plugin_manager
       @plugin_manager ||= Fastlane::PluginManager.new
     end
+
+    # The location where we can store persistent data
+    # This is inside a method, so that it might be a more dynamic
+    # value in the future, depending on the system environment
+    def config_dir
+      CONFIG_DIR
+    end
+
+    # This method is called after `require 'fastlane'` was executed
+    def init
+      # Some of the tools use ~/.fastlane as the location to store
+      # persistent data/caches for this machine
+      # We need to rescue also, because on some Unix system the user might not
+      # have permission to create a directory
+      begin
+        FileUtils.mkdir_p(config_dir) unless File.directory?(config_dir)
+      rescue
+        nil
+      end
+    end
   end
+
+  Fastlane.init
 end
