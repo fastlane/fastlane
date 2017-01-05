@@ -140,8 +140,7 @@ module Sigh
       profile
     end
 
-    # Certificate to use based on the current distribution mode
-    def certificate_to_use
+    def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
       when 'ios'
         if profile_type == Spaceship.provisioning_profile.Development
@@ -159,9 +158,17 @@ module Sigh
           certificates = Spaceship.certificate.mac_app_distribution.all
         elsif profile_type == Spaceship.provisioning_profile.Direct
           certificates = Spaceship.certificate.developer_id_application.all
+        else
+          certificates = Spaceship.certificate.mac_app_distribution.all
         end
       end
-        
+
+      certificates
+    end
+
+    # Certificate to use based on the current distribution mode
+    def certificate_to_use
+      certificates = certificates_for_profile_and_platform
 
       # Filter them
       certificates = certificates.find_all do |c|

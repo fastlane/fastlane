@@ -132,7 +132,7 @@ module Cert
       when 'macos'
         cert_type = Spaceship.certificate.mac_app_distribution
         cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
-        
+
       end
 
       cert_type
