@@ -68,7 +68,7 @@ module Fastlane
           if Gem::Version.new(installed_version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
@@ -112,7 +112,7 @@ module Fastlane
           if Gem::Version.new(current_gem.version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
