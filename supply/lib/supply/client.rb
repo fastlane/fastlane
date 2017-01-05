@@ -7,6 +7,9 @@ require 'net/http'
 
 module Supply
   class Client
+    #environment variable that can be used to set credentials
+    SUPPLY_JSON_GOOGLE_CREDS = "SUPPLY_JSON_GOOGLE_CREDS"
+
     # Connecting with Google
     attr_accessor :android_publisher
 
@@ -22,7 +25,7 @@ module Supply
 
     # instantiate a client given the supplied configuration
     def self.make_from_config
-      unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
+      unless Supply.config[:json_key] || ENV[SUPPLY_JSON_GOOGLE_CREDS] || (Supply.config[:key] && Supply.config[:issuer])
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
         Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
       end
@@ -41,6 +44,8 @@ module Supply
 
       if path_to_service_account_json
         key_io = File.open(File.expand_path(path_to_service_account_json))
+      elsif ENV[SUPPLY_JSON_GOOGLE_CREDS]
+        key_io = StringIO.new(ENV[SUPPLY_JSON_GOOGLE_CREDS])
       else
         require 'google/api_client/auth/key_utils'
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
