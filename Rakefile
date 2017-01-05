@@ -1,6 +1,6 @@
 require "bundler/gem_tasks"
 
-GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab danger-device_grid)
+GEMS = %w(fastlane danger-device_grid)
 RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
