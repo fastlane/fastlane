@@ -7,7 +7,7 @@ require 'net/http'
 
 module Supply
   class Client
-    #environment variable that can be used to set credentials
+    # Environment variable that can be used to set credentials
     SUPPLY_JSON_GOOGLE_CREDS = "SUPPLY_JSON_GOOGLE_CREDS"
 
     # Connecting with Google
