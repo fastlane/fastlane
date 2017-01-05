@@ -45,7 +45,7 @@ module Gym
                 UI.important("try adding the following parameter to your gym call:")
                 UI.success("gym(toolchain: :swift_2_3)")
                 UI.message("or")
-                UI.success("gym --toolchain swift_2_3")
+                UI.success("fastlane gym --toolchain swift_2_3")
               end
 
               UI.user_error!(ex)

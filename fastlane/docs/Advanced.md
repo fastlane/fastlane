@@ -200,7 +200,7 @@ sh("#{ENV['PWD']}/script.sh")
 
 The order in which `fastlane` tools take their values from
 
-1. CLI parameter (e.g. `gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
+1. CLI parameter (e.g. `fastlane gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
 1. Environment variable (e.g. `GYM_SCHEME`)
 1. Tool specific config file (e.g. `Gymfile` containing `scheme 'Example'`)
 1. Default value (which might be taken from the `Appfile`, e.g. `app_identifier` from the `Appfile`)
