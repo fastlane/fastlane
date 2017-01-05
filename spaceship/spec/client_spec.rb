@@ -141,7 +141,7 @@ describe Spaceship::Client do
       expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.spaceship/username/cookie"))
     end
 
-    it "uses /var/tmp if home not available", now: true do
+    it "uses /var/tmp if home not available" do
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(true)
