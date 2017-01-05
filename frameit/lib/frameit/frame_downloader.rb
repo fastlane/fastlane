@@ -13,7 +13,6 @@ module Frameit
       FileUtils.mkdir_p(templates_path)
 
       frames_version = download_file("version.txt")
-      File.write(File.join(templates_path, "version.txt"), frames_version)
       UI.important("Using frame version '#{frames_version}', you can optionally lock that version in your Framefile.json using `device_frame_version`")
 
       files = JSON.parse(download_file("files.json"))
@@ -23,11 +22,17 @@ module Frameit
       end
       File.write(File.join(templates_path, "offsets.json"), download_file("offsets.json"))
 
+      # Write the version.txt at the very end to properly resume downloads
+      # if it's interrupted
+      File.write(File.join(templates_path, "version.txt"), frames_version)
+
       UI.success("Successfully downloaded all required image assets")
     end
 
     def frames_exist?(version: "latest")
-      Dir["#{templates_path}/*.png"].count > 0 && File.read(File.join(templates_path, "version.txt")).to_i > 0
+      version_path = File.join(templates_path, "version.txt")
+      version = File.read(version_path) if File.exist?(version_path)
+      Dir["#{templates_path}/*.png"].count > 0 && version.to_i > 0
     end
 
     def self.templates_path
