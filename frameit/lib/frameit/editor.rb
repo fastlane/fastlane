@@ -22,8 +22,6 @@ module Frameit
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
-        width = self.screenshot.portrait? ? offset['width'] : self.screenshot.size[0]
-        image.resize width # resize the image to fit the frame
         put_into_frame # put it in the frame
       end
 
