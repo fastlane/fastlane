@@ -131,18 +131,26 @@ describe Spaceship::Client do
     end
 
     it "uses home dir by default" do
-      allow(subject).to receive(:directory_accessible?).with("~").and_return(true)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(true)
+      expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.fastlane/spaceship/username/cookie"))
+    end
+
+    it "supports legacy .spaceship path" do
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(true)
       expect(subject.persistent_cookie_path).to eq(File.expand_path("~/.spaceship/username/cookie"))
     end
 
     it "uses /var/tmp if home not available" do
-      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(true)
       expect(subject.persistent_cookie_path).to eq("/var/tmp/spaceship/username/cookie")
     end
 
     it "falls back to Dir.tmpdir as last resort" do
-      allow(subject).to receive(:directory_accessible?).with("~").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(false)
       allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
       expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")

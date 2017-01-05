@@ -1,6 +1,5 @@
 module Frameit
   class FrameDownloader
-    FRAME_PATH = '.frameit/devices_frames_2'
     HOST_URL = "https://fastlane.github.io/frameit-frames"
 
     def download_frames
@@ -9,7 +8,7 @@ module Frameit
       require 'json'
       require 'fileutils'
 
-      UI.message("Downloading device frames...")
+      UI.message("Downloading device frames to '#{templates_path}'")
       FileUtils.mkdir_p(templates_path)
 
       frames_version = download_file("version.txt")
@@ -31,7 +30,12 @@ module Frameit
     end
 
     def self.templates_path
-      File.join(ENV['HOME'], FRAME_PATH, Frameit.frames_version)
+      # Previously ~/.frameit/device_frames_2/x
+      legacy_path = File.join(ENV['HOME'], ".frameit/devices_frames_2", Frameit.frames_version)
+      return legacy_path if File.directory?(legacy_path)
+
+      # New path, being ~/.fastlane/frameit/x
+      return File.join(FastlaneCore.fastlane_user_dir, "frameit", Frameit.frames_version)
     end
 
     def templates_path

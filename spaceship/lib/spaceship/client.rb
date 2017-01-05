@@ -172,9 +172,9 @@ module Spaceship
       if ENV["SPACESHIP_COOKIE_PATH"]
         path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
       else
-        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+        [File.join(FastlaneCore.fastlane_user_dir, "spaceship"), "~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
           dir_parts = File.split(dir)
-          if directory_accessible?(dir_parts.first)
+          if directory_accessible?(File.expand_path(dir_parts.first))
             path = File.expand_path(File.join(dir, self.user, "cookie"))
             break
           end
