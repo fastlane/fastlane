@@ -58,12 +58,26 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :json_key,
                                      env_name: "SUPPLY_JSON_KEY",
                                      short_option: "-j",
-                                     conflicting_options: [:issuer, :key],
+                                     conflicting_options: [:issuer, :key, :json_key_data],
                                      optional: true, # this is shouldn't be optional but is until --key and --issuer are completely removed
                                      description: "The service account json file used to authenticate with Google",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find service account json file at path '#{File.expand_path(value)}'" unless File.exist?(File.expand_path(value))
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :json_key_data,
+                                     env_name: "SUPPLY_JSON_KEY_DATA",
+                                     short_option: "-c",
+                                     conflicting_options: [:issuer, :key, :json_key],
+                                     optional: true,
+                                     description: "The service account json used to authenticate with Google",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+                                     verify_block: proc do |value|
+                                       begin
+                                         JSON.parse(value)
+                                       rescue JSON::ParserError
+                                         UI.user_error! "Could not parse service account json  JSON::ParseError"
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk,
                                      env_name: "SUPPLY_APK",

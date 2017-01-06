@@ -7,9 +7,6 @@ require 'net/http'
 
 module Supply
   class Client
-    # Environment variable that can be used to set credentials
-    SUPPLY_JSON_GOOGLE_CREDS = "SUPPLY_JSON_GOOGLE_CREDS"
-
     # Connecting with Google
     attr_accessor :android_publisher
 
@@ -25,27 +22,28 @@ module Supply
 
     # instantiate a client given the supplied configuration
     def self.make_from_config
-      unless Supply.config[:json_key] || ENV[SUPPLY_JSON_GOOGLE_CREDS] || (Supply.config[:key] && Supply.config[:issuer])
+      unless Supply.config[:json_key] || Supply.config[:json_key_data] || (Supply.config[:key] && Supply.config[:issuer])
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
         Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
       end
 
       return Client.new(path_to_key: Supply.config[:key],
                         issuer: Supply.config[:issuer],
-                        path_to_service_account_json: Supply.config[:json_key])
+                        path_to_service_account_json: Supply.config[:json_key], service_account_json: Supply.config[:json_key_data])
     end
 
     # Initializes the android_publisher and its auth_client using the specified information
+    # @param service_account_json: The raw service account Json data
     # @param path_to_service_account_json: The path to your service account Json file
     # @param path_to_key: The path to your p12 file (@deprecated)
     # @param issuer: Email addresss for oauth (@deprecated)
-    def initialize(path_to_key: nil, issuer: nil, path_to_service_account_json: nil)
+    def initialize(path_to_key: nil, issuer: nil, path_to_service_account_json: nil, service_account_json: nil)
       scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
       if path_to_service_account_json
         key_io = File.open(File.expand_path(path_to_service_account_json))
-      elsif ENV[SUPPLY_JSON_GOOGLE_CREDS]
-        key_io = StringIO.new(ENV[SUPPLY_JSON_GOOGLE_CREDS])
+      elsif service_account_json
+        key_io = StringIO.new(service_account_json)
       else
         require 'google/api_client/auth/key_utils'
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
