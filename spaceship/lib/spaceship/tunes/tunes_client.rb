@@ -582,6 +582,9 @@ module Spaceship
       r = request(:get, url)
       return parse_response(r, 'data')
     rescue Spaceship::Client::UnexpectedResponse => ex
+      # Build trains fail randomly very often
+      # we need to catch those errors and retry
+      # https://github.com/fastlane/fastlane/issues/6419
       error_content = ex.to_s
       if error_content == "{\"data\"=>nil, \"messages\"=>{\"warn\"=>nil, \"error\"=>[\"ITC.response.error.OPERATION_FAILED\"], \"info\"=>nil}, \"statusCode\"=>\"ERROR\"}"
         unless (tries -= 1).zero?
