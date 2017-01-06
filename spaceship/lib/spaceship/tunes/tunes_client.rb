@@ -575,12 +575,22 @@ module Spaceship
     #####################################################
 
     # @param (testing_type) internal or external
-    def build_trains(app_id, testing_type, platform: nil)
+    def build_trains(app_id, testing_type, platform: nil, tries: 5)
       raise "app_id is required" unless app_id
       url = "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
       url += "&platform=#{platform}" unless platform.nil?
       r = request(:get, url)
-      parse_response(r, 'data')
+      return parse_response(r, 'data')
+    rescue Spaceship::Client::UnexpectedResponse => ex
+      error_content = ex.to_s
+      if error_content == "{\"data\"=>nil, \"messages\"=>{\"warn\"=>nil, \"error\"=>[\"ITC.response.error.OPERATION_FAILED\"], \"info\"=>nil}, \"statusCode\"=>\"ERROR\"}"
+        unless (tries -= 1).zero?
+          logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
+          sleep 3 unless defined? SpecHelper
+          retry
+        end
+      end
+      return {} # better than nothing
     end
 
     def update_build_trains!(app_id, testing_type, data)
