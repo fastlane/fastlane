@@ -574,8 +574,9 @@ module Spaceship
     # @!group Build Trains
     #####################################################
 
+    # rubocop:disable Metrics/BlockNesting
     # @param (testing_type) internal or external
-    def build_trains(app_id, testing_type, platform: nil, tries: 5)
+    def build_trains(app_id, testing_type, tries = 5, platform: nil)
       raise "app_id is required" unless app_id
       url = "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
       url += "&platform=#{platform}" unless platform.nil?
@@ -585,16 +586,18 @@ module Spaceship
       # Build trains fail randomly very often
       # we need to catch those errors and retry
       # https://github.com/fastlane/fastlane/issues/6419
-      error_content = ex.to_s
-      if error_content == "{\"data\"=>nil, \"messages\"=>{\"warn\"=>nil, \"error\"=>[\"ITC.response.error.OPERATION_FAILED\"], \"info\"=>nil}, \"statusCode\"=>\"ERROR\"}"
-        unless (tries -= 1).zero?
+      if ex.to_s.include?("ITC.response.error.OPERATION_FAILED")
+        tries -= 1
+        if tries > 0
           logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
           sleep 3 unless defined? SpecHelper
           retry
         end
       end
-      return {} # better than nothing
+
+      raise Spaceship::Client::UnexpectedResponse, "Temporary iTunes Connect error: #{ex}"
     end
+    # rubocop:enable Metrics/BlockNesting
 
     def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
@@ -1016,7 +1019,7 @@ module Spaceship
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
       unless (tries -= 1).zero?
-        msg = "ITC temporary save error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "iTunes Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
         puts msg
         logger.warn msg
         sleep 60 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
