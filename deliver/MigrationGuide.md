@@ -8,7 +8,7 @@ Originally `deliver` was designed to be "The Continuous Delivery tool for iOS". 
 
 In general, check out the latest documentation for the [Deliverfile](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md).
 
-With 1.0 the app will not be submitted to Review by default. You can use the `deliver --submit_for_review` to submit after the upload.
+With 1.0 the app will not be submitted to Review by default. You can use the `fastlane deliver --submit_for_review` to submit after the upload.
 
 #### Standard Setups (one app)
 

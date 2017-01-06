@@ -12,4 +12,4 @@ locales ['en-US', 'fr-FR', 'it-IT']
 clear_previous_screenshots true
 
 # For more information about all available options run
-#   screengrab --help
+#   fastlane screengrab --help
