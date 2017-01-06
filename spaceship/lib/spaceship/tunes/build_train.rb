@@ -51,9 +51,8 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id, platform: nil)
           trains = []
-          # Array for when there is no valid server response
-          trains += Array(client.build_trains(app_id, 'internal', platform: platform)['trains'])
-          trains += Array(client.build_trains(app_id, 'external', platform: platform)['trains'])
+          trains += client.build_trains(app_id, 'internal', platform: platform)['trains']
+          trains += client.build_trains(app_id, 'external', platform: platform)['trains']
 
           result = {}
           trains.each do |attrs|
