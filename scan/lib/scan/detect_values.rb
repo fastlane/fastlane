@@ -167,7 +167,7 @@ module Scan
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `scan --help`")
+        UI.important("Instead use the other options available in `fastlane scan --help`")
         UI.important("Using your value '#{Scan.config[:destination]}' for now")
         UI.important("because I trust you know what you're doing...")
         return

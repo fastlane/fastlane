@@ -155,7 +155,7 @@ module FastlaneCore
     # (optional) Returns the app identifier for the current tool
     # supply and screengrab use different param names and env variable patterns so we have to special case here
     # example:
-    #   supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
+    #   fastlane supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
     #   screengrab -a com.test.app should return com.test.app
     def self.android_app_identifier(args, gem_name)
       app_identifier = nil

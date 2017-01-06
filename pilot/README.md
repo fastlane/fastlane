@@ -248,7 +248,7 @@ fastlane pilot import -c ~/Desktop/testers.csv
 
 If you run into any issues you can use the `verbose` mode to get a more detailed output:
 
-    fastlane pilot --verbose
+    fastlane pilot upload --verbose
 
 ## Firewall Issues
 

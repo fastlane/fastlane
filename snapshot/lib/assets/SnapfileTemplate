@@ -33,4 +33,4 @@ languages([
 # launch_arguments(["-favColor red"])
 
 # For more information about all available options run
-# snapshot --help
+# fastlane snapshot --help
