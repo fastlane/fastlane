@@ -221,6 +221,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsa_signature,
                                       env_name: "FL_HOCKEY_DSA_SIGNATURE",
                                       description: "dsa signature for sparkle updates",
+                                      is_string: true,
                                       optional: true)
         ]
       end
