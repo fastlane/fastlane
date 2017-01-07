@@ -22,25 +22,30 @@ module Supply
 
     # instantiate a client given the supplied configuration
     def self.make_from_config
-      unless Supply.config[:json_key] || (Supply.config[:key] && Supply.config[:issuer])
+      unless Supply.config[:json_key] || Supply.config[:json_key_data] || (Supply.config[:key] && Supply.config[:issuer])
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
         Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
       end
 
+      if Supply.config[:json_key]
+        service_account_json = File.open(File.expand_path(Supply.config[:json_key]))
+      elsif Supply.config[:json_key_data]
+        service_account_json = StringIO.new(Supply.config[:json_key_data])
+      end
+
       return Client.new(path_to_key: Supply.config[:key],
-                        issuer: Supply.config[:issuer],
-                        path_to_service_account_json: Supply.config[:json_key])
+                        issuer: Supply.config[:issuer], service_account_json: service_account_json)
     end
 
     # Initializes the android_publisher and its auth_client using the specified information
-    # @param path_to_service_account_json: The path to your service account Json file
+    # @param service_account_json: The raw service account Json data
     # @param path_to_key: The path to your p12 file (@deprecated)
     # @param issuer: Email addresss for oauth (@deprecated)
-    def initialize(path_to_key: nil, issuer: nil, path_to_service_account_json: nil)
+    def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
       scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
-      if path_to_service_account_json
-        key_io = File.open(File.expand_path(path_to_service_account_json))
+      if service_account_json
+        key_io = service_account_json
       else
         require 'google/api_client/auth/key_utils'
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
