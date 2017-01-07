@@ -45,7 +45,7 @@ module Fastlane
         # See https://github.com/fastlane/fastlane/issues/6951
         fork do
           begin
-            exit(1) unless require name
+            require name
           rescue LoadError
             exit(1)
           end
