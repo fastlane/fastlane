@@ -11,7 +11,7 @@ describe Spaceship::TunesClient do
         # First, stub a failing request
         stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?testingType=internal").
           to_return(status: 200, body: TunesStubbing.itc_read_fixture_file('build_trains_operation_failed.json'), headers: { 'Content-Type' => 'application/json' }).times(2).
-          then.to_return(status: 200, body: TunesStubbing.itc_read_fixture_file('build_trains.json'))
+          then.to_return(status: 200, body: TunesStubbing.itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
 
         build_trains = app.build_trains
         expect(build_trains).to be_a(Hash)
