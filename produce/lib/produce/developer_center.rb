@@ -18,11 +18,6 @@ module Produce
         app_name = Produce.config[:app_name]
         UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
-        allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
-                        :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
-
-        Produce.config[:enabled_features].select { |key, value| allowed_keys.include? key }
-
         enabled_clean_options = {}
         Produce.config[:enabled_features].each do |k, v|
           if k == :data_protection
