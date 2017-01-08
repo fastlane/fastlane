@@ -120,7 +120,6 @@ module Fastlane
               supplied_options = { command: args.first }
             end
           end
-          
           config = FastlaneCore::Configuration.new(options_available, supplied_options)
           return_data[:configuration] = config
         rescue => ex
