@@ -63,31 +63,32 @@ module Fastlane
       out_channel = StringIO.new
       $stdout = out_channel
       $stderr = out_channel
+      
       if @original_action.to_s == "import_from_git"
         begin
-        fl = Fastlane::FastFile.new
-        fl.runner = Runner.new
-        path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "HEAD", return_file: true)
+          fl = Fastlane::FastFile.new
+          fl.runner = Runner.new
+          path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "HEAD", return_file: true)
 
-        actions_path = File.join(path, 'actions')
-        Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+          actions_path = File.join(path, 'actions')
+          Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-        icontent = File.read("#{path}/fastlane/Fastfile")
-        fl_parser = FastfileParser.new(content: icontent, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
-        fl_parser.analyze
-        @content << "#########################################\n"
-        @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
-        @content << "#########################################\n"
-        @content << icontent
-        @content << "#########################################\n"
-        @content << "# END import_from_git at: #{@line_number} END\n"
-        @content << "#########################################\n"
-        # lines.merge!(fl_parser.lines)
-        fl_parser.lines.each do |l|
-          lines << l
+          icontent = File.read("#{path}/fastlane/Fastfile")
+          fl_parser = FastfileParser.new(content: icontent, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
+          fl_parser.analyze
+          @content << "#########################################\n"
+          @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
+          @content << "#########################################\n"
+          @content << icontent
+          @content << "#########################################\n"
+          @content << "# END import_from_git at: #{@line_number} END\n"
+          @content << "#########################################\n"
+          # lines.merge!(fl_parser.lines)
+          fl_parser.lines.each do |l|
+            lines << l
+          end
+        rescue
         end
-      rescue
-      end
       end
 
       if @platforms && @platforms.length > 0
@@ -107,13 +108,22 @@ module Fastlane
         end
       end
 
-      options_avail = a.available_options
-      return return_data if options_avail.nil?
+      options_available = a.available_options
+      return return_data if options_available.nil?
 
       # Validate Options
-      if options_avail.length > 0 && options_avail.first.kind_of?(FastlaneCore::ConfigItem)
+      if options_available.length > 0 && options_available.first.kind_of?(FastlaneCore::ConfigItem)
         begin
-          config = FastlaneCore::Configuration.new(options_avail, args.first)
+          supplied_options = args.first
+          
+          if @original_action.to_s == "sh"
+            # this is required since the recent change to the sh action.
+            unless supplied_options.kind_of?(Hash)
+              supplied_options = {command: args.first}
+            end
+          end
+          
+          config = FastlaneCore::Configuration.new(options_available, supplied_options)
           return_data[:configuration] = config
         rescue => ex
           return_data[:error] = ex.message
@@ -129,7 +139,7 @@ module Fastlane
       end
 
       # get deprecated and sensitive's
-      options_avail.each do |o|
+      options_available.each do |o|
         next unless o.kind_of?(FastlaneCore::ConfigItem)
         if o.sensitive
           self.class.secrets << args.first[o.key.to_sym].to_s if args.first[o.key.to_sym] && !self.class.secrets.include?(args.first[o.key.to_sym].to_s)

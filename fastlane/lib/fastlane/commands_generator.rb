@@ -95,26 +95,28 @@ module Fastlane
 
       always_trace!
 
-      command "validate-fastfile" do |c|
+      command "lint" do |c|
         c.syntax = 'fastlane validate-fastfile /path/to/Fastfile'
         c.option '--platforms STRING', String, 'Comma seperated list of platforms (ios, mac, android) of actions to validate (others will be skipped)'
         c.action do |args, options|
-          if File.exist?(args.first)
+          file_path = args.first
+          file_path ||= FastlaneCore::FastlaneFolder.fastfile_path
+          if File.exist?(file_path)
 
-            plat = []
-            plat = options.platforms.split(",") if options.platforms
-            fl_parser = FastfileParser.new(content: File.read(args.first), filepath: args.first, name: "Fastfile", platforms: plat)
+            platforms = []
+            platforms = options.platforms.split(",") if options.platforms
+            fl_parser = FastfileParser.new(content: File.read(file_path), filepath: file_path, name: "Fastfile", platforms: platforms)
             table = fl_parser.analyze
             puts table
             counters = fl_parser.counters
           else
-            raise "File not found"
+            raise "File not found: #{File.expand_path(file_path)}"
           end
 
           if counters[:all] == 0
             puts "File succesfully validated".green
           else
-            puts "Found: Errors/Deprecations/Info: #{counters[:errors].to_s.red}/#{counters[:deprecations].to_s.yellow}/#{counters[:infos].to_s.blue}"
+            puts "Fastfile has some issues: #{counters[:errors].to_s.red} Errors, #{counters[:deprecations].to_s.yellow} Deprecations #{counters[:infos].to_s.blue} Infos"
           end
         end
       end
