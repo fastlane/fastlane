@@ -63,7 +63,6 @@ module Fastlane
       out_channel = StringIO.new
       $stdout = out_channel
       $stderr = out_channel
-      
       if @original_action.to_s == "import_from_git"
         begin
           fl = Fastlane::FastFile.new
@@ -115,11 +114,10 @@ module Fastlane
       if options_available.length > 0 && options_available.first.kind_of?(FastlaneCore::ConfigItem)
         begin
           supplied_options = args.first
-          
           if @original_action.to_s == "sh"
             # this is required since the recent change to the sh action.
             unless supplied_options.kind_of?(Hash)
-              supplied_options = {command: args.first}
+              supplied_options = { command: args.first }
             end
           end
           
