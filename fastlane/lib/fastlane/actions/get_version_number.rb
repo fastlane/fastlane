@@ -80,8 +80,7 @@ module Fastlane
         version_number = line.partition('=').last
         return version_number if Helper.is_test?
 
-        targets_available = self.parse_targets(results)
-        self.validate_target(params, targets_available)
+        self.validate_targets(params, results)
 
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
@@ -101,7 +100,8 @@ module Fastlane
         return targets_available
       end
 
-      def self.validate_target(params, targets_available)
+      def self.validate_targets(params, results)
+        targets_available = self.parse_targets(results)
         if params[:target] && !targets_available.include?(params[:target])
           UI.important("Could not find specified target: #{params[:target]}")
           UI.important("Availaible targets:")
