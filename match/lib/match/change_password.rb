@@ -13,6 +13,7 @@ module Match
     end
 
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
+      UI.user_error!("No interactive shell found, cannot ask for password!") unless UI.interactive?
       loop do
         password = UI.password(message)
         if confirm
