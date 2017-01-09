@@ -1,4 +1,5 @@
 module Fastlane
+  # rubocop:disable Metrics/ModuleLength
   module Actions
     module SharedValues
       LANE_NAME = :LANE_NAME
@@ -144,4 +145,5 @@ module Fastlane
       is_class_action?(class_ref) && class_ref.category == :deprecated
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
