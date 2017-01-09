@@ -166,13 +166,20 @@ module Spaceship
       return File.read(path)
     end
 
+    # This is a duplicate method of fastlane_core/fastlane_core.rb#fastlane_user_dir
+    def fastlane_user_dir
+      path = File.expand_path(File.join("~", ".fastlane"))
+      FileUtils.mkdir_p(path) unless File.directory?(path)
+      return path
+    end
+
     # Returns preferred path for storing cookie
     # for two step verification.
     def persistent_cookie_path
       if ENV["SPACESHIP_COOKIE_PATH"]
         path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
       else
-        [File.join(FastlaneCore.fastlane_user_dir, "spaceship"), "~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+        [File.join(self.fastlane_user_dir, "spaceship"), "~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
           dir_parts = File.split(dir)
           if directory_accessible?(File.expand_path(dir_parts.first))
             path = File.expand_path(File.join(dir, self.user, "cookie"))
