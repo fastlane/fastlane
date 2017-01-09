@@ -14,7 +14,7 @@ module Fastlane
       all_actions(platform) do |action, name|
         current = []
 
-        if Fastlane::Actions.is_class_action?(action) && action.category == :deprecated
+        if Fastlane::Actions.is_deprecated?(action)
           current << "#{name} (DEPRECATED)".deprecated
         else
           current << name.yellow
@@ -61,7 +61,7 @@ module Fastlane
         print_output_variables(action, filter)
         print_return_value(action, filter)
 
-        if Fastlane::Actions.is_class_action?(action) && action.category == :deprecated
+        if Fastlane::Actions.is_deprecated?(action)
           puts "==========================================".deprecated
           puts "This action (#{filter}) is deprecated".deprecated
           puts action.deprecated_notes.to_s.deprecated if action.deprecated_notes
