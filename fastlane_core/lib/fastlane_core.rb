@@ -41,6 +41,8 @@ module FastlaneCore
 
   # A directory that's being used to user-wide fastlane configs
   # This directory is also used for the bundled fastlane
+  # Since we don't want to access FastlaneCore from spaceship
+  # this method is duplicated in spaceship/client.rb
   def self.fastlane_user_dir
     path = File.expand_path(File.join("~", ".fastlane"))
     FileUtils.mkdir_p(path) unless File.directory?(path)
