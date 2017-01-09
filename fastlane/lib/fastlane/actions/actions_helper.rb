@@ -138,5 +138,9 @@ module Fastlane
     def self.is_class_action?(class_ref)
       class_ref < Fastlane::Action
     end
+    
+    def self.is_deprecated?(class_ref)
+      is_class_action?(class_ref) && class_ref.category == :deprecated
+    end
   end
 end
