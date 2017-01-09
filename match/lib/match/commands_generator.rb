@@ -26,7 +26,7 @@ module Match
       FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'match'
+        c.syntax = 'fastlane match'
         c.description = Match::DESCRIPTION
 
         c.action do |args, options|
@@ -42,7 +42,7 @@ module Match
 
       Match.environments.each do |type|
         command type do |c|
-          c.syntax = "match #{type}"
+          c.syntax = "fastlane match #{type}"
           c.description = "Run match for a #{type} provisioning profile"
 
           c.action do |args, options|
@@ -55,7 +55,7 @@ module Match
       end
 
       command :init do |c|
-        c.syntax = 'match init'
+        c.syntax = 'fastlane match init'
         c.description = 'Create the Matchfile for you'
         c.action do |args, options|
           containing = (File.directory?("fastlane") ? 'fastlane' : '.')
@@ -71,7 +71,7 @@ module Match
       end
 
       command :change_password do |c|
-        c.syntax = 'match change_password'
+        c.syntax = 'fastlane match change_password'
         c.description = 'Re-encrypt all files with a different password'
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -83,7 +83,7 @@ module Match
       end
 
       command :decrypt do |c|
-        c.syntax = "match decrypt"
+        c.syntax = "fastlane match decrypt"
         c.description = "Decrypts the repository and keeps it on the filesystem"
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -94,7 +94,7 @@ module Match
       end
       command "nuke" do |c|
         # We have this empty command here, since otherwise the normal `match` command will be executed
-        c.syntax = "match nuke"
+        c.syntax = "fastlane match nuke"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
         c.action do |args, options|
           FastlaneCore::UI.user_error!("Please run `match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
@@ -103,7 +103,7 @@ module Match
 
       ["development", "distribution"].each do |type|
         command "nuke #{type}" do |c|
-          c.syntax = "match nuke #{type}"
+          c.syntax = "fastlane match nuke #{type}"
           c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal of the type #{type}"
           c.action do |args, options|
             params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
