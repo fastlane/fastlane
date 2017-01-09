@@ -136,7 +136,8 @@ module Fastlane
     end
 
     def self.is_class_action?(class_ref)
-      class_ref < Fastlane::Action
+      return false if class_ref.nil?
+      class_ref < Fastlane::Action || false
     end
     
     def self.is_deprecated?(class_ref)
