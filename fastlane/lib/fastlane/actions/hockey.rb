@@ -217,7 +217,12 @@ module Fastlane
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
                                       description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",
                                       is_string: false,
-                                      default_value: false)
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :dsa_signature,
+                                      env_name: "FL_HOCKEY_DSA_SIGNATURE",
+                                      description: "dsa signature(en.wikipedia.org/wiki/Digital_signature) for sparkle(sparkle-project.org) updates (macOS)",
+                                      is_string: true,
+                                      optional: true)
         ]
       end
 
