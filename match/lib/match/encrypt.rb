@@ -15,11 +15,15 @@ module Match
       end
 
       unless password
-        UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
-        UI.important "This passphrase is specific per repository and will be stored in your local keychain"
-        UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
-        password = ChangePassword.ask_password(confirm: true)
-        store_password(git_url, password)
+        if !UI.interactive?
+          UI.error "No password found neither in environment nor in local keychain. Bailing out as in non interactive mode."
+        else
+          UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
+          UI.important "This passphrase is specific per repository and will be stored in your local keychain"
+          UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
+          password = ChangePassword.ask_password(confirm: true)
+          store_password(git_url, password)
+        end
       end
 
       return password
