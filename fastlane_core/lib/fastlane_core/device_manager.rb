@@ -51,15 +51,12 @@ module FastlaneCore
       def connected_devices(requested_os_type)
         UI.verbose("Fetching available connected devices")
 
-        tvos_devices = ["AppleTV"]
-        ios_devices = ["iPhone", "iPad", "iPod"]
-
         device_types = if requested_os_type == "tvOS"
-                         tvos_devices
+                         ["AppleTV"]
                        elsif requested_os_type == "iOS"
-                         ios_devices
+                         ["iPhone", "iPad", "iPod"]
                        else
-                         ios_devices + tvos_devices
+                         []
                        end
 
         devices = [] # Return early if no supported devices are being searched for

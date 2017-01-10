@@ -60,18 +60,6 @@ describe Scan do
 "
     FastlaneCore::Simulator.clear_cache
     response = "response"
-    device = "device"
-    system_profiler_output = '<?xml version="1.0" encoding="UTF-8"?>
-                                  <array>
-                                  	<dict>
-                                  		<key>_items</key>
-                                  		<array/>
-                                  	</dict>
-                                  </array>'
-
-    allow(device).to receive(:read).and_return(system_profiler_output)
-    allow(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, device, nil, nil)
-
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
