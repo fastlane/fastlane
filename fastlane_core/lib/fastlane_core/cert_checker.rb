@@ -26,7 +26,7 @@ module FastlaneCore
           "You can run `security find-identity -v -p codesigning` to get this output.",
           "This Stack Overflow thread has more information: http://stackoverflow.com/q/35390072/774.",
           "(Check in Keychain Access for an expired WWDR certificate: http://stackoverflow.com/a/35409835/774 has more info.)"
-        ].join(' '))
+        ].join("\n"))
       end
 
       ids = []
