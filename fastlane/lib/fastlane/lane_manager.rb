@@ -162,19 +162,20 @@ module Fastlane
     end
 
     def self.load_dot_env(env)
-      return if Dir.glob("**/*.env*", File::FNM_DOTMATCH).count == 0
+      base_path = FastlaneCore::FastlaneFolder.path || '.'
+      return if Dir.glob(File.join(base_path, '*.env*'), File::FNM_DOTMATCH).count == 0
       require 'dotenv'
 
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env.default')
+      env_file = File.join(base_path, '.env')
+      env_default_file = File.join(base_path, '.env.default')
       Dotenv.load(env_file, env_default_file)
 
       # Loads .env file for the environment passed in through options
       if env
-        env_file = File.join(FastlaneCore::FastlaneFolder.path || "", ".env.#{env}")
+        env_file = File.join(base_path, ".env.#{env}")
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
