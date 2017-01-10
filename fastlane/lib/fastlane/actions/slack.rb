@@ -230,7 +230,7 @@ module Fastlane
         deep_merge(slack_attachment, options[:attachment_properties])
       end
 
-      # Adapted from http://stackoverflow.com/a/30225093/158525
+      # Adapted from https://stackoverflow.com/a/30225093/158525
       def self.deep_merge(a, b)
         merger = proc do |key, v1, v2|
           Hash === v1 && Hash === v2 ?

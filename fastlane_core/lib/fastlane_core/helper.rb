@@ -71,7 +71,7 @@ module FastlaneCore
     end
 
     def self.windows?
-      # taken from: http://stackoverflow.com/a/171011/1945875
+      # taken from: https://stackoverflow.com/a/171011/1945875
       (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
     end
 
