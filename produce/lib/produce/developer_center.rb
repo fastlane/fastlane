@@ -20,7 +20,6 @@ module Produce
 
         app_service = Spaceship.app_service
         enabled_clean_options = {}
-        
         Produce.config[:enabled_features].each do |k, v|
           if k == :data_protection
             case v
