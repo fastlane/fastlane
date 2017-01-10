@@ -22,7 +22,7 @@ module Fastlane
         UI.user_error!("Passed invalid UDID: #{udid} for device: #{name}") unless UDID_REGEXP =~ udid
         Spaceship::Device.create!(name: name, udid: udid)
 
-        UI.success("Successfully registered new device.")
+        UI.success("Successfully registered new device")
         return udid
       end
 
@@ -68,7 +68,7 @@ module Fastlane
         [
           "This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add a device to the member center, and never remove a device. If the device has already been registered within the member center, it will be left alone in the member center.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`."
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option."
         ].join("\n")
       end
 
@@ -79,11 +79,11 @@ module Fastlane
       def self.example_code
         [
           'register_device(
-            name: "Luka iPhone 6"
-            udid: "1234567890123456789012345678901234567890",
+            name: "Luka iPhone 6",
+            udid: "1234567890123456789012345678901234567890"
           ) # Simply provide the name and udid of the device',
           'register_device(
-            name: "Luka iPhone 6"
+            name: "Luka iPhone 6",
             udid: "1234567890123456789012345678901234567890",
             team_id: "XXXXXXXXXX",         # Optional, if you"re a member of multiple teams, then you need to pass the team ID here.
             username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
