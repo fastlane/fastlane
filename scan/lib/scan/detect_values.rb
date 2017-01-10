@@ -175,13 +175,9 @@ module Scan
 
       # building up the destination now
       if Scan.devices && Scan.devices.count > 0
-        if Scan.project.ios?
-          Scan.config[:destination] = Scan.devices.map { |d| self.destination("iOS", d) }
-        elsif Scan.project.tvos?
-          Scan.config[:destination] = Scan.devices.map { |d| self.destination("tvOS", d) }
-        else
-          Scan.config[:destination] = min_xcode8? ? [self.destination("macOS", nil)] : [self.destination("OS X", nil)]
-        end
+        Scan.config[:destination] = Scan.devices.map { |d| self.destination(d.os_type, d) }
+      else
+        Scan.config[:destination] = min_xcode8? ? [self.destination("macOS", nil)] : [self.destination("OS X", nil)]
       end
     end
 
