@@ -1,6 +1,6 @@
 #!/bin/bash --login
 
-# Originally from, http://stackoverflow.com/questions/33041109
+# Originally from, https://stackoverflow.com/questions/33041109
 # Modified to work in RVM and non RVM environments
 #
 # Xcode 7 (incl. 7.0.1) seems to have a dependency on the system ruby.
