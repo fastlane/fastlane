@@ -181,6 +181,8 @@ module Fastlane
     end
 
     def self.print_lane_context
+      return if Actions.lane_context.empty?
+
       if $verbose
         UI.important 'Lane Context:'.yellow
         UI.message Actions.lane_context
