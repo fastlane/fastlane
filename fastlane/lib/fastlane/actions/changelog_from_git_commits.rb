@@ -63,8 +63,8 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :between,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN',
-                                       description: 'Array containing two Git revision values between which to collect messages, you mustn\'t use it with :commits_count key at the same time',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN",
+                                       description: "Array containing two Git revision values between which to collect messages.\nYou should not use it with :commits_count key at the same time",
                                        optional: true,
                                        is_string: false,
                                        conflicting_options: [:commits_count],
@@ -74,8 +74,8 @@ module Fastlane
                                          UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :commits_count,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
-                                       description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_COUNT",
+                                       description: "Number of commits to include in changelog.\nYou should not use it with :between key at the same time",
                                        optional: true,
                                        is_string: false,
                                        conflicting_options: [:between],
@@ -84,23 +84,23 @@ module Fastlane
                                          UI.user_error!(":commits_count must be >= 1") unless value.to_i >= 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
-                                       description: 'The format applied to each commit while generating the collected value',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY",
+                                       description: "The format applied to each commit while generating the collected value",
                                        optional: true,
                                        default_value: '%B',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :tag_match_pattern,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_MATCH_PATTERN',
-                                       description: 'A glob(7) pattern to match against when finding the last git tag',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_TAG_MATCH_PATTERN",
+                                       description: "A glob(7) pattern to match against when finding the last git tag",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :match_lightweight_tag,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MATCH_LIGHTWEIGHT_TAG',
-                                       description: 'Whether or not to match a lightweight tag when searching for the last one',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_MATCH_LIGHTWEIGHT_TAG",
+                                       description: "Whether or not to match a lightweight tag when searching for the last one",
                                        optional: true,
                                        default_value: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :include_merges,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_INCLUDE_MERGES',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_INCLUDE_MERGES",
                                        description: "Whether or not to include any commits that are merges\n" + '(DEPRECATED - use :merge_commit_filtering)'.red,
                                        optional: true,
                                        is_string: false,
@@ -108,7 +108,7 @@ module Fastlane
                                          UI.important "The :include_merges option is deprecated. Please use :merge_commit_filtering instead" unless value.nil?
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
-                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
+                                       env_name: "FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING",
                                        description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
@@ -120,7 +120,7 @@ module Fastlane
       end
 
       def self.return_value
-        "Returns a String containing your formatted git commits"
+        "A String containing your formatted git commits"
       end
 
       def self.author
