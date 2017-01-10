@@ -82,7 +82,7 @@ module Scan
       deployment_target_version = Scan.project.build_settings(key: deployment_target_key) || '0'
 
       simulators = filter_simulators(
-        FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
+        FastlaneCore::DeviceManager.all(requested_os_type).tap do |array|
           if array.empty?
             UI.user_error!(['No', simulator_type_descriptor, 'simulators found on local machine'].reject(&:nil?).join(' '))
           end
@@ -175,10 +175,26 @@ module Scan
 
       # building up the destination now
       if Scan.devices && Scan.devices.count > 0
-        Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
-      else
-        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
+        if Scan.project.ios?
+          Scan.config[:destination] = Scan.devices.map { |d| self.destination("iOS", d) }
+        elsif Scan.project.tvos?
+          Scan.config[:destination] = Scan.devices.map { |d| self.destination("tvOS", d) }
+        else
+          Scan.config[:destination] = min_xcode8? ? [self.destination("macOS", nil)] : [self.destination("OS X", nil)]
+        end
       end
+    end
+
+    def self.destination(platform, device)
+      destination = "platform=#{platform}"
+      unless device.nil?
+        if device.is_simulator
+          destination += " Simulator"
+        end
+        destination += ",id=#{device.udid}"
+      end
+
+      return destination
     end
   end
 end
