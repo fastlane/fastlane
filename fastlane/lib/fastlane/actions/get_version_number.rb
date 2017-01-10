@@ -104,7 +104,7 @@ module Fastlane
         targets_available = self.parse_targets(results)
         if params[:target] && !targets_available.include?(params[:target])
           UI.important("Could not find specified target: #{params[:target]}")
-          UI.important("Availaible targets:")
+          UI.important("Available targets:")
           targets_available.each do |t|
             UI.important("\t #{t}")
           end
