@@ -18,8 +18,42 @@ module Produce
         app_name = Produce.config[:app_name]
         UI.message "Creating new app '#{app_name}' on the Apple Dev Center"
 
+        allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
+                        :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
+
+        Produce.config[:enabled_features].select { |key, value| allowed_keys.include? key }
+
+        enabled_clean_options = {}
+        Produce.config[:enabled_features].each do |k, v|
+          if k == :data_protection
+            case v
+            when "complete"
+              enabled_clean_options[Spaceship.app_service.data_protection.complete.service_id] = Spaceship.app_service.data_protection.complete.on
+            when "unlessopen"
+              enabled_clean_options[Spaceship.app_service.data_protection.unlessopen.service_id] = Spaceship.app_service.data_protection.unlessopen.on
+            when "untilfirstauth"
+              enabled_clean_options[Spaceship.app_service.data_protection.untilfirstauth.service_id] = Spaceship.app_service.data_protection.untilfirstauth.on
+            end
+          elsif k == :icloud
+            case v
+            when "legacy"
+              enabled_clean_options[Spaceship.app_service.icloud.on.service_id] = Spaceship.app_service.icloud.on
+              enabled_clean_options[Spaceship.app_service.cloud_kit.xcode5_compatible.service_id] = Spaceship.app_service.cloud_kit.xcode5_compatible
+            when "cloudkit"
+              enabled_clean_options[Spaceship.app_service.icloud.on.service_id] = Spaceship.app_service.icloud.on
+              enabled_clean_options[Spaceship.app_service.cloud_kit.cloud_kit.service_id] = Spaceship.app_service.cloud_kit.cloud_kit
+            end
+          else
+            if v == "on"
+              enabled_clean_options[Spaceship.app_service.send(k.to_s).on.service_id] = Spaceship.app_service.send(k.to_s).on
+            else
+              enabled_clean_options[Spaceship.app_service.send(k.to_s).off.service_id] = Spaceship.app_service.send(k.to_s).off
+            end
+          end
+        end
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name,
+                                         enabled_features: enabled_clean_options,
                                          mac: Produce.config[:platform] == "osx")
 
         if app.name != Produce.config[:app_name]
