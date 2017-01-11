@@ -11,16 +11,16 @@ module Match
       ENV[key] = value
     end
 
-    def self.environment_variable_name(app_identifier: nil, type: nil)
-      base_environment_variable_name(app_identifier: app_identifier, type: type).join("_")
+    def self.environment_variable_name(app_identifier: nil, type: nil, platform: 'ios')
+      base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform).join("_")
     end
 
-    def self.environment_variable_name_team_id(app_identifier: nil, type: nil)
-      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["team-id"]).join("_")
+    def self.environment_variable_name_team_id(app_identifier: nil, type: nil, platform: 'ios')
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["team-id"]).join("_")
     end
 
-    def self.environment_variable_name_profile_name(app_identifier: nil, type: nil)
-      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["profile-name"]).join("_")
+    def self.environment_variable_name_profile_name(app_identifier: nil, type: nil, platform: 'ios')
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-name"]).join("_")
     end
 
     def self.get_cert_info(cer_certificate_path)
@@ -52,8 +52,12 @@ module Match
       return {}
     end
 
-    def self.base_environment_variable_name(app_identifier: nil, type: nil)
-      ["sigh", app_identifier, type]
+    def self.base_environment_variable_name(app_identifier: nil, type: nil, platform: 'ios')
+      if platform == 'ios'
+        ["sigh", app_identifier, type] # We keep the ios profiles without the platform for backwards compatibility
+      else
+        ["sigh", app_identifier, type, platform]
+      end
     end
   end
 end
