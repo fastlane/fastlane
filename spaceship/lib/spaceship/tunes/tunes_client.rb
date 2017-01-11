@@ -1,5 +1,5 @@
 require "securerandom"
-
+require "pry"
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -528,6 +528,14 @@ module Spaceship
       du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
     end
 
+    # Uploads an In-App-Purchase Review screenshot
+    # @param app_id (AppId): The id of the app
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the response
+    def upload_purchase_review_screenshot(app_id, upload_image)
+      du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+    end
+
     # Uploads a screenshot
     # @param app_version (AppVersion): The version of your app
     # @param upload_image (UploadFile): The image to upload
@@ -853,6 +861,173 @@ module Spaceship
 
       handle_itc_response(r.body)
       parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group in-app-purchases
+    #####################################################
+
+    # Returns list of all available In-App-Purchases
+    def iaps(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps")
+      return r.body["data"]
+    end
+
+    # Returns list of all available Families
+    def iap_families(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/families")
+      return r.body["data"]
+    end
+
+    # Deletes a In-App-Purchases
+    def delete_iap!(app_id: nil, purchase_id: nil)
+      r = request(:delete, "ra/apps/#{app_id}/iaps/#{purchase_id}")
+      handle_itc_response(r)
+    end
+
+    # loads the full In-App-Purchases
+    def load_iap(app_id: nil, purchase_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
+      parse_response(r, 'data')
+    end
+
+    # loads the full In-App-Purchases-Family
+    def load_iap_family(app_id: nil, family_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")
+      parse_response(r, 'data')
+    end
+
+    # updates an In-App-Purchases-Family
+    def update_iap_family!(app_id: nil, family_id: nil, data: nil)
+      with_tunes_retry do
+        r = request(:put) do |req|
+          req.url "ra/apps/#{app_id}/iaps/family/#{family_id}/"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    # updates an In-App-Purchases
+    def update_iap!(app_id: nil, purchase_id: nil, data: nil)
+      with_tunes_retry do
+        r = request(:put) do |req|
+          req.url "ra/apps/#{app_id}/iaps/#{purchase_id}"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    def create_iap_family(app_id: nil, name: nil, product_id: nil, reference_name: nil, versions: [])
+      r = request(:get, "ra/apps/#{app_id}/iaps/family/template")
+      data = parse_response(r, 'data')
+
+      # data['activeAddOns'][0]['name'] = { value: name }
+      data['activeAddOns'][0]['productId'] = { value: product_id }
+      data['activeAddOns'][0]['referenceName'] = { value: reference_name }
+      data['name'] = { value: name }
+
+      versions_array = []
+      versions.each do |k, v|
+        versions_array << {
+                  value: {
+                    subscriptionName: { value: v[:subscription_name] },
+                    name: { value: v[:name] },
+                    localeCode: { value: k.to_s }
+                  }
+        }
+      end
+      data["details"]["value"] = versions_array
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/iaps/family/"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    # returns pricing goal array
+    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency: "EUR", tier: 1)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/equalize/#{currency}/#{tier}")
+      parse_response(r, 'data')
+    end
+
+    # Creates an In-App-Purchases
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+      # Load IAP Template based on Type
+      type ||= "consumable"
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
+      data = parse_response(r, 'data')
+
+      # Now fill in the values we have
+      # some values are nil, that's why there is a hash
+      data['familyId'] = family_id.to_s if family_id
+      data['productId'] = { value: product_id }
+      data['referenceName'] = { value: reference_name }
+      data['clearedForSale'] = { value: cleared_for_sale }
+
+      data['pricingDurationType'] = { value: subscription_duration } if subscription_duration
+      data['freeTrialDurationType'] = { value: subscription_free_trial } if subscription_free_trial
+
+      # pricing tier
+      if pricing_intervals
+        data['pricingIntervals'] = []
+        pricing_intervals.each do |interval|
+          data['pricingIntervals'] << {
+              value: {
+                  country: interval[:country] || "WW",
+                  tierStem: interval[:tier].to_s,
+                  priceTierEndDate: interval[:end_date],
+                  priceTierEffectiveDate: interval[:begin_date]
+                }
+          }
+        end
+      end
+
+      versions_array = []
+      versions.each do |k, v|
+        versions_array << {
+                  value: {
+                    description: { value: v[:description] },
+                    name: { value: v[:name] },
+                    localeCode: k.to_s
+                  }
+        }
+      end
+      data["versions"][0]["details"]["value"] = versions_array
+      data['versions'][0]["reviewNotes"] = { value: review_notes }
+
+      if review_screenshot
+        # Upload Screenshot:
+        upload_file = UploadFile.from_path review_screenshot
+        screenshot_data = upload_purchase_review_screenshot(app_id, upload_file)
+        new_screenshot = {
+          "value" => {
+            "assetToken" => screenshot_data["token"],
+            "sortOrder" => 0,
+            "type" => "SortedScreenShot",
+            "originalFileName" => upload_file.file_name,
+            "size" => screenshot_data["length"],
+            "height" => screenshot_data["height"],
+            "width" => screenshot_data["width"],
+            "checksum" => screenshot_data["md5"]
+          }
+        }
+
+        data["versions"][0]["reviewScreenshot"] = new_screenshot
+      end
+      # binding.pry
+      # Now send back the modified hash
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/iaps"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
     end
 
     #####################################################

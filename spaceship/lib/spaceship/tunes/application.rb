@@ -250,6 +250,16 @@ module Spaceship
       end
 
       #####################################################
+      # @!group in_app_purchases
+      #####################################################
+      # Get base In-App-Purchases object
+      def in_app_purchases
+        attrs = {}
+        attrs[:application] = self
+        Tunes::IAP.factory(attrs)
+      end
+
+      #####################################################
       # @!group Builds
       #####################################################
 

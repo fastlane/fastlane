@@ -18,6 +18,10 @@ module Spaceship
       upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device, is_messages))
     end
 
+    def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
+      upload_purchase_preview(app_id, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.SortedScreenShot')
+    end
+
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
       upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.LargeApplicationIcon')
     end
@@ -39,6 +43,30 @@ module Spaceship
     end
 
     private
+
+    def upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = "MZPFT.SortedScreenShot")
+      referrer = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app_id}/addons/create/consumable"
+      r = request(:post) do |req|
+        req.url "#{self.class.hostname}#{path}"
+        req.body = upload_file.bytes
+        req.headers['Accept'] = 'application/json, text/plain, */*'
+        req.headers['Content-Type'] = upload_file.content_type
+        req.headers['X-Apple-Upload-Referrer'] = referrer
+        req.headers['Referrer'] = referrer
+        req.headers['X-Apple-Upload-AppleId'] = app_id
+        req.headers['X-Apple-Upload-itctoken'] = sso_token
+        req.headers['X-Apple-Upload-ContentProviderId'] = content_provider_id
+        req.headers['X-Original-Filename'] = upload_file.file_name
+        req.headers['X-Apple-Upload-Validation-RuleSets'] = du_validation_rule_set if du_validation_rule_set
+        req.headers['Content-Length'] = upload_file.file_size.to_s
+        req.headers['Connection'] = "keep-alive"
+      end
+      if r.status == 500 and r.body.include?("Server Error")
+        return upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set)
+      end
+
+      parse_upload_response(r)
+    end
 
     def upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = nil)
       raise "File #{upload_file.file_path} is empty" if upload_file.file_size == 0
