@@ -22,6 +22,9 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 - Create a new branch to work on:
   - `git checkout -b <YOUR_BRANCH_NAME>`
   - A good name for a branch describes the thing you’ll be working on, e.g. `docs-fixes`, `fix-deliver-upload`, `gym-build-android-app`, etc.
+- Install rspec and rubocop, you will need them for testing and validating your changes:
+  - `bundle inject rspec '> 0'`
+  - `bundle inject rubocop '> 0'`
 - That’s it! Now you’re ready to work on _fastlane_ 
 
 ## Testing your local changes
