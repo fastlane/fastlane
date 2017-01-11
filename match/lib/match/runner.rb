@@ -99,7 +99,7 @@ module Match
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform] != 'ios'
+      if params[:platform].to_s != :ios.to_s
         names.push(params[:platform])
       end
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard

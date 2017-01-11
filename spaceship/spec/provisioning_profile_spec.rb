@@ -7,7 +7,7 @@ describe Spaceship::ProvisioningProfile do
     let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 
     it "properly retrieves and filters the provisioning profiles" do
-      expect(provisioning_profiles.count).to eq(3) # ignore the Xcode generated profiles
+      expect(provisioning_profiles.count).to eq(4) # ignore the Xcode generated profiles
 
       profile = provisioning_profiles.last
       expect(profile.name).to eq('net.sunapps.7 AdHoc')
@@ -25,8 +25,8 @@ describe Spaceship::ProvisioningProfile do
 
     it 'should filter by the correct types' do
       expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(2)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(2)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(3)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(3)
     end
 
     it "AppStore and AdHoc are the same" do
@@ -43,12 +43,12 @@ describe Spaceship::ProvisioningProfile do
     describe "include managed by Xcode" do
       it 'filters Xcode managed profiles' do
         provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: false)
-        expect(provisioning_profiles.count).to eq(3) # ignore the Xcode generated profiles
+        expect(provisioning_profiles.count).to eq(4) # ignore the Xcode generated profiles
       end
 
       it 'includes Xcode managed profiles' do
         provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: true)
-        expect(provisioning_profiles.count).to eq(5) # include the Xcode generated profiles
+        expect(provisioning_profiles.count).to eq(6) # include the Xcode generated profiles
       end
     end
   end
@@ -61,7 +61,7 @@ describe Spaceship::ProvisioningProfile do
 
     it "returns the profile in an array if matching" do
       profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.7")
-      expect(profiles.count).to eq(3)
+      expect(profiles.count).to eq(4)
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.7')
       expect(profiles.first.distribution_method).to eq('store')
@@ -242,10 +242,16 @@ describe Spaceship::ProvisioningProfile do
 
   describe "#update!" do
     let(:profile) { Spaceship::ProvisioningProfile.all.first }
+    let(:tvOSProfile) { Spaceship::ProvisioningProfile.all_tvos.first }
 
-    it "updates an existing profile" do
+    it "updates an existing iOS profile" do
       expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRU', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false, sub_platform: nil).and_return({})
       profile.update!
+    end
+
+    it "updates an existing tvOS profile" do
+      expect(client).to receive(:repair_provisioning_profile!).with('2MAY7NPHRF', 'net.sunapps.7 AppStore', 'store', '572XTN75U2', [cert_id], [], mac: false, sub_platform: 'tvOS').and_return({})
+      tvOSProfile.update!
     end
   end
 

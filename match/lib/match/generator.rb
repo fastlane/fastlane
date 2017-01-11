@@ -41,8 +41,8 @@ module Match
 
       names = ["match", profile_type_name(prov_type), app_identifier]
 
-      if params[:platform] != 'ios' # For ios we do not include the platform for bc
-        names.push(params[:platform])
+      if params[:platform].to_s != :ios.to_s # For ios we do not include the platform for backwards compatibility
+        names << params[:platform]
       end
 
       profile_name = names.join(" ")

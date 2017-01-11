@@ -14,14 +14,14 @@ module Match
       UI.error(ex)
     end
 
-    def self.print_summary(app_identifier: nil, type: nil, platform: 'ios')
+    def self.print_summary(app_identifier: nil, type: nil, platform: :ios)
       rows = []
 
       type = type.to_sym
 
       rows << ["App Identifier", "", app_identifier]
       rows << ["Type", "", type]
-      rows << ["Platform", "", platform]
+      rows << ["Platform", "", platform.to_s]
 
       {
         Utils.environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) => "Profile UUID",

@@ -122,11 +122,11 @@ module Match
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
                                      description: "Set the provisioning profile's platform to work with (i.e. ios, tvos)",
-                                     is_string: true,
-                                     default_value: 'ios',
+                                     is_string: false,
+                                     default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos tvos ios)
+                                       pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end)
       ]
