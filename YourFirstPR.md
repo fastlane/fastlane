@@ -8,7 +8,7 @@ Before you start working on _fastlane_, you should have [Bundler][bundler] insta
 
 The core team usually tags issues that are ready to be worked on and easily accessible for new contributors with the [“you can do this” label][you can do this]. If you’ve never contributed to _fastlane_ before, these are a great place to start!
 
-If you want to work on something else, e.g. new functionality or fixing a bug, we kindly ask you to submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
+If you want to work on something else, e.g. new functionality or fixing a bug, if would be helpful if you submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
 
 ## Checking out the _fastlane_ repo
 
