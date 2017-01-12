@@ -70,7 +70,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             directory = initializeDirectory(externalDir);
         }
 
-        if (directory == null) {
+        // We can only try this fall-back before Android N, since N makes Context.MODE_WORLD_READABLE
+        // result in a SecurityException
+        if (directory == null && Build.VERSION.SDK_INT < 24) {
             File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
             directory = initializeDirectory(internalDir);
         }
@@ -90,7 +92,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             if (dir.isDirectory() && dir.canWrite()) {
                 return dir;
             }
-        } catch (IOException ignored) {}
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to initialize directory: " + dir.getAbsolutePath(), e);
+        }
 
         return null;
     }
