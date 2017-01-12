@@ -1,4 +1,4 @@
 locales ['en-US', 'fr-FR', 'ja-JP']
 clear_previous_screenshots true
-tests_apk_path 'build/outputs/apk/example-debug-androidTest-unaligned.apk'
+tests_apk_path 'build/outputs/apk/example-debug-androidTest.apk'
 app_apk_path 'build/outputs/apk/example-debug.apk'
