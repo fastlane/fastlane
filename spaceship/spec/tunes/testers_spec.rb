@@ -70,6 +70,26 @@ describe Spaceship::Tunes::Tester do
     end
   end
 
+  describe "Creating external testers" do
+    it "sends a valid request" do
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/create").
+        with(body: "{\"testers\":[{\"emailAddress\":{\"value\":\"something@krausefx.com\"},\"firstName\":{\"value\":\"First Name Yo\"},\"lastName\":{\"value\":\"Last Name Yo\"},\"testing\":{\"value\":true},\"groups\":[{\"id\":\"b6f65dbd-c845-4d91-bc39-0b661d608970\",\"isSelected\":true},{\"name\":{\"value\":\"CustomGroup\"},\"isSelected\":true}]}]}").
+        to_return(status: 200, body: TunesStubbing.itc_read_fixture_file("testers/created_tester.json"), headers: { 'Content-Type' => 'application/json' })
+
+      tester = Spaceship::Tunes::Tester.external.create!(
+        email: "something@krausefx.com",
+        first_name: "First Name Yo",
+        last_name: "Last Name Yo",
+        groups: ["b6f65dbd-c845-4d91-bc39-0b661d608970"],
+        group_names: ["CustomGroup"]
+      )
+
+      expect(tester.first_name).to eq("First Name Yo")
+      expect(tester.last_name).to eq("Last Name Yo")
+      expect(tester.email).to eq("yolo2@krausefx.com")
+    end
+  end
+
   describe "Sandbox testers" do
     describe "listing" do
       it 'loads sandbox testers correctly' do

@@ -1,0 +1,52 @@
+{
+  "data": {
+    "sectionErrorKeys": null,
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "testers": [{
+      "emailAddress": {
+        "value": "yolo2@krausefx.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "firstName": {
+        "value": "First Name Yo",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "lastName": {
+        "value": "Last Name Yo",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "testerId": null,
+      "devices": null,
+      "latestInstalledAppAdamId": null,
+      "latestInstalledVersion": null,
+      "latestInstalledShortVersion": null,
+      "latestInstalledDate": null,
+      "latestInstalledName": null,
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": null,
+      "itcUsername": null,
+      "dsId": null,
+      "groups": []
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
