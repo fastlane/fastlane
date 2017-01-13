@@ -24,14 +24,10 @@ module Sigh
         profile = profiles.first
 
         if Sigh.config[:force]
-          if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
-            UI.important "Updating the provisioning profile"
-          else
-            UI.important "Updating the profile to include all devices"
-            profile.devices = Spaceship.device.all_for_profile_type(profile.type)
-          end
-
-          profile = profile.update! # assign it, as it's a new profile
+          # Recreating the profile ensures it has all of the requested properties (cert, name, etc.)
+          UI.important "Recreating the profile"
+          profile.delete!
+          profile = create_profile!
         end
       else
         UI.important "No existing profiles found, that match the certificates you have installed locally! Creating a new provisioning profile for you"
@@ -67,7 +63,7 @@ module Sigh
       UI.message "Fetching profiles..."
       results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
       results = results.find_all do |current_profile|
-        if current_profile.valid?
+        if current_profile.valid? || Sigh.config[:force]
           true
         else
           UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
