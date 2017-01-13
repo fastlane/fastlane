@@ -53,7 +53,7 @@ module Fastlane
                                 print_command_output: params[:print_command_output])
 
         # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` scenario
-        return result unless task.start_with?('assemble')
+        return result unless task =~ /\b(assemble)/
 
         apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '*.apk')
 
