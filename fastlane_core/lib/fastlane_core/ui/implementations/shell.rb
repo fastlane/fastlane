@@ -121,9 +121,3 @@ module FastlaneCore
     end
   end
 end
-
-class String
-  def deprecated
-    self.bold.blue
-  end
-end
