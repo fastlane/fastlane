@@ -193,6 +193,17 @@ module Spaceship
         end
       end
 
+      def in_app_purchases
+        unless @iaps
+          in_app_purchases = client.get_iap(apple_id)
+          @iaps = in_app_purchases.map do |attrs|
+            attrs[:application] = self
+            Tunes::AppIAP.factory(attrs)
+          end
+        end
+        @iaps
+      end
+
       #####################################################
       # @!group Modifying
       #####################################################

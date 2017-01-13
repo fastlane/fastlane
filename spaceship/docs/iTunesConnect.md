@@ -338,6 +338,22 @@ reviews = ratings.reviews("US") # => Array of hashes representing review data
 
 ```
 
+## In-app purchases
+
+```ruby
+# Get all the in-app purchases of the app
+in_app_purchases = app.in_app_purchases # => [Spaceship::Tunes::AppIAP]
+
+# Get the first IAP type
+iap_type = in_app_purchases[0].type # => Spaceship::Tunes::IAPType
+
+# Get the first IAP vendor ID
+vendor_id = in_app_purchases[0].vendor_id # => (String)
+
+# Get the first IAP status
+status = in_app_purchases.first.status # => Spaceship::Tunes::IAPStatus
+```
+
 ### License
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
