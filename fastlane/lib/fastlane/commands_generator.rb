@@ -11,7 +11,11 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       $verbose = true if ARGV.include?("--verbose")
-      $capture_output = true if ARGV.include?("--capture_output")
+
+      if ARGV.include?("--capture_output")
+        $capture_output = true
+        $verbose = true
+      end
 
       # has to be checked here - in case we wan't to troubleshoot plugin related issues
       if ARGV.include?("--troubleshoot")
@@ -81,7 +85,10 @@ module Fastlane
       program :help_formatter, :compact
 
       global_option('--verbose') { $verbose = true }
-      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
+      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
+        $capture_output = true
+        $verbose = true
+      end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
 
       always_trace!
