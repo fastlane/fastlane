@@ -135,11 +135,16 @@ module Fastlane
       ["xcake"]
     end
 
+    # Returns a boolean indicating whether the class
+    # reference is a Fastlane::Action
     def self.is_class_action?(class_ref)
       return false if class_ref.nil?
-      class_ref < Fastlane::Action || false
+      is_an_action = class_ref < Fastlane::Action
+      return is_an_action || false
     end
 
+    # Returns a boolean indicating if the class
+    # reference is a deprecated Fastlane::Action
     def self.is_deprecated?(class_ref)
       is_class_action?(class_ref) && class_ref.category == :deprecated
     end
