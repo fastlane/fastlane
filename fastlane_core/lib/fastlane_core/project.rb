@@ -288,6 +288,9 @@ module FastlaneCore
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
           @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !self.xcodebuild_list_silent)
+          if @build_settings.empty?
+            UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
+          end
         rescue Timeout::Error
           UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
             " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
