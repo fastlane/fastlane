@@ -9,11 +9,6 @@ module FastlaneCore
     def initialize(config, path, block_for_missing)
       self.config = config
 
-      # Setting this variable to be true allows a one-time overwrite of a particular
-      # configuration value. This is used by the override block methods to allow
-      # giving a more specific config value for a particular circumstance
-      @allow_overwite = false
-
       @block_for_missing = block_for_missing
       content = File.read(path)
 
