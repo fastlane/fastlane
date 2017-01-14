@@ -8,6 +8,12 @@ module FastlaneCore
     # @param path [String] The path to the configuration file to use
     def initialize(config, path, block_for_missing)
       self.config = config
+
+      # Setting this variable to be true allows a one-time overwrite of a particular
+      # configuration value. This is used by the override block methods to allow
+      # giving a more specific config value for a particular circumstance
+      @allow_overwite = false
+
       @block_for_missing = block_for_missing
       content = File.read(path)
 
@@ -58,6 +64,9 @@ module FastlaneCore
     def method_missing(method_sym, *arguments, &block)
       # First, check if the key is actually available
       if self.config.all_keys.include?(method_sym)
+        # This silently prevents a value from having its value set more than once.
+        return unless self.config._values[method_sym].to_s.empty?
+
         value = arguments.first
         value = yield if value.nil? && block_given?
 
@@ -85,7 +94,9 @@ module FastlaneCore
     #             be applied.
     def for_lane(lane_name)
       if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
-        yield
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
       end
     end
 
@@ -98,7 +109,22 @@ module FastlaneCore
     #             be applied.
     def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
+      end
+    end
+
+    # Allows a configuration block (for_lane, for_platform) to get a clean
+    # configuration for applying values, so that values can be overridden
+    # (once) again. Those values are then merged into the surrounding
+    # configuration as the block completes
+    def with_a_clean_config_merged_when_complete
+      self.config.push_values!
+      begin
         yield
+      ensure
+        self.config.pop_values!
       end
     end
   end
