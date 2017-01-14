@@ -241,8 +241,12 @@ module FastlaneCore
     end
 
     def supported_platforms
-      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
-      supported_platforms.map do |platform|
+      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
+      if supported_platforms.nil?
+        UI.important("Could not read the \"SUPPORTED_PLATFORMS\" build setting, assuming that the project supports iOS only.")
+        return [:iOS]
+      end
+      supported_platforms.split.map do |platform|
         case platform
         when "macosx" then :macOS
         when "iphonesimulator", "iphoneos" then :iOS
