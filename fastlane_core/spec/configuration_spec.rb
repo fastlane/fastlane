@@ -407,6 +407,41 @@ describe FastlaneCore do
           expect(config.values[:test]).to eq('456value')
           ENV.delete("FL_TEST")
         end
+
+        it "can push and pop configuration values" do
+          name = FastlaneCore::ConfigItem.new(key: :name)
+          platform = FastlaneCore::ConfigItem.new(key: :platform)
+          other = FastlaneCore::ConfigItem.new(key: :other)
+
+          config = FastlaneCore::Configuration.create([name, other, platform], {})
+          config.set(:name, "name1")
+          config.set(:other, "other")
+          config.push_values!
+
+          expect(config._values).to be_empty
+
+          config.set(:name, "name2")
+          config.set(:platform, "platform")
+          config.pop_values!
+
+          expect(config.fetch(:name)).to eq("name2")
+          expect(config.fetch(:other)).to eq("other")
+          expect(config.fetch(:platform)).to eq("platform")
+        end
+
+        it "does nothing if you pop values with nothing pushed" do
+          name = FastlaneCore::ConfigItem.new(key: :name)
+          platform = FastlaneCore::ConfigItem.new(key: :platform)
+          other = FastlaneCore::ConfigItem.new(key: :other)
+
+          config = FastlaneCore::Configuration.create([name, other, platform], {})
+          config.set(:name, "name1")
+          config.set(:other, "other")
+          config.pop_values!
+
+          expect(config.fetch(:name)).to eq("name1")
+          expect(config.fetch(:other)).to eq("other")
+        end
       end
 
       describe "Automatically removes the --verbose flag" do
