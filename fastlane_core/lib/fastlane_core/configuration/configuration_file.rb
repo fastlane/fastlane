@@ -80,13 +80,13 @@ module FastlaneCore
       end
     end
 
-    # Override configuration for a specific lane.
+    # Override configuration for a specific lane. If received lane name does not
+    # match the lane name available as environment variable, no changes will
+    # be applied.
     #
-    # lane_name  - Symbol representing a lane name.
-    # block - Block to execute to override configuration values.
+    # @param lane_name Symbol representing a lane name.
+    # @yield Block to run for overriding configuration values.
     #
-    # Discussion If received lane name does not match the lane name available as environment variable, no changes will
-    #             be applied.
     def for_lane(lane_name)
       if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
         with_a_clean_config_merged_when_complete do
@@ -95,13 +95,13 @@ module FastlaneCore
       end
     end
 
-    # Override Appfile configuration for a specific platform.
+    # Override configuration for a specific platform. If received platform name
+    # does not match the platform name available as environment variable, no
+    # changes will be applied.
     #
-    # platform_name  - Symbol representing a platform name.
-    # block - Block to execute to override configuration values.
+    # @param platform_name Symbol representing a platform name.
+    # @yield Block to run for overriding configuration values.
     #
-    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
-    #             be applied.
     def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
         with_a_clean_config_merged_when_complete do
