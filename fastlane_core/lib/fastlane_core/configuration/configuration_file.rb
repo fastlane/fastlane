@@ -58,9 +58,6 @@ module FastlaneCore
     def method_missing(method_sym, *arguments, &block)
       # First, check if the key is actually available
       if self.config.all_keys.include?(method_sym)
-        # This silently prevents a value from having its value set more than once.
-        return unless self.config._values[method_sym].to_s.empty?
-
         value = arguments.first
         value = yield if value.nil? && block_given?
 
@@ -76,6 +73,32 @@ module FastlaneCore
         else
           self.config[method_sym] = '' # important, since this will raise a good exception for free
         end
+      end
+    end
+
+    # Override configuration for a specific lane.
+    #
+    # lane_name  - Symbol representing a lane name.
+    # block - Block to execute to override configuration values.
+    #
+    # Discussion If received lane name does not match the lane name available as environment variable, no changes will
+    #             be applied.
+    def for_lane(lane_name)
+      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
+        yield
+      end
+    end
+
+    # Override Appfile configuration for a specific platform.
+    #
+    # platform_name  - Symbol representing a platform name.
+    # block - Block to execute to override configuration values.
+    #
+    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
+    #             be applied.
+    def for_platform(platform_name)
+      if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
+        yield
       end
     end
   end
