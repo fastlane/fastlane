@@ -154,7 +154,7 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 [app launch];
 ```
 
-_Make sure you only have one `launch` call, as Xcode adds one automatically on new test files._
+_Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
 
 ![assets/snapshot.gif](assets/snapshot.gif)
 
