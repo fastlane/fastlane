@@ -72,10 +72,10 @@ module Deliver
     def prepare_app_icons(options = {})
       return unless options[:metadata_path]
 
-      default_app_icon_path = File.join(options[:metadata_path], "app_icon.png")
+      default_app_icon_path = Dir["#{options[:metadata_path]}/app_icon.{png,jpg}"].first
       options[:app_icon] ||= default_app_icon_path if File.exist?(default_app_icon_path)
 
-      default_watch_icon_path = File.join(options[:metadata_path], "watch_icon.png")
+      default_watch_icon_path = Dir["#{options[:metadata_path]}/watch_icon.{png,jpg}"].first
       options[:app_icon] ||= default_watch_icon_path if File.exist?(default_watch_icon_path)
     end
 
