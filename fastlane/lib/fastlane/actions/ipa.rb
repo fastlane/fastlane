@@ -245,4 +245,3 @@ module Fastlane
   end
 end
 # rubocop:enable Lint/AssignmentInCondition
-# rubocop:enable Style/Next
