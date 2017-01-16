@@ -38,6 +38,10 @@ Style/NumericLiteralPrefix:
 Style/TernaryParentheses:
   Enabled: false
 
+# sometimes it is usefull to have those empty methods
+Style/EmptyMethod:
+  Enabled: false
+
 # It's better to be more explicit about the type
 Style/BracesAroundHashParameters:
   Enabled: false

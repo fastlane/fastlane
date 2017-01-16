@@ -69,7 +69,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 1.19.0'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '= 0.46'
+  spec.add_development_dependency 'rubocop', '~> 0.47'
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
