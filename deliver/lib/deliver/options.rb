@@ -127,7 +127,7 @@ module Deliver
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find config file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless value.end_with?(".json")
+                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
