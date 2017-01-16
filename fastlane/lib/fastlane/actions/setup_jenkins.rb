@@ -26,6 +26,7 @@ module Fastlane
         # Print table
         FastlaneCore::PrintTable.print_values(
           config: params,
+          mask_keys: [:keychain_password],
           title: "Summary for Setup Jenkins Action"
         )
 
@@ -133,6 +134,7 @@ module Fastlane
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Keychain password",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: ""),
 
           # Code signing identity
