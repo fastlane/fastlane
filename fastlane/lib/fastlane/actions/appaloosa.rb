@@ -83,11 +83,7 @@ module Fastlane
       def self.get_screenshots(screenshots_path, locale, device)
         get_env_value('screenshots').nil? ? locale = '' : locale.concat('/')
         device.nil? ? device = '' : device.concat('-')
-        if !screenshots_path.strip.empty?
-          return screenshots_list(screenshots_path, locale, device)
-        else
-          return nil
-        end
+        screenshots_path.strip.empty? ? nil : screenshots_list(screenshots_path, locale, device)
       end
 
       def self.screenshots_list(path, locale, device)
