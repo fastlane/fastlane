@@ -26,7 +26,6 @@ module Fastlane
         # Print table
         FastlaneCore::PrintTable.print_values(
           config: params,
-          mask_keys: [:keychain_password],
           title: "Summary for Setup Jenkins Action"
         )
 
