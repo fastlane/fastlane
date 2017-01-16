@@ -75,9 +75,6 @@ module Fastlane
         values = options.values
         values[:dsym_filename] = dsym_filename
         values[:notes_type] = options[:notes_type]
-        # Remove DSA signature from request payload if option is unset
-        # it results in a dsa_signature=null inside the json payload
-        values.delete(:dsa_signature) unless options[:dsa_signature]
 
         return values if Helper.test?
 
@@ -225,6 +222,7 @@ module Fastlane
                                       env_name: "FL_HOCKEY_DSA_SIGNATURE",
                                       description: "DSA signature for sparkle updates for macOS",
                                       is_string: true,
+                                      default_value: "",
                                       optional: true)
         ]
       end
