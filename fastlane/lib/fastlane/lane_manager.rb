@@ -162,8 +162,12 @@ module Fastlane
     end
 
     def self.load_dot_env(env)
-      base_path = FastlaneCore::FastlaneFolder.path || '.'
-      return if Dir.glob(File.join(base_path, '*.env*'), File::FNM_DOTMATCH).count == 0
+      # search for dotenvs in either fastlane or the current dir
+      search_paths = [FastlaneCore::FastlaneFolder.path, '.'].compact
+      base_path = search_paths.find do |dir|
+        Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
+      end
+      return unless base_path
       require 'dotenv'
 
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
