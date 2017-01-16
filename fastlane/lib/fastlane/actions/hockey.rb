@@ -222,6 +222,7 @@ module Fastlane
                                       env_name: "FL_HOCKEY_DSA_SIGNATURE",
                                       description: "DSA signature for sparkle updates for macOS",
                                       is_string: true,
+                                      default_value: "",
                                       optional: true)
         ]
       end
