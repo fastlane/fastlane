@@ -52,7 +52,7 @@ module FastlaneCore
     end
 
     def deprecated(message)
-      log.error(message.to_s.bold.blue)
+      log.error(message.to_s.deprecated)
     end
 
     def command(message)
