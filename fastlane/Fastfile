@@ -109,12 +109,15 @@ lane :release do
   # After publishing
   #
   if ENV['SLACK_URL']
+    release_notes = github_release['body']
+    # markup - turn github references into links
+    release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
     slack(
       channel: "releases",
       default_payloads: [],
       message: "Successfully released [fastlane #{version}](#{release_url}) :rocket:",
       payload: {
-        "New" => github_release['body']
+        "New" => release_notes
       }
     )
   end
