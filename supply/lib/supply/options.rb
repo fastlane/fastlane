@@ -63,6 +63,7 @@ module Supply
                                      description: "The service account json file used to authenticate with Google",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      verify_block: proc do |value|
+                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        UI.user_error! "Could not find service account json file at path '#{File.expand_path(value)}'" unless File.exist?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :json_key_data,
