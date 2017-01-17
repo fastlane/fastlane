@@ -250,7 +250,7 @@ module Gym
                                        UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :analyze_build_time,
-                                     env_name: "ANALYZE_BUILD_TIME",
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
                                      description: "Analyze the project build time and store the output in culprit.txt file",
                                      optional: true,
                                      is_string: false)
