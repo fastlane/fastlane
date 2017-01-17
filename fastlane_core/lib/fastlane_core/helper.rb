@@ -29,6 +29,18 @@ module FastlaneCore
       str.gsub(/\e\[([;\d]+)?m/, '')
     end
 
+    # checks if given file is a valid json file
+    # base taken from: http://stackoverflow.com/a/26235831/1945875
+    def self.json_file?(filename)
+      return false unless File.exist?(filename)
+      begin
+        JSON.parse(File.read(filename))
+        return true
+      rescue JSON::ParserError
+        return false
+      end
+    end
+
     # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
     def self.bundler?
       # Bundler environment variable
