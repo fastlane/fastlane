@@ -74,7 +74,7 @@ module Fastlane
       end
     end
 
-    def filter_sensitive_options(o)
+    def filter_sensitive_options(o,args)
       if o.sensitive
         self.class.secrets << args.first[o.key.to_sym].to_s if args.first[o.key.to_sym] && !self.class.secrets.include?(args.first[o.key.to_sym].to_s)
         @action_vars.each do |e|
@@ -86,13 +86,12 @@ module Fastlane
     def run_import_from_git(args)
       fl = Fastlane::FastFile.new
       fl.runner = Runner.new
-      path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "HEAD", return_file: true)
-
+      path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "master", return_file: true)
       actions_path = File.join(path, 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
-
       imported_file_content = File.read("#{path}/fastlane/Fastfile")
       fl_parser = FastfileParser.new(content: imported_file_content, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
+      
       fl_parser.analyze
       @content << "#########################################\n"
       @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
@@ -128,15 +127,16 @@ module Fastlane
       end
     end
 
-    def detect_bad_options(args)
-      bad_options.each do |b|
+    def detect_bad_options(bad_options_in,args)
+      return unless args.first.kind_of?(Hash)
+      bad_options_in.each do |b|
         if args.first[b.to_sym]
           lines << { state: :error, line: @line_number, msg: "do not use this option '#{b.to_sym}'" }
         end
       end
     end
 
-    def detect_deprecated_options(o)
+    def detect_deprecated_options(o, args)
       if o.deprecated && args.first[o.key.to_sym]
         lines << { state: :deprecated, line: @line_number, msg: "Use of deprecated option - '#{o.key}' - `#{o.deprecated}`" }
       end
@@ -194,13 +194,13 @@ module Fastlane
       return_data.merge!(validation_result)
 
       # get bad options
-      detect_bad_options(args)
+      detect_bad_options(bad_options, args)
 
       # get deprecated and sensitive's
       options_available.each do |o|
         next unless o.kind_of?(FastlaneCore::ConfigItem)
-        filter_sensitive_options(o)
-        detect_deprecated_options(o)
+        filter_sensitive_options(o,args)
+        detect_deprecated_options(o,args)
       end
       # reenabled output
       reset_output
@@ -219,7 +219,6 @@ module Fastlane
     end
 
     def method_missing(sym, *args, &block)
-      UI.important("CHECK #{sym} - #{args.inspect} - #{block.inspect}") if $verbose
       return "dummy" if sym.to_s == "to_str"
       dummy
     end
@@ -364,11 +363,8 @@ module Fastlane
           dropper = '
 
           '
-          UI.important(src_code) if $verbose
           begin
             Dir.chdir(@dirname) do
-              UI.important "CHDIR to: #{@dirname}" if $verbose
-              UI.important "###### ACT-#{@original_action} to: #{src_code}" if $verbose
               # rubocop:disable Security/Eval
               result = eval(dropper + src_code)
               # rubocop:enable Security/Eval
@@ -376,6 +372,7 @@ module Fastlane
             end
           rescue => ex
             UI.important("PARSE ERROR") if $verbose
+            UI.important ex.backtrace if $verbose
             UI.important("Exception: #{ex}") if $verbose
           end
         else
