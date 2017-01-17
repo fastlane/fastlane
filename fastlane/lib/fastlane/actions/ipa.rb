@@ -77,7 +77,7 @@ module Fastlane
             "Original Error:",
             " => " + ex.to_s,
             "A build error occured. You are using legacy `shenzhen` for building",
-            "it is recommended to upgrade to `gym`: ",
+            "it is recommended to upgrade to _gym_: ",
             "https://github.com/fastlane/fastlane/tree/master/gym",
             core_command,
             "-------------------------------------------------------"
@@ -227,7 +227,7 @@ module Fastlane
 
       def self.deprecated_notes
         "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
-        "It is recommended to upgrade to `gym`\n" \
+        "It is recommended to upgrade to _gym_\n" \
         "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile\n" \
         "To make code signing work, follow https://docs.fastlane.tools/codesigning/xcode-project/#"
       end
