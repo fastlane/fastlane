@@ -426,7 +426,7 @@ module Fastlane
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
-          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specif    ied.']
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -472,7 +472,7 @@ module Fastlane
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
-          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specif    ied.']
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -518,7 +518,7 @@ module Fastlane
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
-          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specif    ied.']
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -560,7 +560,7 @@ module Fastlane
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
-          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specif    ied.']
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
 
@@ -610,7 +610,7 @@ module Fastlane
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
-          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specif    ied.']
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
 
