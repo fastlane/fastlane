@@ -51,13 +51,25 @@ module Fastlane
       # Suppress UI output
 
       return_data = { args: args.first }
-      return return_data if args.length <= 0
       return return_data if @original_action.nil?
       UI.important("ACTION: #{@original_action.inspect} 1") if $verbose
       UI.important("PARAMS: #{args.inspect}") if $verbose
       a = Fastlane::Actions.action_class_ref(@original_action.to_sym)
       a = find_alias(@original_action.to_sym) unless a
       return return_data unless a
+
+      if a.respond_to?(:category)
+        UI.important("CATEGORY - #{@original_action.to_sym}: #{a.category}") if $verbose
+        if a.category == :deprecated
+          deprecated_notes = ""
+          if a.respond_to?(:deprecated_notes)
+            deprecated_notes = a.deprecated_notes
+          end
+          lines << { state: :deprecated, line: @line_number, msg: "Action `#{@original_action}` is deprecated!\n #{deprecated_notes}" }
+        end
+      end
+
+      return return_data if args.length <= 0
 
       # Get the importet file
       out_channel = StringIO.new
@@ -106,13 +118,6 @@ module Fastlane
           return return_data
         end
       end
-      if a.category == :deprecated
-        deprecated_notes = ""
-        if a.respond_to?(:deprecated_notes)
-          deprecated_notes = a.deprecated_notes
-        end
-        lines << { state: :deprecated, line: @line_number, msg: "Action `#{@original_action}` is deprecated!\n #{deprecated_notes}" }
-      end
       options_available = a.available_options
       return return_data if options_available.nil?
 
@@ -160,6 +165,7 @@ module Fastlane
       $stderr = STDERR
       return_data
     end
+    # rubocop:enable PerceivedComplexity
 
     def self.secrets
       unless @secrets
@@ -296,7 +302,8 @@ module Fastlane
             lines << { state: :info, line: @line_number, msg: "Name of the lane `#{lane_name}` already taken by action `#{lane_name}`" }
           end
         end
-        if (child.type.to_s == "send") and (child.children[0].to_s == "" && (Fastlane::Actions.action_class_ref(child.children[1].to_s) || find_alias(child.children[1].to_s)))
+
+        if (child.type.to_s == "send") and ((Fastlane::Actions.action_class_ref(child.children[1].to_s) || find_alias(child.children[1].to_s)))
           src_code = child.loc.expression.source
           src_code.sub!(child.children[1].to_s, "fake_action")
           @line_number = "#{@filename}:#{child.loc.expression.line}"
@@ -321,7 +328,10 @@ module Fastlane
           begin
             Dir.chdir(@dirname) do
               UI.important "CHDIR to: #{@dirname}" if $verbose
-              result = eval(dropper + src_code) # rubocop:disable Lint/Eval
+              UI.important "###### ACT-#{@original_action} to: #{src_code}" if $verbose
+              # rubocop:disable Security/Eval
+              result = eval(dropper + src_code)
+              # rubocop:enable Security/Eval
               actions << { action: @original_action, result: result, line: @line_number }
             end
           rescue => ex
