@@ -162,8 +162,11 @@ module Fastlane
     end
 
     def self.load_dot_env(env)
-      # search for dotenvs in either fastlane or the current dir
-      search_paths = [FastlaneCore::FastlaneFolder.path, '.'].compact
+      # find the first directory of [fastlane, its parent] containing dotenv files
+      path = FastlaneCore::FastlaneFolder.path
+      search_paths = [path]
+      search_paths << path + "/.." unless path.nil?
+      search_paths.compact!
       base_path = search_paths.find do |dir|
         Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
       end
