@@ -27,6 +27,9 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 - Keep external dependencies to a minimum
 - Keep test coverage high and ensure up-to-date documentation
 
+### Pull Request Ownership:
+We work in a high-trust environment which implies that anyone and everyone is able to merge pull requests from the community. If the PR reviewer feels strongly about seeing a PR to completion, they should assign it to themselves and request necessary changes.
+
 
 __Most Importantly__, our community prides itself in our supportive and friendly attitude. Above all else, we are always:
 - Polite
