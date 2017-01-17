@@ -106,7 +106,13 @@ module Fastlane
           return return_data
         end
       end
-
+      if a.category == :deprecated
+        deprecated_notes = ""
+        if a.respond_to?(:deprecated_notes)
+          deprecated_notes = a.deprecated_notes
+        end
+        lines << { state: :deprecated, line: @line_number, msg: "Action `#{@original_action}` is deprecated!\n #{deprecated_notes}" }
+      end
       options_available = a.available_options
       return return_data if options_available.nil?
 
