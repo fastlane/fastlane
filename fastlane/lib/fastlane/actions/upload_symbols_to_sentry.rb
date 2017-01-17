@@ -152,7 +152,13 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `sentry` plugin instead.\n" \
+          "Install using `fastlane add_plugin sentry`.\n" \
+          "Replace `upload_symbols_to_sentry` with `sentry_upload_dsym`"
       end
     end
   end

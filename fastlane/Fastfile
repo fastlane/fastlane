@@ -140,6 +140,14 @@ lane :verify_docs do
   end
 end
 
+desc "Generates the actions.md that will get used on https://docs.fastlane.tools"
+desc "This will NOT also automatically submit a pull request to fastlane/docs"
+desc "This SHOULD only be used for testing changes to the docs"
+lane :test_generate_docs do
+  ENV['USE_ENHANCE_TEST_DATA'] = "true"
+  generate_markdown_docs
+end
+
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
@@ -149,9 +157,7 @@ lane :update_docs do
   end
 
   clone_docs do
-    require 'fastlane/documentation/markdown_docs_generator'
-    actions_md_path = File.expand_path("docs/actions.md")
-    Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+    actions_md_path = generate_markdown_docs
 
     Bundler.with_clean_env do
       sh "bundle update"
@@ -180,6 +186,14 @@ lane :update_docs do
       end
     end
   end
+end
+
+def generate_markdown_docs
+  require 'fastlane/documentation/markdown_docs_generator'
+  actions_md_path = File.expand_path("docs/actions.md")
+  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+
+  return actions_md_path
 end
 
 def clone_docs

@@ -9,6 +9,10 @@ Style/NumericPredicate:
 # this would cause errors with long lanes
 Metrics/BlockLength:
   Enabled: false
+  
+# this is a bit buggy
+Metrics/ModuleLength:
+  Enabled: false
 
 # certificate_1 is an okay variable name
 Style/VariableNumber:
