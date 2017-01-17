@@ -10,6 +10,12 @@ module FastlaneCore
         options = {}
         unless config.nil?
           if config.kind_of?(FastlaneCore::Configuration)
+            # find sensitive options and mask them by default
+            config.available_options.each do |config_item|
+              if config_item.sensitive
+                mask_keys << config_item.key.to_s
+              end
+            end
             options = config.values(ask: false)
           else
             options = config
