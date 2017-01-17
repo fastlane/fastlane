@@ -46,82 +46,68 @@ module Fastlane
       rc
     end
 
-    # rubocop:disable PerceivedComplexity
-    def fake_action(*args)
-      # Suppress UI output
-
-      return_data = { args: args.first }
-      return return_data if @original_action.nil?
-      UI.important("ACTION: #{@original_action.inspect} 1") if $verbose
-      UI.important("PARAMS: #{args.inspect}") if $verbose
-      a = Fastlane::Actions.action_class_ref(@original_action.to_sym)
-      a = find_alias(@original_action.to_sym) unless a
-      return return_data unless a
-
-      if a.respond_to?(:category)
-        UI.important("CATEGORY - #{@original_action.to_sym}: #{a.category}") if $verbose
-        if a.category == :deprecated
-          deprecated_notes = ""
-          if a.respond_to?(:deprecated_notes)
-            deprecated_notes = a.deprecated_notes
-          end
-          lines << { state: :deprecated, line: @line_number, msg: "Action `#{@original_action}` is deprecated!\n #{deprecated_notes}" }
-        end
-      end
-
-      return return_data if args.length <= 0
-
-      # Get the importet file
-      out_channel = StringIO.new
-      $stdout = out_channel
-      $stderr = out_channel
-      if @original_action.to_s == "import_from_git"
-        begin
-          fl = Fastlane::FastFile.new
-          fl.runner = Runner.new
-          path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "HEAD", return_file: true)
-
-          actions_path = File.join(path, 'actions')
-          Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
-
-          icontent = File.read("#{path}/fastlane/Fastfile")
-          fl_parser = FastfileParser.new(content: icontent, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
-          fl_parser.analyze
-          @content << "#########################################\n"
-          @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
-          @content << "#########################################\n"
-          @content << icontent
-          @content << "#########################################\n"
-          @content << "# END import_from_git at: #{@line_number} END\n"
-          @content << "#########################################\n"
-          # lines.merge!(fl_parser.lines)
-          fl_parser.lines.each do |l|
-            lines << l
-          end
-        rescue
-        end
-      end
-
+    def platform_is_ok(action)
+      has_platform = true
+      # platform's set by commandline
       if @platforms && @platforms.length > 0
         has_platform = false
         @platforms.each do |pl|
-          next unless a.respond_to?(:is_supported?)
-          has_platform = a.is_supported?(pl.to_sym)
+          next unless action.respond_to?(:is_supported?)
+          has_platform = action.is_supported?(pl.to_sym)
           if has_platform
             break
           end
         end
+      end
+      return has_platform
+    end
 
-        unless has_platform
-          $stdout = STDOUT
-          $stderr = STDERR
-          return return_data
+    def action_deprecation(action, original_action_name)
+      if action.respond_to?(:category)
+        if action.category == :deprecated
+          deprecated_notes = ""
+          if action.respond_to?(:deprecated_notes)
+            deprecated_notes = action.deprecated_notes
+          end
+          lines << { state: :deprecated, line: @line_number, msg: "Action `#{original_action_name}` is deprecated!\n #{deprecated_notes}" }
         end
       end
-      options_available = a.available_options
-      return return_data if options_available.nil?
+    end
 
-      # Validate Options
+    def filter_sensitive_options(o)
+      if o.sensitive
+        self.class.secrets << args.first[o.key.to_sym].to_s if args.first[o.key.to_sym] && !self.class.secrets.include?(args.first[o.key.to_sym].to_s)
+        @action_vars.each do |e|
+          self.class.secrets << e unless self.class.secrets.include?(e)
+        end
+      end
+    end
+
+    def run_import_from_git(args)
+      fl = Fastlane::FastFile.new
+      fl.runner = Runner.new
+      path = fl.import_from_git(url: args.first[:url], branch: args.first[:branch] || "HEAD", return_file: true)
+
+      actions_path = File.join(path, 'actions')
+      Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+
+      imported_file_content = File.read("#{path}/fastlane/Fastfile")
+      fl_parser = FastfileParser.new(content: imported_file_content, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
+      fl_parser.analyze
+      @content << "#########################################\n"
+      @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
+      @content << "#########################################\n"
+      @content << imported_file_content
+      @content << "#########################################\n"
+      @content << "# END import_from_git at: #{@line_number} END\n"
+      @content << "#########################################\n"
+      fl_parser.lines.each do |l|
+        lines << l
+      end
+    end
+
+    def validate_options(options_available, args)
+      return_data = {}
       if options_available.length > 0 && options_available.first.kind_of?(FastlaneCore::ConfigItem)
         begin
           supplied_options = args.first
@@ -133,39 +119,93 @@ module Fastlane
           end
           config = FastlaneCore::Configuration.new(options_available, supplied_options)
           return_data[:configuration] = config
+          return return_data
         rescue => ex
           return_data[:error] = ex.message
           lines << { state: :error, line: @line_number, msg: "'#{@original_action}'  failed with:  `#{ex.message}`" }
+          return return_data
         end
       end
+    end
 
-      # get bad options
+    def detect_bad_options(args)
       bad_options.each do |b|
         if args.first[b.to_sym]
           lines << { state: :error, line: @line_number, msg: "do not use this option '#{b.to_sym}'" }
         end
       end
+    end
+
+    def detect_deprecated_options(o)
+      if o.deprecated && args.first[o.key.to_sym]
+        lines << { state: :deprecated, line: @line_number, msg: "Use of deprecated option - '#{o.key}' - `#{o.deprecated}`" }
+      end
+    end
+
+    def reset_output
+      $stdout = STDOUT
+      $stderr = STDERR
+    end
+
+    def fake_action(*args)
+      return_data = { args: args.first }
+      # return if there is no @original_action
+      return return_data if @original_action.nil?
+
+      # get the reference to the original_action
+      a = Fastlane::Actions.action_class_ref(@original_action.to_sym)
+      a = find_alias(@original_action.to_sym) unless a
+
+      # no action ref can be found.
+      return return_data unless a
+
+      # check for deprecations
+      action_deprecation(a, @original_action)
+
+      # no args supplied, so we do not need to validate them
+      return return_data if args.length <= 0
+
+      # Get the imported file
+      out_channel = StringIO.new
+      $stdout = out_channel
+      $stderr = out_channel
+      if @original_action.to_s == "import_from_git"
+        begin
+          run_import_from_git(args)
+        rescue
+        end
+      end
+      # if platform is not selected return
+      unless platform_is_ok(a)
+        reset_output
+        return return_data
+      end
+
+      options_available = a.available_options
+      # no availaible options - return
+
+      if options_available.nil?
+        reset_output
+        return return_data
+      end
+
+      # Validate Options
+      validation_result = validate_options(options_available, args)
+      return_data.merge!(validation_result)
+
+      # get bad options
+      detect_bad_options(args)
 
       # get deprecated and sensitive's
       options_available.each do |o|
         next unless o.kind_of?(FastlaneCore::ConfigItem)
-        if o.sensitive
-          self.class.secrets << args.first[o.key.to_sym].to_s if args.first[o.key.to_sym] && !self.class.secrets.include?(args.first[o.key.to_sym].to_s)
-          UI.important("AX - #{@original_action.to_sym}: #{@action_vars.inspect}") if $verbose
-          @action_vars.each do |e|
-            self.class.secrets << e unless self.class.secrets.include?(e)
-          end
-        end
-        if o.deprecated && args.first[o.key.to_sym]
-          lines << { state: :deprecated, line: @line_number, msg: "Use of deprecated option - '#{o.key}' - `#{o.deprecated}`" }
-        end
+        filter_sensitive_options(o)
+        detect_deprecated_options(o)
       end
       # reenabled output
-      $stdout = STDOUT
-      $stderr = STDERR
+      reset_output
       return_data
     end
-    # rubocop:enable PerceivedComplexity
 
     def self.secrets
       unless @secrets

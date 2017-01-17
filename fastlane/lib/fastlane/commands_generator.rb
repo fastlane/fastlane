@@ -95,16 +95,15 @@ module Fastlane
 
       always_trace!
 
-      command "lint" do |c|
-        c.syntax = 'fastlane validate-fastfile /path/to/Fastfile'
-        c.option '--platforms STRING', String, 'Comma seperated list of platforms (ios, mac, android) of actions to validate (others will be skipped)'
+      command :lint do |c|
+        c.syntax = 'fastlane lint /path/to/Fastfile'
+        c.option '--platforms STRING', Array, 'Comma seperated list of platforms (ios, mac, android) of actions to validate (others will be skipped)'
         c.action do |args, options|
           file_path = args.first
           file_path ||= FastlaneCore::FastlaneFolder.fastfile_path
-          if File.exist?(file_path)
-
+          if File.exist?(File.expand_path(file_path))
             platforms = []
-            platforms = options.platforms.split(",") if options.platforms
+            platforms = options.platforms if options.platforms
             fl_parser = FastfileParser.new(content: File.read(file_path), filepath: file_path, name: "Fastfile", platforms: platforms)
             table = fl_parser.analyze
             puts table
@@ -120,6 +119,7 @@ module Fastlane
           end
         end
       end
+
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
