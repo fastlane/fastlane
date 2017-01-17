@@ -3,6 +3,39 @@ require "credentials_manager"
 
 module Scan
   class Options
+    def self.testing_options
+      [
+        FastlaneCore::ConfigItem.new(key: :only_testing,
+                                     env_name: "SCAN_ONLY_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       if value.kind_of?(Array)
+                                         value.each do |test_path|
+                                           UI.user_error!("'only_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
+                                         end
+                                       elsif !value.kind_of?(String)
+                                         UI.user_error!("Incorrect parameter type for 'only_testing': '#{value}'")
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_testing,
+                                     env_name: "SCAN_SKIP_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       if value.kind_of?(Array)
+                                         value.each do |test_path|
+                                           UI.user_error!("'skip_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
+                                         end
+                                       elsif !value.kind_of?(String)
+                                         UI.user_error!("Incorrect parameter type for 'skip_testing': '#{value}'")
+                                       end
+                                     end)
+      ]
+    end
+
     def self.available_options
       containing = Helper.fastlane_enabled? ? './fastlane' : '.'
 
@@ -154,34 +187,6 @@ module Scan
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :only_testing,
-                                     env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
-                                     optional: true,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       if value.kind_of?(Array)
-                                         value.each do |test_path|
-                                           UI.user_error!("'only_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
-                                         end
-                                       elsif !value.kind_of?(String)
-                                         UI.user_error!("Incorrect parameter type for 'only_testing': '#{value}'")
-                                       end
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :skip_testing,
-                                     env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
-                                     optional: true,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       if value.kind_of?(Array)
-                                         value.each do |test_path|
-                                           UI.user_error!("'skip_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
-                                         end
-                                       elsif !value.kind_of?(String)
-                                         UI.user_error!("Incorrect parameter type for 'skip_testing': '#{value}'")
-                                       end
-                                     end),
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
                                      env_name: "SLACK_URL",
@@ -217,7 +222,7 @@ module Scan
                                     description: "Sets custom full report file name",
                                     optional: true,
                                     is_string: true)
-      ]
+      ] + testing_options
     end
   end
 end
