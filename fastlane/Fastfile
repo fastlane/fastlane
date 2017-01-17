@@ -85,7 +85,7 @@ lane :release do
     show_changelog(old_version: old_version)
 
     title = prompt(text: 'Title: ')
-    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't' affect the enduser): ",
+    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't affect the enduser): ",
                          multi_line_end_keyword: "END")
 
     github_release = set_github_release(
