@@ -50,7 +50,9 @@
     </style>
 
     <h1 style="text-align: center;"><%= title %></h1>
-    <!-- <img src="app_icon.png" id="appIcon"> -->
+    <% if app_icon %>
+    <img src="<%= app_icon %>" id="appIcon">
+    <% end %>
 
     <div class="oneRow">
       <span class="download" id="ios">
