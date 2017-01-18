@@ -39,6 +39,18 @@ describe Spaceship::ProvisioningProfile do
       profile = provisioning_profiles.first
       expect(profile.app).to be_instance_of(Spaceship::App)
     end
+
+    describe "include managed by Xcode" do
+      it 'filters Xcode managed profiles' do
+        provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: false)
+        expect(provisioning_profiles.count).to eq(3) # ignore the Xcode generated profiles
+      end
+
+      it 'includes Xcode managed profiles' do
+        provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: true)
+        expect(provisioning_profiles.count).to eq(5) # include the Xcode generated profiles
+      end
+    end
   end
 
   describe '#find_by_bundle_id' do
