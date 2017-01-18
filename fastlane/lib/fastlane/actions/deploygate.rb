@@ -48,7 +48,7 @@ module Fastlane
           [:message, :distribution_key, :release_note, :disable_notify].include? key
         end
 
-        raise 'missing `ipa` and `apk`. deploygate action needs least one.' unless binary
+        UI.user_error!('missing `ipa` and `apk`. deploygate action needs least one.') unless binary
 
         return binary if Helper.test?
 
@@ -122,7 +122,7 @@ module Fastlane
                                        env_name: "DEPLOYGATE_USER",
                                        description: "Target username or organization name",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No User for app given, pass using `user: 'user'`") unless value.to_s.length > 0
+                                         UI.user_error!("No User for DeployGate given, pass using `user: 'user'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "DEPLOYGATE_IPA_PATH",

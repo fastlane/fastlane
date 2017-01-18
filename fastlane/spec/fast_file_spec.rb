@@ -205,7 +205,7 @@ describe Fastlane do
 
         expect do
           ff.runner.execute(:crash, nil, { value: time })
-        end.to raise_error # since we cause a crash
+        end.to raise_error("Wups") # since we cause a crash
 
         expect(File.read("/tmp/error.txt")).to eq(time)
         File.delete("/tmp/error.txt")
