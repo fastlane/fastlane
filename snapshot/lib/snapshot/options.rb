@@ -110,6 +110,11 @@ module Snapshot
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :store_screenshots_on_failure,
+                                     env_name: 'SNAPSHOT_STORE_SCREENSHOTS_ON_FAILURE',
+                                     description: "Enabling this option allows snapshot to store screenshots for failed tests",
+                                     default_value: false,
+                                     is_string: false),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,

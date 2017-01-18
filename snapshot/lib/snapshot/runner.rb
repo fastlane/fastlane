@@ -36,28 +36,40 @@ module Snapshot
       self.collected_errors = []
       results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
-      Snapshot.config[:devices].each_with_index do |device, device_index|
-        launch_arguments_set.each do |launch_arguments|
-          Snapshot.config[:languages].each_with_index do |language, language_index|
-            locale = nil
-            if language.kind_of?(Array)
-              locale = language[1]
-              language = language[0]
+      catch :runs do
+        Snapshot.config[:devices].each_with_index do |device, device_index|
+          launch_arguments_set.each do |launch_arguments|
+            Snapshot.config[:languages].each_with_index do |language, language_index|
+              locale = nil
+              if language.kind_of?(Array)
+                locale = language[1]
+                language = language[0]
+              end
+              results[device] ||= {}
+
+              current_run = device_index * Snapshot.config[:languages].count + language_index + 1
+              number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
+              UI.message("snapshot run #{current_run} of #{number_of_runs}")
+
+              results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
+              if Snapshot.config[:stop_after_first_error] && self.collected_errors.count > 0
+                throw :runs
+              end
             end
-            results[device] ||= {}
-
-            current_run = device_index * Snapshot.config[:languages].count + language_index + 1
-            number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
-            UI.message("snapshot run #{current_run} of #{number_of_runs}")
-
-            results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
           end
         end
       end
 
       print_results(results)
 
-      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
+      if self.collected_errors.count > 0
+        if Snapshot.config[:store_screenshots_on_failure]
+          # Generate HTML report
+          ReportsGenerator.new.generate
+        end
+
+        UI.user_error!(self.collected_errors.join('; '))
+      end
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -77,11 +89,10 @@ module Snapshot
 
       if retries < Snapshot.config[:number_of_retries]
         UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
-        run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
+        return run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
       else
         UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
         self.collected_errors << ex
-        raise ex if Snapshot.config[:stop_after_first_error]
         return false # for the results
       end
     end
@@ -118,8 +129,7 @@ module Snapshot
       puts ""
     end
 
-    # Returns true if it succeded
-    def launch(language, locale, device_type, launch_arguments)
+    def prepare_files_for_launch(language, locale, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
       FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
@@ -130,7 +140,9 @@ module Snapshot
       File.write(File.join(prefix, "language.txt"), language)
       File.write(File.join(prefix, "locale.txt"), locale || "")
       File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
+    end
 
+    def prepare_simulator_for_launch(language, locale, device_type)
       # Kill and shutdown all currently running simulators so that the following settings
       # changes will be picked up when they are started again.
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
@@ -153,8 +165,11 @@ module Snapshot
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
 
       open_simulator_for_device(device_type)
+    end
 
-      command = TestCommandGenerator.generate(device_type: device_type)
+    # Returns true if tests were successful
+    def execute_launch(language, locale, device_type, launch_arguments)
+      command = Snapshot::TestCommandGenerator.generate(device_type: device_type)
 
       if locale
         UI.header("#{device_type} - #{language} (#{locale})")
@@ -163,19 +178,20 @@ module Snapshot
       end
 
       prefix_hash = [
-        {
-          prefix: "Running Tests: ",
-          block: proc do |value|
-            value.include?("Touching")
-          end
-        }
+          {
+              prefix: "Running Tests: ",
+              block: proc do |value|
+                value.include?("Touching")
+              end
+          }
       ]
 
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
-                                            loading: "Loading...",
+      begin
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                              print_all: true,
+                                              print_command: true,
+                                              prefix: prefix_hash,
+                                              loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
 
@@ -190,12 +206,35 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
+        return true
+      rescue ErrorHandler::SnapshotTestsError
+        return false
+      end
+    end
 
+    def collect_screenshots(language, locale, device_type, launch_arguments, tests_successful)
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
 
       dir_name = locale || language
 
-      return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
+      has_screenshots = false
+      if Snapshot.config[:store_screenshots_on_failure] || tests_successful
+        has_screenshots = Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
+      end
+
+      unless tests_successful
+        UI.user_error!("Tests failed - check out the log above")
+      end
+
+      has_screenshots
+    end
+
+    # Returns true if it succeded
+    def launch(language, locale, device_type, launch_arguments)
+      prepare_files_for_launch(language, locale, launch_arguments)
+      prepare_simulator_for_launch(language, locale, device_type)
+      tests_successful = execute_launch(language, locale, device_type, launch_arguments)
+      collect_screenshots(language, locale, device_type, launch_arguments, tests_successful)
     end
 
     def open_simulator_for_device(device_name)
