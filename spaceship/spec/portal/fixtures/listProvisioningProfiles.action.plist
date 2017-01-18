@@ -187,6 +187,174 @@
             <string>2</string>
             <key>dateExpire</key>
             <date>2015-11-25T22:45:50Z</date>
+            <key>managingApp</key>
+            <string>Xcode</string>
+            <key>appId</key>
+            <dict>
+               <key>appIdId</key>
+               <string>572XTN75U2</string>
+               <key>name</key>
+               <string>Broken SunGolf</string>
+               <key>appIdPlatform</key>
+               <string>ios</string>
+               <key>prefix</key>
+               <string>5A997XSHK2</string>
+               <key>identifier</key>
+               <string>net.sunapps.7</string>
+               <key>isWildCard</key>
+               <false />
+               <key>isDuplicate</key>
+               <false />
+               <key>features</key>
+               <dict>
+                  <key>push</key>
+                  <true />
+                  <key>iCloud</key>
+                  <false />
+                  <key>inAppPurchase</key>
+                  <true />
+                  <key>gameCenter</key>
+                  <true />
+                  <key>LPLF93JG7M</key>
+                  <false />
+                  <key>passbook</key>
+                  <false />
+                  <key>IAD53UNK2F</key>
+                  <false />
+                  <key>V66P55NK2I</key>
+                  <false />
+                  <key>dataProtection</key>
+                  <string />
+                  <key>SKC3T5S89Y</key>
+                  <false />
+                  <key>APG3427HIY</key>
+                  <false />
+                  <key>HK421J6T7P</key>
+                  <false />
+                  <key>homeKit</key>
+                  <false />
+                  <key>WC421J6T7P</key>
+                  <false />
+                  <key>cloudKitVersion</key>
+                  <integer>1</integer>
+               </dict>
+               <key>enabledFeatures</key>
+               <array>
+                  <string>gameCenter</string>
+                  <string>inAppPurchase</string>
+                  <string>push</string>
+               </array>
+               <key>isDevPushEnabled</key>
+               <false />
+               <key>isProdPushEnabled</key>
+               <false />
+            </dict>
+            <key>appIdId</key>
+            <string>572XTN75U2</string>
+         </dict>
+         <dict>
+            <key>provisioningProfileId</key>
+            <string>FB8594WWQG</string>
+            <key>name</key>
+            <string>net.sunapps.7 AdHoc</string>
+            <key>status</key>
+            <string>Active</string>
+            <key>type</key>
+            <string>iOS Distribution</string>
+            <key>distributionMethod</key>
+            <string>store</string>
+            <key>proProPlatform</key>
+            <string>ios</string>
+            <key>UUID</key>
+            <string>a8b1563e-7559-41f7-854b-6cd09f950d11</string>
+            <key>version</key>
+            <string>2</string>
+            <key>dateExpire</key>
+            <date>2015-11-25T22:45:50Z</date>
+            <key>managingApp</key>
+            <string>Xcode</string>
+            <key>appId</key>
+            <dict>
+               <key>appIdId</key>
+               <string>572XTN75U2</string>
+               <key>name</key>
+               <string>Broken SunGolf</string>
+               <key>appIdPlatform</key>
+               <string>ios</string>
+               <key>prefix</key>
+               <string>5A997XSHK2</string>
+               <key>identifier</key>
+               <string>net.sunapps.7</string>
+               <key>isWildCard</key>
+               <false />
+               <key>isDuplicate</key>
+               <false />
+               <key>features</key>
+               <dict>
+                  <key>push</key>
+                  <true />
+                  <key>iCloud</key>
+                  <false />
+                  <key>inAppPurchase</key>
+                  <true />
+                  <key>gameCenter</key>
+                  <true />
+                  <key>LPLF93JG7M</key>
+                  <false />
+                  <key>passbook</key>
+                  <false />
+                  <key>IAD53UNK2F</key>
+                  <false />
+                  <key>V66P55NK2I</key>
+                  <false />
+                  <key>dataProtection</key>
+                  <string />
+                  <key>SKC3T5S89Y</key>
+                  <false />
+                  <key>APG3427HIY</key>
+                  <false />
+                  <key>HK421J6T7P</key>
+                  <false />
+                  <key>homeKit</key>
+                  <false />
+                  <key>WC421J6T7P</key>
+                  <false />
+                  <key>cloudKitVersion</key>
+                  <integer>1</integer>
+               </dict>
+               <key>enabledFeatures</key>
+               <array>
+                  <string>gameCenter</string>
+                  <string>inAppPurchase</string>
+                  <string>push</string>
+               </array>
+               <key>isDevPushEnabled</key>
+               <false />
+               <key>isProdPushEnabled</key>
+               <false />
+            </dict>
+            <key>appIdId</key>
+            <string>572XTN75U2</string>
+         </dict>
+         <dict>
+            <key>provisioningProfileId</key>
+            <string>FB8594WWQG</string>
+            <key>name</key>
+            <string>net.sunapps.7 AdHoc</string>
+            <key>status</key>
+            <string>Active</string>
+            <key>type</key>
+            <string>iOS Distribution</string>
+            <key>distributionMethod</key>
+            <string>store</string>
+            <key>proProPlatform</key>
+            <string>ios</string>
+            <key>UUID</key>
+            <string>a8b1563e-7559-41f7-854b-6cd09f950d11</string>
+            <key>version</key>
+            <string>2</string>
+            <key>dateExpire</key>
+            <date>2015-11-25T22:45:50Z</date>
             <key>appId</key>
             <dict>
                <key>appIdId</key>
