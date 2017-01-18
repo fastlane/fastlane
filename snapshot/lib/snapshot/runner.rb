@@ -178,12 +178,12 @@ module Snapshot
       end
 
       prefix_hash = [
-          {
-              prefix: "Running Tests: ",
-              block: proc do |value|
-                value.include?("Touching")
-              end
-          }
+        {
+            prefix: "Running Tests: ",
+            block: proc do |value|
+              value.include?("Touching")
+            end
+        }
       ]
 
       begin
