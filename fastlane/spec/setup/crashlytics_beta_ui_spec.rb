@@ -11,12 +11,12 @@ describe Fastlane::CrashlyticsBetaUi do
 
     it 'crashes when asking for input from the user not in interactive mode' do
       ENV["CI"] = "1"
-      expect { ui.input("Input stuff") }.to raise_error
+      expect { ui.input("Input stuff") }.to raise_error FastlaneCore::Interface::FastlaneCrash
     end
 
     it 'crashes when asking for confirmation from the user not in interactive mode' do
       ENV["CI"] = "1"
-      expect { ui.confirm("confirm stuff") }.to raise_error
+      expect { ui.confirm("confirm stuff") }.to raise_error FastlaneCore::Interface::FastlaneCrash
     end
   end
 end

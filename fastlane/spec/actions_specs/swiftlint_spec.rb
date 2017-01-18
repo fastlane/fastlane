@@ -77,7 +77,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                 swiftlint
               end").runner.execute(:test)
-            end.to raise_error
+            end.to raise_error(/SwiftLint finished with errors/)
           end
         end
 
@@ -107,7 +107,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                 swiftlint(ignore_exit_status: false)
               end").runner.execute(:test)
-            end.to raise_error
+            end.to raise_error(/SwiftLint finished with errors/)
           end
         end
       end
