@@ -40,9 +40,9 @@ module CredentialsManager
                  'you should turn off smart quotes in your editor of choice.'.red
           end
 
-          # rubocop:disable Lint/Eval
+          # rubocop:disable Security/Eval
           eval(content)
-          # rubocop:enable Lint/Eval
+          # rubocop:enable Security/Eval
 
           print_debug_information(path: full_path) if $verbose
         end
