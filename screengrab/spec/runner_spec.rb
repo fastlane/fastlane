@@ -24,6 +24,20 @@ describe Screengrab::Runner do
     let(:test_classes_to_use) { nil }
     let(:test_packages_to_use) { nil }
 
+    context "when launch arguments are specified" do
+      before do
+        config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
+        config[:locales] = %w(en-US)
+        config[:ending_locale] = 'en-US'
+      end
+      it 'sets custom launch_arguments' do
+        # expect(FastlaneCore::CommandExecutor).to receive(:execute).with(/hjanuschka/)
+        expect(mock_executor).to receive(:execute)
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500  \\\n/"))
+        @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
+      end
+    end
+
     context 'when a locale is specified' do
       before do
         config[:locales] = %w(en-US)
@@ -43,7 +57,7 @@ describe Screengrab::Runner do
           it 'prints an error and exits the program' do
             expect(ui).to receive(:user_error!).with("Tests failed", show_github_issues: false).and_call_original
 
-            expect { @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use) }.to raise_fastlane_error
+            expect { @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_error
           end
         end
 
@@ -55,7 +69,7 @@ describe Screengrab::Runner do
           it 'prints an error and does not exit the program' do
             expect(ui).to receive(:error).with("Tests failed").and_call_original
 
-            @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+            @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, nil)
           end
         end
       end
