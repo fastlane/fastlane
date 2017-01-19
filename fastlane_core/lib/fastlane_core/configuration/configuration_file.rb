@@ -21,9 +21,9 @@ module FastlaneCore
       end
 
       begin
-        # rubocop:disable Lint/Eval
+        # rubocop:disable Security/Eval
         eval(content) # this is okay in this case
-        # rubocop:enable Lint/Eval
+        # rubocop:enable Security/Eval
 
         print_resulting_config_values(path) # only on success
       rescue SyntaxError => ex
