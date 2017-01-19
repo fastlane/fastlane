@@ -67,7 +67,7 @@ module Screengrab
 
       grant_permissions(device_serial)
 
-      run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+      run_tests(device_serial, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
@@ -210,7 +210,7 @@ module Screengrab
       end
     end
 
-    def run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+    def run_tests(device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
       @config[:locales].each do |locale|
         UI.message "Running tests for locale: #{locale}"
 
@@ -219,6 +219,7 @@ module Screengrab
                               "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
         instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
         instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
+        instrument_command << launch_arguments.map { |item| '-e ' + item + ' ' }.join.to_s if launch_arguments
         instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
         test_output = run_adb_command(instrument_command.join(" \\\n"),
