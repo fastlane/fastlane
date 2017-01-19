@@ -6,7 +6,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate()
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /No API Token for DeployGate given/)
       end
 
       it "raises an error if no api token was given" do
@@ -28,7 +28,7 @@ describe Fastlane do
               api_token: 'thisistest'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /No User for DeployGate given/)
       end
 
       it "raises an error if no binary path was given" do
@@ -39,7 +39,7 @@ describe Fastlane do
               user: 'deploygate'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'missing `ipa` and `apk`. deploygate action needs least one.')
       end
 
       it "raises an error if the given ipa path was not found" do
@@ -48,10 +48,10 @@ describe Fastlane do
             deploygate({
               api_token: 'thisistest',
               user: 'deploygate',
-              ipa_path: './fastlane/nonexistent'
+              ipa: './fastlane/nonexistent'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find ipa file at path './fastlane/nonexistent'")
       end
 
       it "raises an error if the given apk path was not found" do
@@ -60,10 +60,10 @@ describe Fastlane do
             deploygate({
               api_token: 'testistest',
               user: 'deploygate',
-              apk_path: './fastlane/nonexistent'
+              apk: './fastlane/nonexistent'
             })
-          ").runner.execute(:test)
-        end.to raise_error
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find apk file at path './fastlane/nonexistent'")
       end
 
       it "works with valid parameters" do
