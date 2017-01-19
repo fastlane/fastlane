@@ -50,9 +50,9 @@ module Fastlane
           # is this always clear and safe to declare any local variables we want, because the eval function uses the instance scope
           # instead of local.
 
-          # rubocop:disable Lint/Eval
+          # rubocop:disable Security/Eval
           eval(data, parsing_binding, relative_path) # using eval is ok for this case
-          # rubocop:enable Lint/Eval
+          # rubocop:enable Security/Eval
         rescue SyntaxError => ex
           line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
           UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")

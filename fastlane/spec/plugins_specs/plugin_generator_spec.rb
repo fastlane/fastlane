@@ -121,9 +121,9 @@ describe Fastlane::PluginGenerator do
         lib = File.expand_path('lib')
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-        # rubocop:disable Lint/Eval
+        # rubocop:disable Security/Eval
         eval(plugin_rb_contents)
-        # rubocop:enable Lint/Eval
+        # rubocop:enable Security/Eval
 
         # If we evaluate the contents of the generated plugin.rb file,
         # we'll get the all_classes helper method defined. This ensures
@@ -176,9 +176,9 @@ describe Fastlane::PluginGenerator do
 
       action_contents = File.read(action_file)
 
-      # rubocop:disable Lint/Eval
+      # rubocop:disable Security/Eval
       eval(action_contents)
-      # rubocop:enable Lint/Eval
+      # rubocop:enable Security/Eval
 
       # If we evaluate the contents of the generated action file,
       # we'll get the Action class defined. This ensures that the
@@ -210,9 +210,9 @@ describe Fastlane::PluginGenerator do
         # ensures that the syntax is valid, and lets us interrogate
         # the values!
         #
-        # rubocop:disable Lint/Eval
+        # rubocop:disable Security/Eval
         gemspec = eval(File.read(gemspec_file))
-        # rubocop:enable Lint/Eval
+        # rubocop:enable Security/Eval
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
@@ -236,9 +236,9 @@ describe Fastlane::PluginGenerator do
 
       helper_contents = File.read(helper_file)
 
-      # rubocop:disable Lint/Eval
+      # rubocop:disable Security/Eval
       eval(helper_contents)
-      # rubocop:enable Lint/Eval
+      # rubocop:enable Security/Eval
 
       # If we evaluate the contents of the generated helper file,
       # we'll get the helper class defined. This ensures that the

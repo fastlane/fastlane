@@ -41,7 +41,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             appetize()
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "raises an error if no url or path was given" do
@@ -51,7 +51,7 @@ describe Fastlane do
               api_token: '#{api_token}'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /url parameter is required/)
       end
 
       it "works with valid parameters" do

@@ -313,7 +313,7 @@ describe FastlaneCore do
 
           expect do
             config_item.valid?('ABC')
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Float! Found String instead.")
         end
 
         it "verifies the default value as well" do
@@ -351,7 +351,7 @@ describe FastlaneCore do
                                                        description: 'foo',
                                                        optional: false,
                                                        deprecated: 'replaced by bar')
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneCrash, 'Deprecated option must be optional')
         end
 
         it "doesn't display a deprecation message when loading a config if a deprecated option doesn't have a value" do

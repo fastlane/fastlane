@@ -98,11 +98,15 @@ module Fastlane
         # By default we use xcpretty
         raw_buildlog = false
 
+        # By default we don't pass the utf flag
+        xcpretty_utf = false
+
         if params
           # Operation bools
           archiving    = params.key? :archive
           exporting    = params.key? :export_archive
           testing      = params.key? :test
+          xcpretty_utf = params[:xcpretty_utf]
 
           if params.key? :raw_buildlog
             raw_buildlog = params[:raw_buildlog]
@@ -248,6 +252,9 @@ module Fastlane
 
         xcpretty_command = ""
         xcpretty_command = "| xcpretty #{xcpretty_args}" unless raw_buildlog
+        unless raw_buildlog
+          xcpretty_command = "#{xcpretty_command} --utf" if xcpretty_utf
+        end
 
         pipe_command = "| tee '#{buildlog_path}/xcodebuild.log' #{xcpretty_command}"
 
@@ -365,7 +372,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
 
@@ -417,7 +425,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -462,7 +471,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -507,7 +517,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
     end
@@ -548,7 +559,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
 
@@ -597,7 +609,8 @@ module Fastlane
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
-          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\'']
+          ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
+          ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
         ]
       end
 

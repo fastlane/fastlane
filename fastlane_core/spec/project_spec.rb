@@ -20,7 +20,7 @@ describe FastlaneCore do
         expect do
           config = FastlaneCore::Configuration.new(options, { project: 'yup', workspace: 'yeah' })
           FastlaneCore::Project.detect_projects(config)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "You can only pass either a workspace or a project path, not both")
       end
 
       it 'keeps the specified project' do
