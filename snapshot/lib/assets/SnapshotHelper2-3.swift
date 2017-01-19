@@ -141,7 +141,7 @@ public class Snapshot: NSObject {
             homeDir = usersDir.stringByAppendingPathComponent(user) as NSString
         #else
             guard homeDir = ProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString else {
-                print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
+                print("Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable.")
                 return nil
             }
         #endif

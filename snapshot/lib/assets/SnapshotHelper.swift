@@ -137,8 +137,12 @@ open class Snapshot: NSObject {
             
             homeDir = usersDir.appendingPathComponent(user)
         #else
-            guard let homeDirUrl = URL(string: ProcessInfo().environment["SIMULATOR_HOST_HOME"]!) else {
-                print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
+            guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
+                print("Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable.")
+                return nil
+            }
+            guard let homeDirUrl = URL(string: simulatorHostHome) else {
+                print("Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?")
                 return nil
             }
             homeDir = homeDirUrl
