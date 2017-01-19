@@ -219,7 +219,7 @@ module Screengrab
                               "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
         instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
         instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
-        instrument_command << launch_arguments.map { |item| '-e ' + item + ' ' }.join.to_s if launch_arguments
+        instrument_command << launch_arguments.map { |item| '-e ' + item }.join(' ') if launch_arguments
         instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
         test_output = run_adb_command(instrument_command.join(" \\\n"),

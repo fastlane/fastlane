@@ -33,7 +33,7 @@ describe Screengrab::Runner do
       it 'sets custom launch_arguments' do
         # expect(FastlaneCore::CommandExecutor).to receive(:execute).with(/hjanuschka/)
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500  \\\n/"))
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500 \\\n/"))
         @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
