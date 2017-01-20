@@ -31,8 +31,7 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 We work in a high-trust environment which implies that anyone and everyone is able to merge pull requests from the community. If the PR reviewer feels strongly about seeing a PR to completion, they should assign it to themselves and request necessary changes.
 
 ### Adding Dependencies:
-As we want to keep _fastlane_ moving forward, sometimes that means adding dependencies to the project. Please be aware that we want to avoid adding dependencies with GPL licenses to _fastlane_ in order to keep everything as open as possible.
-
+We want to keep _fastlane_ slim and robust. Please avoid adding new dependencies to the code base unless it is necessary. In the event that a PR does add a dependency, please ping a member of the _fastlane_ team to approve the pull request.
 
 __Most Importantly__, our community prides itself in our supportive and friendly attitude. Above all else, we are always:
 - Polite
