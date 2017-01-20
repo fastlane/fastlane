@@ -78,7 +78,7 @@ module Fastlane
 
       def self.details
         [
-          "You should check out the code signing gide before using this action: https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning",
+          "You should check out the code signing gide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
           "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
           "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
           "The `target_filter` value can be used to only update code signing for specified targets",
