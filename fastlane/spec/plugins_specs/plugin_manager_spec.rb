@@ -197,7 +197,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             my_custom_plugin
           end").runner.execute(:test)
-        end.to raise_exception("Could not find action, lane or variable 'my_custom_plugin'. Check out the documentation for more details: https://docs.fastlane.tools")
+        end.to raise_exception("Could not find action, lane or variable 'my_custom_plugin'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
       end
     end
   end
