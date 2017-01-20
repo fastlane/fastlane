@@ -31,7 +31,7 @@ match
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
-[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
+[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](https://rubygems.org/gems/match)
 
 ###### Easily sync your certificates and profiles across your team using git
 
@@ -311,7 +311,7 @@ Some repo hosts might allow you to use the same deploy key for different repos, 
 
 There are a few ways around this:
 
-1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
+1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/faq/adding-projects-with-submodules/).
 2. Some CIs allow you to upload your signing credentials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
 
 Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.

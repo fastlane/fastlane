@@ -294,7 +294,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error
+            end.to raise_error(%r{Couldn't find crashlytics at path .*fastlane/wadus})
           end
 
           it "raises an error if no api token was given" do

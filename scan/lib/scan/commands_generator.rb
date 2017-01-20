@@ -31,7 +31,7 @@ module Scan
       global_option("--verbose") { $verbose = true }
 
       command :tests do |c|
-        c.syntax = "scan"
+        c.syntax = "fastlane scan"
         c.description = Scan::DESCRIPTION
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Scan::Options.available_options,
@@ -41,7 +41,7 @@ module Scan
       end
 
       command :init do |c|
-        c.syntax = "scan init"
+        c.syntax = "fastlane scan init"
         c.description = "Creates a new Scanfile for you"
         c.action do |_args, options|
           containing = (Helper.fastlane_enabled? ? 'fastlane' : '.')

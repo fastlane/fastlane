@@ -123,9 +123,17 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      cert_type = Spaceship.certificate.production
-      cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-      cert_type = Spaceship.certificate.development if Cert.config[:development]
+      case Cert.config[:platform].to_s
+      when 'ios', 'tvos'
+        cert_type = Spaceship.certificate.production
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+        cert_type = Spaceship.certificate.development if Cert.config[:development]
+
+      when 'macos'
+        cert_type = Spaceship.certificate.mac_app_distribution
+        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+
+      end
 
       cert_type
     end

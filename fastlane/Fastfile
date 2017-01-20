@@ -51,13 +51,6 @@ lane :bump do |options|
   sh "git checkout master"
 end
 
-desc "Display a changelog for fastlane since its last release."
-lane :show_changelog do
-  old_version = current_version
-
-  print_release_changelog(old_version: old_version)
-end
-
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
@@ -89,10 +82,10 @@ lane :release do
   #
   github_release = get_github_release(url: "fastlane/fastlane", version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    print_release_changelog(old_version: old_version)
+    show_changelog(old_version: old_version)
 
     title = prompt(text: 'Title: ')
-    description = prompt(text: "Please enter a changelog: ",
+    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't affect the end-user): ",
                          multi_line_end_keyword: "END")
 
     github_release = set_github_release(
@@ -116,12 +109,15 @@ lane :release do
   # After publishing
   #
   if ENV['SLACK_URL']
+    release_notes = github_release['body']
+    # markup - turn github references into links
+    release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
     slack(
       channel: "releases",
       default_payloads: [],
       message: "Successfully released [fastlane #{version}](#{release_url}) :rocket:",
       payload: {
-        "New" => github_release['body']
+        "New" => release_notes
       }
     )
   end
@@ -147,6 +143,14 @@ lane :verify_docs do
   end
 end
 
+desc "Generates the actions.md that will get used on https://docs.fastlane.tools"
+desc "This will NOT also automatically submit a pull request to fastlane/docs"
+desc "This SHOULD only be used for testing changes to the docs"
+lane :test_generate_docs do
+  ENV['USE_ENHANCE_TEST_DATA'] = "true"
+  generate_markdown_docs
+end
+
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
@@ -156,9 +160,7 @@ lane :update_docs do
   end
 
   clone_docs do
-    require 'fastlane/documentation/markdown_docs_generator'
-    actions_md_path = File.expand_path("docs/actions.md")
-    Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+    actions_md_path = generate_markdown_docs
 
     Bundler.with_clean_env do
       sh "bundle update"
@@ -187,6 +189,14 @@ lane :update_docs do
       end
     end
   end
+end
+
+def generate_markdown_docs
+  require 'fastlane/documentation/markdown_docs_generator'
+  actions_md_path = File.expand_path("docs/actions.md")
+  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+
+  return actions_md_path
 end
 
 def clone_docs
@@ -260,14 +270,15 @@ private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
 end
 
-desc "Print out the changelog since the last tagged release"
-private_lane :print_release_changelog do |options|
-  tool_name = options[:tool] || "fastlane"
-  old_version = options[:old_version]
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
+  old_version = options[:old_version] || current_version
 
-  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
-  changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
+  changes = sh("git log --pretty='* %s' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
+
+  github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
+  sh "open #{github_diff_url}"
 
   puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
   changes # return the text without the modified colors

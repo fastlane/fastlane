@@ -10,8 +10,13 @@ module Fastlane
     def self.start
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
+      FastlaneCore::Swag.show_loader
       $verbose = true if ARGV.include?("--verbose")
-      $capture_output = true if ARGV.include?("--capture_output")
+
+      if ARGV.include?("--capture_output")
+        $capture_output = true
+        $verbose = true
+      end
 
       # has to be checked here - in case we wan't to troubleshoot plugin related issues
       if ARGV.include?("--troubleshoot")
@@ -27,8 +32,9 @@ module Fastlane
       end
       FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
       Fastlane.load_actions
+      FastlaneCore::Swag.stop_loader
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
-      unless ARGV[0] == "env"
+      unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command?
         # *after* loading the plugins
         Fastlane.plugin_manager.load_plugins
         Fastlane::PluginUpdateManager.start_looking_for_updates
@@ -81,7 +87,10 @@ module Fastlane
       program :help_formatter, :compact
 
       global_option('--verbose') { $verbose = true }
-      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') { $capture_output = true }
+      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
+        $capture_output = true
+        $verbose = true
+      end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
 
       always_trace!

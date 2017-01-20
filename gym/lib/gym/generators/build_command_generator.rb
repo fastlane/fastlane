@@ -51,13 +51,7 @@ module Gym
 
         actions = []
         actions << :clean if config[:clean]
-
-        if Gym.project.library? || Gym.project.framework?
-          actions << :build
-        else
-          # that's the default for iOS apps
-          actions << :archive
-        end
+        actions << :archive
 
         actions
       end
@@ -78,6 +72,7 @@ module Gym
           pipe << " --no-color" if Helper.colors_disabled?
           pipe << " --formatter " if formatter
           pipe << formatter if formatter
+          pipe << "--utf" if Gym.config[:xcpretty_utf]
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]

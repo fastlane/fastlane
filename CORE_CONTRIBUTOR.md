@@ -1,7 +1,7 @@
 # _fastlane_ Core Contributor Expectations
 
 
-We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, enthusaistic members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
+We believe that our most valuable resource is the passionate community members who keep _fastlane_ running. We are always looking for active, enthusiastic members of the _fastlane_ community to become core contributors. We hope to harness the diverse experiences of our community to optimize _fastlane_ as the defacto tool to deploy betas and releases for iOS and Android apps.
 
 
 ## How does one become a core contributor?
@@ -26,6 +26,9 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 - Maintain backwards compatibility
 - Keep external dependencies to a minimum
 - Keep test coverage high and ensure up-to-date documentation
+
+### Pull Request Ownership:
+We work in a high-trust environment which implies that anyone and everyone is able to merge pull requests from the community. If the PR reviewer feels strongly about seeing a PR to completion, they should assign it to themselves and request necessary changes.
 
 
 __Most Importantly__, our community prides itself in our supportive and friendly attitude. Above all else, we are always:

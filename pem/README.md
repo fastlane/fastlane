@@ -31,7 +31,7 @@ pem
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pem/LICENSE)
-[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
+[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](https://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
 
@@ -41,9 +41,7 @@ Tired of manually creating and maintaining your push notification profiles for y
 
 `pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
 
-To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/fastlane/tree/master/sigh).
-
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
 <p align="center">
@@ -61,7 +59,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
-
 
 Check out this gif:
 
@@ -87,7 +84,7 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```pem``` will never revoke your existing certificates.
+Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 

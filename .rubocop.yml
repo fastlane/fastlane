@@ -9,6 +9,10 @@ Style/NumericPredicate:
 # this would cause errors with long lanes
 Metrics/BlockLength:
   Enabled: false
+  
+# this is a bit buggy
+Metrics/ModuleLength:
+  Enabled: false
 
 # certificate_1 is an okay variable name
 Style/VariableNumber:
@@ -36,6 +40,10 @@ Style/NumericLiteralPrefix:
 # command = !clean_expired.nil? || !clean_pattern.nil? ? CLEANUP : LIST
 # 
 Style/TernaryParentheses:
+  Enabled: false
+
+# sometimes it is usefull to have those empty methods
+Style/EmptyMethod:
   Enabled: false
 
 # It's better to be more explicit about the type

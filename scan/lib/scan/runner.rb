@@ -82,6 +82,16 @@ module Scan
 
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
+      if Scan.config[:include_simulator_logs]
+        Scan.devices.each do |device|
+          sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
+          if File.exist?(sim_device_logfilepath_source)
+            sim_device_logfilepath_dest = File.join(Scan.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
+            FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
+          end
+        end
+      end
+
       unless tests_exit_status == 0
         UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
       end

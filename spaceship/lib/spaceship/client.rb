@@ -166,15 +166,22 @@ module Spaceship
       return File.read(path)
     end
 
+    # This is a duplicate method of fastlane_core/fastlane_core.rb#fastlane_user_dir
+    def fastlane_user_dir
+      path = File.expand_path(File.join("~", ".fastlane"))
+      FileUtils.mkdir_p(path) unless File.directory?(path)
+      return path
+    end
+
     # Returns preferred path for storing cookie
     # for two step verification.
     def persistent_cookie_path
       if ENV["SPACESHIP_COOKIE_PATH"]
         path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
       else
-        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+        [File.join(self.fastlane_user_dir, "spaceship"), "~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
           dir_parts = File.split(dir)
-          if directory_accessible?(dir_parts.first)
+          if directory_accessible?(File.expand_path(dir_parts.first))
             path = File.expand_path(File.join(dir, self.user, "cookie"))
             break
           end
@@ -361,9 +368,10 @@ module Spaceship
 
     def with_retry(tries = 5, &_block)
       return yield
-    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError, Errno::EPIPE => ex # New Faraday version: Faraday::TimeoutError => ex
-      unless (tries -= 1).zero?
-        logger.warn("Timeout received: '#{ex.message}'.  Retrying after 3 seconds (remaining: #{tries})...")
+    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+      tries -= 1
+      unless tries.zero?
+        logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
         sleep 3 unless defined? SpecHelper
         retry
       end
@@ -373,6 +381,11 @@ module Spaceship
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
+
+        if self.class.spaceship_session_env.to_s.length > 0
+          raise UnauthorizedAccessError.new, "Authentication error, you passed an invalid session using the environment variable FASTLANE_SESSION or SPACESHIP_SESSION"
+        end
+
         do_login(self.user, @password)
         sleep 3 unless defined? SpecHelper
         retry

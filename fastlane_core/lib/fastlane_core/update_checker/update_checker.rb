@@ -71,6 +71,8 @@ module FastlaneCore
       end
       puts '#######################################################################'.green
       Changelog.show_changes(gem_name, current_version) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+
+      ensure_rubygems_source
     end
 
     # The command that the user should use to update their mac
@@ -82,6 +84,20 @@ module FastlaneCore
       else
         "sudo gem update #{gem_name.downcase}"
       end
+    end
+
+    # Check if RubyGems is set as a gem source
+    # on some machines that might not be the case
+    # and then users can't find the update when
+    # running the specified command
+    def self.ensure_rubygems_source
+      return if Helper.contained_fastlane?
+      return if `gem sources`.include?("https://rubygems.org")
+      puts ""
+      UI.error("RubyGems is not listed as your Gem source")
+      UI.error("You can run `gem sources` to see all your sources")
+      UI.error("Please run the following command to fix this:")
+      UI.command("gem sources --add https://rubygems.org")
     end
 
     # Generate the URL on the main thread (since we're switching directory)
@@ -139,7 +155,7 @@ module FastlaneCore
     # (optional) Returns the app identifier for the current tool
     # supply and screengrab use different param names and env variable patterns so we have to special case here
     # example:
-    #   supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
+    #   fastlane supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
     #   screengrab -a com.test.app should return com.test.app
     def self.android_app_identifier(args, gem_name)
       app_identifier = nil

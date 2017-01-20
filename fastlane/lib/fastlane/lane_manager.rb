@@ -162,25 +162,35 @@ module Fastlane
     end
 
     def self.load_dot_env(env)
-      return if Dir.glob("**/*.env*", File::FNM_DOTMATCH).count == 0
+      # find the first directory of [fastlane, its parent] containing dotenv files
+      path = FastlaneCore::FastlaneFolder.path
+      search_paths = [path]
+      search_paths << path + "/.." unless path.nil?
+      search_paths.compact!
+      base_path = search_paths.find do |dir|
+        Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
+      end
+      return unless base_path
       require 'dotenv'
 
       Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
 
       # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(FastlaneCore::FastlaneFolder.path || "", '.env.default')
+      env_file = File.join(base_path, '.env')
+      env_default_file = File.join(base_path, '.env.default')
       Dotenv.load(env_file, env_default_file)
 
       # Loads .env file for the environment passed in through options
       if env
-        env_file = File.join(FastlaneCore::FastlaneFolder.path || "", ".env.#{env}")
+        env_file = File.join(base_path, ".env.#{env}")
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
     end
 
     def self.print_lane_context
+      return if Actions.lane_context.empty?
+
       if $verbose
         UI.important 'Lane Context:'.yellow
         UI.message Actions.lane_context

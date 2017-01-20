@@ -8,6 +8,7 @@ module FastlaneCore
     # @param path [String] The path to the configuration file to use
     def initialize(config, path, block_for_missing)
       self.config = config
+
       @block_for_missing = block_for_missing
       content = File.read(path)
 
@@ -20,9 +21,9 @@ module FastlaneCore
       end
 
       begin
-        # rubocop:disable Lint/Eval
+        # rubocop:disable Security/Eval
         eval(content) # this is okay in this case
-        # rubocop:enable Lint/Eval
+        # rubocop:enable Security/Eval
 
         print_resulting_config_values(path) # only on success
       rescue SyntaxError => ex
@@ -76,6 +77,49 @@ module FastlaneCore
         else
           self.config[method_sym] = '' # important, since this will raise a good exception for free
         end
+      end
+    end
+
+    # Override configuration for a specific lane. If received lane name does not
+    # match the lane name available as environment variable, no changes will
+    # be applied.
+    #
+    # @param lane_name Symbol representing a lane name.
+    # @yield Block to run for overriding configuration values.
+    #
+    def for_lane(lane_name)
+      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
+      end
+    end
+
+    # Override configuration for a specific platform. If received platform name
+    # does not match the platform name available as environment variable, no
+    # changes will be applied.
+    #
+    # @param platform_name Symbol representing a platform name.
+    # @yield Block to run for overriding configuration values.
+    #
+    def for_platform(platform_name)
+      if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
+      end
+    end
+
+    # Allows a configuration block (for_lane, for_platform) to get a clean
+    # configuration for applying values, so that values can be overridden
+    # (once) again. Those values are then merged into the surrounding
+    # configuration as the block completes
+    def with_a_clean_config_merged_when_complete
+      self.config.push_values!
+      begin
+        yield
+      ensure
+        self.config.pop_values!
       end
     end
   end

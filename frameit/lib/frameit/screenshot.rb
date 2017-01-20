@@ -60,7 +60,7 @@ module Frameit
     end
 
     def mac?
-      return device_name == 'Mac'
+      return device_name == 'MacBook'
     end
 
     # The name of the orientation of a screenshot. Used to find the correct template

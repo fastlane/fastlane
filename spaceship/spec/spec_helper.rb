@@ -5,10 +5,6 @@ require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
 
-unless ENV["DEBUG"]
-  $stdout = File.open("/tmp/spaceship_tests", "w")
-end
-
 @cache_paths = [
   File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]

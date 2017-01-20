@@ -1,0 +1,19 @@
+app_identifier "com.global.id"
+
+for_lane "enterprise" do
+  app_identifier "com.forlane.enterprise"
+end
+
+for_platform "ios" do
+  app_identifier "com.forplatform.ios"
+
+  for_lane "release" do
+    app_identifier "com.forplatformios.forlanerelease"
+    app_identifier "com.forplatformios.ignored"
+  end
+
+  for_lane "explode" do
+    app_identifier "com.forplatformios.boom"
+    raise "oh noes!"
+  end
+end

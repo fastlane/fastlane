@@ -144,7 +144,7 @@ module Spaceship
       latinized
     end
 
-    def create_app!(type, name, bundle_id, mac: false)
+    def create_app!(type, name, bundle_id, mac: false, enabled_features: {})
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
       # https://github.com/fastlane/fastlane/issues/5813
@@ -170,9 +170,10 @@ module Spaceship
         name: valid_name_for(name),
         teamId: team_id
       }
-
       params.merge!(ident_params)
-
+      enabled_features.each do |k, v|
+        params[v.service_id.to_sym] = v.value
+      end
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
     end
@@ -185,6 +186,17 @@ module Spaceship
         appIdId: app_id
       })
       parse_response(r)
+    end
+
+    def update_app_name!(app_id, name, mac: false)
+      ensure_csrf(Spaceship::App)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/updateAppIdName.action", {
+        teamId: team_id,
+        appIdId: app_id,
+        name: valid_name_for(name)
+      })
+      parse_response(r, 'appId')
     end
 
     #####################################################
@@ -303,10 +315,10 @@ module Spaceship
       end
     end
 
-    def create_certificate!(type, csr, app_id = nil)
+    def create_certificate!(type, csr, app_id = nil, mac = false)
       ensure_csrf(Spaceship::Certificate)
 
-      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
         csrContent: csr,

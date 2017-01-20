@@ -1,6 +1,7 @@
 require 'fastlane/erb_template_helper'
 require 'ostruct'
 require 'uri'
+require 'cgi'
 
 module Fastlane
   module Actions
@@ -111,13 +112,13 @@ module Fastlane
         build_num = info['CFBundleVersion']
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
-        title = info['CFBundleName']
+        title = CGI.escapeHTML(info['CFBundleName'])
         device_family = info['UIDeviceFamily']
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
         s3_domain = AWS::Core::Endpoints.hostname(s3_region, 's3') || 's3.amazonaws.com'
-        plist_file_name ||= "#{url_part}#{title.delete(' ')}.plist"
+        plist_file_name ||= "#{url_part}#{URI.escape(title)}.plist"
         plist_url = URI::HTTPS.build(host: s3_domain, path: "/#{s3_bucket}/#{plist_file_name}").to_s
 
         html_file_name ||= "index.html"
@@ -433,7 +434,12 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `aws_s3` plugin instead.\n" \
+          "Install using `fastlane add_plugin aws_s3`."
       end
     end
   end

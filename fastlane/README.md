@@ -23,7 +23,7 @@ fastlane
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane/LICENSE)
-[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
+[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 
 ######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
@@ -86,7 +86,7 @@ fastlane release
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
-:ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
+:ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for both iOS, Mac OS and Android apps

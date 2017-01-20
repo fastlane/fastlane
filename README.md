@@ -7,7 +7,7 @@ fastlane
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
-[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
+[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 #### ✨ Check out [docs.fastlane.tools](https://docs.fastlane.tools) on how to get started with fastlane ✨
@@ -43,7 +43,7 @@ Then to deploy a new 'beta' version of your app just run
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
-:ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show output directly in test results
+:ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
 :hatching_chick: | Over 170 built-in integrations available
 :computer: | Support for iOS, Mac, and Android apps

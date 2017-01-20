@@ -1,8 +1,15 @@
-Thanks for contributing to _fastlane_! Before you submit your pull request, please make sure to check the following boxes:
+<!-- Thanks for contributing to _fastlane_! Before you submit your pull request, please make sure to check the following boxes by putting an x in the [ ] -->
 
-- [ ] Run `bundle exec rspec` from the root directory.
-- [ ] Run `bundle exec rubocop -a` to ensure the code style is valid
-- [ ] Read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
-- [ ] We currently don't accept new actions, please publish a plugin instead, more information in [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md)
+### Checklist
+- [ ] I've run `bundle exec rspec` from the root directory to see all new and existing tests pass
+- [ ] I've followed the _fastlane_ code style and run `bundle exec rubocop -a` to ensure the code style is valid
+- [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I've updated the documentation if necessary.
 
-Before submitting a pull request, we appreciate if you create an issue first to discuss the change :+1:
+### Description
+<!--- Describe your changes in detail -->
+
+### Motivation and Context
+<!--- Why is this change required? What problem does it solve? -->
+<!--- If it fixes an open issue, please link to the issue here. -->
+<!--- Please describe in detail how you tested your changes. --->

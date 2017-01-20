@@ -27,7 +27,7 @@ module Snapshot
       FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'snapshot'
+        c.syntax = 'fastlane snapshot'
         c.description = 'Take new screenshots based on the Snapfile.'
 
         c.action do |args, options|
@@ -39,7 +39,7 @@ module Snapshot
       end
 
       command :init do |c|
-        c.syntax = 'snapshot init'
+        c.syntax = 'fastlane snapshot init'
         c.description = "Creates a new Snapfile in the current directory"
 
         c.action do |args, options|
@@ -50,7 +50,7 @@ module Snapshot
       end
 
       command :update do |c|
-        c.syntax = 'snapshot update'
+        c.syntax = 'fastlane snapshot update'
         c.description = "Updates your SnapshotHelper.swift to the latest version"
 
         c.action do |args, options|
@@ -60,7 +60,7 @@ module Snapshot
       end
 
       command :reset_simulators do |c|
-        c.syntax = 'snapshot reset_simulators'
+        c.syntax = 'fastlane snapshot reset_simulators'
         c.description = "This will remove all your existing simulators and re-create new ones"
         c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
         c.option '--force', 'Disables confirmation prompts'
@@ -75,7 +75,7 @@ module Snapshot
       end
 
       command :clear_derived_data do |c|
-        c.syntax = 'snapshot clear_derived_data -f path'
+        c.syntax = 'fastlane snapshot clear_derived_data -f path'
         c.description = "Clear the directory where build products and other derived data will go"
 
         c.action do |args, options|

@@ -7,7 +7,7 @@ module FastlaneCore
       #
       #    which('ruby') #=> /usr/bin/ruby
       #
-      # Derived from http://stackoverflow.com/a/5471032/3005
+      # Derived from https://stackoverflow.com/a/5471032/3005
       def which(cmd)
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"

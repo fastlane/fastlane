@@ -33,7 +33,7 @@ module Spaceship
       # Example:
       # name: DES5c148586daa451e55afb017aa62418f91
       # value: HSARMTKNSRVTWFlaF/ek8asaa9lymMA0dN8JQ6pY7B3F5kdqTxJvMT19EVEFX8EQudB/uNwBHOHzaa30KYTU/eCP/UF7vGTgxs6PAnlVWKscWssOVHfP2IKWUPaa4Dn+I6ilA7eAFQsiaaVT
-      cookies = YAML.load(itc_cookie_content)
+      cookies = YAML.safe_load(itc_cookie_content)
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|

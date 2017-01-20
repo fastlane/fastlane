@@ -31,7 +31,7 @@ snapshot
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/snapshot/LICENSE)
-[![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
+[![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](https://rubygems.org/gems/snapshot)
 
 ###### Automate taking localized screenshots of your iOS and tvOS apps on every device
 
@@ -153,6 +153,8 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 [Snapshot setupSnapshot:app];
 [app launch];
 ```
+
+_Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
 
 ![assets/snapshot.gif](assets/snapshot.gif)
 

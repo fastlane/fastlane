@@ -25,7 +25,7 @@ module Cert
       FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
 
       command :create do |c|
-        c.syntax = 'cert create'
+        c.syntax = 'fastlane cert create'
         c.description = 'Create new iOS code signing certificates'
 
         c.action do |args, options|
@@ -35,7 +35,7 @@ module Cert
       end
 
       command :revoke_expired do |c|
-        c.syntax = 'cert revoke_expired'
+        c.syntax = 'fastlane cert revoke_expired'
         c.description = 'Revoke expired iOS code signing certificates'
 
         c.action do |args, options|

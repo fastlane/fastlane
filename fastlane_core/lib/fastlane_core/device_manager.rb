@@ -71,14 +71,8 @@ module FastlaneCore
 
         device_uuids = []
         result = Plist.parse_xml(usb_devices_output)
-        result[0]['_items'].each do |host_controller| # loop just incase the host system has more then 1 controller
-          host_controller['_items'].each do |usb_device|
-            is_supported_device = device_types.any? { |device_type| usb_device['_name'] == device_type }
-            if is_supported_device && usb_device['serial_num'].length == 40
-              device_uuids.push(usb_device['serial_num'])
-            end
-          end
-        end
+
+        discover_devices(result[0], device_types, device_uuids) if result[0]
 
         if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
           instruments_devices_output = ''
@@ -98,6 +92,21 @@ module FastlaneCore
         end
 
         return devices
+      end
+
+      # Recursively handle all USB items, discovering devices that match the
+      # desired types.
+      def discover_devices(usb_item, device_types, discovered_device_udids)
+        (usb_item['_items'] || []).each do |child_item|
+          discover_devices(child_item, device_types, discovered_device_udids)
+        end
+
+        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        has_serial_number = (usb_item['serial_num'] || '').length == 40
+
+        if is_supported_device && has_serial_number
+          discovered_device_udids << usb_item['serial_num']
+        end
       end
 
       # The code below works from Xcode 7 on

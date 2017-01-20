@@ -8,13 +8,13 @@ Before you start working on _fastlane_, you should have [Bundler][bundler] insta
 
 The core team usually tags issues that are ready to be worked on and easily accessible for new contributors with the [“you can do this” label][you can do this]. If you’ve never contributed to _fastlane_ before, these are a great place to start!
 
-If you want to work on something else, e.g. new functionality or fixing a bug, we kindly ask you to submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
+If you want to work on something else, e.g. new functionality or fixing a bug, if would be helpful if you submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
 
 ## Checking out the _fastlane_ repo
 
 - Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane]
 - Clone your fork:
-  - `git clone <YOUR_GITHUB_USER> git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
+  - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
   - Run `bundle install` in the project root
   - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
@@ -28,19 +28,21 @@ If you want to work on something else, e.g. new functionality or fixing a bug, w
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
-First, navigate into the sub-directory of the tool you want to test.
-
-To run the automated unit tests
+First, navigate into the root of the _fastlane_ project and run unit tests using
 
 ```
 bundle exec rspec
 ```
+
+If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
 
 To verify and auto-fix the code style
 
 ```
 bundle exec rubocop -a
 ```
+
+If you want to run code style verification only for one tool, use `bundle exec rubocop -a [tool_name]`
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application.
 
