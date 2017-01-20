@@ -63,11 +63,7 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
-      install_apks(device_serial, app_apk_path, tests_apk_path)
-
-      grant_permissions(device_serial)
-
-      run_tests(device_serial, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
+      run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
@@ -189,6 +185,20 @@ module Screengrab
       UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")
     end
 
+    def uninstall_apks(device_serial, app_package_name, tests_package_name)
+      UI.message 'Uninstalling app APK'
+      apk_uninstall_output = run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                                             print_all: true,
+                                             print_command: true)
+      UI.user_error! "App APK could not be uninstalled" if apk_uninstall_output.include?("Failure [")
+
+      UI.message 'Uninstalling tests APK'
+      apk_uninstall_output = run_adb_command("adb -s #{device_serial} uninstall -r #{tests_package_name}",
+                                             print_all: true,
+                                             print_command: true)
+      UI.user_error! "Tests APK could not be uninstalled" if apk_uninstall_output.include?("Failure [")
+    end
+
     def grant_permissions(device_serial)
       UI.message 'Granting the permission necessary to change locales on the device'
       run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.CHANGE_CONFIGURATION",
@@ -210,27 +220,41 @@ module Screengrab
       end
     end
 
-    def run_tests(device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+    def run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, launch_arguments)
+      unless @config[:reinstall_app]
+        install_apks(device_serial, app_apk_path, tests_apk_path)
+        grant_permissions(device_serial)
+      end
+
       @config[:locales].each do |locale|
-        UI.message "Running tests for locale: #{locale}"
-
-        instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
-                              "-e testLocale #{locale.tr('-', '_')}",
-                              "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
-        instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
-        instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
-        instrument_command << launch_arguments.map { |item| '-e ' + item }.join(' ') if launch_arguments
-        instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
-
-        test_output = run_adb_command(instrument_command.join(" \\\n"),
-                                      print_all: true,
-                                      print_command: true)
-
-        if @config[:exit_on_test_failure]
-          UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
-        else
-          UI.error("Tests failed") if test_output.include?("FAILURES!!!")
+        if @config[:reinstall_app]
+          uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
+          install_apks(device_serial, app_apk_path, tests_apk_path)
+          grant_permissions(device_serial)
         end
+        run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+      end
+    end
+
+    def run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+      UI.message "Running tests for locale: #{locale}"
+
+      instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
+                            "-e testLocale #{locale.tr('-', '_')}",
+                            "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
+      instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
+      instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
+      instrument_command << launch_arguments.map { |item| '-e ' + item }.join(' ') if launch_arguments
+      instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
+
+      test_output = run_adb_command(instrument_command.join(" \\\n"),
+                                    print_all: true,
+                                    print_command: true)
+
+      if @config[:exit_on_test_failure]
+        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
+      else
+        UI.error("Tests failed") if test_output.include?("FAILURES!!!")
       end
     end
 
