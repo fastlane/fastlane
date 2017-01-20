@@ -315,10 +315,10 @@ module Spaceship
       end
     end
 
-    def create_certificate!(type, csr, app_id = nil)
+    def create_certificate!(type, csr, app_id = nil, mac = false)
       ensure_csrf(Spaceship::Certificate)
 
-      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
         csrContent: csr,
