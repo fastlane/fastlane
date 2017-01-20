@@ -21,6 +21,8 @@ describe Screengrab::Runner do
 
   describe :run_tests do
     let(:device_serial) { 'device_serial' }
+    let(:app_apk_path) { 'fake_apk_path' }
+    let(:tests_apk_path) { 'fake_apk_path' }
     let(:test_classes_to_use) { nil }
     let(:test_packages_to_use) { nil }
 
@@ -33,7 +35,7 @@ describe Screengrab::Runner do
       it 'sets custom launch_arguments' do
         expect(mock_executor).to receive(:execute)
           .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500 \\\n/"))
-        @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
+        @runner.run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
 
@@ -56,7 +58,7 @@ describe Screengrab::Runner do
           it 'prints an error and exits the program' do
             expect(ui).to receive(:user_error!).with("Tests failed", show_github_issues: false).and_call_original
 
-            expect { @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_error
+            expect { @runner.run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_error
           end
         end
 
@@ -68,7 +70,7 @@ describe Screengrab::Runner do
           it 'prints an error and does not exit the program' do
             expect(ui).to receive(:error).with("Tests failed").and_call_original
 
-            @runner.run_tests(device_serial, test_classes_to_use, test_packages_to_use, nil)
+            @runner.run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, nil)
           end
         end
       end
