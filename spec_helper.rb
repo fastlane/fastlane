@@ -41,3 +41,26 @@ RSpec.configure do |config|
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
 end
+
+module FastlaneSpec
+  module Env
+    # a wrapper to temporarily modify the values of ARGV to
+    # avoid errors like: "warning: already initialized constant ARGV"
+    # if no block is given, modifies ARGV for good
+    # rubocop:disable Style/MethodName
+    def self.with_ARGV(argv)
+      copy = ARGV.dup
+      ARGV.clear
+      ARGV.concat(argv)
+      if block_given?
+        begin
+          yield
+        ensure
+          ARGV.clear
+          ARGV.concat(copy)
+        end
+      end
+    end
+    # rubocop:enable Style/MethodName
+  end
+end
