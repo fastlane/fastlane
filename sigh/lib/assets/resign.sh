@@ -66,7 +66,7 @@
 log() {
     # Make sure it returns 0 code even when verose mode is off (test 1)
     # To use like [[ condition ]] && log "x" && something
-    [[ -n "$VERBOSE" ]] && echo -e "$@" || test 1
+    if [[ -n "$VERBOSE" ]]; then echo -e "$@"; else test 1; fi
 }
 
 error() {
