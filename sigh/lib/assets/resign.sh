@@ -301,7 +301,9 @@ fi
 # Set the app name
 # In Payload directory may be another file except .app file, such as StoreKit folder.
 # Search the first .app file within the Payload directory
-APP_NAME=$(ls "$TEMP_DIR/Payload/"|grep ".app$"| head -1)
+# TODO: Replace with glob or call to 'find'; and remove shellcheck directive
+# shellcheck disable=SC2010
+APP_NAME=$(ls "$TEMP_DIR/Payload/" | grep ".app$" | head -1)
 
 # Make sure that PATH includes the location of the PlistBuddy helper tool as its location is not standard
 export PATH=$PATH:/usr/libexec
@@ -696,6 +698,8 @@ function resign {
             # Add new entry to patched entitlements
             # plutil needs dots in the key path to be escaped (e.g. com\.apple\.security\.application-groups)
             # otherwise it interprets they key path as nested keys
+            # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
+            # shellcheck disable=SC2001
             PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
@@ -794,6 +798,8 @@ log "Repackaging as $NEW_FILE"
 # Zip all the contents, saving the zip file in the above directory
 # Navigate back to the orignating directory (sending the output to null)
 pushd "$TEMP_DIR" > /dev/null
+# TODO: Fix shellcheck warning and remove directive
+# shellcheck disable=SC2035
 zip -qry "../$TEMP_DIR.ipa" *
 popd > /dev/null
 
