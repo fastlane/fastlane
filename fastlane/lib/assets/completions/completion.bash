@@ -15,7 +15,7 @@ _fastlane_complete() {
   fi
 
   # parse 'beta' out of 'lane :beta do', etc
-  completions=`cat $file | grep "^\s*lane \:" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+  completions=$(grep "^\s*lane \:" $file | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}')
 
   COMPREPLY=( $(compgen -W "$completions" -- "$word") )
 }
