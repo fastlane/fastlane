@@ -173,23 +173,24 @@ module Fastlane
       return unless base_path
       require 'dotenv'
 
-      envs = envs.split(",") if envs # multiple envs?
-
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = envs if envs
-
       # Making sure the default '.env' and '.env.default' get loaded
       env_file = File.join(base_path, '.env')
       env_default_file = File.join(base_path, '.env.default')
       Dotenv.load(env_file, env_default_file)
 
-      # Loads .env file for the environment passed in through options
-      if envs
-        envs = [envs] unless envs.kind_of? Array
-        envs.each do |env|
-          env_file = File.join(base_path, ".env.#{env}")
-          UI.success "Loading from '#{env_file}'"
-          Dotenv.overload(env_file)
-        end
+      return unless envs
+
+      envs = envs.split(",") # multiple envs?
+
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = envs
+
+      # Loads .env file for the environment(s) passed in through options
+      envs = [envs] unless envs.kind_of? Array
+
+      envs.each do |env|
+        env_file = File.join(base_path, ".env.#{env}")
+        UI.success "Loading from '#{env_file}'"
+        Dotenv.overload(env_file)
       end
     end
 
