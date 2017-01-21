@@ -448,7 +448,7 @@ function resign {
         if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
         then
             log "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'"
-            `PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"`
+            PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"
         fi
     fi
 
@@ -498,7 +498,7 @@ function resign {
     if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
     then
         log "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'"
-        `PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"`
+        PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"
         checkStatus
     fi
 
@@ -509,8 +509,8 @@ function resign {
         if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
         then
             log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
-            `PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"`
-            `PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"`
+            PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"
+            PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"
         fi
     fi
 
@@ -569,7 +569,7 @@ function resign {
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
-                `PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
+                PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
             fi
         fi
     done
