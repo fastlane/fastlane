@@ -46,7 +46,7 @@ Then to deploy a new 'beta' version of your app just run
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
 :hatching_chick: | Over 170 built-in integrations available
-:computer: | Support for iOS, Mac, and Android apps
+:computer: | Support for iOS, macOS, and Android apps
 :octocat: | Full Git and Mercurial support
 
 <hr />

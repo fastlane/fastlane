@@ -101,7 +101,7 @@ module CredentialsManager
 
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
-      puts "The login information you enter will be stored in your Mac OS Keychain".green
+      puts "The login information you enter will be stored in your macOS Keychain".green
       if default_prefix?
         # We don't want to show this message, if we ask for the application specific password
         # which has a different prefix
