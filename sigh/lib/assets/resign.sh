@@ -309,6 +309,7 @@ export PATH=$PATH:/usr/libexec
 # The first one may contain the wildcard character '*', in which case pattern matching will be used unless the third parameter is "STRICT"
 function does_bundle_id_match {
 
+    # shellcheck disable=SC2049
     if [[ "$1" == "$2" ]]; then
         return 0
     elif [[ "$3" != STRICT && "$1" =~ \* ]]; then
@@ -427,6 +428,7 @@ function resign {
 
     # Use provisioning profile's bundle identifier
     if [ "$BUNDLE_IDENTIFIER" == "" ]; then
+        # shellcheck disable=SC2049
         if [[ "$PROVISION_BUNDLE_IDENTIFIER" =~ \* ]]; then
             log "Bundle Identifier contains a *, using the current bundle identifier"
             BUNDLE_IDENTIFIER="$CURRENT_BUNDLE_IDENTIFIER"
@@ -556,7 +558,7 @@ function resign {
 
     # Check for and update bundle identifiers for extensions and associated nested apps
     log "Fixing nested app and extension references"
-    for key in ${NESTED_APP_REFERENCE_KEYS[@]}; do
+    for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
         REF_BUNDLE_ID=`PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null`
         if [ -n "$REF_BUNDLE_ID" ];
@@ -566,6 +568,7 @@ function resign {
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
             # Change if not the same and if doesn't contain wildcard
+            # shellcheck disable=SC2049
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
@@ -671,7 +674,7 @@ function resign {
             "keychain-access-groups|APP_ID")
 
         # Loop over all the entitlement keys that need to be transferred from app entitlements
-        for RULE in ${ENTITLEMENTS_TRANSFER_RULES[@]}; do
+        for RULE in "${ENTITLEMENTS_TRANSFER_RULES[@]}"; do
             KEY=$(echo $RULE | cut -d'|' -f1)
             ID_TYPE=$(echo $RULE | cut -d'|' -f2)
 
