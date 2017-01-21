@@ -23,6 +23,7 @@
 # -----
 
 which rvm > /dev/null
+# shellcheck disable=SC2181
 if [[ $? -eq 0 ]]; then
   echo "RVM detected, forcing to use system ruby"
   # This allows you to use rvm in a script. Otherwise you get a BS
