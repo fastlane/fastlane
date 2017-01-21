@@ -14,4 +14,4 @@ test:
   override:
     - bundle exec rspec -r rspec_junit_formatter --format progress --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml
     - bundle exec rubocop
-    - find -E . -regex ".*\.(sh|bash)" -exec shellcheck {} +
+    - find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -exec shellcheck {} +
