@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
 
-  spec.required_ruby_version = '>= 2.0.0'
+  spec.required_ruby_version = ['>= 2.2.0', '< 2.4.0']
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"]
   spec.bindir = "bin"
