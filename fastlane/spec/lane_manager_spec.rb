@@ -62,9 +62,6 @@ describe Fastlane do
             end
             Dir.chdir(dir) do
               ff = Fastlane::LaneManager.load_dot_env(envs)
-              ENV.each do |k, v|
-                puts "#{k} = #{v}"
-              end
               expected_values.each do |k, v|
                 expect(ENV[k.to_s]).to eq(v)
               end
