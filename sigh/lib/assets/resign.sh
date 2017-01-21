@@ -87,7 +87,7 @@ function checkStatus {
 }
 
 usage() {
-    echo -e "Usage: $(basename $0) source identity -p|--provisioning provisioning" >&2
+    echo -e "Usage: $(basename "$0") source identity -p|--provisioning provisioning" >&2
     echo -e "\t\t[-e|--entitlements entitlements]" >&2
     echo -e "\t\t[-k|--keychain keychain]" >&2
     echo -e "\t\t[-d|--display-name displayName]" >&2
@@ -97,7 +97,7 @@ usage() {
     echo -e "\t\t[-b|--bundle-id bundleId]" >&2
     echo -e "\t\t[--use-app-entitlements]" >&2
     echo -e "\t\toutputIpa" >&2
-    echo "Usage: $(basename $0) -h|--help" >&2
+    echo "Usage: $(basename "$0") -h|--help" >&2
     echo "Options:" >&2
     echo -e "\t-p, --provisioning provisioning\t\tProvisioning profile option, may be provided multiple times." >&2
     echo -e "\t\t\t\t\t\tYou can specify provisioning profile file name." >&2
@@ -292,9 +292,9 @@ fi
 # check the keychain
 if [ "${KEYCHAIN}" != "" ];
 then
-    security list-keychains -s $KEYCHAIN
-    security unlock $KEYCHAIN
-    security default-keychain -s $KEYCHAIN
+    security list-keychains -s "$KEYCHAIN"
+    security unlock "$KEYCHAIN"
+    security default-keychain -s "$KEYCHAIN"
 fi
 
 # Set the app name
@@ -548,7 +548,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
             then
-                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
+                /usr/bin/codesign ${VERBOSE} "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
@@ -564,7 +564,7 @@ function resign {
         if [ -n "$REF_BUNDLE_ID" ];
         then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
-            REF_PROVISION=$(provision_for_bundle_id $REF_BUNDLE_ID)
+            REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
@@ -675,8 +675,8 @@ function resign {
 
         # Loop over all the entitlement keys that need to be transferred from app entitlements
         for RULE in "${ENTITLEMENTS_TRANSFER_RULES[@]}"; do
-            KEY=$(echo $RULE | cut -d'|' -f1)
-            ID_TYPE=$(echo $RULE | cut -d'|' -f2)
+            KEY=$(echo "$RULE" | cut -d'|' -f1)
+            ID_TYPE=$(echo "$RULE" | cut -d'|' -f2)
 
             # Get the entry from app's entitlements
             # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
@@ -759,7 +759,7 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
         cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
 
