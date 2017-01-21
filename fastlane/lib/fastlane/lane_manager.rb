@@ -161,7 +161,7 @@ module Fastlane
       end
     end
 
-    def self.load_dot_env(env)
+    def self.load_dot_env(envs)
       # find the first directory of [fastlane, its parent] containing dotenv files
       path = FastlaneCore::FastlaneFolder.path
       search_paths = [path]
@@ -173,7 +173,9 @@ module Fastlane
       return unless base_path
       require 'dotenv'
 
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
+      envs = envs.split(",") if envs # multiple envs?
+
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = envs if envs
 
       # Making sure the default '.env' and '.env.default' get loaded
       env_file = File.join(base_path, '.env')
@@ -181,10 +183,13 @@ module Fastlane
       Dotenv.load(env_file, env_default_file)
 
       # Loads .env file for the environment passed in through options
-      if env
-        env_file = File.join(base_path, ".env.#{env}")
-        UI.success "Loading from '#{env_file}'"
-        Dotenv.overload(env_file)
+      if envs
+        envs = [envs] unless envs.kind_of? Array
+        envs.each do |env|
+          env_file = File.join(base_path, ".env.#{env}")
+          UI.success "Loading from '#{env_file}'"
+          Dotenv.overload(env_file)
+        end
       end
     end
 
