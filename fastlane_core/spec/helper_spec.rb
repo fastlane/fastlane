@@ -58,7 +58,7 @@ describe FastlaneCore do
       end
     end
 
-    # Mac OS only (to work on Linux)
+    # macOS only (to work on Linux)
     if FastlaneCore::Helper.is_mac?
       describe "Xcode" do
         # Those tests also work when using a beta version of Xcode

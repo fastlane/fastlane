@@ -18,7 +18,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 Requirements:
 
-- Mac OS 10.9 or newer
+- macOS 10.9 or newer
 - Ruby 2.0 or newer (`ruby -v`)
 - Xcode
 

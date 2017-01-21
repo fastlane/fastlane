@@ -43,7 +43,7 @@ module Snapshot
 
     def self.check_simctl
       unless `xcrun simctl`.include? "openurl"
-        UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and Mac OS installed.")
+        UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and macOS installed.")
       end
     end
   end
