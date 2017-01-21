@@ -29,6 +29,7 @@ module Fastlane
         destination_timeout: "-destination-timeout",
         dry_run: "-dry-run",
         enableAddressSanitizer: "-enableAddressSanitizer",
+        enableThreadSanitizer: "-enableThreadSanitizer",
         enableCodeCoverage: "-enableCodeCoverage",
         export_archive: "-exportArchive",
         export_format: "-exportFormat",
@@ -150,6 +151,9 @@ module Fastlane
 
           if params.key? :enable_address_sanitizer
             params[:enableAddressSanitizer] = params[:enable_address_sanitizer] ? 'YES' : 'NO'
+          end
+          if params.key? :enable_thread_sanitizer
+            params[:enableThreadSanitizer] = params[:enable_thread_sanitizer] ? 'YES' : 'NO'
           end
           if params.key? :enable_code_coverage
             params[:enableCodeCoverage] = params[:enable_code_coverage] ? 'YES' : 'NO'
