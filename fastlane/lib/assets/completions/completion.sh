@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2155
 if [ -n "$BASH_VERSION" ]; then
   source ~/.fastlane/completions/completion.bash
 

@@ -1,4 +1,5 @@
 #!/bin/bash --login
+# shellcheck disable=SC2155
 
 # Originally from, https://stackoverflow.com/questions/33041109
 # Modified to work in RVM and non RVM environments

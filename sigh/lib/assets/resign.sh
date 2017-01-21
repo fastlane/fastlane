@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2155
 
 # Copyright (c) 2011 Float Mobile Learning
 # http://www.floatlearning.com/
@@ -224,7 +225,7 @@ then
 fi
 
 # Log the options
-for provision in ${RAW_PROVISIONS[@]}; do
+for provision in "${RAW_PROVISIONS[@]}"; do
     if [[ "$provision" =~ .+=.+ ]]; then
         log "Specified provisioning profile: '${provision#*=}' for bundle identifier: '${provision%%=*}'"
     else
