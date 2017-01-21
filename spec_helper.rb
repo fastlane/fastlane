@@ -7,6 +7,14 @@ WebMock.disable_net_connect!(allow: 'coveralls.io')
 require "fastlane"
 UI = FastlaneCore::UI
 
+unless FastlaneCore::Helper.xcode_path.include?("Contents/Developer")
+  UI.error("Seems like you didn't set the developer tools path correctly")
+  UI.error("Please run the following on your machine")
+  UI.command("sudo xcode-select -s /Applications/Xcode.app")
+  UI.error("Adapt the path if you have Xcode installed/named somewhere else")
+  exit(1)
+end
+
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
