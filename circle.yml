@@ -4,8 +4,10 @@ machine:
   xcode:
     version: "7.3"
 dependencies:
+  pre:
+    - brew install shellcheck
   override:
-    - bundle install --jobs=4 --retry=3
+    - bundle install --jobs=4 --retry=3    
 test:
   pre:
     - ulimit -n 400
