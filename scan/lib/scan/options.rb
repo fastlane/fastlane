@@ -63,11 +63,23 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :code_coverage,
                                      description: "Should generate code coverage (Xcode 7 only)?",
                                      is_string: false,
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :address_sanitizer,
                                      description: "Should turn on the address sanitizer?",
                                      is_string: false,
-                                     default_value: false),
+                                     optional: true,
+                                     conflicting_options: [:thread_sanitizer],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'address_sanitizer' and 'thread_sanitizer' options in one run")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :thread_sanitizer,
+                                     description: "Should turn on the thread sanitizer?",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:address_sanitizer],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'thread_sanitizer' and 'address_sanitizer' options in one run")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_build,
                                      description: "Should skip debug build before test build?",
                                      short_option: "-r",
