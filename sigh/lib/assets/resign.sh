@@ -337,7 +337,7 @@ function provision_for_bundle_id {
 # Find the bundle identifier contained inside a provisioning profile
 function bundle_id_for_provison {
 
-    local FULL_BUNDLE_ID=`PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< $(security cms -D -i "$1")`
+    local FULL_BUNDLE_ID=$(PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< "$(security cms -D -i "$1")")
     checkStatus
     echo "${FULL_BUNDLE_ID#*.}"
 }
@@ -348,7 +348,7 @@ function add_provision_for_bundle_id {
     local PROVISION="$1"
     local BUNDLE_ID="$2"
 
-    local CURRENT_PROVISION=`provision_for_bundle_id "$BUNDLE_ID" STRICT`
+    local CURRENT_PROVISION=$(provision_for_bundle_id "$BUNDLE_ID" STRICT)
 
     if [[ "$CURRENT_PROVISION" != "" && "$CURRENT_PROVISION" != "$PROVISION" ]]; then
         error "Conflicting provisioning profiles '$PROVISION' and '$CURRENT_PROVISION' for bundle identifier '$BUNDLE_ID'."
@@ -373,7 +373,7 @@ function add_provision {
         error "Provisioning profile '$PROVISION' file does not exist"
     fi
 
-    local BUNDLE_ID=`bundle_id_for_provison "$PROVISION"`
+    local BUNDLE_ID=$(bundle_id_for_provison "$PROVISION")
     add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
 }
 
@@ -407,9 +407,9 @@ function resign {
     cp -f "$APP_PATH/Info.plist" "$TEMP_DIR/oldInfo.plist"
 
     # Read in current values from the app
-    local CURRENT_NAME=`PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist"`
-    local CURRENT_BUNDLE_IDENTIFIER=`PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist"`
-    local NEW_PROVISION=`provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}"`
+    local CURRENT_NAME=$(PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist")
+    local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
+    local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
 
     if [[ "$NEW_PROVISION" == "" && "$NESTED" != NESTED ]]; then
         NEW_PROVISION="$DEFAULT_PROVISION"
@@ -424,7 +424,7 @@ function resign {
         error "Use the -p option (example: -p com.example.app=xxxx.mobileprovision)"
     fi
 
-    local PROVISION_BUNDLE_IDENTIFIER=`bundle_id_for_provison "$NEW_PROVISION"`
+    local PROVISION_BUNDLE_IDENTIFIER=$(bundle_id_for_provison "$NEW_PROVISION")
 
     # Use provisioning profile's bundle identifier
     if [ "$BUNDLE_IDENTIFIER" == "" ]; then
@@ -459,10 +459,10 @@ function resign {
     security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
     checkStatus
 
-    APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
+    APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
     if [ "$APP_IDENTIFIER_PREFIX" == "" ];
     then
-        APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"`
+        APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist")
         if [ "$APP_IDENTIFIER_PREFIX" == "" ];
         then
             error "Failed to extract any app identifier prefix from '$NEW_PROVISION'"
@@ -476,10 +476,10 @@ function resign {
     # Set new app identifer prefix if such entry exists in plist file
     PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
 
-    TEAM_IDENTIFIER=`PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n'`
+    TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
     if [ "$TEAM_IDENTIFIER" == "" ];
     then
-        TEAM_IDENTIFIER=`PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist"`
+        TEAM_IDENTIFIER=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist")
         if [ "$TEAM_IDENTIFIER" == "" ];
         then
             warning "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher"
@@ -507,7 +507,7 @@ function resign {
     # Update the version number properties in the Info.plist if a version number has been provided
     if [ "$VERSION_NUMBER" != "" ];
     then
-        CURRENT_VERSION_NUMBER=`PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist"`
+        CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")
         if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
         then
             log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
@@ -560,13 +560,13 @@ function resign {
     log "Fixing nested app and extension references"
     for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
-        REF_BUNDLE_ID=`PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null`
+        REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
         if [ -n "$REF_BUNDLE_ID" ];
         then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
-            REF_PROVISION=`provision_for_bundle_id $REF_BUNDLE_ID`
+            REF_PROVISION=$(provision_for_bundle_id $REF_BUNDLE_ID)
             # Map to the new bundle id
-            NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
+            NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
             # shellcheck disable=SC2049
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
@@ -582,7 +582,7 @@ function resign {
         if [ -n "$APP_IDENTIFIER_PREFIX" ];
         then
             # sanity check the 'application-identifier' is present in the provided entitlements and matches the provisioning profile value
-            ENTITLEMENTS_APP_ID_PREFIX=`PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
+            ENTITLEMENTS_APP_ID_PREFIX=$(PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
             if [ "$ENTITLEMENTS_APP_ID_PREFIX" == "" ];
             then
                 error "Provided entitlements file is missing a value for the required 'application-identifier' key"
@@ -595,7 +595,7 @@ function resign {
         if [ -n "$TEAM_IDENTIFIER" ];
         then
             # sanity check the 'com.apple.developer.team-identifier' is present in the provided entitlements and matches the provisioning profile value
-            ENTITLEMENTS_TEAM_IDENTIFIER=`PlistBuddy -c "Print :com.apple.developer.team-identifier" "$ENTITLEMENTS" | tr -d '\n'`
+            ENTITLEMENTS_TEAM_IDENTIFIER=$(PlistBuddy -c "Print :com.apple.developer.team-identifier" "$ENTITLEMENTS" | tr -d '\n')
             if [ "$ENTITLEMENTS_TEAM_IDENTIFIER" == "" ];
             then
                 error "Provided entitlements file is missing a value for the required 'com.apple.developer.team-identifier' key"
@@ -695,7 +695,7 @@ function resign {
             # Add new entry to patched entitlements
             # plutil needs dots in the key path to be escaped (e.g. com\.apple\.security\.application-groups)
             # otherwise it interprets they key path as nested keys
-            PLUTIL_KEY=`echo "$KEY" | sed 's/\./\\\\./g'`
+            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
             # Patch the ID value if specified
