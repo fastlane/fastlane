@@ -1,10 +1,11 @@
 #!/bin/sh
 # shellcheck disable=SC2155
-if [ -n "$BASH_VERSION" ]; then
-  source ~/.fastlane/completions/completion.bash
+# shellcheck disable=SC1090
 
+if [ -n "$BASH_VERSION" ]; then
+  . ~/.fastlane/completions/completion.bash
 elif [ -n "$ZSH_VERSION" ]; then
-  source ~/.fastlane/completions/completion.zsh
+  . ~/.fastlane/completions/completion.zsh
 fi
 
 # Do not remove v0.0.1
