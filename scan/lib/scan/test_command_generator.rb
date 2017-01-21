@@ -35,8 +35,9 @@ module Scan
         options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-        options << "-enableCodeCoverage YES" if config[:code_coverage]
-        options << "-enableAddressSanitizer YES" if config[:address_sanitizer]
+        options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
+        options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
+        options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
