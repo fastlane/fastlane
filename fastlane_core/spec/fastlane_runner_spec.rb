@@ -61,9 +61,12 @@ describe Commander::Runner do
       expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
       expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
 
-      expect do
-        CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
-      end.to raise_error(SystemExit)
+      stdout, stderr = capture_stds do
+        expect do
+          CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
+        end.to raise_error(SystemExit)
+      end
+      expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneError".red + "\n")
     end
   end
 
