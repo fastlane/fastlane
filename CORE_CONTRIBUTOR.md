@@ -30,6 +30,8 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 ### Pull Request Ownership:
 We work in a high-trust environment which implies that anyone and everyone is able to merge pull requests from the community. If the PR reviewer feels strongly about seeing a PR to completion, they should assign it to themselves and request necessary changes.
 
+### Adding Dependencies:
+We want to keep _fastlane_ slim and robust. Please avoid adding new dependencies to the code base unless it is necessary. In the event that a PR does add a dependency, please ping a member of the _fastlane_ team to approve the pull request.
 
 __Most Importantly__, our community prides itself in our supportive and friendly attitude. Above all else, we are always:
 - Polite
