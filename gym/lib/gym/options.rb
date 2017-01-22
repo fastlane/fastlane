@@ -253,7 +253,7 @@ module Gym
                                      env_name: "GYM_ANALYZE_BUILD_TIME",
                                      description: "Analyze the project build time and store the output in culprit.txt file",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",
