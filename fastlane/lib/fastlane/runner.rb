@@ -192,7 +192,7 @@ module Fastlane
         # Call the platform specific after block and then the general one
         execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
 
-        UI.message "Cruising back to lane '#{original_full}'  🚘"
+        UI.message "Cruising back to lane '#{original_full}' 🚘"
         return result
       else
         raise LaneNotAvailableError.new, "Lane not found"
