@@ -188,6 +188,18 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --reporter json")
         end
       end
+
+      context "when specify quiet option" do
+        it "adds quiet option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              quiet: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --quiet")
+        end
+      end
     end
   end
 end
