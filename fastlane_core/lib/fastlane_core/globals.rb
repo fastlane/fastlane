@@ -14,8 +14,7 @@ module FastlaneCore
     end
 
     def self.capture_output?
-      return false unless @capture_output
-      return true
+      return @capture_output
     end
 
     def self.captured_output?
@@ -26,8 +25,7 @@ module FastlaneCore
     end
 
     def self.verbose?
-      return false unless @verbose
-      return true
+      return @verbose
     end
   end
 end
