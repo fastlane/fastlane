@@ -25,7 +25,7 @@ module Supply
 
       always_trace!
 
-      global_option('--verbose') { FastlaneCore::Globals.verbose? = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :run do |c|
         c.syntax = 'fastlane supply'
