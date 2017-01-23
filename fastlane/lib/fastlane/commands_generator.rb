@@ -10,11 +10,11 @@ module Fastlane
     def self.start
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
-      FastlaneCore::Globals.verbose(true) if ARGV.include?("--verbose")
-      FastlaneCore::Globals.capture_output(true)  if ARGV.include?("--capture_output")
+      FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
+      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
       if ARGV.include?("--capture_output")
-        FastlaneCore::Globals.verbose(true)
-        FastlaneCore::Globals.capture_output(true)
+        FastlaneCore::Globals.verbose = true
+        FastlaneCore::Globals.capture_output = true
       end
       FastlaneCore::Swag.show_loader
 
