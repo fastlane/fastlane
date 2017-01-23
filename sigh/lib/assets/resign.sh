@@ -715,6 +715,33 @@ function resign {
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
         sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
 
+        log "Removing blacklisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+        BLACKLISTED_KEYS=(\
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            "com.apple.developer.icloud-container-environment" \
+            "com.apple.developer.icloud-container-identifiers" \
+            "com.apple.developer.icloud-services" \
+            "com.apple.developer.restricted-resource-mode" \
+            "com.apple.developer.ubiquity-container-identifiers" \
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            "inter-app-audio" \
+            "com.apple.developer.homekit" \
+            "com.apple.developer.healthkit" \
+            "com.apple.developer.in-app-payments" \
+            "com.apple.developer.associated-domains" \
+            "com.apple.security.application-groups" \
+            "com.apple.developer.maps" \
+            "com.apple.developer.networking.vpn.api" \
+            "com.apple.external-accessory.wireless-configuration"
+        )
+
+        # Blacklisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in ${BLACKLISTED_KEYS[@]}; do
+            log "Removing blacklisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
+
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
