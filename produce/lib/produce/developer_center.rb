@@ -9,7 +9,6 @@ module Produce
 
     def create_new_app
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
-      STDERR.puts "AAA"
       if app_exists?
         UI.success "[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center"
         ENV["CREATED_NEW_APP_ID"] = nil
