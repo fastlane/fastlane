@@ -21,8 +21,8 @@ describe Match do
         command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -43,8 +43,8 @@ describe Match do
         command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}' --depth 1"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -65,8 +65,8 @@ describe Match do
         command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -88,8 +88,8 @@ describe Match do
         command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -100,8 +100,8 @@ describe Match do
         command = "git branch --list origin/#{git_branch} --no-color -r"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -112,8 +112,8 @@ describe Match do
         command = "git checkout --orphan #{git_branch}"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
@@ -124,8 +124,8 @@ describe Match do
         command = "git reset --hard"
         to_params = {
           command: command,
-          print_all: nil,
-          print_command: nil
+          print_all: false,
+          print_command: false
         }
 
         expect(FastlaneCore::CommandExecutor).
