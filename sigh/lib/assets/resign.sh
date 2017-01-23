@@ -746,7 +746,7 @@ function resign {
         )
 
         # Blacklisted keys must not be included into new profile, so remove them from patched profile
-        for KEY in ${BLACKLISTED_KEYS[@]}; do
+        for KEY in "${BLACKLISTED_KEYS[@]}"; do
             log "Removing blacklisted key: $KEY"
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
         done
