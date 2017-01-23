@@ -21,7 +21,7 @@ module Produce
         app_service = Spaceship.app_service
         enabled_clean_options = {}
         Produce.config[:enabled_features].each do |k, v|
-          if k == :data_protection
+          if k.to_sym == :data_protection
             case v
             when "complete"
               enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete
@@ -30,7 +30,7 @@ module Produce
             when "untilfirstauth"
               enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
             end
-          elsif k == :icloud
+          elsif k.to_sym == :icloud
             case v
             when "legacy"
               enabled_clean_options[app_service.icloud.on.service_id] = app_service.icloud.on
