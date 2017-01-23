@@ -24,11 +24,11 @@ module Produce
           if k == :data_protection
             case v
             when "complete"
-              enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete.on
+              enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete
             when "unlessopen"
-              enabled_clean_options[app_service.data_protection.unlessopen.service_id] = app_service.data_protection.unlessopen.on
+              enabled_clean_options[app_service.data_protection.unlessopen.service_id] = app_service.data_protection.unlessopen
             when "untilfirstauth"
-              enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth.on
+              enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
             end
           elsif k == :icloud
             case v
