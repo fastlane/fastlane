@@ -74,7 +74,7 @@ module Fastlane
       end
     end
 
-    def filter_sensitive_options(o,args)
+    def filter_sensitive_options(o, args)
       if o.sensitive
         self.class.secrets << args.first[o.key.to_sym].to_s if args.first[o.key.to_sym] && !self.class.secrets.include?(args.first[o.key.to_sym].to_s)
         @action_vars.each do |e|
@@ -91,7 +91,7 @@ module Fastlane
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
       imported_file_content = File.read("#{path}/fastlane/Fastfile")
       fl_parser = FastfileParser.new(content: imported_file_content, filepath: @dirname, name: "Imported at #{@line_number}", change_dir: false, platforms: @platforms)
-      
+
       fl_parser.analyze
       @content << "#########################################\n"
       @content << "# BEGIN import_from_git at: #{@line_number} BEGIN\n"
@@ -127,7 +127,7 @@ module Fastlane
       end
     end
 
-    def detect_bad_options(bad_options_in,args)
+    def detect_bad_options(bad_options_in, args)
       return unless args.first.kind_of?(Hash)
       bad_options_in.each do |b|
         if args.first[b.to_sym]
@@ -199,8 +199,8 @@ module Fastlane
       # get deprecated and sensitive's
       options_available.each do |o|
         next unless o.kind_of?(FastlaneCore::ConfigItem)
-        filter_sensitive_options(o,args)
-        detect_deprecated_options(o,args)
+        filter_sensitive_options(o, args)
+        detect_deprecated_options(o, args)
       end
       # reenabled output
       reset_output
