@@ -9,12 +9,20 @@ describe Produce do
         enabled_features: { "data_protection" => "complete" },
         skip_itc: true
       }
-      Produce::Manager.start_producing
+      instance = Produce::DeveloperCenter.new
+      features = instance.enabled_features
+      expect(features["dataProtection"].value).to eq("complete")
+    end
 
-      # this does not get triggerd - HELP
-      # i would return true here, and check  if the `enabled_features` argument to create_new_app is the expected one
-      # but it just does not get called.
-      expect(Produce::DeveloperCenter).to receive(:create_new_app).with(anything).and_return(false)
+    it "accepts symbol'd hash" do
+      Produce.config = {
+        username: "helmut@januschka.com",
+        enabled_features: { data_protection: "complete" },
+        skip_itc: true
+      }
+      instance = Produce::DeveloperCenter.new
+      features = instance.enabled_features
+      expect(features["dataProtection"].value).to eq("complete")
     end
   end
 end
