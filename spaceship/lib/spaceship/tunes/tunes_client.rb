@@ -327,6 +327,11 @@ module Spaceship
       parse_response(r, 'data')['reviews']
     end
 
+    def get_iap(app_id)
+      r = request(:get, "ra/apps/#{app_id}/iaps")
+      parse_response(r, 'data')
+    end
+
     #####################################################
     # @!group AppVersions
     #####################################################

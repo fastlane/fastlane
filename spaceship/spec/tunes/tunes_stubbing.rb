@@ -64,6 +64,10 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/details").
         to_return(status: 200, body: itc_read_fixture_file('app_details.json'), headers: { 'Content-Type' => 'application/json' })
 
+      # In-App purchases
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
+        to_return(status: 200, body: itc_read_fixture_file('app_iaps.json'), headers: { 'Content-Type' => 'application/json' })
+
       # Versions History
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/stateHistory?platform=ios").
         to_return(status: 200, body: itc_read_fixture_file('app_versions_history.json'), headers: { 'Content-Type' => 'application/json' })

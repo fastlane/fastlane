@@ -1,0 +1,61 @@
+{
+    "data": [{
+        "adamId": "1148568401",
+        "referenceName": "1 Week Subscription",
+        "familyReferenceName": "1 Week Subscription",
+        "vendorId": "seven_days",
+        "addOnType": "ITC.addons.type.recurring",
+        "durationDays": 7,
+        "versions": [{
+            "screenshotUrl": null,
+            "canSubmit": false,
+            "issuesCount": 0,
+            "itunesConnectStatus": "readyForSale"
+        }],
+        "purpleSoftwareAdamIds": ["1060065791"],
+        "lastModifiedDate": 1484245719000,
+        "isNewsSubscription": false,
+        "numberOfCodes": 0,
+        "maximumNumberOfCodes": 100,
+        "appMaximumNumberOfCodes": 1000,
+        "isEditable": false,
+        "isRequired": false,
+        "canDeleteAddOn": false,
+        "errorKeys": null,
+        "isEmptyValue": false,
+        "itcsubmitNextVersion": false,
+        "iTunesConnectStatus": "readyForSale"
+    }, {
+        "adamId": "1181349302",
+        "referenceName": "1 Month Subscription",
+        "familyReferenceName": "1 Month Subscription",
+        "vendorId": "one_month",
+        "addOnType": "ITC.addons.type.recurring",
+        "durationDays": 30,
+        "versions": [{
+            "screenshotUrl": null,
+            "canSubmit": false,
+            "issuesCount": 0,
+            "itunesConnectStatus": "waitingForReview"
+        }],
+        "purpleSoftwareAdamIds": ["1060065791"],
+        "lastModifiedDate": 1484245408000,
+        "isNewsSubscription": false,
+        "numberOfCodes": 0,
+        "maximumNumberOfCodes": 100,
+        "appMaximumNumberOfCodes": 1000,
+        "isEditable": false,
+        "isRequired": false,
+        "canDeleteAddOn": true,
+        "errorKeys": null,
+        "isEmptyValue": false,
+        "itcsubmitNextVersion": false,
+        "iTunesConnectStatus": "waitingForReview"
+    }],
+    "messages": {
+        "warn": null,
+        "error": null,
+        "info": null
+    },
+    "statusCode": "SUCCESS"
+}
