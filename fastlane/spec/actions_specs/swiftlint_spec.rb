@@ -1,8 +1,13 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
+      let (:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
       let (:output_file) { "swiftlint.result.json" }
       let (:config_file) { ".swiftlint-ci.yml" }
+
+      before :each do
+        allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(swiftlint_gem_version)
+      end
 
       context "default use case" do
         it "default use case" do
@@ -14,7 +19,7 @@ describe Fastlane do
         end
       end
 
-      context "when specify strict options" do
+      context "when specify strict option" do
         it "adds strict option" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
@@ -23,6 +28,18 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint --strict")
+        end
+      end
+
+      context "when specify false for strict option" do
+        it "doesn't add strict option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              strict: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
         end
       end
 
@@ -186,6 +203,42 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint --reporter json")
+        end
+      end
+
+      context "when specify quiet option" do
+        it "adds quiet option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              quiet: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --quiet")
+        end
+
+        it "omits the switch if swiftlint version is too low" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.8.0'))
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              quiet: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
+        end
+      end
+
+      context "when specify false for quiet option" do
+        it "doesn't add quiet option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              quiet: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
         end
       end
     end
