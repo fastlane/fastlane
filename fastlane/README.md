@@ -89,7 +89,7 @@ fastlane release
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 170 built-in integrations available
-:computer: | Support for both iOS, Mac OS and Android apps
+:computer: | Support for iOS, macOS and Android apps
 :octocat: | Full git and mercurial support
 
 

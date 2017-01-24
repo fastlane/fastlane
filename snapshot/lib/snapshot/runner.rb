@@ -74,6 +74,10 @@ module Snapshot
       # Generate HTML report
       ReportsGenerator.new.generate
 
+      if Snapshot.config[:output_simulator_logs]
+        output_simulator_logs
+      end
+
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
         FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
@@ -104,6 +108,17 @@ module Snapshot
         [launch_arguments]
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
+      end
+    end
+
+    def output_simulator_logs
+      Snapshot.config[:devices].each do |device_name|
+        device = TestCommandGenerator.find_device(device_name)
+        sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
+        next unless File.exist?(sim_device_logfilepath_source)
+
+        sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
+        FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
       end
     end
 

@@ -51,8 +51,8 @@ module Sigh
         use_app_entitlements_flag,
         verbose,
         bundle_id,
-        ipa.shellescape,
-        specific_keychain
+        specific_keychain,
+        ipa.shellescape # Output path must always be last argument
       ].join(' ')
 
       puts command.magenta

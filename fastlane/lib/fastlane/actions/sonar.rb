@@ -18,6 +18,7 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
+        sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
@@ -25,8 +26,8 @@ module Fastlane
           'sonar-scanner',
           sonar_scanner_args
         ].join(' ')
-
-        Action.sh command
+        # hide command, as it may contain credentials
+        Fastlane::Actions.sh_control_output(command, print_command: false, print_command_output: true)
       end
 
       def self.verify_sonar_scanner_binary
@@ -84,7 +85,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :sonar_runner_args,
                                        env_name: "FL_SONAR_RUNNER_ARGS",
                                        description: "Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS=\"-Dsonar.verbose=true\"",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_login,
+                                       env_name: "FL_SONAR_LOGIN",
+                                       description: "Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       optional: true,
+                                       is_string: true,
+                                       sensitive: true)
         ]
       end
 
