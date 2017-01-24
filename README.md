@@ -60,7 +60,9 @@ Then to deploy a new 'beta' version of your app just run
 ## Installation
 Make sure you have the latest version of the Xcode command line tools installed:
 
-    xcode-select --install
+```
+xcode-select --install
+```
 
 ### Choose your installation method:
 

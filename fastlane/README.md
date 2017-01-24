@@ -98,22 +98,31 @@ fastlane release
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 
 ## Installation
+Make sure you have the latest version of the Xcode command line tools installed:
 
-I recommend following the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started.
+```
+xcode-select --install
+```
 
-    sudo gem install fastlane --verbose
+### Choose your installation method:
 
-Make sure, you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
-
-If you experience slow launch times of fastlane, try running
-
-    gem cleanup
-
-to clean up outdated gems.
-
-System Requirements: `fastlane` requires macOS or Linux with Ruby 2.0.0 or above.
+<table width="100%" >
+<tr>
+<th width="33%"><a href="http://brew.sh">Homebrew</a></td>
+<th width="33%">Installer Script</td>
+<th width="33%">Rubygems</td>
+</tr>
+<tr>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
+</tr>
+<tr> 
+<td width="33%"><code>brew cask install fastlane</code></td>
+<td width="33%"><a href="https://download.fastlane.tools/fastlane.zip">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
+<td width="33%"><code>sudo gem install fastlane -NV</code></td>
+</tr>
+</table>
 
 
 If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
@@ -135,7 +144,9 @@ There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gi
 
 Usually you'll use fastlane by triggering individual lanes:
 
-    fastlane [lane_name]
+```
+fastlane [lane_name]
+```
 
 #### Other commands
 
