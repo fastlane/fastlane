@@ -25,6 +25,8 @@ require 'spaceship/tunes/tester'
 require 'spaceship/tunes/app_details'
 require 'spaceship/tunes/pricing_tier'
 require 'spaceship/tunes/recovery_device'
+require 'spaceship/tunes/territory'
+require 'spaceship/tunes/availability'
 
 require 'spaceship/tunes/app_version_promocodes'
 require 'spaceship/tunes/app_version_generated_promocodes'

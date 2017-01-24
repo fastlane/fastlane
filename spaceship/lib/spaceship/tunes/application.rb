@@ -239,6 +239,16 @@ module Spaceship
         client.price_tier(self.apple_id)
       end
 
+      # set the availability. This method doesn't require `save` to be called
+      def update_availability!(availability)
+        client.update_availability!(self.apple_id, availability)
+      end
+
+      # The current availability.
+      def availability
+        client.availability(self.apple_id)
+      end
+
       #####################################################
       # @!group Builds
       #####################################################
