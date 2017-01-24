@@ -18,7 +18,7 @@ module Fastlane
         command << supported_option_switch(params, :quiet, "0.9.0", true)
 
         if params[:files]
-          if version < Gem::Version.new('0.5.1') and !Helper.test?
+          if version < Gem::Version.new('0.5.1')
             UI.user_error!("Your version of swiftlint (#{version}) does not support list of files as input.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           end
 
@@ -38,14 +38,14 @@ module Fastlane
 
       # Get current SwiftLint version
       def self.swiftlint_version
-        Gem::Version.new(Helper.test? ? '0.0.0' : `swiftlint version`.chomp)
+        Gem::Version.new(`swiftlint version`.chomp)
       end
 
       # Return "--option" switch if option is on and current SwiftLint version is greater or equal than min version.
       # Return "" otherwise.
       def self.supported_option_switch(params, option, min_version, can_ignore = false)
         return "" unless params[option]
-        if swiftlint_version < Gem::Version.new(min_version) and !Helper.test?
+        if swiftlint_version < Gem::Version.new(min_version)
           message = "Your version of swiftlint (#{swiftlint_version}) does not support '--#{option}' option.\nUpdate swiftlint to #{min_version} or above using `brew update && brew upgrade swiftlint`"
           message += "\nThe option will be ignored." if can_ignore
           can_ignore ? UI.important(message) : UI.user_error!(message)
