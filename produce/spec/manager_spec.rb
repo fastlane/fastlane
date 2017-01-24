@@ -1,7 +1,4 @@
 describe Produce do
-  before do
-    stub_produce
-  end
   describe "Manager" do
     it "should auto convert string hash keys to symbol keys" do
       Produce.config = {
