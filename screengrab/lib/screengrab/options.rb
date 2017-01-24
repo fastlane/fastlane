@@ -116,7 +116,8 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :reinstall_app,
                                      env_name: 'SCREENGRAB_REINSTALL_APP',
                                      description: "Enabling this option will automatically uninstall the application before running it",
-                                     default_value: false)
+                                     default_value: false,
+                                     is_string: false)
       ]
     end
   end
