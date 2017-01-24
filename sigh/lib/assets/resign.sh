@@ -551,7 +551,10 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
             then
-                /usr/bin/codesign ${VERBOSE} "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$framework"
+                log "Resigning '$framework'"
+                # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # shellcheck disable=SC2086
+                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
