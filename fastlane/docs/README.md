@@ -1,3 +1,10 @@
+-----
+
+<h4 align="center">For fastlane guides, check out the new <a href="https://docs.fastlane.tools">docs.fastlane.tools</a> page</h4>
+
+-----
+
+
 # Documentation
 
 - [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started. 
@@ -23,6 +30,12 @@
 - [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
 - [Circle.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Circle.md) for Circle CI specific help
 - [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
+
+-----
+
+<h4 align="center">For fastlane guides, check out the new <a href="https://docs.fastlane.tools">docs.fastlane.tools</a> page</h4>
+
+-----
 
 ## Fastfile
 
