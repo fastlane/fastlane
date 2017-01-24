@@ -6,11 +6,13 @@ require 'cgi'
 module Fastlane
   module Actions
     module SharedValues
-      S3_IPA_OUTPUT_PATH = :S3_IPA_OUTPUT_PATH
-      S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
-      S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
-      S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
-      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
+      # Using ||= because these MAY be defined by the the
+      # preferred aws_s3 plugin
+      S3_IPA_OUTPUT_PATH ||= :S3_IPA_OUTPUT_PATH
+      S3_DSYM_OUTPUT_PATH ||= :S3_DSYM_OUTPUT_PATH
+      S3_PLIST_OUTPUT_PATH ||= :S3_PLIST_OUTPUT_PATH
+      S3_HTML_OUTPUT_PATH ||= :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH ||= :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
