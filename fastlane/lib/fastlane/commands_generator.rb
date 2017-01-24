@@ -98,7 +98,7 @@ module Fastlane
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
-        c.option '--env STRING', String, 'Add environment to use with `dotenv`'
+        c.option '--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`'
 
         c.action do |args, options|
           if ensure_fastfile
