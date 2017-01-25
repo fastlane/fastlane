@@ -187,16 +187,14 @@ module Screengrab
 
     def uninstall_apks(device_serial, app_package_name, tests_package_name)
       UI.message 'Uninstalling app APK'
-      apk_uninstall_output = run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
-                                             print_all: true,
-                                             print_command: true)
-      UI.user_error! "App APK could not be uninstalled" if apk_uninstall_output.include?("Failure [")
+      run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                      print_all: true,
+                      print_command: true)
 
       UI.message 'Uninstalling tests APK'
-      apk_uninstall_output = run_adb_command("adb -s #{device_serial} uninstall -r #{tests_package_name}",
-                                             print_all: true,
-                                             print_command: true)
-      UI.user_error! "Tests APK could not be uninstalled" if apk_uninstall_output.include?("Failure [")
+      run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
+                      print_all: true,
+                      print_command: true)
     end
 
     def grant_permissions(device_serial)
