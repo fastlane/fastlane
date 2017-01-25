@@ -4,7 +4,12 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:keychain_name]))
+
+        if params[:keychain_name]
+          keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:keychain_name]))
+        else
+          keychain_path = params[:keychain_path]
+        end
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
       end
@@ -17,8 +22,16 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
-                                       description: "Keychain the items should be imported to",
-                                       optional: false),
+                                       description: "Name of the keychain the items should be imported to",
+                                       conflicting_options: [:keychain_path],
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :keychain_path,
+                                       env_name: "KEYCHAIN_PATH",
+                                       description: "Path to the keychain the items should be imported to",
+                                       conflicting_options: [:keychain_name],
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_password,
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
                                        description: "The password for the keychain. Note that for the login keychain this is your user's password",
@@ -41,7 +54,7 @@ module Fastlane
       end
 
       def self.authors
-        ["gin0606"]
+        ["gin0606", "koenpunt"]
       end
 
       def self.is_supported?(platform)
@@ -56,6 +69,11 @@ module Fastlane
         [
           'import_certificate(certificate_path: "certs/AppleWWDRCA.cer")',
           'import_certificate(
+            certificate_path: "certs/dist.p12",
+            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
+          )',
+          'import_certificate(
+            keychain_path: "/keychains/project.keychain",
             certificate_path: "certs/dist.p12",
             certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
           )'
