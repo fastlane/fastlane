@@ -603,10 +603,10 @@ describe Spaceship::AppVersion, all: true do
       it "overwrites release_upon_approval if auto_release_date is set" do
         TunesStubbing.itc_stub_valid_version_update_with_autorelease_and_release_on_datetime
         version.release_on_approval = true
-        version.auto_release_date = 148_043_520_000_0
+        version.auto_release_date = 1_480_435_200_000
         returned = Spaceship::Tunes::AppVersion.new(version.save!)
         expect(returned.release_on_approval).to eq(false)
-        expect(returned.auto_release_date).to eq(148_043_520_000_0)
+        expect(returned.auto_release_date).to eq(1_480_435_200_000)
       end
     end
 
