@@ -327,5 +327,36 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'uninclude_all_future_territories_response.json')),
                   headers: { 'Content-Type' => 'application/json' })
     end
+
+    def itc_stub_members
+      # resend notification
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/helmut@januschka.com/resendInvitation").
+        to_return(status: 200, body: "", headers: {})
+
+      # create member default (admin, all-apps)
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # create member role: developer, apps: all
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create_developer.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # create member role: appmanager, apps: 12345
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create_appmanager_single_app.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # member template
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_template.json')),
+                  headers: { "Content-Type" => "application/json" })
+
+      # Load member list
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_list.json')),
+         headers: { "Content-Type" => "application/json" })
+    end
   end
 end

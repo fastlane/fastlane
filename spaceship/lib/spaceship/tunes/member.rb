@@ -25,6 +25,7 @@ module Spaceship
           self.new(attrs)
         end
       end
+
       def setup
         @selected_apps = []
         if raw_data["userSoftwares"]["value"]["grantAllSoftware"]
