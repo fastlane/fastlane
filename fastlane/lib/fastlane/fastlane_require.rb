@@ -2,7 +2,7 @@ module Fastlane
   class FastlaneRequire
     class << self
       def install_gem_if_needed(gem_name: nil, require_gem: true)
-        gem_require_name = gem_name.tr("-", "/") # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
+        gem_require_name = format_gem_require_name(gem_name)
 
         # check if it's installed
         if gem_installed?(gem_name)
@@ -61,6 +61,13 @@ module Fastlane
         gems = fetcher.suggest_gems_from_name(user_supplied_name)
 
         return gems.first
+      end
+
+      def format_gem_require_name(gem_name)
+        # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
+        gem_name = gem_name.tr("-", "/") if gem_name.start_with? "fastlane-plugin-"
+
+        return gem_name
       end
     end
   end
