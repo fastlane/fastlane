@@ -13,7 +13,7 @@ module Fastlane
       def self.details
         [
           "By default, fastlane will track what actions are being used",
-          "No personal information is shard. More information available on",
+          "No personal information is shared. More information available on",
           "https://github.com/fastlane/enhancer",
           "Add `opt_out_usage` at the top of your Fastfile"
         ].join(' ')
