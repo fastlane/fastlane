@@ -4,11 +4,14 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-
         if params[:keychain_name]
           keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:keychain_name]))
         else
           keychain_path = params[:keychain_path]
+        end
+
+        if keychain_path.nil?
+          UI.user_error!("You either have to set :name or :path")
         end
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
