@@ -8,10 +8,14 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      UI.error("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if Match.enterprise?
-
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
-      self.spaceship = SpaceshipEnsure.new(params[:username]) unless params[:readonly]
+
+      unless params[:readonly]
+        self.spaceship = SpaceshipEnsure.new(params[:username])
+        if params[:type] == "enterprise" && !Spaceship.client.in_house?
+          UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
+        end
+      end
 
       if params[:app_identifier].kind_of?(Array)
         app_identifiers = params[:app_identifier]
