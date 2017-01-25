@@ -9,7 +9,7 @@ describe Spaceship::Tunes::Members do
       expect(member.has_all_apps).to eq(true)
 
       member = Spaceship::Members.find("hjanuschka+no-accept@gmail.com")
-      expect(member.has_all_apps).to eq(nil)
+      expect(member.has_all_apps).to eq(false)
       expect(member.selected_apps.first.name).to eq("App Name 1")
     end
 
