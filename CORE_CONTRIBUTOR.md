@@ -11,7 +11,8 @@ Contributors who have displayed lasting commitment to the evolution and maintena
 
 
 ## As core contributors, we:
-- Review and merge pull requests
+- Review pull requests using the "Review Changes" feature in Github
+- Merge pull requests we review, except for PRs where the author has push access. Push access to _fastlane_ repos is noted in Github with the `Member` tag. Merge PRs using the "Squash and Merge" feature in Github
 - Respond to issues and help others
 - Own regressions caused by our own contributions and PR approvals
 - Maintain consistent coding standards
