@@ -36,7 +36,19 @@ module Scan
 
       default_derived_data
 
+      coerce_to_array_of_strings(:only_testing)
+      coerce_to_array_of_strings(:skip_testing)
+
       return config
+    end
+
+    def self.coerce_to_array_of_strings(config_key)
+      config_value = Scan.config[config_key]
+
+      return if config_value.nil?
+
+      config_value = [config_value] unless config_value.kind_of?(Array)
+      Scan.config[config_key] = config_value.map(&:to_s)
     end
 
     def self.default_derived_data

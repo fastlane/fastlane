@@ -3,6 +3,11 @@ require "credentials_manager"
 
 module Scan
   class Options
+    def self.verify_type(item_name, acceptable_types, value)
+      type_ok = [Array, String].any? { |type| value.kind_of?(type) }
+      UI.user_error!("'#{item_name}' should be of type #{acceptable_types.join(' or ')} but found: #{value.class.name}") unless type_ok
+    end
+
     def self.available_options
       containing = Helper.fastlane_enabled? ? './fastlane' : '.'
 
@@ -172,13 +177,7 @@ module Scan
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
-                                       if value.kind_of?(Array)
-                                         value.each do |test_path|
-                                           UI.user_error!("'only_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
-                                         end
-                                       elsif !value.kind_of?(String)
-                                         UI.user_error!("Incorrect parameter type for 'only_testing': '#{value}'")
-                                       end
+                                       verify_type('only_testing', [Array, String], value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_testing,
                                      env_name: "SCAN_SKIP_TESTING",
@@ -186,13 +185,7 @@ module Scan
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
-                                       if value.kind_of?(Array)
-                                         value.each do |test_path|
-                                           UI.user_error!("'skip_testing' array should only contain strings, but found: '#{test_path}' which is of type '#{value.class.name}'") unless test_path.kind_of?(String)
-                                         end
-                                       elsif !value.kind_of?(String)
-                                         UI.user_error!("Incorrect parameter type for 'skip_testing': '#{value}'")
-                                       end
+                                       verify_type('skip_testing', [Array, String], value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
