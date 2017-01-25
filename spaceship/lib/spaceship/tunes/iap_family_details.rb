@@ -29,11 +29,11 @@ module Spaceship
         # Transform Localization versions to nice hash
         @versions = {}
         versions = raw_data["details"]["value"]
-        versions.each do |v|
-          language = v["value"]["localeCode"]["value"]
+        versions.each do |version|
+          language = version["value"]["localeCode"]["value"]
           @versions[language.to_sym] = {
-            subscription_name: v["value"]["subscriptionName"]["value"],
-            name: v["value"]["name"]["value"]
+            subscription_name: version["value"]["subscriptionName"]["value"],
+            name: version["value"]["name"]["value"]
           }
         end
       end
@@ -42,12 +42,12 @@ module Spaceship
       def save!
         # Transform localization versions back to original format.
         versions_array = []
-        versions.each do |k, v|
+        versions.each do |language_code, value|
           versions_array << {
                     value: {
-                      subscriptionName: { value: v[:subscription_name] },
-                      name: { value: v[:name] },
-                      localeCode: { value: k.to_s }
+                      subscriptionName: { value: value[:subscription_name] },
+                      name: { value: value[:name] },
+                      localeCode: { value: language_code.to_s }
                     }
           }
         end

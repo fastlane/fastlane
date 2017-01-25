@@ -34,8 +34,8 @@ module Spaceship
           'subscription' => READABLE_NON_RENEWING_SUBSCRIPTION
         }
 
-        mapping.each do |k, v|
-          return v if k == text
+        mapping.each do |itc_type, readable_type|
+          return readable_type if itc_type == text
         end
 
         return nil

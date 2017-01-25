@@ -37,8 +37,8 @@ module Spaceship
           'rejected' => REJECTED
         }
 
-        mapping.each do |k, v|
-          return v if k == text
+        mapping.each do |itc_status, readable_status|
+          return readable_status if itc_status == text
         end
 
         return nil

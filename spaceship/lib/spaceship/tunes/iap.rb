@@ -98,8 +98,8 @@ module Spaceship
       def all
         r = client.iaps(app_id: self.application.apple_id)
         return_iaps = []
-        r.each  do |i|
-          attrs = i
+        r.each  do |product|
+          attrs = product
           attrs[:application] = self.application
           loaded_iap = Tunes::IAPList.factory(attrs)
           next if loaded_iap.status == "deleted"

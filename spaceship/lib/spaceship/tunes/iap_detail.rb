@@ -88,12 +88,12 @@ module Spaceship
       def save!
         # Transform localization versions back to original format.
         versions_array = []
-        versions.each do |k, v|
+        versions.each do |language, value|
           versions_array << {
                     value: {
-                      description: { value: v[:description] },
-                      name: { value: v[:name] },
-                      localeCode: k.to_s
+                      description: { value: value[:description] },
+                      name: { value: value[:name] },
+                      localeCode: language.to_s
                     }
           }
         end
