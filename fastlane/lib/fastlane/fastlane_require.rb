@@ -62,11 +62,11 @@ module Fastlane
 
         return gems.first
       end
-      
+
       def format_gem_require_name(gem_name)
         # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
         gem_name = gem_name.tr("-", "/") if gem_name.start_with? "fastlane-plugin-"
-        
+
         return gem_name
       end
     end
