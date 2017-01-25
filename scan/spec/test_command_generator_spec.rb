@@ -198,6 +198,22 @@ describe Scan do
       end
     end
 
+    describe "Xcode 8+ Example" do
+      it "supports the build-for-testing command" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", build_for_testing: true }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to include("build-for-testing")
+      end
+
+      it "supports the test-without-building command" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", test_with_xctestrun: '/path/to/test.xctestrun' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to include("-xctestrun '/path/to/test.xctestrun'", "test-without-building")
+      end
+    end
+
     it "uses a device without version specifier" do
       options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)

@@ -30,7 +30,7 @@ module Scan
         config = Scan.config
 
         options = []
-        options += project_path_array
+        options += project_path_array unless config[:test_with_xctestrun]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
@@ -39,6 +39,7 @@ module Scan
         options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
         options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
+        options << "-xctestrun '#{config[:test_with_xctestrun]}'" if config[:test_with_xctestrun]
         options << config[:xcargs] if config[:xcargs]
 
         options
@@ -48,9 +49,17 @@ module Scan
         config = Scan.config
 
         actions = []
+
         actions << :clean if config[:clean]
-        actions << :build unless config[:skip_build]
-        actions << :test
+
+        if config[:build_for_testing]
+          actions << 'build-for-testing'
+        elsif config[:test_with_xctestrun]
+          actions << 'test-without-building'
+        else
+          actions << :build unless config[:skip_build]
+          actions << :test
+        end
 
         actions
       end
