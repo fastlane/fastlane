@@ -30,14 +30,12 @@ module Spaceship
       attr_accessor :status
 
       attr_accessor :type
-      attr_accessor :type_raw
 
       attr_mapping({
         'adamId' => :purchase_id,
         'referenceName' => :reference_name,
         'familyReferenceName' => :family_reference_name,
         'vendorId' => :product_id,
-        'addOnType' => :type_raw,
         'durationDays' => :duration_days,
         'versions' => :versions,
         'purpleSoftwareAdamIds' => :purple_apple_id,
@@ -48,24 +46,20 @@ module Spaceship
         'appMaximumNumberOfCodes' => :app_maximum_number_of_codes,
         'isEditable' => :is_editable,
         'isRequired' => :is_required,
-        'canDeleteAddOn' => :can_delete_addon,
-        'iTunesConnectStatus' => :status_raw
+        'canDeleteAddOn' => :can_delete_addon
       })
 
       class << self
         def factory(attrs)
+          @status = Tunes::IAPStatus.get_from_string(attrs["iTunesConnectStatus"])
+
+          # Parse the type
+          @type = Tunes::IAPType.get_from_string(attrs["addOnType"])
           return self.new(attrs)
         end
       end
 
       # Private methods
-      def setup
-        # Parse the status
-        @status = Tunes::IAPStatus.get_from_string(status_raw)
-
-        # Parse the type
-        @type = Tunes::IAPType.get_from_string(type_raw)
-      end
 
       def edit
         attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)

@@ -46,6 +46,7 @@ module Spaceship
       #   }
       # }
       attr_accessor :versions
+      attr_accessor :versions_raw
 
       attr_accessor :review_screenshot
 
@@ -61,9 +62,6 @@ module Spaceship
       # @return (String) Human Readable type of the purchase
       attr_accessor :type
 
-      # @return (String) Raw iTunes type of the purchase
-      attr_accessor :type_raw
-
       # @return (Hash) subscription pricing target
       attr_accessor :subscription_price_target
 
@@ -71,15 +69,46 @@ module Spaceship
         'adamId' => :purchase_id,
         'referenceName.value' => :reference_name,
         'productId.value' => :product_id,
-        'addOnType' => :type_raw,
         'isNewsSubscription' => :is_news_subscription,
         'pricingDurationType.value' => :subscription_duration,
         'freeTrialDurationType.value' => :subscription_free_trial,
-        'clearedForSale.value' => :cleared_for_sale
+        'clearedForSale.value' => :cleared_for_sale,
+        'versions' => :versions,
+        'addOnType' => :type,
+        'status' => :status,
+        'pricingIntervals' => :pricing_intervals
       })
 
       class << self
         def factory(attrs)
+          # Transform Localization versions to nice hash
+
+          parsed_versions = {}
+          raw_versions = attrs["versions"].first["details"]["value"]
+          raw_versions.each do |localized_version|
+            language = localized_version["value"]["localeCode"]
+            parsed_versions[language.to_sym] = {
+              name: localized_version["value"]["name"]["value"],
+              description: localized_version["value"]["description"]["value"]
+            }
+          end
+          attrs["status"] = Tunes::IAPStatus.get_from_string(attrs["versions"].first["status"])
+          attrs["versions"]  = parsed_versions
+          attrs["addOnType"] = Tunes::IAPType.get_from_string(attrs["addOnType"])
+
+          # Transform pricingDetails
+          parsed_intervals = []
+          attrs["pricingIntervals"].each do |interval|
+            parsed_intervals << {
+              tier: interval["value"]["tierStem"].to_i,
+              begin_date: interval["value"]["priceTierEffectiveDate"],
+              end_date: interval["value"]["priceTierEndDate"],
+              grandfathered: interval["value"]["grandfathered"],
+              country: interval["value"]["country"]
+            }
+          end
+          attrs["pricingIntervals"] = parsed_intervals
+
           return self.new(attrs)
         end
       end
@@ -97,8 +126,8 @@ module Spaceship
                     }
           }
         end
-        raw_data["versions"][0]["details"]["value"] = versions_array
-        raw_data['versions'][0]["reviewNotes"] = { value: @review_notes } if @review_notes
+
+        raw_data.set(["versions"], [{ reviewNotes: @review_notes, details: { value: versions_array } }])
 
         # transform pricingDetails
         intervals_array = []
@@ -154,34 +183,6 @@ module Spaceship
         end
         # Update the Purchase
         client.update_iap!(app_id: application.apple_id, purchase_id: self.purchase_id, data: raw_data)
-      end
-
-      def setup
-        # Transform Localization versions to nice hash
-        @versions = {}
-        versions = raw_data["versions"].first["details"]["value"]
-        versions.each do |v|
-          language = v["value"]["localeCode"]
-          @versions[language.to_sym] = {
-            name: v["value"]["name"]["value"],
-            description: v["value"]["description"]["value"]
-          }
-        end
-
-        # Transform pricingDetails
-        @pricing_intervals = []
-        raw_data["pricingIntervals"].each do |interval|
-          @pricing_intervals << {
-            tier: interval["value"]["tierStem"].to_i,
-            begin_date: interval["value"]["priceTierEffectiveDate"],
-            end_date: interval["value"]["priceTierEndDate"],
-            grandfathered: interval["value"]["grandfathered"],
-            country: interval["value"]["country"]
-          }
-        end
-
-        @status = Tunes::IAPStatus.get_from_string(raw_data["versions"].first["status"])
-        @type = Tunes::IAPType.get_from_string(type_raw)
       end
 
       # Deletes In-App-Purchase

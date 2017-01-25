@@ -16,25 +16,25 @@ module Spaceship
 
       attr_mapping({
         'id' => :family_id,
-        'name.value' => :name
+        'name.value' => :name,
+        'details' => :versions
       })
 
       class << self
         def factory(attrs)
-          return self.new(attrs)
-        end
-      end
+          # Transform Localization versions to nice hash
+          parsed_versions = {}
+          raw_versions = attrs["details"]["value"]
+          raw_versions.each do |version|
+            language = version["value"]["localeCode"]["value"]
+            parsed_versions[language.to_sym] = {
+              subscription_name: version["value"]["subscriptionName"]["value"],
+              name: version["value"]["name"]["value"]
+            }
+          end
+          attrs["details"] = parsed_versions
 
-      def setup
-        # Transform Localization versions to nice hash
-        @versions = {}
-        versions = raw_data["details"]["value"]
-        versions.each do |version|
-          language = version["value"]["localeCode"]["value"]
-          @versions[language.to_sym] = {
-            subscription_name: version["value"]["subscriptionName"]["value"],
-            name: version["value"]["name"]["value"]
-          }
+          return self.new(attrs)
         end
       end
 
@@ -51,7 +51,9 @@ module Spaceship
                     }
           }
         end
-        raw_data["details"]["value"] = versions_array
+
+        raw_data.set(["details"], { value: versions_array })
+
         client.update_iap_family!(app_id: application.apple_id, family_id: self.family_id, data: raw_data)
       end
     end
