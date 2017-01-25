@@ -53,6 +53,7 @@ module Snapshot
         'iPhone6' => "iPhone6 (4.7-Inch)",
         'iPhone5' => "iPhone5 (4-Inch)",
         'iPhone4' => "iPhone4 (3.5-Inch)",
+        'iPhone SE' => "iPhone SE",
         'iPad2' => "iPad2",
         'iPadAir2' => 'iPad Air 2',
         'iPadPro(12.9-inch)' => 'iPad Air Pro (12.9 inch)',
