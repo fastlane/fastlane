@@ -26,7 +26,6 @@ module Spaceship
       attr_accessor :is_required
       attr_accessor :can_delete_addon
 
-      attr_accessor :status_raw
       attr_accessor :status
 
       attr_accessor :type
@@ -46,15 +45,17 @@ module Spaceship
         'appMaximumNumberOfCodes' => :app_maximum_number_of_codes,
         'isEditable' => :is_editable,
         'isRequired' => :is_required,
-        'canDeleteAddOn' => :can_delete_addon
+        'canDeleteAddOn' => :can_delete_addon,
+        'addOnType' => :type,
+        'iTunesConnectStatus' => :status
       })
 
       class << self
         def factory(attrs)
-          @status = Tunes::IAPStatus.get_from_string(attrs["iTunesConnectStatus"])
+          attrs["iTunesConnectStatus"] = Tunes::IAPStatus.get_from_string(attrs["iTunesConnectStatus"])
 
           # Parse the type
-          @type = Tunes::IAPType.get_from_string(attrs["addOnType"])
+          attrs["addOnType"] = Tunes::IAPType.get_from_string(attrs["addOnType"])
           return self.new(attrs)
         end
       end

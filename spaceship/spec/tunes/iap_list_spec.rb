@@ -8,6 +8,8 @@ describe Spaceship::Tunes::IAPList do
       element = app.in_app_purchases.find("go.find.me")
       expect(element.class).to eq(Spaceship::Tunes::IAPList)
       expect(element.product_id).to eq("go.find.me")
+      expect(element.status).to eq("Missing Metadata")
+      expect(element.type).to eq("Consumable")
     end
     it "Loads Edit Version" do
       edit_version = app.in_app_purchases.find("go.find.me").edit
