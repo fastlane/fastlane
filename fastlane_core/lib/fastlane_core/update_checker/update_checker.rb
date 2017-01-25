@@ -79,7 +79,7 @@ module FastlaneCore
     def self.update_command(gem_name: "fastlane")
       if Helper.bundler?
         "bundle update #{gem_name.downcase}"
-      elsif Helper.contained_fastlane?
+      elsif Helper.contained_fastlane? || Helper.homebrew?
         "fastlane update_fastlane"
       else
         "sudo gem update #{gem_name.downcase}"
