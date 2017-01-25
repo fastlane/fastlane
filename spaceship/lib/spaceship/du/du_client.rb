@@ -44,7 +44,7 @@ module Spaceship
 
     private
 
-    def upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = "MZPFT.SortedScreenShot")
+    def upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = "MZPFT.SortedScreenShot", retry_count = 0)
       referrer = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app_id}/addons/create/consumable"
       r = request(:post) do |req|
         req.url "#{self.class.hostname}#{path}"
@@ -61,8 +61,10 @@ module Spaceship
         req.headers['Content-Length'] = upload_file.file_size.to_s
         req.headers['Connection'] = "keep-alive"
       end
+
       if r.status == 500 and r.body.include?("Server Error")
-        return upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set)
+        raise "Preview Screenshot Upload failed!" if retry_count > 5
+        return upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set, ++retry_count)
       end
 
       parse_upload_response(r)

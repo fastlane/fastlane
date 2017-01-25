@@ -167,6 +167,7 @@ module Spaceship
             description: v["value"]["description"]["value"]
           }
         end
+
         # Transform pricingDetails
         @pricing_intervals = []
         raw_data["pricingIntervals"].each do |interval|

@@ -27,6 +27,7 @@ module Spaceship
       end
 
       # Creates a new In-App-Purchese on iTunes Connect
+      # if the In-App-Purchase already exists an exception is raised. Spaceship::TunesClient::ITunesConnectError
       # @param type (String): The Type of the in-app-purchase (Spaceship::Tunes::IAPType::CONSUMABLE,Spaceship::Tunes::IAPType::NON_CONSUMABLE,Spaceship::Tunes::IAPType::RECURRING,Spaceship::Tunes::IAPType::NON_RENEW_SUBSCRIPTION)
       # @param versions (Hash): a Hash of the languages
       # @example: {
@@ -93,16 +94,16 @@ module Spaceship
       end
 
       # return all available In-App-Purchase's of current app
-      # this is not paged inside iTC-Api so if you have alot if IAP's (2k+)
-      # it might take some time to load
-      def all
+      # this is not paged inside iTC-API so if you have a lot if IAP's (2k+)
+      # it might take some time to load, same as it takes when you load the list via iTunes Connect
+      def all(include_deleted: false)
         r = client.iaps(app_id: self.application.apple_id)
         return_iaps = []
-        r.each  do |product|
+        r.each do |product|
           attrs = product
           attrs[:application] = self.application
           loaded_iap = Tunes::IAPList.factory(attrs)
-          next if loaded_iap.status == "deleted"
+          next if loaded_iap.status == "deleted" && !include_deleted
           return_iaps << loaded_iap
         end
         return_iaps

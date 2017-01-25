@@ -1,5 +1,4 @@
 require "securerandom"
-require "pry"
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -925,22 +924,10 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/iaps/family/template")
       data = parse_response(r, 'data')
 
-      # data['activeAddOns'][0]['name'] = { value: name }
       data['activeAddOns'][0]['productId'] = { value: product_id }
       data['activeAddOns'][0]['referenceName'] = { value: reference_name }
       data['name'] = { value: name }
-
-      versions_array = []
-      versions.each do |k, v|
-        versions_array << {
-                  value: {
-                    subscriptionName: { value: v[:subscription_name] },
-                    name: { value: v[:name] },
-                    localeCode: { value: k.to_s }
-                  }
-        }
-      end
-      data["details"]["value"] = versions_array
+      data["details"]["value"] = versions
 
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/iaps/family/"
@@ -951,7 +938,7 @@ module Spaceship
     end
 
     # returns pricing goal array
-    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency: "EUR", tier: 1)
+    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency:, tier:)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/equalize/#{currency}/#{tier}")
       parse_response(r, 'data')
     end
@@ -1020,7 +1007,7 @@ module Spaceship
 
         data["versions"][0]["reviewScreenshot"] = new_screenshot
       end
-      # binding.pry
+
       # Now send back the modified hash
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/iaps"
