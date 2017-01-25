@@ -5,7 +5,6 @@ module Spaceship
       attr_accessor :firstname
       attr_accessor :lastname
       attr_accessor :preferred_currency
-      attr_accessor :roles_raw
       attr_accessor :roles
       attr_accessor :username
       attr_accessor :selected_apps
