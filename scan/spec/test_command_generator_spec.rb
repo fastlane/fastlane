@@ -198,6 +198,98 @@ describe Scan do
       end
     end
 
+    describe "Test Exclusion Example" do
+      it "only tests the test bundle/suite/cases specified in only_testing when the input is an array" do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    only_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       '-only-testing:TestBundleA/TestSuiteB',
+                                       '-only-testing:TestBundleC',
+                                       :build,
+                                       :test
+                                     ])
+      end
+
+      it "only tests the test bundle/suite/cases specified in only_testing when the input is a string" do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    only_testing: 'TestBundleA/TestSuiteB' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       '-only-testing:TestBundleA/TestSuiteB',
+                                       :build,
+                                       :test
+                                     ])
+      end
+
+      it "does not the test bundle/suite/cases specified in skip_testing when the input is an array" do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    skip_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       '-skip-testing:TestBundleA/TestSuiteB',
+                                       '-skip-testing:TestBundleC',
+                                       :build,
+                                       :test
+                                     ])
+      end
+
+      it "does not the test bundle/suite/cases specified in skip_testing when the input is a string" do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    skip_testing: 'TestBundleA/TestSuiteB' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       '-skip-testing:TestBundleA/TestSuiteB',
+                                       :build,
+                                       :test
+                                     ])
+      end
+    end
+
     it "uses a device without version specifier" do
       options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)

@@ -41,6 +41,11 @@ module Scan
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
         options << config[:xcargs] if config[:xcargs]
 
+        # detect_values will ensure that these values are present as Arrays if
+        # they are present at all
+        options += config[:only_testing].map { |test_id| "-only-testing:#{test_id}" } if config[:only_testing]
+        options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id}" } if config[:skip_testing]
+
         options
       end
 
