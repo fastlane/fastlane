@@ -334,7 +334,7 @@ _snapshot_ finds all these entries using a regex. The number of _snapshot_ outpu
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
-Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
+Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has been resolved with Xcode 8.3, so it's now possible to actually take screenshots from the simulator. We'll keep using the old approach for now, since many of you still want to use older versions of Xcode.
 
 # Tips
 
