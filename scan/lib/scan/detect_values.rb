@@ -47,7 +47,10 @@ module Scan
 
       return if config_value.nil?
 
-      config_value = [config_value] unless config_value.kind_of?(Array)
+      # splitting on comma allows us to support comma-separated lists of values
+      # from the command line, even though the ConfigItem is not defined as an
+      # Array type
+      config_value = config_value.split(',') unless config_value.kind_of?(Array)
       Scan.config[config_key] = config_value.map(&:to_s)
     end
 
