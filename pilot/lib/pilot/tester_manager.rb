@@ -118,12 +118,8 @@ module Pilot
       begin
         int_testers = Spaceship::Tunes::Tester::Internal.all
         ext_testers = Spaceship::Tunes::Tester::External.all
-      rescue => ex
-        if ex.to_s.include?("Forbidden")
-          UI.user_error!("You don't have the permission to list the testers of your whole team. Please provide an app identifier to list all testers of a specific application.")
-        else
-          raise ex
-        end
+      rescue Spaceship::Client::InsufficientPermissions
+        UI.user_error!("You don't have the permission to list the testers of your whole team. Please provide an app identifier to list all testers of a specific application.")
       end
 
       list_global(int_testers, "Internal Testers")

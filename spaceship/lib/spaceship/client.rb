@@ -50,7 +50,19 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
-    class InsufficientPermissions < BasicPreferredInfoError; end
+    class InsufficientPermissions < BasicPreferredInfoError
+      TITLE = 'Insufficient permissions for your Apple ID:'.freeze
+
+      def preferred_error_info
+        message ? [TITLE, message] : nil
+      end
+
+      # We don't want to show similar GitHub issues, as the error message
+      # should be pretty clear
+      def show_github_issues
+        false
+      end
+    end
 
     class UnexpectedResponse < StandardError
       attr_reader :error_info
@@ -430,8 +442,11 @@ module Spaceship
       if content.nil?
         # Check if the failure is due to missing permissions
         if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
-          calling_method_name = caller[0][/`.*'/][1..-2] # get the method name of the request that failed
-          raise InsufficientPermissions, "User #{self.user} doesn't have enough permission for the following action: #{calling_method_name}"
+          # get the method name of the request that failed
+          # `block in` is used very often for requests when surrounded for paging or retrying blocks
+          # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
+          calling_method_name = caller_locations(1, 1).first.label.delete("block in").delete("!").strip
+          raise InsufficientPermissions, "User #{self.user} (Team ID #{self.team_id}) doesn't have enough permission for the following action: #{calling_method_name}"
         end
 
         raise UnexpectedResponse, response.body

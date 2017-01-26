@@ -140,16 +140,17 @@ module Commander
       # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
       # method. If so, we'll present any returned error info in the manner of a user_error!
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
+      should_show_github_issues = e.respond_to?(:show_github_issues) ? e.show_github_issues : true
 
       if error_info
         error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
 
-        show_github_issues(error_info)
+        show_github_issues(error_info) if should_show_github_issues
 
         display_user_error!(e, error_info)
       else
         # Pass the error instead of a message so that the inspector can do extra work to simplify the query
-        show_github_issues(e)
+        show_github_issues(e) if should_show_github_issues
 
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible

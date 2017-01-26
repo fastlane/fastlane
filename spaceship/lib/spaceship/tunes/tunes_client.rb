@@ -214,10 +214,17 @@ module Spaceship
       errors << different_error if different_error
 
       if errors.count > 0 # they are separated by `.` by default
+        # Sample `error` content: [["Forbidden"]]
         if errors.count == 1 and errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
         elsif errors.count == 1 and errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
+        elsif errors.count == 1 and errors.first.include?("Forbidden")
+          # get the method name of the request that failed
+          # `block in` is used very often for requests when surrounded for paging or retrying blocks
+          # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
+          calling_method_name = caller_locations(1, 1).first.label.delete("block in").delete("!").strip
+          raise InsufficientPermissions, "User #{self.user} (Team ID #{self.team_id}) doesn't have enough permission for the following action: #{calling_method_name}"
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
