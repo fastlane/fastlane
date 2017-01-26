@@ -102,16 +102,18 @@ module Spaceship
         # @param email (String) (required): The email of the new tester
         # @param first_name (String) (optional): The first name of the new tester
         # @param last_name (String) (optional): The last name of the new tester
-        # @param groups (Array) (option): Names/IDs of existing groups for the new tester
+        # @param groups (Array) (option): IDs of existing groups for the new tester
+        # @param group_names (Array) (option): Names of existing or new groups for the new tester
         # @example
         #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name:"Bennett", groups:["Testers"])
         # @return (Tester): The newly created tester
-        def create!(email: nil, first_name: nil, last_name: nil, groups: nil)
+        def create!(email: nil, first_name: nil, last_name: nil, groups: nil, group_names: nil)
           data = client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
                                     last_name: last_name,
-                                       groups: groups)
+                                       groups: groups,
+                                  group_names: group_names)
           self.factory(data)
         end
 

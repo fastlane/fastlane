@@ -927,26 +927,46 @@ module Spaceship
       @cached_groups = parse_response(r, 'data')['groups']
     end
 
-    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, groups: nil)
+    # @param groups [String] An array of group IDs to add the tester to
+    # @param group_names [String] An array of group names to add the tester to
+    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, groups: nil, group_names: nil)
       url = tester.url[:create]
       raise "Action not provided for this tester type." unless url
 
       tester_data = {
-            emailAddress: {
-              value: email
-            },
-            firstName: {
-              value: first_name || ""
-            },
-            lastName: {
-              value: last_name || ""
-            },
-            testing: {
-              value: true
-            }
-          }
+        emailAddress: {
+          value: email
+        },
+        firstName: {
+          value: first_name || ""
+        },
+        lastName: {
+          value: last_name || ""
+        },
+        testing: {
+          value: true
+        },
+        groups: []
+      }
+
       if groups
-        tester_data[:groups] = groups.map { |x| { "id" => x } }
+        tester_data[:groups] += groups.map do |x|
+          {
+            "id" => x,
+            "isSelected" => true
+          }
+        end
+      end
+
+      if group_names
+        tester_data[:groups] += group_names.map do |x|
+          {
+            "name" => {
+              "value" => x
+            },
+            "isSelected" => true
+          }
+        end
       end
 
       data = { testers: [tester_data] }
