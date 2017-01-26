@@ -54,7 +54,7 @@ module Fastlane
 
     def print_open_link_hint(newline = false)
       puts "" if newline
-      puts "🔗 You can ⌘ + double-click on links to open them directly in your browser." if Helper.mac?
+      puts "🔗  You can ⌘ + double-click on links to open them directly in your browser." if Helper.mac?
     end
   end
 end
