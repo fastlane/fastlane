@@ -46,9 +46,7 @@ module Spaceship
 
     # @return (Array) A list of all available teams
     def teams
-      return @teams if @teams
-      r = request(:get, "ra/user/detail")
-      @teams = parse_response(r, 'data')['associatedAccounts'].sort_by do |team|
+      user_details_data['associatedAccounts'].sort_by do |team|
         [
           team['contentProvider']['name'],
           team['contentProvider']['contentProviderId']
@@ -596,14 +594,61 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
+    # Fetch the general information of the user, is used by various methods across spaceship
+    # Sample return value
+    # => {"associatedAccounts"=>
+    #   [{"contentProvider"=>{"contentProviderId"=>11142800, "name"=>"Felix Krause", "contentProviderTypes"=>["Purple Software"]}, "roles"=>["Developer"], "lastLogin"=>1468784113000}],
+    #  "sessionToken"=>{"dsId"=>"8501011116", "contentProviderId"=>18111111, "expirationDate"=>nil, "ipAddress"=>nil},
+    #  "permittedActivities"=>
+    #   {"EDIT"=>
+    #     ["UserManagementSelf",
+    #      "GameCenterTestData",
+    #      "AppAddonCreation"],
+    #    "REPORT"=>
+    #     ["UserManagementSelf",
+    #      "AppAddonCreation"],
+    #    "VIEW"=>
+    #     ["TestFlightAppExternalTesterManagement",
+    #      ...
+    #      "HelpGeneral",
+    #      "HelpApplicationLoader"]},
+    #  "preferredCurrencyCode"=>"EUR",
+    #  "preferredCountryCode"=>nil,
+    #  "countryOfOrigin"=>"AT",
+    #  "isLocaleNameReversed"=>false,
+    #  "feldsparToken"=>nil,
+    #  "feldsparChannelName"=>nil,
+    #  "hasPendingFeldsparBindingRequest"=>false,
+    #  "isLegalUser"=>false,
+    #  "userId"=>"1771111155",
+    #  "firstname"=>"Detlef",
+    #  "lastname"=>"Mueller",
+    #  "isEmailInvalid"=>false,
+    #  "hasContractInfo"=>false,
+    #  "canEditITCUsersAndRoles"=>false,
+    #  "canViewITCUsersAndRoles"=>true,
+    #  "canEditIAPUsersAndRoles"=>false,
+    #  "transporterEnabled"=>false,
+    #  "contentProviderFeatures"=>["APP_SILOING", "PROMO_CODE_REDESIGN", ...],
+    #  "contentProviderType"=>"Purple Software",
+    #  "displayName"=>"Detlef",
+    #  "contentProviderId"=>"18742800",
+    #  "userFeatures"=>[],
+    #  "visibility"=>true,
+    #  "DYCVisibility"=>false,
+    #  "contentProvider"=>"Felix Krause",
+    #  "userName"=>"detlef@krausefx.com"}
+    def user_details_data
+      return @_cached_user_details if @_cached_user_details
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
+      @_cached_user_details = parse_response(r, 'data')
+    end
+
     # Fetches the User Detail information from ITC. This gets called often and almost never changes
     # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
-      return @cached if @cached
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
-      data = parse_response(r, 'data')
-      @cached = Spaceship::Tunes::UserDetail.factory(data)
+      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data)
     end
 
     #####################################################
