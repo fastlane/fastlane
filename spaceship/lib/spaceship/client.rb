@@ -50,6 +50,8 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
+    class InsufficientPermissions < BasicPreferredInfoError; end
+
     class UnexpectedResponse < StandardError
       attr_reader :error_info
 
@@ -426,6 +428,12 @@ module Spaceship
       end
 
       if content.nil?
+        # Check if the failure is due to missing permissions
+        if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
+          calling_method_name = caller[0][/`.*'/][1..-2] # get the method name of the request that failed
+          raise InsufficientPermissions, "User #{self.user} doesn't have enough permission for the following action: #{calling_method_name}"
+        end
+
         raise UnexpectedResponse, response.body
       else
         store_csrf_tokens(response)
