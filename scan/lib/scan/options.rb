@@ -138,7 +138,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :xctestrun,
                                      short_option: "-X",
                                      env_name: "SCAN_XCTESTRUN",
-                                     description: "Run tests using the provided .xctest binary",
+                                     description: "Run tests using the provided .xctestrun file",
                                      conflicting_options: [:test_without_building, :build_for_testing],
                                      is_string: true,
                                      optional: true),

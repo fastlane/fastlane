@@ -273,7 +273,7 @@ describe Scan do
         end.to raise_error("Unresolved conflict between options: 'test_without_building' and 'build_for_testing'")
       end
 
-      it "should run tests from xctestrun binary" do
+      it "should run tests from xctestrun file" do
         Scan.config[:xctestrun] = "/folder/mytests.xctestrun"
         result = Scan::TestCommandGenerator.generate
         expect(result).to start_with([
