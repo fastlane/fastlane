@@ -901,13 +901,13 @@ module Spaceship
 
       if groups
         tester_data[:groups] = groups.map do |group_name_or_group_id|
-          if self.groups.values.include?(group_name_or_group_id)
+          if self.groups.has_value?(group_name_or_group_id)
             # This is an existing group, let's use that, the user specified the group name
             group_name = group_name_or_group_id
-            group_id = self.groups.find { |id, name| name == group_name_or_group_id }[0]
-          elsif self.groups.keys.include?(group_name_or_group_id)
+            group_id = self.groups.key(group_name_or_group_id)
+          elsif self.groups.has_key?(group_name_or_group_id)
             # This is an existing group, let's use that, the user specified the group ID
-            group_name = self.groups.find { |id, name| id == group_name_or_group_id }[1]
+            group_name = self.groups[group_name_or_group_id]
             group_id = group_name_or_group_id
           else
             group_name = group_name_or_group_id
