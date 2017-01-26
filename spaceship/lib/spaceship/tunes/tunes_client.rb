@@ -676,13 +676,13 @@ module Spaceship
       # Build trains fail randomly very often
       # we need to catch those errors and retry
       # https://github.com/fastlane/fastlane/issues/6419
-      RETRY_ERROR_MESSAGES = [
+      retry_error_messages = [
         "ITC.response.error.OPERATION_FAILED",
         "Internal Server Error",
         "Service Unavailable"
       ].freeze
 
-      if RETRY_ERROR_MESSAGES.any? { |message| ex.to_s.include?(message) }
+      if retry_error_messages.any? { |message| ex.to_s.include?(message) }
         tries -= 1
         if tries > 0
           logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
