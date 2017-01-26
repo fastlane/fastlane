@@ -2,6 +2,15 @@ describe Spaceship::Base do
   before { Spaceship.login }
   let(:client) { Spaceship::App.client }
 
+  class TestBase < Spaceship::Base
+    attr_accessor :self_reference
+
+    def initialize
+      self.self_reference = self
+    end
+
+  end
+
   describe "#inspect" do
     it "contains the relevant data" do
       app = Spaceship::App.all.first
@@ -17,6 +26,13 @@ describe Spaceship::Base do
       output = v.inspect
       expect(output).to include "Tunes::AppVersion"
       expect(output).to include "Tunes::Application"
+    end
+
+    it 'handles circular references' do
+      test_base = TestBase.new
+      expect do
+        test_base.inspect
+      end.to_not raise_error(SystemStackError)
     end
   end
 
