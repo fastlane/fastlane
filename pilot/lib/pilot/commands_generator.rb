@@ -33,7 +33,7 @@ module Pilot
         rescue => ex
           message = "[#{address}]: #{ex}"
           failures << message
-          UI.user_error!(message)
+          UI.error(message)
         end
       end
       UI.user_error!("Some operations failed: #{failures.join(', ')}") unless failures.empty?
