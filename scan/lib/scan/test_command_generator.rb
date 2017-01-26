@@ -39,6 +39,7 @@ module Scan
         options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
         options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
+        options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
         options << config[:xcargs] if config[:xcargs]
 
         options
@@ -52,7 +53,7 @@ module Scan
 
         if config[:build_for_testing]
           actions << "build-for-testing"
-        elsif config[:test_without_building]
+        elsif config[:test_without_building] || config[:xctestrun]
           actions << "test-without-building"
         else
           actions << :build unless config[:skip_build]
