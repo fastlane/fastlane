@@ -50,6 +50,7 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
+    # User doesn't have enough permission for given action
     class InsufficientPermissions < BasicPreferredInfoError
       TITLE = 'Insufficient permissions for your Apple ID:'.freeze
 
