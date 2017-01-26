@@ -11,31 +11,29 @@ module Spaceship
       # @return (Intger) the Family Id
       attr_accessor :family_id
 
-      # @return (Hash) localized names
-      attr_accessor :versions
-
       attr_mapping({
         'id' => :family_id,
-        'name.value' => :name,
-        'details' => :versions
+        'name.value' => :name
       })
 
       class << self
         def factory(attrs)
-          # Transform Localization versions to nice hash
-          parsed_versions = {}
-          raw_versions = attrs["details"]["value"]
-          raw_versions.each do |version|
-            language = version["value"]["localeCode"]["value"]
-            parsed_versions[language.to_sym] = {
-              subscription_name: version["value"]["subscriptionName"]["value"],
-              name: version["value"]["name"]["value"]
-            }
-          end
-          attrs["details"] = parsed_versions
-
           return self.new(attrs)
         end
+      end
+
+      # @return (Hash) localized names
+      def versions
+        parsed_versions = {}
+        raw_versions = raw_data["details"]["value"]
+        raw_versions.each do |version|
+          language = version["value"]["localeCode"]["value"]
+          parsed_versions[language.to_sym] = {
+            subscription_name: version["value"]["subscriptionName"]["value"],
+            name: version["value"]["name"]["value"]
+          }
+        end
+        return parsed_versions
       end
 
       # modify existing family

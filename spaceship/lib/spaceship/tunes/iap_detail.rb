@@ -25,42 +25,10 @@ module Spaceship
       # @return (Bool) Cleared for sale flag
       attr_accessor :cleared_for_sale
 
-      # @return (Array) pricing intervals
-      # @example:
-      #  [
-      #    {
-      #      country: "WW",
-      #      begin_date: nil,
-      #      end_date: nil,
-      #      tier: 1
-      #    }
-      #  ]
-      attr_accessor :pricing_intervals
-
-      # @return (Hash) Hash of languages
-      # @example: {
-      #   'de-DE': {
-      #     name: "Name shown in AppStore",
-      #     description: "Description of the In app Purchase"
-      #
-      #   }
-      # }
-      attr_accessor :versions
-      attr_accessor :versions_raw
-
       attr_accessor :review_screenshot
 
       # @return (String) the notes for the review team
       attr_accessor :review_notes
-
-      # @return (String) Human Readable status of the purchase
-      attr_accessor :status
-
-      # @return (String) Raw iTunes status of the purchase
-      attr_accessor :status_raw
-
-      # @return (String) Human Readable type of the purchase
-      attr_accessor :type
 
       # @return (Hash) subscription pricing target
       attr_accessor :subscription_price_target
@@ -72,45 +40,68 @@ module Spaceship
         'isNewsSubscription' => :is_news_subscription,
         'pricingDurationType.value' => :subscription_duration,
         'freeTrialDurationType.value' => :subscription_free_trial,
-        'clearedForSale.value' => :cleared_for_sale,
-        'versions' => :versions,
-        'addOnType' => :type,
-        'status' => :status,
-        'pricingIntervals' => :pricing_intervals
+        'clearedForSale.value' => :cleared_for_sale
       })
 
       class << self
         def factory(attrs)
-          # Transform Localization versions to nice hash
-
-          parsed_versions = {}
-          raw_versions = attrs["versions"].first["details"]["value"]
-          raw_versions.each do |localized_version|
-            language = localized_version["value"]["localeCode"]
-            parsed_versions[language.to_sym] = {
-              name: localized_version["value"]["name"]["value"],
-              description: localized_version["value"]["description"]["value"]
-            }
-          end
-          attrs["status"] = Tunes::IAPStatus.get_from_string(attrs["versions"].first["status"])
-          attrs["versions"]  = parsed_versions
-          attrs["addOnType"] = Tunes::IAPType.get_from_string(attrs["addOnType"])
-
-          # Transform pricingDetails
-          parsed_intervals = []
-          attrs["pricingIntervals"].each do |interval|
-            parsed_intervals << {
-              tier: interval["value"]["tierStem"].to_i,
-              begin_date: interval["value"]["priceTierEffectiveDate"],
-              end_date: interval["value"]["priceTierEndDate"],
-              grandfathered: interval["value"]["grandfathered"],
-              country: interval["value"]["country"]
-            }
-          end
-          attrs["pricingIntervals"] = parsed_intervals
-
           return self.new(attrs)
         end
+      end
+
+      # @return (Hash) Hash of languages
+      # @example: {
+      #   'de-DE': {
+      #     name: "Name shown in AppStore",
+      #     description: "Description of the In app Purchase"
+      #
+      #   }
+      # }
+      def versions
+        parsed_versions = {}
+        raw_versions = raw_data["versions"].first["details"]["value"]
+        raw_versions.each do |localized_version|
+          language = localized_version["value"]["localeCode"]
+          parsed_versions[language.to_sym] = {
+            name: localized_version["value"]["name"]["value"],
+            description: localized_version["value"]["description"]["value"]
+          }
+        end
+        return parsed_versions
+      end
+
+      # @return (Array) pricing intervals
+      # @example:
+      #  [
+      #    {
+      #      country: "WW",
+      #      begin_date: nil,
+      #      end_date: nil,
+      #      tier: 1
+      #    }
+      #  ]
+      def pricing_intervals
+        parsed_intervals = []
+        raw_data["pricingIntervals"].each do |interval|
+          parsed_intervals << {
+            tier: interval["value"]["tierStem"].to_i,
+            begin_date: interval["value"]["priceTierEffectiveDate"],
+            end_date: interval["value"]["priceTierEndDate"],
+            grandfathered: interval["value"]["grandfathered"],
+            country: interval["value"]["country"]
+          }
+        end
+        return parsed_intervals
+      end
+
+      # @return (String) Human Readable type of the purchase
+      def type
+        Tunes::IAPType.get_from_string(raw_data["addOnType"])
+      end
+
+      # @return (String) Human Readable status of the purchase
+      def status
+        Tunes::IAPStatus.get_from_string(raw_data["versions"].first["status"])
       end
 
       # Saves the current In-App-Purchase

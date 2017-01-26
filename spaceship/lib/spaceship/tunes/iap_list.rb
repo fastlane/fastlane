@@ -26,10 +26,6 @@ module Spaceship
       attr_accessor :is_required
       attr_accessor :can_delete_addon
 
-      attr_accessor :status
-
-      attr_accessor :type
-
       attr_mapping({
         'adamId' => :purchase_id,
         'referenceName' => :reference_name,
@@ -45,22 +41,22 @@ module Spaceship
         'appMaximumNumberOfCodes' => :app_maximum_number_of_codes,
         'isEditable' => :is_editable,
         'isRequired' => :is_required,
-        'canDeleteAddOn' => :can_delete_addon,
-        'addOnType' => :type,
-        'iTunesConnectStatus' => :status
+        'canDeleteAddOn' => :can_delete_addon
       })
 
       class << self
         def factory(attrs)
-          attrs["iTunesConnectStatus"] = Tunes::IAPStatus.get_from_string(attrs["iTunesConnectStatus"])
-
-          # Parse the type
-          attrs["addOnType"] = Tunes::IAPType.get_from_string(attrs["addOnType"])
           return self.new(attrs)
         end
       end
 
-      # Private methods
+      def type
+        Tunes::IAPType.get_from_string(raw_data["addOnType"])
+      end
+
+      def status
+        Tunes::IAPStatus.get_from_string(raw_data["iTunesConnectStatus"])
+      end
 
       def edit
         attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
