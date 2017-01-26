@@ -4,10 +4,7 @@ module Spaceship
       attr_accessor :email_address
       attr_accessor :firstname
       attr_accessor :lastname
-      attr_accessor :preferred_currency
-      attr_accessor :roles
       attr_accessor :username
-      attr_accessor :selected_apps
       attr_accessor :not_accepted_invitation
       attr_accessor :user_id
 
@@ -16,37 +13,39 @@ module Spaceship
         'firstName.value' => :firstname,
         'lastName.value' => :lastname,
         'userName' => :username,
-        'dsId' => :user_id,
-        'preferredCurrency' => :preferred_currency,
-        'userSoftwares' => :selected_apps,
-        'roles' => :roles
+        'dsId' => :user_id
       )
 
       class << self
         def factory(attrs)
-          parsed_apps = []
-
-          attrs["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
-            parsed_apps << Application.find(app_id)
-          end
-          attrs["userSoftwares"] = parsed_apps
-
-          currency_base = attrs["preferredCurrency"]["value"]
-          attrs["preferredCurrency"] = {
-            name:    currency_base["name"],
-            code:    currency_base["currencyCode"],
-            country: currency_base["countryName"],
-            country_code: currency_base["countryCode"]
-          }
-
-          parsed_roles = []
-          attrs["roles"].each do |role|
-            parsed_roles << role["value"]["name"]
-          end
-
-          attrs["roles"] = parsed_roles
           self.new(attrs)
         end
+      end
+
+      def roles
+        parsed_roles = []
+        raw_data["roles"].each do |role|
+          parsed_roles << role["value"]["name"]
+        end
+        return parsed_roles
+      end
+
+      def preferred_currency
+        currency_base = raw_data["preferredCurrency"]["value"]
+        return {
+          name:    currency_base["name"],
+          code:    currency_base["currencyCode"],
+          country: currency_base["countryName"],
+          country_code: currency_base["countryCode"]
+        }
+      end
+
+      def selected_apps
+        parsed_apps = []
+        raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
+          parsed_apps << Application.find(app_id)
+        end
+        return parsed_apps
       end
 
       def not_accepted_invitation
@@ -55,7 +54,7 @@ module Spaceship
       end
 
       def has_all_apps
-        raw_data["userSoftwares"].length == 0
+        selected_apps.length == 0
       end
 
       def delete!
