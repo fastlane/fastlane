@@ -29,7 +29,6 @@ module Fastlane
       puts "Found no similar issues. To create a new issue, please visit:"
       puts "https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/issues/new"
       puts "Run `fastlane env` to append the fastlane environment to your issue"
-      print_open_link_hint(true)
     end
 
     # Called when there have been networking issues in creating the report.
@@ -37,7 +36,6 @@ module Fastlane
       puts "Could not access the GitHub API, you may have better luck via the website."
       puts "https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/search?q=#{query}&type=Issues&utf8=✓"
       puts "Error: #{error.name}"
-      print_open_link_hint(true)
     end
 
     private
