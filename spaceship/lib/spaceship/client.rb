@@ -441,12 +441,24 @@ module Spaceship
       end
 
       if content.nil?
-        # Check if the failure is due to missing permissions
+        # Check if the failure is due to missing permissions (iTunes Connect)
         if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
           raise_insuffient_permission_error!
         end
 
         raise UnexpectedResponse, response.body
+      elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
+        # example content when doing a Developer Portal action with not enough permission
+        # => {"responseId"=>"e5013d83-c5cb-4ba0-bb62-734a8d56007f",
+        #    "resultCode"=>1200,
+        #    "resultString"=>"webservice.certificate.downloadNotAllowed",
+        #    "userString"=>"You are not permitted to download this certificate.",
+        #    "creationTimestamp"=>"2017-01-26T22:44:13Z",
+        #    "protocolVersion"=>"QH65B2",
+        #    "userLocale"=>"en_US",
+        #    "requestUrl"=>"https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action",
+        #    "httpCode"=>200}
+        raise_insuffient_permission_error!(additional_error_string: content["userString"])
       else
         store_csrf_tokens(response)
         content
@@ -454,13 +466,15 @@ module Spaceship
     end
 
     # This also gets called from subclasses
-    def raise_insuffient_permission_error!
+    def raise_insuffient_permission_error!(additional_error_string: nil)
       # get the method name of the request that failed
       # `block in` is used very often for requests when surrounded for paging or retrying blocks
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
       # Using `sub` instead of `delete` as we don't want to allow multiple matches
       calling_method_name = caller_locations(2, 2).first.label.sub("block in", "").delete("!").strip
-      raise InsufficientPermissions, "User #{self.user} (Team ID #{self.team_id}) doesn't have enough permission for the following action: #{calling_method_name}"
+      error_message = "User #{self.user} (Team ID #{self.team_id}) doesn't have enough permission for the following action: #{calling_method_name}"
+      error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
+      raise InsufficientPermissions, error_message
     end
 
     private
