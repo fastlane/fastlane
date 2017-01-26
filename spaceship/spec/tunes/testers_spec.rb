@@ -70,6 +70,64 @@ describe Spaceship::Tunes::Tester do
     end
   end
 
+  describe "Create new testers" do
+    it "works as expected and supports groups (existing using name, ID, and creating a new group on the fly)" do
+      first_name = "FirstName"
+      last_name = "LastName"
+      email = "customtesters@krausefx.com"
+
+      expected_body = {
+        "testers" => [{
+          "emailAddress" => {
+            "value" => email
+          },
+          "firstName" => {
+            "value" => first_name
+          },
+          "lastName" => {
+            "value" => last_name
+          },
+          "testing" => {
+            "value" => true
+          },
+          "groups" => [{
+            "id" => "c4739ccc-672f-46d4-9dad-23df8c60a35f",
+            "name" => {
+              "value" => "boarding123"
+            }
+          }, {
+            "id" => "b6f65dbd-c845-4d91-bc39-0b661d608970",
+            "name" => {
+              "value" => "Boarding"
+            }
+          }, {
+            "id" => nil,
+            "name" => {
+              "value" => "custom-new-group"
+            }
+          }]
+        }]
+      }
+
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/create").
+        with(body: expected_body.to_json).
+        to_return(status: 200, body: TunesStubbing.itc_read_fixture_file("testers/create_tester.json"), headers: { 'Content-Type' => 'application/json' })
+
+      tester = Spaceship::Tunes::Tester::External.create!(
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        groups: ["boarding123", "b6f65dbd-c845-4d91-bc39-0b661d608970", "custom-new-group"]
+      )
+
+      expect(tester.first_name).to eq(first_name)
+      expect(tester.last_name).to eq(last_name)
+      expect(tester.groups.count).to eq(3)
+      expect(tester.groups.first["id"]).to eq("c4739ccc-672f-46d4-9dad-23df8c60a35f")
+      expect(tester.groups.first["name"]["value"]).to eq("boarding123")
+    end
+  end
+
   describe "Sandbox testers" do
     describe "listing" do
       it 'loads sandbox testers correctly' do
@@ -114,10 +172,4 @@ describe Spaceship::Tunes::Tester do
       end
     end
   end
-
-  # describe "invite testers to an existing app" do
-  #   it "invite all users to an app" do
-  #     app.add_all_testers!
-  #   end
-  # end
 end

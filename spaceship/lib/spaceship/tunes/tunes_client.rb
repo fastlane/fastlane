@@ -870,6 +870,10 @@ module Spaceship
       parse_response(r, 'data')['users']
     end
 
+    # Returns a list of available testing groups
+    # e.g.
+    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
+    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
     def groups
       return @cached_groups if @cached_groups
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
@@ -881,21 +885,42 @@ module Spaceship
       raise "Action not provided for this tester type." unless url
 
       tester_data = {
-            emailAddress: {
-              value: email
-            },
-            firstName: {
-              value: first_name || ""
-            },
-            lastName: {
-              value: last_name || ""
-            },
-            testing: {
-              value: true
+        emailAddress: {
+          value: email
+        },
+        firstName: {
+          value: first_name || ""
+        },
+        lastName: {
+          value: last_name || ""
+        },
+        testing: {
+          value: true
+        }
+      }
+
+      if groups
+        tester_data[:groups] = groups.map do |group_name_or_group_id|
+          if self.groups.values.include?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group name
+            group_name = group_name_or_group_id
+            group_id = self.groups.find { |id, name| name == group_name_or_group_id }[0]
+          elsif self.groups.keys.include?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group ID
+            group_name = self.groups.find { |id, name| id == group_name_or_group_id }[1]
+            group_id = group_name_or_group_id
+          else
+            group_name = group_name_or_group_id
+            group_id = nil # this is expected by the iTC API
+          end
+
+          {
+            "id" => group_id,
+            "name" => {
+              "value" => group_name
             }
           }
-      if groups
-        tester_data[:groups] = groups.map { |x| { "id" => x } }
+        end
       end
 
       data = { testers: [tester_data] }
