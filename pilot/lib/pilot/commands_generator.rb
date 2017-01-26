@@ -31,11 +31,12 @@ module Pilot
         begin
           mgr.public_send(action, config)
         rescue => ex
-          failures.push(address)
-          UI.message("[#{address}]: #{ex}")
+          message = "[#{address}]: #{ex}"
+          failures << message
+          UI.error(message)
         end
       end
-      UI.user_error!("Some operations failed: #{failures}") unless failures.empty?
+      UI.user_error!("Some operations failed: #{failures.join(', ')}") unless failures.empty?
     end
 
     def run
