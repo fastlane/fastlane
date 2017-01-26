@@ -8,7 +8,6 @@ describe Spaceship::Base do
     def initialize
       self.self_reference = self
     end
-
   end
 
   describe "#inspect" do
@@ -32,7 +31,12 @@ describe Spaceship::Base do
       test_base = TestBase.new
       expect do
         test_base.inspect
-      end.to_not raise_error(SystemStackError)
+      end.to_not raise_error
+    end
+
+    it 'displays a placeholder value in inspect/to_s' do
+      test_base = TestBase.new
+      expect(test_base.to_s).to eq("<TestBase \n\tself_reference=<TestBase \n\t~~DUPE~~>>")
     end
   end
 
