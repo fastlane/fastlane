@@ -103,6 +103,8 @@ module Fastlane
         "--no-merges"
       when :only_include_merges
         "--merges"
+      when :include_merges
+        nil
       end
     end
   end
