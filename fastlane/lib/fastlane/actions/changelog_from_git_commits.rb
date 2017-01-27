@@ -129,7 +129,7 @@ module Fastlane
       end
 
       def self.author
-        ['mfurtak', 'asfalcone', 'SiarheiFedartsou']
+        ['mfurtak', 'asfalcone', 'SiarheiFedartsou', 'allewun']
       end
 
       def self.is_supported?(platform)
