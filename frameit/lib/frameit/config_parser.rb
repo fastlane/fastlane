@@ -64,11 +64,10 @@ module Frameit
         if value.kind_of?(Hash)
           validate_values(value) # recursive call
         else
-          if key == 'font'
+          case key
+          when 'font'
             UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
-          end
-
-          if key == 'fonts'
+          when 'fonts'
             UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
 
             value.each do |current|
@@ -76,23 +75,15 @@ module Frameit
               UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
               UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of? Array
             end
-          end
-
-          if key == 'background'
+          when 'background'
             UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist? value
-          end
-
-          if key == 'color'
+          when 'color'
             UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
-          end
-
-          if key == 'padding'
+          when 'padding'
             unless value.kind_of?(Integer) || value.split('x').length == 2
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB'")
             end
-          end
-
-          if key == 'font_scale_factor'
+          when 'font_scale_factor'
             UI.user_error! "font_scale_factor must be numeric" unless value.kind_of?(Numeric)
           end
         end
