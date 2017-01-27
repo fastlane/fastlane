@@ -22,9 +22,9 @@ describe Snapshot do
           project: './snapshot/example/Example.xcodeproj',
           scheme: 'ExampleUITests'
         })
-        expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/iPhone .*_iOS_.*system.log})
-        expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/iPad Air_iOS_.*system.log})
-        runner.output_simulator_logs
+        expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/de-DE/system-cfcd208495d565ef66e7dff9f98764da.lo}).and_return(true)
+        expect(FileUtils).to receive(:cp_r).with(/.*/, %r{#{Snapshot.config[:output_directory]}/de-DE/system-cfcd208495d565ef66e7dff9f98764dasystem_logs.logarchive}).and_return(true)
+        runner.output_simulator_logs("iPhone 6s", "de-DE", nil, 0)
       end
     end
   end
