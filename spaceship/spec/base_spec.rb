@@ -5,13 +5,7 @@ describe Spaceship::Base do
   class TestBase < Spaceship::Base
     attr_accessor :child
 
-    def initialize
-    end
-
-    def self.self_reference
-      r = TestBase.new
-      r.child = r
-      r
+    def initialize # required
     end
   end
 
@@ -33,14 +27,16 @@ describe Spaceship::Base do
     end
 
     it 'handles circular references' do
-      test_base = TestBase.self_reference
+      test_base = TestBase.new
+      test_base.child = test_base # self-references
       expect do
         test_base.inspect
       end.to_not raise_error
     end
 
     it 'displays a placeholder value in inspect/to_s' do
-      test_base = TestBase.self_reference
+      test_base = TestBase.new
+      test_base.child = test_base # self-references
       expect(test_base.to_s).to eq("<TestBase \n\tchild=<TestBase \n\t~~DUPE~~>>")
     end
 
