@@ -212,10 +212,13 @@ module Spaceship
       errors << different_error if different_error
 
       if errors.count > 0 # they are separated by `.` by default
+        # Sample `error` content: [["Forbidden"]]
         if errors.count == 1 and errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
         elsif errors.count == 1 and errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
+        elsif errors.count == 1 and errors.first.include?("Forbidden")
+          raise_insuffient_permission_error!
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
