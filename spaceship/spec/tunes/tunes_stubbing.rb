@@ -185,6 +185,8 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('testers/get_external.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/internalTesters/898536088/").
         to_return(status: 200, body: itc_read_fixture_file('testers/existing_internal_testers.json'), headers: { 'Content-Type' => 'application/json' })
+
+      # Creating new testers is stubbed in `testers_spec.rb`
     end
 
     def itc_stub_testflight
