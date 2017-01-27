@@ -51,6 +51,12 @@ module Snapshot
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
+            
+            if Snapshot.config[:output_simulator_logs]
+              output_simulator_logs(device, language)
+              exit
+            end
+            
           end
         end
       end
@@ -61,10 +67,6 @@ module Snapshot
 
       # Generate HTML report
       ReportsGenerator.new.generate
-
-      if Snapshot.config[:output_simulator_logs]
-        output_simulator_logs
-      end
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
@@ -100,15 +102,29 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs
-      Snapshot.config[:devices].each do |device_name|
+    def output_simulator_logs(device_name,language)
         device = TestCommandGenerator.find_device(device_name)
+        
+        UI.header("Collecting system logs #{device_name} - #{language}")
+        
         sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-        next unless File.exist?(sim_device_logfilepath_source)
-
-        sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-        FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-      end
+        if File.exist?(sim_device_logfilepath_source)
+          sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_{language}_system.log")
+          FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
+          UI.success "Copied system.log"
+        end
+        # collect os_log 
+        # os_log_folder = `xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIR 2>/dev/null` # FIXME: fails all the time
+        # logarchive_path = "#{os_log_folder}/system_logs.logarchive" # FIXME
+        logarchive_path = "~/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/system_logs.logarchive" # FIXME
+        
+        # collect fails if already existing
+        FileUtils.rm_rf(File.expand_path(logarchive_path)) if File.exists?(File.expand_path(logarchive_path))
+        `xcrun simctl spawn #{device.udid} log collect`
+        logarchive_base = "#{device.name}_#{device.os_type}_#{device.os_version}_#{language}_system.logarchive"
+        logarchive_dest = File.join(Snapshot.config[:output_directory], logarchive_base)
+        FileUtils.cp_r(File.expand_path(logarchive_path), logarchive_dest)
+      
     end
 
     def print_results(results)
