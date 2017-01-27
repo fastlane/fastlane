@@ -10,7 +10,7 @@ describe Spaceship::Tunes::IAP do
 
     it "Finds a specific product" do
       expect(app.in_app_purchases.find("go.find.me")).not_to eq(nil)
-      expect(app.in_app_purchases.find("go.find.me").reference_name).to eq("locallizeddemo")
+      expect(app.in_app_purchases.find("go.find.me").reference_name).to eq("localizeddemo")
     end
 
     it "Finds families" do
@@ -35,7 +35,7 @@ describe Spaceship::Tunes::IAP do
               description: "German has at least 10 characters"
             }
           },
-          reference_name: "locallizeddemo11111",
+          reference_name: "localizeddemo",
           product_id: "x.a.a.b.b.c.d.x.y.f",
           cleared_for_sale: true,
           review_notes: "Some Review Notes here bla bla bla",

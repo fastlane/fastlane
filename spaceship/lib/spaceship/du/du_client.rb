@@ -15,79 +15,59 @@ module Spaceship
     #####################################################
 
     def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device, is_messages)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device, is_messages))
+      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device, is_messages), false)
     end
 
     def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
-      upload_purchase_preview(app_id, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.SortedScreenShot')
+      upload_file(app_id, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.SortedScreenShot', true)
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.LargeApplicationIcon')
+      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.LargeApplicationIcon', false)
     end
 
     def upload_watch_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.GizmoAppIcon')
+      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.GizmoAppIcon', false)
     end
 
     def upload_geojson(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/geo-json', content_provider_id, sso_token_for_image)
+      upload_file(app_version, upload_file, '/upload/geo-json', content_provider_id, sso_token_for_image, false)
     end
 
     def upload_trailer(app_version, upload_file, content_provider_id, sso_token_for_video)
-      upload_file(app_version, upload_file, '/upload/purple-video', content_provider_id, sso_token_for_video)
+      upload_file(app_version, upload_file, '/upload/purple-video', content_provider_id, sso_token_for_video, false)
     end
 
     def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/app-screenshot-image', content_provider_id, sso_token_for_image)
+      upload_file(app_version, upload_file, '/upload/app-screenshot-image', content_provider_id, sso_token_for_image, false)
     end
 
     private
 
-    def upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = "MZPFT.SortedScreenShot", retry_count = 0)
-      referrer = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app_id}/addons/create/consumable"
-      r = request(:post) do |req|
-        req.url "#{self.class.hostname}#{path}"
-        req.body = upload_file.bytes
-        req.headers['Accept'] = 'application/json, text/plain, */*'
-        req.headers['Content-Type'] = upload_file.content_type
-        req.headers['X-Apple-Upload-Referrer'] = referrer
-        req.headers['Referrer'] = referrer
-        req.headers['X-Apple-Upload-AppleId'] = app_id
-        req.headers['X-Apple-Upload-itctoken'] = sso_token
-        req.headers['X-Apple-Upload-ContentProviderId'] = content_provider_id
-        req.headers['X-Original-Filename'] = upload_file.file_name
-        req.headers['X-Apple-Upload-Validation-RuleSets'] = du_validation_rule_set if du_validation_rule_set
-        req.headers['Content-Length'] = upload_file.file_size.to_s
-        req.headers['Connection'] = "keep-alive"
-      end
-
-      if r.status == 500 and r.body.include?("Server Error")
-        raise "Preview Screenshot Upload failed!" if retry_count > 5
-        return upload_purchase_preview(app_id, upload_file, path, content_provider_id, sso_token, du_validation_rule_set, ++retry_count)
-      end
-
-      parse_upload_response(r)
-    end
-
-    def upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = nil)
+    def upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = nil, use_app_id = false)
       raise "File #{upload_file.file_path} is empty" if upload_file.file_size == 0
 
-      version = app_version.version
-      app_id = app_version.application.apple_id
-      app_type = app_version.app_type
-
-      referrer = app_version.application.url
+      if use_app_id
+        app_id = app_version
+        app_type = nil
+        version = nil
+        referrer = nil
+      else
+        version = app_version.version
+        app_id = app_version.application.apple_id
+        app_type = app_version.app_type
+        referrer = app_version.application.url
+      end
 
       r = request(:post) do |req|
         req.url "#{self.class.hostname}#{path}"
         req.body = upload_file.bytes
         req.headers['Accept'] = 'application/json, text/plain, */*'
         req.headers['Content-Type'] = upload_file.content_type
-        req.headers['X-Apple-Upload-Referrer'] = referrer
-        req.headers['Referrer'] = referrer
+        req.headers['X-Apple-Upload-Referrer'] = referrer if referrer
+        req.headers['Referrer'] = referrer if referrer
         req.headers['X-Apple-Upload-AppleId'] = app_id
-        req.headers['X-Apple-Jingle-Correlation-Key'] = "#{app_type}:AdamId=#{app_id}:Version=#{version}"
+        req.headers['X-Apple-Jingle-Correlation-Key'] = "#{app_type}:AdamId=#{app_id}:Version=#{version}" if app_type
         req.headers['X-Apple-Upload-itctoken'] = sso_token
         req.headers['X-Apple-Upload-ContentProviderId'] = content_provider_id
         req.headers['X-Original-Filename'] = upload_file.file_name

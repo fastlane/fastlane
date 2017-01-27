@@ -42,12 +42,12 @@ module Spaceship
         versions_array = []
         versions.each do |language_code, value|
           versions_array << {
-                    value: {
-                      subscriptionName: { value: value[:subscription_name] },
-                      name: { value: value[:name] },
-                      localeCode: { value: language_code.to_s }
-                    }
-          }
+                               value: {
+                                 subscriptionName: { value: value[:subscription_name] },
+                                 name: { value: value[:name] },
+                                 localeCode: { value: language_code.to_s }
+                               }
+                            }
         end
 
         raw_data.set(["details"], { value: versions_array })

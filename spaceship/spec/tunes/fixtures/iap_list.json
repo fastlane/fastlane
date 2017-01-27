@@ -27,7 +27,7 @@
     "iTunesConnectStatus": "deleted"
   }, {
     "adamId": "1194457865",
-    "referenceName": "locallizeddemo",
+    "referenceName": "localizeddemo",
     "familyReferenceName": null,
     "vendorId": "go.find.me",
     "addOnType": "ITC.addons.type.consumable",
@@ -183,7 +183,7 @@
     "iTunesConnectStatus": "readyToSubmit"
   }, {
     "adamId": "1194457911",
-    "referenceName": "locallizeddemo11111",
+    "referenceName": "localizeddemo",
     "familyReferenceName": null,
     "vendorId": "x.a.a.b.b.c.d.x.y.f",
     "addOnType": "ITC.addons.type.consumable",

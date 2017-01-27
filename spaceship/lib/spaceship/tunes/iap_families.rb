@@ -31,7 +31,7 @@ module Spaceship
       #  }
       # }
 
-      def create!(name: nil, product_id: nil, reference_name: nil, versions: [])
+      def create!(name: nil, product_id: nil, reference_name: nil, versions: {})
         versions_array = []
         versions.each do |language_code, value|
           versions_array << {
