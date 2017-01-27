@@ -17,6 +17,14 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%s%n%b\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
       end
 
+      it "Uses the provided date format to collect log messages if specified" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(pretty: '%s%n%b', date_format: 'short')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%s%n%b\" --date=\"short\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
+
       it "Does not match lightweight tags when searching for the last one if so requested" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(match_lightweight_tag: false)
@@ -33,7 +41,7 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
       end
 
-      it "handles tag names with characters that need shell escaping" do
+      it "Handles tag names with characters that need shell escaping" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(between: ['v1.8.0(30)', 'HEAD'])
         end").runner.execute(:test)
