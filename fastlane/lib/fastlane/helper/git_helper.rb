@@ -52,7 +52,7 @@ module Fastlane
       command = ['git log -1']
       command << "--pretty=\"#{pretty_format}\""
       command << "--date=\"#{date_format}\"" if date_format
-      Actions.sh(command.join(' '), log: false).chomp
+      Actions.sh(command.compact.join(' '), log: false).chomp
     rescue
       nil
     end

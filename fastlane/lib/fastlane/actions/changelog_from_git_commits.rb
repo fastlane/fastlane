@@ -91,7 +91,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :date_format,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_DATE_FORMAT',
-                                       description: 'The date format applied to each commit while generating the collected value ',
+                                       description: 'The date format applied to each commit while generating the collected value',
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :tag_match_pattern,
