@@ -30,9 +30,9 @@ module Fastlane
         end
 
         if params[:commits_count]
-          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering)
+          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format])
         else
-          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering)
+          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format])
         end
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
@@ -89,6 +89,11 @@ module Fastlane
                                        optional: true,
                                        default_value: '%B',
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :date_format,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_DATE_FORMAT',
+                                       description: 'The date format applied to each commit while generating the collected value ',
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :tag_match_pattern,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_MATCH_PATTERN',
                                        description: 'A glob(7) pattern to match against when finding the last git tag',
@@ -136,9 +141,10 @@ module Fastlane
           'changelog_from_git_commits',
           'changelog_from_git_commits(
             between: ["7b092b3", "HEAD"], # Optional, lets you specify a revision/tag range between which to collect commit info
-            pretty: "- (%ae) %s", # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+            pretty: "- (%ae) %s",         # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+            date_format: "short",         # Optional, lets you provide an additional date format to dates within the pretty-formatted string
             match_lightweight_tag: false, # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
-            include_merges: true # Optional, lets you filter out merge commits
+            include_merges: true          # Optional, lets you filter out merge commits
           )'
         ]
       end
