@@ -230,8 +230,11 @@ module Spaceship
         value = "~~DUPE~~"
       else
         thread[:inspected_objects].add self
-        value = inspect_value
-        thread[:inspected_objects] = nil if tree_root
+        begin
+          value = inspect_value
+        ensure
+          thread[:inspected_objects] = nil if tree_root
+        end
       end
 
       "<#{self.class.name} \n#{value}>"
