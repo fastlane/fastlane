@@ -51,12 +51,10 @@ module Snapshot
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
-            
+
             if Snapshot.config[:output_simulator_logs]
-              output_simulator_logs(device, language)
-              exit
+              output_simulator_logs(device, language, locale, launch_arguments)
             end
-            
           end
         end
       end
@@ -102,29 +100,35 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs(device_name,language)
-        device = TestCommandGenerator.find_device(device_name)
-        
-        UI.header("Collecting system logs #{device_name} - #{language}")
-        
-        sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-        if File.exist?(sim_device_logfilepath_source)
-          sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_{language}_system.log")
-          FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-          UI.success "Copied system.log"
-        end
-        # collect os_log 
-        # os_log_folder = `xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIR 2>/dev/null` # FIXME: fails all the time
-        # logarchive_path = "#{os_log_folder}/system_logs.logarchive" # FIXME
-        logarchive_path = "~/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/system_logs.logarchive" # FIXME
-        
-        # collect fails if already existing
-        FileUtils.rm_rf(File.expand_path(logarchive_path)) if File.exists?(File.expand_path(logarchive_path))
-        `xcrun simctl spawn #{device.udid} log collect`
-        logarchive_base = "#{device.name}_#{device.os_type}_#{device.os_version}_#{language}_system.logarchive"
-        logarchive_dest = File.join(Snapshot.config[:output_directory], logarchive_base)
-        FileUtils.cp_r(File.expand_path(logarchive_path), logarchive_dest)
-      
+    def output_simulator_logs(device_name, language, locale, launch_arguments_index)
+      detected_language = locale || language
+      language_folder = File.join(Snapshot.config[:output_directory], detected_language)
+      device = TestCommandGenerator.find_device(device_name)
+      components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+      UI.header("Collecting system logs #{device_name} - #{language}")
+
+      system_log_src = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
+      if File.exist?(system_log_src)
+        system_log_dest = File.join(language_folder, "system-" + Digest::MD5.hexdigest(components.join("-")) + ".log")
+        FileUtils.cp(system_log_src, system_log_dest)
+        UI.success "Copying file '#{system_log_src}' to '#{system_log_dest}'..."
+      end
+
+      # collect os_log
+      # os_log_folder = `xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIR 2>/dev/null` # FIXME: fails all the time
+      # logarchive_path = "#{os_log_folder}/system_logs.logarchive" # FIXME
+      logarchive_src = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/system_logs.logarchive") # FIXME
+      # collect fails if local file already exists
+      FileUtils.rm_rf(logarchive_src) if File.exist?(logarchive_src)
+
+      command = "xcrun simctl spawn #{device.udid} log collect"
+      FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: false)
+
+      logarchive_dest = File.join(language_folder, "system-" + Digest::MD5.hexdigest(components.join("-")) + "system_logs.logarchive")
+      # if logarchive already exists it fails as the .logarchive is a directory, so delete it to be sure its gone
+      FileUtils.rm_rf(logarchive_dest) if File.exist?(logarchive_dest)
+      FileUtils.cp_r(logarchive_src, logarchive_dest)
+      UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dest}'..."
     end
 
     def print_results(results)
