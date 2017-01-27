@@ -1,5 +1,5 @@
 require 'logger'
-require 'colored'
+require 'colored2'
 
 module FastlaneCore
   module Helper
