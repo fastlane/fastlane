@@ -375,6 +375,67 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Members
+    #####################################################
+
+    def members
+      r = request(:get, "ra/users/itc")
+      parse_response(r, 'data')["users"]
+    end
+
+    def reinvite_member(email)
+      request(:post, "ra/users/itc/#{email}/resendInvitation")
+    end
+
+    def delete_member!(user_id, email)
+      payload = []
+      payload << {
+        dsId: user_id,
+        email: email
+      }
+      request(:post) do |req|
+        req.url "ra/users/itc/delete"
+        req.body = payload.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+    end
+
+    def create_member!(firstname: nil, lastname: nil, email_address: nil, roles: [], apps: [])
+      r = request(:get, "ra/users/itc/create")
+      data = parse_response(r, 'data')
+
+      data["user"]["firstName"] = { value: firstname }
+      data["user"]["lastName"] = { value: lastname }
+      data["user"]["emailAddress"] = { value: email_address }
+
+      roles << "admin" if roles.length == 0
+
+      data["user"]["roles"] = []
+      roles.each do |role|
+        # find role from template
+        data["roles"].each do |template_role|
+          if template_role["value"]["name"] == role
+            data["user"]["roles"] << template_role
+          end
+        end
+      end
+
+      if apps.length == 0
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: true, grantedSoftwareAdamIds: [] } }
+      else
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: false, grantedSoftwareAdamIds: apps } }
+      end
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/users/itc/create"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    #####################################################
     # @!group Pricing
     #####################################################
 
