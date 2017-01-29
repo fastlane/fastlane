@@ -86,7 +86,12 @@ module Fastlane
                                       env_name: "MAILGUN_REPLY_TO",
                                       description: "Mail Reply to",
                                       optional: true,
-                                      is_string: true)
+                                      is_string: true),
+          FastlaneCore::ConfigItem.new(key: :attachment,
+                                      env_name: "MAILGUN_ATTACHMENT",
+                                      description: "Mail Attachments",
+                                      optional: true,
+                                      is_string: false)
 
         ]
       end
@@ -114,6 +119,13 @@ module Fastlane
         unless options[:reply_to].nil?
           params.store(:"h:Reply-To", options[:reply_to])
         end
+
+        unless options[:attachment].nil?
+          attachment_filenames = [*options[:attachment]]
+          attachments = attachment_filenames.map { |filename| File.new(filename, 'rb') }
+          params.store(:attachment, attachments)
+        end
+
         RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
         mail_template(options)
       end
@@ -158,7 +170,8 @@ module Fastlane
             message: "Mail Body",
             app_link: "http://www.myapplink.com",
             ci_build_link: "http://www.mycibuildlink.com",
-            template_path: "HTML_TEMPLATE_PATH"
+            template_path: "HTML_TEMPLATE_PATH",
+            attachment: "build/changelog.txt"
           )'
         ]
       end
