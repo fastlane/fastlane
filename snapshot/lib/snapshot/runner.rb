@@ -52,9 +52,7 @@ module Snapshot
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
 
-            if Snapshot.config[:output_simulator_logs]
-              output_simulator_logs(device, language, locale, launch_arguments)
-            end
+            output_simulator_logs(device, language, locale, launch_arguments)
           end
         end
       end
@@ -101,31 +99,23 @@ module Snapshot
     end
 
     def output_simulator_logs(device_name, language, locale, launch_arguments_index)
+      return unless Snapshot.config[:output_simulator_logs]
+
       detected_language = locale || language
       language_folder = File.join(Snapshot.config[:output_directory], detected_language)
       device = TestCommandGenerator.find_device(device_name)
       components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
       UI.header("Collecting system logs #{device_name} - #{language}")
 
-      system_log_src = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-      if File.exist?(system_log_src)
-        system_log_dest = File.join(language_folder, "system-" + Digest::MD5.hexdigest(components.join("-")) + ".log")
-        FileUtils.cp(system_log_src, system_log_dest)
-        UI.success "Copying file '#{system_log_src}' to '#{system_log_dest}'..."
-      end
-
-      # collect os_log
-      # os_log_folder = `xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIR 2>/dev/null` # FIXME: fails all the time
-      # logarchive_path = "#{os_log_folder}/system_logs.logarchive" # FIXME
-      logarchive_src = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/system_logs.logarchive") # FIXME
-      # collect fails if local file already exists
+      sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
+      logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
       FileUtils.rm_rf(logarchive_src) if File.exist?(logarchive_src)
 
-      command = "xcrun simctl spawn #{device.udid} log collect"
-      FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: false)
+      command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
+      FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
 
-      logarchive_dest = File.join(language_folder, "system-" + Digest::MD5.hexdigest(components.join("-")) + "system_logs.logarchive")
-      # if logarchive already exists it fails as the .logarchive is a directory, so delete it to be sure its gone
+      logarchive_dest = File.join(language_folder, "system_logs-" + Digest::MD5.hexdigest(components.join("-")) + ".logarchive")
+      # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
       FileUtils.rm_rf(logarchive_dest) if File.exist?(logarchive_dest)
       FileUtils.cp_r(logarchive_src, logarchive_dest)
       UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dest}'..."

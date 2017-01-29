@@ -80,17 +80,9 @@ module Scan
       })
       puts ""
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
+      output_simulator_logs
 
-      if Scan.config[:include_simulator_logs]
-        Scan.devices.each do |device|
-          sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-          if File.exist?(sim_device_logfilepath_source)
-            sim_device_logfilepath_dest = File.join(Scan.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-            FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-          end
-        end
-      end
+      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
       unless tests_exit_status == 0
         UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
@@ -98,6 +90,26 @@ module Scan
 
       unless result[:failures] == 0
         UI.user_error!("Tests failed")
+      end
+    end
+
+    def output_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
+        logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
+        FileUtils.rm_rf(logarchive_src) if File.exist?(logarchive_src)
+
+        command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+
+        logarchive_dest = File.join(Scan.config[:output_directory], "system_logs-#{device.name}_#{device.os_type}_#{device.os_version}.logarchive")
+        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
+        FileUtils.rm_rf(logarchive_dest) if File.exist?(logarchive_dest)
+        FileUtils.cp_r(logarchive_src, logarchive_dest)
+        UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dest}'..."
       end
     end
 
