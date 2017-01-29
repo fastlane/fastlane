@@ -237,6 +237,63 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Team
+    #####################################################
+    def team_members
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+        req.body = {
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_set_role(team_member_id, role)
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles"
+        req.body = {
+          teamId: team_id,
+          role: role,
+          teamMemberIds: [team_member_id]
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_remove_member!(team_member_id)
+      removeTeamMembers
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers"
+        req.body = {
+          teamId: team_id,
+          teamMemberIds: [team_member_id]
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_invite(email, role)
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/sendInvites"
+        req.body = {
+          invites: [
+            { recipientEmail: email, recipientRole: role }
+          ],
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    #####################################################
     # @!group Devices
     #####################################################
 
