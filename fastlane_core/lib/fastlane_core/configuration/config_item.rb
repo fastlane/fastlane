@@ -30,6 +30,11 @@ module FastlaneCore
         UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
 
+     if allow_shell_conversion
+       # Only makes sense if type is string
+       UI.user_error!("allow_shell_conversion only makes sense for ConfigItems of type String") unless type == String || (type.nil? && is_string)
+     end
+
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
           UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of? Symbol
