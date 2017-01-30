@@ -21,30 +21,6 @@ describe Scan do
           @scan.handle_results(0)
         end
       end
-
-      describe "with Scan option :include_simulator_logs" do
-        before(:each) do
-          allow(File).to receive(:exist?).and_return(true)
-
-          allow(FileUtils).to receive(:cp).with(anything, anything) do
-            # nothing
-          end
-        end
-
-        context "extract system.logarchive", now: true do
-          it "copies all device logs to the output directory" do
-            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-              output_directory: '/tmp/scan_results',
-              include_simulator_logs: true,
-              devices: ["iPhone 6s", "iPad Air"],
-              project: './scan/examples/standard/app.xcodeproj'
-            })
-            expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-.*.logarchive/)
-            expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-.*.logarchive/)
-            @scan.handle_results(0)
-          end
-        end
-      end
     end
   end
 end

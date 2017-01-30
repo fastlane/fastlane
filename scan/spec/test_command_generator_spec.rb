@@ -176,6 +176,48 @@ describe Scan do
       end
     end
 
+    describe "with Scan option :include_simulator_logs" do
+      context "extract system.logarchive" do
+        it "copies all device logs to the output directory" do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            include_simulator_logs: true,
+            devices: ["iPhone 6s", "iPad Air"],
+            project: './scan/examples/standard/app.xcodeproj'
+          })
+          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPhone 6s_iOS_10.0.logarchive/)
+          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPad Air_iOS_10.0.logarchive/)
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl getenv 021A465B-A294-4D9E-AD07-6BDC8E186343 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl getenv 2ABEAF08-E480-4617-894F-6BAB587E7963 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          mock_slack_poster = Object.new
+          allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
+          allow(mock_slack_poster).to receive(:run)
+          allow(Scan::TestCommandGenerator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
+
+          Scan::Runner.new.handle_results(0)
+        end
+      end
+    end
+
     describe "Result Bundle Example" do
       it "uses the correct build command with the example project" do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")

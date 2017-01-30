@@ -98,13 +98,13 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs(device_name, language, locale, launch_arguments_index)
+    def output_simulator_logs(device_name, language, locale, launch_arguments)
       return unless Snapshot.config[:output_simulator_logs]
 
       detected_language = locale || language
       language_folder = File.join(Snapshot.config[:output_directory], detected_language)
       device = TestCommandGenerator.find_device(device_name)
-      components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+      components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
       UI.header("Collecting system logs #{device_name} - #{language}")
 
       sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)

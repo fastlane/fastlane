@@ -7,24 +7,5 @@ describe Snapshot do
         expect(helper_version).to match(/^SnapshotHelperVersion \[\d.\d\]$/)
       end
     end
-
-    describe 'output_simulator_logs' do
-      before(:each) do
-        allow(FileUtils).to receive(:cp).with(anything, anything)
-        allow(File).to receive(:exist?).and_return(true)
-      end
-
-      it 'copies all device logs to the output directory' do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
-          output_directory: '/tmp/scan_results',
-          output_simulator_logs: true,
-          devices: ['iPhone 6s', 'iPad Air'],
-          project: './snapshot/example/Example.xcodeproj',
-          scheme: 'ExampleUITests'
-        })
-        expect(FileUtils).to receive(:cp_r).with(/.*/, /.*system_logs-.*.logarchive/).and_return(true)
-        runner.output_simulator_logs("iPhone 6s", "de-DE", nil, 0)
-      end
-    end
   end
 end
