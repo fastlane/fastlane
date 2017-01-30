@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated, :sensitive
+    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated, :sensitive, :allow_shell_conversion
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -18,7 +18,7 @@ module FastlaneCore
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil)
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, allow_shell_conversion: false)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -58,6 +58,7 @@ module FastlaneCore
       @conflict_block = conflict_block
       @deprecated = deprecated
       @sensitive = sensitive
+      @allow_shell_conversion = allow_shell_conversion
     end
 
     # This will raise an exception if the value is not valid
@@ -99,7 +100,7 @@ module FastlaneCore
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
-      elsif data_type == String
+      elsif data_type == String && allow_shell_conversion
         return value.map(&:to_s).map(&:shellescape).join(' ') if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
       else

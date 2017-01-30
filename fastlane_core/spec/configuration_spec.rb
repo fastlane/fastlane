@@ -230,24 +230,48 @@ describe FastlaneCore do
           expect(value).to eq(9.91)
         end
 
-        it "auto converts Array values to Strings" do
+        it "auto converts Array values to Strings if allowed" do
           config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
                                                      description: 'xcargs',
-                                                     type: String)
+                                                     type: String,
+                                                     allow_shell_conversion: true)
 
           value = config_item.auto_convert_value(['a b', 'c d', :e])
 
           expect(value).to eq('a\\ b c\\ d e')
         end
 
-        it "auto converts Hash values to Strings" do
+        it "auto converts Hash values to Strings if allowed" do
           config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
                                                      description: 'xcargs',
-                                                     type: String)
+                                                     type: String,
+                                                     allow_shell_conversion: true)
 
           value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
 
           expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+        end
+
+        it "does not auto convert Array values to Strings if not allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          array = ['a b', 'c d', :e]
+          value = config_item.auto_convert_value(array)
+
+          expect(value).to eq(array)
+        end
+
+        it "does not auto convert Hash values to Strings if not allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          hash = { 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' }
+          value = config_item.auto_convert_value(hash)
+
+          expect(value).to eq(hash)
         end
 
         it "auto converts nil to nil when type is not specified" do
