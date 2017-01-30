@@ -12,14 +12,13 @@ module FastlaneCore
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
-    # @param type (Class) the data type of this config item. Takes precedence over `is_string`
+    # @param type (Class) the data type of this config item. Takes precedence over `is_string`. Use `:shell_string` to allow types `String`, `Hash` and `Array` that will be converted to shell-escaped strings
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
-    # @param allow_shell_conversion (Boolean) Set if type is String but Array and Hash could also be accepted and are to be auto-converted to a shell-compatible escaped string
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, allow_shell_conversion: false)
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -29,11 +28,6 @@ module FastlaneCore
       if description
         UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
       end
-
-     if allow_shell_conversion
-       # Only makes sense if type is string
-       UI.user_error!("allow_shell_conversion only makes sense for ConfigItems of type String") unless type == String || (type.nil? && is_string)
-     end
 
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
@@ -58,13 +52,13 @@ module FastlaneCore
       @default_value = default_value
       @verify_block = verify_block
       @is_string = is_string
-      @data_type = type
+      @data_type = (type == :shell_string) ? String : type
       @optional = optional
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
       @deprecated = deprecated
       @sensitive = sensitive
-      @allow_shell_conversion = allow_shell_conversion
+      @allow_shell_conversion = (type == :shell_string)
     end
 
     # This will raise an exception if the value is not valid

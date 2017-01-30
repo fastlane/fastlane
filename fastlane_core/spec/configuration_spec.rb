@@ -233,8 +233,7 @@ describe FastlaneCore do
         it "auto converts Array values to Strings if allowed" do
           config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
                                                      description: 'xcargs',
-                                                     type: String,
-                                                     allow_shell_conversion: true)
+                                                     type: :shell_string)
 
           value = config_item.auto_convert_value(['a b', 'c d', :e])
 
@@ -244,8 +243,7 @@ describe FastlaneCore do
         it "auto converts Hash values to Strings if allowed" do
           config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
                                                      description: 'xcargs',
-                                                     type: String,
-                                                     allow_shell_conversion: true)
+                                                     type: :shell_string)
 
           value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
 

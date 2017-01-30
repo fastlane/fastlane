@@ -197,7 +197,7 @@ module Gym
                                      env_name: "GYM_XCARGS",
                                      description: "Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true,
-                                     allow_shell_conversion: true),
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :xcconfig,
                                      short_option: "-y",
                                      env_name: "GYM_XCCONFIG",

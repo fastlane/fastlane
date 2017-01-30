@@ -188,7 +188,7 @@ module Fastlane
                                        env_name: "IPA_XCARGS",
                                        description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
                                        optional: true,
-                                       allow_shell_conversion: true)
+                                       type: :shell_string)
         ]
       end
 
