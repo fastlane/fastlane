@@ -52,7 +52,8 @@ module FastlaneCore
       @default_value = default_value
       @verify_block = verify_block
       @is_string = is_string
-      @data_type = (type == :shell_string) ? String : type
+      @data_type = type
+      @data_type = String if type == :shell_string
       @optional = optional
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
