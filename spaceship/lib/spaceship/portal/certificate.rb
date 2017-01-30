@@ -15,7 +15,7 @@ module Spaceship
       # @example Company
       #   "SunApps GmbH"
       # @example Push Profile
-      #   "Apple Push Services
+      #   "Apple Push Services"
       attr_accessor :name
 
       # @return (String) Status of the certificate
