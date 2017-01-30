@@ -89,7 +89,7 @@ module Fastlane
                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :attachment,
                                       env_name: "MAILGUN_ATTACHMENT",
-                                      description: "Mail Attachments",
+                                      description: "Mail Attachment filenames, either an array or just one string",
                                       optional: true,
                                       is_string: false)
 
@@ -171,7 +171,7 @@ module Fastlane
             app_link: "http://www.myapplink.com",
             ci_build_link: "http://www.mycibuildlink.com",
             template_path: "HTML_TEMPLATE_PATH",
-            attachment: "build/changelog.txt"
+            attachment: "dirname/filename.ext"
           )'
         ]
       end
