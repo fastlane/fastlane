@@ -265,7 +265,6 @@ module Spaceship
     end
 
     def team_remove_member!(team_member_id)
-      removeTeamMembers
       ensure_csrf(Spaceship::Portal::Persons)
       response = request(:post) do |req|
         req.url "/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers"

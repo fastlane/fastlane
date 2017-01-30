@@ -20,13 +20,13 @@ module Spaceship
           if members.kind_of?(Hash)
             attrs = members
             attrs[:type] = type
-            return Spaceship::Portal::Person.new(attrs)
+            return Spaceship::Portal::Person.factory(attrs)
           end
           final_members = []
           members.each do |member|
             attrs = member
             attrs[:type] = type
-            final_members << Spaceship::Portal::Person.new(attrs)
+            final_members << Spaceship::Portal::Person.factory(attrs)
           end
           return final_members
         end
