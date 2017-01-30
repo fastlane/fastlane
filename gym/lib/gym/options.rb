@@ -131,7 +131,8 @@ module Gym
                                      conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
-                                     end),
+                                     end,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
                                      description: "Export ipa from previously build xarchive. Uses archive_path as source",
