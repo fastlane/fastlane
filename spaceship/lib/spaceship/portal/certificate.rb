@@ -15,7 +15,7 @@ module Spaceship
       # @example Company
       #   "SunApps GmbH"
       # @example Push Profile
-      #   "com.krausefx.app"
+      #   "Apple Push Services"
       attr_accessor :name
 
       # @return (String) Status of the certificate
@@ -46,8 +46,8 @@ module Spaceship
       #
       # @example Code Signing Identity (usually the company name)
       #   "SunApps Gmbh"
-      # @example Push Certificate (the name of your App ID)
-      #   "Awesome App"
+      # @example Push Certificate (the bundle identifier)
+      #   "tools.fastlane.app"
       attr_accessor :owner_name
 
       # @return (String) The ID of the owner, that can be used to
