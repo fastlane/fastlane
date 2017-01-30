@@ -18,6 +18,7 @@ module FastlaneCore
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
+    # @param allow_shell_conversion (Boolean) Set if type is String but Array and Hash could also be accepted and are to be auto-converted to a shell-compatible escaped string
     def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, allow_shell_conversion: false)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
