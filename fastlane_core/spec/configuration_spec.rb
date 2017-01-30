@@ -230,6 +230,26 @@ describe FastlaneCore do
           expect(value).to eq(9.91)
         end
 
+        it "auto converts Array values to Strings" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          value = config_item.auto_convert_value(['a b', 'c d', :e])
+
+          expect(value).to eq('a\\ b c\\ d e')
+        end
+
+        it "auto converts Hash values to Strings" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
+
+          expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+        end
+
         it "auto converts nil to nil when type is not specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo')
