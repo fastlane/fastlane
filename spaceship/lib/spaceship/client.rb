@@ -8,6 +8,7 @@ require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
+require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -78,8 +79,8 @@ module Spaceship
 
         [
           "Apple provided the following error info:",
-          @error_info['resultString'],
-          @error_info['userString']
+          CGI.unescapeHTML(@error_info['resultString']),
+          CGI.unescapeHTML(@error_info['userString'])
         ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
       end
     end
