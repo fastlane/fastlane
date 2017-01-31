@@ -236,6 +236,9 @@ module Frameit
     end
 
     def actual_font_size
+      if fetch_config['title_font_size']
+        return fetch_config['title_font_size']
+      end
       [@image.width / 10.0].max.round
     end
 
