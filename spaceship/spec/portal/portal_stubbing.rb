@@ -199,6 +199,26 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('addAppId.action.nopush.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
+    def adp_stub_persons
+      # get all members
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getTeamMembers").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: adp_read_fixture_file("peopleList.json"), headers: { 'Content-Type' => 'application/json' })
+
+      # invite new member
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/sendInvites").
+        with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
+        to_return(status: 200, body: "", headers: {})
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/setTeamMemberRoles").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"role\":\"member\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
+        to_return(status: 200, body: "", headers: {})
+    end
+
     def adp_stub_app_groups
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listApplicationGroups.action').
         with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
