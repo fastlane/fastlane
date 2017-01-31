@@ -36,7 +36,7 @@ module FastlaneCore
     attr_accessor :sensitive
 
     # [Boolean] Set if the variable is to be converted to a shell-escaped String when provided as a Hash or Array
-    # Allows items expected to be strings used in shell arguments to b alternatively provided as a Hash or Array for better readability and auto-escaped for us.
+    # Allows items expected to be strings used in shell arguments to be alternatively provided as a Hash or Array for better readability and auto-escaped for us.
     attr_accessor :allow_shell_conversion
 
     # Creates a new option
