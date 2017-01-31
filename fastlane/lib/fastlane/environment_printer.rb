@@ -217,7 +217,8 @@ module Fastlane
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => anonymized_path(RbConfig::CONFIG['libdir']),
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
-        "Is contained" => Helper.contained_fastlane?.to_s
+        "Is contained" => Helper.contained_fastlane?.to_s,
+        "Is homebrew" => Helper.homebrew?.to_s
       }
 
       if Helper.mac?
