@@ -316,6 +316,72 @@ describe Scan do
       # FIXME: expect UI error starting "No simulators found that are equal to the version of specifier"
     end
 
+    describe "test-without-building and build-for-testing", now: true do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
+          "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
+          "platform=iOS Simulator,name=iPad Air 2,OS=9.2"
+        ] }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "should build-for-testing" do
+        Scan.config[:build_for_testing] = true
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
+                                       "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       "build-for-testing"
+                                     ])
+      end
+      it "should test-without-building" do
+        Scan.config[:test_without_building] = true
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
+                                       "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       "test-without-building"
+                                     ])
+      end
+      it "should raise an exception if two build_modes are set" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            scan(
+              project: './scan/examples/standard/app.xcodeproj',
+              test_without_building: true,
+              build_for_testing: true
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'test_without_building' and 'build_for_testing'")
+      end
+
+      it "should run tests from xctestrun file" do
+        Scan.config[:xctestrun] = "/folder/mytests.xctestrun"
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
+                                       "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       "-xctestrun '/folder/mytests.xctestrun'",
+                                       "test-without-building"
+                                     ])
+      end
+    end
+
     describe "Multiple devices example" do
       it "uses multiple destinations" do
         options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
