@@ -77,10 +77,7 @@ describe Scan do
     it "supports additional parameters" do
       log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
-      xcargs = xcargs_hash.map do |k, v|
-        "#{k.to_s.shellescape}=#{v.shellescape}"
-      end.join ' '
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 

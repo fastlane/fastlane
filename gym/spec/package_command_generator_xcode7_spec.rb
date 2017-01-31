@@ -24,10 +24,7 @@ describe Gym do
     end
 
     it "works with the example project and additional parameters" do
-      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
-      xcargs = xcargs_hash.map do |k, v|
-        "#{k.to_s.shellescape}=#{v.shellescape}"
-      end.join ' '
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
 
       options = { project: "./gym/examples/standard/Example.xcodeproj", export_xcargs: xcargs }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
