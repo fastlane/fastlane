@@ -37,7 +37,7 @@ describe Spaceship::Base do
     it 'displays a placeholder value in inspect/to_s' do
       test_base = TestBase.new
       test_base.child = test_base # self-references
-      expect(test_base.to_s).to eq("<TestBase \n\tchild=<TestBase \n\t~~DUPE~~>>")
+      expect(test_base.to_s).to eq("<TestBase \n\tchild=<TestBase \n\t#<Object ...>>>")
     end
 
     it "doesn't leak state when throwing expections while inspecting objects" do

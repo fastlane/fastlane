@@ -226,8 +226,9 @@ module Spaceship
       thread[:inspected_objects] = Set.new if tree_root
 
       if thread[:inspected_objects].include? self
-        # already inspected objects have a default value
-        value = "~~DUPE~~"
+        # already inspected objects have a default value,
+        # let's follow Ruby's convention for circular references
+        value = "#<Object ...>"
       else
         thread[:inspected_objects].add self
         begin
