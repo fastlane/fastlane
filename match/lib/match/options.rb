@@ -19,7 +19,7 @@ module Match
                                      default_value: 'master'),
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
-                                     description: "Create a development certificate instead of a distribution one",
+                                     description: "Define the profile type, can be #{Match.environments.join(', ')}",
                                      is_string: true,
                                      short_option: "-y",
                                      default_value: 'development',
