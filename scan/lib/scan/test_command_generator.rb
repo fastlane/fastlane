@@ -39,6 +39,7 @@ module Scan
         options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
         options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
+        options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
         options << config[:xcargs] if config[:xcargs]
 
         # detect_values will ensure that these values are present as Arrays if
@@ -54,8 +55,15 @@ module Scan
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :build unless config[:skip_build]
-        actions << :test
+
+        if config[:build_for_testing]
+          actions << "build-for-testing"
+        elsif config[:test_without_building] || config[:xctestrun]
+          actions << "test-without-building"
+        else
+          actions << :build unless config[:skip_build]
+          actions << :test
+        end
 
         actions
       end
