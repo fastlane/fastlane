@@ -854,19 +854,19 @@ module Spaceship
       }
 
       if groups
-        tester_data[:groups] += groups.map do |x|
+        tester_data[:groups] += groups.map do |group_id|
           {
-            "id" => x,
+            "id" => group_id,
             "isSelected" => true
           }
         end
       end
 
       if group_names
-        tester_data[:groups] += group_names.map do |x|
+        tester_data[:groups] += group_names.map do |group_name|
           {
             "name" => {
-              "value" => x
+              "value" => group_name
             },
             "isSelected" => true
           }
