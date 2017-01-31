@@ -1,6 +1,5 @@
 module FastlaneCore
   class ConfigItem
-
     # [Symbol] the key which is used as command paramters or key in the fastlane tools
     attr_accessor :key
 
@@ -23,16 +22,16 @@ module FastlaneCore
 
     # [Boolean] is false by default. If set to true, also string values will not be asked to the user
     attr_accessor :optional
-    
+
     # [Array] array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     attr_accessor :conflicting_options
-    
+
     # An optional block which is called when options conflict happens
     attr_accessor :conflict_block
-    
+
     # [String] Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     attr_accessor :deprecated
-    
+
     # [Boolean] Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     attr_accessor :sensitive
 
