@@ -1,6 +1,6 @@
 describe Spaceship::Portal::Persons do
   before { Spaceship.login }
-  let(:client) { Spaceship::Portal::App.client }
+  let(:client) { Spaceship::Persons.client }
   it "should factor a new person object" do
     attrs = {
       "personId" => "1234",
@@ -15,8 +15,9 @@ describe Spaceship::Portal::Persons do
     expect(person.email_address).to eq("helmut@januschka.com")
   end
   it "Should remove a member" do
+    expect(client).to receive(:team_remove_member!).with("5M8TWKRZ3J")
     person = Spaceship::Portal::Persons.find("helmut@januschka.com")
-    expect { person.remove! }.to_not raise_error
+    person.remove!
   end
 
   it "should change role" do
