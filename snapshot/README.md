@@ -170,10 +170,16 @@ fastlane snapshot
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
 
-If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
+If any error occurs while running the snapshot script on a device and _snapshot_ will continue with the next device or language. To stop the flow after one device and language combination had issues, run
 
 ```sh
 fastlane snapshot --stop_after_first_error
+```
+
+Screenshots are by default ignored if tests fail. With the following option, any screenshots made will still be collected.
+
+```sh
+fastlane snapshot --store_screenshots_on_failure true
 ```
 
 Also by default, _snapshot_ will open the HTML after all is done. This can be skipped with the following command

@@ -7,7 +7,8 @@ module Snapshot
         # The order of the handling below is import
 
         if return_code == 65
-          UI.user_error!("Tests failed - check out the log above")
+          # this can include build errors, but we want to include tests failed errors primarly
+          raise SnapshotTestsError.new, "Tests failed"
         end
 
         case output
@@ -17,6 +18,9 @@ module Snapshot
           UI.user_error!("Scheme is not properly configured, make sure to check out the snapshot README")
         end
       end
+    end
+
+    class SnapshotTestsError < StandardError
     end
   end
 end
