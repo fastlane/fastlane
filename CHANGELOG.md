@@ -7,7 +7,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 ```
 * Describe your change here. End it with a full-stop and 2 spaces.  
   [Put Your Name Here](https://github.com/yourGitHubHandle)
-  [#nn](https://github.com/fastlane/fastlane/issues/nn)
+  [#nn](https://github.com/fastlane/fastlane/pull/nn)
 ```
 
 ---
