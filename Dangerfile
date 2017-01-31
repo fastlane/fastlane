@@ -6,9 +6,23 @@ if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")
 end
 
-# Contributors should always provide a changelog when submitting a PR
+# Contributors should always provide a summary when submitting a PR
 if github.pr_body.length < 5
-  warn("Please provide a changelog summary in the Pull Request description @#{pr_author}")
+  warn("Please provide a summary in the Pull Request description @#{pr_author}")
+end
+
+# Contributors should add an entry in the CHANGELOG.md file when submitting a change
+if !git.modified_files.include?('CHANGELOG.md') && !git.modified_files.grep(/lib/).empty?
+  fail("Please include a CHANGELOG entry to credit yourself! \nYou can find it at [CHANGELOG.md](https://github.com/fastlane/fastlane/blob/master/CHANGELOG.md).", :sticky => false)
+  markdown <<-MARKDOWN
+Here's an example of your CHANGELOG entry:
+```markdown
+* #{pr_title}#{' '}
+  [#{pr_author}](https://github.com/#{pr_author})
+  [#issue_number](https://github.com/CocoaPods/CocoaPods/issues/issue_number)
+```
+*note*: There are two invisible spaces after the entry's text.
+MARKDOWN
 end
 
 # We want contributors to create an issue first before submitting a PR
