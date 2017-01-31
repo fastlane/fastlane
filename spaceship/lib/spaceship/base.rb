@@ -217,20 +217,43 @@ module Spaceship
     #####################################################
 
     def inspect
-      inspectables = self.attributes
+      # To avoid circular references, we keep track of the references
+      # of all objects already inspected from the first call to inspect
+      # in this call stack
+      # We use a Thread local storage for multi-thread friendliness
+      thread = Thread.current
+      tree_root = thread[:inspected_objects].nil?
+      thread[:inspected_objects] = Set.new if tree_root
 
-      value = inspectables.map do |k|
+      if thread[:inspected_objects].include? self
+        # already inspected objects have a default value,
+        # let's follow Ruby's convention for circular references
+        value = "#<Object ...>"
+      else
+        thread[:inspected_objects].add self
+        begin
+          value = inspect_value
+        ensure
+          thread[:inspected_objects] = nil if tree_root
+        end
+      end
+
+      "<#{self.class.name} \n#{value}>"
+    end
+
+    def inspect_value
+      self.attributes.map do |k|
         v = self.send(k).inspect
         v.gsub!("\n", "\n\t") # to align nested elements
 
         "\t#{k}=#{v}"
       end.join(", \n")
-
-      "<#{self.class.name} \n#{value}>"
     end
 
     def to_s
       self.inspect
     end
+
+    private :inspect_value
   end
 end
