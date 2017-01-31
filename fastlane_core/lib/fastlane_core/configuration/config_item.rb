@@ -1,6 +1,44 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated, :sensitive, :allow_shell_conversion
+
+    # [Symbol] the key which is used as command paramters or key in the fastlane tools
+    attr_accessor :key
+
+    # [String] the name of the environment variable, which is only used if no other values were found
+    attr_accessor :env_name
+
+    # [String] A description shown to the user
+    attr_accessor :description
+
+    # [String] A string of length 1 which is used for the command parameters (e.g. -f)
+    attr_accessor :short_option
+
+    # the value which is used if there was no given values and no environment values
+    attr_accessor :default_value
+
+    # An optional block which is called when a new value is set.
+    #   Check value is valid. This could be type checks or if a folder/file exists
+    #   You have to raise a specific exception if something goes wrong. Append .red after the string
+    attr_accessor :verify_block
+
+    # [Boolean] is false by default. If set to true, also string values will not be asked to the user
+    attr_accessor :optional
+    
+    # [Array] array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
+    attr_accessor :conflicting_options
+    
+    # An optional block which is called when options conflict happens
+    attr_accessor :conflict_block
+    
+    # [String] Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
+    attr_accessor :deprecated
+    
+    # [Boolean] Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
+    attr_accessor :sensitive
+
+    # [Boolean] Set if the variable is to be converted to a shell-escaped String when provided as a Hash or Array
+    # Allows items expected to be strings used in shell arguments to b alternatively provided as a Hash or Array for better readability and auto-escaped for us.
+    attr_accessor :allow_shell_conversion
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
