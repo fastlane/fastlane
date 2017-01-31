@@ -37,7 +37,7 @@ describe Spaceship::Application do
           expect(a.class).to eq(Spaceship::Application)
           expect(a.apple_id).to eq('898536088')
         end
-        
+
         it "returns the application if available ignoring case" do
           a = Spaceship::Application.find('net.sunaPPs.107')
           expect(a.class).to eq(Spaceship::Application)
