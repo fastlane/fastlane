@@ -77,6 +77,20 @@ module Fastlane
             workspace: "App.xcworkspace",
             scheme: "MyTests",
             clean: false
+          )',
+          '#Build For Testing
+           scan(
+             derived_data_path: "my_folder",
+             build_for_testing: true
+          )',
+          '# run tests using derived data from prev. build
+           scan(
+             derived_data_path: "my_folder",
+             test_without_building: true
+          )',
+          '# or run it from an existing xctestrun package
+          scan(
+             xctestrun: "/path/to/mytests.xctestrun"
           )'
         ]
       end
