@@ -23,7 +23,7 @@ desc 'Print stats about how much time has passed and work has happened since the
 task :release_stats do
   require 'date'
   require 'terminal-table'
-  require 'colored'
+  require 'colored2'
   require 'shellwords'
 
   `git pull --tags`

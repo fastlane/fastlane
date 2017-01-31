@@ -1,4 +1,4 @@
-require 'colored'
+require 'colored2'
 require 'mini_magick'
 require 'json'
 

@@ -1,4 +1,4 @@
-require 'colored'
+require 'colored2'
 require 'ostruct'
 
 describe Pilot::TesterManager do
