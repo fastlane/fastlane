@@ -78,7 +78,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Add support for --quiet option for swiftlint action.  
   [mgrebenets](https://github.com/mgrebenets)
   [#7953](https://github.com/fastlane/fastlane/pull/7953)
-* Make exit_on_test_failure have `is_string: false`.  
+* Make `exit_on_test_failure` have `is_string: false`.  
   [mfurtak](https://github.com/mfurtak)
   [#7981](https://github.com/fastlane/fastlane/pull/7981)
 * [spaceship] Get and set territories.  
@@ -94,13 +94,13 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Support loading multiple dotenvs.  
   [lacostej](https://github.com/lacostej)
   [#7943](https://github.com/fastlane/fastlane/pull/7943)
-* _produce_: fix data_protection in enabled features.  
+* _produce_: fix `data_protection` in enabled features.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7955](https://github.com/fastlane/fastlane/pull/7955)
 * Update bundler dependency to be more flexible.  
   [KrauseFx](https://github.com/KrauseFx)
   [#7964](https://github.com/fastlane/fastlane/pull/7964)
-* Fix the type of option reinstall_app in _screengrab_ tool.  
+* Fix the type of option `reinstall_app` in _screengrab_ tool.  
   [gersonmendes](https://github.com/gersonmendes)
   [#7980](https://github.com/fastlane/fastlane/pull/7980)
 
@@ -161,7 +161,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Add spinning fastlane wheel.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7477](https://github.com/fastlane/fastlane/pull/7477)
-* Enable --verbose during --capture_output.  
+* Enable `--verbose` during `--capture_output`.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7851](https://github.com/fastlane/fastlane/pull/7851)
 * Deprecated actions will display deprecated notes in actions list, action info, while running, and in docs.  
@@ -203,7 +203,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Prevent users on Android N from attempting to use internal storage.  
   [mfurtak](https://github.com/mfurtak)
   [#7838](https://github.com/fastlane/fastlane/pull/7838)
-* produce - enabled_features feature.  
+* produce - `enabled_features` feature.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7641](https://github.com/fastlane/fastlane/pull/7641)
 * Make .env Dir.glob much less greedy.  
@@ -218,13 +218,13 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Scan Support for connected devices.  
   [matthewellis](https://github.com/matthewellis)
   [#5159](https://github.com/fastlane/fastlane/pull/5159)
-* Consistent support for DELIVER_USER and DELIVER_USERNAME env variables.  
+* Consistent support for `DELIVER_USER` and `DELIVER_USERNAME` env variables.  
   [asfalcone](https://github.com/asfalcone)
   [#7806](https://github.com/fastlane/fastlane/pull/7806)
 * Skip printing of empty lane context.  
   [KrauseFx](https://github.com/KrauseFx)
   [#7799](https://github.com/fastlane/fastlane/pull/7799)
-* add register_device to register a single ios device more easily.  
+* add `register_device` to register a single ios device more easily.  
   [pvinis](https://github.com/pvinis)
   [#7800](https://github.com/fastlane/fastlane/pull/7800)
 * Fix syntax error in code sample.  
@@ -242,7 +242,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Fix gradle apk search path to make directory under project option..  
   [marcferna](https://github.com/marcferna)
   [#7786](https://github.com/fastlane/fastlane/pull/7786)
-* Fix non-interactive shell password_ask loop in match.  
+* Fix non-interactive shell `password_ask` loop in _match_.  
   [lacostej](https://github.com/lacostej)
   [#7561](https://github.com/fastlane/fastlane/pull/7561)
 * Add `verbose` flag to `zip` action with a default value of 'true'.  
@@ -263,7 +263,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Make waiting for build processing more stable by retrying failed requests.  
   [KrauseFx](https://github.com/KrauseFx)
   [#7762](https://github.com/fastlane/fastlane/pull/7762)
-* Fix FastlaneRequire#gem_installed? to handle already-loaded libs.  
+* Fix `FastlaneRequire#gem_installed?` to handle already-loaded libs.  
   [reidab](https://github.com/reidab)
   [#7771](https://github.com/fastlane/fastlane/pull/7771)
 * [supply] Added support for google service account credentials via environment variable.  
@@ -336,7 +336,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * deliver: respect the '--platform' command-line setting.  
   [elliot-nelson](https://github.com/elliot-nelson)
   [#7648](https://github.com/fastlane/fastlane/pull/7648)
-* Add sign option to add_git_tag action.  
+* Add sign option to `add_git_tag` action.  
   [Vratislav](https://github.com/Vratislav)
   [#7714](https://github.com/fastlane/fastlane/pull/7714)
 * credentials-manager: Fetch port, path, protocol for new internet passwords.  
@@ -351,10 +351,10 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Add Android support to DeployGate action.  
   [tomorrowkey](https://github.com/tomorrowkey)
   [#6166](https://github.com/fastlane/fastlane/pull/6166)
-* Add new param 'disable_notify'  to deploygate-action.  
+* Add new param `disable_notify`  to deploygate-action.  
   [laiso](https://github.com/laiso)
   [#7698](https://github.com/fastlane/fastlane/pull/7698)
-* Add Spaceship::Portal::App#update_name.  
+* Add `Spaceship::Portal::App#update_name`.  
   [cpunion](https://github.com/cpunion)
   [#7688](https://github.com/fastlane/fastlane/pull/7688)
 * FileWritingScreenshotCallback: moved code that returns a file to write to to a separate method to allow extension & customization..  
@@ -371,10 +371,10 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 
 ## 2.3.0 Improvements
 
-* Removed redundant check in reset_git_repo, fixes #7650.  
+* Removed redundant check in `reset_git_repo`, fixes #7650.  
   [schung7](https://github.com/schung7)
   [#7649](https://github.com/fastlane/fastlane/pull/7649)
-* Allow commit_version_bump to find the Settings.bundle in the project.  
+* Allow `commit_version_bump` to find the Settings.bundle in the project.  
   [jdee](https://github.com/jdee)
   [#6997](https://github.com/fastlane/fastlane/pull/6997)
 * Updates credential manager docs for execution with monogem.  
@@ -404,7 +404,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * [README] spaceauth - adopt to monogem changes.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7615](https://github.com/fastlane/fastlane/pull/7615)
-* [deliver] support metdata update of live_version.  
+* [deliver] support metdata update of `live_version`.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7172](https://github.com/fastlane/fastlane/pull/7172)
 * Remove imagemagick check, fixes #6904.  
@@ -416,7 +416,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Use Dir.mktmpdir internal cleanup mechanism to remove tmp folder.  
   [lacostej](https://github.com/lacostej)
   [#7635](https://github.com/fastlane/fastlane/pull/7635)
-* Update CORE_CONTRIBUTOR.md.  
+* Update `CORE_CONTRIBUTOR.md`.  
   [lacostej](https://github.com/lacostej)
   [#7634](https://github.com/fastlane/fastlane/pull/7634)
 * Preventing actions called from another action to show in summary.  
@@ -431,10 +431,10 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * [spaceship] Fix path to referenced fastfile.  
   [ohwutup](https://github.com/ohwutup)
   [#7604](https://github.com/fastlane/fastlane/pull/7604)
-* [fastlane action] Support mailgun reply_to.  
+* [fastlane action] Support mailgun `reply_to`.  
   [ohwutup](https://github.com/ohwutup)
   [#7605](https://github.com/fastlane/fastlane/pull/7605)
-* [fastlane] Anonymize sensitive options for captured_output.  
+* [fastlane] Anonymize sensitive options for `captured_output`.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7335](https://github.com/fastlane/fastlane/pull/7335)
 * [snapshot] Add additional ipad classifiers..  
@@ -450,7 +450,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 ## 2.1.2 Fix gym builds
 
 * Fix gym build failure.  
-* Fixed parallel upload locked due to temp file in ipa_file_analyser.  
+* Fixed parallel upload locked due to temp file in `ipa_file_analyser`.  
   [philipp-heyse](https://github.com/philipp-heyse)
   [#7359](https://github.com/fastlane/fastlane/pull/7359)
 * Refactor `IpaFileAnalyser`.  
@@ -478,10 +478,10 @@ Dependencies fix for bundler
 * fix platform.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7360](https://github.com/fastlane/fastlane/pull/7360)
-* [gym] Remove promotion for use_legacy_build_api.  
+* [gym] Remove promotion for `use_legacy_build_api`.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7379](https://github.com/fastlane/fastlane/pull/7379)
-* user_error if plist error.  
+* `user_error` if plist error.  
   [hjanuschka](https://github.com/hjanuschka)
   [#7547](https://github.com/fastlane/fastlane/pull/7547)
 * more tests for aliases.  
@@ -581,15 +581,15 @@ From now on, all of _fastlane_ is inside the _fastlane_ gem :tada: This enables 
 * Clarify version number error messaging when Xcode project is not set up correctly.  
 * Ignore CocoaPods paths.  
 * Update `fastlane_version` action to show new update message.  
-* Set fail_build to expect a string.  
-* Add bitrise.io git_branch ENV variable check.  
+* Set `fail_build` to expect a string.  
+* Add bitrise.io `git_branch` ENV variable check.  
 * Add option to provide -framework option for archive Carthage command.  
 * Update dependency to latest `fastlane_core` to fix app-specific password prompting.  
 * Unit tests run on Sierra.  
 
 ## 1.109.0 Improvements
 
-* Update all tools to latest fastlane_core.  
+* Update all tools to latest `fastlane_core`.  
   [asfalcone](https://github.com/asfalcone)
   [#7026](https://github.com/fastlane/fastlane/pull/7026)
 * Pass generated Fastfile ID through to enhancer.  
@@ -600,7 +600,7 @@ From now on, all of _fastlane_ is inside the _fastlane_ gem :tada: This enables 
   [#6889](https://github.com/fastlane/fastlane/pull/6889)
 * Improvements to 'fastlane env' (#6871, #6955, #6950).  
 
-## 1.108.0 New update_fastlane command, fastlane_require to auto-install gems & more
+## 1.108.0 New `update_fastlane` command, `fastlane_require` to auto-install gems & more
 
 * Implement `fastlane_require` to automatically install gems into bundle.  
   [KrauseFx](https://github.com/KrauseFx)
@@ -614,7 +614,7 @@ From now on, all of _fastlane_ is inside the _fastlane_ gem :tada: This enables 
 * Hide options with no description in docs.  
   [KrauseFx](https://github.com/KrauseFx)
   [#6919](https://github.com/fastlane/fastlane/pull/6919)
-* Fix commit_version_bump could not find a .xcodeproj.  
+* Fix `commit_version_bump` could not find a `.xcodeproj`.  
   [WANGjieJacques](https://github.com/WANGjieJacques)
   [#6676](https://github.com/fastlane/fastlane/pull/6676)
 
@@ -623,10 +623,10 @@ From now on, all of _fastlane_ is inside the _fastlane_ gem :tada: This enables 
 * Add error message on `fastlane init` when fastlane directory or file already exists.  
   [KrauseFx](https://github.com/KrauseFx)
   [#6849](https://github.com/fastlane/fastlane/pull/6849)
-* Update error message when using fastlane_version with bundle.  
+* Update error message when using `fastlane_version` with bundle.  
   [juli1quere](https://github.com/juli1quere)
   [#6831](https://github.com/fastlane/fastlane/pull/6831)
-* Automatically use GITHUB_API_TOKEN for create pull request action.  
+* Automatically use `GITHUB_API_TOKEN` for create pull request action.  
   [KrauseFx](https://github.com/KrauseFx)
   [#6841](https://github.com/fastlane/fastlane/pull/6841)
 * Add `app_store_build_number action`.  
@@ -657,7 +657,7 @@ Update internal dependencies to support new iTunes Connect team selection (#6724
 ## 1.106.1 Update frameit dependency
 
 * Losen up _frameit_ dependency.  
-* Add `env` to black_list for valid lane names.  
+* Add `env` to `black_list` for valid lane names.  
   [KrauseFx](https://github.com/KrauseFx)
   [#6693](https://github.com/fastlane/fastlane/pull/6693)
 * Markdown docs generator: only print on verbose.  
