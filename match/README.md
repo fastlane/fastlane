@@ -377,13 +377,13 @@ In general those profiles are harmless as they can only be used to install a sig
 
 Attackers could use an In-House profile to distribute signed application to a potentially unlimited number of devices. All this would run under your company name and it could eventually lead to Apple revoking your In-House account. However it is very easy to revoke a certificate to remotely break the app on all devices.
 
-Because of the potentially dangerous nature of In-House profiles we decided to not allow the use of `match` with enterprise accounts.
+Because of the potentially dangerous nature of In-House profiles please use _match_ with enterprise profiles with caution, ensure your git repository is private and use a secure password.
 
 ##### To sum up
 
 - You have full control over the access list of your Git repo, no third party service involved
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
-- `match` does not currently support In-House Enterprise profiles as they are harder to control
+- Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
 - The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/fastlane/tree/master/match)
 
