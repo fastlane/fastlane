@@ -69,7 +69,7 @@ When the coding is done and you’re finished testing your changes, you are read
 - Create a separate PR for each tool that you’ve worked on
 - Use a descriptive title 
 - Link the issues that are related to your PR in the body
-- Add en entry in the `CHANGELOG.md` file describing your change and crediting yourself for this awesome contribution you did
+- Add en entry in the `CHANGELOG.md` file describing your change and crediting yourself for the awesome contribution you made
 
 ## After the review
 

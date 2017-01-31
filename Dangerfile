@@ -19,7 +19,7 @@ Here's an example of your CHANGELOG entry:
 ```markdown
 * #{pr_title}#{' '}
   [#{pr_author}](https://github.com/#{pr_author})
-  [#issue_number](https://github.com/CocoaPods/CocoaPods/issues/issue_number)
+  [#issue_number](https://github.com/fastlane/fastlane/issues/issue_number)
 ```
 *note*: There are two invisible spaces after the entry's text.
 MARKDOWN
