@@ -13,7 +13,7 @@ module Match
 
       params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
 
-      had_app_identifier = self.params[:app_identifier]
+      had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier, :workspace],
@@ -56,6 +56,8 @@ module Match
 
       Spaceship.login(params[:username])
       Spaceship.select_team
+
+      UI.user_error!("`fastlane match nuke` doesn't support enterprise accounts") if Spaceship.client.in_house?
 
       self.certs = certificate_type(cert_type).all
       self.profiles = []
