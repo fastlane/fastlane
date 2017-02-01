@@ -86,5 +86,16 @@ describe Match do
         expect(item[1]).to eq(uuid)
       end
     end
+
+    describe "certificates manipulation" do
+      it "loads a pcks12 from file" do
+        fixture_p12 = "./spec/fixtures/match_self_signed.p12"
+        p12 = Match::Utils.load_pkcs12_file(fixture_p12)
+
+        expect(p12).to be_kind_of(OpenSSL::PKCS12)
+        expect(p12.certificate).to be_kind_of(OpenSSL::X509::Certificate)
+        expect(p12.key).to be_kind_of(OpenSSL::PKey::RSA)
+      end
+    end
   end
 end

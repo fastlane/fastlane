@@ -36,4 +36,10 @@ module Match
     return :development if type == "development"
     return :distribution
   end
+
+  def self.cert_type_sym_from_cert(cert)
+    return :enterprise if Match.enterprise? && cert.kind_of?(Spaceship::Portal::Certificate::InHouse)
+    return :development if cert.kind_of?(Spaceship::Portal::Certificate::Development)
+    return :distribution
+  end
 end
