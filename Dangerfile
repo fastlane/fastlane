@@ -17,7 +17,7 @@ if !git.modified_files.include?('CHANGELOG.md') && !git.modified_files.grep(/lib
   markdown <<-MARKDOWN
 Here's an example of your CHANGELOG entry:
 ```markdown
-* #{pr_title}#{' '}
+* #{pr_title}#{'  '}
   [#{pr_author}](https://github.com/#{pr_author})
   [#pr_number](https://github.com/fastlane/fastlane/pull/pr_number)
 ```
