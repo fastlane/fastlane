@@ -30,7 +30,7 @@ describe Snapshot do
       end
     end
 
-    describe 'output_simulator_logs' do
+    describe 'copy_simulator_logs' do
       it 'copies all device logs to the output directory' do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
           output_directory: '/tmp/scan_results',
@@ -62,8 +62,8 @@ describe Snapshot do
           with(command: "xcrun simctl spawn 22222 log collect 2>/dev/null", print_all: false, print_command: true).
           and_return("/tmp/folder")
 
-        Snapshot::Runner.new.output_simulator_logs("iPhone 6s", "de-DE", nil, 0)
-        Snapshot::Runner.new.output_simulator_logs("iPhone 6", "en-US", nil, 0)
+        Snapshot::Runner.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
+        Snapshot::Runner.new.copy_simulator_logs("iPhone 6", "en-US", nil, 0)
       end
     end
 

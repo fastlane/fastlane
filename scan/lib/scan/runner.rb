@@ -80,7 +80,7 @@ module Scan
       })
       puts ""
 
-      output_simulator_logs
+      copy_simulator_logs
 
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
@@ -93,23 +93,13 @@ module Scan
       end
     end
 
-    def output_simulator_logs
+    def copy_simulator_logs
       return unless Scan.config[:include_simulator_logs]
 
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
-        sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
-        logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
-        FileUtils.rm_rf(logarchive_src) if File.exist?(logarchive_src)
-
-        command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
-
         logarchive_dest = File.join(Scan.config[:output_directory], "system_logs-#{device.name}_#{device.os_type}_#{device.os_version}.logarchive")
-        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
-        FileUtils.rm_rf(logarchive_dest) if File.exist?(logarchive_dest)
-        FileUtils.cp_r(logarchive_src, logarchive_dest)
-        UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dest}'..."
+        FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
       end
     end
 

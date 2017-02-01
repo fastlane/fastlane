@@ -52,7 +52,7 @@ module Snapshot
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
 
-            output_simulator_logs(device, language, locale, launch_arguments)
+            copy_simulator_logs(device, language, locale, launch_arguments)
           end
         end
       end
@@ -98,27 +98,17 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs(device_name, language, locale, launch_arguments)
+    def copy_simulator_logs(device_name, language, locale, launch_arguments)
       return unless Snapshot.config[:output_simulator_logs]
 
       detected_language = locale || language
       language_folder = File.join(Snapshot.config[:output_directory], detected_language)
       device = TestCommandGenerator.find_device(device_name)
       components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
+
       UI.header("Collecting system logs #{device_name} - #{language}")
-
-      sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
-      logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
-      FileUtils.rm_rf(logarchive_src) if File.exist?(logarchive_src)
-
-      command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
-      FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
-
       logarchive_dest = File.join(language_folder, "system_logs-" + Digest::MD5.hexdigest(components.join("-")) + ".logarchive")
-      # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
-      FileUtils.rm_rf(logarchive_dest) if File.exist?(logarchive_dest)
-      FileUtils.cp_r(logarchive_src, logarchive_dest)
-      UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dest}'..."
+      FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
     end
 
     def print_results(results)
