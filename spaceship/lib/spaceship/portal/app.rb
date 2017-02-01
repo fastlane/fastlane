@@ -103,7 +103,7 @@ module Spaceship
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
           all(mac: mac).find do |app|
-            app.bundle_id == bundle_id
+            return app if app.bundle_id.casecmp(bundle_id) == 0
           end
         end
       end

@@ -67,6 +67,12 @@ describe Spaceship::Portal::App do
       expect(app.is_wildcard).to eq(false)
     end
 
+    it "works with specific App IDs even with diffrent case" do
+      app = Spaceship::Portal::App.find("net.sunaPPs.151")
+      expect(app.app_id).to eq("B7JBD8LHAA")
+      expect(app.is_wildcard).to eq(false)
+    end
+
     it "works with wilcard App IDs" do
       app = Spaceship::Portal::App.find("net.sunapps.*")
       expect(app.app_id).to eq("L42E9BTRAA")
