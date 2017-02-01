@@ -15,40 +15,40 @@ module Spaceship
     #####################################################
 
     def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device, is_messages)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, screenshot_picture_type(device, is_messages), false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, is_messages))
     end
 
     def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_id, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.SortedScreenShot', true)
+      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.SortedScreenShot')
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.LargeApplicationIcon', false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.LargeApplicationIcon')
     end
 
     def upload_watch_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/image', content_provider_id, sso_token_for_image, 'MZPFT.GizmoAppIcon', false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.GizmoAppIcon')
     end
 
     def upload_geojson(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/geo-json', content_provider_id, sso_token_for_image, false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/geo-json', content_provider_id: content_provider_id, sso_token: sso_token_for_image)
     end
 
     def upload_trailer(app_version, upload_file, content_provider_id, sso_token_for_video)
-      upload_file(app_version, upload_file, '/upload/purple-video', content_provider_id, sso_token_for_video, false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/purple-video', content_provider_id: content_provider_id, sso_token: sso_token_for_video)
     end
 
     def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version, upload_file, '/upload/app-screenshot-image', content_provider_id, sso_token_for_image, false)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/app-screenshot-image', content_provider_id: content_provider_id, sso_token: sso_token_for_image)
     end
 
     private
 
-    def upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set = nil, use_app_id = false)
+    def upload_file(app_version: nil, upload_file: nil, path: nil, content_provider_id: nil, sso_token: nil, du_validation_rule_set: nil, app_id: nil)
       raise "File #{upload_file.file_path} is empty" if upload_file.file_size == 0
 
-      if use_app_id
-        app_id = app_version
+      if app_id
+        app_id = app_id
         app_type = nil
         version = nil
         referrer = nil
