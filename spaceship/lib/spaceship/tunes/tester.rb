@@ -90,7 +90,7 @@ module Spaceship
         # @param identifier (String) (required): Value used to filter the tester, case insensitive
         def find(identifier)
           all.find do |tester|
-            (tester.tester_id.to_s.casecmp(identifier.to_s).zero? or tester.email.to_s.casecmp(identifier.to_s).zero?)
+            ((tester.tester_id && tester.tester_id.to_s.casecmp(identifier.to_s).zero?) or tester.email.to_s.casecmp(identifier.to_s).zero?)
           end
         end
 
@@ -131,7 +131,7 @@ module Spaceship
         # @param identifier (String) (required): Value used to filter the tester, case insensitive
         def find_by_app(app_id, identifier)
           all_by_app(app_id).find do |tester|
-            (tester.tester_id.to_s.casecmp(identifier.to_s).zero? or tester.email.to_s.casecmp(identifier.to_s).zero?)
+            ((tester.tester_id && tester.tester_id.to_s.casecmp(identifier.to_s).zero?) or tester.email.to_s.casecmp(identifier.to_s).zero?)
           end
         end
 
