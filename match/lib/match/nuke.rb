@@ -176,7 +176,7 @@ module Match
         distribution: Spaceship.certificate.production,
         development:  Spaceship.certificate.development,
         enterprise:   Spaceship.certificate.in_house
-      }[type] ||= raise "Unknown type #{type}"
+      }[type] ||= raise "Unknown type '#{type}'"
     end
 
     # The kind of provisioning profile we're interested in
@@ -186,7 +186,7 @@ module Match
         development: Spaceship.provisioning_profile.development,
         enterprise:  Spaceship.provisioning_profile.in_house,
         adhoc:       Spaceship.provisioning_profile.ad_hoc
-      }[prov_type] ||= raise "Unknown prov. type #{prov_type}"
+      }[prov_type] ||= raise "Unknown provisioning type '#{prov_type}'"
     end
   end
 end

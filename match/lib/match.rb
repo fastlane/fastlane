@@ -32,6 +32,6 @@ module Match
     return :enterprise if type == "enterprise"
     return :development if type == "development"
     return :distribution if type == "adhoc" || type == "appstore"
-    raise "Unknown type #{type}"
+    raise "Unknown cert type: '#{type}'"
   end
 end
