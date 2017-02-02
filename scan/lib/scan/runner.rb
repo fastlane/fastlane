@@ -79,17 +79,9 @@ module Scan
       })
       puts ""
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
+      copy_simulator_logs
 
-      if Scan.config[:include_simulator_logs]
-        Scan.devices.each do |device|
-          sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-          if File.exist?(sim_device_logfilepath_source)
-            sim_device_logfilepath_dest = File.join(Scan.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-            FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-          end
-        end
-      end
+      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
       unless tests_exit_status == 0
         UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
@@ -97,6 +89,16 @@ module Scan
 
       unless result[:failures] == 0
         UI.user_error!("Tests failed")
+      end
+    end
+
+    def copy_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        logarchive_dest = File.join(Scan.config[:output_directory], "system_logs-#{device.name}_#{device.os_type}_#{device.os_version}.logarchive")
+        FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
       end
     end
 
