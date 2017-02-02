@@ -355,7 +355,7 @@ describe Scan do
       # FIXME: expect UI error starting "No simulators found that are equal to the version of specifier"
     end
 
-    describe "test-without-building and build-for-testing", now: true do
+    describe "test-without-building and build-for-testing" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
