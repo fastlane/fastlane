@@ -132,13 +132,13 @@ module Sigh
                                 bundle_id: bundle_id,
                               certificate: cert,
                                       mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvos' : nil)
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
       profile
     end
 
     def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
-      when 'ios'
+      when 'ios', 'tvos'
         if profile_type == Spaceship.provisioning_profile.Development
           certificates = Spaceship.certificate.development.all
         elsif profile_type == Spaceship.provisioning_profile.InHouse
