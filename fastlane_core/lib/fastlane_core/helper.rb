@@ -199,13 +199,13 @@ module FastlaneCore
         name
       ].map { |path| File.expand_path(path) }
 
-      # Transforms ["thing"] to ["thing", "thing-db", "thing.keychain", "thing.keychain-db"]
+      # Transforms ["thing"] to ["thing-db", "thing.keychain-db", "thing", "thing.keychain"]
       keychain_paths = []
       possible_locations.each do |location|
-        keychain_paths << location
         keychain_paths << "#{location}-db"
-        keychain_paths << "#{location}.keychain"
         keychain_paths << "#{location}.keychain-db"
+        keychain_paths << location
+        keychain_paths << "#{location}.keychain"
       end
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
