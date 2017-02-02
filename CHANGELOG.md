@@ -40,7 +40,7 @@ When contributing to fastlane, don't forget to add an entry to this CHANGELOG.md
 * Fix `spaceauth` YAML spaceship cookie loading  
   [hjanuschka](https://github.com/hjanuschka)
   [#8012](https://github.com/fastlane/fastlane/pull/8012)
-* Simplify spaceship requests for account user information 
+* Simplify spaceship requests for account user information  
   [KrauseFx](https://github.com/KrauseFx)
   [#8013](https://github.com/fastlane/fastlane/pull/8013)
 * Improve error output when pilot can’t register new testers  
