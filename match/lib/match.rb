@@ -25,15 +25,13 @@ module Match
   end
 
   def self.profile_type_sym(type)
-    return :enterprise if type == "enterprise"
-    return :adhoc if type == "adhoc"
-    return :appstore if type == "appstore"
-    return :development
+    return type.to_sym
   end
 
   def self.cert_type_sym(type)
     return :enterprise if type == "enterprise"
     return :development if type == "development"
-    return :distribution
+    return :distribution if type == "adhoc" || type == "appstore"
+    raise "Unknown cert type: '#{type}'"
   end
 end

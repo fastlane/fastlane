@@ -51,8 +51,10 @@ module Match
       UI.message "Fetching certificates and profiles..."
       cert_type = Match.cert_type_sym(type)
 
-      prov_types = [:development]
+      prov_types = []
+      prov_types = [:development] if cert_type == :development
       prov_types = [:appstore, :adhoc] if cert_type == :distribution
+      prov_types = [:enterprise] if cert_type == :enterprise
 
       Spaceship.login(params[:username])
       Spaceship.select_team
@@ -172,21 +174,21 @@ module Match
 
     # The kind of certificate we're interested in
     def certificate_type(type)
-      cert_type = Spaceship.certificate.production
-      cert_type = Spaceship.certificate.development if type == :development
-      cert_type = Spaceship.certificate.in_house if type == :enterprise
-
-      cert_type
+      {
+        distribution: Spaceship.certificate.production,
+        development:  Spaceship.certificate.development,
+        enterprise:   Spaceship.certificate.in_house
+      }[type] ||= raise "Unknown type '#{type}'"
     end
 
     # The kind of provisioning profile we're interested in
-    def profile_type(type)
-      profile_type = Spaceship.provisioning_profile.app_store
-      profile_type = Spaceship.provisioning_profile.in_house if type == :enterprise
-      profile_type = Spaceship.provisioning_profile.ad_hoc if type == :adhoc
-      profile_type = Spaceship.provisioning_profile.development if type == :development
-
-      profile_type
+    def profile_type(prov_type)
+      {
+        appstore:    Spaceship.provisioning_profile.app_store,
+        development: Spaceship.provisioning_profile.development,
+        enterprise:  Spaceship.provisioning_profile.in_house,
+        adhoc:       Spaceship.provisioning_profile.ad_hoc
+      }[prov_type] ||= raise "Unknown provisioning type '#{prov_type}'"
     end
   end
 end
