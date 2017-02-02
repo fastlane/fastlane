@@ -51,6 +51,8 @@ module Snapshot
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
+
+            copy_simulator_logs(device, language, locale, launch_arguments)
           end
         end
       end
@@ -61,10 +63,6 @@ module Snapshot
 
       # Generate HTML report
       ReportsGenerator.new.generate
-
-      if Snapshot.config[:output_simulator_logs]
-        output_simulator_logs
-      end
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
@@ -100,15 +98,17 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs
-      Snapshot.config[:devices].each do |device_name|
-        device = TestCommandGenerator.find_device(device_name)
-        sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-        next unless File.exist?(sim_device_logfilepath_source)
+    def copy_simulator_logs(device_name, language, locale, launch_arguments)
+      return unless Snapshot.config[:output_simulator_logs]
 
-        sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-        FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-      end
+      detected_language = locale || language
+      language_folder = File.join(Snapshot.config[:output_directory], detected_language)
+      device = TestCommandGenerator.find_device(device_name)
+      components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
+
+      UI.header("Collecting system logs #{device_name} - #{language}")
+      logarchive_dest = File.join(language_folder, "system_logs-" + Digest::MD5.hexdigest(components.join("-")) + ".logarchive")
+      FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
     end
 
     def print_results(results)
