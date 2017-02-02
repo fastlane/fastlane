@@ -1,5 +1,10 @@
 skip_docs
 
+desc "Runs the unit tests and other verifications for the fastlane repo"
+lane :test do |options|
+  validate_repo
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   ensure_git_branch(branch: "master")
@@ -253,6 +258,9 @@ private_lane :validate_repo do
     # Run the tests
     #
     sh "bundle exec rake test_all"
+
+    # Verify shell code style
+    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -exec shellcheck {} +'
   end
 
   # Verify docs are still working
