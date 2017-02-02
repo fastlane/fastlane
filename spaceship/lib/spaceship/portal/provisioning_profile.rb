@@ -65,6 +65,11 @@ module Spaceship
       #   "ios"
       attr_accessor :platform
 
+      # @return (String) The supported sub_platform for this profile
+      # @example
+      #   "tvOS"
+      attr_accessor :sub_platform
+
       # No information about this attribute
       attr_accessor :managing_app
 
@@ -136,6 +141,7 @@ module Spaceship
         'type' => :type,
         'version' => :version,
         'proProPlatform' => :platform,
+        'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
         'appId' => :app
       })
@@ -205,6 +211,8 @@ module Spaceship
 
           app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
+
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
 
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
@@ -276,6 +284,20 @@ module Spaceship
           return profiles.select do |profile|
             profile.class == klass
           end
+        end
+
+        # @return (Array) Returns all profiles registered for this account
+        #  If you're calling this from a subclass (like AdHoc), this will
+        #  only return the profiles that are of this type
+        def all_tvos
+          profiles = all(mac: false)
+          tv_os_profiles = []
+          profiles.each do |tv_os_profile|
+            if tv_os_profile.tvos?
+              tv_os_profiles << tv_os_profile
+            end
+          end
+          return tv_os_profiles
         end
 
         # @return (Array) Returns an array of provisioning
@@ -385,7 +407,8 @@ module Spaceship
             app.app_id,
             certificates.map(&:id),
             devices.map(&:id),
-            mac: mac?
+            mac: mac?,
+            sub_platform: tvos? ? 'tvOS' : nil
           )
         end
 
@@ -423,6 +446,11 @@ module Spaceship
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
+      end
+
+      # @return (Bool) Is this a tvos provisioning profile?
+      def tvos?
+        sub_platform == 'tvOS'
       end
 
       def devices

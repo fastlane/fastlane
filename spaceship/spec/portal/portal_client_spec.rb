@@ -207,6 +207,12 @@ describe Spaceship::Client do
           response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
         end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
       end
+
+      it "works when subplatform is null and mac is false" do
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'], mac: false, sub_platform: nil)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
+        expect(response['distributionMethod']).to eq('limited')
+      end
     end
 
     describe '#delete_provisioning_profile!' do

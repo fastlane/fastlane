@@ -21,7 +21,7 @@ describe Match do
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier]).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path)
-      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore", git_url, "master")
+      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore and platform ios", git_url, "master")
 
       spaceship = "spaceship"
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)

@@ -241,7 +241,7 @@ module Frameit
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 2.0).round
+      (actual_font_size / 3.0).round
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image

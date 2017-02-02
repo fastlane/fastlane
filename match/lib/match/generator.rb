@@ -39,7 +39,13 @@ module Match
 
       prov_type = Match.profile_type_sym(params[:type])
 
-      profile_name = ["match", profile_type_name(prov_type), app_identifier].join(" ")
+      names = ["match", profile_type_name(prov_type), app_identifier]
+
+      if params[:platform].to_s != :ios.to_s # For ios we do not include the platform for backwards compatibility
+        names << params[:platform]
+      end
+
+      profile_name = names.join(" ")
 
       values = {
         app_identifier: app_identifier,
@@ -52,6 +58,7 @@ module Match
         team_id: params[:team_id]
       }
 
+      values[:platform] = params[:platform]
       values[:adhoc] = true if prov_type == :adhoc
       values[:development] = true if prov_type == :development
 
