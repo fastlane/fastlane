@@ -51,7 +51,7 @@ module Match
 
       # Print a summary table for each app_identifier
       app_identifiers.each do |app_identifier|
-        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type])
+        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type], platform: params[:platform])
       end
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
@@ -102,7 +102,11 @@ module Match
     def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil)
       prov_type = Match.profile_type_sym(params[:type])
 
-      profile_name = [Match::Generator.profile_type_name(prov_type), app_identifier].join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
+      names = [Match::Generator.profile_type_name(prov_type), app_identifier]
+      if params[:platform].to_s != :ios.to_s
+        names.push(params[:platform])
+      end
+      profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
 
@@ -143,16 +147,20 @@ module Match
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
-                                                                       type: prov_type),
+                                                                       type: prov_type,
+                                                                   platform: params[:platform]),
+
                              uuid)
 
       # TeamIdentifier is returned as an array, but we're not sure why there could be more than one
       Utils.fill_environment(Utils.environment_variable_name_team_id(app_identifier: app_identifier,
-                                                                               type: prov_type),
+                                                                               type: prov_type,
+                                                                           platform: params[:platform]),
                              parsed["TeamIdentifier"].first)
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                                    type: prov_type),
+                                                                                    type: prov_type,
+                                                                                platform: params[:platform]),
                              parsed["Name"])
 
       return uuid
