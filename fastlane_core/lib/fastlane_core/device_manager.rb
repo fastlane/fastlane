@@ -198,13 +198,13 @@ module FastlaneCore
         sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
         logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
 
+        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
         FileUtils.rm_rf(logarchive_src)
         FileUtils.rm_rf(dest)
 
         command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
 
-        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
         FileUtils.cp_r(logarchive_src, dest)
         UI.success "Copying file '#{logarchive_src}' to '#{dest}'..."
       end
