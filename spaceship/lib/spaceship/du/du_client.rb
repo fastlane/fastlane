@@ -77,7 +77,7 @@ module Spaceship
       end
 
       if r.status == 500 and r.body.include?("Server Error")
-        return upload_file(app_version, upload_file, path, content_provider_id, sso_token, du_validation_rule_set)
+        return upload_file(app_version: app_version, upload_file: upload_file, path: path, content_provider_id: content_provider_id, sso_token: sso_token, du_validation_rule_set: du_validation_rule_set, app_id: app_id)
       end
 
       parse_upload_response(r)
