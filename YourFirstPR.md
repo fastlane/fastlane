@@ -26,6 +26,18 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 
 ## Testing your local changes
 
+### Checking it all
+
+The `Fastfile` included at the top of the fastlane project allows you to run several validation steps, such as automated tests, code style and more.
+
+```
+bundle exec fastlane test
+```
+
+You can also run those steps independently or on a more fine grained way.
+
+### Automated tests
+
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
 First, navigate into the root of the _fastlane_ project and run unit tests using
@@ -36,6 +48,8 @@ bundle exec rspec
 
 If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
 
+### Code style
+
 To verify and auto-fix the code style
 
 ```
@@ -43,6 +57,8 @@ bundle exec rubocop -a
 ```
 
 If you want to run code style verification only for one tool, use `bundle exec rubocop -a [tool_name]`
+
+### Test the changes for your application
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application.
 
