@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.authors
-        ["lacostej/jerome@wewanttoknow.com"]
+        ["lacostej"]
       end
 
       def self.is_supported?(platform)
