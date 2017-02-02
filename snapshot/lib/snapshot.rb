@@ -14,6 +14,7 @@ require 'snapshot/fixes/simulator_zoom_fix'
 require 'snapshot/fixes/hardware_keyboard_fix'
 
 require 'fastlane_core'
+require 'snapshot/features'
 
 require 'open3'
 

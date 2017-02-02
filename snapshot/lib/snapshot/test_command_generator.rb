@@ -2,13 +2,19 @@ module Snapshot
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
     class << self
-      def generate(device_type: nil)
+      def generate(device_type: nil, build_type: "build test")
+        simname = device_type =~ /^Apple TV/ ? "appletvsimulator" : "iphonesimulator"
         parts = prefix
         parts << "xcodebuild"
         parts += options
-        parts += destination(device_type)
+        if FastlaneCore::Feature.enabled?('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING')
+          parts += destination(device_type) if build_type != "build-for-testing"
+          parts += ["  -sdk #{simname} ONLY_ACTIVE_ARCH=NO"] if build_type == "build-for-testing"
+        else
+          parts += destination(device_type)
+        end
         parts += build_settings
-        parts += actions
+        parts += actions(build_type)
         parts += suffix
         parts += pipe
 
@@ -49,11 +55,18 @@ module Snapshot
         build_settings
       end
 
-      def actions
+      def actions(build_type)
         actions = []
-        actions << :clean if Snapshot.config[:clean]
-        actions << :build # https://github.com/fastlane/snapshot/issues/246
-        actions << :test
+
+        if FastlaneCore::Feature.enabled?('FASTLANE_SNAPSHOT_BUILD_FOR_TESTING')
+          actions << :clean if Snapshot.config[:clean] and build_type != "test-without-building"
+          # actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << build_type
+        else
+          actions << :clean if Snapshot.config[:clean]
+          actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << :test
+        end
 
         actions
       end
@@ -75,6 +88,7 @@ module Snapshot
         #   { platform:iOS Simulator, id:A141F23B-96B3-491A-8949-813B376C28A7, OS:9.0, name:iPhone 5 }
         #
         simulators = FastlaneCore::DeviceManager.simulators
+
         # Sort devices with matching names by OS version, largest first, so that we can
         # pick the device with the newest OS in case an exact OS match is not available
         name_matches = simulators.find_all { |sim| sim.name.strip == device_name.strip }
