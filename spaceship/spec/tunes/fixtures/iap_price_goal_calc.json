@@ -1,0 +1,1095 @@
+{
+  "data": {
+    "HK": {
+      "countryName": "Hong Kong",
+      "fRetailPrice": "HK$ 5.00",
+      "fWholesalePrice": "HK$ 3.50",
+      "fWholesalePrice2": "HK$ 4.25",
+      "tierStem": "1"
+    },
+    "PT": {
+      "countryName": "Portugal",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "HN": {
+      "countryName": "Honduras",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PW": {
+      "countryName": "Palau",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PY": {
+      "countryName": "Paraguay",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "HR": {
+      "countryName": "Croatia",
+      "fRetailPrice": "US$0.61",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "YE": {
+      "countryName": "Yemen",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "HU": {
+      "countryName": "Hungary",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,27 €",
+      "fWholesalePrice2": "0,33 €",
+      "tierStem": "1"
+    },
+    "QA": {
+      "countryName": "Qatar",
+      "fRetailPrice": "1.99 QAR",
+      "fWholesalePrice": "1.39 QAR",
+      "fWholesalePrice2": "1.69 QAR",
+      "tierStem": "1"
+    },
+    "ID": {
+      "countryName": "Indonesia",
+      "fRetailPrice": "Rp 6ribu",
+      "fWholesalePrice": "Rp 4.200",
+      "fWholesalePrice2": "Rp 5.100",
+      "tierStem": "3"
+    },
+    "IE": {
+      "countryName": "Ireland",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "IL": {
+      "countryName": "Israel",
+      "fRetailPrice": "NIS 1.90",
+      "fWholesalePrice": "NIS 1.33",
+      "fWholesalePrice2": "NIS 1.62",
+      "tierStem": "1"
+    },
+    "AE": {
+      "countryName": "United Arab Emirates",
+      "fRetailPrice": "AED 1.99",
+      "fWholesalePrice": "AED 1.39",
+      "fWholesalePrice2": "AED 1.69",
+      "tierStem": "1"
+    },
+    "IN": {
+      "countryName": "India",
+      "fRetailPrice": "Rs 30",
+      "fWholesalePrice": "Rs 18.26",
+      "fWholesalePrice2": "Rs 22.17",
+      "tierStem": "3"
+    },
+    "AG": {
+      "countryName": "Antigua and Barbuda",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "ZA": {
+      "countryName": "South Africa",
+      "fRetailPrice": "R6.99",
+      "fWholesalePrice": "R4.29",
+      "fWholesalePrice2": "R5.21",
+      "tierStem": "2"
+    },
+    "AI": {
+      "countryName": "Anguilla",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "IS": {
+      "countryName": "Iceland",
+      "fRetailPrice": "US$0.61",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "AL": {
+      "countryName": "Albania",
+      "fRetailPrice": "US$0.59",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "IT": {
+      "countryName": "Italy",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "AM": {
+      "countryName": "Armenia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "AO": {
+      "countryName": "Angola",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "AR": {
+      "countryName": "Argentina",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "AT": {
+      "countryName": "Austria",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "AU": {
+      "countryName": "Australia",
+      "fRetailPrice": "AU$0.49",
+      "fWholesalePrice": "AU$0.31",
+      "fWholesalePrice2": "AU$0.38",
+      "tierStem": "1"
+    },
+    "AZ": {
+      "countryName": "Azerbaijan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "RO": {
+      "countryName": "Romania",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "ZW": {
+      "countryName": "Zimbabwe",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BB": {
+      "countryName": "Barbados",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BE": {
+      "countryName": "Belgium",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "JM": {
+      "countryName": "Jamaica",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "RU": {
+      "countryName": "Russia",
+      "fRetailPrice": "29 р.",
+      "fWholesalePrice": "17,20 р.",
+      "fWholesalePrice2": "20,89 р.",
+      "tierStem": "2"
+    },
+    "BF": {
+      "countryName": "Burkina Faso",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BG": {
+      "countryName": "Bulgaria",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "JO": {
+      "countryName": "Jordan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BH": {
+      "countryName": "Bahrain",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "JP": {
+      "countryName": "Japan",
+      "fRetailPrice": "JP¥50",
+      "fWholesalePrice": "JP¥35",
+      "fWholesalePrice2": "JP¥43",
+      "tierStem": "1"
+    },
+    "BJ": {
+      "countryName": "Benin",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BM": {
+      "countryName": "Bermuda",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BN": {
+      "countryName": "Brunei Darussalam",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BO": {
+      "countryName": "Bolivia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SA": {
+      "countryName": "Saudi Arabia",
+      "fRetailPrice": "SR 1.99",
+      "fWholesalePrice": "SR 1.39",
+      "fWholesalePrice2": "SR 1.69",
+      "tierStem": "1"
+    },
+    "SB": {
+      "countryName": "Solomon Islands",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BR": {
+      "countryName": "Brazil",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SC": {
+      "countryName": "Seychelles",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BS": {
+      "countryName": "Bahamas",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BT": {
+      "countryName": "Bhutan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SE": {
+      "countryName": "Sweden",
+      "fRetailPrice": "5,00 kr",
+      "fWholesalePrice": "2,80 kr",
+      "fWholesalePrice2": "3,40 kr",
+      "tierStem": "1"
+    },
+    "SG": {
+      "countryName": "Singapore",
+      "fRetailPrice": "S$ .48",
+      "fWholesalePrice": "S$ .34",
+      "fWholesalePrice2": "S$ .41",
+      "tierStem": "1"
+    },
+    "BW": {
+      "countryName": "Botswana",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SI": {
+      "countryName": "Slovenia",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "BY": {
+      "countryName": "Belarus",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "BZ": {
+      "countryName": "Belize",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SK": {
+      "countryName": "Slovakia",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "SL": {
+      "countryName": "Sierra Leone",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KE": {
+      "countryName": "Kenya",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SN": {
+      "countryName": "Senegal",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KG": {
+      "countryName": "Kyrgyzstan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KH": {
+      "countryName": "Cambodia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CA": {
+      "countryName": "Canada",
+      "fRetailPrice": "CA$0.49",
+      "fWholesalePrice": "CA$0.34",
+      "fWholesalePrice2": "CA$0.42",
+      "tierStem": "1"
+    },
+    "SR": {
+      "countryName": "Suriname",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "ST": {
+      "countryName": "São Tomé and Príncipe",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "SV": {
+      "countryName": "El Salvador",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KN": {
+      "countryName": "St. Kitts and Nevis",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CG": {
+      "countryName": "Congo, Republic of",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CH": {
+      "countryName": "Switzerland",
+      "fRetailPrice": "CHF 0.50",
+      "fWholesalePrice": "CHF 0.32",
+      "fWholesalePrice2": "CHF 0.39",
+      "tierStem": "1"
+    },
+    "KR": {
+      "countryName": "Korea, Republic Of",
+      "fRetailPrice": "US$0.54",
+      "fWholesalePrice": "US$0.39",
+      "fWholesalePrice2": "US$0.46",
+      "tierStem": "1"
+    },
+    "SZ": {
+      "countryName": "Swaziland",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CL": {
+      "countryName": "Chile",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CN": {
+      "countryName": "China",
+      "fRetailPrice": "CN¥3.00",
+      "fWholesalePrice": "CN¥2.06",
+      "fWholesalePrice2": "CN¥2.50",
+      "tierStem": "3"
+    },
+    "CO": {
+      "countryName": "Colombia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KW": {
+      "countryName": "Kuwait",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KY": {
+      "countryName": "Cayman Islands",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CR": {
+      "countryName": "Costa Rica",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "KZ": {
+      "countryName": "Kazakhstan",
+      "fRetailPrice": "149.00₸",
+      "fWholesalePrice": "104.30₸",
+      "fWholesalePrice2": "126.65₸",
+      "tierStem": "4"
+    },
+    "TC": {
+      "countryName": "Turks and Caicos",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TD": {
+      "countryName": "Chad",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CV": {
+      "countryName": "Cape Verde",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TH": {
+      "countryName": "Thailand",
+      "fRetailPrice": "฿15.00",
+      "fWholesalePrice": "฿10.50",
+      "fWholesalePrice2": "฿12.75",
+      "tierStem": "2"
+    },
+    "LA": {
+      "countryName": "Lao People's Democratic Republic",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CY": {
+      "countryName": "Cyprus",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "LB": {
+      "countryName": "Lebanon",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TJ": {
+      "countryName": "Tajikistan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "CZ": {
+      "countryName": "Czech Republic",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "LC": {
+      "countryName": "Saint Lucia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TM": {
+      "countryName": "Turkmenistan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TN": {
+      "countryName": "Tunisia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TR": {
+      "countryName": "Turkey",
+      "fRetailPrice": "1,49 TL",
+      "fWholesalePrice": "1,04 TL",
+      "fWholesalePrice2": "1,27 TL",
+      "tierStem": "3"
+    },
+    "LK": {
+      "countryName": "Sri Lanka",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TT": {
+      "countryName": "Trinidad and Tobago",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "DE": {
+      "countryName": "Germany",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "TW": {
+      "countryName": "Taiwan",
+      "fRetailPrice": "NT$ 10",
+      "fWholesalePrice": "NT$ 7",
+      "fWholesalePrice2": "NT$ 9",
+      "tierStem": "1"
+    },
+    "LR": {
+      "countryName": "Liberia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "TZ": {
+      "countryName": "Tanzania, United Republic Of",
+      "fRetailPrice": "900.00 TZS",
+      "fWholesalePrice": "630.00 TZS",
+      "fWholesalePrice2": "765.00 TZS",
+      "tierStem": "3"
+    },
+    "DK": {
+      "countryName": "Denmark",
+      "fRetailPrice": "5,00 kr",
+      "fWholesalePrice": "2,80 kr",
+      "fWholesalePrice2": "3,40 kr",
+      "tierStem": "1"
+    },
+    "LT": {
+      "countryName": "Lithuania",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "DM": {
+      "countryName": "Dominica",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "LU": {
+      "countryName": "Luxembourg",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,36 €",
+      "tierStem": "1"
+    },
+    "LV": {
+      "countryName": "Latvia",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "DO": {
+      "countryName": "Dominican Republic",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "UA": {
+      "countryName": "Ukraine",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "UG": {
+      "countryName": "Uganda",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "DZ": {
+      "countryName": "Algeria",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MD": {
+      "countryName": "Moldova, Republic Of",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MG": {
+      "countryName": "Madagascar",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "EC": {
+      "countryName": "Ecuador",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MK": {
+      "countryName": "Macedonia, The Former Yugoslav Republic Of",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "US": {
+      "countryName": "United States",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "ML": {
+      "countryName": "Mali",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "EE": {
+      "countryName": "Estonia",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "MN": {
+      "countryName": "Mongolia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "EG": {
+      "countryName": "Egypt",
+      "fRetailPrice": "EGP8.99",
+      "fWholesalePrice": "EGP5.57",
+      "fWholesalePrice2": "EGP6.76",
+      "tierStem": "7"
+    },
+    "MO": {
+      "countryName": "Macau",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "UY": {
+      "countryName": "Uruguay",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MR": {
+      "countryName": "Mauritania",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "UZ": {
+      "countryName": "Uzbekistan",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MS": {
+      "countryName": "Montserrat",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MT": {
+      "countryName": "Malta",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "MU": {
+      "countryName": "Mauritius",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MW": {
+      "countryName": "Malawi",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "MX": {
+      "countryName": "Mexico",
+      "fRetailPrice": "$9.00",
+      "fWholesalePrice": "$6.30",
+      "fWholesalePrice2": "$7.65",
+      "tierStem": "2"
+    },
+    "MY": {
+      "countryName": "Malaysia",
+      "fRetailPrice": "RM1.90",
+      "fWholesalePrice": "RM1.33",
+      "fWholesalePrice2": "RM1.62",
+      "tierStem": "2"
+    },
+    "MZ": {
+      "countryName": "Mozambique",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "VC": {
+      "countryName": "St. Vincent and The Grenadines",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "ES": {
+      "countryName": "Spain",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "VE": {
+      "countryName": "Venezuela",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "VG": {
+      "countryName": "Virgin Islands, British",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "NA": {
+      "countryName": "Namibia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "NE": {
+      "countryName": "Niger",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "VN": {
+      "countryName": "Vietnam",
+      "fRetailPrice": "9.000đ",
+      "fWholesalePrice": "6.300đ",
+      "fWholesalePrice2": "7.650đ",
+      "tierStem": "3"
+    },
+    "NG": {
+      "countryName": "Nigeria",
+      "fRetailPrice": "₦ 150.00",
+      "fWholesalePrice": "₦ 105.00",
+      "fWholesalePrice2": "₦ 127.50",
+      "tierStem": "2"
+    },
+    "NI": {
+      "countryName": "Nicaragua",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "NL": {
+      "countryName": "Netherlands",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "NO": {
+      "countryName": "Norway",
+      "fRetailPrice": "5,00 kr",
+      "fWholesalePrice": "2,80 kr",
+      "fWholesalePrice2": "3,40 kr",
+      "tierStem": "1"
+    },
+    "NP": {
+      "countryName": "Nepal",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "FI": {
+      "countryName": "Finland",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "FJ": {
+      "countryName": "Fiji",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "FM": {
+      "countryName": "Micronesia, Federated States of",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "FR": {
+      "countryName": "France",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,29 €",
+      "fWholesalePrice2": "0,35 €",
+      "tierStem": "1"
+    },
+    "NZ": {
+      "countryName": "New Zealand",
+      "fRetailPrice": "NZ$0.49",
+      "fWholesalePrice": "NZ$0.30",
+      "fWholesalePrice2": "NZ$0.36",
+      "tierStem": "1"
+    },
+    "GB": {
+      "countryName": "United Kingdom",
+      "fRetailPrice": "£0.49",
+      "fWholesalePrice": "£0.29",
+      "fWholesalePrice2": "£0.35",
+      "tierStem": "1"
+    },
+    "GD": {
+      "countryName": "Grenada",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "OM": {
+      "countryName": "Oman",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "GH": {
+      "countryName": "Ghana",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "GM": {
+      "countryName": "Gambia",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "GR": {
+      "countryName": "Greece",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    },
+    "GT": {
+      "countryName": "Guatemala",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "GW": {
+      "countryName": "Guinea-Bissau",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PA": {
+      "countryName": "Panama",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "GY": {
+      "countryName": "Guyana",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PE": {
+      "countryName": "Peru",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PG": {
+      "countryName": "Papua New Guinea",
+      "fRetailPrice": "US$0.49",
+      "fWholesalePrice": "US$0.35",
+      "fWholesalePrice2": "US$0.42",
+      "tierStem": "1"
+    },
+    "PH": {
+      "countryName": "Philippines",
+      "fRetailPrice": "₱ 19.00",
+      "fWholesalePrice": "₱ 13.30",
+      "fWholesalePrice2": "₱ 16.15",
+      "tierStem": "3"
+    },
+    "PK": {
+      "countryName": "Pakistan",
+      "fRetailPrice": "Rs 50.00",
+      "fWholesalePrice": "Rs 35.00",
+      "fWholesalePrice2": "Rs 42.50",
+      "tierStem": "3"
+    },
+    "PL": {
+      "countryName": "Poland",
+      "fRetailPrice": "0,49 €",
+      "fWholesalePrice": "0,28 €",
+      "fWholesalePrice2": "0,34 €",
+      "tierStem": "1"
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

@@ -45,6 +45,7 @@ def before_each_spaceship
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
   TunesStubbing.itc_stub_supported_countries
+  TunesStubbing.itc_stub_iap
 end
 
 def after_each_spaceship
