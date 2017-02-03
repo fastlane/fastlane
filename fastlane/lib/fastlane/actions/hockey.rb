@@ -261,7 +261,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac, :android].include? platform
+        true
       end
 
       def self.details
