@@ -95,7 +95,7 @@ module Fastlane
           if response.body.to_s.include?("App could not be created")
             UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
           else
-            UI.user_error!("Error when trying to upload ipa to HockeyApp: #{response.body}")
+            UI.user_error!("Error when trying to upload ipa to HockeyApp: #{response.status} - #{response.body}")
           end
         end
       end
@@ -183,7 +183,7 @@ module Fastlane
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
-                                      description: "App id of the app you are targeting, usually you won't need this value. Required, if `upload_dsm_only` set to `true`",
+                                      description: "App id of the app you are targeting, usually you won't need this value. Required, if `upload_dsym_only` set to `true`",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :commit_sha,
                                       env_name: "FL_HOCKEY_COMMIT_SHA",
