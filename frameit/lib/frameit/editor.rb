@@ -109,7 +109,7 @@ module Frameit
       if fetch_config['title']
         background = put_title_into_background(background, fetch_config['stack_title'])
       end
-      
+
       if self.frame # we have no frame on le mac
         resize_frame!
         put_into_frame
@@ -213,11 +213,12 @@ module Frameit
       vertical_padding = vertical_frame_padding
       keyword_top_space = vertical_padding
 
-      title_top_space = vertical_padding + keyword.height + (title.height / 2)
+      spacing_between_title_and_keyword = (title.height / 2)
+      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title_width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
 
-      self.top_space_above_device += title.height + keyword.height + vertical_padding
+      self.top_space_above_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose "Over"
@@ -237,7 +238,7 @@ module Frameit
       keyword = title_images[:keyword]
       title = title_images[:title]
 
-      if stack_title && keyword != nil && title != nil &&  keyword.width > 0 && title.width > 0
+      if stack_title && !keyword.nil? && !title.nil? && keyword.width > 0 && title.width > 0
         background = put_title_into_background_stacked(background, title, keyword)
         return background
       end
