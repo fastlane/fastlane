@@ -10,7 +10,7 @@ describe Fastlane do
       it "raises an error if unknow method is called" do
         expect do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
-        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
+        end.to raise_exception "Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
       end
     end
 
@@ -205,7 +205,7 @@ describe Fastlane do
 
         expect do
           ff.runner.execute(:crash, nil, { value: time })
-        end.to raise_error # since we cause a crash
+        end.to raise_error("Wups") # since we cause a crash
 
         expect(File.read("/tmp/error.txt")).to eq(time)
         File.delete("/tmp/error.txt")
@@ -262,7 +262,7 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid, :ios)
-          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
+          end.to raise_error "Could not find action, lane or variable 'wrong_platform'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
         end
 
         it "raises an exception when not passing a hash" do
@@ -319,6 +319,13 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
+      end
+
+      it "imports actions associated with a Fastfile before their Fastfile", focus: true do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
+        expect do
+          ff.import('./import1/Fastfile')
+        end.not_to raise_error
       end
 
       it "raises an error if lane is not available" do

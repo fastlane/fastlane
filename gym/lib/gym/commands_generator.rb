@@ -32,7 +32,7 @@ module Gym
       global_option("--verbose") { $verbose = true }
 
       command :build do |c|
-        c.syntax = "gym"
+        c.syntax = "fastlane gym"
         c.description = "Just builds your app"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Gym::Options.available_options,
@@ -42,7 +42,7 @@ module Gym
       end
 
       command :init do |c|
-        c.syntax = "gym init"
+        c.syntax = "fastlane gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
           containing = (File.directory?("fastlane") ? 'fastlane' : '.')

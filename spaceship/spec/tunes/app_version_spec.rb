@@ -22,6 +22,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.can_prepare_for_upload).to eq(false)
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
+      expect(version.auto_release_date).to eq(nil)
       expect(version.can_beta_test).to eq(true)
       expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
@@ -597,6 +598,15 @@ describe Spaceship::AppVersion, all: true do
         TunesStubbing.itc_stub_valid_update
         expect(client).to receive(:update_app_version!).with('898536088', 812_106_519, version.raw_data)
         version.save!
+      end
+
+      it "overwrites release_upon_approval if auto_release_date is set" do
+        TunesStubbing.itc_stub_valid_version_update_with_autorelease_and_release_on_datetime
+        version.release_on_approval = true
+        version.auto_release_date = 1_480_435_200_000
+        returned = Spaceship::Tunes::AppVersion.new(version.save!)
+        expect(returned.release_on_approval).to eq(false)
+        expect(returned.auto_release_date).to eq(1_480_435_200_000)
       end
     end
 

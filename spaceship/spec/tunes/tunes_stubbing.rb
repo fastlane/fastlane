@@ -185,6 +185,8 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('testers/get_external.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/internalTesters/898536088/").
         to_return(status: 200, body: itc_read_fixture_file('testers/existing_internal_testers.json'), headers: { 'Content-Type' => 'application/json' })
+
+      # Creating new testers is stubbed in `testers_spec.rb`
     end
 
     def itc_stub_testflight
@@ -222,6 +224,13 @@ class TunesStubbing
       # Called from the specs to simulate valid server responses
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/812106519").
         to_return(status: 200, body: itc_read_fixture_file("update_app_version_success.json"),
+                  headers: { "Content-Type" => "application/json" })
+    end
+
+    def itc_stub_valid_version_update_with_autorelease_and_release_on_datetime
+      # Called from the specs to simulate valid server responses
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/812106519").
+        to_return(status: 200, body: itc_read_fixture_file("update_app_version_with_autorelease_overwrite_success.json"),
                   headers: { "Content-Type" => "application/json" })
     end
 
@@ -289,10 +298,134 @@ class TunesStubbing
                   headers: { "Content-Type" => "application/json" })
     end
 
+    def itc_stub_iap
+      # pricing goal calculator
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137656/pricing/equalize/EUR/1").
+        to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
+                 headers: { "Content-Type" => "application/json" })
+      # delete iap
+      stub_request(:delete, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
+        to_return(status: 200, body: "", headers: {})
+      # create consumable iap
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
+        with(body: itc_read_fixture_file("iap_create.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_detail.json"),
+                 headers: { "Content-Type" => "application/json" })
+
+      # iap consumable template
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/consumable/template").
+        to_return(status: 200, body: itc_read_fixture_file("iap_consumable_template.json"),
+                 headers: { "Content-Type" => "application/json" })
+      # iap edit family
+      stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
+        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                    headers: { "Content-Type" => "application/json" })
+
+      # iap family detail
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20372345").
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                    headers: { "Content-Type" => "application/json" })
+      # create IAP family
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/").
+        with(body: JSON.parse(itc_read_fixture_file("iap_family_create.json"))).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_create_success.json"), headers: { "Content-Type" => "application/json" })
+
+      # load IAP Family Template
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/template").
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_template.json"),
+                 headers: { "Content-Type" => "application/json" })
+
+      # update IAP
+      stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137656").
+        with(body: JSON.parse(itc_read_fixture_file("iap_update.json"))).
+        to_return(status: 200, body: itc_read_fixture_file("iap_detail.json"),
+                   headers: { "Content-Type" => "application/json" })
+
+      # iap details
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
+        to_return(status: 200, body: itc_read_fixture_file("iap_detail.json"),
+                headers: { "Content-Type" => "application/json" })
+
+      # list families
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/families").
+        to_return(status: 200, body: itc_read_fixture_file("iap_families.json"),
+                headers: { "Content-Type" => "application/json" })
+
+      # list iaps
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
+        to_return(status: 200, body: itc_read_fixture_file("iap_list.json"),
+                headers: { "Content-Type" => "application/json" })
+    end
+
     def itc_stub_reject_version_success
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/reject").
         to_return(status: 200, body: itc_read_fixture_file("reject_app_version_success.json"),
                   headers: { "Content-Type" => "application/json" })
+    end
+
+    def itc_stub_supported_countries
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/supportedCountries").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('supported_countries.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_add_territory
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'add_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'add_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_remove_territory
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'remove_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'remove_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_uninclude_future_territories
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'uninclude_all_future_territories_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'uninclude_all_future_territories_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_members
+      # resend notification
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/helmut@januschka.com/resendInvitation").
+        to_return(status: 200, body: "", headers: {})
+
+      # create member default (admin, all-apps)
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # create member role: developer, apps: all
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create_developer.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # create member role: appmanager, apps: 12345
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        with(body: JSON.parse(itc_read_fixture_file("member_create_appmanager_single_app.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # member template
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_template.json')),
+                  headers: { "Content-Type" => "application/json" })
+
+      # Load member list
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_list.json')),
+         headers: { "Content-Type" => "application/json" })
     end
   end
 end

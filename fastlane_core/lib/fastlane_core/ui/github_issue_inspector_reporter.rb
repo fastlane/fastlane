@@ -18,7 +18,10 @@ module Fastlane
 
       if report.issues.count > NUMBER_OF_ISSUES_INLINE
         puts "and #{report.total_results - NUMBER_OF_ISSUES_INLINE} more at: #{report.url}"
+        puts ""
       end
+
+      print_open_link_hint
     end
 
     # Called once the report has been recieved, but when there are no issues found.
@@ -45,6 +48,11 @@ module Fastlane
       puts "   #{issue.html_url} [#{status}] #{issue.comments} 💬"
       puts "   #{Time.parse(issue.updated_at).to_pretty}"
       puts ""
+    end
+
+    def print_open_link_hint(newline = false)
+      puts "" if newline
+      puts "🔗  You can ⌘ + double-click on links to open them directly in your browser." if Helper.mac?
     end
   end
 end

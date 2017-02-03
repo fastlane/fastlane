@@ -10,7 +10,8 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(url: "https://upload.hockeyapp.net") do |builder|
+        base_url = options[:bypass_cdn] ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
+        connection = Faraday.new(url: base_url) do |builder|
           builder.request :multipart
           builder.request :url_encoded
           builder.response :json, content_type: /\bjson$/
@@ -211,7 +212,18 @@ module Fastlane
                                        default_value: "add",
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :bypass_cdn,
+                                      env_name: "FL_HOCKEY_BYPASS_CDN",
+                                      description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",
+                                      is_string: false,
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :dsa_signature,
+                                      env_name: "FL_HOCKEY_DSA_SIGNATURE",
+                                      description: "DSA signature for sparkle updates for macOS",
+                                      is_string: true,
+                                      default_value: "",
+                                      optional: true)
         ]
       end
 

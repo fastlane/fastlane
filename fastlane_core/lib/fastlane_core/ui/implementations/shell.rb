@@ -7,7 +7,8 @@ module FastlaneCore
 
       $stdout.sync = true
 
-      if Helper.is_test?
+      if Helper.is_test? && !ENV.key?('DEBUG')
+        $stdout.puts "Logging disabled while running tests. Force them by setting the DEBUG environment variable"
         @log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @log ||= Logger.new($stdout)
@@ -51,7 +52,7 @@ module FastlaneCore
     end
 
     def deprecated(message)
-      log.error(message.to_s.bold.blue)
+      log.error(message.to_s.deprecated)
     end
 
     def command(message)

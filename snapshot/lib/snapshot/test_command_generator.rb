@@ -35,13 +35,16 @@ module Snapshot
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-
+        options << config[:xcargs] if config[:xcargs]
         options
       end
 
       def build_settings
+        config = Snapshot.config
+
         build_settings = []
         build_settings << "FASTLANE_SNAPSHOT=YES"
+        build_settings << "TEST_TARGET_NAME='#{config[:test_target_name]}'" if config[:test_target_name]
 
         build_settings
       end

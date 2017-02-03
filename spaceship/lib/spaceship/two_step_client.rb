@@ -35,7 +35,7 @@ module Spaceship
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
-      elsif r.body.kind_of?(Hash) && r.body["phoneNumberVerification"].kind_of?(Hash)
+      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
@@ -48,7 +48,7 @@ module Spaceship
       puts "If you're running this in a non-interactive session (e.g. server or CI)"
       puts "check out #{two_factor_url}"
 
-      security_code = response.body["phoneNumberVerification"]["securityCode"]
+      security_code = response.body["securityCode"]
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,
       #  "tooManyCodesValidated"=>false,
@@ -87,12 +87,11 @@ module Spaceship
     end
 
     def load_session_from_env
-      yaml_text = ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
-      return if yaml_text.to_s.length == 0
+      return if self.class.spaceship_session_env.to_s.length == 0
       puts "Loading session from environment variable" if $verbose
 
       file = Tempfile.new('cookie.yml')
-      file.write(yaml_text.gsub("\\n", "\n"))
+      file.write(self.class.spaceship_session_env.gsub("\\n", "\n"))
       file.close
 
       begin
@@ -104,6 +103,12 @@ module Spaceship
       ensure
         file.unlink
       end
+    end
+
+    # Fetch the session cookie from the environment
+    # (if exists)
+    def self.spaceship_session_env
+      ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
     def select_device(r, device_id)

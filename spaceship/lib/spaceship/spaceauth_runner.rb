@@ -17,7 +17,12 @@ module Spaceship
         puts "Successfully logged in to iTunes Connect".green
         puts ""
       rescue
-        puts "Could not login to iTunes Connect...".red
+        puts "Could not login to iTunes Connect".red
+        puts "Please check your credentials and try again.".yellow
+        puts "This could be an issue with iTunes Connect,".yellow
+        puts "Please try unsetting the FASTLANE_SESSION environment variable".yellow
+        puts "and re-run `fastlane spaceauth`".yellow
+        UI.crash!("Problem connecting to iTunes Connect")
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
@@ -28,11 +33,16 @@ module Spaceship
       # Example:
       # name: DES5c148586daa451e55afb017aa62418f91
       # value: HSARMTKNSRVTWFlaF/ek8asaa9lymMA0dN8JQ6pY7B3F5kdqTxJvMT19EVEFX8EQudB/uNwBHOHzaa30KYTU/eCP/UF7vGTgxs6PAnlVWKscWssOVHfP2IKWUPaa4Dn+I6ilA7eAFQsiaaVT
-      cookies = YAML.load(itc_cookie_content)
+      cookies = YAML.safe_load(
+        itc_cookie_content,
+        [HTTP::Cookie, Time], # classes whitelist
+        [],                   # symbols whitelist
+        true                  # allow YAML aliases
+      )
 
       # We remove all the un-needed cookies
-      cookies.delete_if do |current|
-        ['aa', 'X-SESS', 'site', 'acn01', 'myacinfo', 'itctx', 'wosid', 'woinst', 'NSC_17ofu-jud-jud-mc'].include?(current.name)
+      cookies.select! do |cookie|
+        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")

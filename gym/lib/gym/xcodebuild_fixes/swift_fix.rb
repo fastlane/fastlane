@@ -1,5 +1,5 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 require 'zip'
@@ -45,7 +45,7 @@ module Gym
                 UI.important("try adding the following parameter to your gym call:")
                 UI.success("gym(toolchain: :swift_2_3)")
                 UI.message("or")
-                UI.success("gym --toolchain swift_2_3")
+                UI.success("fastlane gym --toolchain swift_2_3")
               end
 
               UI.user_error!(ex)

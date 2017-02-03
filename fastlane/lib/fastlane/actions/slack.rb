@@ -206,7 +206,7 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if FastlaneCore::Env.truthy?('FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS') && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
@@ -230,7 +230,7 @@ module Fastlane
         deep_merge(slack_attachment, options[:attachment_properties])
       end
 
-      # Adapted from http://stackoverflow.com/a/30225093/158525
+      # Adapted from https://stackoverflow.com/a/30225093/158525
       def self.deep_merge(a, b)
         merger = proc do |key, v1, v2|
           Hash === v1 && Hash === v2 ?

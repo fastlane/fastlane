@@ -1,5 +1,4 @@
 require "securerandom"
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -46,9 +45,7 @@ module Spaceship
 
     # @return (Array) A list of all available teams
     def teams
-      return @teams if @teams
-      r = request(:get, "ra/user/detail")
-      @teams = parse_response(r, 'data')['associatedAccounts'].sort_by do |team|
+      user_details_data['associatedAccounts'].sort_by do |team|
         [
           team['contentProvider']['name'],
           team['contentProvider']['contentProviderId']
@@ -214,10 +211,13 @@ module Spaceship
       errors << different_error if different_error
 
       if errors.count > 0 # they are separated by `.` by default
+        # Sample `error` content: [["Forbidden"]]
         if errors.count == 1 and errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
         elsif errors.count == 1 and errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
+        elsif errors.count == 1 and errors.first.include?("Forbidden")
+          raise_insuffient_permission_error!
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -374,6 +374,67 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Members
+    #####################################################
+
+    def members
+      r = request(:get, "ra/users/itc")
+      parse_response(r, 'data')["users"]
+    end
+
+    def reinvite_member(email)
+      request(:post, "ra/users/itc/#{email}/resendInvitation")
+    end
+
+    def delete_member!(user_id, email)
+      payload = []
+      payload << {
+        dsId: user_id,
+        email: email
+      }
+      request(:post) do |req|
+        req.url "ra/users/itc/delete"
+        req.body = payload.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+    end
+
+    def create_member!(firstname: nil, lastname: nil, email_address: nil, roles: [], apps: [])
+      r = request(:get, "ra/users/itc/create")
+      data = parse_response(r, 'data')
+
+      data["user"]["firstName"] = { value: firstname }
+      data["user"]["lastName"] = { value: lastname }
+      data["user"]["emailAddress"] = { value: email_address }
+
+      roles << "admin" if roles.length == 0
+
+      data["user"]["roles"] = []
+      roles.each do |role|
+        # find role from template
+        data["roles"].each do |template_role|
+          if template_role["value"]["name"] == role
+            data["user"]["roles"] << template_role
+          end
+        end
+      end
+
+      if apps.length == 0
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: true, grantedSoftwareAdamIds: [] } }
+      else
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: false, grantedSoftwareAdamIds: apps } }
+      end
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/users/itc/create"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    #####################################################
     # @!group Pricing
     #####################################################
 
@@ -446,6 +507,51 @@ module Spaceship
       data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
     end
 
+    #####################################################
+    # @!group Availability
+    #####################################################
+    # Updates the availability
+    #
+    # @note Although this information is publicly available, the current spaceship implementation requires you to have a logged in client to access it
+    # @param app_id (String): The id of your app
+    # @param availability (Availability): The availability update
+    #
+    # @return [Spaceship::Tunes::Availability] the new Availability
+    def update_availability!(app_id, availability)
+      r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
+      data = parse_response(r, 'data')
+
+      data["countriesChanged"] = true
+      data["countries"] = availability.territories.map { |territory| { 'code' => territory.code } }
+      data["theWorld"] = availability.include_future_territories.nil? ? true : availability.include_future_territories
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/pricing/intervals"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+      data = parse_response(r, 'data')
+      Spaceship::Tunes::Availability.factory(data)
+    end
+
+    def availability(app_id)
+      r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
+      data = parse_response(r, 'data')
+      Spaceship::Tunes::Availability.factory(data)
+    end
+
+    # Returns an array of all supported territories
+    #
+    # @note Although this information is publicly available, the current spaceship implementation requires you to have a logged in client to access it
+    #
+    # @return [Array] the Territory objects (Spaceship::Tunes::Territory)
+    def supported_territories
+      data = supported_countries
+      data.map { |country| Spaceship::Tunes::Territory.factory(country) }
+    end
+
     # An array of supported countries
     # [{
     #   "code": "AL",
@@ -481,6 +587,14 @@ module Spaceship
       raise "upload_image is required" unless upload_image
 
       du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads an In-App-Purchase Review screenshot
+    # @param app_id (AppId): The id of the app
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the response
+    def upload_purchase_review_screenshot(app_id, upload_image)
+      du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
     end
 
     # Uploads a screenshot
@@ -551,14 +665,61 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
+    # Fetch the general information of the user, is used by various methods across spaceship
+    # Sample return value
+    # => {"associatedAccounts"=>
+    #   [{"contentProvider"=>{"contentProviderId"=>11142800, "name"=>"Felix Krause", "contentProviderTypes"=>["Purple Software"]}, "roles"=>["Developer"], "lastLogin"=>1468784113000}],
+    #  "sessionToken"=>{"dsId"=>"8501011116", "contentProviderId"=>18111111, "expirationDate"=>nil, "ipAddress"=>nil},
+    #  "permittedActivities"=>
+    #   {"EDIT"=>
+    #     ["UserManagementSelf",
+    #      "GameCenterTestData",
+    #      "AppAddonCreation"],
+    #    "REPORT"=>
+    #     ["UserManagementSelf",
+    #      "AppAddonCreation"],
+    #    "VIEW"=>
+    #     ["TestFlightAppExternalTesterManagement",
+    #      ...
+    #      "HelpGeneral",
+    #      "HelpApplicationLoader"]},
+    #  "preferredCurrencyCode"=>"EUR",
+    #  "preferredCountryCode"=>nil,
+    #  "countryOfOrigin"=>"AT",
+    #  "isLocaleNameReversed"=>false,
+    #  "feldsparToken"=>nil,
+    #  "feldsparChannelName"=>nil,
+    #  "hasPendingFeldsparBindingRequest"=>false,
+    #  "isLegalUser"=>false,
+    #  "userId"=>"1771111155",
+    #  "firstname"=>"Detlef",
+    #  "lastname"=>"Mueller",
+    #  "isEmailInvalid"=>false,
+    #  "hasContractInfo"=>false,
+    #  "canEditITCUsersAndRoles"=>false,
+    #  "canViewITCUsersAndRoles"=>true,
+    #  "canEditIAPUsersAndRoles"=>false,
+    #  "transporterEnabled"=>false,
+    #  "contentProviderFeatures"=>["APP_SILOING", "PROMO_CODE_REDESIGN", ...],
+    #  "contentProviderType"=>"Purple Software",
+    #  "displayName"=>"Detlef",
+    #  "contentProviderId"=>"18742800",
+    #  "userFeatures"=>[],
+    #  "visibility"=>true,
+    #  "DYCVisibility"=>false,
+    #  "contentProvider"=>"Felix Krause",
+    #  "userName"=>"detlef@krausefx.com"}
+    def user_details_data
+      return @_cached_user_details if @_cached_user_details
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
+      @_cached_user_details = parse_response(r, 'data')
+    end
+
     # Fetches the User Detail information from ITC. This gets called often and almost never changes
     # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
-      return @cached if @cached
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
-      data = parse_response(r, 'data')
-      @cached = Spaceship::Tunes::UserDetail.factory(data)
+      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data)
     end
 
     #####################################################
@@ -574,14 +735,36 @@ module Spaceship
     # @!group Build Trains
     #####################################################
 
+    # rubocop:disable Metrics/BlockNesting
     # @param (testing_type) internal or external
-    def build_trains(app_id, testing_type, platform: nil)
+    def build_trains(app_id, testing_type, tries = 5, platform: nil)
       raise "app_id is required" unless app_id
       url = "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
       url += "&platform=#{platform}" unless platform.nil?
       r = request(:get, url)
-      parse_response(r, 'data')
+      return parse_response(r, 'data')
+    rescue Spaceship::Client::UnexpectedResponse => ex
+      # Build trains fail randomly very often
+      # we need to catch those errors and retry
+      # https://github.com/fastlane/fastlane/issues/6419
+      retry_error_messages = [
+        "ITC.response.error.OPERATION_FAILED",
+        "Internal Server Error",
+        "Service Unavailable"
+      ].freeze
+
+      if retry_error_messages.any? { |message| ex.to_s.include?(message) }
+        tries -= 1
+        if tries > 0
+          logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
+          sleep 3 unless defined? SpecHelper
+          retry
+        end
+      end
+
+      raise Spaceship::Client::UnexpectedResponse, "Temporary iTunes Connect error: #{ex}"
     end
+    # rubocop:enable Metrics/BlockNesting
 
     def update_build_trains!(app_id, testing_type, data)
       raise "app_id is required" unless app_id
@@ -795,6 +978,161 @@ module Spaceship
     end
 
     #####################################################
+    # @!group in-app-purchases
+    #####################################################
+
+    # Returns list of all available In-App-Purchases
+    def iaps(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps")
+      return r.body["data"]
+    end
+
+    # Returns list of all available Families
+    def iap_families(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/families")
+      return r.body["data"]
+    end
+
+    # Deletes a In-App-Purchases
+    def delete_iap!(app_id: nil, purchase_id: nil)
+      r = request(:delete, "ra/apps/#{app_id}/iaps/#{purchase_id}")
+      handle_itc_response(r)
+    end
+
+    # loads the full In-App-Purchases
+    def load_iap(app_id: nil, purchase_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
+      parse_response(r, 'data')
+    end
+
+    # loads the full In-App-Purchases-Family
+    def load_iap_family(app_id: nil, family_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")
+      parse_response(r, 'data')
+    end
+
+    # updates an In-App-Purchases-Family
+    def update_iap_family!(app_id: nil, family_id: nil, data: nil)
+      with_tunes_retry do
+        r = request(:put) do |req|
+          req.url "ra/apps/#{app_id}/iaps/family/#{family_id}/"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    # updates an In-App-Purchases
+    def update_iap!(app_id: nil, purchase_id: nil, data: nil)
+      with_tunes_retry do
+        r = request(:put) do |req|
+          req.url "ra/apps/#{app_id}/iaps/#{purchase_id}"
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    def create_iap_family(app_id: nil, name: nil, product_id: nil, reference_name: nil, versions: [])
+      r = request(:get, "ra/apps/#{app_id}/iaps/family/template")
+      data = parse_response(r, 'data')
+
+      data['activeAddOns'][0]['productId'] = { value: product_id }
+      data['activeAddOns'][0]['referenceName'] = { value: reference_name }
+      data['name'] = { value: name }
+      data["details"]["value"] = versions
+
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/iaps/family/"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    # returns pricing goal array
+    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency: nil, tier: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/equalize/#{currency}/#{tier}")
+      parse_response(r, 'data')
+    end
+
+    # Creates an In-App-Purchases
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+      # Load IAP Template based on Type
+      type ||= "consumable"
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
+      data = parse_response(r, 'data')
+
+      # Now fill in the values we have
+      # some values are nil, that's why there is a hash
+      data['familyId'] = family_id.to_s if family_id
+      data['productId'] = { value: product_id }
+      data['referenceName'] = { value: reference_name }
+      data['clearedForSale'] = { value: cleared_for_sale }
+
+      data['pricingDurationType'] = { value: subscription_duration } if subscription_duration
+      data['freeTrialDurationType'] = { value: subscription_free_trial } if subscription_free_trial
+
+      # pricing tier
+      if pricing_intervals
+        data['pricingIntervals'] = []
+        pricing_intervals.each do |interval|
+          data['pricingIntervals'] << {
+              value: {
+                  country: interval[:country] || "WW",
+                  tierStem: interval[:tier].to_s,
+                  priceTierEndDate: interval[:end_date],
+                  priceTierEffectiveDate: interval[:begin_date]
+                }
+          }
+        end
+      end
+
+      versions_array = []
+      versions.each do |k, v|
+        versions_array << {
+                  value: {
+                    description: { value: v[:description] },
+                    name: { value: v[:name] },
+                    localeCode: k.to_s
+                  }
+        }
+      end
+      data["versions"][0]["details"]["value"] = versions_array
+      data['versions'][0]["reviewNotes"] = { value: review_notes }
+
+      if review_screenshot
+        # Upload Screenshot:
+        upload_file = UploadFile.from_path review_screenshot
+        screenshot_data = upload_purchase_review_screenshot(app_id, upload_file)
+        new_screenshot = {
+          "value" => {
+            "assetToken" => screenshot_data["token"],
+            "sortOrder" => 0,
+            "type" => "SortedScreenShot",
+            "originalFileName" => upload_file.file_name,
+            "size" => screenshot_data["length"],
+            "height" => screenshot_data["height"],
+            "width" => screenshot_data["width"],
+            "checksum" => screenshot_data["md5"]
+          }
+        }
+
+        data["versions"][0]["reviewScreenshot"] = new_screenshot
+      end
+
+      # Now send back the modified hash
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/iaps"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    #####################################################
     # @!group Testers
     #####################################################
     def testers(tester)
@@ -809,6 +1147,10 @@ module Spaceship
       parse_response(r, 'data')['users']
     end
 
+    # Returns a list of available testing groups
+    # e.g.
+    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
+    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
     def groups
       return @cached_groups if @cached_groups
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
@@ -820,21 +1162,42 @@ module Spaceship
       raise "Action not provided for this tester type." unless url
 
       tester_data = {
-            emailAddress: {
-              value: email
-            },
-            firstName: {
-              value: first_name || ""
-            },
-            lastName: {
-              value: last_name || ""
-            },
-            testing: {
-              value: true
+        emailAddress: {
+          value: email
+        },
+        firstName: {
+          value: first_name || ""
+        },
+        lastName: {
+          value: last_name || ""
+        },
+        testing: {
+          value: true
+        }
+      }
+
+      if groups
+        tester_data[:groups] = groups.map do |group_name_or_group_id|
+          if self.groups.value?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group name
+            group_name = group_name_or_group_id
+            group_id = self.groups.key(group_name_or_group_id)
+          elsif self.groups.key?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group ID
+            group_name = self.groups[group_name_or_group_id]
+            group_id = group_name_or_group_id
+          else
+            group_name = group_name_or_group_id
+            group_id = nil # this is expected by the iTC API
+          end
+
+          {
+            "id" => group_id,
+            "name" => {
+              "value" => group_name
             }
           }
-      if groups
-        tester_data[:groups] = groups.map { |x| { "id" => x } }
+        end
       end
 
       data = { testers: [tester_data] }
@@ -1003,7 +1366,7 @@ module Spaceship
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
       unless (tries -= 1).zero?
-        msg = "ITC temporary save error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "iTunes Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
         puts msg
         logger.warn msg
         sleep 60 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?

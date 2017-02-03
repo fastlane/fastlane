@@ -105,13 +105,15 @@ describe FastlaneCore do
 
       describe "#platform" do
         it "ios" do
-          ARGV = ["--app_identifier", "yolo.app"]
-          expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://fastlane-refresher.herokuapp.com/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+          FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://fastlane-refresher.herokuapp.com/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+          end
         end
 
         it "android" do
-          ARGV = ["--app_package_name", "yolo.android.app"]
-          expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://fastlane-refresher.herokuapp.com/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+          FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://fastlane-refresher.herokuapp.com/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+          end
         end
       end
     end

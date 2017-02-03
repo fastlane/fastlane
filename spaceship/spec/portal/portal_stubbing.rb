@@ -52,6 +52,10 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+        with(body: { "provisioningProfileId" => "2MAY7NPHRF", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfiletvOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
         with(body: { "provisioningProfileId" => "475ESRP5F3", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -75,6 +79,10 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
         with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('repair_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
+        with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX", "subPlatform" => "tvOS" }).
+        to_return(status: 200, body: adp_read_fixture_file('repair_profile_tvos_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Delete Profiles
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").
@@ -193,6 +201,30 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteAppId.action").
         with(body: { "appIdId" => "LXD24VUE49", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('deleteAppId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
+        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "Production App", "push" => "true", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.nopush.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def adp_stub_persons
+      # get all members
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getTeamMembers").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: adp_read_fixture_file("peopleList.json"), headers: { 'Content-Type' => 'application/json' })
+
+      # invite new member
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/sendInvites").
+        with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
+        to_return(status: 200, body: "", headers: {})
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/setTeamMemberRoles").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"role\":\"member\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
+        to_return(status: 200, body: "", headers: {})
     end
 
     def adp_stub_app_groups

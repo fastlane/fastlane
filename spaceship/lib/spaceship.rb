@@ -26,6 +26,8 @@ module Spaceship
   AppVersion = Spaceship::Tunes::AppVersion
   AppSubmission = Spaceship::Tunes::AppSubmission
   Application = Spaceship::Tunes::Application
+  Members = Spaceship::Tunes::Members
+  Persons = Spaceship::Portal::Persons
 
   DESCRIPTION = "Ruby library to access the Apple Dev Center and iTunes Connect".freeze
 end

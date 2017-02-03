@@ -4,9 +4,12 @@ machine:
   xcode:
     version: "7.3"
 dependencies:
+  pre:
+    - brew install shellcheck
   override:
     - bundle install --jobs=4 --retry=3
 test:
+  pre:
+    - ulimit -n 400
   override:
-    - bundle exec rspec --pattern ./**/*_spec.rb -r rspec_junit_formatter --format progress --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml
-    - bundle exec rubocop
+    - bundle exec fastlane test

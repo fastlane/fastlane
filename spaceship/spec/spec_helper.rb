@@ -5,10 +5,6 @@ require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
 
-unless ENV["DEBUG"]
-  $stdout = File.open("/tmp/spaceship_tests", "w")
-end
-
 @cache_paths = [
   File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]
@@ -29,6 +25,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_certificates
   PortalStubbing.adp_stub_apps
   PortalStubbing.adp_stub_app_groups
+  PortalStubbing.adp_stub_persons
 
   TunesStubbing.itc_stub_login
   TunesStubbing.itc_stub_applications
@@ -47,6 +44,8 @@ def before_each_spaceship
   TunesStubbing.itc_stub_promocodes
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
+  TunesStubbing.itc_stub_supported_countries
+  TunesStubbing.itc_stub_iap
 end
 
 def after_each_spaceship

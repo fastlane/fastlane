@@ -31,7 +31,7 @@ screengrab
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/screengrab/LICENSE)
-[![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
+[![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](https://rubygems.org/gems/screengrab)
 
 ###### Automated localized screenshots of your Android app on every device
 
@@ -58,7 +58,7 @@ sudo gem install fastlane
 androidTestCompile 'tools.fastlane:screengrab:x.x.x'
 ```
 
-The latest version can be determined by visiting the [screengrab RubyGems page](https://rubygems.org/gems/screengrab)
+The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**

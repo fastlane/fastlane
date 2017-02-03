@@ -118,6 +118,14 @@ describe Spaceship::Client do
         expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
+
+      it 'should make a request create an explicit app id with no push feature' do
+        payload = {}
+        payload[Spaceship.app_service.push_notification.on.service_id] = Spaceship.app_service.push_notification.on
+        response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', enabled_features: payload)
+        expect(response['enabledFeatures']).to_not include("push")
+        expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
+      end
     end
 
     describe '#delete_app!' do
@@ -198,6 +206,12 @@ describe Spaceship::Client do
         expect do
           response = subject.create_provisioning_profile!("taken", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])
         end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+
+      it "works when subplatform is null and mac is false" do
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'], mac: false, sub_platform: nil)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
+        expect(response['distributionMethod']).to eq('limited')
       end
     end
 

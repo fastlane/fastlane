@@ -22,8 +22,6 @@ module Frameit
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
-        width = offset['width']
-        image.resize width # resize the image to fit the frame
         put_into_frame # put it in the frame
       end
 
@@ -129,7 +127,7 @@ module Frameit
     # Horizontal adding around the frames
     def horizontal_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[0].to_i
       end
       return scale_padding(padding)
@@ -138,13 +136,16 @@ module Frameit
     # Vertical adding around the frames
     def vertical_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[1].to_i
       end
       return scale_padding(padding)
     end
 
     def scale_padding(padding)
+      if padding.kind_of?(String) && padding.end_with?('%')
+        padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
+      end
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
@@ -238,12 +239,13 @@ module Frameit
     end
 
     def actual_font_size
-      [@image.width / 10.0].max.round
+      font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      [@image.width * font_scale_factor].max.round
     end
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 2.0).round
+      (actual_font_size / 3.0).round
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image

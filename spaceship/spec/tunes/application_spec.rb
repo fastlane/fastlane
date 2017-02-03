@@ -38,6 +38,12 @@ describe Spaceship::Application do
           expect(a.apple_id).to eq('898536088')
         end
 
+        it "returns the application if available ignoring case" do
+          a = Spaceship::Application.find('net.sunAPPs.107')
+          expect(a.class).to eq(Spaceship::Application)
+          expect(a.apple_id).to eq('898536088')
+        end
+
         it "returns nil if not available" do
           a = Spaceship::Application.find('netnot.available')
           expect(a).to eq(nil)
@@ -269,6 +275,30 @@ describe Spaceship::Application do
         expect(promocodes.version.number_of_codes).to eq(7)
         expect(promocodes.version.maximum_number_of_codes).to eq(100)
         expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
+    end
+
+    describe "#availability" do
+      let(:app) { Spaceship::Application.all.first }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        availability = app.availability
+        expect(availability.inspect).to include("Tunes::Availability")
+      end
+    end
+
+    describe "#update_availability" do
+      let(:app) { Spaceship::Application.all.first }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        TunesStubbing.itc_stub_app_uninclude_future_territories
+
+        availability = app.availability
+        availability.include_future_territories = false
+        availability = app.update_availability!(availability)
+        expect(availability.inspect).to include("Tunes::Availability")
       end
     end
   end

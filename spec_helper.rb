@@ -7,6 +7,16 @@ WebMock.disable_net_connect!(allow: 'coveralls.io')
 require "fastlane"
 UI = FastlaneCore::UI
 
+xcode_path = FastlaneCore::Helper.xcode_path
+unless xcode_path.include?("Contents/Developer")
+  UI.error("Seems like you didn't set the developer tools path correctly")
+  UI.error("Detected path '#{xcode_path}'") if xcode_path.to_s.length > 0
+  UI.error("Please run the following on your machine")
+  UI.command("sudo xcode-select -s /Applications/Xcode.app")
+  UI.error("Adapt the path if you have Xcode installed/named somewhere else")
+  exit(1)
+end
+
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
 end
@@ -40,4 +50,27 @@ RSpec.configure do |config|
   end
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
+end
+
+module FastlaneSpec
+  module Env
+    # a wrapper to temporarily modify the values of ARGV to
+    # avoid errors like: "warning: already initialized constant ARGV"
+    # if no block is given, modifies ARGV for good
+    # rubocop:disable Style/MethodName
+    def self.with_ARGV(argv)
+      copy = ARGV.dup
+      ARGV.clear
+      ARGV.concat(argv)
+      if block_given?
+        begin
+          yield
+        ensure
+          ARGV.clear
+          ARGV.concat(copy)
+        end
+      end
+    end
+    # rubocop:enable Style/MethodName
+  end
 end

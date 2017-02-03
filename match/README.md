@@ -31,7 +31,7 @@ match
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
-[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
+[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](https://rubygems.org/gems/match)
 
 ###### Easily sync your certificates and profiles across your team using git
 
@@ -311,7 +311,7 @@ Some repo hosts might allow you to use the same deploy key for different repos, 
 
 There are a few ways around this:
 
-1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
+1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/faq/adding-projects-with-submodules/).
 2. Some CIs allow you to upload your signing credentials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
 
 Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.
@@ -377,13 +377,13 @@ In general those profiles are harmless as they can only be used to install a sig
 
 Attackers could use an In-House profile to distribute signed application to a potentially unlimited number of devices. All this would run under your company name and it could eventually lead to Apple revoking your In-House account. However it is very easy to revoke a certificate to remotely break the app on all devices.
 
-Because of the potentially dangerous nature of In-House profiles we decided to not allow the use of `match` with enterprise accounts.
+Because of the potentially dangerous nature of In-House profiles please use _match_ with enterprise profiles with caution, ensure your git repository is private and use a secure password.
 
 ##### To sum up
 
 - You have full control over the access list of your Git repo, no third party service involved
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
-- `match` does not currently support In-House Enterprise profiles as they are harder to control
+- Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
 - The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/fastlane/tree/master/match)
 

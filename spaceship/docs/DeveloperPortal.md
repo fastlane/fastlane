@@ -298,9 +298,13 @@ profile.update!
 # Get the currently used team_id
 Spaceship::Portal.client.team_id
 
+app = Spaceship::Portal.app.find("com.krausefx.app")
+
+# Update app name
+app.update_name!('New App Name')
+
 # We generally don't want to be destructive, but you can also delete things
 # This method might fail for various reasons, e.g. app is already in the store
-app = Spaceship::Portal.app.find("com.krausefx.app")
 app.delete!
 ```
 

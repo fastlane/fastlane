@@ -1,6 +1,6 @@
 require "bundler/gem_tasks"
 
-GEMS = %w(fastlane fastlane_core deliver snapshot frameit pem sigh produce cert gym pilot credentials_manager spaceship scan supply watchbuild match screengrab danger-device_grid)
+GEMS = %w(fastlane danger-device_grid)
 RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
@@ -15,7 +15,9 @@ task :rubygems_admins do
 end
 
 task :test_all do
-  sh "rspec --pattern ./**/*_spec.rb"
+  formatter = "--format progress"
+  formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml" if ENV["CIRCLE_TEST_REPORTS"]
+  sh "rspec --pattern ./**/*_spec.rb #{formatter}"
 end
 
 # Overwrite the default rake task

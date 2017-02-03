@@ -2,6 +2,12 @@ module Fastlane
   class EnvironmentPrinter
     def self.output
       env_info = get
+
+      # Remove sensitive option values
+      FastlaneCore::Configuration.sensitive_strings.compact.each do |sensitive_element|
+        env_info.gsub!(sensitive_element, "#########")
+      end
+
       puts env_info
       if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
         copy_to_clipboard(env_info)
@@ -62,7 +68,7 @@ module Fastlane
           if Gem::Version.new(installed_version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
@@ -106,7 +112,7 @@ module Fastlane
           if Gem::Version.new(current_gem.version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
@@ -211,7 +217,8 @@ module Fastlane
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => anonymized_path(RbConfig::CONFIG['libdir']),
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
-        "Is contained" => Helper.contained_fastlane?.to_s
+        "Is contained" => Helper.contained_fastlane?.to_s,
+        "Is homebrew" => Helper.homebrew?.to_s
       }
 
       if Helper.mac?

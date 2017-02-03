@@ -30,15 +30,22 @@ module Scan
         config = Scan.config
 
         options = []
-        options += project_path_array
+        options += project_path_array unless config[:xctestrun]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << destination # generated in `detect_values`
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-        options << "-enableCodeCoverage YES" if config[:code_coverage]
-        options << "-enableAddressSanitizer YES" if config[:address_sanitizer]
+        options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
+        options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
+        options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
+        options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
         options << config[:xcargs] if config[:xcargs]
+
+        # detect_values will ensure that these values are present as Arrays if
+        # they are present at all
+        options += config[:only_testing].map { |test_id| "-only-testing:#{test_id}" } if config[:only_testing]
+        options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id}" } if config[:skip_testing]
 
         options
       end
@@ -48,8 +55,15 @@ module Scan
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :build unless config[:skip_build]
-        actions << :test
+
+        if config[:build_for_testing]
+          actions << "build-for-testing"
+        elsif config[:test_without_building] || config[:xctestrun]
+          actions << "test-without-building"
+        else
+          actions << :build unless config[:skip_build]
+          actions << :test
+        end
 
         actions
       end
@@ -69,7 +83,7 @@ module Scan
         formatter = []
         if Scan.config[:formatter]
           formatter << "-f `#{Scan.config[:formatter]}`"
-        elsif ENV.key?("TRAVIS")
+        elsif FastlaneCore::Env.truthy?("TRAVIS")
           formatter << "-f `xcpretty-travis-formatter`"
           UI.success("Automatically switched to Travis formatter")
         end

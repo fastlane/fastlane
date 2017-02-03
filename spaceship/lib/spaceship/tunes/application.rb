@@ -63,7 +63,7 @@ module Spaceship
         #   as either the App ID or the bundle identifier
         def find(identifier, mac: false)
           all.find do |app|
-            (app.apple_id == identifier.to_s || app.bundle_id == identifier) &&
+            ((app.apple_id && app.apple_id.casecmp(identifier.to_s) == 0) || (app.bundle_id && app.bundle_id.casecmp(identifier.to_s) == 0)) &&
               app.version_sets.any? { |v| (mac ? ["osx"] : ["ios", "appletvos"]).include?(v.platform) }
           end
         end
@@ -237,6 +237,26 @@ module Spaceship
       # The current price tier
       def price_tier
         client.price_tier(self.apple_id)
+      end
+
+      # set the availability. This method doesn't require `save` to be called
+      def update_availability!(availability)
+        client.update_availability!(self.apple_id, availability)
+      end
+
+      # The current availability.
+      def availability
+        client.availability(self.apple_id)
+      end
+
+      #####################################################
+      # @!group in_app_purchases
+      #####################################################
+      # Get base In-App-Purchases object
+      def in_app_purchases
+        attrs = {}
+        attrs[:application] = self
+        Tunes::IAP.factory(attrs)
       end
 
       #####################################################

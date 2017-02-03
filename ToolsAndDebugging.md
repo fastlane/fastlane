@@ -1,10 +1,10 @@
 # Tooling and Debugging
 
-For detailed instructions on how to get started with contributing to _fastlane_, first check out [HowToContribute.md](HowToContribute.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
+For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr]. This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
 ## Debug using [pry](http://pryrepl.org/)
 
-Before you’re able to use [pry](http://pryrepl.org/), make sure to have completed the [HowToContribute.md](HowToContribute.md) setup part, as this will install all required development dependencies.
+Before you’re able to use [pry](http://pryrepl.org/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
 
 To add a breakpoint anywhere in the _fastlane_ codebase, add the following 2 lines wherever you want to jump in
 
@@ -19,10 +19,10 @@ As debugging with pry requires the development dependencies, make sure to execut
 bundle exec fastlane beta --verbose
 ```
 
-If you need the breakpoint when running tests, make sure to have the `DEBUG` mode enabled, as the default test runner will remove all output from stdout, and therefore not showing the output of `pry`:
+If you need the breakpoint when running tests, make sure to have the `DEBUG` environment variable set, as the default test runner will remove all output from stdout, and therefore not showing the output of `pry`:
 
 ```
-DEBUG=1 bundle exec rspec
+DEBUG= bundle exec rspec
 ```
 
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
@@ -150,3 +150,6 @@ To run the newly created script, `cd` into the _spaceship_ directory and run
 ```
 FASTLANE_DEBUG=1 fastlane debug
 ```
+
+<!--Links-->
+[first-pr]: YourFirstPR.md

@@ -31,11 +31,12 @@ module Pilot
         begin
           mgr.public_send(action, config)
         rescue => ex
-          failures.push(address)
-          UI.message("[#{address}]: #{ex}")
+          message = "[#{address}]: #{ex}"
+          failures << message
+          UI.error(message)
         end
       end
-      UI.user_error!("Some operations failed: #{failures}") unless failures.empty?
+      UI.user_error!("Some operations failed: #{failures.join(', ')}") unless failures.empty?
     end
 
     def run
@@ -50,7 +51,7 @@ module Pilot
       global_option("--verbose") { $verbose = true }
 
       command :upload do |c|
-        c.syntax = "pilot upload"
+        c.syntax = "fastlane pilot upload"
         c.description = "Uploads a new binary to Apple TestFlight"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -59,7 +60,7 @@ module Pilot
       end
 
       command :distribute do |c|
-        c.syntax = "pilot distribute"
+        c.syntax = "fastlane pilot distribute"
         c.description = "Distribute a previously uploaded binary to Apple TestFlight"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -69,7 +70,7 @@ module Pilot
       end
 
       command :builds do |c|
-        c.syntax = "pilot builds"
+        c.syntax = "fastlane pilot builds"
         c.description = "Lists all builds for given application"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -78,7 +79,7 @@ module Pilot
       end
 
       command :add do |c|
-        c.syntax = "pilot add"
+        c.syntax = "fastlane pilot add"
         c.description = "Adds new external tester(s) to a specific app (if given). This will also add an existing tester to an app."
         c.action do |args, options|
           handle_multiple('add_tester', args, options)
@@ -86,7 +87,7 @@ module Pilot
       end
 
       command :list do |c|
-        c.syntax = "pilot list"
+        c.syntax = "fastlane pilot list"
         c.description = "Lists all registered testers, both internal and external"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -95,7 +96,7 @@ module Pilot
       end
 
       command :find do |c|
-        c.syntax = "pilot find"
+        c.syntax = "fastlane pilot find"
         c.description = "Find tester(s) (internal or external) by their email address"
         c.action do |args, options|
           handle_multiple('find_tester', args, options)
@@ -103,7 +104,7 @@ module Pilot
       end
 
       command :remove do |c|
-        c.syntax = "pilot remove"
+        c.syntax = "fastlane pilot remove"
         c.description = "Remove external tester(s) by their email address"
         c.action do |args, options|
           handle_multiple('remove_tester', args, options)
@@ -111,7 +112,7 @@ module Pilot
       end
 
       command :export do |c|
-        c.syntax = "pilot export"
+        c.syntax = "fastlane pilot export"
         c.description = "Exports all external testers to a CSV file"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
@@ -120,7 +121,7 @@ module Pilot
       end
 
       command :import do |c|
-        c.syntax = "pilot import"
+        c.syntax = "fastlane pilot import"
         c.description = "Create external testers from a CSV file"
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))

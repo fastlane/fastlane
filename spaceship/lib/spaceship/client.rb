@@ -8,6 +8,7 @@ require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
+require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -50,6 +51,21 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
+    # User doesn't have enough permission for given action
+    class InsufficientPermissions < BasicPreferredInfoError
+      TITLE = 'Insufficient permissions for your Apple ID:'.freeze
+
+      def preferred_error_info
+        message ? [TITLE, message] : nil
+      end
+
+      # We don't want to show similar GitHub issues, as the error message
+      # should be pretty clear
+      def show_github_issues
+        false
+      end
+    end
+
     class UnexpectedResponse < StandardError
       attr_reader :error_info
 
@@ -63,8 +79,8 @@ module Spaceship
 
         [
           "Apple provided the following error info:",
-          @error_info['resultString'],
-          @error_info['userString']
+          CGI.unescapeHTML(@error_info['resultString']),
+          CGI.unescapeHTML(@error_info['userString'])
         ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
       end
     end
@@ -166,15 +182,22 @@ module Spaceship
       return File.read(path)
     end
 
+    # This is a duplicate method of fastlane_core/fastlane_core.rb#fastlane_user_dir
+    def fastlane_user_dir
+      path = File.expand_path(File.join("~", ".fastlane"))
+      FileUtils.mkdir_p(path) unless File.directory?(path)
+      return path
+    end
+
     # Returns preferred path for storing cookie
     # for two step verification.
     def persistent_cookie_path
       if ENV["SPACESHIP_COOKIE_PATH"]
         path = File.expand_path(File.join(ENV["SPACESHIP_COOKIE_PATH"], "spaceship", self.user, "cookie"))
       else
-        ["~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
+        [File.join(self.fastlane_user_dir, "spaceship"), "~/.spaceship", "/var/tmp/spaceship", "#{Dir.tmpdir}/spaceship"].each do |dir|
           dir_parts = File.split(dir)
-          if directory_accessible?(dir_parts.first)
+          if directory_accessible?(File.expand_path(dir_parts.first))
             path = File.expand_path(File.join(dir, self.user, "cookie"))
             break
           end
@@ -361,9 +384,10 @@ module Spaceship
 
     def with_retry(tries = 5, &_block)
       return yield
-    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError, Errno::EPIPE => ex # New Faraday version: Faraday::TimeoutError => ex
-      unless (tries -= 1).zero?
-        logger.warn("Timeout received: '#{ex.message}'.  Retrying after 3 seconds (remaining: #{tries})...")
+    rescue Faraday::Error::ConnectionFailed, Faraday::Error::TimeoutError, AppleTimeoutError => ex # New Faraday version: Faraday::TimeoutError => ex
+      tries -= 1
+      unless tries.zero?
+        logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
         sleep 3 unless defined? SpecHelper
         retry
       end
@@ -373,6 +397,11 @@ module Spaceship
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts msg if $verbose
         logger.warn msg
+
+        if self.class.spaceship_session_env.to_s.length > 0
+          raise UnauthorizedAccessError.new, "Authentication error, you passed an invalid session using the environment variable FASTLANE_SESSION or SPACESHIP_SESSION"
+        end
+
         do_login(self.user, @password)
         sleep 3 unless defined? SpecHelper
         retry
@@ -413,11 +442,48 @@ module Spaceship
       end
 
       if content.nil?
+        # Check if the failure is due to missing permissions (iTunes Connect)
+        if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
+          raise_insuffient_permission_error!
+        end
+
         raise UnexpectedResponse, response.body
+      elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
+        # example content when doing a Developer Portal action with not enough permission
+        # => {"responseId"=>"e5013d83-c5cb-4ba0-bb62-734a8d56007f",
+        #    "resultCode"=>1200,
+        #    "resultString"=>"webservice.certificate.downloadNotAllowed",
+        #    "userString"=>"You are not permitted to download this certificate.",
+        #    "creationTimestamp"=>"2017-01-26T22:44:13Z",
+        #    "protocolVersion"=>"QH65B2",
+        #    "userLocale"=>"en_US",
+        #    "requestUrl"=>"https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action",
+        #    "httpCode"=>200}
+        raise_insuffient_permission_error!(additional_error_string: content["userString"])
       else
         store_csrf_tokens(response)
         content
       end
+    end
+
+    # This also gets called from subclasses
+    def raise_insuffient_permission_error!(additional_error_string: nil)
+      # get the method name of the request that failed
+      # `block in` is used very often for requests when surrounded for paging or retrying blocks
+      # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
+      # Using `sub` instead of `delete` as we don't want to allow multiple matches
+      calling_method_name = caller_locations(2, 2).first.label.sub("block in", "").delete("!").strip
+      begin
+        team_id = "(Team ID #{self.team_id}) "
+      rescue
+        # Showing the team ID is something that's nice to have, however it might cause an exception
+        # when the user doesn't have any permission at all (e.g. failing at login)
+        # we still want the error message to show the actual string, but without the team_id in that case
+        team_id = ""
+      end
+      error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
+      error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
+      raise InsufficientPermissions, error_message
     end
 
     private

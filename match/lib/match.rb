@@ -21,37 +21,17 @@ module Match
   DESCRIPTION = "Easily sync your certificates and profiles across your team using git"
 
   def self.environments
-    envs = %w(appstore adhoc development)
-    envs << "enterprise" if self.enterprise?
-    return envs
-  end
-
-  # @return [Boolean] returns true if the unsupported enterprise mode should be enabled
-  def self.enterprise?
-    force_enterprise = ENV["MATCH_FORCE_ENTERPRISE"]
-
-    return false if (force_enterprise.kind_of?(String) || force_enterprise.kind_of?(Numeric)) &&
-                    (force_enterprise.to_s == "0")
-    return false if force_enterprise.kind_of?(String) &&
-                    (force_enterprise == "" || force_enterprise.casecmp("false") == 0 || force_enterprise.casecmp("no") == 0)
-    return !!force_enterprise
-  end
-
-  # @return [Boolean] returns true if match should interpret the given [certificate|profile] type as an enterprise one
-  def self.type_is_enterprise?(type)
-    Match.enterprise? && type != "development"
+    return %w(appstore adhoc development enterprise)
   end
 
   def self.profile_type_sym(type)
-    return :enterprise if self.type_is_enterprise? type
-    return :adhoc if type == "adhoc"
-    return :appstore if type == "appstore"
-    return :development
+    return type.to_sym
   end
 
   def self.cert_type_sym(type)
-    return :enterprise if self.type_is_enterprise? type
+    return :enterprise if type == "enterprise"
     return :development if type == "development"
-    return :distribution
+    return :distribution if ["adhoc", "appstore", "distribution"].include?(type)
+    raise "Unknown cert type: '#{type}'"
   end
 end
