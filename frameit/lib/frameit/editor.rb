@@ -237,7 +237,7 @@ module Frameit
       keyword = title_images[:keyword]
       title = title_images[:title]
 
-      if stack_title && keyword.width > 0 && title.width > 0
+      if stack_title && keyword != nil && title != nil &&  keyword.width > 0 && title.width > 0
         background = put_title_into_background_stacked(background, title, keyword)
         return background
       end
