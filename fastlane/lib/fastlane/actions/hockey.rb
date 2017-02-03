@@ -72,8 +72,8 @@ module Fastlane
             UI.user_error!("You have to provide a build file")
           end
 
-          dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
-          if options[:ipa]
+          if options[:ipa].to_s.end_with?(".ipa")
+            dsym_path = options[:ipa].to_s.gsub('.ipa', '.app.dSYM.zip')
             if File.exist?(dsym_path)
               dsym_filename = dsym_path
             else
