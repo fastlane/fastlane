@@ -1053,7 +1053,7 @@ module Spaceship
     end
 
     # returns pricing goal array
-    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency:, tier:)
+    def iap_subscription_pricing_target(app_id: nil, purchase_id: nil, currency: nil, tier: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/equalize/#{currency}/#{tier}")
       parse_response(r, 'data')
     end
