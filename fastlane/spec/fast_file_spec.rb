@@ -338,7 +338,7 @@ describe Fastlane do
         ff.import('./FastfileSytnaxError')
       end
 
-      it "imports actions associated with a Fastfile before their Fastfile", focus: true do
+      it "imports actions associated with a Fastfile before their Fastfile" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect do
           ff.import('./import1/Fastfile')
