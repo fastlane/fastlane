@@ -91,7 +91,7 @@ module Fastlane
         if options[:upload_dsym_only]
           UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
         else
-          UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
+          UI.success('Starting with file(s) upload to HockeyApp... this could take some time.')
         end
 
         values = options.values
@@ -117,7 +117,7 @@ module Fastlane
           if response.body.to_s.include?("App could not be created")
             UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
           else
-            UI.user_error!("Error when trying to upload ipa to HockeyApp: #{response.status} - #{response.body}")
+            UI.user_error!("Error when trying to upload file(s) to HockeyApp: #{response.status} - #{response.body}")
           end
         end
       end
