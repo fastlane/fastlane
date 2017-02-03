@@ -222,7 +222,7 @@ module Sigh
         profile_name += "_tvos"
       end
 
-      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
+      profile_name += '.mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
