@@ -9,7 +9,7 @@ class String
       self # do nothing with the string, but return it
     end
   end
-  Colored2::EXTRAS.keys.each do |extra|
+  Colored2::EFFECTS.keys.each do |extra|
     define_method(extra) do
       self # do nothing with the string, but return it
     end
