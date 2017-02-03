@@ -1,3 +1,9 @@
+if ENV["SPACESHIP_DEBUG"]
+  require 'openssl'
+  # this has to be on top of this file, since the value can't be changed later
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
+
 module Fastlane
   module Actions
     module SharedValues
@@ -17,6 +23,15 @@ module Fastlane
           builder.response :json, content_type: /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
+          if ENV['SPACESHIP_DEBUG']
+            # for debugging only
+            # This enables tracking of networking requests using Charles Web Proxy
+            builder.proxy "https://127.0.0.1:8888"
+          end
+
+          if ENV["DEBUG"]
+            puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
+          end
         end
       end
 
