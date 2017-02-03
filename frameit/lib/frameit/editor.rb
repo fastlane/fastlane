@@ -70,7 +70,7 @@ module Frameit
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot)
+      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
 
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
@@ -104,19 +104,23 @@ module Frameit
     def complex_framing
       background = generate_background
 
+      self.top_space_above_device = vertical_frame_padding
+
+      if fetch_config['title']
+        background = put_title_into_background(background)
+      end
+
       if self.frame # we have no frame on le mac
         resize_frame!
         put_into_frame
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
+        frame_height = background.height - top_space_above_device - vertical_frame_padding
         @image.resize "#{frame_width}x"
-      end
-
-      self.top_space_above_device = vertical_frame_padding
-
-      if fetch_config['title']
-        background = put_title_into_background(background)
+        if @image.height > frame_height
+          @image.resize "x#{frame_height.to_i}"
+        end
       end
 
       @image = put_device_into_background(background)
@@ -184,13 +188,13 @@ module Frameit
 
       multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
-      frame.resize "#{new_frame_width.round}x" # resize it to the calculated witdth
+      frame.resize "#{new_frame_width.round}x" # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
     # Add the title above the device
     def put_title_into_background(background)
-      title_images = build_title_images(image.width, image.height)
+      title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = title_images[:keyword]
       title = title_images[:title]
@@ -202,7 +206,7 @@ module Frameit
 
       # Resize the 2 labels if necessary
       smaller = 1.0 # default
-      ratio = (sum_width + keyword_padding * 2) / image.width.to_f
+      ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
       if ratio > 1.0
         # too large - resizing now
         smaller = (1.0 / ratio)
@@ -215,10 +219,10 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding
-      top_space = vertical_padding
+      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.top_space_above_device += title.height + vertical_padding
+      self.top_space_above_device += actual_font_size + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
