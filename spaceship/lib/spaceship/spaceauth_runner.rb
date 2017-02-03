@@ -50,11 +50,11 @@ module Spaceship
       puts "---"
       puts ""
       puts "Pass the following via the FASTLANE_SESSION environment variable:"
-      puts yaml.cyan.underline
+      puts yaml.cyan.underlined
       puts ""
       puts ""
       puts "Example:"
-      puts "export FASTLANE_SESSION='#{yaml}'".cyan.underline
+      puts "export FASTLANE_SESSION='#{yaml}'".cyan.underlined
     end
   end
 end
