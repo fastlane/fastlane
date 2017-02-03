@@ -410,8 +410,6 @@ describe Scan do
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme app",
-                                       "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
