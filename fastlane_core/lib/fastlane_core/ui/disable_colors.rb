@@ -9,9 +9,11 @@ class String
       self # do nothing with the string, but return it
     end
   end
-  Colored2::EXTRAS.keys.each do |extra|
-    define_method(extra) do
-      self # do nothing with the string, but return it
+  if Object.const_defined?("Colored2::EXTRAS")
+    Colored2::EXTRAS.keys.each do |extra|
+      define_method(extra) do
+        self # do nothing with the string, but return it
+      end
     end
   end
 end
