@@ -107,8 +107,8 @@ module Snapshot
       components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
 
       UI.header("Collecting system logs #{device_name} - #{language}")
-      logarchive_dest = File.join(language_folder, "system_logs-" + Digest::MD5.hexdigest(components.join("-")) + ".logarchive")
-      FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
+      log_identity = Digest::MD5.hexdigest(components.join("-"))
+      FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
     end
 
     def print_results(results)
