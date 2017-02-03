@@ -177,6 +177,13 @@ describe Fastlane do
         File.delete("/tmp/after_all.txt")
       end
 
+      it "allows the user to invent a new platform" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileNewPlatform')
+        expect do
+          ff.runner.execute(:crash, :windows)
+        end.to raise_error(":windows crash")
+      end
+
       it "before_each and after_each are called every time" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneBlocks')
         ff.runner.execute(:run_ios, :ios)
