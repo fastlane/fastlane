@@ -6,18 +6,22 @@ module Fastlane
     end
 
     class HockeyAction < Action
-      def self.upload_build(api_token, ipa, options)
+      def self.connection(options)
         require 'faraday'
         require 'faraday_middleware'
 
         base_url = options[:bypass_cdn] ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
-        connection = Faraday.new(url: base_url) do |builder|
+        Faraday.new(url: base_url) do |builder|
           builder.request :multipart
           builder.request :url_encoded
           builder.response :json, content_type: /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
         end
+      end
+
+      def self.upload_build(api_token, ipa, options)
+        connection = self.connection(options)
 
         options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
 
