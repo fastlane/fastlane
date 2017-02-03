@@ -17,7 +17,10 @@ module Fastlane
         require 'faraday_middleware'
 
         base_url = options[:bypass_cdn] ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
-        Faraday.new(url: base_url) do |builder|
+        foptions = {
+          url: base_url
+        }
+        Faraday.new(foptions) do |builder|
           builder.request :multipart
           builder.request :url_encoded
           builder.response :json, content_type: /\bjson$/
