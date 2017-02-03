@@ -127,7 +127,7 @@ module Sigh
         end
       end
 
-      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name} for #{Sigh.config[:platform]} platform'"
+      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]} platform'"
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert,
