@@ -51,7 +51,7 @@ task :issue_stats do
   require 'json'
   require 'faraday'
   require 'terminal-table'
-  require 'colored2'
+  require 'colored'
 
   raise "Please set GITHUB_SCRIPT_TOKEN in your environment with a GitHub personal access token value".red if GITHUB_TOKEN.to_s.empty?
 
