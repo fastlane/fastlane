@@ -30,7 +30,16 @@ module FastlaneCore
       # @param prefix [Array] An array containg a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
+      def execute(*args)
+        exec = proc { _execute(*args) }
+        if defined? Bundler
+          Bundler.with_clean_env(&exec)
+        else
+          exec
+        end
+      end
+
+      def _execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
         print_all = true if $verbose
         prefix ||= {}
 
