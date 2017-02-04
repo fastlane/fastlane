@@ -22,11 +22,11 @@ module Sigh
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
-      FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
-
       command :renew do |c|
         c.syntax = 'fastlane sigh renew'
         c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           user_input = options.__hash__
