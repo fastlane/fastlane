@@ -19,7 +19,7 @@ module Match
                                      default_value: 'master'),
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
-                                     description: "Create a development certificate instead of a distribution one",
+                                     description: "Define the profile type, can be #{Match.environments.join(', ')}",
                                      is_string: true,
                                      short_option: "-y",
                                      default_value: 'development',
@@ -47,6 +47,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :keychain_password,
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
+                                     sensitive: true,
                                      description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :readonly,
@@ -116,7 +117,18 @@ module Match
                                      env_name: "MATCH_SKIP_DOCS",
                                      description: "Skip generation of a README.md for the created git repository",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: '-o',
+                                     env_name: "MATCH_PLATFORM",
+                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos)",
+                                     is_string: false,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       pt = %w(tvos ios)
+                                       UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
+                                     end)
       ]
     end
   end

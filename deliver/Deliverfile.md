@@ -16,7 +16,7 @@ The bundle identifier (e.g. "com.krausefx.app")
 Your Apple ID email address
 
 ##### ipa
-A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
+A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `fastlane deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
 
 ```ruby
 ipa "App.ipa"

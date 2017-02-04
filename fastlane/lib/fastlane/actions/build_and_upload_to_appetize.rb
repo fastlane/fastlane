@@ -60,6 +60,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
                                        description: "Appetize.io API Token",
+                                       sensitive: true,
                                        is_string: true)
         ]
       end

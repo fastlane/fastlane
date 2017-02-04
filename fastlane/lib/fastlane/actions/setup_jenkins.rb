@@ -133,6 +133,7 @@ module Fastlane
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Keychain password",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: ""),
 
           # Code signing identity

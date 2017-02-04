@@ -37,6 +37,7 @@ module Fastlane
                                        env_name: "CURRENT_BUILD_NUMBER_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",

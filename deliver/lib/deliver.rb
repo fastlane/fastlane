@@ -1,5 +1,4 @@
 require 'json'
-require 'deliver/version'
 require 'deliver/options'
 require 'deliver/commands_generator'
 require 'deliver/detect_values'
@@ -27,4 +26,6 @@ module Deliver
   # Constant that captures the root Pathname for the project. Should be used for building paths to assets or other
   # resources that code needs to locate locally
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
+  DESCRIPTION = 'Upload screenshots, metadata and your app to the App Store using a single command'
 end

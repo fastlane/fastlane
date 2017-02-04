@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,15 +8,13 @@ module Frameit
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('frameit')
       Frameit::DependencyChecker.check_dependencies
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
     end
 
     def run
-      program :version, Frameit::VERSION
+      program :name, 'frameit'
+      program :version, Fastlane::VERSION
       program :description, 'Quickly put your screenshots into the right device frames'
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -28,7 +27,7 @@ module Frameit
       default_command :run
 
       command :run do |c|
-        c.syntax = 'frameit black'
+        c.syntax = 'fastlane frameit black'
         c.description = "Adds a black frame around all screenshots"
 
         c.action do |args, options|
@@ -38,7 +37,7 @@ module Frameit
       end
 
       command :silver do |c|
-        c.syntax = 'frameit silver'
+        c.syntax = 'fastlane frameit silver'
         c.description = "Adds a silver frame around all screenshots"
 
         c.action do |args, options|
@@ -48,7 +47,7 @@ module Frameit
       end
 
       command :gold do |c|
-        c.syntax = 'frameit gold'
+        c.syntax = 'fastlane frameit gold'
         c.description = "Adds a gold frame around all screenshots"
 
         c.action do |args, options|
@@ -58,7 +57,7 @@ module Frameit
       end
 
       command :rose_gold do |c|
-        c.syntax = 'frameit rose_gold'
+        c.syntax = 'fastlane frameit rose_gold'
         c.description = "Adds a rose gold frame around all screenshots"
 
         c.action do |args, options|
@@ -68,7 +67,7 @@ module Frameit
       end
 
       command :setup do |c|
-        c.syntax = 'frameit setup'
+        c.syntax = 'fastlane frameit setup'
         c.description = "Downloads and sets up the latest device frames"
 
         c.action do |args, options|
@@ -77,7 +76,7 @@ module Frameit
       end
 
       command :download_frames do |c|
-        c.syntax = 'frameit download_frames'
+        c.syntax = 'fastlane frameit download_frames'
         c.description = "Downloads and sets up the latest device frames"
 
         c.action do |args, options|

@@ -1,7 +1,3 @@
-# Workaround, since hockeyapp.rb from shenzhen includes the code for commander
-def command(_param)
-end
-
 module Fastlane
   module Actions
     module SharedValues
@@ -10,11 +6,39 @@ module Fastlane
     end
 
     class HockeyAction < Action
+      def self.upload_build(api_token, ipa, options)
+        require 'faraday'
+        require 'faraday_middleware'
+
+        base_url = options[:bypass_cdn] ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
+        connection = Faraday.new(url: base_url) do |builder|
+          builder.request :multipart
+          builder.request :url_encoded
+          builder.response :json, content_type: /\bjson$/
+          builder.use FaradayMiddleware::FollowRedirects
+          builder.adapter :net_http
+        end
+
+        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+
+        dsym_filename = options.delete(:dsym_filename)
+        if dsym_filename
+          options[:dsym] = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream')
+        end
+
+        connection.post do |req|
+          if options[:public_identifier].nil?
+            req.url("/api/2/apps/upload")
+          else
+            req.url("/api/2/apps/#{options.delete(:public_identifier)}/app_versions/upload")
+          end
+          req.headers['X-HockeyAppToken'] = api_token
+          req.body = options
+        end
+      end
+
       def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
-
-        require 'shenzhen'
-        require 'shenzhen/plugins/hockeyapp'
 
         build_file = [
           options[:ipa],
@@ -42,9 +66,11 @@ module Fastlane
 
         UI.user_error!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
-        UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
-
-        client = Shenzhen::Plugins::HockeyApp::Client.new(options[:api_token])
+        if options[:upload_dsym_only]
+          UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
+        else
+          UI.success('Starting with ipa upload to HockeyApp... this could take some time.')
+        end
 
         values = options.values
         values[:dsym_filename] = dsym_filename
@@ -55,7 +81,7 @@ module Fastlane
         ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
-        response = client.upload_build(ipa_filename, values)
+        response = self.upload_build(options[:api_token], ipa_filename, values)
         case response.status
         when 200...300
           url = response.body['public_url']
@@ -94,6 +120,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
+                                       sensitive: true,
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?
@@ -156,7 +183,7 @@ module Fastlane
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
-                                      description: "Public identifier of the app you are targeting, usually you won't need this value",
+                                      description: "App id of the app you are targeting, usually you won't need this value. Required, if `upload_dsm_only` set to `true`",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :commit_sha,
                                       env_name: "FL_HOCKEY_COMMIT_SHA",
@@ -185,7 +212,18 @@ module Fastlane
                                        default_value: "add",
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :bypass_cdn,
+                                      env_name: "FL_HOCKEY_BYPASS_CDN",
+                                      description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",
+                                      is_string: false,
+                                      default_value: false),
+          FastlaneCore::ConfigItem.new(key: :dsa_signature,
+                                      env_name: "FL_HOCKEY_DSA_SIGNATURE",
+                                      description: "DSA signature for sparkle updates for macOS",
+                                      is_string: true,
+                                      default_value: "",
+                                      optional: true)
         ]
       end
 

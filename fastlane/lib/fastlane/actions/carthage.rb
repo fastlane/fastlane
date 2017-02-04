@@ -2,14 +2,19 @@ module Fastlane
   module Actions
     class CarthageAction < Action
       def self.run(params)
+        validate(params)
+
         cmd = ["carthage"]
+        command_name = params[:command]
+        cmd << command_name
 
-        cmd << params[:command]
-
-        if params[:command] == "update" && params[:dependencies].count > 0
+        if command_name == "archive" && params[:frameworks].count > 0
+          cmd.concat params[:frameworks]
+        elsif command_name == "update" && params[:dependencies].count > 0
           cmd.concat params[:dependencies]
         end
 
+        cmd << "--output #{params[:output]}" if params[:output]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
@@ -23,6 +28,16 @@ module Fastlane
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
 
         Actions.sh(cmd.join(' '))
+      end
+
+      def self.validate(params)
+        command_name = params[:command]
+        if command_name != "archive" && params[:frameworks].count > 0
+          UI.user_error!("Frameworks option is avaialble only for 'archive' command.")
+        end
+        if command_name != "archive" && params[:output]
+          UI.user_error!("Output option is avaialble only for 'archive' command.")
+        end
       end
 
       def self.description
@@ -112,6 +127,18 @@ module Fastlane
                                            UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.map(&:downcase).include?(platform.downcase)
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :frameworks,
+                                       description: "Framework name or names to archive, could be applied only along with the archive command",
+                                       default_value: [],
+                                       is_string: false,
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :output,
+                                       description: "Output name for the archive, could be applied only along with the archive command. Use following format *.framework.zip",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass a valid string for output. Use following format *.framework.zip") unless value.end_with?("framework.zip")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        env_name: "FL_CARTHAGE_CONFIGURATION",
                                        description: "Define which build configuration to use when building",
@@ -136,6 +163,8 @@ module Fastlane
         [
           'carthage',
           'carthage(
+            frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
+            output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
             dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
@@ -160,7 +189,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton", "antondomashnev"]
       end
     end
   end

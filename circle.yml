@@ -1,13 +1,15 @@
 machine:
+  environment:
+    FL_BUILDLOG_PATH: ~/Library/Logs
   xcode:
     version: "7.3"
 dependencies:
+  pre:
+    - brew install shellcheck
   override:
-    - rake bundle_install_all
-  cache_directories:
-    - ~/.fastlane_bundle
+    - bundle install --jobs=4 --retry=3
 test:
+  pre:
+    - ulimit -n 400
   override:
-    # - bundle exec danger
-    - bundle exec rake test_all
-    # - bundle exec danger
+    - bundle exec fastlane test

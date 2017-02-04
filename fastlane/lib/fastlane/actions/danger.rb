@@ -13,6 +13,7 @@ module Fastlane
         dangerfile = params[:dangerfile]
         cmd << "--danger_id=#{danger_id}" if danger_id
         cmd << "--dangerfile=#{dangerfile}" if dangerfile
+        cmd << "--fail-on-errors=true" if params[:fail_on_errors]
 
         ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
 
@@ -55,8 +56,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :github_api_token,
                                        env_name: "FL_DANGER_GITHUB_API_TOKEN",
                                        description: "GitHub API token for danger",
+                                       sensitive: true,
                                        is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :fail_on_errors,
+                                       env_name: "FL_DANGER_FAIL_ON_ERRORS",
+                                       description: "Should always fail the build process, defaults to false",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false)
         ]
       end
 

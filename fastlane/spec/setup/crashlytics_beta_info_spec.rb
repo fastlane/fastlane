@@ -8,7 +8,7 @@ describe Fastlane::CrashlyticsBetaInfo do
       end
 
       it 'finds an existing crashlytics_path to be valid' do
-        beta_info.crashlytics_path = 'spec/fixtures/xcodeproj/Crashlytics.framework'
+        beta_info.crashlytics_path = './fastlane/spec/fixtures/xcodeproj/Crashlytics.framework'
 
         expect(beta_info.crashlytics_path_valid?).to be(true)
       end

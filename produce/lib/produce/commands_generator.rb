@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,14 +8,12 @@ module Produce
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('produce')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
     end
 
     def run
-      program :version, Produce::VERSION
+      program :name, 'produce'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -26,7 +25,7 @@ module Produce
       FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
 
       command :create do |c|
-        c.syntax = 'produce create'
+        c.syntax = 'fastlane produce create'
         c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
 
         c.action do |args, options|
@@ -37,7 +36,7 @@ module Produce
       end
 
       command :enable_services do |c|
-        c.syntax = 'produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+        c.syntax = 'fastlane produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
         c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable_services -a com.example.app --healthkit --homekit --passbook'
 
@@ -68,7 +67,7 @@ module Produce
       end
 
       command :disable_services do |c|
-        c.syntax = 'produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+        c.syntax = 'fastlane produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
         c.example 'Disable HealthKit', 'produce disable_services -a com.example.app --healthkit'
 
@@ -99,7 +98,7 @@ module Produce
       end
 
       command :group do |c|
-        c.syntax = 'produce group'
+        c.syntax = 'fastlane produce group'
         c.description = 'Ensure that a specific App Group exists'
         c.example 'Create group', 'produce group -g group.example.app -n "Example App Group"'
 
@@ -116,7 +115,7 @@ module Produce
       end
 
       command :associate_group do |c|
-        c.syntax = 'produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
+        c.syntax = 'fastlane produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
         c.description = 'Associate with a group, which is create if needed or simply located otherwise'
         c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
 

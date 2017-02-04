@@ -8,7 +8,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
     let(:valid_api_key) { '0123456789012345678901234567890123456789' }
     let(:valid_build_secret) { '0123456789012345678901234567890123456789012345678901234567890123' }
-    let(:valid_crashlytics_path) { 'spec/fixtures/xcodeproj/Crashlytics.framework' }
+    let(:valid_crashlytics_path) { './fastlane/spec/fixtures/xcodeproj/Crashlytics.framework' }
     let(:valid_emails) { ['email@domain.com'] }
     let(:valid_groups) { ['group1', 'group2'] }
     let(:valid_schemes) { ['SchemeName'] }

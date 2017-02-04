@@ -6,17 +6,13 @@ module Fastlane
 
         require 'frameit'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
+        FastlaneCore::UpdateChecker.start_looking_for_update('frameit') unless Helper.is_test?
 
-          UI.message("Framing screenshots at path #{config[:path]}")
+        UI.message("Framing screenshots at path #{config[:path]}")
 
-          Dir.chdir(config[:path]) do
-            Frameit.config = config
-            Frameit::Runner.new.run('.')
-          end
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('frameit', Frameit::VERSION)
+        Dir.chdir(config[:path]) do
+          Frameit.config = config
+          Frameit::Runner.new.run('.')
         end
       end
 
@@ -38,7 +34,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FRAMEIT_SCREENSHOTS_PATH",
                                        description: "The path to the directory containing the screenshots",
-                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneFolder.path)
+                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneCore::FastlaneFolder.path)
         ]
       end
 
@@ -49,7 +45,9 @@ module Fastlane
       def self.example_code
         [
           'frameit',
-          'frameit :silver'
+          'frameit(silver: true)',
+          'frameit(path: "/screenshots")',
+          'frameit(rose_gold: true)'
         ]
       end
 

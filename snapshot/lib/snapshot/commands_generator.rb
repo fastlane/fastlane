@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,14 +8,12 @@ module Snapshot
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('snapshot')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('snapshot', Snapshot::VERSION)
     end
 
     def run
-      program :version, Snapshot::VERSION
+      program :name, 'snapshot'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -28,7 +27,7 @@ module Snapshot
       FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options)
 
       command :run do |c|
-        c.syntax = 'snapshot'
+        c.syntax = 'fastlane snapshot'
         c.description = 'Take new screenshots based on the Snapfile.'
 
         c.action do |args, options|
@@ -40,7 +39,7 @@ module Snapshot
       end
 
       command :init do |c|
-        c.syntax = 'snapshot init'
+        c.syntax = 'fastlane snapshot init'
         c.description = "Creates a new Snapfile in the current directory"
 
         c.action do |args, options|
@@ -51,7 +50,7 @@ module Snapshot
       end
 
       command :update do |c|
-        c.syntax = 'snapshot update'
+        c.syntax = 'fastlane snapshot update'
         c.description = "Updates your SnapshotHelper.swift to the latest version"
 
         c.action do |args, options|
@@ -61,21 +60,22 @@ module Snapshot
       end
 
       command :reset_simulators do |c|
-        c.syntax = 'snapshot reset_simulators'
+        c.syntax = 'fastlane snapshot reset_simulators'
         c.description = "This will remove all your existing simulators and re-create new ones"
         c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
+        c.option '--force', 'Disables confirmation prompts'
 
         c.action do |args, options|
           options.default ios_version: Snapshot::LatestOsVersion.ios_version
           versions = options.ios_version.split(',') if options.ios_version
           require 'snapshot/reset_simulators'
 
-          Snapshot::ResetSimulators.clear_everything!(versions)
+          Snapshot::ResetSimulators.clear_everything!(versions, options.force)
         end
       end
 
       command :clear_derived_data do |c|
-        c.syntax = 'snapshot clear_derived_data -f path'
+        c.syntax = 'fastlane snapshot clear_derived_data -f path'
         c.description = "Clear the directory where build products and other derived data will go"
 
         c.action do |args, options|

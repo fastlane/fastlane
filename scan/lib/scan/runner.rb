@@ -16,7 +16,6 @@ module Scan
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first) if Scan.devices
-
       command = TestCommandGenerator.generate
       prefix_hash = [
         {
@@ -80,6 +79,8 @@ module Scan
       })
       puts ""
 
+      copy_simulator_logs
+
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
       unless tests_exit_status == 0
@@ -91,8 +92,18 @@ module Scan
       end
     end
 
+    def copy_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        logarchive_dest = File.join(Scan.config[:output_directory], "system_logs-#{device.name}_#{device.os_type}_#{device.os_version}.logarchive")
+        FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
+      end
+    end
+
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`

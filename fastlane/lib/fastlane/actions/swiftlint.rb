@@ -6,17 +6,19 @@ module Fastlane
           UI.user_error!("You have to install swiftlint using `brew install swiftlint`")
         end
 
-        version = Gem::Version.new(Helper.test? ? '0.0.0' : `swiftlint version`.chomp)
+        version = swiftlint_version
         if params[:mode] == :autocorrect and version < Gem::Version.new('0.5.0') and !Helper.test?
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
         command = "swiftlint #{params[:mode]}"
-        command << " --strict" if params[:strict]
+        command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
+        command << " --reporter #{params[:reporter]}" if params[:reporter]
+        command << supported_option_switch(params, :quiet, "0.9.0", true)
 
         if params[:files]
-          if version < Gem::Version.new('0.5.1') and !Helper.test?
+          if version < Gem::Version.new('0.5.1')
             UI.user_error!("Your version of swiftlint (#{version}) does not support list of files as input.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           end
 
@@ -31,6 +33,25 @@ module Fastlane
           Actions.sh(command)
         rescue
           handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+        end
+      end
+
+      # Get current SwiftLint version
+      def self.swiftlint_version
+        Gem::Version.new(`swiftlint version`.chomp)
+      end
+
+      # Return "--option" switch if option is on and current SwiftLint version is greater or equal than min version.
+      # Return "" otherwise.
+      def self.supported_option_switch(params, option, min_version, can_ignore = false)
+        return "" unless params[option]
+        if swiftlint_version < Gem::Version.new(min_version)
+          message = "Your version of swiftlint (#{swiftlint_version}) does not support '--#{option}' option.\nUpdate swiftlint to #{min_version} or above using `brew update && brew upgrade swiftlint`"
+          message += "\nThe option will be ignored." if can_ignore
+          can_ignore ? UI.important(message) : UI.user_error!(message)
+          ""
+        else
+          " --#{option}"
         end
       end
 
@@ -70,6 +91,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ignore_exit_status,
                                        description: "Ignore the exit status of the SwiftLint command, so that serious violations \
                                                     don't fail the build (true/false)",
+                                       default_value: false,
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :reporter,
+                                       description: 'Choose output reporter',
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :quiet,
+                                       description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
                                        is_string: false,
                                        optional: true)

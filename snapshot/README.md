@@ -31,9 +31,9 @@ snapshot
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/snapshot/LICENSE)
-[![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](http://rubygems.org/gems/snapshot)
+[![Gem](https://img.shields.io/gem/v/snapshot.svg?style=flat)](https://rubygems.org/gems/snapshot)
 
-###### Automate taking localized screenshots of your iOS app on every device
+###### Automate taking localized screenshots of your iOS and tvOS apps on every device
 
 <hr />
 <h4 align="center">
@@ -41,7 +41,7 @@ snapshot
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
+_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -107,7 +107,7 @@ This tool automatically switches the language and device type and runs UI Tests 
 
 Install the gem
 
-    sudo gem install snapshot
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -129,7 +129,7 @@ Here a few links to get started:
 # Quick Start
 
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
-- Run `snapshot init` in your project folder
+- Run `fastlane snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
 - (Objective C only) add the bridging header to your test class.
  - `#import "MYUITests-Swift.h"`
@@ -154,6 +154,8 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 [app launch];
 ```
 
+_Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
+
 ![assets/snapshot.gif](assets/snapshot.gif)
 
 You can try the _snapshot_ [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
@@ -163,7 +165,7 @@ To quick start your UI tests, you can use the UI Test recorder. You only have to
 # Usage
 
 ```sh
-snapshot
+fastlane snapshot
 ```
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
@@ -171,44 +173,44 @@ Your screenshots will be stored in the `./screenshots/` folder by default (or `.
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 
 ```sh
-snapshot --stop_after_first_error
+fastlane snapshot --stop_after_first_error
 ```
 
 Also by default, _snapshot_ will open the HTML after all is done. This can be skipped with the following command
 
 
 ```sh
-snapshot --stop_after_first_error --skip_open_summary
+fastlane snapshot --stop_after_first_error --skip_open_summary
 ```
 
 There are a lot of options available that define how to build your app, for example
 
 ```sh
-snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
+fastlane snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
 ```
 
 Reinstall the app before running _snapshot_
 
 ```sh
-snapshot --reinstall_app --app_identifier "tools.fastlane.app"
+fastlane snapshot --reinstall_app --app_identifier "tools.fastlane.app"
 ```
 
 By default _snapshot_ automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#372](https://github.com/fastlane/snapshot/issues/372)). You can adapt this number using
 
 ```sh
-snapshot --number_of_retries 3
+fastlane snapshot --number_of_retries 3
 ```
 
 Add photos and/or videos to the simulator before running _snapshot_
 
 ```sh
-snapshot --add_photos MyTestApp/Assets/demo.jpg --add_videos MyTestApp/Assets/demo.mp4
+fastlane snapshot --add_photos MyTestApp/Assets/demo.jpg --add_videos MyTestApp/Assets/demo.mp4
 ```
 
 For a list for all available options run
 
 ```sh
-snapshot --help
+fastlane snapshot --help
 ```
 
 After running _snapshot_ you will get a nice summary:
@@ -219,9 +221,9 @@ After running _snapshot_ you will get a nice summary:
 
 All of the available options can also be stored in a configuration file called the `Snapfile`. Since most values will not change often for your project, it is recommended to store them there:
 
-First make sure to have a `Snapfile` (you get it for free when running `snapshot init`)
+First make sure to have a `Snapfile` (you get it for free when running `fastlane snapshot init`)
 
-The `Snapfile` can contain all the options that are also available on `snapshot --help`
+The `Snapfile` can contain all the options that are also available on `fastlane snapshot --help`
 
 
 ```ruby
@@ -254,10 +256,10 @@ add_photos ["MyTestApp/Assets/demo.jpg"]
 
 ### Completely reset all simulators
 
-You can run this command in the terminal to delete and re-create all iOS simulators:
+You can run this command in the terminal to delete and re-create all iOS and tvOS simulators:
 
 ```
-snapshot reset_simulators
+fastlane snapshot reset_simulators
 ```
 
 **Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running _snapshot_.
@@ -271,7 +273,7 @@ Some updates require the helper files to be updated. _snapshot_ will automatical
 Basically you can run
 
 ```
-snapshot update
+fastlane snapshot update
 ```
 
 to update your `SnapshotHelper.swift` files. In case you modified your `SnapshotHelper.swift` and want to manually update the file, check out [SnapshotHelper.swift](https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift).
@@ -332,7 +334,7 @@ _snapshot_ finds all these entries using a regex. The number of _snapshot_ outpu
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
-Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
+Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has been resolved with Xcode 8.3, so it's now possible to actually take screenshots from the simulator. We'll keep using the old approach for now, since many of you still want to use older versions of Xcode.
 
 # Tips
 

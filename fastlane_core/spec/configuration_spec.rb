@@ -134,6 +134,47 @@ describe FastlaneCore do
         end
       end
 
+      describe "#sensitive flag" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        end
+
+        it "should set the sensitive flag" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: Array,
+                                                     optional: true,
+                                                     sensitive: true,
+                                                     default_value: ['5', '4', '3', '2', '1'])
+          expect(config_item.sensitive).to eq(true)
+        end
+
+        it "should ask using asterisks" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: String,
+                                                     is_string: true,
+                                                     optional: false,
+                                                     sensitive: true)
+          config = FastlaneCore::Configuration.create([config_item], {})
+          expect(FastlaneCore::UI).to receive(:password).and_return("password")
+          expect(config[:foo]).to eq("password")
+        end
+        it "should ask using plaintext" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo',
+                                                     type: String,
+                                                     is_string: false,
+                                                     optional: false,
+                                                     sensitive: false)
+          config = FastlaneCore::Configuration.create([config_item], {})
+          expect(FastlaneCore::UI).to receive(:input).and_return("plaintext")
+          expect(config[:foo]).to eq("plaintext")
+        end
+      end
+
       describe "arrays" do
         it "returns Array default values correctly" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
@@ -187,6 +228,48 @@ describe FastlaneCore do
           value = config_item.auto_convert_value('9.91')
 
           expect(value).to eq(9.91)
+        end
+
+        it "auto converts Array values to Strings if allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: :shell_string)
+
+          value = config_item.auto_convert_value(['a b', 'c d', :e])
+
+          expect(value).to eq('a\\ b c\\ d e')
+        end
+
+        it "auto converts Hash values to Strings if allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: :shell_string)
+
+          value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
+
+          expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+        end
+
+        it "does not auto convert Array values to Strings if not allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          array = ['a b', 'c d', :e]
+          value = config_item.auto_convert_value(array)
+
+          expect(value).to eq(array)
+        end
+
+        it "does not auto convert Hash values to Strings if not allowed" do
+          config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
+                                                     description: 'xcargs',
+                                                     type: String)
+
+          hash = { 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' }
+          value = config_item.auto_convert_value(hash)
+
+          expect(value).to eq(hash)
         end
 
         it "auto converts nil to nil when type is not specified" do
@@ -272,7 +355,7 @@ describe FastlaneCore do
 
           expect do
             config_item.valid?('ABC')
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Float! Found String instead.")
         end
 
         it "verifies the default value as well" do
@@ -310,7 +393,7 @@ describe FastlaneCore do
                                                        description: 'foo',
                                                        optional: false,
                                                        deprecated: 'replaced by bar')
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneCrash, 'Deprecated option must be optional')
         end
 
         it "doesn't display a deprecation message when loading a config if a deprecated option doesn't have a value" do
@@ -365,6 +448,41 @@ describe FastlaneCore do
           config.values[:test].gsub!("123", "456")
           expect(config.values[:test]).to eq('456value')
           ENV.delete("FL_TEST")
+        end
+
+        it "can push and pop configuration values" do
+          name = FastlaneCore::ConfigItem.new(key: :name)
+          platform = FastlaneCore::ConfigItem.new(key: :platform)
+          other = FastlaneCore::ConfigItem.new(key: :other)
+
+          config = FastlaneCore::Configuration.create([name, other, platform], {})
+          config.set(:name, "name1")
+          config.set(:other, "other")
+          config.push_values!
+
+          expect(config._values).to be_empty
+
+          config.set(:name, "name2")
+          config.set(:platform, "platform")
+          config.pop_values!
+
+          expect(config.fetch(:name)).to eq("name2")
+          expect(config.fetch(:other)).to eq("other")
+          expect(config.fetch(:platform)).to eq("platform")
+        end
+
+        it "does nothing if you pop values with nothing pushed" do
+          name = FastlaneCore::ConfigItem.new(key: :name)
+          platform = FastlaneCore::ConfigItem.new(key: :platform)
+          other = FastlaneCore::ConfigItem.new(key: :other)
+
+          config = FastlaneCore::Configuration.create([name, other, platform], {})
+          config.set(:name, "name1")
+          config.set(:other, "other")
+          config.pop_values!
+
+          expect(config.fetch(:name)).to eq("name1")
+          expect(config.fetch(:other)).to eq("other")
         end
       end
 

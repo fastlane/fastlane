@@ -3,10 +3,11 @@ module Deliver
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
+      return if options[:edit_live]
 
       app = options[:app]
 
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
       UI.message("Starting with the upload of screenshots...")
@@ -17,7 +18,7 @@ module Deliver
         # First, clear all previously uploaded screenshots
         screenshots_per_language.keys.each do |language|
           v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, index, t.language, t.device_type)
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
           end
         end
       end
@@ -40,13 +41,13 @@ module Deliver
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
           indized[screenshot.language] ||= {}
-          indized[screenshot.language][screenshot.device_type] ||= 0
-          indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
+          indized[screenshot.language][screenshot.formatted_name] ||= 0
+          indized[screenshot.language][screenshot.formatted_name] += 1 # we actually start with 1... wtf iTC
 
-          index = indized[screenshot.language][screenshot.device_type]
+          index = indized[screenshot.language][screenshot.formatted_name]
 
           if index > 5
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
 
@@ -54,7 +55,8 @@ module Deliver
           v.upload_screenshot!(screenshot.path,
                                index,
                                screenshot.language,
-                               screenshot.device_type)
+                               screenshot.device_type,
+                               screenshot.is_messages?)
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
@@ -77,7 +79,7 @@ module Deliver
         language = File.basename(lng_folder)
 
         # Check to see if we need to traverse multiple platforms or just a single platform
-        if language == Loader::APPLE_TV_DIR_NAME
+        if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
           screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
           next
         end

@@ -1,9 +1,10 @@
 require 'json'
+require 'fastlane/version'
 
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 
-require 'fastlane_core/version'
+require 'fastlane_core/env'
 require 'fastlane_core/feature/feature'
 require 'fastlane_core/features'
 require 'fastlane_core/helper'
@@ -27,6 +28,7 @@ require 'fastlane_core/ui/ui'
 require 'fastlane_core/tool_collector'
 require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/keychain_importer'
+require 'fastlane_core/swag'
 
 # Third Party code
 require 'colored'
@@ -37,4 +39,14 @@ require 'fastlane_core/ui/fastlane_runner' # monkey patch
 
 module FastlaneCore
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
+  # A directory that's being used to user-wide fastlane configs
+  # This directory is also used for the bundled fastlane
+  # Since we don't want to access FastlaneCore from spaceship
+  # this method is duplicated in spaceship/client.rb
+  def self.fastlane_user_dir
+    path = File.expand_path(File.join("~", ".fastlane"))
+    FileUtils.mkdir_p(path) unless File.directory?(path)
+    return path
+  end
 end

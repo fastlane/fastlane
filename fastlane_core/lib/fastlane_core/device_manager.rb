@@ -71,14 +71,8 @@ module FastlaneCore
 
         device_uuids = []
         result = Plist.parse_xml(usb_devices_output)
-        result[0]['_items'].each do |host_controller| # loop just incase the host system has more then 1 controller
-          host_controller['_items'].each do |usb_device|
-            is_supported_device = device_types.any? { |device_type| usb_device['_name'] == device_type }
-            if is_supported_device && usb_device['serial_num'].length == 40
-              device_uuids.push(usb_device['serial_num'])
-            end
-          end
-        end
+
+        discover_devices(result[0], device_types, device_uuids) if result[0]
 
         if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
           instruments_devices_output = ''
@@ -98,6 +92,21 @@ module FastlaneCore
         end
 
         return devices
+      end
+
+      # Recursively handle all USB items, discovering devices that match the
+      # desired types.
+      def discover_devices(usb_item, device_types, discovered_device_udids)
+        (usb_item['_items'] || []).each do |child_item|
+          discover_devices(child_item, device_types, discovered_device_udids)
+        end
+
+        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        has_serial_number = (usb_item['serial_num'] || '').length == 40
+
+        if is_supported_device && has_serial_number
+          discovered_device_udids << usb_item['serial_num']
+        end
       end
 
       # The code below works from Xcode 7 on
@@ -183,6 +192,26 @@ module FastlaneCore
       # Reset all simulators of this type
       def reset_all
         all.each(&:reset)
+      end
+
+      def copy_logarchive(device, dest)
+        sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
+        logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
+
+        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
+        FileUtils.rm_rf(logarchive_src)
+        FileUtils.rm_rf(dest)
+
+        command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+
+        FileUtils.cp_r(logarchive_src, dest)
+        UI.success "Copying file '#{logarchive_src}' to '#{dest}'..."
+      end
+
+      def reset_all_by_version(os_version: nil)
+        return false unless os_version
+        all.select { |device| device.os_version == os_version }.each(&:reset)
       end
 
       # Reset simulator by UDID or name and OS version

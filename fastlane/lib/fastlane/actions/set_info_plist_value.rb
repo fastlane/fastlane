@@ -11,13 +11,13 @@ module Fastlane
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
           plist[params[:key]] = params[:value]
-          new_plist = plist.to_plist
+          new_plist = Plist::Emit.dump(plist)
           File.write(path, new_plist)
 
           return params[:value]
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to set value to plist file at '#{path}'")
+          UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
       end
 

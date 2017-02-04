@@ -1,7 +1,0 @@
-#!/usr/bin/env ruby
-
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'frameit'
-require 'frameit/commands_generator'
-Frameit::CommandsGenerator.start

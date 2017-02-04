@@ -23,7 +23,7 @@ module Fastlane
       template.gsub!('[[NAME_UP]]', name.upcase)
       template.gsub!('[[NAME_CLASS]]', name.fastlane_class + 'Action')
 
-      actions_path = File.join((FastlaneFolder.path || Dir.pwd), 'actions')
+      actions_path = File.join((FastlaneCore::FastlaneFolder.path || Dir.pwd), 'actions')
       FileUtils.mkdir_p(actions_path) unless File.directory?(actions_path)
 
       path = File.join(actions_path, "#{name}.rb")

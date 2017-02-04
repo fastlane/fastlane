@@ -253,6 +253,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_PASSWORD",
                                        description: "Password for your Xcode Server",
+                                       sensitive: true,
                                        optional: true,
                                        default_value: ""),
           FastlaneCore::ConfigItem.new(key: :target_folder,

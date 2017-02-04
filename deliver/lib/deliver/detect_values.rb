@@ -1,9 +1,11 @@
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
+      find_platform(options)
       find_app_identifier(options)
       find_app(options)
       find_folders(options)
+      ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
     end
 
@@ -25,7 +27,7 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Application.find(search_by)
+      app = Spaceship::Application.find(search_by, mac: options[:platform] == "osx")
       if app
         options[:app] = app
       else
@@ -34,10 +36,12 @@ module Deliver
     end
 
     def find_folders(options)
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
       options[:screenshots_path] ||= File.join(containing, 'screenshots')
       options[:metadata_path] ||= File.join(containing, 'metadata')
+    end
 
+    def ensure_folders_created(options)
       FileUtils.mkdir_p(options[:screenshots_path])
       FileUtils.mkdir_p(options[:metadata_path])
     end
@@ -52,6 +56,14 @@ module Deliver
       end
     rescue
       UI.user_error!("Could not infer your app's version")
+    end
+
+    def find_platform(options)
+      if options[:ipa]
+        options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
+      elsif options[:pkg]
+        options[:platform] = 'osx'
+      end
     end
   end
 end

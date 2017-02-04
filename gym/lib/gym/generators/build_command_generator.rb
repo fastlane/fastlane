@@ -33,7 +33,6 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
@@ -72,6 +71,7 @@ module Gym
           pipe << " --no-color" if Helper.colors_disabled?
           pipe << " --formatter " if formatter
           pipe << formatter if formatter
+          pipe << "--utf" if Gym.config[:xcpretty_utf]
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]

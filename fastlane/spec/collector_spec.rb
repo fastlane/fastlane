@@ -22,7 +22,7 @@ describe Fastlane do
     it "doesn't track unofficial actions" do
       ENV.delete("FASTLANE_OPT_OUT_USAGE")
 
-      Fastlane::Actions.load_external_actions("spec/fixtures/actions") # load custom actions
+      Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions") # load custom actions
 
       ff = nil
       begin

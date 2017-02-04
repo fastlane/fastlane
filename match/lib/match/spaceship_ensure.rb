@@ -11,7 +11,7 @@ module Match
       if keychain_entry.password(ask_if_missing: false).to_s.length == 0
         UI.important("You can also run `match` in readonly mode to not require any access to the")
         UI.important("Developer Portal. This way you only share the keys and credentials")
-        UI.command("match --readonly")
+        UI.command("fastlane match --readonly")
         UI.important("More information https://github.com/fastlane/fastlane/tree/master/match#access-control")
       end
 

@@ -1,3 +1,5 @@
+require 'fastlane_core/tool_collector'
+
 module Fastlane
   class ActionCollector < FastlaneCore::ToolCollector
     # Is this an official fastlane action, that is bundled with fastlane?

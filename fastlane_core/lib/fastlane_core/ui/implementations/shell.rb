@@ -7,7 +7,8 @@ module FastlaneCore
 
       $stdout.sync = true
 
-      if Helper.is_test?
+      if Helper.is_test? && !ENV.key?('DEBUG')
+        $stdout.puts "Logging disabled while running tests. Force them by setting the DEBUG environment variable"
         @log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @log ||= Logger.new($stdout)
@@ -16,7 +17,7 @@ module FastlaneCore
       @log.formatter = proc do |severity, datetime, progname, msg|
         if $verbose
           string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
-        elsif ENV["FASTLANE_HIDE_TIMESTAMP"]
+        elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
           string = ""
         else
           string = "[#{datetime.strftime('%H:%M:%S')}]: "
@@ -51,7 +52,7 @@ module FastlaneCore
     end
 
     def deprecated(message)
-      log.error(message.to_s.bold.blue)
+      log.error(message.to_s.deprecated)
     end
 
     def command(message)

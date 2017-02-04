@@ -36,7 +36,22 @@ module Scan
 
       default_derived_data
 
+      coerce_to_array_of_strings(:only_testing)
+      coerce_to_array_of_strings(:skip_testing)
+
       return config
+    end
+
+    def self.coerce_to_array_of_strings(config_key)
+      config_value = Scan.config[config_key]
+
+      return if config_value.nil?
+
+      # splitting on comma allows us to support comma-separated lists of values
+      # from the command line, even though the ConfigItem is not defined as an
+      # Array type
+      config_value = config_value.split(',') unless config_value.kind_of?(Array)
+      Scan.config[config_key] = config_value.map(&:to_s)
     end
 
     def self.default_derived_data
@@ -121,9 +136,11 @@ module Scan
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               potential_emptiness_error = lambda do |sims|
-                UI.error("No simulators found that are equal to the version " \
-                "of specifier (#{version}) and greater than or equal to the version " \
-                "of deployment target (#{deployment_target_version})") if sims.empty?
+                if sims.empty?
+                  UI.error("No simulators found that are equal to the version " \
+                  "of specifier (#{version}) and greater than or equal to the version " \
+                  "of deployment target (#{deployment_target_version})")
+                end
               end
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
@@ -165,7 +182,7 @@ module Scan
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `scan --help`")
+        UI.important("Instead use the other options available in `fastlane scan --help`")
         UI.important("Using your value '#{Scan.config[:destination]}' for now")
         UI.important("because I trust you know what you're doing...")
         return

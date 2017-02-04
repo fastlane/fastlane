@@ -1,0 +1,52 @@
+{
+  "sectionErrorKeys": [
+
+  ],
+  "sectionInfoKeys": [
+
+  ],
+  "sectionWarningKeys": [
+
+  ],
+  "countriesChanged": true,
+  "countries": [
+    {
+      "code": "GB"
+    },
+    {
+      "code": "US"
+    }
+  ],
+  "b2BAppFlagDisabled": false,
+  "educationDiscountDisabledFlag": false,
+  "hotFudgeFeatureEnabled": true,
+  "coldFudgeFeatureEnabled": false,
+  "bitcodeAutoRecompileDisAllowed": false,
+  "b2bAppEnabled": false,
+  "educationalDiscount": true,
+  "theWorld": false,
+  "pricingIntervalsFieldTO": {
+    "value": [
+      {
+        "priceTierEffectiveDate": null,
+        "priceTierEndDate": null,
+        "tierStem": "0"
+      }
+    ],
+    "isEditable": true,
+    "isRequired": false,
+    "errorKeys": null
+  },
+  "availableDate": 1476687600000,
+  "unavailableDate": -2,
+  "creatingApp": false,
+  "hasApprovedVersion": false,
+  "appVersionsForOTAByPlatforms": {
+    "iOS": [
+
+    ]
+  },
+  "b2bUsers": [
+
+  ]
+}

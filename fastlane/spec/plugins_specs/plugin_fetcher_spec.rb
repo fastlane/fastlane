@@ -5,13 +5,13 @@ describe Fastlane do
         current_gem = "yolo"
         # We have to stub both a specific search, and the general listing
         stub_request(:get, "https://rubygems.org/api/v1/search.json?page=1&query=fastlane-plugin-#{current_gem}").
-          to_return(status: 200, body: File.read("spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
+          to_return(status: 200, body: File.read("./fastlane/spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
 
         stub_request(:get, "https://rubygems.org/api/v1/search.json?page=2&query=fastlane-plugin-#{current_gem}").
           to_return(status: 200, body: [].to_json, headers: {})
 
         stub_request(:get, "https://rubygems.org/api/v1/search.json?page=1&query=fastlane-plugin-").
-          to_return(status: 200, body: File.read("spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
+          to_return(status: 200, body: File.read("./fastlane/spec/fixtures/requests/rubygems_plugin_query.json"), headers: {})
 
         stub_request(:get, "https://rubygems.org/api/v1/search.json?page=2&query=fastlane-plugin-").
           to_return(status: 200, body: [].to_json, headers: {})

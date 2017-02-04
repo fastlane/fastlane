@@ -1,3 +1,5 @@
+require "fastlane/cli_tools_distributor"
+
 module Fastlane
   class PluginManager
     require "bundler"
@@ -22,8 +24,8 @@ module Fastlane
     end
 
     def pluginfile_path
-      if FastlaneFolder.path
-        return File.join(FastlaneFolder.path, PLUGINFILE_NAME)
+      if FastlaneCore::FastlaneFolder.path
+        return File.join(FastlaneCore::FastlaneFolder.path, PLUGINFILE_NAME)
       else
         return nil
       end
@@ -233,8 +235,8 @@ module Fastlane
 
     # The code required to load the Plugins file
     def self.code_to_attach
-      if FastlaneFolder.path
-        fastlane_folder_name = File.basename(FastlaneFolder.path)
+      if FastlaneCore::FastlaneFolder.path
+        fastlane_folder_name = File.basename(FastlaneCore::FastlaneFolder.path)
       else
         fastlane_folder_name = "fastlane"
       end
@@ -294,7 +296,7 @@ module Fastlane
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
 
-      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || ENV["FASTLANE_ENV_PRINTER"]
+      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || FastlaneCore::Env.truthy?("FASTLANE_ENV_PRINTER")
 
       # We want to avoid printing output other than the version number if we are running `fastlane -v`
       print_plugin_information(self.plugin_references) unless skip_print_plugin_info

@@ -11,7 +11,7 @@ module FastlaneCore
 
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
-      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
 
       @start_time = Time.now
 
@@ -47,25 +47,57 @@ module FastlaneCore
       end
     end
 
+    # Show a message to the user to update to a new version of fastlane (or a sub-gem)
+    # Use this method, as this will detect the current Ruby environment and show an
+    # appropriate message to the user
     def self.show_update_message(gem_name, current_version)
       available = server_results[gem_name]
       puts ""
       puts '#######################################################################'.green
-      puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
-      puts "# It is recommended to use the latest version.".green
-      if Helper.bundler?
-        puts "# Update using 'bundle update #{gem_name.downcase}'.".green
+      if available
+        puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
       else
-        puts "# Update using 'sudo gem update #{gem_name.downcase}'.".green
+        puts "# An update for #{gem_name} is available. You are on #{current_version}.".green
       end
-      puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if ENV["FASTLANE_HIDE_CHANGELOG"]
+      puts "# It is recommended to use the latest version.".green
+      puts "# Please update using `#{self.update_command(gem_name: gem_name)}`.".green
 
-      if Random.rand(5) == 1 && !Helper.bundler?
+      puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+
+      if !Helper.bundler? && !Helper.contained_fastlane? && Random.rand(5) == 1
+        # We want to show this message from time to time, if the user doesn't use bundler, nor bundled fastlane
         puts '#######################################################################'.green
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
       puts '#######################################################################'.green
-      Changelog.show_changes(gem_name, current_version) unless ENV["FASTLANE_HIDE_CHANGELOG"]
+      Changelog.show_changes(gem_name, current_version) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+
+      ensure_rubygems_source
+    end
+
+    # The command that the user should use to update their mac
+    def self.update_command(gem_name: "fastlane")
+      if Helper.bundler?
+        "bundle update #{gem_name.downcase}"
+      elsif Helper.contained_fastlane? || Helper.homebrew?
+        "fastlane update_fastlane"
+      else
+        "sudo gem update #{gem_name.downcase}"
+      end
+    end
+
+    # Check if RubyGems is set as a gem source
+    # on some machines that might not be the case
+    # and then users can't find the update when
+    # running the specified command
+    def self.ensure_rubygems_source
+      return if Helper.contained_fastlane?
+      return if `gem sources`.include?("https://rubygems.org")
+      puts ""
+      UI.error("RubyGems is not listed as your Gem source")
+      UI.error("You can run `gem sources` to see all your sources")
+      UI.error("Please run the following command to fix this:")
+      UI.command("gem sources --add https://rubygems.org")
     end
 
     # Generate the URL on the main thread (since we're switching directory)
@@ -87,11 +119,18 @@ module FastlaneCore
     end
 
     def self.finished_running(gem_name)
-      time = (Time.now - @start_time).to_i
+      return if ENV["FASTLANE_OPT_OUT_USAGE"]
 
+      time = (Time.now - @start_time).to_i
       url = UPDATE_URL + "time/#{gem_name}"
       url += "?time=#{time}"
-      url += "&ci=1" if Helper.is_ci?
+      url += "&ci=1" if Helper.ci?
+      url += "&gem=1" if Helper.rubygems?
+      url += "&bundler=1" if Helper.bundler?
+      url += "&mac_app=1" if Helper.mac_app?
+      url += "&standalone=1" if Helper.contained_fastlane?
+      url += "&homebrew=1" if Helper.homebrew?
+
       Excon.post(url)
     end
 
@@ -105,7 +144,7 @@ module FastlaneCore
       end
 
       ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
-        return ENV["#{current}_APP_IDENTIFIER"] if ENV["#{current}_APP_IDENTIFIER"]
+        return ENV["#{current}_APP_IDENTIFIER"] if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
       end
 
       return CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
@@ -116,7 +155,7 @@ module FastlaneCore
     # (optional) Returns the app identifier for the current tool
     # supply and screengrab use different param names and env variable patterns so we have to special case here
     # example:
-    #   supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
+    #   fastlane supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
     #   screengrab -a com.test.app should return com.test.app
     def self.android_app_identifier(args, gem_name)
       app_identifier = nil
@@ -128,8 +167,8 @@ module FastlaneCore
         end
       end
 
-      app_identifier ||= ENV["SUPPLY_PACKAGE_NAME"] if ENV["SUPPLY_PACKAGE_NAME"]
-      app_identifier ||= ENV["SCREENGRAB_APP_PACKAGE_NAME"] if ENV["SCREENGRAB_APP_PACKAGE_NAME"]
+      app_identifier ||= ENV["SUPPLY_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SUPPLY_PACKAGE_NAME")
+      app_identifier ||= ENV["SCREENGRAB_APP_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SCREENGRAB_APP_PACKAGE_NAME")
       app_identifier ||= CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
 
       # Add Android prefix to prevent collisions if there is an iOS app with the same identifier
@@ -150,7 +189,7 @@ module FastlaneCore
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def self.p_hash(args, gem_name)
-      return nil if ENV["FASTLANE_OPT_OUT_USAGE"]
+      return nil if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
       require 'credentials_manager'
 
       # check if this is an android project first because some of the same params exist for iOS and Android tools

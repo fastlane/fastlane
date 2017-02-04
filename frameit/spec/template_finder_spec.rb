@@ -6,7 +6,7 @@ describe Frameit do
       # directory.
       before(:all) do
         @old_env_home = ENV['HOME']
-        ENV['HOME'] = '/thisdirectorydoesnotexist'
+        ENV['HOME'] = '/tmp/thisdirectorydoesnotexist'
       end
 
       after(:all) do
@@ -91,7 +91,7 @@ describe Frameit do
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
 
-      it 'finds an ipad pro', now: true do
+      it 'finds an ipad pro' do
         screenshot = make_screenshot({
           device_name: 'iPad-Pro',
           color: 'SpaceGray',

@@ -23,7 +23,7 @@ fastlane
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane/LICENSE)
-[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](http://rubygems.org/gems/fastlane)
+[![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 
 ######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
@@ -51,7 +51,7 @@ Store your configuration in a text file to easily test, build, and deploy from _
 
 Define different environments (`lanes`) in your `Fastfile`: Examples are: `appstore`, `beta` and `test`.
 
-You define a `lane` like this (more details about the commands in the [Actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) documentation):
+You define a `lane` like this (more details about the commands in the [Actions](https://docs.fastlane.tools/actions) documentation):
 
 ```ruby
 lane :release do
@@ -86,10 +86,10 @@ fastlane release
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
-:ghost: | [Jenkins Integration](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md): Show the output directly in the Jenkins test results
+:ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 170 built-in integrations available
-:computer: | Support for both iOS, Mac OS and Android apps
+:computer: | Support for iOS, macOS and Android apps
 :octocat: | Full git and mercurial support
 
 
@@ -98,22 +98,31 @@ fastlane release
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
 
 ## Installation
+Make sure you have the latest version of the Xcode command line tools installed:
 
-I recommend following the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started.
+```
+xcode-select --install
+```
 
-    sudo gem install fastlane --verbose
+### Choose your installation method:
 
-Make sure, you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
-
-If you experience slow launch times of fastlane, try running
-
-    gem cleanup
-
-to clean up outdated gems.
-
-System Requirements: `fastlane` requires macOS or Linux with Ruby 2.0.0 or above.
+<table width="100%" >
+<tr>
+<th width="33%"><a href="http://brew.sh">Homebrew</a></td>
+<th width="33%">Installer Script</td>
+<th width="33%">Rubygems</td>
+</tr>
+<tr>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS</td>
+<td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
+</tr>
+<tr> 
+<td width="33%"><code>brew cask install fastlane</code></td>
+<td width="33%"><a href="https://download.fastlane.tools/fastlane.zip">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
+<td width="33%"><code>sudo gem install fastlane -NV</code></td>
+</tr>
+</table>
 
 
 If you want to take a look at a project, already using `fastlane`, check out the [fastlane-examples](https://github.com/fastlane/examples) with `fastlane` setups by Wikipedia, Product Hunt, MindNode and more.
@@ -125,7 +134,7 @@ The setup assistant will create all the necessary files for you, using the exist
 - ```cd [your_project_folder]```
 - ```fastlane init```
 - Follow the setup assistant, which will set up ```fastlane``` for you
-- Further customise the ```Fastfile``` with [actions](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md).
+- Further customise the ```Fastfile``` with [actions](https://docs.fastlane.tools/actions).
 
 For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
 
@@ -135,7 +144,9 @@ There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gi
 
 Usually you'll use fastlane by triggering individual lanes:
 
-    fastlane [lane_name]
+```
+fastlane [lane_name]
+```
 
 #### Other commands
 

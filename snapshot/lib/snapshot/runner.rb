@@ -26,7 +26,7 @@ module Snapshot
       # We go 2 folders up, to not show "Contents/Developer/"
       values = Snapshot.config.values(ask: false)
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
-      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Snapshot::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Fastlane::VERSION}")
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
@@ -51,6 +51,8 @@ module Snapshot
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
+
+            copy_simulator_logs(device, language, locale, launch_arguments)
           end
         end
       end
@@ -94,6 +96,19 @@ module Snapshot
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
       end
+    end
+
+    def copy_simulator_logs(device_name, language, locale, launch_arguments)
+      return unless Snapshot.config[:output_simulator_logs]
+
+      detected_language = locale || language
+      language_folder = File.join(Snapshot.config[:output_directory], detected_language)
+      device = TestCommandGenerator.find_device(device_name)
+      components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
+
+      UI.header("Collecting system logs #{device_name} - #{language}")
+      logarchive_dest = File.join(language_folder, "system_logs-" + Digest::MD5.hexdigest(components.join("-")) + ".logarchive")
+      FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
     end
 
     def print_results(results)
@@ -199,7 +214,7 @@ module Snapshot
     end
 
     def open_simulator_for_device(device_name)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       device = TestCommandGenerator.find_device(device_name)
       FastlaneCore::Simulator.launch(device) if device
