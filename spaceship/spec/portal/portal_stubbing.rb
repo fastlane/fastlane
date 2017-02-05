@@ -241,6 +241,32 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
+    def adp_stub_website_pushes
+      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listWebsitePushIds.action').
+        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+        to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listWebsitePushIds.action").
+        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addWebsitePushId.action").
+        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/addWebsitePushId.action").
+        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteWebsitePushId.action").
+        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/deleteWebsitePushId.action").
+        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
     def adp_stub_download_certificate_failure
       stub_request(:get, 'https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA').
         to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
