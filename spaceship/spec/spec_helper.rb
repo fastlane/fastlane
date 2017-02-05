@@ -26,6 +26,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_apps
   PortalStubbing.adp_stub_app_groups
   PortalStubbing.adp_stub_persons
+  PortalStubbing.adp_stub_website_pushes
 
   TunesStubbing.itc_stub_login
   TunesStubbing.itc_stub_applications
