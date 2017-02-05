@@ -1,11 +1,21 @@
 module Fastlane
   class SupportedPlatforms
+    class << self
+      attr_accessor :extra
+      attr_reader :default
+
+      def extra=(value)
+        value ||= []
+        UI.important("Setting '#{value}' as extra SupportedPlatforms")
+        @extra = value
+      end
+    end
+
+    @default = [:ios, :mac, :android]
+    @extra = []
+
     def self.all
-      [
-        :ios,
-        :mac,
-        :android
-      ]
+      (@default + @extra).flatten
     end
 
     # this will log a warning if the passed platform is not supported
