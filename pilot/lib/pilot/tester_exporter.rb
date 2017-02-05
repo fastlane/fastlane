@@ -20,21 +20,14 @@ module Pilot
       file = config[:testers_file_path]
 
       CSV.open(file, "w") do |csv|
-        csv << ['First', 'Last', 'Email', 'Devices', 'Groups', 'Installed Version', 'Install Date']
+        csv << ['First', 'Last', 'Email', 'Groups', 'Devices', 'Installed Version', 'Install Date']
 
         testers.each do |tester|
-          groups = tester.raw_data.get("groups")
-
-          group_names = ""
-          if groups && groups.length > 0
-            names = groups.map { |group| group["name"]["value"] }
-            group_names = names.join(';')
-          end
-
+          group_names = tester.groups_list(';') || ""
           install_version = tester.full_version || ""
           pretty_date = tester.pretty_install_date || ""
 
-          csv << [tester.first_name, tester.last_name, tester.email, tester.devices.count, group_names, install_version, pretty_date]
+          csv << [tester.first_name, tester.last_name, tester.email, group_names, tester.devices.count, install_version, pretty_date]
         end
 
         UI.success("Successfully exported CSV to #{file}")

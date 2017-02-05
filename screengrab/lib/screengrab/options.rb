@@ -61,6 +61,12 @@ module Screengrab
                                      short_option: "-l",
                                      type: Array,
                                      description: "Only run tests in these Java classes"),
+        FastlaneCore::ConfigItem.new(key: :launch_arguments,
+                                      env_name: 'SCREENGRAB_LAUNCH_ARGUMENTS',
+                                      optional: true,
+                                      short_option: "-e",
+                                      type: Array,
+                                      description: "Additional launch arguments"),
         FastlaneCore::ConfigItem.new(key: :test_instrumentation_runner,
                                      env_name: 'SCREENGRAB_TEST_INSTRUMENTATION_RUNNER',
                                      optional: true,
@@ -102,7 +108,17 @@ module Screengrab
                                      default_value: "phone",
                                      verify_block: proc do |value|
                                        UI.user_error! "device_type must be one of: #{DEVICE_TYPES}" unless DEVICE_TYPES.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :exit_on_test_failure,
+                                     env_name: 'EXIT_ON_TEST_FAILURE',
+                                     description: "Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary",
+                                     default_value: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :reinstall_app,
+                                     env_name: 'SCREENGRAB_REINSTALL_APP',
+                                     description: "Enabling this option will automatically uninstall the application before running it",
+                                     default_value: false,
+                                     is_string: false)
       ]
     end
   end

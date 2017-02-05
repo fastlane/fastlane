@@ -1,6 +1,43 @@
 module FastlaneCore
   class ConfigItem
-    attr_accessor :key, :env_name, :description, :short_option, :default_value, :verify_block, :optional, :conflicting_options, :conflict_block, :deprecated
+    # [Symbol] the key which is used as command paramters or key in the fastlane tools
+    attr_accessor :key
+
+    # [String] the name of the environment variable, which is only used if no other values were found
+    attr_accessor :env_name
+
+    # [String] A description shown to the user
+    attr_accessor :description
+
+    # [String] A string of length 1 which is used for the command parameters (e.g. -f)
+    attr_accessor :short_option
+
+    # the value which is used if there was no given values and no environment values
+    attr_accessor :default_value
+
+    # An optional block which is called when a new value is set.
+    #   Check value is valid. This could be type checks or if a folder/file exists
+    #   You have to raise a specific exception if something goes wrong. Append .red after the string
+    attr_accessor :verify_block
+
+    # [Boolean] is false by default. If set to true, also string values will not be asked to the user
+    attr_accessor :optional
+
+    # [Array] array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
+    attr_accessor :conflicting_options
+
+    # An optional block which is called when options conflict happens
+    attr_accessor :conflict_block
+
+    # [String] Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
+    attr_accessor :deprecated
+
+    # [Boolean] Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
+    attr_accessor :sensitive
+
+    # [Boolean] Set if the variable is to be converted to a shell-escaped String when provided as a Hash or Array
+    # Allows items expected to be strings used in shell arguments to be alternatively provided as a Hash or Array for better readability and auto-escaped for us.
+    attr_accessor :allow_shell_conversion
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
@@ -12,12 +49,13 @@ module FastlaneCore
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
-    # @param type (Class) the data type of this config item. Takes precedence over `is_string`
+    # @param type (Class) the data type of this config item. Takes precedence over `is_string`. Use `:shell_string` to allow types `String`, `Hash` and `Array` that will be converted to shell-escaped strings
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil)
+    # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -42,6 +80,8 @@ module FastlaneCore
       end
       optional = false if optional.nil?
 
+      sensitive = false if sensitive.nil?
+
       @key = key
       @env_name = env_name
       @description = description
@@ -50,10 +90,13 @@ module FastlaneCore
       @verify_block = verify_block
       @is_string = is_string
       @data_type = type
+      @data_type = String if type == :shell_string
       @optional = optional
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
       @deprecated = deprecated
+      @sensitive = sensitive
+      @allow_shell_conversion = (type == :shell_string)
     end
 
     # This will raise an exception if the value is not valid
@@ -95,6 +138,9 @@ module FastlaneCore
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
+      elsif data_type == String && allow_shell_conversion
+        return value.map(&:to_s).map(&:shellescape).join(' ') if value.kind_of?(Array)
+        return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
       else
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here

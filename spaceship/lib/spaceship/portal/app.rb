@@ -87,14 +87,14 @@ module Spaceship
         # @param name [String] the name of the App
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
-        def create!(bundle_id: nil, name: nil, mac: false)
+        def create!(bundle_id: nil, name: nil, mac: false, enabled_features: {})
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac)
+          new_app = client.create_app!(type, name, bundle_id, mac: mac, enabled_features: enabled_features)
           self.new(new_app)
         end
 
@@ -103,7 +103,7 @@ module Spaceship
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
           all(mac: mac).find do |app|
-            app.bundle_id == bundle_id
+            return app if app.bundle_id.casecmp(bundle_id) == 0
           end
         end
       end
@@ -114,6 +114,13 @@ module Spaceship
       def delete!
         client.delete_app!(app_id, mac: mac?)
         self
+      end
+
+      # Update name of this App ID.
+      # @return (App) The app you updated. This is nil if the app can't be found
+      def update_name!(name, mac: false)
+        app = client.update_app_name!(app_id, name, mac: mac)
+        self.class.factory(app)
       end
 
       # Fetch a specific App ID details based on the bundle_id

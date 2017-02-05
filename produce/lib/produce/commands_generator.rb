@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,14 +8,12 @@ module Produce
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('produce')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('produce', Produce::VERSION)
     end
 
     def run
-      program :version, Produce::VERSION
+      program :name, 'produce'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -26,7 +25,7 @@ module Produce
       FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
 
       command :create do |c|
-        c.syntax = 'produce create'
+        c.syntax = 'fastlane produce create'
         c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
 
         c.action do |args, options|
@@ -37,20 +36,24 @@ module Produce
       end
 
       command :enable_services do |c|
-        c.syntax = 'produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+        c.syntax = 'fastlane produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
         c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable_services -a com.example.app --healthkit --homekit --passbook'
 
         c.option '--app-group', 'Enable App Groups'
+        c.option '--apple-pay', 'Enable Apple Pay'
         c.option '--associated-domains', 'Enable Associated Domains'
         c.option '--data-protection STRING', String, 'Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"'
+        c.option '--game-center', 'Enable Game Center'
         c.option '--healthkit', 'Enable HealthKit'
         c.option '--homekit', 'Enable HomeKit'
         c.option '--wireless-conf', 'Enable Wireless Accessory Configuration'
         c.option '--icloud STRING', String, 'Enable iCloud, suitable values are "legacy" and "cloudkit"'
+        c.option '--in-app-purchase', 'Enable In-App Purchase'
         c.option '--inter-app-audio', 'Enable Inter-App-Audio'
         c.option '--passbook', 'Enable Passbook'
         c.option '--push-notification', 'Enable Push notification (only enables the service, does not configure certificates)'
+        c.option '--sirikit', 'Enable SiriKit'
         c.option '--vpn-conf', 'Enable VPN Configuration'
 
         c.action do |args, options|
@@ -64,20 +67,24 @@ module Produce
       end
 
       command :disable_services do |c|
-        c.syntax = 'produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
+        c.syntax = 'fastlane produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
         c.example 'Disable HealthKit', 'produce disable_services -a com.example.app --healthkit'
 
         c.option '--app-group', 'Disable App Groups'
+        c.option '--apple-pay', 'Disable Apple Pay'
         c.option '--associated-domains', 'Disable Associated Domains'
         c.option '--data-protection', 'Disable Data Protection'
+        c.option '--game-center', 'Disable Game Center'
         c.option '--healthkit', 'Disable HealthKit'
         c.option '--homekit', 'Disable HomeKit'
         c.option '--wireless-conf', 'Disable Wireless Accessory Configuration'
         c.option '--icloud', 'Disable iCloud'
+        c.option '--in-app-purchase', 'Disable In-App Purchase'
         c.option '--inter-app-audio', 'Disable Inter-App-Audio'
         c.option '--passbook', 'Disable Passbook'
         c.option '--push-notification', 'Disable Push notifications'
+        c.option '--sirikit', 'Disable SiriKit'
         c.option '--vpn-conf', 'Disable VPN Configuration'
 
         c.action do |args, options|
@@ -91,7 +98,7 @@ module Produce
       end
 
       command :group do |c|
-        c.syntax = 'produce group'
+        c.syntax = 'fastlane produce group'
         c.description = 'Ensure that a specific App Group exists'
         c.example 'Create group', 'produce group -g group.example.app -n "Example App Group"'
 
@@ -108,7 +115,7 @@ module Produce
       end
 
       command :associate_group do |c|
-        c.syntax = 'produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
+        c.syntax = 'fastlane produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
         c.description = 'Associate with a group, which is create if needed or simply located otherwise'
         c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
 

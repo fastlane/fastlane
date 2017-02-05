@@ -1,5 +1,7 @@
 source "https://rubygems.org"
 
-gemspec path: "fastlane"
+gem "xcode-install", ">= 2.0.10"
+gemspec path: "."
 
-gem "danger", "~> 0.10"
+plugins_path = File.join(File.expand_path("..", __FILE__), 'fastlane', 'Pluginfile')
+eval(File.read(plugins_path), binding)

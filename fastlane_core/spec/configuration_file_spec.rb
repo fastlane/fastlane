@@ -73,7 +73,7 @@ describe FastlaneCore do
       describe "Handling invalid broken configuration files" do
         it "automatically corrects invalid quotations" do
           config = FastlaneCore::Configuration.create(options, {})
-          config.load_configuration_file('./spec/fixtures/ConfigInvalidQuotation')
+          config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigInvalidQuotation')
           # Not raising an error, even though we have invalid quotes
           expect(config[:app_identifier]).to eq("net.sunapps.1")
         end
@@ -81,8 +81,27 @@ describe FastlaneCore do
         it "properly shows an error message when there is a syntax error in the Fastfile" do
           config = FastlaneCore::Configuration.create(options, {})
           expect do
-            config.load_configuration_file('./spec/fixtures/ConfigSytnaxError')
+            config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigSytnaxError')
           end.to raise_error(/Syntax error in your configuration file .* on line 15/)
+        end
+      end
+
+      describe "Prints out a table of summary" do
+        it "shows a warning when no values were found" do
+          expect(FastlaneCore::UI).to receive(:important).with("No values defined in './fastlane_core/spec/fixtures/ConfigFileEmpty'")
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileEmpty')
+        end
+
+        it "prints out a table of all the set values" do
+          expect(Terminal::Table).to receive(:new).with({
+            rows: [[:app_identifier, "com.krausefx.app"], [:apple_id, "from_le_block"]],
+            title: "Detected Values from './fastlane_core/spec/fixtures/ConfigFileValid'"
+          })
+
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileValid')
         end
       end
 
@@ -99,6 +118,60 @@ describe FastlaneCore do
           else UI.user_error!("no")
           end
         end)
+      end
+
+      describe "for_lane and for_platform support" do
+        it "reads global keys when not specifying lane or platform" do
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileForLane')
+
+          expect(config[:app_identifier]).to eq("com.global.id")
+        end
+
+        it "reads global keys when platform and lane dont match" do
+          with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'debug') do
+            config = FastlaneCore::Configuration.create(options, {})
+            config.load_configuration_file('ConfigFileForLane')
+
+            expect(config[:app_identifier]).to eq("com.global.id")
+          end
+        end
+
+        it "reads lane setting when platform doesn't match or no for_platform" do
+          with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'enterprise') do
+            config = FastlaneCore::Configuration.create(options, {})
+            config.load_configuration_file('ConfigFileForLane')
+
+            expect(config[:app_identifier]).to eq("com.forlane.enterprise")
+          end
+        end
+
+        it "reads platform setting when lane doesn't match or no for_lane" do
+          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'debug') do
+            config = FastlaneCore::Configuration.create(options, {})
+            config.load_configuration_file('ConfigFileForLane')
+
+            expect(config[:app_identifier]).to eq("com.forplatform.ios")
+          end
+        end
+
+        it "reads platform and lane setting" do
+          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'release') do
+            config = FastlaneCore::Configuration.create(options, {})
+            config.load_configuration_file('ConfigFileForLane')
+
+            expect(config[:app_identifier]).to eq("com.forplatformios.forlanerelease")
+          end
+        end
+
+        it "allows exceptions in blocks to escape but the configuration is still intact" do
+          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'explode') do
+            config = FastlaneCore::Configuration.create(options, {})
+
+            expect { config.load_configuration_file('ConfigFileForLane') }.to raise_error("oh noes!")
+            expect(config[:app_identifier]).to eq("com.forplatformios.boom")
+          end
+        end
       end
     end
   end

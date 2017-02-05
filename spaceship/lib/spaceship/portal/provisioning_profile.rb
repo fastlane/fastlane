@@ -65,6 +65,11 @@ module Spaceship
       #   "ios"
       attr_accessor :platform
 
+      # @return (String) The supported sub_platform for this profile
+      # @example
+      #   "tvOS"
+      attr_accessor :sub_platform
+
       # No information about this attribute
       attr_accessor :managing_app
 
@@ -136,6 +141,7 @@ module Spaceship
         'type' => :type,
         'version' => :version,
         'proProPlatform' => :platform,
+        'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
         'appId' => :app
       })
@@ -206,6 +212,8 @@ module Spaceship
           app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
@@ -249,13 +257,15 @@ module Spaceship
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all(mac: false)
+        # @param mac (Bool) (optional): Pass true to get all Mac provisioning profiles
+        # @param xcode (Bool) (optional): Pass true to include Xcode managed provisioning profiles
+        def all(mac: false, xcode: false)
           profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
           end
 
           # filter out the profiles managed by xcode
-          profiles.delete_if(&:managed_by_xcode?)
+          profiles.delete_if(&:managed_by_xcode?) unless xcode
 
           return profiles if self == ProvisioningProfile
 
@@ -274,6 +284,20 @@ module Spaceship
           return profiles.select do |profile|
             profile.class == klass
           end
+        end
+
+        # @return (Array) Returns all profiles registered for this account
+        #  If you're calling this from a subclass (like AdHoc), this will
+        #  only return the profiles that are of this type
+        def all_tvos
+          profiles = all(mac: false)
+          tv_os_profiles = []
+          profiles.each do |tv_os_profile|
+            if tv_os_profile.tvos?
+              tv_os_profiles << tv_os_profile
+            end
+          end
+          return tv_os_profiles
         end
 
         # @return (Array) Returns an array of provisioning
@@ -383,7 +407,8 @@ module Spaceship
             app.app_id,
             certificates.map(&:id),
             devices.map(&:id),
-            mac: mac?
+            mac: mac?,
+            sub_platform: tvos? ? 'tvOS' : nil
           )
         end
 
@@ -423,12 +448,19 @@ module Spaceship
         platform == 'mac'
       end
 
+      # @return (Bool) Is this a tvos provisioning profile?
+      def tvos?
+        sub_platform == 'tvOS'
+      end
+
       def devices
         fetch_details
 
-        @devices = (self.profile_details["devices"] || []).collect do |device|
-          Device.set_client(client).factory(device)
-        end if (@devices || []).empty?
+        if (@devices || []).empty?
+          @devices = (self.profile_details["devices"] || []).collect do |device|
+            Device.set_client(client).factory(device)
+          end
+        end
 
         @devices
       end
@@ -436,9 +468,11 @@ module Spaceship
       def certificates
         fetch_details
 
-        @certificates = (profile_details["certificates"] || []).collect do |cert|
-          Certificate.set_client(client).factory(cert)
-        end if (@certificates || []).empty?
+        if (@certificates || []).empty?
+          @certificates = (profile_details["certificates"] || []).collect do |cert|
+            Certificate.set_client(client).factory(cert)
+          end
+        end
 
         return @certificates
       end

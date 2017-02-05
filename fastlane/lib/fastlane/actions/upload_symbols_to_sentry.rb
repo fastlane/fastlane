@@ -89,10 +89,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "SENTRY_API_KEY",
                                        description: "API key for Sentry",
+                                       sensitive: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :auth_token,
                                        env_name: "SENTRY_AUTH_TOKEN",
                                        description: "Authentication token for Sentry",
+                                       sensitive: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :org_slug,
                                        env_name: "SENTRY_ORG_SLUG",
@@ -150,7 +152,13 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `sentry` plugin instead.\n" \
+          "Install using `fastlane add_plugin sentry`.\n" \
+          "Replace `upload_symbols_to_sentry` with `sentry_upload_dsym`"
       end
     end
   end

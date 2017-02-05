@@ -19,6 +19,9 @@ module Fastlane
         elsif extensions.count > 0
           command << " --include=\\*.#{extensions.join(',')}"
         end
+
+        command << " --exclude #{params[:exclude]}" if params[:exclude]
+
         return command if Helper.is_test?
 
         UI.important(command)
@@ -70,13 +73,18 @@ module Fastlane
                                        description: "The extension that should be searched for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         value.delete!('.') if value.include? "."
+                                         value.delete!('.') if value.include?(".")
                                        end),
           FastlaneCore::ConfigItem.new(key: :extensions,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
                                        description: "An array of file extensions that should be searched for",
                                        optional: true,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :exclude,
+                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
+                                       description: "Exclude a certain pattern from the search",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 

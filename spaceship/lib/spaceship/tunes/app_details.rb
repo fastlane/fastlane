@@ -122,18 +122,17 @@ module Spaceship
       #####################################################
       # @!group General
       #####################################################
-      def setup
-      end
+      def setup; end
 
       private
 
       def prefix_mzgenre(value)
-        (value.include? "MZGenre") ? value : "MZGenre.#{value}"
+        value.include?("MZGenre") ? value : "MZGenre.#{value}"
       end
 
       def prefix_apps(value)
         return value unless value.include? "Stickers"
-        (value.include? "Apps") ? value : "Apps.#{value}"
+        value.include?("Apps") ? value : "Apps.#{value}"
       end
     end
   end

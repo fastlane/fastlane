@@ -109,7 +109,7 @@ public class Snapshot: NSObject {
 
     class func waitForLoadingIndicatorToDisappear() {
         #if os(tvOS)
-            return;
+            return
         #endif
 
         let query = XCUIApplication().statusBars.childrenMatchingType(.Other).elementBoundByIndex(1).childrenMatchingType(.Other)
@@ -131,6 +131,10 @@ public class Snapshot: NSObject {
 
 extension XCUIElement {
     var isLoadingIndicator: Bool {
+        let whiteListedLoaders = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
+        if whiteListedLoaders.contains(self.identifier) {
+            return false
+        }
         return self.frame.size == CGSize(width: 10, height: 20)
     }
 }

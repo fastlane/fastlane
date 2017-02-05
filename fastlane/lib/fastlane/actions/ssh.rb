@@ -93,6 +93,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        short_option: "-p",
                                        env_name: "FL_SSH_PASSWORD",
+                                       sensitive: true,
                                        description: "Password",
                                        optional: true,
                                        is_string: true),

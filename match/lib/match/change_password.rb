@@ -1,6 +1,8 @@
 module Match
+  # These functions should only be used while in (UI.) interactive mode
   class ChangePassword
     def self.update(params: nil, from: nil, to: nil)
+      ensure_ui_interactive
       to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: false)
       from ||= ChangePassword.ask_password(message: "Old passphrase for Git Repo: ", confirm: true)
       GitHelper.clear_changes
@@ -13,6 +15,7 @@ module Match
     end
 
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
+      ensure_ui_interactive
       loop do
         password = UI.password(message)
         if confirm
@@ -26,5 +29,11 @@ module Match
         UI.error("Passhprases differ. Try again")
       end
     end
+
+    def self.ensure_ui_interactive
+      raise "This code should only run in interactive mode" unless UI.interactive?
+    end
+
+    private_class_method :ensure_ui_interactive
   end
 end

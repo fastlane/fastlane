@@ -102,6 +102,7 @@ module Fastlane
                                        description: "The room or @username"),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "HIPCHAT_API_TOKEN",
+                                       sensitive: true,
                                        description: "Hipchat API Token",
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0

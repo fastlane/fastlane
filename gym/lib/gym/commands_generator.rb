@@ -11,10 +11,7 @@ module Gym
     FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options)
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update("gym")
       new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status("gym", Gym::VERSION)
     end
 
     def convert_options(options)
@@ -24,7 +21,8 @@ module Gym
     end
 
     def run
-      program :version, Gym::VERSION
+      program :name, 'gym'
+      program :version, Fastlane::VERSION
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
@@ -34,7 +32,7 @@ module Gym
       global_option("--verbose") { $verbose = true }
 
       command :build do |c|
-        c.syntax = "gym"
+        c.syntax = "fastlane gym"
         c.description = "Just builds your app"
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Gym::Options.available_options,
@@ -44,7 +42,7 @@ module Gym
       end
 
       command :init do |c|
-        c.syntax = "gym init"
+        c.syntax = "fastlane gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
           containing = (File.directory?("fastlane") ? 'fastlane' : '.')

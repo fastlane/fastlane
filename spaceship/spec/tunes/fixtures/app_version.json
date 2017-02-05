@@ -352,6 +352,52 @@
                                     "isRequired": false,
                                     "errorKeys": null
                                 },
+                                "messagesScaled": {
+                                    "value": true,
+                                    "isEditable": true,
+                                    "isRequired": false,
+                                    "errorKeys": null
+                                },
+                                "messagesScreenshots": {
+                                    "value": [
+                                        {
+                                            "value": {
+                                                "assetToken": "Purple62/v4/4f/26/50/4f265065-b11d-857b-6232-d219ad4791d2/pr_source.png",
+                                                "sortOrder": 1,
+                                                "type": null,
+                                                "originalFileName": "ftl_250ec6b31ba0da4c4e8e22fdf83d71a1_65ea94f6b362563260a5742b93659729.png"
+                                            },
+                                            "isEditable": true,
+                                            "isRequired": false,
+                                            "errorKeys": null
+                                        },
+                                        {
+                                            "value": {
+                                                "assetToken": "Purple71/v4/6d/bc/94/6dbc946c-90f2-cfa1-02ea-993c2cb89733/pr_source.png",
+                                                "sortOrder": 2,
+                                                "type": null,
+                                                "originalFileName": "ftl_e9ea3f152ae51e75c08f458729c4ec03_bbd0825584e9df0c5fba89f15e207978.png"
+                                            },
+                                            "isEditable": true,
+                                            "isRequired": false,
+                                            "errorKeys": null
+                                        },
+                                        {
+                                            "value": {
+                                                "assetToken": "Purple71/v4/ed/06/26/ed06263d-d158-8d96-fc97-42f97e06386c/pr_source.png",
+                                                "sortOrder": 3,
+                                                "type": null,
+                                                "originalFileName": "ftl_66ee8db4eeaed4f4f4c28a5299e6e3ca_f00ce35bfeb953204a37e39b2ee10417.png"
+                                            },
+                                            "isEditable": true,
+                                            "isRequired": false,
+                                            "errorKeys": null
+                                        }
+                                    ],
+                                    "isEditable": true,
+                                    "isRequired": false,
+                                    "errorKeys": null
+                                },
                                 "trailer": {
                                     "value": null,
                                     "isEditable": true,
@@ -753,6 +799,9 @@
             "isEditable": false,
             "isRequired": true,
             "errorKeys": null
+        },
+        "preReleaseBuild": {
+          "buildVersion": "9"
         },
         "preReleaseBuildTrainVersionString": "0.9.13",
         "preReleaseBuildIconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/2d/eb/52/2deb529b-63ad-d456-017b-b379bac333dc/Icon-60@2x.png.png/150x150bb-80.png",

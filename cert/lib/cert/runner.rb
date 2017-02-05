@@ -22,7 +22,7 @@ module Cert
     def run
       FileUtils.mkdir_p(Cert.config[:output_path])
 
-      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Cert::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Fastlane::VERSION}")
 
       login
 
@@ -43,7 +43,7 @@ module Cert
 
     # Command method for the :revoke_expired sub-command
     def revoke_expired_certs!
-      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Cert::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Fastlane::VERSION}")
 
       login
 
@@ -94,8 +94,10 @@ module Cert
 
           return path
         elsif File.exist?(private_key_path)
-          KeychainImporter.import_file(private_key_path)
-          KeychainImporter.import_file(path)
+          keychain = File.expand_path(Cert.config[:keychain_path])
+          password = Cert.config[:keychain_password]
+          FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password)
+          FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password)
 
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
@@ -121,9 +123,17 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      cert_type = Spaceship.certificate.production
-      cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-      cert_type = Spaceship.certificate.development if Cert.config[:development]
+      case Cert.config[:platform].to_s
+      when 'ios', 'tvos'
+        cert_type = Spaceship.certificate.production
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+        cert_type = Spaceship.certificate.development if Cert.config[:development]
+
+      when 'macos'
+        cert_type = Spaceship.certificate.mac_app_distribution
+        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+
+      end
 
       cert_type
     end
@@ -155,8 +165,10 @@ module Cert
       cert_path = store_certificate(certificate)
 
       # Import all the things into the Keychain
-      KeychainImporter.import_file(private_key_path)
-      KeychainImporter.import_file(cert_path)
+      keychain = File.expand_path(Cert.config[:keychain_path])
+      password = Cert.config[:keychain_password]
+      FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password)
+      FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password)
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id

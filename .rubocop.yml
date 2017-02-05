@@ -2,6 +2,50 @@
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
+# .length == 0 is also good, we don't always want .zero?
+Style/NumericPredicate:
+  Enabled: false
+
+# this would cause errors with long lanes
+Metrics/BlockLength:
+  Enabled: false
+  
+# this is a bit buggy
+Metrics/ModuleLength:
+  Enabled: false
+
+# certificate_1 is an okay variable name
+Style/VariableNumber:
+  Enabled: false
+
+# This is used a lot across the fastlane code base for config files
+Style/MethodMissing:
+  Enabled: false
+
+# 
+#   File.chmod(0777, f)
+# 
+# is easier to read than
+# 
+#   File.chmod(0o777, f)
+# 
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+# 
+# command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
+# 
+# is easier to read than
+# 
+# command = !clean_expired.nil? || !clean_pattern.nil? ? CLEANUP : LIST
+# 
+Style/TernaryParentheses:
+  Enabled: false
+
+# sometimes it is usefull to have those empty methods
+Style/EmptyMethod:
+  Enabled: false
+
 # It's better to be more explicit about the type
 Style/BracesAroundHashParameters:
   Enabled: false

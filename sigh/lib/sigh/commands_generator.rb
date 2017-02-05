@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,14 +8,12 @@ module Sigh
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
     end
 
     def run
-      program :version, Sigh::VERSION
+      program :name, 'sigh'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
@@ -26,7 +25,7 @@ module Sigh
       FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
 
       command :renew do |c|
-        c.syntax = 'sigh renew'
+        c.syntax = 'fastlane sigh renew'
         c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
 
         c.action do |args, options|
@@ -58,7 +57,7 @@ module Sigh
       end
 
       command :download_all do |c|
-        c.syntax = 'sigh download_all'
+        c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
 
         c.action do |args, options|
@@ -68,7 +67,7 @@ module Sigh
       end
 
       command :repair do |c|
-        c.syntax = 'sigh repair'
+        c.syntax = 'fastlane sigh repair'
         c.description = 'Repairs all expired or invalid provisioning profiles'
 
         c.action do |args, options|
@@ -79,7 +78,7 @@ module Sigh
       end
 
       command :resign do |c|
-        c.syntax = 'sigh resign'
+        c.syntax = 'fastlane sigh resign'
         c.description = 'Resigns an existing ipa file with the given provisioning profile'
         c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
         c.option '-x', '--version_number STRING', String, 'Version number to force binary and all nested binaries to use. Changes both CFBundleShortVersionString and CFBundleIdentifier.'
@@ -101,7 +100,7 @@ module Sigh
       end
 
       command :manage do |c|
-        c.syntax = 'sigh manage'
+        c.syntax = 'fastlane sigh manage'
         c.description = 'Manage installed provisioning profiles on your system.'
 
         c.option '-f', '--force', 'Force remove all expired provisioning profiles. Required on CI.'

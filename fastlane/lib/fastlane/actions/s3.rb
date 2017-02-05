@@ -1,14 +1,18 @@
 require 'fastlane/erb_template_helper'
 require 'ostruct'
+require 'uri'
+require 'cgi'
 
 module Fastlane
   module Actions
     module SharedValues
-      S3_IPA_OUTPUT_PATH = :S3_IPA_OUTPUT_PATH
-      S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
-      S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
-      S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
-      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
+      # Using ||= because these MAY be defined by the the
+      # preferred aws_s3 plugin
+      S3_IPA_OUTPUT_PATH ||= :S3_IPA_OUTPUT_PATH
+      S3_DSYM_OUTPUT_PATH ||= :S3_DSYM_OUTPUT_PATH
+      S3_PLIST_OUTPUT_PATH ||= :S3_PLIST_OUTPUT_PATH
+      S3_HTML_OUTPUT_PATH ||= :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH ||= :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -43,11 +47,9 @@ module Fastlane
         params[:html_file_name] = config[:html_file_name]
         params[:version_template_path] = config[:version_template_path]
         params[:version_file_name] = config[:version_file_name]
-        params [:acl] = config[:acl]
 
         # Pulling parameters for other uses
         s3_region = params[:region]
-        s3_subdomain = params[:region] ? "s3-#{params[:region]}" : "s3"
         s3_access_key = params[:access_key]
         s3_secret_access_key = params[:secret_access_key]
         s3_bucket = params[:bucket]
@@ -112,13 +114,14 @@ module Fastlane
         build_num = info['CFBundleVersion']
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
-        title = info['CFBundleName']
+        title = CGI.escapeHTML(info['CFBundleName'])
         device_family = info['UIDeviceFamily']
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
-        plist_file_name ||= "#{url_part}#{title.delete(' ')}.plist"
-        plist_url = "https://#{s3_subdomain}.amazonaws.com/#{s3_bucket}/#{plist_file_name}"
+        s3_domain = AWS::Core::Endpoints.hostname(s3_region, 's3') || 's3.amazonaws.com'
+        plist_file_name ||= "#{url_part}#{URI.escape(title)}.plist"
+        plist_url = URI::HTTPS.build(host: s3_domain, path: "/#{s3_bucket}/#{plist_file_name}").to_s
 
         html_file_name ||= "index.html"
 
@@ -360,11 +363,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :access_key,
                                        env_name: "S3_ACCESS_KEY",
                                        description: "AWS Access Key ID ",
+                                       sensitive: true,
                                        optional: true,
                                        default_value: ENV['AWS_ACCESS_KEY_ID']),
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                        env_name: "S3_SECRET_ACCESS_KEY",
                                        description: "AWS Secret Access Key ",
+                                       sensitive: true,
                                        optional: true,
                                        default_value: ENV['AWS_SECRET_ACCESS_KEY']),
           FastlaneCore::ConfigItem.new(key: :bucket,
@@ -431,7 +436,12 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `aws_s3` plugin instead.\n" \
+          "Install using `fastlane add_plugin aws_s3`."
       end
     end
   end

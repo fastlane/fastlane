@@ -41,8 +41,8 @@ describe Fastlane do
         end").runner.execute(:test)
 
         pwd = Dir.pwd
-        output = File.expand_path(File.join(pwd, "../output"))
-        derived_data = File.expand_path(File.join(pwd, "../derivedData"))
+        output = File.expand_path(File.join(pwd, "./output"))
+        derived_data = File.expand_path(File.join(pwd, "./derivedData"))
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
@@ -65,8 +65,8 @@ describe Fastlane do
         end").runner.execute(:test)
 
         pwd = Dir.pwd
-        output = File.expand_path(File.join(pwd, "../output"))
-        derived_data = File.expand_path(File.join(pwd, "../derivedData"))
+        output = File.expand_path(File.join(pwd, "output"))
+        derived_data = File.expand_path(File.join(pwd, "derivedData"))
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)

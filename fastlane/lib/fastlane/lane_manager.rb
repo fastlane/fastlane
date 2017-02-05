@@ -9,7 +9,7 @@ module Fastlane
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
-      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+      ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -38,6 +38,12 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
+      # xcodeproj has a bug in certain versions that causes it to change directories
+      # and not return to the original working directory
+      # https://github.com/CocoaPods/Xcodeproj/issues/426
+      # Setting this environment variable causes xcodeproj to work around the problem
+      ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
+
       load_dot_env(env)
 
       started = Time.now
@@ -49,14 +55,13 @@ module Fastlane
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
-        UI.important 'Variable Dump:'.yellow
-        UI.message Actions.lane_context
+        print_lane_context
         UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) unless ENV["FASTLANE_SKIP_DOCS"]
+      Fastlane::DocsGenerator.run(ff) unless FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
 
       duration = ((Time.now - started) / 60.0).round
 
@@ -156,23 +161,73 @@ module Fastlane
       end
     end
 
-    def self.load_dot_env(env)
-      return if Dir.glob("**/*.env*", File::FNM_DOTMATCH).count == 0
+    # @param env_cl_param [String] an optional list of dotenv environment names separated by commas, without space
+    def self.load_dot_env(env_cl_param)
+      base_path = find_dotenv_directory
+
+      return unless base_path
+
+      load_dot_envs_from(env_cl_param, base_path)
+    end
+
+    # finds the first directory of [fastlane, its parent] containing dotenv files
+    def self.find_dotenv_directory
+      path = FastlaneCore::FastlaneFolder.path
+      search_paths = [path]
+      search_paths << path + "/.." unless path.nil?
+      search_paths.compact!
+      search_paths.find do |dir|
+        Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
+      end
+    end
+
+    # loads the dotenvs. First the .env and .env.default and
+    # then override with all speficied extra environments
+    def self.load_dot_envs_from(env_cl_param, base_path)
       require 'dotenv'
 
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
-
       # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", '.env.default')
+      env_file = File.join(base_path, '.env')
+      env_default_file = File.join(base_path, '.env.default')
       Dotenv.load(env_file, env_default_file)
 
-      # Loads .env file for the environment passed in through options
-      if env
-        env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.#{env}")
+      return unless env_cl_param
+
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env_cl_param
+
+      # multiple envs?
+      envs = env_cl_param.split(",")
+
+      # Loads .env file for the environment(s) passed in through options
+      envs.each do |env|
+        env_file = File.join(base_path, ".env.#{env}")
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
+    end
+
+    private_class_method :find_dotenv_directory, :load_dot_envs_from
+
+    def self.print_lane_context
+      return if Actions.lane_context.empty?
+
+      if $verbose
+        UI.important 'Lane Context:'.yellow
+        UI.message Actions.lane_context
+        return
+      end
+
+      # Print a nice table unless in $verbose mode
+      rows = Actions.lane_context.collect do |key, content|
+        [key, content.to_s]
+      end
+      rows = FastlaneCore::PrintTable.limit_row_size(rows)
+
+      require 'terminal-table'
+      puts Terminal::Table.new({
+        title: "Lane Context".yellow,
+        rows: rows
+      })
     end
   end
 end

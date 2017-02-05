@@ -6,7 +6,6 @@ module Fastlane
       if first_element and first_element.kind_of? FastlaneCore::ConfigItem
         # default use case
         return FastlaneCore::Configuration.create(action.available_options, params)
-
       elsif first_element
         UI.error("Old configuration format for action '#{action}'") if Helper.is_test?
         return params

@@ -118,7 +118,7 @@ describe Fastlane do
               oclint( compile_commands: "./fastlane/spec/fixtures/oclint/compile_commands.json" )
             end').runner.execute(:test)
           end
-          let(:command) { "cd #{File.expand_path('..').shellescape} && oclint -report-type=html -o=oclint_report.html" }
+          let(:command) { "cd #{File.expand_path('.').shellescape} && oclint -report-type=html -o=oclint_report.html" }
 
           it 'uses system wide oclint' do
             expect(result).to include(command)
@@ -134,7 +134,7 @@ describe Fastlane do
               )
             end').runner.execute(:test)
           end
-          let(:command) { "cd #{File.expand_path('..').shellescape} && test/bin/oclint -report-type=html -o=oclint_report.html" }
+          let(:command) { "cd #{File.expand_path('.').shellescape} && test/bin/oclint -report-type=html -o=oclint_report.html" }
 
           it 'uses oclint provided' do
             expect(result).to include(command)

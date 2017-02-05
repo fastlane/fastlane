@@ -40,6 +40,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CHATWORK_API_TOKEN",
                                        description: "ChatWork API Token",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
                                            UI.error("Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.")

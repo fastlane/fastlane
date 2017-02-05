@@ -2,37 +2,62 @@ require 'fastlane_core/update_checker/update_checker'
 
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
-    let (:name) { 'deliver' }
+    let (:name) { 'fastlane' }
 
     describe "#update_available?" do
       it "no update is available" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = '0.1'
+        FastlaneCore::UpdateChecker.server_results[name] = '0.1'
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.11')).to eq(false)
       end
 
       it "new update is available" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = '999.0'
+        FastlaneCore::UpdateChecker.server_results[name] = '999.0'
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.11')).to eq(true)
       end
 
       it "same version" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = FastlaneCore::VERSION
-        expect(FastlaneCore::UpdateChecker.update_available?(name, FastlaneCore::VERSION)).to eq(false)
+        FastlaneCore::UpdateChecker.server_results[name] = Fastlane::VERSION
+        expect(FastlaneCore::UpdateChecker.update_available?(name, Fastlane::VERSION)).to eq(false)
       end
 
       it "new pre-release" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = [FastlaneCore::VERSION, 'pre'].join(".")
-        expect(FastlaneCore::UpdateChecker.update_available?(name, FastlaneCore::VERSION)).to eq(false)
+        FastlaneCore::UpdateChecker.server_results[name] = [Fastlane::VERSION, 'pre'].join(".")
+        expect(FastlaneCore::UpdateChecker.update_available?(name, Fastlane::VERSION)).to eq(false)
       end
 
       it "current: Pre-Release - new official version" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = '0.9.1'
+        FastlaneCore::UpdateChecker.server_results[name] = '0.9.1'
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.1.pre')).to eq(true)
       end
 
       it "a new pre-release when pre-release is installed" do
-        FastlaneCore::UpdateChecker.server_results['deliver'] = '0.9.1.pre2'
+        FastlaneCore::UpdateChecker.server_results[name] = '0.9.1.pre2'
         expect(FastlaneCore::UpdateChecker.update_available?(name, '0.9.1.pre1')).to eq(true)
+      end
+    end
+
+    describe "#update_command" do
+      before do
+        ENV.delete("BUNDLE_BIN_PATH")
+        ENV.delete("BUNDLE_GEMFILE")
+      end
+
+      it "works a custom gem name" do
+        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem update gym")
+      end
+
+      it "works with system ruby" do
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem update fastlane")
+      end
+
+      it "works with bundler" do
+        ENV["BUNDLE_BIN_PATH"] = "/tmp"
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("bundle update fastlane")
+      end
+
+      it "works with bundled fastlane" do
+        ENV["FASTLANE_SELF_CONTAINED"] = "true"
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
       end
     end
 
@@ -80,13 +105,15 @@ describe FastlaneCore do
 
       describe "#platform" do
         it "ios" do
-          ARGV = ["--app_identifier", "yolo.app"]
-          expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://fastlane-refresher.herokuapp.com/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+          FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://fastlane-refresher.herokuapp.com/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+          end
         end
 
         it "android" do
-          ARGV = ["--app_package_name", "yolo.android.app"]
-          expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://fastlane-refresher.herokuapp.com/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+          FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://fastlane-refresher.herokuapp.com/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+          end
         end
       end
     end

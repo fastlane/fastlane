@@ -119,7 +119,7 @@ module FastlaneCore
     class FastlaneError < StandardError
       attr_reader :show_github_issues
 
-      def initialize(show_github_issues: true)
+      def initialize(show_github_issues: false)
         @show_github_issues = show_github_issues
       end
     end
@@ -155,5 +155,11 @@ module FastlaneCore
     def to_s
       self.class.name.split('::').last
     end
+  end
+end
+
+class String
+  def deprecated
+    self.bold.blue
   end
 end

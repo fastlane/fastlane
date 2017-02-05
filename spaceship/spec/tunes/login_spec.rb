@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes do
   describe ".login" do
     it "works with valid data" do

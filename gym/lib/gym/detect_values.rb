@@ -21,6 +21,11 @@ module Gym
 
       config[:use_legacy_build_api] = true if Xcode.pre_7?
 
+      if config[:use_legacy_build_api]
+        UI.deprecated("the use_legacy_build_api option is deprecated")
+        UI.deprecated("it should not be used anymore - e.g.: if you use app-extensions")
+      end
+
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
       detect_configuration
@@ -34,9 +39,9 @@ module Gym
     # Helper Methods
 
     def self.detect_provisioning_profile
-      return unless Gym.config[:use_legacy_build_api]
+      if Gym.config[:provisioning_profile_path].nil?
+        return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
 
-      unless Gym.config[:provisioning_profile_path]
         Dir.chdir(File.expand_path("..", Gym.project.path)) do
           profiles = Dir["*.mobileprovision"]
           if profiles.count == 1

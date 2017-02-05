@@ -8,16 +8,12 @@ module Fastlane
         require 'deliver'
 
         begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('deliver') unless Helper.is_test?
-
           config.load_configuration_file("Deliverfile")
           config[:screenshots_path] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
           config[:ipa] = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
 
           return config if Helper.test?
           Deliver::Runner.new(config).run
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('deliver', Deliver::VERSION)
         end
       end
 
@@ -56,7 +52,6 @@ module Fastlane
           'deliver(
             force: true, # Set to true to skip PDF verification
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
-
           )'
         ]
       end

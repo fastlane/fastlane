@@ -15,14 +15,9 @@ module Fastlane
     attr_accessor :app_name
 
     def run
-      if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("Fastlane already set up at path #{folder}")
-        return
-      end
-
       show_infos
 
-      FastlaneFolder.create_folder! unless Helper.is_test?
+      FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
       is_manual_setup = false
 
       begin
@@ -138,7 +133,7 @@ module Fastlane
 
     def copy_existing_files
       files_to_copy.each do |current|
-        current = File.join(File.expand_path('..', FastlaneFolder.path), current)
+        current = File.join(File.expand_path('..', FastlaneCore::FastlaneFolder.path), current)
         next unless File.exist?(current)
         file_name = File.basename(current)
         to_path = File.join(folder, file_name)
@@ -258,7 +253,7 @@ module Fastlane
     end
 
     def folder
-      FastlaneFolder.path
+      FastlaneCore::FastlaneFolder.path
     end
 
     def restore_previous_state

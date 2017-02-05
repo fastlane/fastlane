@@ -1,7 +1,7 @@
 module Supply
   class Uploader
     def perform_upload
-      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary for supply #{Supply::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary for supply #{Fastlane::VERSION}")
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
@@ -27,16 +27,24 @@ module Supply
 
       promote_track if Supply.config[:track_promote_to]
 
-      UI.message("Uploading all changes to Google Play...")
-      client.commit_current_edit!
-      UI.success("Successfully finished the upload to Google Play")
+      if Supply.config[:validate_only]
+        UI.message("Validating all changes with Google Play...")
+        client.validate_current_edit!
+        UI.success("Successfully validated the upload to Google Play")
+      else
+        UI.message("Uploading all changes to Google Play...")
+        client.commit_current_edit!
+        UI.success("Successfully finished the upload to Google Play")
+      end
     end
 
     def promote_track
       version_codes = client.track_version_codes(Supply.config[:track])
-      client.update_track(Supply.config[:track], 1.0, nil)
+      # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
+      # but it has to be between 0.05 and 0.5 to pass the validity check. So we are passing the default value 0.1
+      client.update_track(Supply.config[:track], 0.1, nil)
       version_codes.each do |apk_version_code|
-        client.update_track(Supply.config[:track_promote_to], 1.0, apk_version_code)
+        client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], apk_version_code)
       end
     end
 
@@ -105,6 +113,13 @@ module Supply
 
       apk_paths.each do |apk_path|
         apk_version_codes.push(upload_binary_data(apk_path))
+      end
+
+      mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
+      mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
+        if mapping_path
+          client.upload_mapping(mapping_path, version_code)
+        end
       end
 
       update_track(apk_version_codes)

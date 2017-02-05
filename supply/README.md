@@ -31,8 +31,7 @@ supply
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/supply/LICENSE)
-[![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
+[![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](https://rubygems.org/gems/supply)
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
@@ -54,7 +53,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Features
 - Update existing Android applications on Google Play via the command line
@@ -69,25 +68,26 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 Install the gem
 
-    sudo gem install supply
+    sudo gem install fastlane
 
 ## Setup
 
 Setup consists of setting up your Google Developers Service Account
 
-- Open the [Google Play Console](https://play.google.com/apps/publish/)
-- Select **Settings** tab, followed by the **API access** tab
-- Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
-- Click the **Create Service account** button at the top of the developers console screen
-- Provide a name for the service account
-- Click **Select a role** and choose **Project > Service Account Actor**
-- Check the **Furnish a new private key** checkbox
-- Select **JSON** as the Key type
-- Click **Create** to close the dialog
-- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
-- Back on the Google Play developer console, click **Done** to close the dialog
-- Click on **Grant Access** for the newly added service account
-- Choose **Release Manager** from the **Role** dropdown and click **Add user** to close the dialog
+1. Open the [Google Play Console](https://play.google.com/apps/publish/)
+1. Select **Settings** tab, followed by the **API access** tab
+1. Click the **Create Service Account** button and follow the **Google API Console** link in the dialog
+1. Click the **Create Service account** button at the top of the developers console screen
+1. Provide a name for the service account
+1. Click **Select a role** and choose **Project > Service Account Actor**
+1. Check the **Furnish a new private key** checkbox
+1. Select **JSON** as the Key type
+1. Click **Create** to close the dialog
+1. Make a note of the file name of the JSON file downloaded to your computer
+1. Back on the Google Play developer console, click **Done** to close the dialog
+1. Click on **Grant Access** for the newly added service account
+1. Choose **Release Manager** from the **Role** dropdown
+1. Click **Add user** to close the dialog
 
 ### Migrating Google credential format (from .p12 key file to .json)
 
@@ -104,15 +104,15 @@ The previous p12 configuration is still currently supported.
 ## Quick Start
 
 - `cd [your_project_folder]`
-- `supply init`
+- `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
-- `supply run`
+- `fastlane supply run`
 
 ## Available Commands
 
-- `supply`: update an app with metadata, a build, images and screenshots
-- `supply init`: download metadata for an existing app to a local directory
-- `supply --help`: show information on available commands, arguments and environment variables
+- `fastlane supply`: update an app with metadata, a build, images and screenshots
+- `fastlane supply init`: download metadata for an existing app to a local directory
+- `fastlane supply --help`: show information on available commands, arguments and environment variables
 
 You can either run `supply` on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
 
@@ -121,15 +121,15 @@ You can either run `supply` on its own and use it interactively, or you can pass
 To upload a new binary to Google Play, simply run
 
 ```
-supply --apk path/to/app.apk
+fastlane supply --apk path/to/app.apk
 ```
 
-This will also upload app metadata if you previously ran `supply init`.
+This will also upload app metadata if you previously ran `fastlane supply init`.
 
 To gradually roll out a new build use
 
 ```
-supply --apk path/app.apk --track rollout --rollout 0.5
+fastlane supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
@@ -139,7 +139,7 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 
 ## Images and Screenshots
 
-After running `supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
+After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
 
 Here you can supply images with the following file names (extension can be png, jpg or jpeg):
 
@@ -160,7 +160,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```
 └── fastlane
@@ -185,7 +185,7 @@ This can be done using the `--track_promote_to` parameter.  The `--track_promote
 
 ### [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

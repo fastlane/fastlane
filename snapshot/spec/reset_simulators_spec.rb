@@ -24,7 +24,7 @@ describe Snapshot::ResetSimulators do
     usable_devices + unusable_devices
   end
 
-  let(:fixture_data) { File.read('spec/fixtures/xcrun-simctl-list-devices.txt') }
+  let(:fixture_data) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-devices.txt') }
 
   describe '#devices' do
     it 'should read simctl output into arrays of device info' do

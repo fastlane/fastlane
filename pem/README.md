@@ -31,7 +31,7 @@ pem
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pem/LICENSE)
-[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
+[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](https://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
 
@@ -41,9 +41,7 @@ Tired of manually creating and maintaining your push notification profiles for y
 
 `pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
 
-To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/fastlane/tree/master/sigh).
-
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
 <p align="center">
@@ -57,18 +55,17 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
-
 
 Check out this gif:
 
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
-    sudo gem install pem
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -76,7 +73,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    pem
+    fastlane pem
 
 Yes, that's the whole command!
 
@@ -87,37 +84,37 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```pem``` will never revoke your existing certificates.
+Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
-    pem --force
+    fastlane pem --force
 
 You can pass parameters like this:
 
-    pem -a com.krausefx.app -u username
+    fastlane pem -a com.krausefx.app -u username
 
 If you want to generate a development certificate instead:
 
-    pem --development
+    fastlane pem --development
 
 Set a password for your `p12` file:
 
-    pem -p "MyPass"
+    fastlane pem -p "MyPass"
 
 You can specify a name for the output file:
 
-    pem -o my.pem
+    fastlane pem -o my.pem
 
 To get a list of available options run:
 
-    pem --help
+    fastlane pem --help
 
 
 ### Note about empty `p12` passwords and Keychain Access.app
 
 `pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password.
-While the file is valid, Mac OSX's Keychain Access will not allow you to open the file without specifying a passphrase.
+While the file is valid, the Mac's Keychain Access will not allow you to open the file without specifying a passphrase.
 
 Instead, you may verify the file is valid using OpenSSL:
 
@@ -127,7 +124,7 @@ Instead, you may verify the file is valid using OpenSSL:
 
 ## Environment Variables
 
-Run `pem --help` to get a list of available environment variables.
+Run `fastlane pem --help` to get a list of available environment variables.
 
 # How does it work?
 
@@ -140,7 +137,7 @@ Run `pem --help` to get a list of available environment variables.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames

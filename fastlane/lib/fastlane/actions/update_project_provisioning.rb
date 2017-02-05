@@ -5,7 +5,7 @@ module Fastlane
     end
 
     class UpdateProjectProvisioningAction < Action
-      ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
+      ROOT_CERTIFICATE_URL = "https://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
         UI.message("https://docs.fastlane.tools/codesigning/GettingStarted/")
@@ -78,7 +78,7 @@ module Fastlane
 
       def self.details
         [
-          "You should check out the code signing gide before using this action: https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Codesigning",
+          "You should check out the code signing gide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
           "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
           "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
           "The `target_filter` value can be used to only update code signing for specified targets",

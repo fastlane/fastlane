@@ -9,16 +9,19 @@ module Frameit
       self.screenshot = screenshot
       prepare_image
 
-      if load_frame # e.g. Mac doesn't need a frame
+      if load_frame # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(load_frame)
+        self.frame.rotate(90) unless self.screenshot.portrait? # we use portrait device frames for landscape screenshots
+      elsif self.class == Editor
+        # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
+        # Message is already shown elsewhere
+        return
       end
 
       if should_add_title?
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
-        width = offset['width']
-        image.resize width # resize the image to fit the frame
         put_into_frame # put it in the frame
       end
 
@@ -37,23 +40,37 @@ module Frameit
 
     def store_result
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-      image.format "png"
-      image.write output_path
+      image.format("png")
+      image.write(output_path)
       UI.success "Added frame: '#{File.expand_path(output_path)}'"
     end
 
     # puts the screenshot into the frame
     def put_into_frame
+      # We have to rotate the screenshot, since the offset information is for portrait
+      # only. Instead of doing the calculations ourselves, it's much easier to let
+      # imagemagick do the hard lifting for landscape screenshots
+      unless self.screenshot.portrait?
+        frame.rotate(-90)
+        @image.rotate(-90)
+      end
+
       @image = frame.composite(image, "png") do |c|
         c.compose "Over"
         c.geometry offset['offset']
+      end
+
+      # We have to revert the state to be landscape screenshots
+      unless self.screenshot.portrait?
+        frame.rotate(90)
+        @image.rotate(90)
       end
     end
 
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot)
+      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
 
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
@@ -87,19 +104,23 @@ module Frameit
     def complex_framing
       background = generate_background
 
-      if self.frame # we have no frame on le mac
-        resize_frame!
-        @image = put_into_frame
-
-        # Decrease the size of the framed screenshot to fit into the defined padding + background
-        frame_width = background.width - horizontal_frame_padding * 2
-        image.resize "#{frame_width}x"
-      end
-
       self.top_space_above_device = vertical_frame_padding
 
       if fetch_config['title']
         background = put_title_into_background(background)
+      end
+
+      if self.frame # we have no frame on le mac
+        resize_frame!
+        put_into_frame
+
+        # Decrease the size of the framed screenshot to fit into the defined padding + background
+        frame_width = background.width - horizontal_frame_padding * 2
+        frame_height = background.height - top_space_above_device - vertical_frame_padding
+        @image.resize "#{frame_width}x"
+        if @image.height > frame_height
+          @image.resize "x#{frame_height.to_i}"
+        end
       end
 
       @image = put_device_into_background(background)
@@ -110,7 +131,7 @@ module Frameit
     # Horizontal adding around the frames
     def horizontal_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[0].to_i
       end
       return scale_padding(padding)
@@ -119,13 +140,16 @@ module Frameit
     # Vertical adding around the frames
     def vertical_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[1].to_i
       end
       return scale_padding(padding)
     end
 
     def scale_padding(padding)
+      if padding.kind_of?(String) && padding.end_with?('%')
+        padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
+      end
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
@@ -160,15 +184,17 @@ module Frameit
 
     # Resize the frame as it's too low quality by default
     def resize_frame!
-      multiplicator = (screenshot.size[0].to_f / offset['width'].to_f) # by how much do we have to change this?
+      screenshot_width = self.screenshot.portrait? ? screenshot.size[0] : screenshot.size[1]
+
+      multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
-      frame.resize "#{new_frame_width.round}x" # resize it to the calculated witdth
+      frame.resize "#{new_frame_width.round}x" # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
     # Add the title above the device
     def put_title_into_background(background)
-      title_images = build_title_images(image.width, image.height)
+      title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = title_images[:keyword]
       title = title_images[:title]
@@ -180,7 +206,7 @@ module Frameit
 
       # Resize the 2 labels if necessary
       smaller = 1.0 # default
-      ratio = (sum_width + keyword_padding * 2) / image.width.to_f
+      ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
       if ratio > 1.0
         # too large - resizing now
         smaller = (1.0 / ratio)
@@ -193,10 +219,10 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding
-      top_space = vertical_padding
+      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.top_space_above_device += title.height + vertical_padding
+      self.top_space_above_device += actual_font_size + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
@@ -217,12 +243,13 @@ module Frameit
     end
 
     def actual_font_size
-      [@image.width / 10.0].max.round
+      font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      [@image.width * font_scale_factor].max.round
     end
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 2.0).round
+      (actual_font_size / 3.0).round
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image
@@ -271,7 +298,7 @@ module Frameit
       return @config if @config
 
       config_path = File.join(File.expand_path("..", screenshot.path), "Framefile.json")
-      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist? config_path
+      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
       @config = file.fetch_value(screenshot.path)

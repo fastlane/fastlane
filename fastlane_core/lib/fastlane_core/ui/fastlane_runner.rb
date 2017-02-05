@@ -1,17 +1,19 @@
+unless Object.const_defined?("Faraday")
+  # We create these empty error classes if we didn't require Faraday
+  # so that we can use it in the rescue block below even if we didn't
+  # require Faraday or didn't use it
+  module Faraday
+    class Error < StandardError; end
+    class ClientError < Error; end
+    class SSLError < ClientError; end
+    class ConnectionFailed < ClientError; end
+  end
+end
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
-    unless Object.const_defined?("Faraday")
-      module Faraday
-        class SSLError < StandardError
-          # We create this empty error class if we didn't require Faraday
-          # so that we can use it in the rescue block below
-          # even if we didn't require Faraday or didn't use it
-        end
-      end
-    end
-
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
     def run!
       require_program :version, :description
@@ -53,28 +55,82 @@ module Commander
         show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
       rescue Faraday::SSLError => e # SSL issues are very common
-        # SSL errors are very common when the Ruby or OpenSSL installation is somehow broken
-        # We want to show a nice error message to the user here
-        # We have over 20 GitHub issues just for this one error:
-        #   https://github.com/fastlane/fastlane/search?q=errno%3D0+state%3DSSLv3+read+server&type=Issues
-        ui = FastlaneCore::UI
-        ui.error "-----------------------------------------------------------------------"
-        ui.error e.to_s
-        ui.error "SSL errors can be caused by various components on your local machine"
-        ui.error "- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`"
-        ui.error "- If you use rvm:"
-        ui.error "  - First run `rvm osx-ssl-certs update all`"
-        ui.error "  - Then run `rvm reinstall ruby-2.2.3 --with-openssl-dir=/usr/local"
-        ui.error "- If that doesn't fix your issue, please google for the following error message:"
-        ui.error "  '#{e}'"
-        ui.error "-----------------------------------------------------------------------"
-        display_user_error!(e, e.to_s)
+        handle_ssl_error!(e)
+      rescue Faraday::ConnectionFailed => e
+        if e.message.include? 'Connection reset by peer - SSL_connect'
+          handle_tls_error!(e)
+        else
+          handle_unknown_error!(e)
+        end
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         collector.did_crash(@program[:name])
         handle_unknown_error!(e)
       ensure
         collector.did_finish
       end
+    end
+
+    def handle_tls_error!(e)
+      # Apple has upgraded its iTunes Connect servers to require TLS 1.2, but
+      # system Ruby 2.0 does not support it. We want to suggest that users upgrade
+      # their Ruby version
+      suggest_ruby_reinstall(e)
+      display_user_error!(e, e.to_s)
+    end
+
+    def handle_ssl_error!(e)
+      # SSL errors are very common when the Ruby or OpenSSL installation is somehow broken
+      # We want to show a nice error message to the user here
+      # We have over 20 GitHub issues just for this one error:
+      #   https://github.com/fastlane/fastlane/search?q=errno%3D0+state%3DSSLv3+read+server&type=Issues
+      suggest_ruby_reinstall(e)
+      display_user_error!(e, e.to_s)
+    end
+
+    def suggest_ruby_reinstall(e)
+      ui = FastlaneCore::UI
+      ui.error "-----------------------------------------------------------------------"
+      ui.error e.to_s
+      ui.error ""
+      ui.error "SSL errors can be caused by various components on your local machine."
+      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.1')
+        ui.error "Apple has recently changed their servers to require TLS 1.2, which may"
+        ui.error "not be available to your system installed Ruby (#{RUBY_VERSION})"
+      end
+      ui.error ""
+      ui.error "The best solution is to use the self-contained fastlane version."
+      ui.error "Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries"
+      ui.error " - Use One-Click-Installer:"
+      ui.error "    - download fastlane at https://download.fastlane.tools"
+      ui.error "-----------------------------------------------------------"
+      ui.error "    - extract the archive and double click the `install`"
+      ui.error "-----------------------------------------------------------"
+      ui.error " - Use Homebrew"
+      ui.error "    - update brew with `brew update`"
+      ui.error "    - install fastlane:"
+      ui.error "-----------------------------------------------------------"
+      ui.error "      - 🚀 `brew cask install fastlane` 🚀"
+      ui.error "-----------------------------------------------------------"
+      ui.error "for more details on ways to install fastlane please refer the documentation:"
+      ui.error "-----------------------------------------------------------"
+      ui.error "        🚀       https://docs.fastlane.tools          🚀   "
+      ui.error "-----------------------------------------------------------"
+      ui.error ""
+      ui.error "You can also install a new version of Ruby"
+      ui.error ""
+      ui.error "- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`"
+      ui.error "- If you use system Ruby:"
+      ui.error "  - Run `brew update && brew install ruby`"
+      ui.error "- If you use rbenv with ruby-build:"
+      ui.error "  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`"
+      ui.error "  - Run `rbenv global 2.3.1` to make it the new global default Ruby version"
+      ui.error "- If you use rvm:"
+      ui.error "  - First run `rvm osx-ssl-certs update all`"
+      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`"
+      ui.error ""
+      ui.error "If that doesn't fix your issue, please google for the following error message:"
+      ui.error "  '#{e}'"
+      ui.error "-----------------------------------------------------------------------"
     end
 
     def handle_unknown_error!(e)
@@ -84,16 +140,17 @@ module Commander
       # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
       # method. If so, we'll present any returned error info in the manner of a user_error!
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
+      should_show_github_issues = e.respond_to?(:show_github_issues) ? e.show_github_issues : true
 
       if error_info
         error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
 
-        show_github_issues(error_info)
+        show_github_issues(error_info) if should_show_github_issues
 
         display_user_error!(e, error_info)
       else
         # Pass the error instead of a message so that the inspector can do extra work to simplify the query
-        show_github_issues(e)
+        show_github_issues(e) if should_show_github_issues
 
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
@@ -114,7 +171,7 @@ module Commander
     end
 
     def show_github_issues(message_or_error)
-      return if ENV["FASTLANE_HIDE_GITHUB_ISSUES"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_HIDE_GITHUB_ISSUES")
       return if FastlaneCore::Helper.test?
 
       require 'gh_inspector'
@@ -128,7 +185,7 @@ module Commander
         inspector.search_exception(message_or_error, delegate)
       end
     rescue => ex
-      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}")
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if $verbose
     end
   end
 end

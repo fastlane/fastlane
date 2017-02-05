@@ -6,6 +6,7 @@ module Deliver
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      user ||= ENV["DELIVER_USER"]
 
       [
         FastlaneCore::ConfigItem.new(key: :username,
@@ -24,6 +25,13 @@ module Deliver
                                      env_name: "DELIVER_APP_ID",
                                      description: "The app ID of the app you want to use/modify",
                                      is_string: false), # don't add any verification here, as it's used to store a spaceship ref
+        FastlaneCore::ConfigItem.new(key: :edit_live,
+                                     short_option: "-o",
+                                     optional: true,
+                                     default_value: false,
+                                     env_name: "DELIVER_EDIT_LIVE",
+                                     description: "Modify live metadata, this option disables ipa upload and screenshot upload",
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
@@ -31,7 +39,7 @@ module Deliver
                                      description: "Path to your ipa file",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end,
                                      conflicting_options: [:pkg],
@@ -45,12 +53,21 @@ module Deliver
                                      description: "Path to your pkg file",
                                      default_value: Dir["*.pkg"].first,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find pkg file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
                                      end,
                                      conflicting_options: [:ipa],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "DELIVER_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
@@ -109,8 +126,8 @@ module Deliver
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find config file at path '#{value}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless value.end_with?(".json")
+                                       UI.user_error!("Could not find config file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
@@ -120,7 +137,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-k",
                                      env_name: "DELIVER_TEAM_ID",
-                                     description: "The ID of your team if you're in multiple teams",
+                                     description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
@@ -130,26 +147,40 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-e",
                                      env_name: "DELIVER_TEAM_NAME",
-                                     description: "The name of your team if you're in multiple teams",
+                                     description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :dev_portal_team_id,
                                      short_option: "-s",
                                      env_name: "DELIVER_DEV_PORTAL_TEAM_ID",
-                                     description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
+                                     description: "The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :dev_portal_team_name,
+                                     short_option: "-y",
+                                     env_name: "DELIVER_DEV_PORTAL_TEAM_NAME",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                     end),
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
+                                     env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
+                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
+                                     is_string: false,
+                                     default_value: false),
 
         # App Metadata
         # Non Localised
@@ -158,7 +189,7 @@ module Deliver
                                      optional: true,
                                      short_option: "-l",
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
@@ -166,7 +197,7 @@ module Deliver
                                      optional: true,
                                      short_option: "-q",
                                      verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
                                      end),
         FastlaneCore::ConfigItem.new(key: :copyright,

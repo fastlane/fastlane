@@ -15,7 +15,7 @@ describe Fastlane do
 
     describe "#render_template" do
       before do
-        @template = File.read("./spec/fixtures/templates/dummy_html_template.erb")
+        @template = File.read("./fastlane/spec/fixtures/templates/dummy_html_template.erb")
       end
 
       it "return true if it's a platform" do

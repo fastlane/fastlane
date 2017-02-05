@@ -19,7 +19,7 @@ module Match
                                      default_value: 'master'),
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
-                                     description: "Create a development certificate instead of a distribution one",
+                                     description: "Define the profile type, can be #{Match.environments.join(', ')}",
                                      is_string: true,
                                      short_option: "-y",
                                      default_value: 'development',
@@ -31,7 +31,8 @@ module Match
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier of your app",
+                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     is_string: false,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -43,6 +44,12 @@ module Match
                                      env_name: "MATCH_KEYCHAIN_NAME",
                                      description: "Keychain the items should be imported to",
                                      default_value: "login.keychain"),
+        FastlaneCore::ConfigItem.new(key: :keychain_password,
+                                     short_option: "-p",
+                                     env_name: "MATCH_KEYCHAIN_PASSWORD",
+                                     sensitive: true,
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :readonly,
                                      env_name: "MATCH_READONLY",
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",
@@ -51,20 +58,20 @@ module Match
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "FASTLANE_TEAM_ID",
-                                     description: "The ID of your team if you're in multiple teams",
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "FASTLANE_TEAM_NAME",
-                                     description: "The name of your team if you're in multiple teams",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :verbose,
                                      env_name: "MATCH_VERBOSE",
@@ -77,6 +84,11 @@ module Match
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "MATCH_FORCE",
                                      description: "Renew the provisioning profiles every time you run match",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_confirmation,
+                                     env_name: "MATCH_SKIP_CONFIRMATION",
+                                     description: "Disables confirmation prompts during nuke, answering them with yes",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :shallow_clone,
@@ -105,7 +117,18 @@ module Match
                                      env_name: "MATCH_SKIP_DOCS",
                                      description: "Skip generation of a README.md for the created git repository",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: '-o',
+                                     env_name: "MATCH_PLATFORM",
+                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos)",
+                                     is_string: false,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       pt = %w(tvos ios)
+                                       UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
+                                     end)
       ]
     end
   end

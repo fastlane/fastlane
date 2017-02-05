@@ -19,7 +19,7 @@ module Screengrab
     end
 
     def run
-      FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Screengrab::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Fastlane::VERSION}")
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)
       tests_apk_path = @config.fetch(:tests_apk_path, ask: false)
@@ -63,11 +63,7 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
-      install_apks(device_serial, app_apk_path, tests_apk_path)
-
-      grant_permissions(device_serial)
-
-      run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+      run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
@@ -177,16 +173,28 @@ module Screengrab
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message 'Installing app APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "App APK could not be installed" if apk_install_output.include?("Failure [")
 
       UI.message 'Installing tests APK'
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error! "Tests APK could not be installed" if apk_install_output.include?("Failure [")
+    end
+
+    def uninstall_apks(device_serial, app_package_name, tests_package_name)
+      UI.message 'Uninstalling app APK'
+      run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                      print_all: true,
+                      print_command: true)
+
+      UI.message 'Uninstalling tests APK'
+      run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
+                      print_all: true,
+                      print_command: true)
     end
 
     def grant_permissions(device_serial)
@@ -210,22 +218,41 @@ module Screengrab
       end
     end
 
-    def run_tests(device_serial, test_classes_to_use, test_packages_to_use)
+    def run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, launch_arguments)
+      unless @config[:reinstall_app]
+        install_apks(device_serial, app_apk_path, tests_apk_path)
+        grant_permissions(device_serial)
+      end
+
       @config[:locales].each do |locale|
-        UI.message "Running tests for locale: #{locale}"
+        if @config[:reinstall_app]
+          uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
+          install_apks(device_serial, app_apk_path, tests_apk_path)
+          grant_permissions(device_serial)
+        end
+        run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+      end
+    end
 
-        instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
-                              "-e testLocale #{locale.tr('-', '_')}",
-                              "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
-        instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
-        instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
-        instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
+    def run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+      UI.message "Running tests for locale: #{locale}"
 
-        test_output = run_adb_command(instrument_command.join(" \\\n"),
-                                      print_all: true,
-                                      print_command: true)
+      instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
+                            "-e testLocale #{locale.tr('-', '_')}",
+                            "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
+      instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
+      instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
+      instrument_command << launch_arguments.map { |item| '-e ' + item }.join(' ') if launch_arguments
+      instrument_command << "#{@config[:tests_package_name]}/#{@config[:test_instrumentation_runner]}"
 
+      test_output = run_adb_command(instrument_command.join(" \\\n"),
+                                    print_all: true,
+                                    print_command: true)
+
+      if @config[:exit_on_test_failure]
         UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
+      else
+        UI.error("Tests failed") if test_output.include?("FAILURES!!!")
       end
     end
 
@@ -286,7 +313,7 @@ module Screengrab
         # directory for the screenshots, so we'll try to remove that path from the directory name when
         # creating the destination path.
         # See: https://github.com/fastlane/fastlane/pull/4915#issuecomment-236368649
-        dest_dir = dest_dir.gsub('screengrab/', '')
+        dest_dir = dest_dir.gsub(%r{(app_)?screengrab/}, '')
 
         # We then replace the last segment of the screenshots directory path with the device_type
         # specific name, as expected by supply

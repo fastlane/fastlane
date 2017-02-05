@@ -24,7 +24,7 @@ module FastlaneCore
       def parse(path)
         require 'plist'
 
-        plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
+        plist = Plist.parse_xml(decode(path))
         if (plist || []).count > 5
           plist
         else
@@ -63,6 +63,20 @@ module FastlaneCore
         end
 
         true
+      end
+
+      private
+
+      def decode(path)
+        require 'tmpdir'
+        Dir.mktmpdir('fastlane') do |dir|
+          err = "#{dir}/cms.err"
+          # we want to prevent the error output to mix up with the standard output because of
+          # /dev/null: https://github.com/fastlane/fastlane/issues/6387
+          decoded = `security cms -D -i "#{path}" 2> #{err}`
+          UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
+          decoded
+        end
       end
     end
   end

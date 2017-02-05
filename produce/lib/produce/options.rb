@@ -38,6 +38,15 @@ module Produce
                                      description: "SKU Number (e.g. '1234')",
                                      default_value: Time.now.to_i.to_s,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "PRODUCE_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include? value
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
@@ -56,6 +65,22 @@ module Produce
                                      description: "Skip the creation of the app on iTunes Connect",
                                      is_string: false,
                                      default_value: false),
+
+        FastlaneCore::ConfigItem.new(key: :enabled_features,
+                                     short_option: "-P",
+                                     env_name: "PRODUCE_ENABLED_FEATURES",
+                                     description: "Array with Spaceship App Features",
+                                     is_string: false,
+                                     default_value: {},
+                                     verify_block: proc do |value|
+                                                     allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
+                                                                     :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
+                                                     UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
+                                                     value.each do |key, v|
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                     end
+                                                   end),
+
         FastlaneCore::ConfigItem.new(key: :skip_devcenter,
                                      short_option: "-d",
                                      env_name: "PRODUCE_SKIP_DEVCENTER",
@@ -69,7 +94,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -78,7 +103,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :itc_team_id,
                                      short_option: "-k",
@@ -97,7 +122,7 @@ module Produce
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end)
       ]
     end

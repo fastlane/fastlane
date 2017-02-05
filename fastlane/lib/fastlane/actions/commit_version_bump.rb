@@ -18,8 +18,9 @@ module Fastlane
           # ensure that the xcodeproj passed in was OK
           UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
         else
+          all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -66,6 +67,14 @@ module Fastlane
         expected_changed_files = []
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
+
+        if params[:settings]
+          settings_plists_from_param(params[:settings]).each do |file|
+            settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
+            expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
+          end
+        end
+
         expected_changed_files.flatten!.uniq!
 
         # get the list of files that have actually changed in our git workdir
@@ -88,10 +97,6 @@ module Fastlane
             ].join("\n")
             UI.user_error!(error)
           end
-        end
-
-        if params[:settings]
-          expected_changed_files << 'Settings.bundle/Root.plist'
         end
 
         # get the absolute paths to the files
@@ -191,6 +196,29 @@ module Fastlane
 
       def self.category
         :source_control
+      end
+
+      class << self
+        def settings_plists_from_param(param)
+          if param.kind_of? String
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+            return [param]
+          elsif param.kind_of? Array
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+            return param
+          end
+
+          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
+          ["Root.plist"]
+        end
+
+        def settings_bundle_file_path(project, settings_file_name)
+          settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
+          raise "No Settings.bundle in project" if settings_bundle.nil?
+
+          project_parent = File.dirname project.path
+          File.join(project_parent, settings_bundle.path, settings_file_name)
+        end
       end
     end
   end

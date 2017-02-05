@@ -73,6 +73,8 @@ module Fastlane
           update_plugins
           search_plugins
           help
+          env
+          update_fastlane
         )
       end
 

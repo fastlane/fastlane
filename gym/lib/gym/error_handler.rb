@@ -6,7 +6,7 @@ module Gym
       # @param [String] The output of the errored build
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
-        # The order of the handling below is import
+        # The order of the handling below is important
         case output
         when /Your build settings specify a provisioning profile with the UUID/
           print "Invalid code signing settings"
@@ -50,6 +50,9 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "https://stackoverflow.com/a/17031697/445598"
         end
+        print_full_log_path
+        print_xcode_path_instructions
+        print_xcode_version
         UI.user_error!("Error building the application - see the log above")
       end
 
@@ -79,18 +82,8 @@ module Gym
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
           print "provisioning profile and code signing identity."
-        when /expected one of \{\}/
-          print "It seems like you ran into this radar"
-          print "https://openradar.appspot.com/radar?id=4952000420642816"
-          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
-        when /IDEDistributionErrorDomain error 1/
-        when /Error Domain=IDEDistributionErrorDomain Code=/
-          standard_output = read_standard_output output
-          print standard_output if standard_output
-          print "There was an error exporting your application"
-          print "Unfortunately the new Xcode export API is unstable and causes problems on some projects"
-          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
+        print_full_log_path
         UI.user_error!("Error packaging up the application")
       end
 
@@ -119,6 +112,56 @@ module Gym
       # Just to make things easier
       def print(text)
         UI.error text
+      end
+
+      def print_full_log_path
+        return if Gym.config[:disable_xcpretty]
+        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        UI.important("📋  For a more detailed error log, check the full log at:")
+        UI.important("📋  #{log_path}")
+      end
+
+      def print_xcode_version
+        # lots of the times, the user didn't set the correct Xcode version to their Xcode path
+        # since many users don't look at the table of summary before running a tool, let's make
+        # sure they are aware of the Xcode version and SDK they're using
+        values = {
+          xcode_path: File.expand_path("../..", FastlaneCore::Helper.xcode_path),
+          gym_version: Fastlane::VERSION
+        }
+
+        sdk_path = Gym.project.build_settings(key: "SDKROOT")
+        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+
+        FastlaneCore::PrintTable.print_values(config: values,
+                                           hide_keys: [],
+                                               title: "Build environment".yellow)
+      end
+
+      def print_xcode_path_instructions
+        xcode_path = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
+        default_xcode_path = "/Applications/"
+
+        xcode_installations_in_default_path = Dir[File.join(default_xcode_path, "Xcode*.app")]
+        if xcode_installations_in_default_path.count > 1
+          UI.error "Found multiple versions of Xcode in '#{default_xcode_path}'"
+          UI.error "Make sure you selected the right version for your project"
+          UI.error "This build process was executed using '#{xcode_path}'"
+          UI.important "If you want to update your Xcode path, either"
+          UI.message ""
+
+          UI.message "- Specify the Xcode version in your Fastfile"
+          UI.command_output "xcversion(version: \"8.1\") # Selects Xcode 8.1.0"
+          UI.message ""
+
+          UI.message "- Specify an absolute path to your Xcode installation in your Fastfile"
+          UI.command_output "xcode_select \"/Applications/Xcode8.app\""
+          UI.message ""
+
+          UI.message "- Manually update the path using"
+          UI.command_output "sudo xcode-select -s /Applications/Xcode.app"
+          UI.message ""
+        end
       end
     end
   end

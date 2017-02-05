@@ -14,19 +14,44 @@ module Scan
       Scan.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Snapfile there
+      imported_path = File.expand_path(Scan.scanfile_name)
       Dir.chdir(File.expand_path("..", Scan.project.path)) do
-        config.load_configuration_file(Scan.scanfile_name)
+        config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
       end
 
       Scan.project.select_scheme
 
-      detect_simulator_ios if Scan.project.ios?
-      detect_simulator_tvos if Scan.project.tvos?
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      if devices.count > 0
+        detect_simulator(devices, '', '', '', nil)
+      else
+        if Scan.project.ios?
+          # An iPhone 5s is a reasonably small and useful default for tests
+          detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
+        elsif Scan.project.tvos?
+          detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
+        end
+      end
       detect_destination
 
       default_derived_data
 
+      coerce_to_array_of_strings(:only_testing)
+      coerce_to_array_of_strings(:skip_testing)
+
       return config
+    end
+
+    def self.coerce_to_array_of_strings(config_key)
+      config_value = Scan.config[config_key]
+
+      return if config_value.nil?
+
+      # splitting on comma allows us to support comma-separated lists of values
+      # from the command line, even though the ConfigItem is not defined as an
+      # Array type
+      config_value = config_value.split(',') unless config_value.kind_of?(Array)
+      Scan.config[config_key] = config_value.map(&:to_s)
     end
 
     def self.default_derived_data
@@ -66,20 +91,10 @@ module Scan
       /\s(?=\([\d\.]+\)$)/
     end
 
-    def self.detect_simulator_ios
-      # An iPhone 5s is a reasonably small and useful default for tests
-      detect_simulator('iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
-    end
-
-    def self.detect_simulator_tvos
-      detect_simulator('tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
-    end
-
-    def self.detect_simulator(requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
+    def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
-      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
 
-      deployment_target_version = Scan.project.build_settings(key: deployment_target_key)
+      deployment_target_version = Scan.project.build_settings(key: deployment_target_key) || '0'
 
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
@@ -121,9 +136,11 @@ module Scan
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               potential_emptiness_error = lambda do |sims|
-                UI.error("No simulators found that are equal to the version " \
-                "of specifier (#{version}) and greater than or equal to the version " \
-                "of deployment target (#{deployment_target_version})") if sims.empty?
+                if sims.empty?
+                  UI.error("No simulators found that are equal to the version " \
+                  "of specifier (#{version}) and greater than or equal to the version " \
+                  "of deployment target (#{deployment_target_version})")
+                end
               end
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
@@ -162,21 +179,18 @@ module Scan
       Helper.xcode_version.split(".").first.to_i >= 8
     end
 
-    # Is it an iOS, a tvOS or a macOS device?
     def self.detect_destination
       if Scan.config[:destination]
         UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `scan --help`")
+        UI.important("Instead use the other options available in `fastlane scan --help`")
         UI.important("Using your value '#{Scan.config[:destination]}' for now")
         UI.important("because I trust you know what you're doing...")
         return
       end
 
       # building up the destination now
-      if Scan.project.ios?
-        Scan.config[:destination] = Scan.devices.map { |d| "platform=iOS Simulator,id=#{d.udid}" }
-      elsif Scan.project.tvos?
-        Scan.config[:destination] = Scan.devices.map { |d| "platform=tvOS Simulator,id=#{d.udid}" }
+      if Scan.devices && Scan.devices.count > 0
+        Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       else
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end

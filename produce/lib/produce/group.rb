@@ -1,5 +1,4 @@
 require 'spaceship'
-require 'babosa'
 
 module Produce
   class Group
@@ -15,17 +14,17 @@ module Produce
         ENV["CREATED_NEW_GROUP_ID"] = nil
         # Nothing to do here
       else
-        if options.group_name
-          group_name = valid_name_for(options.group_name)
-        else
-          group_name = group_identifier.split(".").map(&:capitalize).reverse.join(' ')
-          group_name = valid_name_for(group_name)
-        end
+        group_name = options.group_name || group_identifier.split(".").map(&:capitalize).reverse.join(' ')
 
         UI.success("Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center")
 
         group = Spaceship.app_group.create!(group_id: group_identifier,
                                             name: group_name)
+
+        if group.name != group_name
+          UI.important("Your group name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
+          UI.important("To fix this a unique (internal) name '#{group.name}' has been created for you.")
+        end
 
         UI.message("Created group #{group.app_group_id}")
 
@@ -85,11 +84,6 @@ module Produce
 
     def app_exists?
       Spaceship.app.find(app_identifier) != nil
-    end
-
-    def valid_name_for(input)
-      latinazed = input.to_slug.transliterate.to_s # remove accents
-      latinazed.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
     end
   end
 end
