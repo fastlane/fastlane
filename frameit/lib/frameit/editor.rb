@@ -273,7 +273,11 @@ module Frameit
 
         text.gsub! '\n', "\n"
         text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
-
+        
+        # rechape text ( to fix Arabic issue similar to this issue #7522 )
+        bidi = Bidi.new
+        text_reshaped = bidi.to_visual reshape "#{text}"
+        
         interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
@@ -281,7 +285,7 @@ module Frameit
           i.font current_font if current_font
           i.gravity "Center"
           i.pointsize actual_font_size
-          i.draw "text 0,0 '#{text}'"
+          i.draw "text 0,0 '#{text_reshaped}'"
           i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
