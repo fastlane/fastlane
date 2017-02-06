@@ -17,13 +17,13 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        "#{format_string(datetime)}#{msg}\n"
+        "#{format_string(datetime, severity)}#{msg}\n"
       end
 
       @log
     end
 
-    def format_string(datetime)
+    def format_string(datetime, severity)
       if $verbose
         return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
       elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
@@ -74,11 +74,12 @@ module FastlaneCore
     end
 
     def header(message)
-      if message.length + 8 < TTY::Screen.width - format_string(Time.now).length
+      format = format_string(Time.now, "")
+      if message.length + 8 < TTY::Screen.width - format.length
         message = "--- #{message} ---"
         i = message.length
       else
-        i = TTY::Screen.width - format_string(Time.now).length
+        i = TTY::Screen.width - format.length
       end
       success("-" * i)
       success(message)
