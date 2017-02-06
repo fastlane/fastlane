@@ -26,6 +26,7 @@ file_path = File.join(containing_dir, "rspec", "fastlane-junit-results.xml")
 
 if File.exist?(file_path)
   junit.parse(file_path)
+  junit.headers = [:name, :file]
   junit.report
 else
   puts "Couldn't find any test artifacts using search pattern: '#{search_path}'"
