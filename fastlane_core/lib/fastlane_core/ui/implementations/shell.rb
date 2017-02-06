@@ -2,6 +2,8 @@ module FastlaneCore
   # Shell is the terminal output of things
   # For documentation for each of the methods open `interface.rb`
   class Shell < Interface
+    require 'tty-screen'
+
     def log
       return @log if @log
 
@@ -15,20 +17,20 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        if $verbose
-          string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
-        elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
-          string = ""
-        else
-          string = "[#{datetime.strftime('%H:%M:%S')}]: "
-        end
-
-        string += "#{msg}\n"
-
-        string
+        "#{format_string(datetime)}#{msg}\n"
       end
 
       @log
+    end
+
+    def format_string(datetime)
+      if $verbose
+        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
+      elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
+        return ""
+      else
+        return "[#{datetime.strftime('%H:%M:%S')}]: "
+      end
     end
 
     #####################################################
@@ -72,9 +74,14 @@ module FastlaneCore
     end
 
     def header(message)
-      i = message.length + 8
+      if message.length + 8 < TTY::Screen.width - format_string(Time.now).length
+        message = "--- #{message} ---"
+        i = message.length
+      else
+        i = TTY::Screen.width - format_string(Time.now).length
+      end
       success("-" * i)
-      success("--- " + message + " ---")
+      success(message)
       success("-" * i)
     end
 
