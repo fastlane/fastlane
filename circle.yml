@@ -12,6 +12,6 @@ test:
   pre:
     - ulimit -n 400
   override:
-    - bundle exec danger # for quick, instant feedback of PR body and title
+    - bundle exec danger --danger_id="comment" # for quick, instant feedback of PR body and title
     - bundle exec fastlane test
-    - bundle exec danger # for posting the test results to GitHub
+    - bundle exec danger --danger_id="results" # for posting the test results to GitHub
