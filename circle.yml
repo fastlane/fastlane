@@ -12,4 +12,5 @@ test:
   pre:
     - ulimit -n 400
   override:
+    - bundle exec danger
     - bundle exec fastlane test

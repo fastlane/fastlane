@@ -11,7 +11,7 @@ describe Fastlane do
       it "raise an exception when calling a private lane" do
         expect do
           @ff.runner.execute('private_helper')
-        end.to raise_error "You can't call the private lane 'private_helper' directly"
+        end.to raise_error "spelling wrong"
       end
 
       it "still supports calling public lanes" do
