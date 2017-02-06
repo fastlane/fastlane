@@ -6,7 +6,7 @@ RAILS = %w(boarding refresher enhancer)
 SECONDS_PER_DAY = 60 * 60 * 24
 
 task :rubygems_admins do
-  names = ["KrauseFx", "ohayon", "hemal", "asfalcone", "mpirri", "mfurtak", "milch"]
+  names = ["KrauseFx", "ohayon", "asfalcone", "mpirri", "mfurtak", "milch"]
   (GEMS + ["krausefx-shenzhen"]).each do |gem_name|
     names.each do |name|
       puts `gem owner #{gem_name} -a #{name}`
