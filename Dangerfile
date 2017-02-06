@@ -21,29 +21,12 @@ end
 
 # To avoid "PR & Runs" for which tests don't pass, we want to make spec errors more visible
 # The code below will run on Circle, parses the results in JSON and posts them to the PR as comment
-
-require 'json'
-
 containing_dir = ENV["CIRCLE_ARTIFACTS"] || "." # for local testing
-rspec_files = Dir[File.join(containing_dir, "rspec_logs_*.json")]
-rspec_files.each do |current|
-  rspec = JSON.parse(File.read(current))
+search_path = File.join(containing_dir, "**", "fastlane-junit-results.xml")
+junit_files = Dir[search_path]
 
-  rspec["examples"].each do |current_test|
-    next if current_test["status"] == "passed"
-
-    # The current "example" failed, let's prepare a nice looking error message
-    new_line = "<br />"
-    border = "<hr />"
-    message = current_test["exception"]["message"].strip.gsub(/\n+/, new_line).gsub(/\\t+/, new_line).gsub(/\\n+/, new_line)
-
-    tool_name = current.match(/.*rspec_logs_(.*).json/)[1] # e.g. "rspec_logs_spaceship.json"
-    file_path = current_test["file_path"].gsub("./", "#{tool_name}/")
-    error_message = "<code>#{file_path}:#{current_test["line_number"]}</code>"
-    error_message += border
-    error_message += "<pre>#{message}</pre>"
-
-    # We have the test failure, let's pass it to danger
-    fail(error_message)
-  end
+puts "Couldn't find any test artifacts using search pattern: '#{search_path}'" if junit_files.count == 0
+junit_files.each do |file_path|
+  junit.parse(file_path)
+  junit.report
 end
