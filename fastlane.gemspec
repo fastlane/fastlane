@@ -36,6 +36,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'word_wrap', '~> 1.0.0' # to add line breaks for tables with long strings
 
+  # TTY dependencies
+  spec.add_dependency 'tty-screen', '~> 0.5.0' # detect the terminal width
+
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
   spec.add_dependency 'colored' # coloured terminal output
   spec.add_dependency 'commander', '>= 4.4.0', '< 5.0.0' # CLI parser
