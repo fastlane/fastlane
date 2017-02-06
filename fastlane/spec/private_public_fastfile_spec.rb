@@ -8,7 +8,7 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new(path)
       end
 
-      it "raise an exception when calling a private lane", now: true do
+      it "raise an exception when calling a private lane" do
         expect do
           @ff.runner.execute('private_helper')
         end.to raise_error "spelling wrong"
