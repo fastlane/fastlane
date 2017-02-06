@@ -74,12 +74,6 @@ module Spaceship
           raise "You have to use a subclass: Internal or External"
         end
 
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @return (Array) Returns all beta testers available for this account
         def all
           client.testers(self).map { |tester| self.factory(tester) }

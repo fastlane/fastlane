@@ -35,12 +35,6 @@ module Spaceship
         'teamMemberId' => :team_member_id
       )
 
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def remove!
         client.team_remove_member!(team_member_id)
       end

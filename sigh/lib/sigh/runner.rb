@@ -127,7 +127,7 @@ module Sigh
         end
       end
 
-      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name} for #{Sigh.config[:platform]} platform'"
+      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform"
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert,
@@ -216,8 +216,13 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
-      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
+      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+
+      if Sigh.config[:platform].to_s == 'tvos'
+        profile_name += "_tvos"
+      end
+
+      profile_name += '.mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)

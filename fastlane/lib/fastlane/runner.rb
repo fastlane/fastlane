@@ -58,10 +58,14 @@ module Fastlane
       rescue => ex
         Dir.chdir(path_to_use) do
           # Provide error block exception without colour code
-          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
-
-          error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
-          error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
+          begin
+            error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
+            error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
+          rescue => error_block_exception
+            UI.error("An error occured while executing the `error` block:")
+            UI.error(error_block_exception.to_s)
+            raise ex # raise the original error message
+          end
         end
 
         raise ex

@@ -84,8 +84,8 @@ module Scan
 
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
-        logarchive_dest = File.join(Scan.config[:output_directory], "system_logs-#{device.name}_#{device.os_type}_#{device.os_version}.logarchive")
-        FastlaneCore::Simulator.copy_logarchive(device, logarchive_dest)
+        log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
       end
     end
 

@@ -211,6 +211,17 @@ describe Fastlane do
         File.delete("/tmp/error.txt")
       end
 
+      it "Exception in error block are swallowed and shown, and original exception is re-raised" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileErrorInError')
+
+        expect(FastlaneCore::UI).to receive(:error).with("An error occured while executing the `error` block:")
+        expect(FastlaneCore::UI).to receive(:error).with("Error in error")
+
+        expect do
+          ff.runner.execute(:beta, nil, {})
+        end.to raise_error("Original error")
+      end
+
       describe "supports switching lanes" do
         it "use case 1: passing parameters to another lane and getting the result" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')

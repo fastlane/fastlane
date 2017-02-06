@@ -79,8 +79,8 @@ module Spaceship
 
         [
           "Apple provided the following error info:",
-          CGI.unescapeHTML(@error_info['resultString']),
-          CGI.unescapeHTML(@error_info['userString'])
+          @error_info['resultString'],
+          @error_info['userString']
         ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
       end
     end
@@ -438,15 +438,18 @@ module Spaceship
       if response.body
         # If we have an `expected_key`, select that from response.body Hash
         # Else, don't.
+
+        # the returned error message and info, is html encoded ->  &quot;issued&quot; -> make this readable ->  "issued"
+        response.body["userString"] = CGI.unescapeHTML(response.body["userString"]) if response.body["userString"]
+        response.body["resultString"] = CGI.unescapeHTML(response.body["resultString"]) if response.body["resultString"]
+
         content = expected_key ? response.body[expected_key] : response.body
       end
-
       if content.nil?
         # Check if the failure is due to missing permissions (iTunes Connect)
         if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
           raise_insuffient_permission_error!
         end
-
         raise UnexpectedResponse, response.body
       elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
         # example content when doing a Developer Portal action with not enough permission

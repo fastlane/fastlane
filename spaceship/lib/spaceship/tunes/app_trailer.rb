@@ -33,12 +33,6 @@ module Spaceship
         'videoStatus' => :video_status
       )
 
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def reset!(attrs = {})
         update_raw_data!({
           video_asset_token: nil,
