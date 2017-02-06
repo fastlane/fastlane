@@ -5,7 +5,7 @@ module FastlaneCore
       # You can pass an array to `hide_keys` if you don't want certain elements to show up (symbols or strings)
       # You can pass an array to `mask_keys` if you want to mask certain elements (symbols or strings)
       def print_values(config: nil, title: nil, hide_keys: [], mask_keys: [])
-        require 'terminal-table'
+        
 
         options = {}
         unless config.nil?

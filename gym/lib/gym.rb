@@ -9,7 +9,7 @@ require 'gym/detect_values'
 require 'gym/xcode'
 
 require 'fastlane_core'
-require 'terminal-table'
+
 require 'shellwords'
 
 module Gym

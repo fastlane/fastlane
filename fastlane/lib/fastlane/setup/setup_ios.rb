@@ -107,7 +107,7 @@ module Fastlane
       rows << ["App Name", self.app_name]
       rows << ["App Identifier", self.app_identifier]
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
-      require 'terminal-table'
+      
       puts ""
       puts Terminal::Table.new(rows: rows, title: "Detected Values")
       puts ""

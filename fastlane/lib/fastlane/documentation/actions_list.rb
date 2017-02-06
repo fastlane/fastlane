@@ -1,7 +1,7 @@
 module Fastlane
   class ActionsList
     def self.run(filter: nil, platform: nil)
-      require 'terminal-table'
+      
       if filter
         show_details(filter: filter)
       else

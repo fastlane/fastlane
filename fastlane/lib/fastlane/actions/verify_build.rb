@@ -1,5 +1,5 @@
 require 'plist'
-require 'terminal-table'
+
 
 module Fastlane
   module Actions

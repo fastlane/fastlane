@@ -33,7 +33,7 @@ module FastlaneCore
     end
 
     def print_resulting_config_values(path)
-      require 'terminal-table'
+      
       UI.success("Successfully loaded '#{File.expand_path(path)}' 📄")
 
       # Show message when self.modified_values is empty

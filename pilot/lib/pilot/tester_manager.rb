@@ -1,6 +1,6 @@
 require "fastlane_core"
 require "pilot/tester_util"
-require 'terminal-table'
+
 
 module Pilot
   class TesterManager < Manager

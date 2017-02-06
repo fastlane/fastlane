@@ -94,7 +94,7 @@ module Fastlane
     def self.print_table(actions)
       return if actions.count == 0
 
-      require 'terminal-table'
+      
 
       rows = []
       actions.each_with_index do |current, i|
@@ -223,7 +223,7 @@ module Fastlane
       end
       rows = FastlaneCore::PrintTable.limit_row_size(rows)
 
-      require 'terminal-table'
+      
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
         rows: rows
