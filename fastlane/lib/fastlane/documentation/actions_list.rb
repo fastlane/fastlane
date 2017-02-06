@@ -34,7 +34,7 @@ module Fastlane
         rows << current
       end
 
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: "Available fastlane actions".green,
         headings: ['Action', 'Description', 'Author'],
         rows: rows
@@ -97,7 +97,7 @@ module Fastlane
       authors = Array(action.author || action.authors)
       rows << ["Created by #{authors.join(', ').green}"] unless authors.empty?
 
-      puts Terminal::Table.new(title: name.green, rows: rows)
+      puts FastlaneCore::TerminalTable.new(title: name.green, rows: rows)
       puts ""
     end
 
@@ -105,7 +105,7 @@ module Fastlane
       options = parse_options(action.available_options) if action.available_options
 
       if options
-        puts Terminal::Table.new(
+        puts FastlaneCore::TerminalTable.new(
           title: "#{name} Options".green,
           headings: ['Key', 'Description', 'Env Var', 'Default'],
           rows: options
@@ -120,7 +120,7 @@ module Fastlane
       output = action.output
       return if output.nil? || output.empty?
 
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: "#{name} Output Variables".green,
         headings: ['Key', 'Description'],
         rows: output.map { |key, desc| [key.yellow, desc] }
@@ -132,7 +132,7 @@ module Fastlane
     def self.print_return_value(action, name)
       return unless action.return_value
 
-      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
+      puts FastlaneCore::TerminalTable.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
       puts ""
     end
 

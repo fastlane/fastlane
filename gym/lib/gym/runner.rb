@@ -56,7 +56,7 @@ module Gym
         end
       end
 
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: title.green,
         headings: ["Option", "Value"],
         rows: rows.delete_if { |c| c.to_s.empty? }

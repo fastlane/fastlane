@@ -313,7 +313,7 @@ module Fastlane
         end
       end
 
-      puts Terminal::Table.new({
+      puts FastlaneCore::TerminalTable.new({
         rows: rows,
         title: "Used plugins".green,
         headings: ["Plugin", "Version", "Action"]

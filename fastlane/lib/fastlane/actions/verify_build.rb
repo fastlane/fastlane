@@ -77,7 +77,7 @@ module Fastlane
       end
 
       def self.print_values(values)
-        table = Terminal::Table.new do |t|
+        table = FastlaneCore::TerminalTable.new do |t|
           t.title = 'Summary for VERIFY_BUILD'.green
           t.headings = 'Key', 'Value'
           values.each do |key, value|

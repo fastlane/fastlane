@@ -31,7 +31,7 @@ module Fastlane
       params[:rows] = rows
 
       puts ""
-      puts Terminal::Table.new(params)
+      puts FastlaneCore::TerminalTable.new(params)
       puts ""
 
       if plugins.count == 1

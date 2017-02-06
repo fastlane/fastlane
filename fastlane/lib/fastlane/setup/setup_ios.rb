@@ -109,7 +109,7 @@ module Fastlane
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values")
+      puts FastlaneCore::TerminalTable.new(rows: rows, title: "Detected Values")
       puts ""
 
       unless self.itc_ref

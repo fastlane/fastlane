@@ -41,7 +41,7 @@ module Fastlane
         return
       end
 
-      puts Terminal::Table.new({
+      puts FastlaneCore::TerminalTable.new({
         rows: rows,
         title: "Plugin updates available".yellow,
         headings: ["Plugin", "Your Version", "Latest Version"]

@@ -158,7 +158,7 @@ module Pilot
 
     # Requires a block that accepts a tester and returns an array of tester column values
     def list(all_testers, title, headings)
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: title.green,
         headings: headings,
         rows: all_testers.map { |tester| yield tester }
@@ -199,7 +199,7 @@ module Pilot
         end
       end
 
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: tester.email.green,
         rows: rows
       )

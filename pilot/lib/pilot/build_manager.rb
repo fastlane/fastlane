@@ -88,7 +88,7 @@ module Pilot
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: "#{app.name} Builds".green,
         headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
         rows: rows

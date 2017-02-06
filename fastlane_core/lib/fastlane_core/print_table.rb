@@ -24,26 +24,14 @@ module FastlaneCore
         rows = self.collect_rows(options: options, hide_keys: hide_keys.map(&:to_s), mask_keys: mask_keys.map(&:to_s), prefix: '')
 
         params = {}
-        params[:rows] = limit_row_size(rows)
+        params[:rows] = FastlaneCore::TerminalTable.limit_row_size(rows)
         params[:title] = title.green if title
 
         puts ""
-        puts Terminal::Table.new(params)
+        puts FastlaneCore::TerminalTable.new(params)
         puts ""
 
         return params
-      end
-
-      def limit_row_size(rows, max_length = 100)
-        require 'fastlane_core/string_filters'
-
-        max_key_length = rows.map { |e| e[0].length }.max || 0
-        max_allowed_value_length = max_length - max_key_length - 7
-        rows.map do |e|
-          value = e[1]
-          value = value.to_s.truncate(max_allowed_value_length) unless [true, false].include?(value)
-          [e[0], value]
-        end
       end
 
       def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********')

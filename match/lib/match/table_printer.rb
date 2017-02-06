@@ -8,7 +8,7 @@ module Match
       }
 
       puts ""
-      puts Terminal::Table.new(params)
+      puts FastlaneCore::TerminalTable.new(params)
       puts ""
     rescue => ex
       UI.error(ex)
@@ -37,7 +37,7 @@ module Match
       params[:headings] = ['Parameter', 'Environment Variable', 'Value']
 
       puts ""
-      puts Terminal::Table.new(params)
+      puts FastlaneCore::TerminalTable.new(params)
       puts ""
     end
   end
