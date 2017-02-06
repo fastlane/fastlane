@@ -358,9 +358,7 @@ module FastlaneCore
       end
 
       if result
-        UI.success("-" * 102)
-        UI.success("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
-        UI.success("-" * 102)
+        UI.header("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
 
         FileUtils.rm_rf(actual_dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
       else
