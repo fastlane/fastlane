@@ -158,6 +158,24 @@ module Spaceship
           super
         end
       end
+
+      ##
+      # The factory class-method. This should only be used or overridden in very specific use-cases
+      #
+      # The only time it makes sense to use or override this method is when we want a base class
+      # to return a sub-class based on attributes.
+      #
+      # Here, we define the method to be the same as `Spaceship::Base.new(attrs)`, be it should
+      # be used only by classes that override it.
+      #
+      # Example:
+      #
+      #   Certificate.factory(attrs)
+      #   #=> #<PushCertificate ... >
+      #
+      def factory(attrs)
+        self.new(attrs)
+      end
     end
 
     ##

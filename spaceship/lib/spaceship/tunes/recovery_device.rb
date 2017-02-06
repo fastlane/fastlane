@@ -58,12 +58,6 @@ module Spaceship
         'lastTwoDigits' => :last_two_digits,
         'updateDate' => :update_date
       )
-
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
     end
   end
 end
