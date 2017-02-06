@@ -233,7 +233,7 @@ private_lane :validate_repo do
   ensure_no_debug_code(text: "now: ", extension: ".rb") # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb") # Merge conflict
 
-  rubocop
+  # rubocop
 
   # Verifying the --help command
   #
