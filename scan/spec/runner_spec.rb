@@ -20,7 +20,7 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: false
           })
-          expect(FastlaneCore::Simulator).not_to receive(:copy_logarchive)
+          expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
           @scan.handle_results(0)
         end
       end
@@ -34,7 +34,7 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: true
           })
-          expect(FastlaneCore::Simulator).to receive(:copy_logarchive)
+          expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)
         end
       end

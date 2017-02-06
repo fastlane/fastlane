@@ -194,21 +194,6 @@ module FastlaneCore
         all.each(&:reset)
       end
 
-      def copy_logarchive(device, dest)
-        sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
-        logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
-
-        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
-        FileUtils.rm_rf(logarchive_src)
-        FileUtils.rm_rf(dest)
-
-        command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
-
-        FileUtils.cp_r(logarchive_src, dest)
-        UI.success "Copying file '#{logarchive_src}' to '#{dest}'..."
-      end
-
       def reset_all_by_version(os_version: nil)
         return false unless os_version
         all.select { |device| device.os_version == os_version }.each(&:reset)
@@ -233,6 +218,48 @@ module FastlaneCore
         UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
 
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: $verbose)
+      end
+
+      def copy_logs(device, log_identity, logs_destination_dir)
+        logs_destination_dir = File.expand_path(logs_destination_dir)
+        os_version = FastlaneCore::CommandExecutor.execute(command: 'sw_vers -productVersion', print_all: false, print_command: false)
+
+        if Gem::Version.new(os_version) >= Gem::Version.new('10.12.0')
+          copy_logarchive(device, log_identity, logs_destination_dir)
+        else
+          copy_logfile(device, log_identity, logs_destination_dir)
+        end
+      end
+
+      private
+
+      def copy_logfile(device, log_identity, logs_destination_dir)
+        logfile_src = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
+        return unless File.exist?(logfile_src)
+
+        FileUtils.mkdir_p(logs_destination_dir)
+        logfile_dst = File.join(logs_destination_dir, "system-#{log_identity}.log")
+
+        FileUtils.rm_f(logfile_dst)
+        FileUtils.cp(logfile_src, logfile_dst)
+        UI.success "Copying file '#{logfile_src}' to '#{logfile_dst}'..."
+      end
+
+      def copy_logarchive(device, log_identity, logs_destination_dir)
+        sim_resource_dir = FastlaneCore::CommandExecutor.execute(command: "xcrun simctl getenv #{device.udid} SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true)
+        logarchive_src = File.join(sim_resource_dir, "system_logs.logarchive")
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive")
+
+        # if logarchive already exists it fails as the .logarchive is a directory, so delete it. to be sure its gone
+        FileUtils.rm_rf(logarchive_src)
+        FileUtils.rm_rf(logarchive_dst)
+
+        command = "xcrun simctl spawn #{device.udid} log collect 2>/dev/null"
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+
+        FileUtils.mkdir_p(logarchive_dst)
+        FileUtils.cp_r("#{logarchive_src}/.", logarchive_dst)
+        UI.success "Copying file '#{logarchive_src}' to '#{logarchive_dst}'..."
       end
     end
   end

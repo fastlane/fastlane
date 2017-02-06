@@ -5,11 +5,12 @@ describe Snapshot do
     let(:iphone6_9_3_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
     let(:iphone6_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: '9.0', udid: "11111", state: "Don't Care", is_simulator: true) }
     let(:iphone6_9_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: '9.2', udid: "11111", state: "Don't Care", is_simulator: true) }
+    let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
     let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
 
     before do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
-      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2])
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, ipad_air_9_1])
       fake_out_xcode_project_loading
     end
 
@@ -31,16 +32,33 @@ describe Snapshot do
     end
 
     describe 'copy_simulator_logs' do
-      it 'copies all device logs to the output directory' do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
+      before (:each) do
+        @config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
           output_directory: '/tmp/scan_results',
           output_simulator_logs: true,
           devices: ['iPhone 6', 'iPhone 6s'],
           project: './snapshot/example/Example.xcodeproj',
           scheme: 'ExampleUITests'
         })
-        expect(FileUtils).to receive(:cp_r).with(/.*/, %r{de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).and_return(true)
-        expect(FileUtils).to receive(:cp_r).with(/.*/, %r{en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).and_return(true)
+      end
+
+      it 'copies all device log archives to the output directory on macOS 10.12 (Siera)' do
+        Snapshot.config = @config
+
+        expect(FileUtils).
+          to receive(:cp_r).
+          with(/.*/, %r{de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).
+          and_return(true)
+
+        expect(FileUtils).
+          to receive(:cp_r).
+          with(/.*/, %r{en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).
+          and_return(true)
+
+        allow(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(command: "sw_vers -productVersion", print_all: false, print_command: false).
+          and_return('10.12.1')
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
@@ -64,6 +82,22 @@ describe Snapshot do
 
         Snapshot::Runner.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
         Snapshot::Runner.new.copy_simulator_logs("iPhone 6", "en-US", nil, 0)
+      end
+
+      it 'copies all device log files to the output directory on macOS 10.11 (El Capitan)' do
+        Snapshot.config = @config
+
+        allow(File).to receive(:exist?).with(/.*system\.log/).and_return(true)
+        allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.11.6')
+
+        expect(FileUtils).to receive(:rm_f).with(%r{#{Snapshot.config[:output_directory]}/de-DE/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
+        expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/de-DE/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
+
+        expect(FileUtils).to receive(:rm_f).with(%r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
+        expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
+
+        Snapshot::Runner.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
+        Snapshot::Runner.new.copy_simulator_logs("iPad Air", "en-US", nil, 0)
       end
     end
 
