@@ -8,6 +8,10 @@ module Fastlane
         ARGV.include?('-v') || ARGV.include?('--version')
       end
 
+      def running_help_command?
+        ARGV.include?('-h') || ARGV.include?('--help')
+      end
+
       def take_off
         before_import_time = Time.now
 
