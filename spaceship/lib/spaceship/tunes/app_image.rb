@@ -21,12 +21,6 @@ module Spaceship
         'originalFileName' => :original_file_name
       )
 
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def reset!(attrs = {})
         update_raw_data!(
           {

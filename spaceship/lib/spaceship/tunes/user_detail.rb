@@ -8,12 +8,6 @@ module Spaceship
         'contentProviderId' => :content_provider_id,
         'sessionToken.dsId' => :ds_id
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
     end
   end
 end

@@ -17,15 +17,6 @@ module Spaceship
         'username' => :username
       })
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
-
       def setup
         @version = Tunes::AppVersionPromocodes.factory(raw_data['version'])
         @codes = raw_data['codes']
