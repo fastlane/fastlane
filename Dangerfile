@@ -22,7 +22,7 @@ end
 # To avoid "PR & Runs" for which tests don't pass, we want to make spec errors more visible
 # The code below will run on Circle, parses the results in JSON and posts them to the PR as comment
 containing_dir = ENV["CIRCLE_ARTIFACTS"] || "." # for local testing
-search_path = File.join(containing_dir, "fastlane-junit-results.xml")
+search_path = File.join(containing_dir, "rspec", "fastlane-junit-results.xml")
 junit_files = Dir[search_path]
 
 puts "Couldn't find any test artifacts using search pattern: '#{search_path}'" if junit_files.count == 0
