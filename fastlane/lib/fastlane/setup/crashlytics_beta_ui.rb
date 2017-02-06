@@ -9,7 +9,10 @@ module Fastlane
     end
 
     def header(text)
-      FastlaneCore::UI.header(text)
+      i = text.length + 8
+      success("-" * i)
+      success("--- " + text + " ---")
+      success("-" * i)
     end
 
     def important(text)
