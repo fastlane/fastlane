@@ -52,12 +52,6 @@ module Spaceship
       })
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param mac [Bool] Fetches Mac devices if true
         # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Array) Returns all devices registered for this account

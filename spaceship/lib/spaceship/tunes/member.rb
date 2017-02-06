@@ -16,12 +16,6 @@ module Spaceship
         'dsId' => :user_id
       )
 
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def roles
         parsed_roles = []
         raw_data["roles"].each do |role|
