@@ -230,7 +230,7 @@ private_lane :validate_repo do
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "**/*/playground.rb") # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb") # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb") # rspec focus
+  # ensure_no_debug_code(text: "now: ", extension: ".rb") # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb") # Merge conflict
 
   # rubocop
