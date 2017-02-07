@@ -79,7 +79,7 @@ To get a list of all available parameters:
 
 ```
   Commands:
-    associate_group  Associate with a group, which is create if needed or simply located otherwise
+    associate_group  Associate with a group, which is created if needed or simply located otherwise
     create           Creates a new app on iTunes Connect and the Apple Developer Portal
     disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
     enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
