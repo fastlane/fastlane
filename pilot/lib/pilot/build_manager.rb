@@ -132,6 +132,7 @@ module Pilot
       latest_build = nil
       UI.message("Waiting for iTunes Connect to process the new build")
       must_update_build_info = config[:update_build_info_on_upload]
+      found_build = false
       loop do
         sleep(wait_processing_interval)
 
@@ -142,10 +143,14 @@ module Pilot
         #  have a nil build
         if app.build_trains(platform: platform).count == 0
           UI.message("New application; waiting for build train to appear on iTunes Connect")
-        else
+        elsif !found_build
           builds = app.all_processing_builds(platform: platform)
           break if builds.count == 0
           latest_build = builds.last
+          found_build = true
+        else
+          builds = app.all_processing_builds(platform: platform)
+          break unless builds.include? latest_build
 
           if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary
