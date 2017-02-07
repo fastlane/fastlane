@@ -25,7 +25,6 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: false
           })
-          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
           @scan.handle_results(0)
@@ -41,7 +40,6 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: true
           })
-          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)

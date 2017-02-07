@@ -46,7 +46,7 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      result = TestResultParser.new.parse_result(File.read(Scan.cache[:temp_junit_report]))
+      result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
 
       if result[:failures] > 0
@@ -77,6 +77,11 @@ module Scan
       if Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
+    end
+
+    def test_results
+      return "" unless Scan.cache[:temp_junit_report]
+      File.read(Scan.cache[:temp_junit_report])
     end
 
     def copy_simulator_logs

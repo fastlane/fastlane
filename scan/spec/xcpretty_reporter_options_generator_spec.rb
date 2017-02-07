@@ -1,8 +1,8 @@
 describe Scan do
   describe Scan::XCPrettyReporterOptionsGenerator do
     before(:all) do
-      # workaround: Scan.cache may not be initialized during tests
-      Scan.cache = {} unless Scan.cache
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
     end
 
     describe "xcpretty reporter options generation" do
