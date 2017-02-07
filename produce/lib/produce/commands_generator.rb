@@ -116,7 +116,7 @@ module Produce
 
       command :associate_group do |c|
         c.syntax = 'fastlane produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
-        c.description = 'Associate with a group, which is create if needed or simply located otherwise'
+        c.description = 'Associate with a group, which is created if needed or simply located otherwise'
         c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
 
         c.action do |args, options|
