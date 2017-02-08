@@ -17,24 +17,30 @@ describe Deliver::SubmitForReview do
   describe :find_build do
     context 'one build' do
       let(:fake_builds) { make_fake_builds(1) }
+      let(:app) { app = OpenStruct.new({ latest_version: OpenStruct.new({ candidate_builds: fake_builds }) }) }
+
       it 'finds the one build' do
         only_build = fake_builds.first
-        expect(review_submitter.find_build(fake_builds)).to eq(only_build)
+        expect(FastlaneCore::BuildWatcher.find_build(app)).to eq(only_build)
       end
     end
 
     context 'no builds' do
       let(:fake_builds) { make_fake_builds(0) }
+      let(:app) { app = OpenStruct.new({ latest_version: OpenStruct.new({ candidate_builds: fake_builds }) }) }
+
       it 'throws a UI error' do
-        expect { review_submitter.find_build(fake_builds) }.to raise_error FastlaneCore::Interface::FastlaneCrash
+        expect { FastlaneCore::BuildWatcher.find_build(app) }.to raise_error FastlaneCore::Interface::FastlaneError
       end
     end
 
     context 'two builds' do
       let(:fake_builds) { make_fake_builds(2) }
+      let(:app) { app = OpenStruct.new({ latest_version: OpenStruct.new({ candidate_builds: fake_builds }) }) }
+
       it 'finds the one build' do
         newest_build = fake_builds.last
-        expect(review_submitter.find_build(fake_builds)).to eq(newest_build)
+        expect(FastlaneCore::BuildWatcher.find_build(app)).to eq(newest_build)
       end
     end
   end
