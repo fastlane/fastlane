@@ -16,7 +16,7 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        base_url = options[:bypass_cdn] ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
+        base_url = options.delete(:bypass_cdn) ? "https://rink.hockeyapp.net" : "https://upload.hockeyapp.net"
         foptions = {
           url: base_url
         }
@@ -38,6 +38,18 @@ module Fastlane
         end
       end
 
+      def self.upload(api_token, ipa, options)
+        create_update = options.delete(:create_update)
+
+        if create_update
+          self.create_and_update_build(api_token, ipa, options)
+        else
+          self.upload_build(api_token, ipa, options)
+        end
+      end
+
+      # Uses https://support.hockeyapp.net/kb/api/api-versions#upload-version if a `public_identifier` was specified
+      # otherwise https://support.hockeyapp.net/kb/api/api-apps#upload-app
       def self.upload_build(api_token, ipa, options)
         connection = self.connection(options)
 
@@ -59,9 +71,48 @@ module Fastlane
         end
       end
 
-      def self.run(options)
-        # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
+      # Uses https://support.hockeyapp.net/kb/api/api-versions#create-version
+      # and https://support.hockeyapp.net/kb/api/api-versions#update-version
+      # to upload a build
+      def self.create_and_update_build(api_token, ipa, options)
+        [:public_identifier, :bundle_short_version, :bundle_version].each do |key|
+          UI.user_error!("To use the 'create_update' upload mechanism you need to pass the '#{key.to_sym}' option.") unless options[key]
+        end
+        # https://support.hockeyapp.net/discussions/problems/33355-is-uploadhockeyappnet-available-for-general-use
+        # GET requests are cached on CDN, so bypass it
+        options[:bypass_cdn] = true
+        connection = self.connection(options)
 
+        options.delete(:ipa)
+        options.delete(:apk)
+        app_id = options.delete(:public_identifier)
+
+        ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+
+        response = connection.get do |req|
+          req.url("/api/2/apps/#{app_id}/app_versions/new")
+          req.headers['X-HockeyAppToken'] = api_token
+          req.body = options
+        end
+
+        case response.status
+        when 200...300
+          app_version_id = response.body['id']
+          UI.message("successfully created version with id #{app_version_id}")
+        else
+          UI.user_error!("Error trying to create app version:  #{response.status} - #{response.body}")
+        end
+
+        options[:ipa] = ipaio
+
+        connection.put do |req|
+          req.url("/api/2/apps/#{app_id}/app_versions/#{app_version_id}")
+          req.headers['X-HockeyAppToken'] = api_token
+          req.body = options
+        end
+      end
+
+      def self.run(options)
         build_file = [
           options[:ipa],
           options[:apk]
@@ -98,12 +149,16 @@ module Fastlane
         values[:dsym_filename] = dsym_filename
         values[:notes_type] = options[:notes_type]
 
+        api_token = values.delete(:api_token)
+
+        values.delete_if { |k, v| v.nil? }
+
         return values if Helper.test?
 
         ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
-        response = self.upload_build(options[:api_token], ipa_filename, values)
+        response = self.upload(api_token, ipa_filename, values)
         case response.status
         when 200...300
           url = response.body['public_url']
@@ -149,7 +204,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
-                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file. In addition you could use this to upload .msi, .zip, .pkg, etc if you use the 'create_update' mechanism",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        optional: true,
                                        verify_block: proc do |value|
@@ -164,6 +219,15 @@ module Fastlane
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        optional: true,
+                                       verify_block: proc do |value|
+                                         # validation is done in the action
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :create_update,
+                                       env_name: "FL_HOCKEY_CREATE_UPDATE",
+                                       description: "Set true if you want to create then update your app as opposed to just upload it."\
+                                         " You will need the 'public_identifier', 'bundle_version' and 'bundle_short_version'",
+                                       is_string: false,
+                                       default_value: false,
                                        verify_block: proc do |value|
                                          # validation is done in the action
                                        end),
@@ -202,6 +266,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :tags,
                                       env_name: "FL_HOCKEY_TAGS",
                                       description: "Comma separated list of tags which will receive access to the build",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_short_version,
+                                      env_name: "FL_HOCKEY_BUNDLE_SHORT_VERSION",
+                                      description: "The bundle_short_version of your application, required when using `create_update`",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_version,
+                                      env_name: "FL_HOCKEY_BUNDLE_VERSION",
+                                      description: "The bundle_version of your application, required when using `create_update`",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
@@ -276,6 +348,15 @@ module Fastlane
           'hockey(
             api_token: "...",
             ipa: "./app.ipa",
+            notes: "Changelog"
+          )',
+          'hockey(
+            api_token: "...",
+            create_update: true,
+            public_identifier: "....",
+            bundle_short_version: "1.0.2,
+            bundle_version: "1.0.2.145",
+            ipa: "./my.msi",
             notes: "Changelog"
           )'
         ]
