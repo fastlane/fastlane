@@ -80,7 +80,7 @@ end
 ### `error` block
 
 This block will get executed when an error occurs, in any of the blocks (*before_all*, the lane itself or *after_all*).
-You can get more information about the error using the field `error_info`.
+You can get more information about the error using the `error_info` property.
 
 ```ruby
 error do |lane, exception|
@@ -91,7 +91,6 @@ error do |lane, exception|
   )
 end
 ```
-
 
 ## Extensions
 
