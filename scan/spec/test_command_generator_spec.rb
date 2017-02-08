@@ -74,7 +74,7 @@ describe Scan do
       end.to raise_error "Project file not found at path '/notExistent'"
     end
 
-    describe ":toolchain", now: true do
+    describe ":toolchain" do
       it "should fail if :xctestrun and :toolchain is set" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
