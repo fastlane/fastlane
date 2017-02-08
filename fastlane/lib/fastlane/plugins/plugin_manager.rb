@@ -279,7 +279,7 @@ module Fastlane
 
           store_plugin_reference(gem_name)
           loaded_plugins = true
-        rescue => ex
+        rescue StandardError, ScriptError => ex # some errors, like ScriptError are not caught unless explicitly
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
 
           # We'll still add it to the table, to make the error
