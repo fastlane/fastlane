@@ -107,7 +107,7 @@ module Frameit
       self.top_space_above_device = vertical_frame_padding
 
       if fetch_config['title']
-        background = put_title_into_background(background)
+        background = put_title_into_background(background, fetch_config['stack_title'])
       end
 
       if self.frame # we have no frame on le mac
@@ -192,13 +192,56 @@ module Frameit
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
+    def resize_text(text)
+      width = text.width
+      ratio = (width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
+      if ratio > 1.0
+        # too large - resizing now
+        smaller = (1.0 / ratio)
+        text.resize "#{(smaller * text.width).round}x"
+      end
+    end
     # Add the title above the device
-    def put_title_into_background(background)
+
+    def put_title_into_background_stacked(background, title, keyword)
+      resize_text(title)
+      resize_text(keyword)
+
+      title_width = title.width
+      keyword_width = keyword.width
+
+      vertical_padding = vertical_frame_padding
+      keyword_top_space = vertical_padding
+
+      spacing_between_title_and_keyword = (title.height / 2)
+      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
+      title_left_space = (background.width / 2.0 - title_width / 2.0).round
+      keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
+
+      self.top_space_above_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
+      # keyword
+      background = background.composite(keyword, "png") do |c|
+        c.compose "Over"
+        c.geometry "+#{keyword_left_space}+#{keyword_top_space}"
+      end
+      # Then, put the title on top of the screenshot next to the keyword
+      background = background.composite(title, "png") do |c|
+        c.compose "Over"
+        c.geometry "+#{title_left_space}+#{title_top_space}"
+      end
+      background
+    end
+
+    def put_title_into_background(background, stack_title)
       title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = title_images[:keyword]
       title = title_images[:title]
 
+      if stack_title && !keyword.nil? && !title.nil? && keyword.width > 0 && title.width > 0
+        background = put_title_into_background_stacked(background, title, keyword)
+        return background
+      end
       # sum_width: the width of both labels together including the space inbetween
       #   is used to calculate the ratio
       sum_width = title.width
