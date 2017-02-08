@@ -205,8 +205,8 @@ error do |lane, exception|
 end
 ```
 
-When gym raises an error the field `error_info` will contain the process output
-in case you want to display the error in 3rd party tools such as slack.
+When gym raises an error the `error_info` property will contain the process output
+in case you want to display the error in 3rd party tools such as Slack.
 
 You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
 
