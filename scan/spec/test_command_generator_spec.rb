@@ -74,6 +74,38 @@ describe Scan do
       end.to raise_error "Project file not found at path '/notExistent'"
     end
 
+    describe ":toolchain", now: true do
+      it "should fail if :xctestrun and :toolchain is set" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            scan(
+              project: './scan/examples/standard/app.xcodeproj',
+              xctestrun: './path/1.xctestrun',
+              toolchain: 'com.apple.dt.toolchain.Swift_2_3'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'toolchain' and 'xctestrun'")
+      end
+      it "Supports toolchain" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-sdk '9.0'",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       :build,
+                                       :test
+                                     ])
+      end
+    end
+
     it "supports additional parameters" do
       log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
