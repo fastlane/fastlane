@@ -28,6 +28,5 @@ describe Gym do
       expect(UI).to receive(:user_error!).with("Error packaging up the application", error_info: @output)
       Gym::ErrorHandler.handle_package_error(@output)
     end
-
   end
 end
