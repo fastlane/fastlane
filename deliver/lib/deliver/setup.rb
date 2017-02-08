@@ -66,6 +66,17 @@ module Deliver
         UI.message("Writing to '#{resulting_path}'")
       end
 
+      # Review information
+      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, option_name|
+        content = v.send(key).to_s
+        content << "\n"
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
+        FileUtils.mkdir_p(base_dir)
+        resulting_path = File.join(base_dir, "#{option_name}.txt")
+        File.write(resulting_path, content)
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
       UI.success("Successfully created new configuration files.")
 
       # get App icon + watch icon
