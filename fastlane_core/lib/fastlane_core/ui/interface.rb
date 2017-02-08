@@ -143,7 +143,6 @@ module FastlaneCore
     # Basically this should be used when you actively catch the error
     # and want to show a nice error message to the user
     def user_error!(error_message, options = {})
-      options = { show_github_issues: false, error_info: nil }.merge(options)
       raise FastlaneError.new(options), error_message.to_s
     end
 
