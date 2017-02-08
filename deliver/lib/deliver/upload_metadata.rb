@@ -15,6 +15,10 @@ module Deliver
                                 :primary_first_sub_category, :primary_second_sub_category,
                                 :secondary_first_sub_category, :secondary_second_sub_category]
 
+    # Review information values
+    REVIEW_INFORMATION_VALUES = [:first_name, :last_name, :phone_number,
+                                 :email_address, :demo_user, :demo_password, :notes]
+
     # Localized app details values, that are editable in live state
     LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url]
 
@@ -182,6 +186,17 @@ module Deliver
 
         UI.message("Loading '#{path}'...")
         options[key] ||= File.read(path)
+      end
+
+      # Load review information
+      options[:app_review_information] ||= {}
+      REVIEW_INFORMATION_VALUES.each do |key|
+        path = File.join(options[:metadata_path], "review_information", "#{key}.txt")
+        next unless File.exist?(path)
+        next if options[:app_review_information][key]
+
+        UI.message("Loading '#{path}'...")
+        options[:app_review_information][key] ||= File.read(path)
       end
     end
 
