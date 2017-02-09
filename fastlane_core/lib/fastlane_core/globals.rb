@@ -16,7 +16,7 @@ module FastlaneCore
     end
 
     def self.captured_output?
-       @capture_output && @captured_output.length > 0
+      @capture_output && @captured_output.length > 0
     end
 
     def self.verbose?
