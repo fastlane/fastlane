@@ -1,10 +1,7 @@
 module FastlaneCore
   class Globals
     def self.captured_output
-      unless @captured_output
-        @captured_output = ""
-      end
-      @captured_output
+      @captured_output || = ""
     end
 
     class << self
@@ -19,10 +16,7 @@ module FastlaneCore
     end
 
     def self.captured_output?
-      if @capture_output && @captured_output.length > 0
-        return true
-      end
-      return false
+       @capture_output && @captured_output.length > 0
     end
 
     def self.verbose?
