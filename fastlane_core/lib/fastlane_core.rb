@@ -1,6 +1,7 @@
 require 'json'
 require 'fastlane/version'
 
+require 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 

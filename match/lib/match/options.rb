@@ -79,7 +79,7 @@ module Match
                                      is_string: false,
                                      default_value: false,
                                      verify_block: proc do |value|
-                                       $verbose = true if value
+                                       FastlaneCore::Globals.verbose = true if value
                                      end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "MATCH_FORCE",

@@ -21,7 +21,7 @@ module Match
       program :help, 'GitHub', 'https://github.com/fastlane/match'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
 

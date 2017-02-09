@@ -39,7 +39,7 @@ module Deliver
 
       FastlaneCore::CommanderGenerator.new.generate(deliverfile_options)
 
-      global_option('--verbose') { $verbose = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       always_trace!
 

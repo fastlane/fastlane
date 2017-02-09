@@ -96,7 +96,7 @@ module Gym
     # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
-      print_command(command, "Generated Build Command") if $verbose
+      print_command(command, "Generated Build Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: !Gym.config[:silent],
@@ -119,7 +119,7 @@ module Gym
 
     def package_app
       command = PackageCommandGenerator.generate
-      print_command(command, "Generated Package Command") if $verbose
+      print_command(command, "Generated Package Command") if FastlaneCore::Globals.verbose?
 
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: false,
@@ -168,7 +168,7 @@ module Gym
         # we have to remove it first, otherwise cp_r fails even with remove_destination
         # e.g.: there are symlinks in the .framework
         if File.exist?(existing_file)
-          UI.important "Removing #{File.basename(f)} from output directory" if $verbose
+          UI.important "Removing #{File.basename(f)} from output directory" if FastlaneCore::Globals.verbose?
           FileUtils.rm_rf(existing_file)
         end
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)

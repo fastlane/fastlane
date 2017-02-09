@@ -29,7 +29,7 @@ module Gym
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/gym"
       program :help_formatter, :compact
 
-      global_option("--verbose") { $verbose = true }
+      global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 
       command :build do |c|
         c.syntax = "fastlane gym"

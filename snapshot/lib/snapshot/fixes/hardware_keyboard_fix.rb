@@ -7,7 +7,7 @@ module Snapshot
       def self.patch
         UI.verbose "Patching simulator to work with secure text fields"
 
-        Helper.backticks("defaults write com.apple.iphonesimulator ConnectHardwareKeyboard 0", print: $verbose)
+        Helper.backticks("defaults write com.apple.iphonesimulator ConnectHardwareKeyboard 0", print: FastlaneCore::Globals.verbose?)
       end
     end
   end
