@@ -49,6 +49,29 @@ describe Fastlane do
         end.to raise_error("Symbols on path '#{File.expand_path('./notHere.dSYM.zip')}' not found")
       end
 
+      it "allows to send a dsym only" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+            hockey({
+              api_token: 'xxx',
+              upload_dsym_only: true,
+              dsym: './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
+            })
+          end").runner.execute(:test)
+
+        expect(values[:notify]).to eq(1.to_s)
+        expect(values[:status]).to eq(2.to_s)
+        expect(values[:notes]).to eq("No changelog given")
+        expect(values[:release_type]).to eq(0.to_s)
+        expect(values.key?(:tags)).to eq(false)
+        expect(values.key?(:teams)).to eq(false)
+        expect(values.key?(:owner_id)).to eq(false)
+        expect(values.key?(:ipa)).to eq(false)
+        expect(values[:mandatory]).to eq(0.to_s)
+        expect(values[:notes_type]).to eq(1.to_s)
+        expect(values[:upload_dsym_only]).to eq(true)
+        expect(values[:strategy]).to eq("add")
+      end
+
       it "raises an error if both ipa and apk provided" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -88,15 +111,15 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(values[:notify]).to eq(1.to_s)
-        expect(values[:status]).to eq(2.to_s)
+        expect(values[:notify]).to eq("1")
+        expect(values[:status]).to eq("2")
         expect(values[:notes]).to eq("No changelog given")
-        expect(values[:release_type]).to eq(0.to_s)
-        expect(values[:tags]).to eq(nil)
-        expect(values[:teams]).to eq(nil)
-        expect(values[:owner_id]).to eq(nil)
-        expect(values[:mandatory]).to eq(0.to_s)
-        expect(values[:notes_type]).to eq(1.to_s)
+        expect(values[:release_type]).to eq("0")
+        expect(values.key?(:tags)).to eq(false)
+        expect(values.key?(:teams)).to eq(false)
+        expect(values.key?(:owner_id)).to eq(false)
+        expect(values[:mandatory]).to eq("0")
+        expect(values[:notes_type]).to eq("1")
         expect(values[:upload_dsym_only]).to eq(false)
         expect(values[:strategy]).to eq("add")
       end
@@ -170,7 +193,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(values[:mandatory]).to eq(1.to_s)
+        expect(values[:mandatory]).to eq("1")
       end
 
       it "can change tags" do
@@ -220,7 +243,7 @@ describe Fastlane do
         expect(values[:strategy]).to eq("replace")
       end
 
-      it "raises an error if supplied dsym file was not found" do
+      it "raises an error if supplied strategy was invalid" do
         expect do
           values = Fastlane::FastFile.new.parse("lane :test do
             hockey({
