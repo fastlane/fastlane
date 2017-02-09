@@ -33,7 +33,7 @@ describe FastlaneCore do
 
       expected_command = "open -a #{FastlaneCore::Helper.xcode_path}Applications/Simulator.app --args -CurrentDeviceUDID #{device.udid}"
 
-      expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+      expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
       FastlaneCore::Simulator.launch(device)
     end

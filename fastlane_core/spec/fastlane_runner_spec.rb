@@ -95,7 +95,7 @@ describe Commander::Runner do
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
-    it 'should abort and show custom info for errors that have the Apple error info provider method with $verbose=false' do
+    it 'should abort and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=false' do
       runner = Commander::Runner.new
       expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
 
@@ -104,7 +104,7 @@ describe Commander::Runner do
       end
     end
 
-    it 'should reraise and show custom info for errors that have the Apple error info provider method with $verbose=true' do
+    it 'should reraise and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=true' do
       with_verbose(true) do
         expect do
           Commander::Runner.new.handle_unknown_error!(CustomError.new)

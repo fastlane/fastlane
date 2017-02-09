@@ -11,8 +11,8 @@ describe Match do
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: $verbose)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: FastlaneCore::Globals.verbose?)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', 'login.keychain')
       end
@@ -27,8 +27,8 @@ describe Match do
         expect(File).to receive(:exist?).with('/my/special.keychain').and_return(true)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: $verbose)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: FastlaneCore::Globals.verbose?)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', '/my/special.keychain')
       end
@@ -51,8 +51,8 @@ describe Match do
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
         expect(File).to receive(:exist?).with("item.path").and_return(true)
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: $verbose)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+        allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: FastlaneCore::Globals.verbose?)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', "login.keychain")
       end

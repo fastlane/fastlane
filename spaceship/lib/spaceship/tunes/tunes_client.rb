@@ -103,7 +103,7 @@ module Spaceship
       t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
       if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
-        puts "Looking for iTunes Connect Team with name #{t_name}" if $verbose
+        puts "Looking for iTunes Connect Team with name #{t_name}" if Spaceship::Globals.verbose?
 
         teams.each do |t|
           t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
@@ -115,7 +115,7 @@ module Spaceship
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
-        puts "Looking for iTunes Connect Team with ID #{t_id}" if $verbose
+        puts "Looking for iTunes Connect Team with ID #{t_id}" if Spaceship::Globals.verbose?
 
         # actually set the team id here
         self.team_id = t_id

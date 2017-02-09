@@ -30,7 +30,7 @@ module Snapshot
         screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
         output_path = File.join(language_folder, screenshot_name)
         from_path = File.join(attachments_path, filename)
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
         else
           UI.success "Copying '#{output_path}'..."

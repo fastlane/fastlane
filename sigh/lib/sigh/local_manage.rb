@@ -86,7 +86,7 @@ module Sigh
     end
 
     def self.profile_info(profile)
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         "#{profile['Name']} - #{File.basename profile['Path']}"
       else
         profile['Name']

@@ -20,7 +20,7 @@ module Cert
       program :help, 'GitHub', 'https://github.com/fastlane/cert'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
 
