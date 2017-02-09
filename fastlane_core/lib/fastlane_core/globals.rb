@@ -1,7 +1,7 @@
 module FastlaneCore
   class Globals
     def self.captured_output
-      @captured_output || = ""
+      @captured_output ||= ""
     end
 
     class << self
