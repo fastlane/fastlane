@@ -74,7 +74,7 @@ describe Scan do
       end.to raise_error "Project file not found at path '/notExistent'"
     end
 
-    describe ":toolchain" do
+    describe "Supports toolchain" do
       it "should fail if :xctestrun and :toolchain is set" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -86,7 +86,8 @@ describe Scan do
           end").runner.execute(:test)
         end.to raise_error("Unresolved conflict between options: 'toolchain' and 'xctestrun'")
       end
-      it "Supports toolchain" do
+
+      it "passes the toolchain option to xcodebuild" do
         options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
