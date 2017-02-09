@@ -70,12 +70,14 @@ module Deliver
 
       # get App icon + watch icon
       if v.large_app_icon.asset_token
-        app_icon_path = File.join(path, "app_icon.png")
+        app_icon_extension = File.extname(v.large_app_icon.url)
+        app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
         File.write(app_icon_path, open(v.large_app_icon.url).read)
         UI.success("Successfully downloaded large app icon")
       end
       if v.watch_app_icon.asset_token
-        watch_icon_path = File.join(path, "watch_icon.png")
+        watch_app_icon_extension = File.extname(v.watch_app_icon.url)
+        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
         File.write(watch_icon_path, open(v.watch_app_icon.url).read)
         UI.success("Successfully downloaded watch icon")
       end
