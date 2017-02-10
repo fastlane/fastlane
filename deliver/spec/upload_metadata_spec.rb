@@ -8,7 +8,7 @@ describe Deliver::UploadMetadata do
   describe '#load_from_filesystem' do
     context 'with review information' do
       let(:tmpdir) { Dir.mktmpdir }
-      let(:options) { {metadata_path: tmpdir, app_review_information: app_review_information} }
+      let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
 
       def create_metadata(path, text)
         File.open(File.join(path), 'w') do |f|
@@ -25,7 +25,7 @@ describe Deliver::UploadMetadata do
           email_address: 'deliver@example.com',
           demo_user: 'user',
           demo_password: 'password',
-          notes: 'This is a note from file',
+          notes: 'This is a note from file'
         }.each do |prefix, text|
           create_metadata(File.join(base_dir, "#{prefix}.txt"), text)
         end
@@ -46,7 +46,7 @@ describe Deliver::UploadMetadata do
       end
 
       context 'with app_review_information' do
-        let(:app_review_information) { {notes: 'This is a note from option'} }
+        let(:app_review_information) { { notes: 'This is a note from option' } }
         it 'values will be masked by the in options' do
           uploader.load_from_filesystem(options)
           expect(options[:app_review_information][:first_name]).to eql('Alice')

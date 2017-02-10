@@ -20,16 +20,14 @@ describe Deliver do
     describe '#generate_metadata_files' do
       context 'with review_information' do
         let(:version) do
-          double(
-              'version',
-              review_first_name: 'John',
-              review_last_name: 'Smith',
-              review_phone_number: '+819012345678',
-              review_email: 'deliver@example.com',
-              review_demo_user: 'user',
-              review_demo_password: 'password',
-              review_notes: 'This is a note',
-          )
+          double('version',
+                 review_first_name: 'John',
+                 review_last_name: 'Smith',
+                 review_phone_number: '+819012345678',
+                 review_email: 'deliver@example.com',
+                 review_demo_user: 'user',
+                 review_demo_password: 'password',
+                 review_notes: 'This is a note')
         end
         let(:application) { double('application') }
         let(:setup) { Deliver::Setup.new }
