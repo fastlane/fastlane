@@ -42,7 +42,7 @@ module Fastlane
                                icon_url: icon_url,
                                attachments: [slack_attachment]
 
-        if result.code.to_i == 200
+        if (200..299) === result.code.to_i
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
