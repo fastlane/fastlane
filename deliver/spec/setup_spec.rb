@@ -48,6 +48,10 @@ describe Deliver do
             expect(File.exist?(File.join(base_dir, "#{filename}.txt"))).to be_truthy
           end
         end
+
+        after do
+          FileUtils.remove_entry_secure(tempdir)
+        end
       end
     end
   end

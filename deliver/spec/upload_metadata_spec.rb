@@ -1,6 +1,5 @@
 require 'deliver/upload_metadata'
 require 'tempfile'
-require 'fileutils'
 
 describe Deliver::UploadMetadata do
   let(:uploader) { Deliver::UploadMetadata.new }
