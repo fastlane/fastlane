@@ -307,3 +307,24 @@ lane :donate_food do
     )
   end
 end
+
+desc "Display git statistics about number of commits, files, lines changed and days between the last releases"
+lane :git_stats do
+  count = 25
+  last_tags = `git tag --sort version:refname | grep "^[0-9]" | tail -#{count}`.split("\n")
+  count = last_tags.count
+  last_tags << 'HEAD'
+  datetimes = last_tags.map do |commit|
+    unixtimestamp = `git log #{commit} -n 1 --format=%ct;`.strip
+    DateTime.strptime(unixtimestamp, '%s')
+  end
+  last_tags.each_with_index do |t, i|
+    break if i == count
+    n = last_tags[i + 1]
+    puts "Comparing: #{t}, #{n}"
+    commit_count = `git log --pretty=oneline #{t}..#{n}^1 | wc -l`.strip
+    shortstat = `git diff --shortstat #{t} #{n}`.strip
+    timediff = (datetimes[i + 1] - datetimes[i]).to_f.round(1)
+    puts "#{commit_count} commit(s) #{shortstat} #{timediff} day(s)"
+  end
+end
