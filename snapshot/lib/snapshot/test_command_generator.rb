@@ -44,7 +44,7 @@ module Snapshot
 
         build_settings = []
         build_settings << "FASTLANE_SNAPSHOT=YES"
-        build_settings << "TEST_TARGET_NAME='#{config[:test_target_name]}'" if config[:test_target_name]
+        build_settings << "TEST_TARGET_NAME=#{config[:test_target_name].shellescape}" if config[:test_target_name]
 
         build_settings
       end
