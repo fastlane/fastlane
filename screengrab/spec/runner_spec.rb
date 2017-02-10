@@ -125,7 +125,7 @@ describe Screengrab::Runner do
         ADB_OUTPUT
         mock_adb_response_for_command(adb_list_devices_command, adb_response)
 
-        expect(@runner.select_device).to eq('T065002LTT')
+        expect(@runner.select_device).to eq('Something else')
       end
     end
 
