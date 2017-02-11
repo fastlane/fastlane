@@ -24,7 +24,7 @@ module Fastlane
 
         if params[:exclude_dirs]
           params[:exclude_dirs].each do |dir|
-            command << " --exclude-dir #{dir}"
+            command << " --exclude-dir #{dir.shellescape}"
           end
         end
 
