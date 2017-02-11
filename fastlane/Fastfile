@@ -228,10 +228,10 @@ desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do
   # Verifying that no debug code is in the code base
   #
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "**/*/playground.rb") # debugging code
-  ensure_no_debug_code(text: "# TODO", extension: ".rb") # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb") # rspec focus
-  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb") # Merge conflict
+  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
+  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
 
   rubocop
 
@@ -252,7 +252,7 @@ private_lane :validate_repo do
 
   Dir.chdir("..") do
     # Install the bundle and the actual gem
-    sh "bundle install"
+    sh "bundle check || bundle install"
     sh "rake install"
 
     # Run the tests
@@ -260,7 +260,7 @@ private_lane :validate_repo do
     sh "bundle exec rake test_all"
 
     # Verify shell code style
-    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -exec shellcheck {} +'
+    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
   # Verify docs are still working
