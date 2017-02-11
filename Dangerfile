@@ -8,7 +8,7 @@ end
 
 # Contributors should always provide a changelog when submitting a PR
 if github.pr_body.length < 5
-  warn("Please provide a changelog summary in the Pull Request description @#{pr_author}")
+  warn("Please provide a changelog summary in the Pull Request description @#{github.pr_author}")
 end
 
 # We want contributors to create an issue first before submitting a PR
