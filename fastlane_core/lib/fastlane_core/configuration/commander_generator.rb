@@ -6,7 +6,7 @@ module FastlaneCore
     include Commander::Methods
 
     # Calls the appropriate methods for commander to show the available parameters
-    def generate(options)
+    def generate(options, command: nil)
       # First, enable `always_trace`, to show the stack trace
       always_trace!
 
