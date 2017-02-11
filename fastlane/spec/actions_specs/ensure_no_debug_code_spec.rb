@@ -42,6 +42,27 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}'")
       end
+
+      it "handles the exclude_dirs parameter with no elements correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: [])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}'")
+      end
+
+      it "handles the exclude_dirs parameter with a single element correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['.bundle'])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir .bundle")
+      end
+
+      it "handles the exclude_dirs parameter with multiple  elements correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['.bundle', 'Packages/'])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir .bundle --exclude-dir Packages/")
+      end
     end
   end
 end
