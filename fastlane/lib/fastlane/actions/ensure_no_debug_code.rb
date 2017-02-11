@@ -95,6 +95,7 @@ module Fastlane
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
                                        description: "An array of dirs that should not be included in the search",
                                        optional: true,
+                                       type: Array,
                                        is_string: false)
         ]
       end
