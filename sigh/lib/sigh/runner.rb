@@ -247,7 +247,7 @@ module Sigh
       UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
       UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
       UI.message ""
-      UI.message "produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
       UI.message ""
       UI.message "You will be asked for any missing information, like the full name of your app"
       UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
