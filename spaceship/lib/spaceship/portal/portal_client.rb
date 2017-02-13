@@ -452,16 +452,22 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles(mac: false)
-      req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
-        r.params = {
-          teamId: team_id,
-          includeInactiveProfiles: true,
-          onlyCountLists: true
-        }
-      end
+      page_size = 10
+      paging do |page_number|
+        req = request(:post) do |r|
+          r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
+          r.params = {
+            teamId: team_id,
+            includeInactiveProfiles: true,
+            onlyCountLists: true,
+            pageSize: page_size,
+            pageNumber: page_number,
+            sort: "name=dasc"
+          }
+        end
 
-      parse_response(req, 'provisioningProfiles')
+        parse_response(req, 'provisioningProfiles')
+      end
     end
 
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
