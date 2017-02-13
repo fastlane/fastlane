@@ -584,6 +584,7 @@ module Spaceship
         lang_details = languages[0]
         display_families = lang_details["displayFamilies"]["value"]
         device_details = display_families.find { |display_family| display_family['name'] == device }
+        raise "Couldn't find device familiy for #{device}" if device_details.nil?
         raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
         return device_details[data_field]
       rescue => ex
