@@ -61,7 +61,8 @@ module Pilot
           return
         end
 
-        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
+        type = options[:distribute_external] ? 'External' : 'Internal'
+        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> #{type}")
       end
 
       unless config[:update_build_info_on_upload]
