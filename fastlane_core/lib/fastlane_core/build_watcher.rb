@@ -74,5 +74,7 @@ module FastlaneCore
         UI.user_error!("Error: Seems like iTunes Connect didn't properly pre-process the binary")
       end
     end
+
+    private_class_method :wait_for_train
   end
 end
