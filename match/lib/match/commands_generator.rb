@@ -31,7 +31,7 @@ module Match
 
         c.action do |args, options|
           if args.count > 0
-            FastlaneCore::UI.user_error!("Please run `match [type]`, allowed values: development, adhoc or appstore")
+            FastlaneCore::UI.user_error!("Please run `fastlane match [type]`, allowed values: development, adhoc or appstore")
           end
 
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -97,7 +97,7 @@ module Match
         c.syntax = "fastlane match nuke"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
         c.action do |args, options|
-          FastlaneCore::UI.user_error!("Please run `match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
+          FastlaneCore::UI.user_error!("Please run `fastlane match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
         end
       end
 

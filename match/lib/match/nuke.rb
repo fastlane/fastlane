@@ -23,7 +23,7 @@ module Match
       print_tables
 
       if params[:readonly]
-        UI.user_error!("`match nuke` doesn't delete anything when running with --readonly enabled")
+        UI.user_error!("`fastlane match nuke` doesn't delete anything when running with --readonly enabled")
       end
 
       if (self.certs + self.profiles + self.files).count > 0
