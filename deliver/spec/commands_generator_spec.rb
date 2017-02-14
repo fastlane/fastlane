@@ -2,15 +2,6 @@ require 'deliver/commands_generator'
 require 'deliver/setup'
 
 describe Deliver::CommandsGenerator do
-
-  def expect_run_with_options(expected_options)
-    fake_runner = "runner"
-    expect(Deliver::Runner).to receive(:new) do |actual_options|
-      expect(expected_options._values).to eq(actual_options._values)
-    end.and_return(fake_runner)
-    expect(fake_runner).to receive(:run)
-  end
-
   describe ":run option handling" do
     it "can use the username short flag from tool options" do
       # leaving out the command name defaults to 'run'
@@ -21,7 +12,11 @@ describe Deliver::CommandsGenerator do
         username: 'me@it.com'
       })
 
-      expect_run_with_options(expected_options)
+      fake_runner = "runner"
+      expect(Deliver::Runner).to receive(:new) do |actual_options|
+        expect(expected_options._values).to eq(actual_options._values)
+      end.and_return(fake_runner)
+      expect(fake_runner).to receive(:run)
 
       Deliver::CommandsGenerator.start
     end
@@ -35,7 +30,11 @@ describe Deliver::CommandsGenerator do
         app_identifier: 'abcd'
       })
 
-      expect_run_with_options(expected_options)
+      fake_runner = "runner"
+      expect(Deliver::Runner).to receive(:new) do |actual_options|
+        expect(expected_options._values).to eq(actual_options._values)
+      end.and_return(fake_runner)
+      expect(fake_runner).to receive(:run)
 
       Deliver::CommandsGenerator.start
     end
