@@ -206,7 +206,7 @@ end
 
 def clone_docs
   require 'tmpdir'
-  git_url = "https://github.com/fastlane/docs"
+  git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
 
   Dir.mktmpdir("fl_clone") do |tmp_dir|
     Dir.chdir(tmp_dir) do
