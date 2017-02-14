@@ -265,6 +265,9 @@ private_lane :validate_repo do
     sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
+  test_generate_docs
+  ensure_code_samples
+
   # Verify docs are still working
   verify_docs
 end
@@ -298,6 +301,13 @@ desc "Add a git tag in the fastlane repo for this release"
 private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
+end
+
+# Run the code samples, yo
+private_lane :ensure_code_samples do
+  UI.message "<U+1F557>  Verifying all code samples work with the latest fastlane release"
+  test_sample_code(path: File.expand_path("docs/Actions.md"))
+  UI.success "<U+2705>  All fastlane code samples work as expected"
 end
 
 lane :donate_food do
