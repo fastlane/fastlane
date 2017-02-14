@@ -82,7 +82,7 @@ module Sigh
       UI.message "#{profiles_soon.count} are valid but will expire within 30 days".yellow
       UI.message "#{profiles_valid.count} are valid".green
 
-      UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
+      UI.message "You can remove all expired profiles using `fastlane sigh manage -e`" if profiles_expired.count > 0
     end
 
     def self.profile_info(profile)

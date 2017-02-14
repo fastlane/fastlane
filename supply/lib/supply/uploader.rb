@@ -5,7 +5,7 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
+      UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
