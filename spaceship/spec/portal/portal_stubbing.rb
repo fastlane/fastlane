@@ -1,280 +1,599 @@
-class PortalStubbing
-  class << self
-    def adp_read_fixture_file(filename)
-      File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+module Spaceship
+  # rubocop:disable Metrics/ClassLength
+  class PortalClient < Spaceship::Client
+    #####################################################
+    # @!group Init and Login
+    #####################################################
+
+    def self.hostname
+      "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/"
     end
 
-    # Necessary, as we're now running this in a different context
-    def stub_request(*args)
-      WebMock::API.stub_request(*args)
+    def send_login_request(user, password)
+      response = send_shared_login_request(user, password)
+      return response if self.cookie.include?("myacinfo")
+
+      # When the user has 2 step enabled, we might have to call this method again
+      # This only occurs when the user doesn't have a team on iTunes Connect
+      # For 2 step verification we use the iTunes Connect back-end
+      # which is enough to get the DES... cookie, however we don't get a valid
+      # myacinfo cookie at that point. That means, after getting the DES... cookie
+      # we have to send the login request again. This will then get us a valid myacinfo
+      # cookie, additionally to the DES... cookie
+      return send_shared_login_request(user, password)
     end
 
-    # Optional: enterprise
-    def adp_enterprise_stubbing
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "9RQEK7MSXA" }).
-        to_return(status: 200, body: adp_read_fixture_file(File.join("enterprise", "listCertRequests.action.json")), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "Q82WC5JRE9", "distributionType" => "inhouse", "provisioningProfileName" => "Delete Me", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
+    # @return (Array) A list of all available teams
+    def teams
+      return @teams if @teams
+      req = request(:post, "https://developer.apple.com/services-account/QH65B2/listTeams.action")
+      @teams = parse_response(req, 'teams').sort_by do |team|
+        [
+          team['name'],
+          team['teamId']
+        ]
+      end
     end
 
-    # Optional: Team Selection
-    def adp_stub_multiple_teams
-      stub_request(:post, 'https://developerservices2.apple.com/services/QH65B2/listTeams.action').
-        to_return(status: 200, body: adp_read_fixture_file('listTeams_multiple.action.json'), headers: { 'Content-Type' => 'application/json' })
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+
+      if teams.count == 0
+        raise "User '#{user}' does not have access to any teams with an active membership"
+      end
+      @current_team_id ||= teams[0]['teamId']
     end
 
-    def adp_stub_login
-      # Most stuff is stubbed in tunes_stubbing (since it's shared)
-      stub_request(:post, 'https://developerservices2.apple.com/services/QH65B2/listTeams.action').
-        to_return(status: 200, body: adp_read_fixture_file('listTeams.action.json'), headers: { 'Content-Type' => 'application/json' })
+    # Shows a team selection for the user in the terminal. This should not be
+    # called on CI systems
+    def select_team
+      @current_team_id = self.UI.select_team
     end
 
-    def adp_stub_provisioning
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action?pageNumber=1&pageSize=1&sort=name=asc&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.plist'), headers: { 'Content-Type' => 'application/x-xml-plist' })
-
-      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file("downloaded_provisioning_profile.mobileprovision"), headers: {})
-
-      # Download profiles
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => true, "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: "", headers: {})
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "2MAY7NPHRF", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfiletvOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "475ESRP5F3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "FB8594WWQG", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAdHoc.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Create Profiles
-
-      # Name is free
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Name already taken
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "taken", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file("create_profile_name_taken.txt"))
-
-      # Repair Profiles
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
-        with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('repair_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
-        with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX", "subPlatform" => "tvOS" }).
-        to_return(status: 200, body: adp_read_fixture_file('repair_profile_tvos_success.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Delete Profiles
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteProvisioningProfile.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # tvOS Profiles
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "C8DL7464RQ", "deviceIds" => "EEEEEEEEEE", "distributionType" => "limited", "provisioningProfileName" => "Delete Me", "subPlatform" => "tvOS", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      @current_team_id = team_id
     end
 
-    def adp_stub_devices
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'iphone', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesiPhone.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'ipod', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesiPod.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'tvOS', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesTV.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesWatch.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'tvOS', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesTV.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesWatch.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevices.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "true" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesDisabled.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/deleteDevice.action').
-        with(body: { "deviceId" => "AAAAAAAAAA", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteDevice.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/enableDevice.action').
-        with(body: { "deviceNumber" => "44ee59893cb94ead4635743b25012e5b9f8c67c1", "displayId" => "DISABLED_B", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('enableDevice.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Register a new device
-      stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/addDevice.action?deviceNumber=7f6c8dc83d77134b5a3a1c53f1202b395b04482b&name=Demo%20Device&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.plist'), headers: { 'Content-Type' => 'application/x-xml-plist' })
-
-      # Custom paging
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesPage1-2.action.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
-        with(body: { "pageNumber" => "2", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesPage2-2.action.json'), headers: { 'Content-Type' => 'application/json' })
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
     end
 
-    def adp_stub_certificates
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,3BQKVH9I2X,FUOY7LWJET" }).
-        to_return(status: 200, body: adp_read_fixture_file('listCertRequests.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => '5QPB9NHCEI' }).
-        to_return(status: 200, body: adp_read_fixture_file("list_certificates_filtered.json"), headers: { 'Content-Type' => 'application/json' })
-
-      # When looking for distribution or development certificates only:
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", 'teamId' => 'XXXXXXXXXX', 'types' => 'R58UK2EWSO' }).
-        to_return(status: 200, body: adp_read_fixture_file("list_certificates_filtered.json"), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
-        to_return(status: 200, body: adp_read_fixture_file('aps_development.cer'))
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
-        with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('submitCertificateRequest.action.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action").
-        with(body: { "certificateId" => "XC5PH8DAAA", "teamId" => "XXXXXXXXXX", "type" => "R58UK2EAAA" }).
-        to_return(status: 200, body: adp_read_fixture_file('revokeCertificate.action.json'), headers: { 'Content-Type' => 'application/json' })
+    # Is the current session from an Enterprise In House account?
+    def in_house?
+      return @in_house unless @in_house.nil?
+      @in_house = (team_information['type'] == 'In-House')
     end
 
-    def adp_stub_apps
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listAppIds.action').
-        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
-        to_return(status: 200, body: adp_read_fixture_file('listApps.action.json'), headers: { 'Content-Type' => 'application/json' })
+    def platform_slug(mac)
+      if mac
+        'mac'
+      else
+        'ios'
+      end
+    end
+    private :platform_slug
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listAppIds.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('listAppsMac.action.json'), headers: { 'Content-Type' => 'application/json' })
+    #####################################################
+    # @!group Apps
+    #####################################################
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/getAppIdDetail.action").
-        with(body: { appIdId: "B7JBD8LHAA", teamId: "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getAppIdDetail.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "name" => "Production App", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "gameCenter" => "on", "inAppPurchase" => "on", "push" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
-        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.explicit.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "name" => "Development App", "identifier" => "tools.fastlane.spaceship.*", "teamId" => "XXXXXXXXXX", "type" => "wildcard" }).
-        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.wildcard.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "pp Test 1ed9e25c93ac7142ff9df53e7f80e84c", "push" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
-        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.apostroph.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteAppId.action").
-        with(body: { "appIdId" => "LXD24VUE49", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteAppId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "Production App", "push" => "true", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
-        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.nopush.json'), headers: { 'Content-Type' => 'application/json' })
+    def apps(mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listAppIds.action", {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'appIds')
+      end
     end
 
-    def adp_stub_persons
-      # get all members
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getTeamMembers").
-        with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
-        to_return(status: 200, body: adp_read_fixture_file("peopleList.json"), headers: { 'Content-Type' => 'application/json' })
-
-      # invite new member
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/sendInvites").
-        with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
-        to_return(status: 200, body: "", headers: {})
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
-        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
-        to_return(status: 200, body: "", headers: {})
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/setTeamMemberRoles").
-        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"role\":\"member\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
-        to_return(status: 200, body: "", headers: {})
+    def details_for_app(app)
+      r = request(:post, "account/#{platform_slug(app.mac?)}/identifiers/getAppIdDetail.action", {
+        teamId: team_id,
+        appIdId: app.app_id
+      })
+      parse_response(r, 'appId')
     end
 
-    def adp_stub_app_groups
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listApplicationGroups.action').
-        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
-        to_return(status: 200, body: adp_read_fixture_file('listApplicationGroups.action.json'), headers: { 'Content-Type' => 'application/json' })
+    def update_service_for_app(app, service)
+      ensure_csrf(Spaceship::App)
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addApplicationGroup.action").
-        with(body: { "name" => "Production App Group", "identifier" => "group.tools.fastlane.spaceship", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
+      request(:post, service.service_uri, {
+        teamId: team_id,
+        displayId: app.app_id,
+        featureType: service.service_id,
+        featureValue: service.value
+      })
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteApplicationGroup.action").
-        with(body: { "applicationGroup" => "2GKKV64NUG", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
+      details_for_app(app)
     end
 
-    def adp_stub_website_pushes
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listWebsitePushIds.action').
-        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
-        to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+    def associate_groups_with_app(app, groups)
+      ensure_csrf(Spaceship::AppGroup)
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listWebsitePushIds.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+      request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
+        teamId: team_id,
+        appIdId: app.app_id,
+        displayId: app.app_id,
+        applicationGroups: groups.map(&:app_group_id)
+      })
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addWebsitePushId.action").
-        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/addWebsitePushId.action").
-        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteWebsitePushId.action").
-        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/deleteWebsitePushId.action").
-        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
+      details_for_app(app)
     end
 
-    def adp_stub_download_certificate_failure
-      stub_request(:get, 'https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA').
-        to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+    def valid_name_for(input)
+      latinized = input.to_slug.transliterate
+      latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      # Check if the input string was modified, since it might be empty now
+      # (if it only contained non-latin symbols) or the duplicate of another app
+      if latinized != input
+        latinized << " "
+        latinized << Digest::MD5.hexdigest(input)
+      end
+      latinized
     end
 
-    def adp_stub_download_provisioning_profile_failure
-      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
-        to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+    def create_app!(type, name, bundle_id, mac: false, enabled_features: {})
+      # We moved the ensure_csrf to the top of this method
+      # as we got some users with issues around creating new apps
+      # https://github.com/fastlane/fastlane/issues/5813
+      ensure_csrf(Spaceship::App)
+
+      ident_params = case type.to_sym
+                     when :explicit
+                       {
+                         type: 'explicit',
+                         identifier: bundle_id,
+                         push: 'on',
+                         inAppPurchase: 'on',
+                         gameCenter: 'on'
+                       }
+                     when :wildcard
+                       {
+                         type: 'wildcard',
+                         identifier: bundle_id
+                       }
+                     end
+
+      params = {
+        name: valid_name_for(name),
+        teamId: team_id
+      }
+      params.merge!(ident_params)
+      enabled_features.each do |k, v|
+        params[v.service_id.to_sym] = v.value
+      end
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
+      parse_response(r, 'appId')
+    end
+
+    def delete_app!(app_id, mac: false)
+      ensure_csrf(Spaceship::App)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteAppId.action", {
+        teamId: team_id,
+        appIdId: app_id
+      })
+      parse_response(r)
+    end
+
+    def update_app_name!(app_id, name, mac: false)
+      ensure_csrf(Spaceship::App)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/updateAppIdName.action", {
+        teamId: team_id,
+        appIdId: app_id,
+        name: valid_name_for(name)
+      })
+      parse_response(r, 'appId')
+    end
+
+    #####################################################
+    # @!group Website Push
+    #####################################################
+
+    def website_push(mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listWebsitePushIds.action", {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        parse_response(r, 'websitePushIdList')
+      end
+    end
+
+    def create_website_push!(name, bundle_id, mac: false)
+      ensure_csrf(Spaceship::WebsitePush)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addWebsitePushId.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'websitePushId')
+    end
+
+    def delete_website_push!(website_id, mac: false)
+      ensure_csrf(Spaceship::WebsitePush)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteWebsitePushId.action", {
+          teamId: team_id,
+          websitePushId: website_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
+    # @!group App Groups
+    #####################################################
+
+    def app_groups
+      paging do |page_number|
+        r = request(:post, 'account/ios/identifiers/listApplicationGroups.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'applicationGroupList')
+      end
+    end
+
+    def create_app_group!(name, group_id)
+      ensure_csrf(Spaceship::AppGroup)
+
+      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
+        name: valid_name_for(name),
+        identifier: group_id,
+        teamId: team_id
+      })
+      parse_response(r, 'applicationGroup')
+    end
+
+    def delete_app_group!(app_group_id)
+      ensure_csrf(Spaceship::AppGroup)
+
+      r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
+        teamId: team_id,
+        applicationGroup: app_group_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
+    # @!group Team
+    #####################################################
+    def team_members
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+        req.body = {
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_set_role(team_member_id, role)
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles"
+        req.body = {
+          teamId: team_id,
+          role: role,
+          teamMemberIds: [team_member_id]
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_remove_member!(team_member_id)
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers"
+        req.body = {
+          teamId: team_id,
+          teamMemberIds: [team_member_id]
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_invite(email, role)
+      ensure_csrf(Spaceship::Portal::Persons)
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/sendInvites"
+        req.body = {
+          invites: [
+            { recipientEmail: email, recipientRole: role }
+          ],
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    #####################################################
+    # @!group Devices
+    #####################################################
+
+    def devices(mac: false, include_disabled: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/device/listDevices.action", {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
+          includeRemovedDevices: include_disabled
+        })
+        parse_response(r, 'devices')
+      end
+    end
+
+    def devices_by_class(device_class, include_disabled: false)
+      paging do |page_number|
+        r = request(:post, 'account/ios/device/listDevices.action', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
+          deviceClasses: device_class,
+          includeRemovedDevices: include_disabled
+        })
+        parse_response(r, 'devices')
+      end
+    end
+
+    def create_device!(device_name, device_id, mac: false)
+      ensure_csrf(Spaceship::Device)
+
+      req = request(:post) do |r|
+        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
+        r.params = {
+          teamId: team_id,
+          deviceNumber: device_id,
+          name: device_name
+        }
+      end
+
+      parse_response(req, 'device')
+    end
+
+    def disable_device!(device_id, device_udid, mac: false)
+      request(:post, "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/device/deleteDevice.action", {
+        teamId: team_id,
+        deviceId: device_id
+      })
+    end
+
+    def enable_device!(device_id, device_udid, mac: false)
+      req = request(:post, "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/device/enableDevice.action", {
+          teamId: team_id,
+          displayId: device_id,
+          deviceNumber: device_udid
+      })
+      parse_response(req, 'device')
+    end
+
+    #####################################################
+    # @!group Certificates
+    #####################################################
+
+    def certificates(types, mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/certificate/listCertRequests.action", {
+          teamId: team_id,
+          types: types.join(','),
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'certRequestStatusCode=asc'
+        })
+        parse_response(r, 'certRequests')
+      end
+    end
+
+    def create_certificate!(type, csr, app_id = nil, mac = false)
+      ensure_csrf(Spaceship::Certificate)
+
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
+        teamId: team_id,
+        type: type,
+        csrContent: csr,
+        appIdId: app_id # optional
+      })
+      parse_response(r, 'certRequest')
+    end
+
+    def download_certificate(certificate_id, type, mac: false)
+      { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
+
+      r = request(:get, "account/#{platform_slug(mac)}/certificate/downloadCertificateContent.action", {
+        teamId: team_id,
+        certificateId: certificate_id,
+        type: type
+      })
+      a = parse_response(r)
+      if r.success? && a.include?("Apple Inc")
+        return a
+      else
+        raise UnexpectedResponse.new, "Couldn't download certificate, got this instead: #{a}"
+      end
+    end
+
+    def revoke_certificate!(certificate_id, type, mac: false)
+      ensure_csrf(Spaceship::Certificate)
+
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
+        teamId: team_id,
+        certificateId: certificate_id,
+        type: type
+      })
+      parse_response(r, 'certRequests')
+    end
+
+    #####################################################
+    # @!group Provisioning Profiles
+    #####################################################
+
+    def provisioning_profiles(mac: false)
+      req = request(:post) do |r|
+        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          includeInactiveProfiles: true,
+          onlyCountLists: true
+        }
+      end
+
+      parse_response(req, 'provisioningProfiles')
+    end
+
+    def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
+      r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
+        teamId: team_id,
+        provisioningProfileId: provisioning_profile_id
+      })
+      parse_response(r, 'provisioningProfile')
+    end
+
+    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
+
+      params = {
+        teamId: team_id,
+        provisioningProfileName: name,
+        appIdId: app_id,
+        distributionType: distribution_method,
+        certificateIds: certificate_ids,
+        deviceIds: device_ids
+      }
+      params[:subPlatform] = sub_platform if sub_platform
+
+      r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", params)
+      parse_response(r, 'provisioningProfile')
+    end
+
+    def download_provisioning_profile(profile_id, mac: false)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
+
+      r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
+        teamId: team_id,
+        provisioningProfileId: profile_id
+      })
+      a = parse_response(r)
+      if r.success? && a.include?("DOCTYPE plist PUBLIC")
+        return a
+      else
+        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
+      end
+    end
+
+    def delete_provisioning_profile!(profile_id, mac: false)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
+
+      r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
+        teamId: team_id,
+        provisioningProfileId: profile_id
+      })
+      parse_response(r)
+    end
+
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
+
+      params = {
+          teamId: team_id,
+          provisioningProfileId: profile_id,
+          provisioningProfileName: name,
+          appIdId: app_id,
+          distributionType: distribution_method,
+          certificateIds: certificate_ids.join(','),
+          deviceIds: device_ids
+      }
+      params[:subPlatform] = sub_platform if sub_platform
+
+      r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", params)
+
+      parse_response(r, 'provisioningProfile')
+    end
+
+    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
+    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
+    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
+    # This method is being called from all requests that modify, create or downloading provisioning
+    # profiles.
+    # Source https://github.com/fastlane/fastlane/issues/5903
+    def fetch_csrf_token_for_provisioning(mac: false)
+      req = request(:post) do |r|
+        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          pageSize: 1,
+          pageNumber: 1,
+          sort: "name=asc"
+        }
+      end
+
+      parse_response(req, 'provisioningProfiles')
+      return nil
+    end
+
+    private
+
+    # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
+    def csrf_cache
+      @csrf_cache || {}
+    end
+
+    # Ensures that there are csrf tokens for the appropriate entity type
+    # Relies on store_csrf_tokens to set csrf_tokens to the appropriate value
+    # then stores that in the correct place in cache
+    # This method also takes a block, if you want to send a custom request, instead of
+    # calling `.all` on the given klass. This is used for provisioning profiles.
+    def ensure_csrf(klass)
+      if csrf_cache[klass]
+        self.csrf_tokens = csrf_cache[klass]
+        return
+      end
+
+      self.csrf_tokens = nil
+
+      # If we directly create a new resource (e.g. app) without querying anything before
+      # we don't have a valid csrf token, that's why we have to do at least one request
+      block_given? ? yield : klass.all
+
+      # Update 18th August 2016
+      # For some reason, we have to query the resource twice to actually get a valid csrf_token
+      # I couldn't find out why, the first response does have a valid Set-Cookie header
+      # But it still needs this second request
+      block_given? ? yield : klass.all
+
+      csrf_cache[klass] = self.csrf_tokens
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
