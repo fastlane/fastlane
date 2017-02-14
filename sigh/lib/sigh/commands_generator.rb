@@ -60,6 +60,8 @@ module Sigh
         c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
 
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
+
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
           Sigh::Manager.download_all
@@ -69,6 +71,8 @@ module Sigh
       command :repair do |c|
         c.syntax = 'fastlane sigh repair'
         c.description = 'Repairs all expired or invalid provisioning profiles'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
