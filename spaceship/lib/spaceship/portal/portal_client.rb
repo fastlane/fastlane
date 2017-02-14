@@ -26,7 +26,7 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
       return @teams if @teams
-      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
+      req = request(:post, "https://developer.apple.com/services-account/QH65B2/account/listTeams.action")
       @teams = parse_response(req, 'teams').sort_by do |team|
         [
           team['name'],
