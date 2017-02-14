@@ -20,7 +20,8 @@ module Deliver
 
       options[:app_identifier] = identifier if identifier.to_s.length > 0
       options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
-    rescue
+    rescue => ex
+      UI.error(ex)
       UI.user_error!("Could not infer your App's Bundle Identifier")
     end
 
