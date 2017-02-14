@@ -7,7 +7,7 @@ dependencies:
   pre:
     - brew install shellcheck
   override:
-    - bundle install --jobs=4 --retry=3
+    - bundle check || bundle install --jobs=4 --retry=3 --path .bundle
 test:
   pre:
     - ulimit -n 400
