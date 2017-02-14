@@ -453,7 +453,6 @@ module Spaceship
 
     def provisioning_profiles(mac: false)
       req = request(:post) do |r|
-        #https://developer.apple.com/services-account/QH65B2/account/ios/profile/
         r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action"
         r.params = {
           teamId: team_id,
