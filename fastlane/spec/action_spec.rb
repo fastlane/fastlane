@@ -62,7 +62,7 @@ describe Fastlane do
 
         response = {
           rocket: "🚀",
-          pwd: File.join(Dir.pwd, "fastlane")
+          pwd: Dir.pwd
         }
         expect(ff.runner.execute(:something, :ios)).to eq(response)
         expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from'])
