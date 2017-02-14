@@ -354,7 +354,7 @@ module Fastlane
             api_token: "...",
             create_update: true,
             public_identifier: "....",
-            bundle_short_version: "1.0.2,
+            bundle_short_version: "1.0.2",
             bundle_version: "1.0.2.145",
             ipa: "./my.msi",
             notes: "Changelog"
