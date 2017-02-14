@@ -117,14 +117,16 @@ lane :release do
     release_notes = github_release['body']
     # markup - turn github references into links
     release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
+    slack_message = "Successfully released [fastlane #{version}](#{release_url}) :rocket:"
     slack(
       channel: "releases",
       default_payloads: [],
-      message: "Successfully released [fastlane #{version}](#{release_url}) :rocket:",
+      message: slack_message,
       payload: {
         "New" => release_notes
       }
     )
+    slack(channel: "action", default_payloads: [], message: slack_message)
   end
 
   clubmate
