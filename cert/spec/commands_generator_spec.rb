@@ -8,7 +8,7 @@ describe Cert::CommandsGenerator do
   end
 
   describe ":create option handling" do
-    it "username short flag from tool options can be used" do
+    it "can use the username short flag from tool options" do
       # leaving out the command name defaults to 'create'
       stub_commander_runner_args(['-u', 'me@it.com'])
 
@@ -21,7 +21,7 @@ describe Cert::CommandsGenerator do
       expect(Cert.config[:username]).to eq('me@it.com')
     end
 
-    it "platform flag from tool options can be used" do
+    it "can use the platform flag from tool options" do
       # leaving out the command name defaults to 'create'
       stub_commander_runner_args(['--platform', 'macos'])
 
@@ -36,7 +36,7 @@ describe Cert::CommandsGenerator do
   end
 
   describe ":revoke_expired option handling" do
-    it "development flag from tool options can be used" do
+    it "can use the development flag from tool options" do
       stub_commander_runner_args(['revoke_expired', '--development', 'true'])
 
       # revoke_expired_certs! takes no params, but we want to expect the call
@@ -48,7 +48,7 @@ describe Cert::CommandsGenerator do
       expect(Cert.config[:development]).to be(true)
     end
 
-    it "output_path short flag from tool options can be used" do
+    it "can use the output_path short flag from tool options" do
       stub_commander_runner_args(['revoke_expired', '-o', 'output/path'])
 
       # revoke_expired_certs! takes no params, but we want to expect the call
