@@ -37,7 +37,13 @@ module Commander
         collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
-        abort "#{e}. Use --help for more information"
+        # calling `abort` makes it likely that tests stop without failing, so
+        # we'll disable that during tests.
+        if FastlaneCore::Helper.test?
+          raise e
+        else
+          abort "#{e}. Use --help for more information"
+        end
       rescue Interrupt => ex
         # We catch it so that the stack trace is hidden by default when using ctrl + c
         if FastlaneCore::Globals.verbose?
@@ -49,7 +55,13 @@ module Commander
         OptionParser::InvalidOption,
         OptionParser::InvalidArgument,
         OptionParser::MissingArgument => e
-        abort e.to_s
+        # calling `abort` makes it likely that tests stop without failing, so
+        # we'll disable that during tests.
+        if FastlaneCore::Helper.test?
+          raise e
+        else
+          abort e.to_s
+        end
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
@@ -159,10 +171,12 @@ module Commander
     end
 
     def display_user_error!(e, message)
-      if FastlaneCore::Globals.verbose? # with stack trace
+      if FastlaneCore::Globals.verbose?
+        # with stack trace
         reraise_formatted!(e, message)
       else
-        abort "\n[!] #{message}".red # without stack trace
+        # without stack trace
+        abort "\n[!] #{message}".red
       end
     end
 
