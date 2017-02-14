@@ -19,7 +19,9 @@ def before_each_spaceship
   ENV["DELIVER_PASSWORD"] = "so_secret"
   ENV.delete("FASTLANE_USER")
 
+  TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
+
   PortalStubbing.adp_stub_provisioning
   PortalStubbing.adp_stub_devices
   PortalStubbing.adp_stub_certificates
@@ -28,7 +30,6 @@ def before_each_spaceship
   PortalStubbing.adp_stub_persons
   PortalStubbing.adp_stub_website_pushes
 
-  TunesStubbing.itc_stub_login
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions
   TunesStubbing.itc_stub_build_trains
