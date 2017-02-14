@@ -35,7 +35,7 @@ module Fastlane
         end
 
         ENV.delete("CI")
-        UI.user_error!("Found at #{errors.count} errors in the documentation") unless errors.empty?
+        UI.user_error!("Found #{errors.count} errors in the documentation") unless errors.empty?
       end
 
       # Is used to look if the method is implemented as an action
