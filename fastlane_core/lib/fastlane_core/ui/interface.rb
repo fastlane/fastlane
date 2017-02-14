@@ -16,7 +16,7 @@ module FastlaneCore
     end
 
     # Level Important: Can be used to show warnings to the user
-    #   not necessarly negative, but something the user should
+    #   not necessarily negative, but something the user should
     #   be aware of.
     #
     #   By default those messages are shown in yellow
