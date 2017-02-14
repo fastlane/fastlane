@@ -76,7 +76,7 @@ module Deliver
       options[:app_icon] ||= default_app_icon_path if default_app_icon_path && File.exist?(default_app_icon_path)
 
       default_watch_icon_path = Dir[File.join(options[:metadata_path], "watch_icon.{png,jpg}")].first
-      options[:app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
+      options[:apple_watch_app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
     end
 
     # Upload the binary to iTunes Connect
