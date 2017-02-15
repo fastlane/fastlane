@@ -26,7 +26,7 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
       return @teams if @teams
-      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
+      req = request(:post, "account/listTeams.action")
       @teams = parse_response(req, 'teams').sort_by do |team|
         [
           team['name'],
@@ -363,16 +363,15 @@ module Spaceship
     def create_device!(device_name, device_id, mac: false)
       ensure_csrf(Spaceship::Device)
 
-      req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
-        r.params = {
-          teamId: team_id,
-          deviceNumber: device_id,
-          name: device_name
-        }
-      end
+      req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
+        teamId: team_id,
+        # deviceClasses: 'iphone',
+        deviceNumbers: device_id,
+        deviceNames: device_name,
+        register: 'single'
+      })
 
-      parse_response(req, 'device')
+      parse_response(req, 'devices').first
     end
 
     def disable_device!(device_id, device_udid, mac: false)
@@ -452,16 +451,18 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles(mac: false)
-      req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
-        r.params = {
+      paging do |page_number|
+        req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
           teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
           includeInactiveProfiles: true,
           onlyCountLists: true
-        }
-      end
+        })
 
-      parse_response(req, 'provisioningProfiles')
+        parse_response(req, 'provisioningProfiles')
+      end
     end
 
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
@@ -473,10 +474,6 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
       params = {
         teamId: team_id,
         provisioningProfileName: name,
@@ -492,10 +489,6 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -509,10 +502,6 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -521,10 +510,6 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
       params = {
           teamId: team_id,
           provisioningProfileId: profile_id,
@@ -539,27 +524,6 @@ module Spaceship
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", params)
 
       parse_response(r, 'provisioningProfile')
-    end
-
-    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
-    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
-    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
-    # This method is being called from all requests that modify, create or downloading provisioning
-    # profiles.
-    # Source https://github.com/fastlane/fastlane/issues/5903
-    def fetch_csrf_token_for_provisioning(mac: false)
-      req = request(:post) do |r|
-        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action"
-        r.params = {
-          teamId: team_id,
-          pageSize: 1,
-          pageNumber: 1,
-          sort: "name=asc"
-        }
-      end
-
-      parse_response(req, 'provisioningProfiles')
-      return nil
     end
 
     private

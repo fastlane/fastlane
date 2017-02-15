@@ -174,9 +174,6 @@ module Spaceship
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
-          # eagerload the Apps using the same client if we have to.
-          attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
-
           klass.client = @client
           obj = klass.new(attrs)
 
@@ -474,7 +471,13 @@ module Spaceship
           end
         end
 
-        return @certificates
+        @certificates
+      end
+
+      def app
+        fetch_details
+
+        App.set_client(client).new(profile_details['appId'])
       end
 
       # @return (Bool) Is this current provisioning profile adhoc?

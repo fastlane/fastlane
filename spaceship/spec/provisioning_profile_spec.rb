@@ -7,7 +7,7 @@ describe Spaceship::ProvisioningProfile do
     let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 
     it "properly retrieves and filters the provisioning profiles" do
-      expect(provisioning_profiles.count).to eq(4) # ignore the Xcode generated profiles
+      expect(provisioning_profiles.count).to eq(33)
 
       profile = provisioning_profiles.last
       expect(profile.name).to eq('net.sunapps.7 AdHoc')
