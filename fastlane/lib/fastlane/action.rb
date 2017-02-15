@@ -121,7 +121,7 @@ module Fastlane
     # When shelling out from the action, should we use `bundle exec`?
     def self.shell_out_should_use_bundle_exec?
       unless Helper.contained_fastlane?
-        given = ENV["BUNDLE_GEMFILE"]
+        given = ENV["BUNDLE_GEMFILE"] # provided by bundler when using 'bundle exec fastlane'
         return true if given && !given.empty?
 
         previous = nil
