@@ -365,7 +365,7 @@ module Spaceship
 
       req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
         teamId: team_id,
-        #deviceClasses: 'iphone',
+        # deviceClasses: 'iphone',
         deviceNumbers: device_id,
         deviceNames: device_name,
         register: 'single'
