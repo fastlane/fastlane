@@ -255,7 +255,7 @@ module Spaceship
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
         # @param mac (Bool) (optional): Pass true to get all Mac provisioning profiles
-        # @param xcode (Bool) (optional): Pass true to include Xcode managed provisioning profiles
+        # @param xcode DEPRECATED
         def all(mac: false, xcode: false)
           profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
