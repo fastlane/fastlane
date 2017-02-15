@@ -127,8 +127,9 @@ module Fastlane
         previous = nil
         current  = File.expand_path(Pathname.pwd).untaint
         until !File.directory?(current) || current == previous
-          filename = File.join(current, "Gemfile")
-          return true if File.file?(filename)
+          ["Gemfile", "gems.rb"].each do |filename|
+            return true if File.file?(File.join(current, filename))
+          end
 
           previous = current
           current = File.expand_path("..", current)
