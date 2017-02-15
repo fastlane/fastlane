@@ -361,6 +361,8 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id, mac: false)
+      ensure_csrf(Spaceship::Device)
+
       req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
         teamId: team_id,
         deviceClasses: mac ? 'mac' : 'iphone',
