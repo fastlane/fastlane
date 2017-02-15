@@ -54,3 +54,9 @@ end
 def after_each_spaceship
   @cache_paths.each { |path| try_delete path }
 end
+
+RSpec.configure do |config|
+  def adp_read_fixture_file(filename)
+    File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+  end
+end

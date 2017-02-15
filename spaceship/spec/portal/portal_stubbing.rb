@@ -1,9 +1,5 @@
 class PortalStubbing
   class << self
-    def adp_read_fixture_file(filename)
-      File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
-    end
-
     # Necessary, as we're now running this in a different context
     def stub_request(*args)
       WebMock::API.stub_request(*args)
@@ -42,13 +38,25 @@ class PortalStubbing
 
       # Download profiles
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => true, "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: "", headers: {})
+        with(body: { "provisioningProfileId" => "PP00000001", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAdHoc.action.json'), headers: { 'Content-Type' => 'application/json' })
 
-        stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-         with(:body => {"provisioningProfileId"=>"PP00000001", "teamId"=>"XXXXXXXXXX"}).
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+         with(:body => {"provisioningProfileId"=>"PP00000006", "teamId"=>"XXXXXXXXXX"}).
          to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
 
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+         with(:body => {"provisioningProfileId"=>"PP00000002", "teamId"=>"XXXXXXXXXX"}).
+         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
+
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+         with(:body => {"provisioningProfileId"=>"PP00000003", "teamId"=>"XXXXXXXXXX"}).
+         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+         with(:body => {"provisioningProfileId"=>"PP00000004", "teamId"=>"XXXXXXXXXX"}).
+         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
         with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
@@ -59,12 +67,9 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfiletvOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "475ESRP5F3", "teamId" => "XXXXXXXXXX" }).
+        with(body: { "provisioningProfileId" => "PP00000005", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "FB8594WWQG", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAdHoc.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Create Profiles
 
@@ -277,7 +282,7 @@ class PortalStubbing
     end
 
     def adp_stub_download_provisioning_profile_failure
-      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
+      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=PP00000001&teamId=XXXXXXXXXX").
         to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
     end
   end
