@@ -205,7 +205,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe "#repair" do
-    let(:profile) { Spaceship::ProvisioningProfile.all.detect{ |pp| pp.id == 'PP00000006' } }
+    let(:profile) { Spaceship::ProvisioningProfile.all.detect { |pp| pp.id == 'PP00000006' } }
 
     it "repairs an existing profile with added devices" do
       profile.devices = Spaceship::Device.all_for_profile_type(profile.type)
@@ -243,7 +243,7 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe "#update!" do
-    let(:profile) { Spaceship::ProvisioningProfile.all.detect{ |pp| pp.id == 'PP00000006' } }
+    let(:profile) { Spaceship::ProvisioningProfile.all.detect { |pp| pp.id == 'PP00000006' } }
     let(:tvOSProfile) { Spaceship::ProvisioningProfile.all_tvos.first }
 
     it "updates an existing iOS profile" do

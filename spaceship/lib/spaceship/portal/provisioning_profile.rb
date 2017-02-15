@@ -265,7 +265,7 @@ module Spaceship
           if xcode
             warn('Apple API no longer returns XCode managed Provisioning Profiles')
           else
-            profiles.delete_if(&:managed_by_xcode?) 
+            profiles.delete_if(&:managed_by_xcode?)
           end
 
           return profiles if self == ProvisioningProfile

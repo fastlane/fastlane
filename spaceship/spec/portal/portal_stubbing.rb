@@ -1,5 +1,9 @@
 class PortalStubbing
   class << self
+    def adp_read_fixture_file(filename)
+      File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+    end
+
     # Necessary, as we're now running this in a different context
     def stub_request(*args)
       WebMock::API.stub_request(*args)
@@ -42,21 +46,20 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAdHoc.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-         with(:body => {"provisioningProfileId"=>"PP00000006", "teamId"=>"XXXXXXXXXX"}).
-         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
+        with(body: { "provisioningProfileId" => "PP00000006", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-         with(:body => {"provisioningProfileId"=>"PP00000002", "teamId"=>"XXXXXXXXXX"}).
-         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
-
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-         with(:body => {"provisioningProfileId"=>"PP00000003", "teamId"=>"XXXXXXXXXX"}).
-         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
+        with(body: { "provisioningProfileId" => "PP00000002", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-         with(:body => {"provisioningProfileId"=>"PP00000004", "teamId"=>"XXXXXXXXXX"}).
-         to_return(:status => 200, :body => adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), :headers => { 'Content-Type' => 'application/json' })
+        with(body: { "provisioningProfileId" => "PP00000003", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+        with(body: { "provisioningProfileId" => "PP00000004", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
         with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
@@ -69,7 +72,6 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
         with(body: { "provisioningProfileId" => "PP00000005", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
-
 
       # Create Profiles
 
@@ -146,8 +148,8 @@ class PortalStubbing
 
       # Register a new device
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/addDevices.action").
-        with(:body => {"deviceNames"=>"Demo Device", "deviceNumbers"=>"7f6c8dc83d77134b5a3a1c53f1202b395b04482b", "register"=>"single", "teamId"=>"XXXXXXXXXX"}).
-        to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.json'), headers: { 'Content-Type' => 'application/json'})
+        with(body: { "deviceNames" => "Demo Device", "deviceNumbers" => "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", "register" => "single", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Custom paging
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").

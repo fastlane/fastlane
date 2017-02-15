@@ -361,11 +361,9 @@ module Spaceship
     end
 
     def create_device!(device_name, device_id, mac: false)
-      ensure_csrf(Spaceship::Device)
-
       req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
         teamId: team_id,
-        #deviceClasses: 'iphone',
+        deviceClasses: mac ? 'mac' : 'iphone',
         deviceNumbers: device_id,
         deviceNames: device_name,
         register: 'single'
@@ -474,6 +472,8 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+      ensure_csrf(Spaceship::ProvisioningProfile)
+
       params = {
         teamId: team_id,
         provisioningProfileName: name,
@@ -489,6 +489,8 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
+      ensure_csrf(Spaceship::ProvisioningProfile)
+
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -502,6 +504,8 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
+      ensure_csrf(Spaceship::ProvisioningProfile)
+
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -510,6 +514,8 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+      ensure_csrf(Spaceship::ProvisioningProfile)
+
       params = {
           teamId: team_id,
           provisioningProfileId: profile_id,
