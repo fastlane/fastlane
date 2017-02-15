@@ -9,7 +9,7 @@ module Fastlane
         if params[:name]
           keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:name]))
         else
-          keychain_path = params[:path]
+          keychain_path = params[:keychain_path]
         end
 
         if keychain_path.nil?
@@ -33,9 +33,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain name",
-                                       conflicting_options: [:path],
+                                       conflicting_options: [:keychain_path],
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :path,
+          FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "KEYCHAIN_PATH",
                                        description: "Keychain path",
                                        conflicting_options: [:name],
