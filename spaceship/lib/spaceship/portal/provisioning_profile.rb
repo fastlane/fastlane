@@ -175,7 +175,7 @@ module Spaceship
                   end
 
           # eagerload the Apps using the same client if we have to.
-          attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
+          # attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
 
           klass.client = @client
           obj = klass.new(attrs)

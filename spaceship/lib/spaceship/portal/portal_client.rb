@@ -26,7 +26,7 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
       return @teams if @teams
-      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
+      req = request(:post, "https://developer.apple.com/services-account/QH65B2/account/listTeams.action")
       @teams = parse_response(req, 'teams').sort_by do |team|
         [
           team['name'],
@@ -364,7 +364,7 @@ module Spaceship
       ensure_csrf(Spaceship::Device)
 
       req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
+        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/device/addDevice.action"
         r.params = {
           teamId: team_id,
           deviceNumber: device_id,
@@ -452,17 +452,18 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles(mac: false)
-      req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
-        r.params = {
+    paging do |page_number|
+      r = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
           teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
           includeInactiveProfiles: true,
           onlyCountLists: true
-        }
-      end
-
-      parse_response(req, 'provisioningProfiles')
+      })
+      parse_response(r, 'provisioningProfiles')
     end
+  end
 
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
       r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
