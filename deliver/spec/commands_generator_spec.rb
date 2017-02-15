@@ -2,6 +2,18 @@ require 'deliver/commands_generator'
 require 'deliver/setup'
 
 describe Deliver::CommandsGenerator do
+  def expect_runner_run_with(expected_options)
+    fake_runner = "runner"
+    expect_runner_new_with(expected_options).and_return(fake_runner)
+    expect(fake_runner).to receive(:run)
+  end
+
+  def expect_runner_new_with(expected_options)
+    expect(Deliver::Runner).to receive(:new) do |actual_options|
+      expect(expected_options._values).to eq(actual_options._values)
+    end
+  end
+
   describe ":run option handling" do
     it "can use the username short flag from tool options" do
       # leaving out the command name defaults to 'run'
@@ -12,11 +24,7 @@ describe Deliver::CommandsGenerator do
         username: 'me@it.com'
       })
 
-      fake_runner = "runner"
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end.and_return(fake_runner)
-      expect(fake_runner).to receive(:run)
+      expect_runner_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -30,11 +38,7 @@ describe Deliver::CommandsGenerator do
         app_identifier: 'abcd'
       })
 
-      fake_runner = "runner"
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end.and_return(fake_runner)
-      expect(fake_runner).to receive(:run)
+      expect_runner_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -51,7 +55,7 @@ describe Deliver::CommandsGenerator do
         build_number: 'latest'
       })
 
-      expect_run_with_options(expected_options)
+      expect_runner_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -66,13 +70,21 @@ describe Deliver::CommandsGenerator do
         build_number: 'latest'
       })
 
-      expect_run_with_options(expected_options)
+      expect_runner_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
   end
 
   describe ":init option handling" do
+    def expect_setup_run_with(expected_options)
+      fake_setup = "setup"
+      expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
+      expect(fake_setup).to receive(:run) do |actual_options|
+        expect(expected_options._values).to eq(actual_options._values)
+      end
+    end
+
     it "can use the username short flag from tool options" do
       stub_commander_runner_args(['init', '--description', 'My description', '-u', 'me@it.com'])
 
@@ -81,15 +93,8 @@ describe Deliver::CommandsGenerator do
         username: 'me@it.com'
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      fake_setup = "setup"
-      expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
-      expect(fake_setup).to receive(:run) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
+      expect_runner_new_with(expected_options)
+      expect_setup_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -102,21 +107,22 @@ describe Deliver::CommandsGenerator do
         app_identifier: 'abcd'
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      fake_setup = "setup"
-      expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
-      expect(fake_setup).to receive(:run) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
+      expect_runner_new_with(expected_options)
+      expect_setup_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
   end
 
   describe ":generate_summary option handling" do
+    def expect_generate_summary_run_with(expected_options)
+      fake_generate_summary = "generate_summary"
+      expect(Deliver::GenerateSummary).to receive(:new).and_return(fake_generate_summary)
+      expect(fake_generate_summary).to receive(:run) do |actual_options|
+        expect(expected_options._values).to eq(actual_options._values)
+      end
+    end
+
     it "can use the username short flag from tool options" do
       stub_commander_runner_args(['generate_summary', '--description', 'My description', '-u', 'me@it.com', '-f', 'true'])
 
@@ -126,15 +132,8 @@ describe Deliver::CommandsGenerator do
         force: true
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      fake_generate_summary = "generate_summary"
-      expect(Deliver::GenerateSummary).to receive(:new).and_return(fake_generate_summary)
-      expect(fake_generate_summary).to receive(:run) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
+      expect_runner_new_with(expected_options)
+      expect_generate_summary_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -148,21 +147,21 @@ describe Deliver::CommandsGenerator do
         force: true
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      fake_generate_summary = "generate_summary"
-      expect(Deliver::GenerateSummary).to receive(:new).and_return(fake_generate_summary)
-      expect(fake_generate_summary).to receive(:run) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
+      expect_runner_new_with(expected_options)
+      expect_generate_summary_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
   end
 
   describe ":download_screenshots option handling" do
+    def expect_download_screenshots_run_with(expected_options)
+      expect(Deliver::DownloadScreenshots).to receive(:run) do |actual_options, screenshots_path|
+        expect(expected_options._values).to eq(actual_options._values)
+        expect(screenshots_path).to eq('screenshots/path')
+      end
+    end
+
     it "can use the username short flag from tool options" do
       stub_commander_runner_args(['download_screenshots', '--description', 'My description', '-u', 'me@it.com', '-w', 'screenshots/path'])
 
@@ -172,14 +171,8 @@ describe Deliver::CommandsGenerator do
         screenshots_path: 'screenshots/path'
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      expect(Deliver::DownloadScreenshots).to receive(:run) do |actual_options, screenshots_path|
-        expect(expected_options._values).to eq(actual_options._values)
-        expect(screenshots_path).to eq('screenshots/path')
-      end
+      expect_runner_new_with(expected_options)
+      expect_download_screenshots_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
@@ -193,14 +186,8 @@ describe Deliver::CommandsGenerator do
         screenshots_path: 'screenshots/path'
       })
 
-      expect(Deliver::Runner).to receive(:new) do |actual_options|
-        expect(expected_options._values).to eq(actual_options._values)
-      end
-
-      expect(Deliver::DownloadScreenshots).to receive(:run) do |actual_options, screenshots_path|
-        expect(expected_options._values).to eq(actual_options._values)
-        expect(screenshots_path).to eq('screenshots/path')
-      end
+      expect_runner_new_with(expected_options)
+      expect_download_screenshots_run_with(expected_options)
 
       Deliver::CommandsGenerator.start
     end
