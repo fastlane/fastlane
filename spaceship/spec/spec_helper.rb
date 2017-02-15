@@ -22,11 +22,12 @@ def before_each_spaceship
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
 
-  PortalStubbing.adp_stub_provisioning
-  PortalStubbing.adp_stub_devices
-  PortalStubbing.adp_stub_certificates
-  PortalStubbing.adp_stub_apps
   PortalStubbing.adp_stub_app_groups
+  PortalStubbing.adp_stub_apps
+
+  PortalStubbing.adp_stub_provisioning
+  PortalStubbing.adp_stub_certificates
+  PortalStubbing.adp_stub_devices
   PortalStubbing.adp_stub_persons
   PortalStubbing.adp_stub_website_pushes
 
