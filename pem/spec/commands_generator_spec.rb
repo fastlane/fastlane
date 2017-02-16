@@ -30,6 +30,4 @@ describe PEM::CommandsGenerator do
       expect(PEM.config._values).to eq(expected_options._values)
     end
   end
-
-  # :init is not tested here because it does not use any tool options.
 end
