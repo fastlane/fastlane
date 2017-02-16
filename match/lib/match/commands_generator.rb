@@ -23,11 +23,11 @@ module Match
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
-      FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options)
-
       command :run do |c|
         c.syntax = 'fastlane match'
         c.description = Match::DESCRIPTION
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
           if args.count > 0
@@ -44,6 +44,8 @@ module Match
         command type do |c|
           c.syntax = "fastlane match #{type}"
           c.description = "Run match for a #{type} provisioning profile"
+
+          FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
           c.action do |args, options|
             params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -73,6 +75,9 @@ module Match
       command :change_password do |c|
         c.syntax = 'fastlane match change_password'
         c.description = 'Re-encrypt all files with a different password'
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
@@ -85,6 +90,9 @@ module Match
       command :decrypt do |c|
         c.syntax = "fastlane match decrypt"
         c.description = "Decrypts the repository and keeps it on the filesystem"
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
@@ -92,6 +100,7 @@ module Match
           UI.success "Repo is at: '#{decrypted_repo}'"
         end
       end
+
       command "nuke" do |c|
         # We have this empty command here, since otherwise the normal `match` command will be executed
         c.syntax = "fastlane match nuke"
@@ -105,6 +114,9 @@ module Match
         command "nuke #{type}" do |c|
           c.syntax = "fastlane match nuke #{type}"
           c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal of the type #{type}"
+
+          FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
           c.action do |args, options|
             params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
             params.load_configuration_file("Matchfile")
