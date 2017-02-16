@@ -21,7 +21,7 @@
       "distributionMethod": "store",
       "proProPlatform": "ios",
       "version": "2",
-      "dateExpire": "2015-11-25",
+      "dateExpire": "2015-11-25T01:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
@@ -39,7 +39,7 @@
       "distributionMethod": "store",
       "proProPlatform": "ios",
       "version": "2",
-      "dateExpire": "2015-11-25",
+      "dateExpire": "2015-11-25T02:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
@@ -57,7 +57,7 @@
       "distributionMethod": "store",
       "proProPlatform": "ios",
       "version": "2",
-      "dateExpire": "2015-11-25",
+      "dateExpire": "2015-11-25T03:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
@@ -76,7 +76,7 @@
       "proProPlatform": "ios",
       "proProSubPlatform": "tvOS",
       "version": "2",
-      "dateExpire": "2015-11-25",
+      "dateExpire": "2015-11-25T04:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
@@ -94,7 +94,7 @@
       "distributionMethod": "limited",
       "proProPlatform": "ios",
       "version": "2",
-      "dateExpire": "2015-11-25",
+      "dateExpire": "2015-11-2505:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
@@ -112,7 +112,7 @@
       "distributionMethod": "store",
       "proProPlatform": "ios",
       "version": "2",
-      "dateExpire": "2016-02-10",
+      "dateExpire": "2016-02-10T00:00:00Z",
       "managingApp": null,
       "deviceIds": [
 
