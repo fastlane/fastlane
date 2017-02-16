@@ -174,6 +174,11 @@ module Spaceship
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
+          # Parse the dates
+          # rubocop:disable Style/RescueModifier
+          attrs['dateExpire'] = (Time.parse(attrs['dateExpire']) rescue attrs['dateExpire'])
+          # rubocop:enable Style/RescueModifier
+
           klass.client = @client
           obj = klass.new(attrs)
 
