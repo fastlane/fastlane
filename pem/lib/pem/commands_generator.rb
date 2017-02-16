@@ -22,11 +22,11 @@ module PEM
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
-      FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
-
       command :renew do |c|
         c.syntax = 'fastlane pem renew'
         c.description = 'Renews the certificate (in case it expired) and shows the path to the generated pem file'
+
+        FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options, command: c)
 
         c.action do |args, options|
           PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options.__hash__)
