@@ -14,11 +14,11 @@ describe Match::CommandsGenerator do
   Match.environments.each do |env|
     describe ":#{env} option handling" do
       it "can use the git_url short flag from tool options" do
-        # leaving out the command name defaults to 'run'
-        stub_commander_runner_args(['-r', 'git@github.com:you/your_repo.git'])
+        stub_commander_runner_args([env, '-r', 'git@github.com:you/your_repo.git'])
 
         expected_options = FastlaneCore::Configuration.create(available_options, {
-          git_url: 'git@github.com:you/your_repo.git'
+          git_url: 'git@github.com:you/your_repo.git',
+          type: env
         })
 
         expect_runner_run_with(expected_options)
@@ -27,10 +27,12 @@ describe Match::CommandsGenerator do
       end
 
       it "can use the git_branch flag from tool options" do
-        # leaving out the command name defaults to 'run'
-        stub_commander_runner_args(['--git_branch', 'my-branch'])
+        stub_commander_runner_args([env, '--git_branch', 'my-branch'])
 
-        expected_options = FastlaneCore::Configuration.create(available_options, { git_branch: 'my-branch' })
+        expected_options = FastlaneCore::Configuration.create(available_options, {
+          git_branch: 'my-branch',
+          type: env
+        })
 
         expect_runner_run_with(expected_options)
 
