@@ -46,9 +46,10 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
-          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
-        }
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
+          'Rejected' => REJECTED
 
+        }
         mapping.each do |k, v|
           return v if k == text
         end
