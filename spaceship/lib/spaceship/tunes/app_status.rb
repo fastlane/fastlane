@@ -49,8 +49,7 @@ module Spaceship
           'inReview' => IN_REVIEW,
           'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
           'rejected' => REJECTED,
-          'metadataRejected' =>METADATA_REJECTED
-
+          'metadataRejected' => METADATA_REJECTED
         }
         mapping.each do |k, v|
           return v if k == text
