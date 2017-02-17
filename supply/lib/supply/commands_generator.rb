@@ -8,8 +8,6 @@ module Supply
   class CommandsGenerator
     include Commander::Methods
 
-    FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
-
     def self.start
       new.run
     end
@@ -30,6 +28,9 @@ module Supply
       command :run do |c|
         c.syntax = 'fastlane supply'
         c.description = 'Run a deploy process'
+
+        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
+
         c.action do |args, options|
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_supplyfile
@@ -41,6 +42,9 @@ module Supply
       command :init do |c|
         c.syntax = 'fastlane supply init'
         c.description = 'Sets up supply for you'
+
+        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
+
         c.action do |args, options|
           require 'supply/setup'
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
