@@ -8,8 +8,6 @@ module Gym
     include Commander::Methods
     UI = FastlaneCore::UI
 
-    FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options)
-
     def self.start
       new.run
     end
@@ -34,6 +32,9 @@ module Gym
       command :build do |c|
         c.syntax = "fastlane gym"
         c.description = "Just builds your app"
+
+        FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options, command: c)
+
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Gym::Options.available_options,
                                                       convert_options(options))
