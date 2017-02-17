@@ -21,7 +21,7 @@ module Deliver
       options[:app_identifier] = identifier if identifier.to_s.length > 0
       options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
     rescue => ex
-      UI.error(ex)
+      UI.error("#{ex.message}\n#{ex.backtrace.join('\n')}")
       UI.user_error!("Could not infer your App's Bundle Identifier")
     end
 
@@ -56,7 +56,7 @@ module Deliver
         options[:app_version] ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
       end
     rescue => ex
-      UI.error(ex)
+      UI.error("#{ex.message}\n#{ex.backtrace.join('\n')}")
       UI.user_error!("Could not infer your app's version")
     end
 
