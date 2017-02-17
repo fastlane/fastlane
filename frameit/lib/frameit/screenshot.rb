@@ -9,7 +9,7 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      UI.user_error "Couldn't find file at path '#{path}'" unless File.exist? path
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist? path
       @color = color
       @path = path
       @size = FastImage.size(path)
