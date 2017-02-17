@@ -1,0 +1,5 @@
+android {
+  defaultConfig {
+    versionCode 1234
+  }
+}
