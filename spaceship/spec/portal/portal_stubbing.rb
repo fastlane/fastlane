@@ -22,21 +22,13 @@ class PortalStubbing
 
     # Optional: Team Selection
     def adp_stub_multiple_teams
-<<<<<<< HEAD
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/listTeams.action').
-=======
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
->>>>>>> fccc6d026cc8d5a6ff510f4f3a19b88624e056c2
         to_return(status: 200, body: adp_read_fixture_file('listTeams_multiple.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def adp_stub_login
       # Most stuff is stubbed in tunes_stubbing (since it's shared)
-<<<<<<< HEAD
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/listTeams.action').
-=======
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/listTeams.action').
->>>>>>> fccc6d026cc8d5a6ff510f4f3a19b88624e056c2
         to_return(status: 200, body: adp_read_fixture_file('listTeams.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -44,14 +36,7 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action").
         to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.json'), headers: { 'Content-Type' => 'application/json' })
 
-<<<<<<< HEAD
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.plist'), headers: { 'Content-Type' => 'application/x-xml-plist' })
-
-      stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=2MAY7NPHRU&teamId=XXXXXXXXXX").
-=======
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=PP00000001&teamId=XXXXXXXXXX").
->>>>>>> fccc6d026cc8d5a6ff510f4f3a19b88624e056c2
         to_return(status: 200, body: adp_read_fixture_file("downloaded_provisioning_profile.mobileprovision"), headers: {})
 
       # Download profiles
@@ -161,14 +146,9 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('enableDevice.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Register a new device
-<<<<<<< HEAD
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/ios/addDevice.action?deviceNumber=7f6c8dc83d77134b5a3a1c53f1202b395b04482b&name=Demo%20Device&teamId=XXXXXXXXXX").
-        to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.plist'), headers: { 'Content-Type' => 'application/x-xml-plist' })
-=======
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/addDevices.action").
         with(body: { "deviceClasses" => "iphone", "deviceNames" => "Demo Device", "deviceNumbers" => "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", "register" => "single", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.json'), headers: { 'Content-Type' => 'application/json' })
->>>>>>> fccc6d026cc8d5a6ff510f4f3a19b88624e056c2
 
       # Custom paging
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
