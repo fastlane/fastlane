@@ -203,7 +203,7 @@ module Deliver
       REVIEW_INFORMATION_VALUES.values.each do |option_name|
         path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
         next unless File.exist?(path)
-        next if options[:app_review_information][option_name]
+        next if options[:app_review_information][option_name].to_s.length > 0
 
         UI.message("Loading '#{path}'...")
         options[:app_review_information][option_name] ||= File.read(path)
