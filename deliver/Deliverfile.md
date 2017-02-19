@@ -88,6 +88,9 @@ app_review_information(
 )
 ```
 
+You can also define each values on `metadata/review_information/*.txt`.
+If you define both, values on `Deliverfile` are on priority.
+
 ##### submission_information 
 Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb#L18-L69).
 
