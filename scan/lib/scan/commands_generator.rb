@@ -7,8 +7,6 @@ module Scan
   class CommandsGenerator
     include Commander::Methods
 
-    FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options)
-
     def self.start
       new.run
     end
@@ -33,6 +31,9 @@ module Scan
       command :tests do |c|
         c.syntax = "fastlane scan"
         c.description = Scan::DESCRIPTION
+
+        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options, command: c)
+
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Scan::Options.available_options,
                                                       convert_options(options))
