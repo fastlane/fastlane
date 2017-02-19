@@ -241,12 +241,12 @@ module Fastlane
         fastlane_folder_name = "fastlane"
       end
       "plugins_path = File.join(File.dirname(__FILE__), '#{fastlane_folder_name}', '#{PluginManager::PLUGINFILE_NAME}')\n" \
-      "eval(File.read(plugins_path), binding) if File.exist?(plugins_path)"
+      "eval_gemfile(plugins_path) if File.exist?(plugins_path)"
     end
 
     # Makes sure, the user's Gemfile actually loads the Plugins file
     def plugins_attached?
-      gemfile_path && gemfile_content.include?(self.class.code_to_attach)
+      gemfile_path && gemfile_content.include?(PluginManager::PLUGINFILE_NAME)
     end
 
     def ensure_plugins_attached!
