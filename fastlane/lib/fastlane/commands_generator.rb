@@ -92,6 +92,7 @@ module Fastlane
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
