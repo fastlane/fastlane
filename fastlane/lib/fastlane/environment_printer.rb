@@ -223,7 +223,12 @@ module Fastlane
 
       if Helper.mac?
         table_content["Xcode Path"] = anonymized_path(Helper.xcode_path)
-        table_content["Xcode Version"] = Helper.xcode_version
+        begin
+          table_content["Xcode Version"] = Helper.xcode_version
+        rescue => ex
+          UI.error(ex)
+          UI.error("Could not get Xcode Version")
+        end
       end
 
       table = ["| Key | Value |"]
