@@ -119,7 +119,18 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      available = []		
+
+	  unless platform
+	  	# If we still have no platform here, try all supported.
+	  	# This can be the case if no default platform is given, when multiple platforms are available and plain "fastlane" is called.
+		Fastlane::SupportedPlatforms.all.each do | platform |
+	    	available += ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+		end
+	  else
+	    available = ff.runner.lanes[platform.to_sym].to_a.reject { |lane| lane.last.is_private }
+	  end      
+
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end
