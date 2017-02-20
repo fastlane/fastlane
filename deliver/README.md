@@ -123,6 +123,12 @@ Download existing screenshots from iTunes Connect
 fastlane deliver download_screenshots
 ```
 
+Download existing metadata from iTunes Connect
+
+```
+fastlane deliver download_metadata
+```
+
 To get a list of available options run
 
 ```
