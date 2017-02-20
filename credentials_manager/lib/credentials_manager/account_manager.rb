@@ -101,6 +101,7 @@ module CredentialsManager
 
     def ask_for_login
       puts "-------------------------------------------------------------------------------------".green
+      puts "Please provide your Apple Developer Program account credentials".green
       puts "The login information you enter will be stored in your macOS Keychain".green
       if default_prefix?
         # We don't want to show this message, if we ask for the application specific password

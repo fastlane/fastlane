@@ -24,11 +24,11 @@ module Screengrab
 
       always_trace!
 
-      FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options)
-
       command :run do |c|
         c.syntax = 'fastlane screengrab'
-        c.description = 'Take new screenshots based on the screengrabfile.'
+        c.description = 'Take new screenshots based on the Screengrabfile.'
+
+        FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options, command: c)
 
         c.action do |args, options|
           o = options.__hash__.dup
