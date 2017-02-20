@@ -11,7 +11,7 @@ module Fastlane
         end
 
         if keychain_path.nil?
-          UI.user_error!("You either have to set :name or :path")
+          UI.user_error!("You either have to set :keychain_name or :keychain_path")
         end
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
