@@ -117,9 +117,19 @@ module Frameit
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
         frame_height = background.height - top_space_above_device - vertical_frame_padding
-        @image.resize "#{frame_width}x"
-        if @image.height > frame_height
-          @image.resize "x#{frame_height.to_i}"
+
+        if fetch_config['show_complete_frame']
+          # calculate the final size of the screenshot to resize in one go
+          # it may be limited either by the width or height of the frame
+          image_aspect_ratio = @image.width.to_f / @image.height.to_f
+          image_width = [frame_width, @image.width].min
+          image_height = [frame_height, image_width / image_aspect_ratio].min
+          image_width = image_height * image_aspect_ratio
+          @image.resize "#{image_width}x#{image_height}" if image_width < @image.width || image_height < @image.height
+        else
+          # the screenshot size is only limited by width.
+          # If higher than the frame, the screenshot is cut off at the bottom
+          @image.resize "#{frame_width}x" if frame_width < @image.width
         end
       end
 
@@ -166,12 +176,6 @@ module Frameit
     end
 
     def put_device_into_background(background)
-      show_complete_frame = fetch_config['show_complete_frame']
-      if show_complete_frame
-        max_height = background.height - top_space_above_device
-        image.resize "x#{max_height}>"
-      end
-
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
