@@ -5,6 +5,7 @@ require 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 
+require 'fastlane_core/build_watcher'
 require 'fastlane_core/env'
 require 'fastlane_core/feature/feature'
 require 'fastlane_core/features'
