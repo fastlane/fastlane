@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)
         env_vars = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME)
         env_name = env_vars.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
-        ENV.fetch(env_name) { `git symbolic-ref HEAD --short 2>/dev/null`.strip }
+        ENV.fetch(env_name.to_s) { `git symbolic-ref HEAD --short 2>/dev/null`.strip }
       end
 
       #####################################################
