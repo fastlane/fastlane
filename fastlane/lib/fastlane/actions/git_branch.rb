@@ -8,9 +8,7 @@ module Fastlane
         branch = `git symbolic-ref HEAD --short 2>/dev/null`.strip
         return branch unless branch.empty?
         %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME)
-          .map { |env_var|
-            FastlaneCore::Env.truthy?(env_var) ? ENV[env_var] : nil
-          }
+          .map { |env_var| ENV[env_var] if FastlaneCore::Env.truthy?(env_var) }
           .compact
           .first
       end
