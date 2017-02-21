@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module Scan
   class ReportCollector
     SUPPORTED = %w(html junit json-compilation-database)
@@ -62,6 +64,8 @@ module Scan
         "compile_commands.json"
       elsif !@custom_report_file_name.nil?
         @custom_report_file_name
+      elsif type == 'junit'
+        Dir::Tmpname.make_tmpname('scan_', '.xml')
       else
         "report.#{type}"
       end
