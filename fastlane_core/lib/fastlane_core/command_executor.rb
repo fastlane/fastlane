@@ -31,7 +31,7 @@ module FastlaneCore
       # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
       def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
-        print_all = true if $verbose
+        print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
         output = []

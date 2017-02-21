@@ -64,7 +64,7 @@ module Fastlane
       output << ""
 
       File.write(output_path, output.join("\n"))
-      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if $verbose
+      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
     end
 
     #####################################################

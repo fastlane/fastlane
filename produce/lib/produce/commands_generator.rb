@@ -20,13 +20,13 @@ module Produce
       program :help, 'GitHub', 'https://github.com/fastlane/produce'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-
-      FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :create do |c|
         c.syntax = 'fastlane produce create'
         c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
         c.action do |args, options|
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
@@ -55,6 +55,8 @@ module Produce
         c.option '--push-notification', 'Enable Push notification (only enables the service, does not configure certificates)'
         c.option '--sirikit', 'Enable SiriKit'
         c.option '--vpn-conf', 'Enable VPN Configuration'
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
         c.action do |args, options|
           # Filter the options so that we can still build the configuration
@@ -87,6 +89,8 @@ module Produce
         c.option '--sirikit', 'Disable SiriKit'
         c.option '--vpn-conf', 'Disable VPN Configuration'
 
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
         c.action do |args, options|
           # Filter the options so that we can still build the configuration
           allowed_keys = Produce::Options.available_options.collect(&:key)
@@ -105,6 +109,8 @@ module Produce
         c.option '-n', '--group_name STRING', String, 'Name for the group that is created (PRODUCE_GROUP_NAME)'
         c.option '-g', '--group_identifier STRING', String, 'Group identifier for the group (PRODUCE_GROUP_IDENTIFIER)'
 
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
         c.action do |args, options|
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
@@ -116,8 +122,10 @@ module Produce
 
       command :associate_group do |c|
         c.syntax = 'fastlane produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
-        c.description = 'Associate with a group, which is create if needed or simply located otherwise'
+        c.description = 'Associate with a group, which is created if needed or simply located otherwise'
         c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
         c.action do |args, options|
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)

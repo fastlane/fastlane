@@ -241,8 +241,12 @@ module FastlaneCore
     end
 
     def supported_platforms
-      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
-      supported_platforms.map do |platform|
+      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
+      if supported_platforms.nil?
+        UI.important("Could not read the \"SUPPORTED_PLATFORMS\" build setting, assuming that the project supports iOS only.")
+        return [:iOS]
+      end
+      supported_platforms.split.map do |platform|
         case platform
         when "macosx" then :macOS
         when "iphonesimulator", "iphoneos" then :iOS
@@ -288,6 +292,9 @@ module FastlaneCore
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
           @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !self.xcodebuild_list_silent)
+          if @build_settings.empty?
+            UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
+          end
         rescue Timeout::Error
           UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
             " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \

@@ -199,6 +199,17 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_exception("Could not find action, lane or variable 'my_custom_plugin'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
       end
+
+      it "shows an appropriate error message when a plugin is really broken" do
+        ex = ScriptError.new
+        pm = Fastlane::PluginManager.new
+        plugin_name = "broken"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true).and_raise(ex)
+        expect(UI).to receive(:error).with("Error loading plugin '#{plugin_name}': #{ex}")
+        pm.load_plugins
+        expect(pm.plugin_references[plugin_name]).not_to be_nil
+      end
     end
   end
 end

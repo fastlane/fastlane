@@ -34,10 +34,10 @@ module Fastlane
       env_tail = "</details>"
       final_output = ""
 
-      if $captured_output
+      if FastlaneCore::Globals.captured_output?
         final_output << "### Captured Output\n\n"
         final_output << "Command Used: `#{ARGV.join(' ')}`\n"
-        final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{$captured_output}\n\n```\n\n</details>\n\n"
+        final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{FastlaneCore::Globals.captured_output}\n\n```\n\n</details>\n\n"
       end
 
       final_output << env_header + env_output + env_tail
@@ -223,7 +223,12 @@ module Fastlane
 
       if Helper.mac?
         table_content["Xcode Path"] = anonymized_path(Helper.xcode_path)
-        table_content["Xcode Version"] = Helper.xcode_version
+        begin
+          table_content["Xcode Version"] = Helper.xcode_version
+        rescue => ex
+          UI.error(ex)
+          UI.error("Could not get Xcode Version")
+        end
       end
 
       table = ["| Key | Value |"]

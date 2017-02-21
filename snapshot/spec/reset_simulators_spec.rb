@@ -28,7 +28,7 @@ describe Snapshot::ResetSimulators do
 
   describe '#devices' do
     it 'should read simctl output into arrays of device info' do
-      expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: $verbose).and_return(fixture_data)
+      expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: FastlaneCore::Globals.verbose?).and_return(fixture_data)
 
       expect(Snapshot::ResetSimulators.devices).to eq(all_devices)
     end
@@ -89,7 +89,7 @@ describe Snapshot::ResetSimulators do
         # By checking against all_devices, we expect those which are in an unusuable state
         # NOT to be selected!
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(all_devices)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end

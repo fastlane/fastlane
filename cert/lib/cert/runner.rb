@@ -63,7 +63,7 @@ module Cert
           revoke_count += 1
         rescue => e
           UI.error "An error occurred while revoking #{certificate.id} #{certificate.name}"
-          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if $verbose
+          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if FastlaneCore::Globals.verbose?
         end
       end
 
