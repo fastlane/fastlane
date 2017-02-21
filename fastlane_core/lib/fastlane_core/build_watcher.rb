@@ -40,8 +40,8 @@ module FastlaneCore
           return nil
         end
         builds = app.all_processing_builds(platform: platform)
-        break if builds.count == 0
-        latest_build = builds.last
+        latest_build = builds.last unless latest_build
+        break unless builds.include?(latest_build)
         UI.message("Waiting for iTunes Connect to finish processing the new build (#{latest_build.train_version} - #{latest_build.build_version})")
       end
 
