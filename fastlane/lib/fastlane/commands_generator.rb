@@ -30,7 +30,7 @@ module Fastlane
         $stdout = out_channel
         $stderr = out_channel
       end
-      FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+
       Fastlane.load_actions
       FastlaneCore::Swag.stop_loader
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
@@ -41,7 +41,6 @@ module Fastlane
       end
       self.new.run
     ensure
-      FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
         FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
