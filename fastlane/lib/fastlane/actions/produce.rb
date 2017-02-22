@@ -10,7 +10,6 @@ module Fastlane
 
         return if Helper.test?
 
-        FastlaneCore::UpdateChecker.start_looking_for_update('produce')
         Produce.config = params # we alread have the finished config
 
         Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
