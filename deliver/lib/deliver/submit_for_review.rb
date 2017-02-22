@@ -39,7 +39,7 @@ module Deliver
         end
       else
         UI.message("Selecting the latest build...")
-        build = FastlaneCore::BuildWatcher.wait_for_build(app, options[:app_platform], sleep_time)
+        build = FastlaneCore::BuildWatcher.wait_for_build(app, options[:platform], sleep_time)
       end
       UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
 
