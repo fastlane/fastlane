@@ -29,7 +29,7 @@ module FastlaneCore
       UI.user_error!("Could not find app with app identifier #{app.bundle_id}") unless app
       # if this is a new version/app wait for train to show up.
       if app.build_trains(platform: platform).count == 0
-        self.class.wait_for_train(app, platform, sleep_time)
+        wait_for_train(app, platform, sleep_time)
       end
 
       latest_build = nil
