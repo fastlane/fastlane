@@ -47,7 +47,9 @@ describe Fastlane::CLIToolsDistributor do
       expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
       expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
       expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION)
-      Fastlane::CLIToolsDistributor.take_off
+      expect do
+        Fastlane::CLIToolsDistributor.take_off
+      end.to raise_error(SystemExit)
     end
   end
 end
