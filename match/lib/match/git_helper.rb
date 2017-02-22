@@ -6,7 +6,7 @@ module Match
       @dir = Dir.mktmpdir
 
       command = "git clone '#{git_url}' '#{@dir}'"
-      command << " --depth 1" if shallow_clone
+      command << " --depth 1 --no-single-branch" if shallow_clone
 
       UI.message "Cloning remote git repo..."
       begin
