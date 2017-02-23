@@ -46,7 +46,7 @@ module Fastlane
       def self.example_code
         [
           'delete_keychain(name: "KeychainName")',
-          'delete_keychain(path: "/keychains/project.keychain")'
+          'delete_keychain(keychain_path: "/keychains/project.keychain")'
         ]
       end
 
