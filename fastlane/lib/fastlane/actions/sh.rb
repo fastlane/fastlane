@@ -32,7 +32,7 @@ module Fastlane
                                          is_string: false,
                                          default_value: true),
           FastlaneCore::ConfigItem.new(key: :error_callback,
-                                         description: 'A callback invoked with the command ouptut if there is a non-zero exit status',
+                                         description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
                                          is_string: true,
                                          default_value: 'nil')
