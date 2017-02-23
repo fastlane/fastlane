@@ -248,9 +248,10 @@ module Scan
                                     is_string: false,
                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                    description: "Sets custom full report file name",
-                                    optional: true,
-                                    is_string: true)
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name",
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end
