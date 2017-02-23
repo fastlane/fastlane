@@ -28,7 +28,7 @@ describe Fastlane do
       it "works with absolute keychain path" do
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
-            path: '/projects/test.keychain'
+            keychain_path: '/projects/test.keychain'
           })
         end").runner.execute(:test)
 
