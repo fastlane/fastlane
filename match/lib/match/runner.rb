@@ -134,7 +134,7 @@ module Match
         self.changes_to_commit = true
       end
 
-      FastlaneCore::ProvisioningProfile.install(profile)
+      installed_profile = FastlaneCore::ProvisioningProfile.install(profile)
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
@@ -162,6 +162,11 @@ module Match
                                                                                     type: prov_type,
                                                                                 platform: params[:platform]),
                              parsed["Name"])
+
+      Utils.fill_environment(Utils.environment_variable_name_profile_path(app_identifier: app_identifier,
+                                                                                    type: prov_type,
+                                                                                platform: params[:platform]),
+                             installed_profile)
 
       return uuid
     end
