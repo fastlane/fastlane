@@ -260,16 +260,19 @@ module Spaceship
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
         # @param mac (Bool) (optional): Pass true to get all Mac provisioning profiles
-        # @param xcode DEPRECATED
+        # @param xcode (Bool) (optional): Pass true to include Xcode managed provisioning profiles
         def all(mac: false, xcode: false)
-          profiles = client.provisioning_profiles(mac: mac).map do |profile|
-            self.factory(profile)
+          if ENV['SPACESHIP_AVOID_XCODE_API']
+            profiles = client.provisioning_profiles(mac: mac)
+          else
+            profiles = client.provisioning_profiles_via_xcode_api(mac: mac)
           end
 
+          # transform raw data to class instances
+          profiles.map! { |profile| self.factory(profile) }
+
           # filter out the profiles managed by xcode
-          if xcode
-            warn('Apple API no longer returns XCode managed Provisioning Profiles')
-          else
+          unless xcode
             profiles.delete_if(&:managed_by_xcode?)
           end
 
@@ -480,7 +483,13 @@ module Spaceship
       end
 
       def app
-        App.set_client(client).new(profile_details['appId'])
+        if raw_data.key?('appId')
+          app_attributes = raw_data['appId']
+        else
+          app_attributes = profile_details['appId']
+        end
+
+        App.set_client(client).new(app_attributes)
       end
 
       # @return (Bool) Is this current provisioning profile adhoc?

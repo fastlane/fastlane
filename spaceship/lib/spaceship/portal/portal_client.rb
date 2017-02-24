@@ -465,6 +465,24 @@ module Spaceship
       end
     end
 
+    ##
+    # this endpoint is used by Xcode to fetch provisioning profiles.
+    # The response is an xml plist but has the added benefit of containing the appId of each provisioning profile.
+    #
+    # Use this method over `provisioning_profiles` if possible because no secondary API calls are necessary to populate the ProvisioningProfile data model.
+    def provisioning_profiles_via_xcode_api(mac: false)
+      req = request(:post) do |r|
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          includeInactiveProfiles: true,
+          onlyCountLists: true
+        }
+      end
+
+      parse_response(req, 'provisioningProfiles')
+    end
+
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
       r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
         teamId: team_id,

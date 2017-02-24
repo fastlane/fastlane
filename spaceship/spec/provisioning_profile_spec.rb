@@ -54,6 +54,28 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
+  describe '#all via xcode api' do
+    around(:all) do |example|
+      switch = ENV['SPACESHIP_AVOID_XCODE_API']
+      example.run
+      ENV['SPACESHIP_AVOID_XCODE_API'] = switch
+    end
+
+    it 'should use the Xcode api to get provisioning profiles and their appIds' do
+      ENV['SPACESHIP_AVOID_XCODE_API'] = nil
+      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
+      expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfile.action')).to_not have_been_made
+    end
+
+    it 'should use the developer portal api to get provisioning profiles and their appIds' do
+      ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
+      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      expect(a_request(:post, /developerservices2.apple.com/)).to_not have_been_made
+      expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action')).to have_been_made.times(6)
+    end
+  end
+
   describe '#find_by_bundle_id' do
     it "returns [] if there are no profiles" do
       profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("notExistent")
