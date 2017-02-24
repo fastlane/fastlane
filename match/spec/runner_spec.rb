@@ -13,6 +13,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
       cert_path = File.join(repo_dir, "something")
       profile_path = "./match/spec/fixtures/test.mobileprovision"
+      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master").and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution).and_return(cert_path)
@@ -20,7 +21,7 @@ describe Match do
                                                                             prov_type: :appstore,
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier]).and_return(profile_path)
-      expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path)
+      expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path).and_return(destination)
       expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore and platform ios", git_url, "master")
 
       spaceship = "spaceship"
@@ -30,6 +31,16 @@ describe Match do
       expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
+
+      expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
+                                                        type: "appstore")]).to eql('98264c6b-5151-4349-8d0f-66691e48ae35')
+      expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
+                                                                type: "appstore")]).to eql('439BBM9367')
+      expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
+                                                                     type: "appstore")]).to eql('tools.fastlane.app AppStore')
+      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
+      expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
+                                                                     type: "appstore")]).to eql(profile_path)
     end
 
     it "uses existing certificates and profiles if they exist" do
@@ -61,6 +72,16 @@ describe Match do
       expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
+
+      expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
+                                                        type: "appstore")]).to eql('736590c3-dfe8-4c25-b2eb-2404b8e65fb8')
+      expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
+                                                                type: "appstore")]).to eql('439BBM9367')
+      expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
+                                                                     type: "appstore")]).to eql('match AppStore tools.fastlane.app 1449198835')
+      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/736590c3-dfe8-4c25-b2eb-2404b8e65fb8.mobileprovision')
+      expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
+                                                                     type: "appstore")]).to eql(profile_path)
     end
   end
 end
