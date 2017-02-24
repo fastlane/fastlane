@@ -23,6 +23,10 @@ module Match
       (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-name"]).join("_")
     end
 
+    def self.environment_variable_name_profile_path(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-path"]).join("_")
+    end
+
     def self.get_cert_info(cer_certificate_path)
       command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
       command << " &" # start in separate process
