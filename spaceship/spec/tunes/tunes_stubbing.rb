@@ -324,8 +324,8 @@ class TunesStubbing
 
       # iap edit family
       stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
-      with(body: itc_read_fixture_file("iap_family_edit.json")).
-      to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
                 headers: { "Content-Type" => "application/json" })
 
       # iap family detail
