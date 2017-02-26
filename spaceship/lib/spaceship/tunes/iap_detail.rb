@@ -70,6 +70,43 @@ module Spaceship
         return parsed_versions
       end
 
+      # transforms user-set versions to iTC ones
+      def versions=(value = {})
+        if value.kind_of?(Array)
+          # input that comes from iTC api
+          return
+        end
+        new_versions = []
+        value.each do |language, current_version|
+          new_versions << {
+            "value" =>   {
+              "name" =>  { "value" => current_version[:name] },
+              "description" =>  { "value" => current_version[:description] },
+              "localeCode" =>  language.to_s
+            }
+          }
+        end
+
+        raw_data.set(["versions"], [{ "details" => { "value" => new_versions } }])
+      end
+
+      # transforms user-set intervals to iTC ones
+      def pricing_intervals=(value = [])
+        new_intervals = []
+        value.each do |current_interval|
+          new_intervals << {
+            "value" =>   {
+              "tierStem" =>  current_interval[:tier],
+              "priceTierEndDate" =>  current_interval[:end_date],
+              "priceTierEffectiveDate" =>  current_interval[:begin_date],
+              "grandfathered" =>  current_interval[:grandfathered],
+              "country" => current_interval[:country]
+            }
+          }
+        end
+        raw_data.set(["pricingIntervals"], new_intervals)
+      end
+
       # @return (Array) pricing intervals
       # @example:
       #  [
@@ -110,26 +147,26 @@ module Spaceship
         versions_array = []
         versions.each do |language, value|
           versions_array << {
-                    value: {
-                      description: { value: value[:description] },
-                      name: { value: value[:name] },
-                      localeCode: language.to_s
+                    "value" =>  {
+                      "description" => { "value" => value[:description] },
+                      "name" => { "value" => value[:name] },
+                      "localeCode" => language.to_s
                     }
           }
         end
 
-        raw_data.set(["versions"], [{ reviewNotes: @review_notes, details: { value: versions_array } }])
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, "details" => { "value" => versions_array }, id: raw_data["versions"].first["id"] }])
 
         # transform pricingDetails
         intervals_array = []
         pricing_intervals.each do |interval|
           intervals_array << {
-            value: {
-              tierStem: interval[:tier],
-              priceTierEffectiveDate: interval[:begin_date],
-              priceTierEndDate: interval[:end_date],
-              country: interval[:country] || "WW",
-              grandfathered: interval[:grandfathered]
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
             }
           }
         end

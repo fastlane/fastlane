@@ -42,6 +42,32 @@ describe Spaceship::Tunes::IAPDetail do
       detailed.subscription_price_target = { currency: "EUR", tier: 1 }
       detailed.save!
     end
+    it "saved with changed pricing detail" do
+      edited = app.in_app_purchases.find("go.find.me").edit
+      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: edited.raw_data)
+      edited.pricing_intervals = [
+        {
+        country: "WW",
+        begin_date: nil,
+        end_date: nil,
+        tier: 4
+        }
+      ]
+      edited.save!
+      expect(edited.pricing_intervals).to eq([{ tier: 4, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }])
+    end
+    it "saved with changed versions" do
+      edited = app.in_app_purchases.find("go.find.me").edit
+      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: edited.raw_data)
+      edited.versions = {
+            'en-US' => {
+              name: "Edit It",
+              description: "Description has at least 10 characters"
+            }
+          }
+      edited.save!
+      expect(edited.versions).to eq({ :"en-US" => { name: "Edit It", description: "Description has at least 10 characters" } })
+    end
   end
   describe "Deletion" do
     it "delete" do

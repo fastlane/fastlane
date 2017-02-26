@@ -11,6 +11,8 @@ module Spaceship
       # @return (Intger) the Family Id
       attr_accessor :family_id
 
+      attr_writer :versions
+
       attr_mapping({
         'id' => :family_id,
         'name.value' => :name
