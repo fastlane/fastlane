@@ -21,12 +21,9 @@ module FastlaneCore
         timestamp = format_string(datetime, severity)
 
         colors = msg.scan(/(\e\[.*?m)/)
-        if colors && colors.length > 0
-          colors.each do |color|
-            msg.delete!(color.first)
-            msg.delete!(color.last)
-          end
-        else
+        msg = FastlaneCore::Helper.strip_ansi_colors(msg)
+
+        unless colors && colors.length > 0
           colors = ["", ""]
         end
 
