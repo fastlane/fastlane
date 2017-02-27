@@ -44,7 +44,7 @@ module Snapshot
 
         c.action do |args, options|
           require 'snapshot/setup'
-          path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
+          path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           Snapshot::Setup.create(path)
         end
       end
