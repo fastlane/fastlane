@@ -11,13 +11,13 @@ module Fastlane
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
           plist[params[:key]] = params[:value]
-          new_plist = plist.to_plist
+          new_plist = Plist::Emit.dump(plist)
           File.write(path, new_plist)
 
           return params[:value]
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to set value to plist file at '#{path}'")
+          UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
       end
 
@@ -46,16 +46,22 @@ module Fastlane
         ]
       end
 
-      def self.output
-        []
-      end
-
       def self.authors
         ["kohtenko"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

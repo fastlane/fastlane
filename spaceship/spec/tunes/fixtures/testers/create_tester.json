@@ -1,0 +1,91 @@
+{
+  "data": {
+    "sectionErrorKeys": null,
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "testers": [{
+      "emailAddress": {
+        "value": "customtesters@krausefx.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "firstName": {
+        "value": "FirstName",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "lastName": {
+        "value": "LastName",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": [],
+        "maxLength": null,
+        "minLength": null
+      },
+      "testerId": null,
+      "devices": null,
+      "latestInstalledAppAdamId": null,
+      "latestInstalledVersion": null,
+      "latestInstalledShortVersion": null,
+      "latestInstalledDate": null,
+      "latestInstalledName": null,
+      "latestInstallByPlatform": null,
+      "hasAddedOrInvitedApp": null,
+      "warnOnDelete": null,
+      "itcUsername": null,
+      "dsId": null,
+      "groups": [{
+        "id": "c4739ccc-672f-46d4-9dad-23df8c60a35f",
+        "name": {
+          "value": "boarding123",
+          "isEditable": false,
+          "isRequired": false,
+          "errorKeys": null,
+          "maxLength": null,
+          "minLength": null
+        },
+        "testerCount": null,
+        "testers": null,
+        "isDeleted": null
+      }, {
+        "id": "b6f65dbd-c845-4d91-bc39-0b661d608970",
+        "name": {
+          "value": "Boarding",
+          "isEditable": false,
+          "isRequired": false,
+          "errorKeys": null,
+          "maxLength": null,
+          "minLength": null
+        },
+        "testerCount": null,
+        "testers": null,
+        "isDeleted": null
+      }, {
+        "id": "555f48c8-a968-4e8f-a41b-0417c4d9c70a",
+        "name": {
+          "value": "custom-new-group",
+          "isEditable": false,
+          "isRequired": false,
+          "errorKeys": null,
+          "maxLength": null,
+          "minLength": null
+        },
+        "testerCount": null,
+        "testers": null,
+        "isDeleted": null
+      }]
+    }]
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

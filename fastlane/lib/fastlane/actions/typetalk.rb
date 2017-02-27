@@ -36,8 +36,8 @@ module Fastlane
         require 'uri'
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topic_id}")
-        response = Net::HTTP.post_form(uri, {'message' => message,
-                                             'typetalkToken' => typetalk_token})
+        response = Net::HTTP.post_form(uri, { 'message' => message,
+                                             'typetalkToken' => typetalk_token })
 
         self.check_response(response)
       end
@@ -71,6 +71,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'typetalk(
+            message: "App successfully released!",
+            note_path: "ChangeLog.md",
+            topicId: 1,
+            success: true,
+            typetalk_token: "Your Typetalk Token"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

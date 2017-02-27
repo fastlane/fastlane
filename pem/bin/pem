@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'pem'
-require 'pem/commands_generator'
-PEM::CommandsGenerator.start

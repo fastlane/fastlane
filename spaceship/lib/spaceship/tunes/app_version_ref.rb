@@ -8,12 +8,6 @@ module Spaceship
         'ssoTokenForImage' => :sso_token_for_image,
         'ssoTokenForVideo' => :sso_token_for_video
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
     end
   end
 end

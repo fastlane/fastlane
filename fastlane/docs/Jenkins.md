@@ -21,7 +21,7 @@ To store the password in the Keychain of your remote machine, I recommend runnin
 
 ## Deploy Strategy
 
-You should **not** deploy a new App Store update after every commit, since you still have to wait 1-2 weeks for the review. Instead I recommend using Git Tags, or custom triggers to deploy a new update.
+You should **not** deploy a new App Store update after every commit, since you still have to wait a few weeks for the review and might reset your number of stars. Instead I recommend using Git Tags, or custom triggers to deploy a new update.
 
 You can set up your own ```Release``` job, which is only triggered manually.
 
@@ -39,10 +39,10 @@ I recommend the following plugins:
 Use the following as your build step:
 
 ```
-fastlane appstore
+fastlane release
 ```
 
-Replace `appstore` with the lane you want to use.
+Replace `release` with the lane you want to use.
 
 ### setup_jenkins
 
@@ -68,3 +68,23 @@ To show the **generated screenhots** right in `Jenkins`
 Save and run. The result should look like this:
 
 ![JenkinsIntegration](../assets/JenkinsIntegration.png)
+
+## Changelog
+
+You might need to automatically generate a changelog from your commits, particularly if you deploy your apps to an internal system.
+
+Jenkins might be already passing relevant information to your environment so that fastlane can generate the change log using an appropriate action.
+
+Here's an example integration if you use the Jenkins Git plugin and the `changelog_from_git_commits` fastlane action:
+
+```ruby
+  changelog = changelog_from_git_commits(
+    between: [ENV['GIT_PREVIOUS_SUCCESSFUL_COMMIT'], ENV['GIT_COMMIT']],
+    pretty: "* (%h) [%aN] %s"
+  )
+  changelog = "Empty changelog..." if changelog.to_s.length == 0
+```
+
+And this is how it would look like if that `changelog` was passed to the `hockeyapp` action:
+
+![Jenkins ChangeLog to HockeyApp](../assets/jenkins_hockeyapp_changelog.png)

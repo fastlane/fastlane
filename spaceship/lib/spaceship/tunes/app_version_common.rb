@@ -10,18 +10,20 @@ module Spaceship
           version['id']
         end
 
-        def find_platform(versions)
+        def find_platform(versions, search_platform: nil)
           # We only support platforms that exist ATM
           platform = versions.detect do |p|
             ['ios', 'osx', 'appletvos'].include? p['platformString']
           end
 
-          raise "Could not find platform ios, osx or appletvos for app #{app_id}" unless platform
+          raise "Could not find platform 'ios', 'osx' or 'appletvos'" unless platform
 
           # If your app has versions for both iOS and tvOS we will default to returning the iOS version for now.
           # This is intentional as we need to do more work to support apps that have hybrid versions.
-          if versions.length > 1
+          if versions.length > 1 && search_platform.nil?
             platform = versions.detect { |p| p['platformString'] == "ios" }
+          elsif !search_platform.nil?
+            platform = versions.detect { |p| p['platformString'] == search_platform }
           end
           platform
         end

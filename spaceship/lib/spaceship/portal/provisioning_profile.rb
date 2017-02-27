@@ -29,6 +29,8 @@ module Spaceship
       #     "adhoc"
       # @example Development Profile
       #     "limited"
+      # @example Mac Developer ID Profile
+      #     "direct"
       attr_accessor :distribution_method
 
       # @return (String) The name of this profile
@@ -62,6 +64,11 @@ module Spaceship
       # @example
       #   "ios"
       attr_accessor :platform
+
+      # @return (String) The supported sub_platform for this profile
+      # @example
+      #   "tvOS"
+      attr_accessor :sub_platform
 
       # No information about this attribute
       attr_accessor :managing_app
@@ -119,6 +126,11 @@ module Spaceship
       #  profile.devices.first.name
       attr_accessor :devices
 
+      # This is the second level request, which is done before creating the object
+      # this includes information about the devices and the certificates
+      # more information on this issue https://github.com/fastlane/fastlane/issues/6137
+      attr_accessor :profile_details
+
       attr_mapping({
         'provisioningProfileId' => :id,
         'UUID' => :uuid,
@@ -129,6 +141,7 @@ module Spaceship
         'type' => :type,
         'version' => :version,
         'proProPlatform' => :platform,
+        'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
         'appId' => :app
       })
@@ -147,30 +160,29 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # Ad Hoc Profiles look exactly like App Store profiles, but usually include devices
-          attrs['distributionMethod'] = 'adhoc' if attrs['distributionMethod'] == 'store' && attrs['devices'].size > 0
-          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited']
-
+          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
                   when 'store'
                     AppStore
-                  when 'adhoc'
-                    AdHoc
                   when 'inhouse'
                     InHouse
+                  when 'direct'
+                    Direct # Mac-only
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
 
-          # eagerload the Apps, Devices, and Certificates using the same client if we have to.
-          attrs['appId'] = App.set_client(@client).factory(attrs['appId'])
-          attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
-          attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
+          # Parse the dates
+          # rubocop:disable Style/RescueModifier
+          attrs['dateExpire'] = (Time.parse(attrs['dateExpire']) rescue attrs['dateExpire'])
+          # rubocop:enable Style/RescueModifier
 
           klass.client = @client
-          klass.new(attrs)
+          obj = klass.new(attrs)
+
+          return obj
         end
 
         # @return (String) The human readable name of this profile type.
@@ -202,10 +214,15 @@ module Spaceship
           app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          devices = [] if self == AppStore || self == InHouse # App Store Profiles MUST NOT have devices
+          if self == AppStore || self == InHouse || self == Direct
+            # Distribution Profiles MUST NOT have devices
+            devices = []
+          end
 
           certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
           certificate_parameter ||= [certificate.id]
@@ -242,20 +259,51 @@ module Spaceship
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
         #  only return the profiles that are of this type
-        def all(mac: false)
+        # @param mac (Bool) (optional): Pass true to get all Mac provisioning profiles
+        # @param xcode DEPRECATED
+        def all(mac: false, xcode: false)
           profiles = client.provisioning_profiles(mac: mac).map do |profile|
             self.factory(profile)
           end
 
           # filter out the profiles managed by xcode
-          profiles.delete_if(&:managed_by_xcode?)
+          if xcode
+            warn('Apple API no longer returns XCode managed Provisioning Profiles')
+          else
+            profiles.delete_if(&:managed_by_xcode?)
+          end
 
           return profiles if self == ProvisioningProfile
 
+          # To distinguish between AppStore and AdHoc profiles, we need to send
+          # a details request (see `fetch_details`). This is an expensive operation
+          # which we can't do for every single provisioning profile
+          # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
+          # Spaceship::ProvisioningProfile::AdHoc.all will return the same array as
+          # Spaceship::ProvisioningProfile::AppStore.all, containing only AppStore
+          # profiles. To determine if it's an Ad Hoc profile, you can use the
+          # is_adhoc? method on the profile.
+          klass = self
+          klass = AppStore if self == AdHoc
+
           # only return the profiles that match the class
-          profiles.select do |profile|
-            profile.class == self
+          return profiles.select do |profile|
+            profile.class == klass
           end
+        end
+
+        # @return (Array) Returns all profiles registered for this account
+        #  If you're calling this from a subclass (like AdHoc), this will
+        #  only return the profiles that are of this type
+        def all_tvos
+          profiles = all(mac: false)
+          tv_os_profiles = []
+          profiles.each do |tv_os_profile|
+            if tv_os_profile.tvos?
+              tv_os_profiles << tv_os_profile
+            end
+          end
+          return tv_os_profiles
         end
 
         # @return (Array) Returns an array of provisioning
@@ -297,6 +345,13 @@ module Spaceship
         end
       end
 
+      # Represents a Mac Developer ID profile from the Dev Portal
+      class Direct < ProvisioningProfile
+        def self.type
+          'direct'
+        end
+      end
+
       # Download the current provisioning profile. This will *not* store
       # the provisioning profile on the file system. Instead this method
       # will return the content of the profile.
@@ -327,10 +382,15 @@ module Spaceship
       # @return (ProvisioningProfile) A new provisioning profile, as
       #  the repair method will generate a profile with a new ID
       def update!
+        # sigh handles more specific filtering and validation steps that make this logic OK
+        #
+        # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
           if mac?
             if self.kind_of? Development
               self.certificates = [Spaceship::Certificate::MacDevelopment.all.first]
+            elsif self.kind_of? Direct
+              self.certificates = [Spaceship::Certificate::DeveloperIDApplication.all.first]
             else
               self.certificates = [Spaceship::Certificate::MacAppDistribution.all.first]
             end
@@ -353,7 +413,8 @@ module Spaceship
             app.app_id,
             certificates.map(&:id),
             devices.map(&:id),
-            mac: mac?
+            mac: mac?,
+            sub_platform: tvos? ? 'tvOS' : nil
           )
         end
 
@@ -378,8 +439,9 @@ module Spaceship
       end
 
       # @return (Bool) Is the current provisioning profile valid?
+      #                To also verify the certificate call certificate_valid?
       def valid?
-        return (status == 'Active' and certificate_valid?)
+        return status == 'Active'
       end
 
       # @return (Bool) Is this profile managed by Xcode?
@@ -390,6 +452,57 @@ module Spaceship
       # @return (Bool) Is this a Mac provisioning profile?
       def mac?
         platform == 'mac'
+      end
+
+      # @return (Bool) Is this a tvos provisioning profile?
+      def tvos?
+        sub_platform == 'tvOS'
+      end
+
+      def devices
+        fetch_details
+
+        if (@devices || []).empty?
+          @devices = (self.profile_details["devices"] || []).collect do |device|
+            Device.set_client(client).factory(device)
+          end
+        end
+
+        @devices
+      end
+
+      def certificates
+        fetch_details
+
+        if (@certificates || []).empty?
+          @certificates = (profile_details["certificates"] || []).collect do |cert|
+            Certificate.set_client(client).factory(cert)
+          end
+        end
+
+        @certificates
+      end
+
+      def app
+        fetch_details
+
+        App.set_client(client).new(profile_details['appId'])
+      end
+
+      # @return (Bool) Is this current provisioning profile adhoc?
+      #                AppStore and AdHoc profiles are the same except that AdHoc has devices
+      def is_adhoc?
+        return false unless self.kind_of?(AppStore) || self.kind_of?(AdHoc)
+
+        return devices.count > 0
+      end
+
+      private
+
+      def fetch_details
+        # Since 15th September 2016 certificates and devices are hidden behind another request
+        # see https://github.com/fastlane/fastlane/issues/6137 for more information
+        self.profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
       end
     end
   end

@@ -13,20 +13,60 @@ module Deliver
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
                                 :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category
-                               ]
+                                :secondary_first_sub_category, :secondary_second_sub_category]
+
+    # Review information values
+    REVIEW_INFORMATION_VALUES = {
+      review_first_name: :first_name,
+      review_last_name: :last_name,
+      review_phone_number: :phone_number,
+      review_email: :email_address,
+      review_demo_user: :demo_user,
+      review_demo_password: :demo_password,
+      review_notes: :notes
+    }
+
+    # Localized app details values, that are editable in live state
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url]
+
+    # Non localized app details values, that are editable in live state
+    NON_LOCALISED_LIVE_VALUES = [:privacy_url]
+
+    # Directory name it contains review information
+    REVIEW_INFORMATION_DIR = "review_information"
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
       return if options[:skip_metadata]
-      verify_available_languages!(options)
+      # it is not possible to create new languages, because
+      # :keywords is not write-able on published versions
+      # therefore skip it.
+      verify_available_languages!(options) unless options[:edit_live]
 
       app = options[:app]
 
       details = app.details
-      v = app.edit_version
+      if options[:edit_live]
+        # not all values are editable when using live_version
+        v = app.live_version(platform: options[:platform])
+        localised_options = LOCALISED_LIVE_VALUES
+        non_localised_options = NON_LOCALISED_LIVE_VALUES
 
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        if v.nil?
+          UI.message("Couldn't find live version, editing the current version on iTunes Connect instead")
+          v = app.edit_version(platform: options[:platform])
+          # we don't want to update the localised_options and non_localised_options
+          # as we also check for `options[:edit_live]` at other areas in the code
+          # by not touching those 2 variables, deliver is more consistent with what the option says
+          # in the documentation
+        end
+      else
+        v = app.edit_version(platform: options[:platform])
+        localised_options = (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES)
+        non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
+      end
+
+      localised_options.each do |key|
         current = options[key]
         next unless current
 
@@ -43,7 +83,7 @@ module Deliver
         end
       end
 
-      (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
+      non_localised_options.each do |key|
         current = options[key].to_s.strip
         next unless current.to_s.length > 0
         v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
@@ -58,7 +98,7 @@ module Deliver
       UI.message("Uploading metadata to iTunes Connect")
       v.save!
       details.save!
-      UI.success("Successfully uploaded initial set of metadata to iTunes Connect")
+      UI.success("Successfully uploaded set of metadata to iTunes Connect")
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
@@ -157,6 +197,17 @@ module Deliver
         UI.message("Loading '#{path}'...")
         options[key] ||= File.read(path)
       end
+
+      # Load review information
+      options[:app_review_information] ||= {}
+      REVIEW_INFORMATION_VALUES.values.each do |option_name|
+        path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
+        next unless File.exist?(path)
+        next if options[:app_review_information][option_name].to_s.length > 0
+
+        UI.message("Loading '#{path}'...")
+        options[:app_review_information][option_name] ||= File.read(path)
+      end
     end
 
     private
@@ -164,16 +215,12 @@ module Deliver
     def set_review_information(v, options)
       return unless options[:app_review_information]
       info = options[:app_review_information]
-      UI.user_error!("`app_review_information` must be a hash") unless info.kind_of?(Hash)
+      UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
-      v.review_first_name = info[:first_name] if info[:first_name]
-      v.review_last_name = info[:last_name] if info[:last_name]
-      v.review_phone_number = info[:phone_number] if info[:phone_number]
-      v.review_email = info[:email_address] if info[:email_address]
-      v.review_demo_user = info[:demo_user] if info[:demo_user]
-      v.review_demo_password = info[:demo_password] if info[:demo_password]
+      REVIEW_INFORMATION_VALUES.each do |key, option_name|
+        v.send("#{key}=", info[option_name]) if info[option_name]
+      end
       v.review_user_needed = (v.review_demo_user.to_s + v.review_demo_password.to_s).length > 0
-      v.review_notes = info[:notes] if info[:notes]
     end
 
     def set_app_rating(v, options)

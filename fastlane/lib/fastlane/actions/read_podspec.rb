@@ -31,7 +31,10 @@ module Fastlane
         [
           "This can be used for only specifying a version string in your podspec",
           "- and during your release process you'd read it from the podspec by running",
-          "`version = read_podspec['version']` at the beginning of your lane"
+          "`version = read_podspec['version']` at the beginning of your lane",
+          "Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc. ",
+          "This can be useful when basing your release process on the version string only stored in one place - in the podspec. As one of ",
+          "the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release)."
         ].join("\n")
       end
 
@@ -58,7 +61,26 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'spec = read_podspec
+          version = spec["version"]
+          puts "Using Version #{version}"',
+          'spec = read_podspec(path: "./XcodeServerSDK.podspec")'
+        ]
+      end
+
+      def self.sample_return_value
+        {
+          'version' => 1.0
+        }
+      end
+
+      def self.category
+        :misc
       end
     end
   end

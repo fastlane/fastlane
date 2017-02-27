@@ -27,7 +27,7 @@ Test Case '-[appTests testPerformanceExample]' started.
 2015-10-11 19:30:39.494 app[3080:2234263] performance
 2015-10-11 19:30:39.494 app[3080:2234263] performance
 2015-10-11 19:30:39.494 app[3080:2234263] performance
-/Users/krausefx/Developer/fastlane/scan/examples/standard/appTests/appTests.m:35: Test Case '-[appTests testPerformanceExample]' measured [Time, seconds] average: 0.000, relative standard deviation: 55.123%, values: [0.000407, 0.000210, 0.000134, 0.000114, 0.000106, 0.000111, 0.000100, 0.000140, 0.000137, 0.000132], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: "", baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100
+/Users/krausefx/Developer/fastlane/scan/scan/examples/standard/appTests/appTests.m:35: Test Case '-[appTests testPerformanceExample]' measured [Time, seconds] average: 0.000, relative standard deviation: 55.123%, values: [0.000407, 0.000210, 0.000134, 0.000114, 0.000106, 0.000111, 0.000100, 0.000140, 0.000137, 0.000132], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: "", baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100
 Test Case '-[appTests testPerformanceExample]' passed (0.258 seconds).
 Test Suite 'appTests' passed at 2015-10-11 19:30:39.500.
    Executed 2 tests, with 0 failures (0 unexpected) in 0.259 (0.260) seconds

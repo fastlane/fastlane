@@ -5,12 +5,12 @@ module Fastlane
     # Does a hard reset and clean on the repo
     class ResetGitRepoAction < Action
       def self.run(params)
-        if params[:force] || params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
+        if params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
           paths = params[:files]
 
           return paths if Helper.is_test?
 
-          if (paths || []).count == 0
+          if paths.nil?
             Actions.sh('git reset --hard HEAD')
 
             clean_options = ['q', 'f', 'd']
@@ -51,6 +51,24 @@ module Fastlane
           "It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if either of these conditions are met:",
           "You have called the ensure_git_status_clean action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run."
         ].join(' ')
+      end
+
+      def self.example_code
+        [
+          'reset_git_repo',
+          'reset_git_repo(force: true) # If you don\'t care about warnings and are absolutely sure that you want to discard all changes. This will reset the repo even if you have valuable uncommitted changes, so use with care!',
+          'reset_git_repo(skip_clean: true) # If you want "git clean" to be skipped, thus NOT deleting untracked files like ".env". Optional, defaults to false.',
+          'reset_git_repo(
+            force: true,
+            files: [
+              "./file.txt"
+            ]
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
 
       def self.available_options

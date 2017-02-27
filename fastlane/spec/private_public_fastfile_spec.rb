@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Public/Private lanes" do
-      let (:path) { './spec/fixtures/fastfiles/FastfilePrivatePublic' }
+      let (:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
       before do
         FileUtils.rm_rf('/tmp/fastlane/')
 

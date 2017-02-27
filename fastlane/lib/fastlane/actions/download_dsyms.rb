@@ -16,6 +16,7 @@ module Fastlane
 
         version = params[:version]
         build_number = params[:build_number]
+        platform = params[:platform]
 
         message = []
         message << "Looking for dSYM files for #{params[:app_identifier]}"
@@ -33,15 +34,21 @@ module Fastlane
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
 
-        app.all_build_train_numbers.each do |train_number|
+        app.all_build_train_numbers(platform: platform).each do |train_number|
           if version && version != train_number
             next
           end
-          app.all_builds_for_train(train: train_number).each do |build|
+          app.all_builds_for_train(train: train_number, platform: platform).each do |build|
             if build_number && build.build_version != build_number
               next
             end
-            download_url = build.details.dsym_url
+
+            begin
+              download_url = build.details.dsym_url
+            rescue Spaceship::TunesClient::ITunesConnectError => ex
+              UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+            end
+
             if download_url
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
@@ -80,8 +87,15 @@ module Fastlane
       def self.details
         [
           "This action downloads dSYM files from Apple iTunes Connect after",
-          "the ipa got re-compiled by Apple. Useful if you have Bitcode enabled"
-        ].join(" ")
+          "the ipa got re-compiled by Apple. Useful if you have Bitcode enabled",
+          "```ruby",
+          "lane :refresh_dsyms do",
+          "  download_dsyms                  # Download dSYM files from iTC",
+          "  upload_symbols_to_crashlytics   # Upload them to Crashlytics",
+          "  clean_build_artifacts           # Delete the local dSYM files",
+          "end",
+          "```"
+        ].join("\n")
       end
 
       def self.available_options
@@ -103,7 +117,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
-                                       description: "The ID of your team if you're in multiple teams",
+                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
@@ -113,12 +127,17 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_NAME",
-                                       description: "The name of your team if you're in multiple teams",
+                                       description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                        verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value
+                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-p",
+                                       env_name: "DOWNLOAD_DSYMS_PLATFORM",
+                                       description: "The app platform for dSYMs you wish to download",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
@@ -148,6 +167,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'download_dsyms',
+          'download_dsyms(version: "1.0.0", build_number: "345")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

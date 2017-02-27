@@ -39,6 +39,7 @@ module Fastlane
       end
 
       def self.details
+        "Check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) for more information"
       end
 
       def self.available_options
@@ -47,6 +48,7 @@ module Fastlane
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "Public key of the app you wish to update",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY],
                                        optional: false,
                                        verify_block: proc do |value|
@@ -99,7 +101,8 @@ module Fastlane
         ]
       end
 
-      def self.output
+      def self.category
+        :misc
       end
 
       def self.return_value

@@ -31,10 +31,6 @@ module Spaceship
       UPLOAD_RECEIVED = "Upload Received"
       PENDING_DEVELOPER_RELEASE = "Pending Developer Release"
       PROCESSING_FOR_APP_STORE = "Processing for App Store"
-
-      # Unused app states
-      # PENDING_APPLE_RELASE = "Pending Apple Release"
-
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       # METADATA_REJECTED = "Metadata Rejected"
       # REMOVED_FROM_SALE = "Removed From Sale"
@@ -49,7 +45,8 @@ module Spaceship
           'pendingContract' => PENDING_CONTRACT,
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
-          'inReview' => IN_REVIEW
+          'inReview' => IN_REVIEW,
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
         }
 
         mapping.each do |k, v|

@@ -62,6 +62,16 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end
+
+      def self.example_code
+        [
+          'get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")'
+        ]
+      end
+
+      def self.category
+        :project
+      end
     end
   end
 end

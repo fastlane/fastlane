@@ -14,12 +14,12 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if File.exist?('Gemfile') && params[:use_bundle_exec]
+        cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--no-repo-update' unless params[:repo_update]
+        cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
@@ -47,10 +47,10 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Run `pod repo update` before install",
                                        is_string: false,
-                                       default_value: true),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
-                                       description: "Show nothing",
+                                       description: "Execute command without logging output",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
@@ -77,6 +77,9 @@ module Fastlane
                                          UI.user_error!("Could not find Podfile") unless File.exist?(value) || Helper.test?
                                        end)
         ]
+        # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
+        # `cocoapods`, please start using a Gemfile and lock the version there
+        # More information https://guides.cocoapods.org/using/a-gemfile.html
       end
 
       def self.is_supported?(platform)
@@ -85,6 +88,24 @@ module Fastlane
 
       def self.authors
         ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
+      end
+
+      def self.details
+        "If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app."
+      end
+
+      def self.example_code
+        [
+          'cocoapods',
+          'cocoapods(
+            clean: true,
+            podfile: "./CustomPodfile"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

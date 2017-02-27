@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Commander::Runner do
   describe 'tool collector interactions' do
     class CommandsGenerator
@@ -63,9 +61,12 @@ describe Commander::Runner do
       expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
       expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
 
-      expect do
-        CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
-      end.to raise_error(SystemExit)
+      stdout, stderr = capture_stds do
+        expect do
+          CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
+        end.to raise_error(SystemExit)
+      end
+      expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneError".red + "\n")
     end
   end
 
@@ -94,7 +95,7 @@ describe Commander::Runner do
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
-    it 'should abort and show custom info for errors that have the Apple error info provider method with $verbose=false' do
+    it 'should abort and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=false' do
       runner = Commander::Runner.new
       expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
 
@@ -103,7 +104,7 @@ describe Commander::Runner do
       end
     end
 
-    it 'should reraise and show custom info for errors that have the Apple error info provider method with $verbose=true' do
+    it 'should reraise and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=true' do
       with_verbose(true) do
         expect do
           Commander::Runner.new.handle_unknown_error!(CustomError.new)

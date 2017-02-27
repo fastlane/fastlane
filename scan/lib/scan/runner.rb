@@ -16,7 +16,6 @@ module Scan
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first) if Scan.devices
-
       command = TestCommandGenerator.generate
       prefix_hash = [
         {
@@ -53,7 +52,9 @@ module Scan
 
       report_collector = ReportCollector.new(Scan.config[:open_report],
                                              Scan.config[:output_types],
-                                             Scan.config[:output_directory])
+                                             Scan.config[:output_directory],
+                                             Scan.config[:use_clang_report_name],
+                                             Scan.config[:custom_report_file_name])
 
       cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
                                                types: 'junit',
@@ -78,20 +79,36 @@ module Scan
       })
       puts ""
 
+      copy_simulator_logs
+
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
-      UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
-      UI.user_error!("Tests failed") unless result[:failures] == 0
+      unless tests_exit_status == 0
+        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
+      end
+
+      unless result[:failures] == 0
+        UI.user_error!("Tests failed")
+      end
+    end
+
+    def copy_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
+      end
     end
 
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
-      UI.message("Explicitly opening simulator for device: #{device.name}")
-      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
+      FastlaneCore::Simulator.launch(device)
     end
   end
 end

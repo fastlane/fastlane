@@ -2,10 +2,14 @@ module Fastlane
   module Actions
     class PromptAction < Action
       def self.run(params)
-        params[:text] += " (y/n)" if params[:boolean]
+        if params[:boolean]
+          return params[:ci_input] unless UI.interactive?
+          return UI.confirm(params[:text])
+        end
+
         UI.message(params[:text])
 
-        return params[:ci_input] if Helper.is_ci?
+        return params[:ci_input] unless UI.interactive?
 
         if params[:multi_line_end_keyword]
           # Multi line
@@ -17,7 +21,6 @@ module Fastlane
           user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
         end
 
-        user_input = user_input.casecmp('y').zero? if params[:boolean]
         return user_input
       end
 
@@ -66,6 +69,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'changelog = prompt(text: "Changelog: ")',
+          'changelog = prompt(
+            text: "Changelog: ",
+            multi_line_end_keyword: "END"
+          )
+
+          crashlytics(notes: changelog)'
+        ]
+      end
+
+      def self.sample_return_value
+        "User Content\nWithNewline"
+      end
+
+      def self.category
+        :misc
       end
     end
   end

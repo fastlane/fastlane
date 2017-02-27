@@ -13,8 +13,8 @@ describe Gym do
       end
     end
 
-    let (:ipa_with_swift) { 'spec/fixtures/xcodebuild_fixes/with_swift_twice.ipa' }
-    let (:ipa_without_swift) { 'spec/fixtures/xcodebuild_fixes/with_no_swift.ipa' }
+    let (:ipa_with_swift) { 'gym/spec/fixtures/xcodebuild_fixes/with_swift_twice.ipa' }
+    let (:ipa_without_swift) { 'gym/spec/fixtures/xcodebuild_fixes/with_no_swift.ipa' }
     let (:default_swift_libs) { 'Payload/Client.app/Frameworks/libswift.*.dylib' }
     let (:all_existing_libs) { 'libswift.*.dylib' }
     let (:non_existing_libs) { 'XXX.*.dylib' }

@@ -16,7 +16,7 @@ module FastlaneCore
     end
 
     # Level Important: Can be used to show warnings to the user
-    #   not necessarly negative, but something the user should
+    #   not necessarily negative, but something the user should
     #   be aware of.
     #
     #   By default those messages are shown in yellow
@@ -63,7 +63,7 @@ module FastlaneCore
 
     # Level Verbose: Print out additional information for the
     #   users that are interested. Will only be printed when
-    #   $verbose = true
+    #   FastlaneCore::Globals.verbose? = true
     #
     #   By default those messages are shown in white
     def verbose(_message)
@@ -117,6 +117,13 @@ module FastlaneCore
 
     # raised from user_error!
     class FastlaneError < StandardError
+      attr_reader :show_github_issues
+      attr_reader :error_info
+
+      def initialize(show_github_issues: false, error_info: nil)
+        @show_github_issues = show_github_issues
+        @error_info = error_info
+      end
     end
 
     # Pass an exception to this method to exit the program
@@ -135,8 +142,8 @@ module FastlaneCore
     #   stack trace
     # Basically this should be used when you actively catch the error
     # and want to show a nice error message to the user
-    def user_error!(error_message)
-      raise FastlaneError.new, error_message.to_s
+    def user_error!(error_message, options = {})
+      raise FastlaneError.new(options), error_message.to_s
     end
 
     #####################################################
@@ -149,5 +156,11 @@ module FastlaneCore
     def to_s
       self.class.name.split('::').last
     end
+  end
+end
+
+class String
+  def deprecated
+    self.bold.blue
   end
 end

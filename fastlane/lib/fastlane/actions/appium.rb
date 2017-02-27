@@ -11,7 +11,7 @@ module Fastlane
         Actions.verify_gem!('appium_lib')
 
         require 'rspec'
-        require 'appium_lib'
+        require 'appium_lib' unless Helper.test?
 
         FastlaneCore::PrintTable.print_values(
           config: params,
@@ -169,6 +169,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.category
+        :testing
+      end
+
+      def self.example_code
+        [
+          'appium(
+            app_path:  "appium/apps/TargetApp.app",
+            spec_path: "appium/spec",
+            platform:  "iOS",
+            caps: {
+              versionNumber: "9.1",
+              deviceName:    "iPhone 6"
+            }
+          )'
+        ]
       end
     end
   end

@@ -8,34 +8,97 @@ module Fastlane
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+      # since at this point we haven't yet loaded commander
+      # however we do want to log verbose information in the PluginManager
+      FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
+      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
+      if ARGV.include?("--capture_output")
+        FastlaneCore::Globals.verbose = true
+        FastlaneCore::Globals.capture_output = true
+      end
+      FastlaneCore::Swag.show_loader
+
+      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      if ARGV.include?("--troubleshoot")
+        self.confirm_troubleshoot
+      end
+
+      if FastlaneCore::Globals.capture_output?
+        # Trace mode is enabled
+        # redirect STDOUT and STDERR
+        out_channel = StringIO.new
+        $stdout = out_channel
+        $stderr = out_channel
+      end
+
       Fastlane.load_actions
+      FastlaneCore::Swag.stop_loader
+      # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
+      unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command? || CLIToolsDistributor.running_help_command?
+        # *after* loading the plugins
+        Fastlane.plugin_manager.load_plugins
+        Fastlane::PluginUpdateManager.start_looking_for_updates
+      end
       self.new.run
     ensure
-      FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      Fastlane::PluginUpdateManager.show_update_status
+      if FastlaneCore::Globals.capture_output?
+        FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
+        $stdout = STDOUT
+        $stderr = STDERR
+
+        require "fastlane/environment_printer"
+        Fastlane::EnvironmentPrinter.output
+      end
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
+    def self.confirm_troubleshoot
+      if Helper.is_ci?
+        UI.error "---"
+        UI.error "You are trying to use '--troubleshoot' on CI"
+        UI.error "this option is not usable in CI, as it is insecure"
+        UI.error "---"
+        UI.user_error!("Do not use --troubleshoot in CI")
+      end
+      # maybe already set by 'start'
+      return if $troubleshoot
+      UI.error "---"
+      UI.error "Are you sure you want to enable '--troubleshoot'?"
+      UI.error "All commmands will run in full unfiltered output mode."
+      UI.error "Sensitive data, like passwords, could be printed to the log."
+      UI.error "---"
+      if UI.confirm("Do you really want to enable --troubleshoot")
+        $troubleshoot = true
+      end
+    end
+
     def run
+      program :name, 'fastlane'
       program :version, Fastlane::VERSION
       program :description, [
         "CLI for 'fastlane' - #{Fastlane::DESCRIPTION}\n",
         "\tRun using `fastlane [platform] [lane_name]`",
-        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"].join("\n")
+        "\tTo pass values to the lanes use `fastlane [platform] [lane_name] key:value key2:value2`"
+      ].join("\n")
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
+        FastlaneCore::Globals.capture_output = true
+        FastlaneCore::Globals.verbose = true
+      end
+      global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
-        c.description = 'Run a sepcific lane. Pass the lane name and optionally the platform first.'
-        c.option '--env STRING', String, 'Add environment to use with `dotenv`'
+        c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
+        c.option '--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`'
 
         c.action do |args, options|
           if ensure_fastfile
@@ -48,8 +111,15 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
+        CrashlyticsBetaCommandLineHandler.apply_options(c)
+
         c.action do |args, options|
-          Fastlane::Setup.new.run
+          if args[0] == 'beta'
+            beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
+            Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
+          else
+            Fastlane::Setup.new.run
+          end
         end
       end
 
@@ -70,9 +140,9 @@ module Fastlane
         c.option "-j", "--json", "Output the lanes in JSON instead of text"
 
         c.action do |args, options|
-          if ensure_fastfile
+          if options.json || ensure_fastfile
             require 'fastlane/lane_list'
-            path = File.join(Fastlane::FastlaneFolder.fastfile_path)
+            path = FastlaneCore::FastlaneFolder.fastfile_path
 
             if options.json
               Fastlane::LaneList.output_json(path)
@@ -88,7 +158,7 @@ module Fastlane
         c.description = 'Lists all available lanes without description'
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+            ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
             UI.message "Available lanes:"
             ff.runner.available_lanes.each do |lane|
               UI.message "- #{lane}"
@@ -105,7 +175,7 @@ module Fastlane
 
         c.action do |args, options|
           if ensure_fastfile
-            ff = Fastlane::FastFile.new(File.join(Fastlane::FastlaneFolder.path || '.', 'Fastfile'))
+            ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
             UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
             Fastlane::DocsGenerator.run(ff)
           end
@@ -144,22 +214,6 @@ module Fastlane
         end
       end
 
-      command :enable_crash_reporting do |c|
-        c.syntax = 'fastlane enable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
-      command :disable_crash_reporting do |c|
-        c.syntax = 'fastlane disable_crash_reporting'
-        c.description = "Deprecated: fastlane doesn't use a crash reporter any more"
-        c.action do |args, options|
-          show_crashreporter_note
-        end
-      end
-
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
@@ -170,8 +224,81 @@ module Fastlane
         end
       end
 
-      default_command :trigger
+      command :env do |c|
+        c.syntax = 'fastlane env'
+        c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
+        c.action do |args, options|
+          require "fastlane/environment_printer"
+          Fastlane::EnvironmentPrinter.output
+        end
+      end
 
+      command :update_fastlane do |c|
+        c.syntax = 'fastlane update_fastlane'
+        c.description = 'Update fastlane to the latest release'
+        c.action do |args, options|
+          require 'fastlane/one_off'
+          Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+        end
+      end
+
+      #####################################################
+      # @!group Plugins
+      #####################################################
+
+      command :new_plugin do |c|
+        c.syntax = 'fastlane new_plugin [plugin_name]'
+        c.description = 'Create a new plugin that can be used with fastlane'
+
+        c.action do |args, options|
+          PluginGenerator.new.generate(args.shift)
+        end
+      end
+
+      command :add_plugin do |c|
+        c.syntax = 'fastlane add_plugin [plugin_name]'
+        c.description = 'Add a new plugin to your fastlane setup'
+
+        c.action do |args, options|
+          args << UI.input("Enter the name of the plugin to install: ") if args.empty?
+          args.each do |plugin_name|
+            Fastlane.plugin_manager.add_dependency(plugin_name)
+          end
+
+          UI.important("Make sure to commit your Gemfile, Gemfile.lock and #{PluginManager::PLUGINFILE_NAME} to version control")
+          Fastlane.plugin_manager.install_dependencies!
+        end
+      end
+
+      command :install_plugins do |c|
+        c.syntax = 'fastlane install_plugins'
+        c.description = 'Install all plugins for this project'
+
+        c.action do |args, options|
+          Fastlane.plugin_manager.install_dependencies!
+        end
+      end
+
+      command :update_plugins do |c|
+        c.syntax = 'fastlane update_plugins'
+        c.description = 'Update all plugin dependencies'
+
+        c.action do |args, options|
+          Fastlane.plugin_manager.update_dependencies!
+        end
+      end
+
+      command :search_plugins do |c|
+        c.syntax = 'fastlane search_plugins [search_query]'
+        c.description = 'Search for plugins, search query is optional'
+
+        c.action do |args, options|
+          search_query = args.last
+          PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      default_command :trigger
       run!
     end
 
@@ -180,20 +307,11 @@ module Fastlane
     # if that's not the case
     # return true if the Fastfile is available
     def ensure_fastfile
-      return true if Fastlane::FastlaneFolder.setup?
+      return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
       Fastlane::Setup.new.run if create
       return false
     end
-
-    def show_crashreporter_note
-      UI.important("fastlane doesn't use a crash reporter any more")
-      UI.important("Instead please submit an issue on GitHub: https://github.com/fastlane/fastlane/issues")
-      UI.important("This command will be removed in one of the next releases")
-    end
-
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
   end
 end

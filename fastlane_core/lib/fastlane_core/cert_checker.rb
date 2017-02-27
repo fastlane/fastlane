@@ -24,16 +24,16 @@ module FastlaneCore
         UI.error([
           "There are no local code signing identities found.",
           "You can run `security find-identity -v -p codesigning` to get this output.",
-          "This Stack Overflow thread has more information: http://stackoverflow.com/q/35390072/774.",
-          "(Check in Keychain Access for an expired WWDR certificate: http://stackoverflow.com/a/35409835/774 has more info.)"
-        ].join(' '))
+          "This Stack Overflow thread has more information: https://stackoverflow.com/q/35390072/774.",
+          "(Check in Keychain Access for an expired WWDR certificate: https://stackoverflow.com/a/35409835/774 has more info.)"
+        ].join("\n"))
       end
 
       ids = []
       available.split("\n").each do |current|
         next if current.include? "REVOKED"
         begin
-          (ids << current.match(/.*\) (.*) \".*/)[1])
+          (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
         rescue
           # the last line does not match
         end
@@ -49,7 +49,7 @@ module FastlaneCore
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: $verbose)
+      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
       return response.include?("attributes:")
     end
 
@@ -59,7 +59,7 @@ module FastlaneCore
         filename = File.basename(url)
         keychain = wwdr_keychain
         keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-        Helper.backticks("curl -O #{url} && security import #{filename} #{keychain}", print: $verbose)
+        Helper.backticks("curl -O #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
         UI.user_error!("Could not install WWDR certificate") unless $?.success?
       end
     end
@@ -70,7 +70,7 @@ module FastlaneCore
         "security default-keychain -d user"
       ]
       priority.each do |command|
-        keychains = Helper.backticks(command, print: $verbose).split("\n")
+        keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")
         unless keychains.empty?
           # Select first keychain name from returned keychains list
           return keychains[0].strip.tr('"', '')

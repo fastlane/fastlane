@@ -1,6 +1,4 @@
-require 'cert/version'
 require 'cert/runner'
-require 'cert/keychain_importer'
 require 'cert/options'
 
 require 'fastlane_core'
@@ -14,6 +12,7 @@ module Cert
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
 end

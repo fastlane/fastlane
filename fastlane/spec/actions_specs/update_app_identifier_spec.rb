@@ -6,7 +6,7 @@ describe Fastlane do
     describe "Update App Identifier Integration" do
       # Variables
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:fixtures_path) { "./spec/fixtures/xcodeproj" }
+      let (:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
       let (:proj_file) { "bundle.xcodeproj" }
       let (:identifier_key) { 'PRODUCT_BUNDLE_IDENTIFIER' }
 

@@ -15,11 +15,15 @@ module Match
       end
 
       unless password
-        UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
-        UI.important "This passphrase is specific per repository and will be stored in your local keychain"
-        UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
-        password = ChangePassword.ask_password(confirm: true)
-        store_password(git_url, password)
+        if !UI.interactive?
+          UI.error "No password found neither in environment nor in local keychain. Bailing out as in non interactive mode."
+        else
+          UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
+          UI.important "This passphrase is specific per repository and will be stored in your local keychain"
+          UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
+          password = ChangePassword.ask_password(confirm: true)
+          store_password(git_url, password)
+        end
       end
 
       return password
@@ -39,7 +43,7 @@ module Match
         crypt(path: current,
           password: password(git_url),
            encrypt: true)
-        UI.success "🔒  Encrypted '#{File.basename(current)}'" if $verbose
+        UI.success "🔒  Encrypted '#{File.basename(current)}'" if FastlaneCore::Globals.verbose?
       end
       UI.success "🔒  Successfully encrypted certificates repo"
     end
@@ -57,7 +61,7 @@ module Match
           decrypt_repo(path: path, git_url: git_url)
           return
         end
-        UI.success "🔓  Decrypted '#{File.basename(current)}'" if $verbose
+        UI.success "🔓  Decrypted '#{File.basename(current)}'" if FastlaneCore::Globals.verbose?
       end
       UI.success "🔓  Successfully decrypted certificates repo"
     end
@@ -83,7 +87,7 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      command << "&> /dev/null" unless $verbose # to show show an error message is something goes wrong
+      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show show an error message is something goes wrong
       success = system(command.join(' '))
 
       UI.crash!("Error decrypting '#{path}'") unless success

@@ -1,5 +1,5 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
@@ -10,7 +10,7 @@ module Gym
   class PackageCommandGeneratorXcode7
     class << self
       def generate
-        print_legacy_information unless Helper.fastlane_enabled?
+        print_legacy_information
 
         parts = ["/usr/bin/xcrun #{XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive"]
         parts += options
@@ -22,11 +22,14 @@ module Gym
       end
 
       def options
-        options = []
+        config = Gym.config
 
+        options = []
         options << "-exportOptionsPlist '#{config_path}'"
-        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
+        options << "-archivePath #{BuildCommandGenerator.archive_path.shellescape}"
         options << "-exportPath '#{temporary_output_path}'"
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+        options << config[:export_xcargs] if config[:export_xcargs]
 
         options
       end
@@ -123,7 +126,7 @@ module Gym
             # Reads options from hash
             hash = normalize_export_options(Gym.config[:export_options])
           else
-            # Reads optoins from file
+            # Reads options from file
             hash = Plist.parse_xml(Gym.config[:export_options])
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
@@ -157,14 +160,31 @@ module Gym
         end
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
-        hash.to_plist
+        UI.important("Generated plist file with the following values:")
+        UI.command_output("-----------------------------------------")
+        UI.command_output(JSON.pretty_generate(hash))
+        UI.command_output("-----------------------------------------")
+        if FastlaneCore::Globals.verbose?
+          UI.message("This results in the following plist file:")
+          UI.command_output("-----------------------------------------")
+          UI.command_output(to_plist(hash))
+          UI.command_output("-----------------------------------------")
+        end
+
+        to_plist(hash)
+      end
+
+      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
+      def to_plist(hash)
+        Plist::Emit.dump(hash, true)
       end
 
       def print_legacy_information
-        if Gym.config[:provisioning_profile_path]
-          UI.important "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
-        end
+        return if Gym.config[:provisioning_profile_path].to_s.length == 0
+
+        UI.error "You're using Xcode 7 or above, the `provisioning_profile_path` value will be ignored"
+        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://docs.fastlane.tools/codesigning/GettingStarted/"
+        UI.error "This is just a warning, gym will continue running just as expected, but the parameter will be ignored"
       end
     end
   end

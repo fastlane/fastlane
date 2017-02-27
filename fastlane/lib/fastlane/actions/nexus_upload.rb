@@ -135,6 +135,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_NEXUS_PROXY_PASSWORD",
+                                       sensitive: true,
                                        description: "Proxy password",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,
@@ -154,6 +155,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'nexus_upload(
+            file: "/path/to/file.ipa",
+            repo_id: "artefacts",
+            repo_group_id: "com.fastlane",
+            repo_project_name: "ipa",
+            repo_project_version: "1.13",
+            repo_classifier: "dSYM", # Optional
+            endpoint: "http://localhost:8081",
+            username: "admin",
+            password: "admin123"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

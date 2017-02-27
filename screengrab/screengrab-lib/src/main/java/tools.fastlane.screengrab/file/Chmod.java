@@ -18,6 +18,7 @@
 
 package tools.fastlane.screengrab.file;
 
+import android.annotation.TargetApi;
 import android.os.Build;
 
 import java.io.File;
@@ -68,11 +69,13 @@ public abstract class Chmod {
 
     private static class Java6Chmod extends Chmod {
         @Override
+        @TargetApi(Build.VERSION_CODES.GINGERBREAD)
         protected void plusR(File file) {
             file.setReadable(true, false);
         }
 
         @Override
+        @TargetApi(Build.VERSION_CODES.GINGERBREAD)
         protected void plusRWX(File file) {
             file.setReadable(true, false);
             file.setWritable(true, false);

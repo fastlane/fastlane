@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::DUClient, :du do
   before { Spaceship::Tunes.login }
 

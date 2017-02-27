@@ -47,6 +47,23 @@ module Fastlane
         ["koglinjg"]
       end
 
+      def self.example_code
+        [
+          'artifactory(
+            username: "username",
+            password: "password",
+            endpoint: "https://artifactory.example.com/artifactory/",
+            file: "example.ipa",                                # File to upload
+            repo: "mobile_artifacts",                           # Artifactory repo
+            repo_path: "/ios/appname/example-major.minor.ipa"   # Path to place the artifact including its filename
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :file,
@@ -72,6 +89,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_ARTIFACTORY_PASSWORD",
                                        description: "Artifactory password",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: "FL_ARTIFACTORY_PROPERTIES",
@@ -97,6 +115,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_ARTIFACTORY_PROXY_PASSWORD",
                                        description: "Proxy password",
+                                       sensitive: true,
                                        default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,

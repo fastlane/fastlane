@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
   <testsuite name="fastlane.lanes">
+    <%# prefix index with leading zeroes to help alpha-numeric sorting. Note that index starts at 0 %>
+    <% log = (@steps.count-1).to_s.length %>
     <% @steps.each_with_index do |step, index| %>
-      <% name = [index, step[:name]].join(": ") %>
+      <% name = [index.to_s.rjust(log, "0"), step[:name]].join(": ") %>
       <testcase classname="fastlane.lanes" name=<%= name.encode(:xml => :attr) %> time="<%= step[:time] %>">
         <% if step[:error] %>
           <failure message=<%= step[:error].encode(:xml => :attr).gsub("\n", "&#10;") %> />

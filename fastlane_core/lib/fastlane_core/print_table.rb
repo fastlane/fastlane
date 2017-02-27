@@ -10,6 +10,12 @@ module FastlaneCore
         options = {}
         unless config.nil?
           if config.kind_of?(FastlaneCore::Configuration)
+            # find sensitive options and mask them by default
+            config.available_options.each do |config_item|
+              if config_item.sensitive
+                mask_keys << config_item.key.to_s
+              end
+            end
             options = config.values(ask: false)
           else
             options = config
@@ -35,7 +41,7 @@ module FastlaneCore
         max_allowed_value_length = max_length - max_key_length - 7
         rows.map do |e|
           value = e[1]
-          value = value.truncate(max_allowed_value_length) if value.kind_of? String
+          value = value.to_s.truncate(max_allowed_value_length) unless [true, false].include?(value)
           [e[0], value]
         end
       end

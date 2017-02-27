@@ -4,7 +4,6 @@
 module Fastlane
   module Actions
     class SlackAction < Action
-
       def self.is_supported?(platform)
         true
       end
@@ -47,7 +46,7 @@ module Fastlane
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
-          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.")
+          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a mispelled or changed group/channel name or an expired SLACK_URL")
         end
       end
 
@@ -73,6 +72,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :slack_url,
                                        env_name: "SLACK_URL",
+                                       sensitive: true,
                                        description: "Create an Incoming WebHook for your Slack group",
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
@@ -117,13 +117,47 @@ module Fastlane
         "KrauseFx"
       end
 
+      def self.example_code
+        [
+          'slack(message: "App successfully released!")',
+          'slack(
+            message: "App successfully released!",
+            channel: "#channel",  # Optional, by default will post to the default channel configured for the POST URL.
+            success: true,        # Optional, defaults to true.
+            payload: {            # Optional, lets you specify any number of your own Slack attachments.
+              "Build Date" => Time.new.to_s,
+              "Built by" => "Jenkins",
+            },
+            default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads.
+                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`.
+            attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments).
+                                     # This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
+              thumb_url: "http://example.com/path/to/thumb.png",
+              fields: [{
+                title: "My Field",
+                value: "My Value",
+                short: true
+              }]
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
+
+      def self.details
+        "Create an Incoming WebHook and export this as `SLACK_URL`. Can send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status."
+      end
+
       #####################################################
       # @!group Helper
       #####################################################
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].include?(payload_name) }
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
 
         slack_attachment = {
           fallback: options[:message],
@@ -142,8 +176,9 @@ module Fastlane
           }
         end
 
-        # lane
-        if should_add_payload[:lane]
+        # Add the lane to the Slack message
+        # This might be nil, if slack is called as "one-off" action
+        if should_add_payload[:lane] && Actions.lane_context[Actions::SharedValues::LANE_NAME]
           slack_attachment[:fields] << {
             title: 'Lane',
             value: Actions.lane_context[Actions::SharedValues::LANE_NAME],
@@ -171,7 +206,7 @@ module Fastlane
 
         # git_author
         if Actions.git_author_email && should_add_payload[:git_author]
-          if ENV['FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS'] && options[:success]
+          if FastlaneCore::Env.truthy?('FASTLANE_SLACK_HIDE_AUTHOR_ON_SUCCESS') && options[:success]
             # We only show the git author if the build failed
           else
             slack_attachment[:fields] << {
@@ -195,7 +230,7 @@ module Fastlane
         deep_merge(slack_attachment, options[:attachment_properties])
       end
 
-      # Adapted from http://stackoverflow.com/a/30225093/158525
+      # Adapted from https://stackoverflow.com/a/30225093/158525
       def self.deep_merge(a, b)
         merger = proc do |key, v1, v2|
           Hash === v1 && Hash === v2 ?

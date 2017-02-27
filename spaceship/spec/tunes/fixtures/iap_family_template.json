@@ -1,0 +1,92 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": null,
+    "activeAddOns": [{
+      "adamId": null,
+      "productId": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 100,
+        "minLength": 2
+      },
+      "familyRank": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "iTunesConnectStatus": null,
+      "referenceName": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 64,
+        "minLength": 2
+      },
+      "pricingDurationType": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    }],
+    "totalActiveAddOns": 0,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [{
+        "value": {
+          "localeCode": {
+            "value": null,
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": null,
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": null,
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": null,
+          "id": null
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

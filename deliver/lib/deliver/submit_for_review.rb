@@ -50,7 +50,7 @@ module Deliver
     end
 
     def wait_for_build(app)
-      UI.user_error!("Could not find app with app identifier #{WatchBuild.config[:app_identifier]}") unless app
+      UI.user_error!("Could not find app with app identifier") unless app
 
       start = Time.now
 

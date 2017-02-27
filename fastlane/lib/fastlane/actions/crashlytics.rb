@@ -16,7 +16,8 @@ module Fastlane
           UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
           params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
-            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog').path
+            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
+          ).path
         end
 
         if params[:ipa_path]
@@ -34,7 +35,7 @@ module Fastlane
                  .gsub(params[:build_secret], '[[BUILD_SECRET]]')
         end
 
-        UI.verbose sanitizer.call(command.join(' ')) if $verbose
+        UI.verbose sanitizer.call(command.join(' ')) if FastlaneCore::Globals.verbose?
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
@@ -45,13 +46,15 @@ module Fastlane
           command.join(" "),
           print_command: false,
           print_command_output: false,
-          error_callback: error_callback)
+          error_callback: error_callback
+        )
 
         return command if Helper.test?
 
-        UI.verbose sanitizer.call(result) if $verbose
+        UI.verbose sanitizer.call(result) if FastlaneCore::Globals.verbose?
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
+        UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
       end
 
       def self.description
@@ -73,7 +76,7 @@ module Fastlane
           # iOS Specific
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "CRASHLYTICS_IPA_PATH",
-                                       description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
                                        optional: true,
                                        verify_block: proc do |value|
@@ -98,13 +101,15 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
-                                       description: "Crashlytics Beta API Token",
+                                       description: "Crashlytics API Key",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_secret,
                                        env_name: "CRASHLYTICS_BUILD_SECRET",
                                        description: "Crashlytics Build Secret",
+                                       sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No build secret for Crashlytics given, pass using `build_secret: 'secret'`") unless value && !value.empty?
                                        end),
@@ -150,6 +155,29 @@ module Fastlane
 
       def self.author
         ["KrauseFx", "pedrogimenez"]
+      end
+
+      def self.details
+        [
+          "Additionally you can specify `notes`, `emails`, `groups` and `notifications`.",
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'crashlytics',
+          'crashlytics(
+            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+            api_token: "...",
+            build_secret: "...",
+            ipa_path: "./app.ipa"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

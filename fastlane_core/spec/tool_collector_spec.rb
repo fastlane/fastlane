@@ -55,8 +55,8 @@ describe FastlaneCore::ToolCollector do
     expect(form["steps"]["gym"]).to eq(1)
     expect(form["steps"]["scan"]).to eq(1)
 
-    expect(form["versions"]["gym"]).to eq(Gym::VERSION)
-    expect(form["versions"]["scan"]).to eq(Scan::VERSION)
+    expect(form["versions"]["gym"]).to eq(Fastlane::VERSION)
+    expect(form["versions"]["scan"]).to eq(Fastlane::VERSION)
 
     expect(form["error"]).to eq("scan")
     expect(form["crash"]).to eq("scan")

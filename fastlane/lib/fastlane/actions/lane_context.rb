@@ -33,6 +33,14 @@ module Fastlane
       def self.step_text
         nil
       end
+
+      def self.example_code
+        []
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

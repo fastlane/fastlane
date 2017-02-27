@@ -3,20 +3,20 @@ describe Fastlane do
     describe "#initialize" do
       it "raises an error if file does not exist" do
         expect do
-          Fastlane::FastFile.new('./spec/fixtures/fastfiles/fastfileNotHere')
-        end.to raise_exception "Could not find Fastfile at path './spec/fixtures/fastfiles/fastfileNotHere'"
+          Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/fastfileNotHere')
+        end.to raise_exception "Could not find Fastfile at path './fastlane/spec/fixtures/fastfiles/fastfileNotHere'"
       end
 
       it "raises an error if unknow method is called" do
         expect do
-          Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalid')
-        end.to raise_exception "Could not find action or lane 'laneasdf'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
+          Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
+        end.to raise_exception "Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
       end
     end
 
     describe "#is_platform_block?" do
       before do
-        @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       end
 
       it "return true if it's a platform" do
@@ -35,10 +35,10 @@ describe Fastlane do
 
     describe "#lane_name" do
       before do
-        @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
       end
 
-      it "raises an error if block is missing", nower: true do
+      it "raises an error if block is missing" do
         expect(UI).to receive(:user_error!).with("You have to pass a block using 'do' for lane 'my_name'. Make sure you read the docs on GitHub.")
         @ff.lane(:my_name)
       end
@@ -55,7 +55,7 @@ describe Fastlane do
       end
 
       it "raises an error if the name is on a black list" do
-        expect(UI).to receive(:user_error!).with("Name 'run' is already taken")
+        expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
         @ff.lane :run do
         end
       end
@@ -71,7 +71,7 @@ describe Fastlane do
       before do
         FileUtils.rm_rf('/tmp/fastlane/')
 
-        @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       end
 
       it "calls a block for a given platform (mac - beta)" do
@@ -131,10 +131,9 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(nil)
       end
 
-      it "raises an exception if unsupported action is called in unsupported platform" do
-        expect do
-          @ff.runner.execute('unsupported_action', 'android')
-        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'."
+      it "logs a warning if and unsupported action is called on an non officially supported platform" do
+        expect(FastlaneCore::UI).to receive(:important).with("Action 'frameit' isn't known to support operating system 'android'.")
+        @ff.runner.execute('unsupported_action', 'android')
       end
     end
 
@@ -143,7 +142,7 @@ describe Fastlane do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
 
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
         expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
         expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
@@ -155,17 +154,22 @@ describe Fastlane do
         expect(File.exist?('/tmp/fastlane/test')).to eq(true)
       end
 
+      it "prints a warning if a lane is called like an action" do
+        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+      end
+
       it "allows calling a lane directly even with a default_platform" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
         result = ff.runner.execute(:test)
         expect(result.to_i).to be > 10
       end
 
       it "Parameters are also passed to the before_all, after_all" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileConfigs')
         time = Time.now.to_i.to_s
 
-        ff.runner.execute(:something, nil, {value: time })
+        ff.runner.execute(:something, nil, { value: time })
 
         expect(File.read("/tmp/before_all.txt")).to eq(time)
         expect(File.read("/tmp/after_all.txt")).to eq(time)
@@ -173,8 +177,22 @@ describe Fastlane do
         File.delete("/tmp/after_all.txt")
       end
 
+      it "allows the user to invent a new platform" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileNewPlatform')
+        expect do
+          ff.runner.execute(:crash, :windows)
+        end.to raise_error(":windows crash")
+      end
+
+      it "allows the user to set the platform in their Fastfile", focus: true do
+        expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
+        expect(UI).to receive(:message).with("echo :windows")
+        ff.runner.execute(:echo, :windows)
+      end
+
       it "before_each and after_each are called every time" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileLaneBlocks')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneBlocks')
         ff.runner.execute(:run_ios, :ios)
 
         expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
@@ -183,7 +201,7 @@ describe Fastlane do
         before_each = File.read("/tmp/fastlane/before_each")
         after_each = File.read("/tmp/fastlane/after_each")
 
-        %w( run lane1 lane2 ).each do |lane|
+        %w(run lane1 lane2).each do |lane|
           expect(before_each).to include(lane)
           expect(after_each).to include(lane)
         end
@@ -195,27 +213,38 @@ describe Fastlane do
       end
 
       it "Parameters are also passed to the error block" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileConfigs')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileConfigs')
         time = Time.now.to_i.to_s
 
         expect do
-          ff.runner.execute(:crash, nil, {value: time })
-        end.to raise_error # since we cause a crash
+          ff.runner.execute(:crash, nil, { value: time })
+        end.to raise_error("Wups") # since we cause a crash
 
         expect(File.read("/tmp/error.txt")).to eq(time)
         File.delete("/tmp/error.txt")
       end
 
+      it "Exception in error block are swallowed and shown, and original exception is re-raised" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileErrorInError')
+
+        expect(FastlaneCore::UI).to receive(:error).with("An error occured while executing the `error` block:")
+        expect(FastlaneCore::UI).to receive(:error).with("Error in error")
+
+        expect do
+          ff.runner.execute(:beta, nil, {})
+        end.to raise_error("Original error")
+      end
+
       describe "supports switching lanes" do
         it "use case 1: passing parameters to another lane and getting the result" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane1, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
         end
 
         it "properly tracks the lane switches" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane1, :ios)
 
           expect(ff.collector.launches).to eq({
@@ -226,42 +255,42 @@ describe Fastlane do
         end
 
         it "use case 2: passing no parameter to a lane that takes parameters" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane3, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + ")
         end
 
         it "use case 3: Calling a lane directly which takes parameters" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane4, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("{}")
         end
 
         it "use case 4: Passing parameters to another lane" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane5, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("{:key=>:value}")
         end
 
         it "use case 5: Calling a method outside of the current platform" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:call_general_lane, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("{:random=>:value}")
         end
 
         it "calling a lane that doesn't exist" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid, :ios)
-          end.to raise_error "Could not find action or lane 'wrong_platform'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane"
+          end.to raise_error "Could not find action, lane or variable 'wrong_platform'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
         end
 
         it "raises an exception when not passing a hash" do
-          ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/SwitcherFastfile')
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid_parameters, :ios)
           end.to raise_error "Parameters for a lane must always be a hash"
@@ -269,7 +298,7 @@ describe Fastlane do
       end
 
       it "collects the lane description for documentation" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
 
         expect(ff.runner.lanes[nil][:deploy].description).to eq(["My Deploy", "description"])
@@ -280,7 +309,7 @@ describe Fastlane do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
 
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile2')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile2')
         ff.runner.execute(:deploy)
         expect(File.exist?('/tmp/fastlane/before_all_deploy')).to eq(true)
         expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
@@ -293,13 +322,13 @@ describe Fastlane do
       end
 
       it "automatically converts invalid quotations" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidQuotation')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalidQuotation')
         # No exception :)
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
-        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileSytnaxError')
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile from string" do
@@ -311,13 +340,20 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile')
-        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
+        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
       end
 
+      it "imports actions associated with a Fastfile before their Fastfile" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
+        expect do
+          ff.import('./import1/Fastfile')
+        end.not_to raise_error
+      end
+
       it "raises an error if lane is not available" do
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         expect do
           ff.runner.execute(:not_here)
         end.to raise_exception("Could not find lane 'not_here'. Available lanes: test, deploy, error_causing_lane, mac specific")
@@ -325,10 +361,12 @@ describe Fastlane do
 
       it "raises an error if the lane name contains spaces" do
         expect(UI).to receive(:user_error!).with("lane name must not contain any spaces")
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileInvalidName')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalidName')
       end
 
       it "runs pod install" do
+        expect(Fastlane::Actions).to receive(:verify_gem!).with("cocoapods")
+
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
         end").runner.execute(:test)
@@ -340,7 +378,7 @@ describe Fastlane do
         FileUtils.rm_rf('/tmp/fastlane/')
         FileUtils.mkdir_p('/tmp/fastlane/')
 
-        ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/Fastfile1')
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         expect do
           ff.runner.execute(:error_causing_lane)
         end.to raise_exception("divided by 0")

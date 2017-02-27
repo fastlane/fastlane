@@ -10,20 +10,20 @@ Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master
 
 **Adding Credentials**
 ```
-fastlane-credentials add --username felix@krausefx.com
+fastlane fastlane-credentials add --username felix@krausefx.com
 Password: *********
 Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
 ```
-fastlane-credentials remove --username felix@krausefx.com
+fastlane fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
 ## Storing in the keychain
 
-By default, your Apple credentials are stored in the OS X Keychain.
+By default, your Apple credentials are stored in the macOS Keychain.
 
 Your password is only stored locally on your computer.
 

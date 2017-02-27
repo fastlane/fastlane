@@ -1,7 +1,0 @@
-git_url "https://github.com/fastlane/certificates"
-
-type "appstore" # The default type, can be: appstore, adhoc or development
-
-# app_identifier "tools.fastlane.app" 
-
-# For all available options run `match --help`

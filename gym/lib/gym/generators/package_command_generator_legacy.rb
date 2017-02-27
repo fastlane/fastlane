@@ -1,5 +1,5 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
@@ -11,6 +11,8 @@ module Gym
   class PackageCommandGeneratorLegacy
     class << self
       def generate
+        print_legacy_information
+
         parts = ["/usr/bin/xcrun #{XcodebuildFixes.patch_package_application.shellescape} -v"]
         parts += options
         parts += pipe
@@ -30,7 +32,7 @@ module Gym
         end
 
         if Gym.config[:codesigning_identity]
-          options << "--sign '#{Gym.config[:codesigning_identity]}'"
+          options << "--sign #{Gym.config[:codesigning_identity].shellescape}"
         end
 
         options
@@ -76,6 +78,24 @@ module Gym
 
       def apps_path
         ""
+      end
+
+      def print_legacy_information
+        if Gym.config[:include_bitcode]
+          UI.important "Legacy build api is enabled, the `include_bitcode` value will be ignored"
+        end
+
+        if Gym.config[:include_symbols]
+          UI.important "Legacy build api is enabled, the `include_symbols` value will be ignored"
+        end
+
+        if Gym.config[:export_team_id].to_s.length > 0
+          UI.important "Legacy build api is enabled, the `export_team_id` value will be ignored"
+        end
+
+        if Gym.config[:export_method].to_s.length > 0
+          UI.important "Legacy build api is enabled, the `export_method` value will be ignored"
+        end
       end
     end
   end

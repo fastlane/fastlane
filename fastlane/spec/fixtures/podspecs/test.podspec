@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = "SpecName"
   s.header_dir   = "SuchHeader"
-  s.Version      = "1.5.1"
+  s.version      = "1.5.1"
   s.summary      = "With just a few lines of code, your app can add fastlane support."
 
   s.description  = <<-DESC

@@ -35,7 +35,15 @@ module Fastlane
       end
 
       def self.description
-        "Deletes files created as result of running ipa, cert, sigh or download_dsyms"
+        "Deletes files created as result of running gym, cert, sigh or download_dsyms"
+      end
+
+      def self.details
+        [
+          "This action deletes the files that get created in your repo as a result of running the _gym_ and _sigh_ commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.",
+          "",
+          "Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards."
+        ].join("\n")
       end
 
       def self.author
@@ -44,6 +52,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'clean_build_artifacts'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

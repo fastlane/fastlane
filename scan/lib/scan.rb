@@ -1,5 +1,4 @@
 require 'json'
-require 'scan/version'
 require 'scan/manager'
 require 'scan/options'
 require 'scan/runner'
@@ -35,4 +34,7 @@ module Scan
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
+  DESCRIPTION = "The easiest way to run tests of your iOS and Mac app"
 end

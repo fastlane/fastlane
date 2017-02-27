@@ -9,25 +9,22 @@ describe Fastlane do
     end
 
     describe "Complete setup process" do
-      let (:fixtures) { File.expand_path("./spec/fixtures/setup_workspace/") }
+      let (:fixtures) { File.expand_path("./fastlane/spec/fixtures/setup_workspace/") }
       let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
       before do
         fastlane_folder = File.join(workspace, 'fastlane')
         FileUtils.rm_rf(workspace) if File.directory? workspace
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
-        $terminal = HighLine.new # mock user inputs :)
-        allow($terminal).to receive(:ask).and_return("y")
+        expect(FastlaneCore::UI).to receive(:input).and_return("y")
 
-        allow(Fastlane::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
 
         ENV['DELIVER_USER'] = 'felix@sunapps.net'
       end
 
       it "setup is successful and generated inital Fastfile" do
         require 'produce'
-
-        allow(FastlaneCore::Helper).to receive(:gem_path).with('fastlane').and_return(File.expand_path(".")) # since we chdir later on
 
         app = "app"
 
@@ -44,7 +41,7 @@ describe Fastlane do
 
         expect(FastlaneCore::UI).to receive(:confirm).and_return(true)
 
-        Fastlane::FastlaneFolder.create_folder!(workspace)
+        FastlaneCore::FastlaneFolder.create_folder!(workspace)
         Dir.chdir(workspace) do
           setup = Fastlane::SetupIos.new
           expect(setup).to receive(:enable_deliver).and_return(nil)
@@ -58,15 +55,15 @@ describe Fastlane do
           allow(project).to receive(:path).and_return("./path")
 
           expect(setup.run).to eq(true)
-          expect(setup.tools).to eq({snapshot: false, cocoapods: true, carthage: false})
+          expect(setup.tools).to eq({ snapshot: false, cocoapods: true, carthage: false })
 
-          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Fastfile'))
+          content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile'))
           expect(content).to include "# update_fastlane"
           expect(content).to include "deliver"
           expect(content).to include "scan"
           expect(content).to include "gym(scheme: \"MyScheme\")"
 
-          content = File.read(File.join(Fastlane::FastlaneFolder.path, 'Appfile'))
+          content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Appfile'))
 
           expect(content).to include "app_identifier \"#{app_identifier}\""
           expect(content).to include "team_id \"#{dev_team_id}\""

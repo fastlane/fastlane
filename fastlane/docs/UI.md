@@ -1,3 +1,7 @@
+## Timestamps
+
+To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
+
 ## Interacting with the user
 
 Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` across all fastlane tools:

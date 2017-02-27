@@ -15,14 +15,9 @@ module Fastlane
     attr_accessor :app_name
 
     def run
-      if FastlaneFolder.setup? and !Helper.is_test?
-        UI.important("Fastlane already set up at path #{folder}")
-        return
-      end
-
       show_infos
 
-      FastlaneFolder.create_folder! unless Helper.is_test?
+      FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
       is_manual_setup = false
 
       begin
@@ -138,7 +133,7 @@ module Fastlane
 
     def copy_existing_files
       files_to_copy.each do |current|
-        current = File.join(File.expand_path('..', FastlaneFolder.path), current)
+        current = File.join(File.expand_path('..', FastlaneCore::FastlaneFolder.path), current)
         next unless File.exist?(current)
         file_name = File.basename(current)
         to_path = File.join(folder, file_name)
@@ -148,15 +143,15 @@ module Fastlane
     end
 
     def ask_for_apple_id
-      self.apple_id ||= ask('Your Apple ID (e.g. fastlane@krausefx.com): '.yellow)
+      self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
     end
 
     def ask_for_app_identifier
-      self.app_identifier = ask('App Identifier (com.krausefx.app): '.yellow)
+      self.app_identifier = UI.input("App Identifier (com.krausefx.app): ")
     end
 
     def generate_appfile(manually: false)
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/AppfileTemplate")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplate")
       if manually
         ask_for_app_identifier
         ask_for_apple_id
@@ -207,7 +202,7 @@ module Fastlane
       rescue => exception
         if exception.to_s.include?("The App Name you entered has already been used")
           UI.important("It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.")
-          Produce.config[:app_name] = ask("App Name: ".yellow)
+          Produce.config[:app_name] = UI.input("App Name: ")
           Produce.config[:skip_devcenter] = true # since we failed on iTC
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
         end
@@ -233,9 +228,9 @@ module Fastlane
     def generate_fastfile(manually: false)
       scheme = self.project.schemes.first unless manually
 
-      template = File.read("#{Helper.gem_path('fastlane')}/lib/assets/DefaultFastfileTemplate")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate")
 
-      scheme = ask("Optional: The scheme name of your app (If you don't need one, just hit Enter): ").to_s.strip unless scheme
+      scheme = UI.input("Optional: The scheme name of your app (If you don't need one, just hit Enter): ") unless scheme
       if scheme.length > 0
         template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
       else
@@ -258,7 +253,7 @@ module Fastlane
     end
 
     def folder
-      FastlaneFolder.path
+      FastlaneCore::FastlaneFolder.path
     end
 
     def restore_previous_state

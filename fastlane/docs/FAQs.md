@@ -33,7 +33,7 @@ If you experiennce slow launch times of `fastlane`, there are 2 solutions to sol
 
 ##### Use a Gemfile
 
-Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From the on launch `fastlane` using:
+Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From then on launch `fastlane` using:
 
 ```
 bundle exec fastlane ...
@@ -64,7 +64,7 @@ DLV_SCND_CATG=Games
 ```
 
 Now your Deliver file should look something like this:
-```
+```ruby
 app_review_information(
   first_name: ENV['DLV_FIRST_NAME'],
   last_name: ENV['DLV_LAST_NAME']
@@ -82,13 +82,16 @@ You can also references these environment variables almost anywhere in `fastlane
 
 You can even define a lane to perform actions on multiple targets:
 
-```
+```ruby
 desc "Deploy both versions"
 lane :deploy_all do
     sh "fastlane deploy --env paid"
     sh "fastlane deploy --env free"
 end
 ```
+
+And you can combine multiple envs in one go
+Ex: `fastlane build --env app1,env1,env2` will use `.env.app1` `.env.env1` and `.env.env2`
 
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
 
@@ -102,5 +105,5 @@ export FASTLANE_DISABLE_COLORS=1
 
 ### "User interaction is not allowed" when using `fastlane` via SSH
 
-This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](http://stackoverflow.com/a/22637896/445598).
+This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](https://stackoverflow.com/a/22637896/445598).
 

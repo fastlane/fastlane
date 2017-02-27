@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'screengrab'
-require 'screengrab/commands_generator'
-Screengrab::CommandsGenerator.start

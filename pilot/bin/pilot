@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
-
-require "pilot"
-require "pilot/commands_generator"
-Pilot::CommandsGenerator.start

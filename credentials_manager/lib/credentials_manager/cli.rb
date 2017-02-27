@@ -1,4 +1,3 @@
-require 'credentials_manager/version'
 require 'commander'
 
 module CredentialsManager
@@ -8,12 +7,12 @@ module CredentialsManager
     # Parses command options and executes actions
     def run
       program :name, 'CredentialsManager'
-      program :version, ::CredentialsManager::VERSION
+      program :version, Fastlane::VERSION
       program :description, 'Manage credentials for fastlane tools.'
 
       # Command to add entry to Keychain
       command :add do |c|
-        c.syntax = 'fastlane-credentials add'
+        c.syntax = 'fastlane fastlane-credentials add'
         c.description = 'Adds a fastlane credential to the keychain.'
 
         c.option '--username username', String, 'Username to add.'
@@ -31,7 +30,7 @@ module CredentialsManager
 
       # Command to remove credential from Keychain
       command :remove do |c|
-        c.syntax = 'fastlane-credentials remove'
+        c.syntax = 'fastlane fastlane-credentials remove'
         c.description = 'Removes a fastlane credential from the keychain.'
 
         c.option '--username username', String, 'Username to remove.'

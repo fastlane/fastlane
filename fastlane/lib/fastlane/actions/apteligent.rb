@@ -72,6 +72,7 @@ module Fastlane
                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_APTELIGENT_API_KEY",
+                                       sensitive: true,
                                        description: "Apteligent App API key e.g. IXPQIi8yCbHaLliqzRoo065tH0lxxxxx",
                                        optional: false)
         ]
@@ -83,6 +84,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'apteligent(
+            app_id: "...",
+            api_key: "..."
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

@@ -112,14 +112,6 @@ module Spaceship
         'buildTestInformationTO.externalStatus' => :external_testing_status
       )
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def setup
         super
 
@@ -130,7 +122,8 @@ module Spaceship
       def details
         response = client.build_details(app_id: self.apple_id,
                                          train: self.train_version,
-                                  build_number: self.build_version)
+                                  build_number: self.build_version,
+                                      platform: self.platform)
         response['apple_id'] = self.apple_id
         BuildDetails.factory(response)
       end

@@ -2,9 +2,13 @@ module Fastlane
   module Helper
     class CrashlyticsHelper
       class << self
+        def discover_default_crashlytics_path
+          Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+        end
+
         def generate_ios_command(params)
           unless params[:crashlytics_path]
-            params[:crashlytics_path] = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+            params[:crashlytics_path] = discover_default_crashlytics_path
           end
 
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
@@ -13,7 +17,7 @@ module Fastlane
           UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
 
           command = []
-          command << submit_binary
+          command << submit_binary.shellescape
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"
@@ -68,8 +72,14 @@ module Fastlane
           begin
             UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
-            result = Net::HTTP.get(URI(url))
-            File.write(zip_path, result)
+            # Work around ruby defect, where HTTP#get_response and HTTP#post_form don't use ENV proxy settings
+            # https://bugs.ruby-lang.org/issues/12724
+            uri = URI(url)
+            http_conn = Net::HTTP.new(uri.host, uri.port)
+            http_conn.use_ssl = true
+            result = http_conn.request_get(uri.path)
+            UI.error! "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            File.write(zip_path, result.body)
 
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"

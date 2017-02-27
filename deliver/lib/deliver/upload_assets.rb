@@ -1,9 +1,10 @@
 module Deliver
   class UploadAssets
     def upload(options)
+      return if options[:edit_live]
       app = options[:app]
 
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
       if options[:app_icon]

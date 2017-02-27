@@ -59,6 +59,10 @@ module Fastlane
         "Update the project's bundle identifier"
       end
 
+      def self.details
+        "Update an app identifier by either setting `CFBundleIdentifier` or `PRODUCT_BUNDLE_IDENTIFIER`, depending on which is already in use."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
@@ -78,12 +82,26 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',
                                        description: 'The app Identifier you want to set',
-                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'])
+                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
         ]
       end
 
       def self.authors
         ['squarefrog', 'tobiasstrebitzer']
+      end
+
+      def self.example_code
+        [
+          'update_app_identifier(
+            xcodeproj: "Example.xcodeproj", # Optional path to xcodeproj, will use the first .xcodeproj if not set
+            plist_path: "Example/Info.plist", # Path to info plist file, relative to xcodeproj
+            app_identifier: "com.test.example" # The App Identifier
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

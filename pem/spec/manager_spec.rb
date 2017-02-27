@@ -4,7 +4,7 @@ describe PEM do
       ENV["DELIVER_USER"] = "test@fastlane.tools"
       ENV["DELIVER_PASSWORD"] = "123"
 
-      stub_spaceship
+      pem_stub_spaceship
     end
 
     before :all do

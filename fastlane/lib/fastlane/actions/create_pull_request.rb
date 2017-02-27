@@ -50,6 +50,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "GITHUB_PULL_REQUEST_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
+                                       sensitive: true,
+                                       default_value: ENV["GITHUB_API_TOKEN"],
                                        is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repo,
@@ -94,6 +96,24 @@ module Fastlane
 
       def self.is_supported?(platform)
         return true
+      end
+
+      def self.example_code
+        [
+          'create_pull_request(
+            api_token: ENV["GITHUB_TOKEN"],
+            repo: "fastlane/fastlane",
+            title: "Amazing new feature",
+            head: "my-feature",                 # optional, defaults to current branch name
+            base: "master",                     # optional, defaults to "master"
+            body: "Please pull this in!",       # optional
+            api_url: "http://yourdomain/api/v3" # optional, for Github Enterprise, defaults to "https://api.github.com"
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

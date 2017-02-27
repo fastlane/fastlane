@@ -1,69 +1,19 @@
 {
   "data": {
-    "sectionErrorKeys": [],
-    "sectionInfoKeys": [],
-    "sectionWarningKeys": [],
-    "trains": [{
-      "versionString": "1.0",
-      "platform": "ios",
-      "testing": null,
-      "internalTesting": {
-        "value": true,
-        "isEditable": true,
-        "isRequired": false,
-        "errorKeys": null
-      },
-      "externalTesting": {
-        "value": false,
-        "isEditable": true,
-        "isRequired": false,
-        "errorKeys": null
-      },
-      "internalActivated": 1443151227000,
-      "externalActivated": null,
-      "builds": [{
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "10",
-        "trainVersion": "1.0",
-        "uploadDate": 1443144470000,
-        "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
+    "sectionErrorKeys": [
+
+    ],
+    "sectionInfoKeys": [
+
+    ],
+    "sectionWarningKeys": [
+
+    ],
+    "trains": [
+      {
+        "versionString": "1.0",
         "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": false,
-        "processingState": null,
-        "id": 5577102,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "active",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445737214000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
+        "testing": null,
         "internalTesting": {
           "value": true,
           "isEditable": true,
@@ -76,407 +26,237 @@
           "isRequired": false,
           "errorKeys": null
         },
-        "buildTestInformationTO": {
-          "sectionErrorKeys": [],
-          "sectionInfoKeys": [],
-          "sectionWarningKeys": [],
-          "internalStatus": "active",
-          "externalStatus": "submitForReview",
-          "expirationDate": null,
-          "internalExpirationDate": null,
-          "externalExpirationDate": null,
-          "primaryLanguage": "English",
-          "primaryLocaleCode": "en-US",
-          "availableLanguages": ["English"],
-          "details": [{
-            "sectionErrorKeys": [],
-            "sectionInfoKeys": [],
-            "sectionWarningKeys": [],
-            "language": "English",
-            "localeCode": "en-US",
-            "whatsNew": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 4000,
-              "minLength": 4
-            },
-            "description": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 4000,
-              "minLength": 10
-            },
-            "feedbackEmail": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 500,
-              "minLength": 1
-            },
-            "marketingUrl": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 255,
-              "minLength": 1
-            },
-            "privacyPolicyUrl": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": false,
-              "errorKeys": null,
-              "maxLength": 255,
-              "minLength": 1
-            },
-            "privacyPolicyText": null
-          }],
-          "reviewFirstName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewLastName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewPhone": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 20,
-            "minLength": 1
-          },
-          "reviewEmail": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewNotes": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 4000,
-            "minLength": 1
-          },
-          "reviewUserName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 400,
-            "minLength": 1
-          },
-          "reviewPassword": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 400,
-            "minLength": 1
-          },
-          "reviewAccountRequired": {
-            "value": false,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null
-          },
-          "eula": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": null,
-            "minLength": 1
-          },
-          "hasExportCompliance": false,
-          "installCount": 0,
-          "externalInstallCount": 0,
-          "internalInstallCount": 0,
-          "sessionCount": 0,
-          "externalSessionCount": 0,
-          "internalSessionCount": 0,
-          "crashCount": 0,
-          "externalCrashCount": 0,
-          "internalCrashCount": 0
-        }
-      }],
-      "buildsInProcessing": []
-    }, {
-      "versionString": "1.1",
-      "platform": "ios",
-      "testing": null,
-      "internalTesting": {
-        "value": false,
-        "isEditable": true,
-        "isRequired": false,
-        "errorKeys": null
-      },
-      "externalTesting": {
-        "value": false,
-        "isEditable": true,
-        "isRequired": false,
-        "errorKeys": null
-      },
-      "internalActivated": null,
-      "externalActivated": null,
-      "builds": [{
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "9",
-        "trainVersion": "1.1",
-        "uploadDate": 1443150586000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
-        "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": false,
-        "processingState": null,
-        "id": 5578620,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "inactive",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
-        "internalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        },
-        "externalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        },
-        "buildTestInformationTO": {
-          "sectionErrorKeys": [],
-          "sectionInfoKeys": [],
-          "sectionWarningKeys": [],
-          "internalStatus": "inactive",
-          "externalStatus": "approvedInactive",
-          "expirationDate": null,
-          "internalExpirationDate": null,
-          "externalExpirationDate": null,
-          "primaryLanguage": "English",
-          "primaryLocaleCode": "en-US",
-          "availableLanguages": ["English"],
-          "details": [{
-            "sectionErrorKeys": [],
-            "sectionInfoKeys": [],
-            "sectionWarningKeys": [],
-            "language": "English",
-            "localeCode": "en-US",
-            "whatsNew": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 4000,
-              "minLength": 4
-            },
-            "description": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 4000,
-              "minLength": 10
-            },
-            "feedbackEmail": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 500,
-              "minLength": 1
-            },
-            "marketingUrl": {
-              "value": null,
-              "isEditable": true,
-              "isRequired": true,
-              "errorKeys": null,
-              "maxLength": 255,
-              "minLength": 1
-            },
-            "privacyPolicyUrl": {
-              "value": null,
+        "internalActivated": 1443151227000,
+        "externalActivated": null,
+        "builds": [
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "10",
+            "trainVersion": "1.0",
+            "uploadDate": 1443144470000,
+            "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5577102,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "active",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445737214000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": true,
               "isEditable": true,
               "isRequired": false,
-              "errorKeys": null,
-              "maxLength": 255,
-              "minLength": 1
+              "errorKeys": null
             },
-            "privacyPolicyText": null
-          }],
-          "reviewFirstName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewLastName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewPhone": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 20,
-            "minLength": 1
-          },
-          "reviewEmail": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": true,
-            "errorKeys": null,
-            "maxLength": 100,
-            "minLength": 1
-          },
-          "reviewNotes": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 4000,
-            "minLength": 1
-          },
-          "reviewUserName": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 400,
-            "minLength": 1
-          },
-          "reviewPassword": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": 400,
-            "minLength": 1
-          },
-          "reviewAccountRequired": {
-            "value": false,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null
-          },
-          "eula": {
-            "value": null,
-            "isEditable": true,
-            "isRequired": false,
-            "errorKeys": null,
-            "maxLength": null,
-            "minLength": 1
-          },
-          "hasExportCompliance": false,
-          "installCount": 0,
-          "externalInstallCount": 0,
-          "internalInstallCount": 0,
-          "sessionCount": 0,
-          "externalSessionCount": 0,
-          "internalSessionCount": 0,
-          "crashCount": 0,
-          "externalCrashCount": 0,
-          "internalCrashCount": 0
-        }
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "buildTestInformationTO": {
+              "sectionErrorKeys": [
+
+              ],
+              "sectionInfoKeys": [
+
+              ],
+              "sectionWarningKeys": [
+
+              ],
+              "internalStatus": "active",
+              "externalStatus": "submitForReview",
+              "expirationDate": null,
+              "internalExpirationDate": null,
+              "externalExpirationDate": null,
+              "primaryLanguage": "English",
+              "primaryLocaleCode": "en-US",
+              "availableLanguages": [
+                "English"
+              ],
+              "details": [
+                {
+                  "sectionErrorKeys": [
+
+                  ],
+                  "sectionInfoKeys": [
+
+                  ],
+                  "sectionWarningKeys": [
+
+                  ],
+                  "language": "English",
+                  "localeCode": "en-US",
+                  "whatsNew": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 4
+                  },
+                  "description": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 10
+                  },
+                  "feedbackEmail": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 500,
+                    "minLength": 1
+                  },
+                  "marketingUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": false,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyText": null
+                }
+              ],
+              "reviewFirstName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewLastName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewPhone": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 20,
+                "minLength": 1
+              },
+              "reviewEmail": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewNotes": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 4000,
+                "minLength": 1
+              },
+              "reviewUserName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewPassword": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewAccountRequired": {
+                "value": false,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              },
+              "eula": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": null,
+                "minLength": 1
+              },
+              "hasExportCompliance": false,
+              "installCount": 0,
+              "externalInstallCount": 0,
+              "internalInstallCount": 0,
+              "sessionCount": 0,
+              "externalSessionCount": 0,
+              "internalSessionCount": 0,
+              "crashCount": 0,
+              "externalCrashCount": 0,
+              "internalCrashCount": 0
+            }
+          }
+        ],
+        "buildsInProcessing": [
+
+        ]
       },
       {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "10",
-        "trainVersion": "1.1",
-        "uploadDate": 1443150586000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
+        "versionString": "1.1",
         "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": false,
-        "processingState": null,
-        "id": 5578620,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "inactive",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
+        "testing": null,
         "internalTesting": {
           "value": false,
           "isEditable": true,
@@ -488,51 +268,845 @@
           "isEditable": true,
           "isRequired": false,
           "errorKeys": null
-        }
+        },
+        "internalActivated": null,
+        "externalActivated": null,
+        "builds": [
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "9",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "buildTestInformationTO": {
+              "sectionErrorKeys": [
+
+              ],
+              "sectionInfoKeys": [
+
+              ],
+              "sectionWarningKeys": [
+
+              ],
+              "internalStatus": "inactive",
+              "externalStatus": "approvedInactive",
+              "expirationDate": null,
+              "internalExpirationDate": null,
+              "externalExpirationDate": null,
+              "primaryLanguage": "English",
+              "primaryLocaleCode": "en-US",
+              "availableLanguages": [
+                "English"
+              ],
+              "details": [
+                {
+                  "sectionErrorKeys": [
+
+                  ],
+                  "sectionInfoKeys": [
+
+                  ],
+                  "sectionWarningKeys": [
+
+                  ],
+                  "language": "English",
+                  "localeCode": "en-US",
+                  "whatsNew": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 4
+                  },
+                  "description": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 10
+                  },
+                  "feedbackEmail": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 500,
+                    "minLength": 1
+                  },
+                  "marketingUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": false,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyText": null
+                }
+              ],
+              "reviewFirstName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewLastName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewPhone": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 20,
+                "minLength": 1
+              },
+              "reviewEmail": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewNotes": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 4000,
+                "minLength": 1
+              },
+              "reviewUserName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewPassword": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewAccountRequired": {
+                "value": false,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              },
+              "eula": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": null,
+                "minLength": 1
+              },
+              "hasExportCompliance": false,
+              "installCount": 0,
+              "externalInstallCount": 0,
+              "internalInstallCount": 0,
+              "sessionCount": 0,
+              "externalSessionCount": 0,
+              "internalSessionCount": 0,
+              "crashCount": 0,
+              "externalCrashCount": 0,
+              "internalCrashCount": 0
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "10",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "11",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "12",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "13",
+            "trainVersion": "1.1",
+            "uploadDate": 1436381720000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "invalidBinary",
+            "id": 5578620,
+            "valid": false,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "14",
+            "trainVersion": "1.1",
+            "uploadDate": 1461108334000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "ios",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "processingFailed",
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "processing",
+            "betaState": "none",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": false,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "15",
+            "trainVersion": "1.1",
+            "uploadDate": 1461452777000,
+            "iconUrl": null,
+            "iconAssetToken": null,
+            "appName": null,
+            "platform": "ios",
+            "betaEntitled": false,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "processing",
+            "id": 0,
+            "valid": false,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "processing",
+            "betaState": "processing",
+            "internalExpiry": 0,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": false,
+            "sdkBuildWhitelisted": false,
+            "internalTesting": null,
+            "externalTesting": null,
+            "nextBuildSubmissionAllowed": 0,
+            "buildTestInformationTO": null
+          }
+        ],
+        "buildsInProcessing": [
+
+        ]
       },
       {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "11",
-        "trainVersion": "1.1",
-        "uploadDate": 1443150586000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
-        "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": true,
-        "processingState": null,
-        "id": 5578620,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "inactive",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
+        "versionString": "1.0",
+        "platform": "appletvos",
+        "testing": null,
+        "internalTesting": {
+          "value": true,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "externalTesting": {
+          "value": false,
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        },
+        "internalActivated": 1443151227000,
+        "externalActivated": null,
+        "builds": [
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "10",
+            "trainVersion": "1.0",
+            "uploadDate": 1443144470000,
+            "iconUrl": "https://is3-ssl.mzstatic.com/image/thumb/Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/94/80/28/948028c9-59e7-7b29-e75b-f57e97421ece/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5577102,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "active",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445737214000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": true,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "buildTestInformationTO": {
+              "sectionErrorKeys": [
+
+              ],
+              "sectionInfoKeys": [
+
+              ],
+              "sectionWarningKeys": [
+
+              ],
+              "internalStatus": "active",
+              "externalStatus": "submitForReview",
+              "expirationDate": null,
+              "internalExpirationDate": null,
+              "externalExpirationDate": null,
+              "primaryLanguage": "English",
+              "primaryLocaleCode": "en-US",
+              "availableLanguages": [
+                "English"
+              ],
+              "details": [
+                {
+                  "sectionErrorKeys": [
+
+                  ],
+                  "sectionInfoKeys": [
+
+                  ],
+                  "sectionWarningKeys": [
+
+                  ],
+                  "language": "English",
+                  "localeCode": "en-US",
+                  "whatsNew": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 4
+                  },
+                  "description": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 10
+                  },
+                  "feedbackEmail": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 500,
+                    "minLength": 1
+                  },
+                  "marketingUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": false,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyText": null
+                }
+              ],
+              "reviewFirstName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewLastName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewPhone": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 20,
+                "minLength": 1
+              },
+              "reviewEmail": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewNotes": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 4000,
+                "minLength": 1
+              },
+              "reviewUserName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewPassword": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewAccountRequired": {
+                "value": false,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              },
+              "eula": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": null,
+                "minLength": 1
+              },
+              "hasExportCompliance": false,
+              "installCount": 0,
+              "externalInstallCount": 0,
+              "internalInstallCount": 0,
+              "sessionCount": 0,
+              "externalSessionCount": 0,
+              "internalSessionCount": 0,
+              "crashCount": 0,
+              "externalCrashCount": 0,
+              "internalCrashCount": 0
+            }
+          }
+        ],
+        "buildsInProcessing": [
+
+        ]
+      },
+      {
+        "versionString": "1.1",
+        "platform": "appletvos",
+        "testing": null,
         "internalTesting": {
           "value": false,
           "isEditable": true,
@@ -544,233 +1118,608 @@
           "isEditable": true,
           "isRequired": false,
           "errorKeys": null
-        }
-      },
-      {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "12",
-        "trainVersion": "1.1",
-        "uploadDate": 1443150586000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
-        "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": true,
-        "processingState": null,
-        "id": 5578620,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "inactive",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
-        "internalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
         },
-        "externalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        }
-      },
+        "internalActivated": null,
+        "externalActivated": null,
+        "builds": [
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "9",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "buildTestInformationTO": {
+              "sectionErrorKeys": [
+
+              ],
+              "sectionInfoKeys": [
+
+              ],
+              "sectionWarningKeys": [
+
+              ],
+              "internalStatus": "inactive",
+              "externalStatus": "approvedInactive",
+              "expirationDate": null,
+              "internalExpirationDate": null,
+              "externalExpirationDate": null,
+              "primaryLanguage": "English",
+              "primaryLocaleCode": "en-US",
+              "availableLanguages": [
+                "English"
+              ],
+              "details": [
+                {
+                  "sectionErrorKeys": [
+
+                  ],
+                  "sectionInfoKeys": [
+
+                  ],
+                  "sectionWarningKeys": [
+
+                  ],
+                  "language": "English",
+                  "localeCode": "en-US",
+                  "whatsNew": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 4
+                  },
+                  "description": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 4000,
+                    "minLength": 10
+                  },
+                  "feedbackEmail": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 500,
+                    "minLength": 1
+                  },
+                  "marketingUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": true,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyUrl": {
+                    "value": null,
+                    "isEditable": true,
+                    "isRequired": false,
+                    "errorKeys": null,
+                    "maxLength": 255,
+                    "minLength": 1
+                  },
+                  "privacyPolicyText": null
+                }
+              ],
+              "reviewFirstName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewLastName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewPhone": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 20,
+                "minLength": 1
+              },
+              "reviewEmail": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": true,
+                "errorKeys": null,
+                "maxLength": 100,
+                "minLength": 1
+              },
+              "reviewNotes": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 4000,
+                "minLength": 1
+              },
+              "reviewUserName": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewPassword": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": 400,
+                "minLength": 1
+              },
+              "reviewAccountRequired": {
+                "value": false,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null
+              },
+              "eula": {
+                "value": null,
+                "isEditable": true,
+                "isRequired": false,
+                "errorKeys": null,
+                "maxLength": null,
+                "minLength": 1
+              },
+              "hasExportCompliance": false,
+              "installCount": 0,
+              "externalInstallCount": 0,
+              "internalInstallCount": 0,
+              "sessionCount": 0,
+              "externalSessionCount": 0,
+              "internalSessionCount": 0,
+              "crashCount": 0,
+              "externalCrashCount": 0,
+              "internalCrashCount": 0
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "10",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": false,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "11",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "12",
+            "trainVersion": "1.1",
+            "uploadDate": 1443150586000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": null,
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "13",
+            "trainVersion": "1.1",
+            "uploadDate": 1436381720000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "invalidBinary",
+            "id": 5578620,
+            "valid": false,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "inactive",
+            "betaState": "submitForReview",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": true,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "14",
+            "trainVersion": "1.1",
+            "uploadDate": 1461108334000,
+            "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
+            "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
+            "appName": "Updated by fastlane",
+            "platform": "appletvos",
+            "betaEntitled": true,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "processingFailed",
+            "id": 5578620,
+            "valid": true,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "processing",
+            "betaState": "none",
+            "internalExpiry": 1445742586000,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": false,
+            "sdkBuildWhitelisted": true,
+            "internalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            },
+            "externalTesting": {
+              "value": false,
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null
+            }
+          },
+          {
+            "sectionErrorKeys": [
+
+            ],
+            "sectionInfoKeys": [
+
+            ],
+            "sectionWarningKeys": [
+
+            ],
+            "buildVersion": "15",
+            "trainVersion": "1.1",
+            "uploadDate": 1461452777000,
+            "iconUrl": null,
+            "iconAssetToken": null,
+            "appName": null,
+            "platform": "appletvos",
+            "betaEntitled": false,
+            "exceededFileSizeLimit": false,
+            "wentLiveWithVersion": false,
+            "processing": true,
+            "processingState": "processing",
+            "id": 0,
+            "valid": false,
+            "missingExportCompliance": false,
+            "waitingForExportComplianceApproval": false,
+            "addedInternalUsersCount": 0,
+            "addedExternalUsersCount": 1,
+            "invitedExternalUsersCount": 0,
+            "invitedInternalUsersCount": 0,
+            "acceptedInternalUsersCount": 1,
+            "acceptedExternalUsersCount": 0,
+            "installCount": 0,
+            "internalInstallCount": 0,
+            "externalInstallCount": 0,
+            "sessionCount": 0,
+            "internalSessionCount": 0,
+            "externalSessionCount": 0,
+            "crashCount": 0,
+            "internalCrashCount": 0,
+            "externalCrashCount": 0,
+            "promotedVersion": null,
+            "internalState": "processing",
+            "betaState": "processing",
+            "internalExpiry": 0,
+            "externalExpiry": 0,
+            "watchKitEnabled": false,
+            "readyToInstall": false,
+            "sdkBuildWhitelisted": false,
+            "internalTesting": null,
+            "externalTesting": null,
+            "nextBuildSubmissionAllowed": 0,
+            "buildTestInformationTO": null
+          }
+        ],
+        "buildsInProcessing": [
+
+        ]
+      }
+    ],
+    "processingBuilds": [
       {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
+        "uploadDate": 1436381720000,
         "buildVersion": "13",
         "trainVersion": "1.1",
-        "uploadDate": 1436381720000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
         "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": true,
-        "processingState": "invalidBinary",
-        "id": 5578620,
-        "valid": false,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "inactive",
-        "betaState": "submitForReview",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": true,
-        "sdkBuildWhitelisted": true,
-        "internalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        },
-        "externalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        }
-      },
-      {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "14",
-        "trainVersion": "1.1",
-        "uploadDate": 1461108334000,
-        "iconUrl": "https://is5-ssl.mzstatic.com/image/thumb/Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png/150x150bb-80.png",
-        "iconAssetToken": "Newsstand3/v4/70/6a/7f/706a7f53-bac9-0a43-eb07-9f2cbb9a7d71/Icon-76@2x.png.png",
-        "appName": "Updated by fastlane",
-        "platform": "ios",
-        "betaEntitled": true,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": true,
-        "processingState": "processingFailed",
-        "id": 5578620,
-        "valid": true,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "processing",
-        "betaState": "none",
-        "internalExpiry": 1445742586000,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": false,
-        "sdkBuildWhitelisted": true,
-        "internalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        },
-        "externalTesting": {
-          "value": false,
-          "isEditable": true,
-          "isRequired": false,
-          "errorKeys": null
-        }
-      },
-      {
-        "sectionErrorKeys": [],
-        "sectionInfoKeys": [],
-        "sectionWarningKeys": [],
-        "buildVersion": "15",
-        "trainVersion": "1.1",
-        "uploadDate": 1461452777000,
-        "iconUrl": null,
-        "iconAssetToken": null,
-        "appName": null,
-        "platform": "ios",
-        "betaEntitled": false,
-        "exceededFileSizeLimit": false,
-        "wentLiveWithVersion": false,
-        "processing": true,
-        "processingState": "processing",
-        "id": 0,
-        "valid": false,
-        "missingExportCompliance": false,
-        "waitingForExportComplianceApproval": false,
-        "addedInternalUsersCount": 0,
-        "addedExternalUsersCount": 1,
-        "invitedExternalUsersCount": 0,
-        "invitedInternalUsersCount": 0,
-        "acceptedInternalUsersCount": 1,
-        "acceptedExternalUsersCount": 0,
-        "installCount": 0,
-        "internalInstallCount": 0,
-        "externalInstallCount": 0,
-        "sessionCount": 0,
-        "internalSessionCount": 0,
-        "externalSessionCount": 0,
-        "crashCount": 0,
-        "internalCrashCount": 0,
-        "externalCrashCount": 0,
-        "promotedVersion": null,
-        "internalState": "processing",
-        "betaState": "processing",
-        "internalExpiry": 0,
-        "externalExpiry": 0,
-        "watchKitEnabled": false,
-        "readyToInstall": false,
-        "sdkBuildWhitelisted": false,
-        "internalTesting": null,
-        "externalTesting": null,
-        "nextBuildSubmissionAllowed": 0,
-        "buildTestInformationTO": null
-      }],
-      "buildsInProcessing": []
-    }],
-    "processingBuilds": [{
-      "uploadDate": 1436381720000,
-      "buildVersion": "13",
-      "trainVersion": "1.1",
-      "platform": "ios",
-      "processingState": "invalidBinary"
-    }],
+        "processingState": "invalidBinary"
+      }
+    ],
     "currentTestingApps": 1,
     "maxTestingApps": 10,
     "isBetaDataAvailable": true,

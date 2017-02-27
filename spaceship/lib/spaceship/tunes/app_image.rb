@@ -12,18 +12,14 @@ module Spaceship
 
       attr_accessor :url
 
+      attr_accessor :is_imessage
+
       attr_mapping(
         'assetToken' => :asset_token,
         'sortOrder' => :sort_order,
         'url' => :url,
         'originalFileName' => :original_file_name
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
 
       def reset!(attrs = {})
         update_raw_data!(

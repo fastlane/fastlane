@@ -35,12 +35,20 @@ module Spaceship
           self::AppGroup
         end
 
+        def apple_pay
+          self::ApplePay
+        end
+
         def associated_domains
           self::AssociatedDomains
         end
 
         def data_protection
           self::DataProtection
+        end
+
+        def game_center
+          self::GameCenter
         end
 
         def health_kit
@@ -63,6 +71,10 @@ module Spaceship
           self::CloudKit
         end
 
+        def in_app_purchase
+          self::InAppPurchase
+        end
+
         def inter_app_audio
           self::InterAppAudio
         end
@@ -73,6 +85,10 @@ module Spaceship
 
         def push_notification
           self::PushNotification
+        end
+
+        def siri_kit
+          self::SiriKit
         end
 
         def vpn_configuration
@@ -97,6 +113,16 @@ module Spaceship
 
         def self.on
           AppService.new("APG3427HIY", true)
+        end
+      end
+
+      module ApplePay
+        def self.off
+          AppService.new("OM633U5T5G", false)
+        end
+
+        def self.on
+          AppService.new("OM633U5T5G", true)
         end
       end
 
@@ -125,6 +151,16 @@ module Spaceship
 
         def self.until_first_auth
           AppService.new("dataProtection", "untilfirstauth")
+        end
+      end
+
+      module GameCenter
+        def self.off
+          AppService.new("gameCenter", false)
+        end
+
+        def self.on
+          AppService.new("gameCenter", true)
         end
       end
 
@@ -178,6 +214,16 @@ module Spaceship
         end
       end
 
+      module InAppPurchase
+        def self.off
+          AppService.new("inAppPurchase", false)
+        end
+
+        def self.on
+          AppService.new("inAppPurchase", true)
+        end
+      end
+
       module InterAppAudio
         def self.off
           AppService.new("IAD53UNK2F", false)
@@ -205,6 +251,16 @@ module Spaceship
 
         def self.on
           AppService.new("push", true)
+        end
+      end
+
+      module SiriKit
+        def self.off
+          AppService.new("SI015DKUHP", false)
+        end
+
+        def self.on
+          AppService.new("SI015DKUHP", true)
         end
       end
 

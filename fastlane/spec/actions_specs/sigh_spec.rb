@@ -9,17 +9,18 @@ describe Fastlane do
       end
 
       it "properly stores the resulting path in the lane environment" do
-        ENV["SIGH_UDID"] = "udid"
+        ENV["SIGH_UUID"] = "uuid"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           sigh
         end").runner.execute(:test)
 
-        expect(result).to eq('udid')
+        expect(result).to eq('uuid')
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_PROFILE_PATH]).to eq(@profile_path)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_PROFILE_PATHS]).to eq([@profile_path])
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_PROFILE_TYPE]).to eq("app-store")
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_UUID]).to eq("uuid")
       end
 
       describe "The different profile types" do

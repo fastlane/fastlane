@@ -34,6 +34,16 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'import "./path/to/other/Fastfile"'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

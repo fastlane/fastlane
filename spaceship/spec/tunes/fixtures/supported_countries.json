@@ -1,0 +1,1095 @@
+{
+  "data": [
+    {
+      "code": "AL",
+      "name": "Albania",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "DZ",
+      "name": "Algeria",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AO",
+      "name": "Angola",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AI",
+      "name": "Anguilla",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AG",
+      "name": "Antigua and Barbuda",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "AUD"
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BS",
+      "name": "Bahamas",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BB",
+      "name": "Barbados",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "BZ",
+      "name": "Belize",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BJ",
+      "name": "Benin",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BM",
+      "name": "Bermuda",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BT",
+      "name": "Bhutan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BO",
+      "name": "Bolivia",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BW",
+      "name": "Botswana",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BN",
+      "name": "Brunei Darussalam",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "BF",
+      "name": "Burkina Faso",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KH",
+      "name": "Cambodia",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "region": "The United States and Canada",
+      "regionLocaleKey": "ITC.region.NAM",
+      "currencyCodeISO3A": "CAD"
+    },
+    {
+      "code": "CV",
+      "name": "Cape Verde",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KY",
+      "name": "Cayman Islands",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TD",
+      "name": "Chad",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "CNY"
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CG",
+      "name": "Congo, Republic of",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CR",
+      "name": "Costa Rica",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "CZ",
+      "name": "Czech Republic",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "DKK"
+    },
+    {
+      "code": "DM",
+      "name": "Dominica",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "DO",
+      "name": "Dominican Republic",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "FJ",
+      "name": "Fiji",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "GM",
+      "name": "Gambia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "GH",
+      "name": "Ghana",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "GD",
+      "name": "Grenada",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "GW",
+      "name": "Guinea-Bissau",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "GY",
+      "name": "Guyana",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "HN",
+      "name": "Honduras",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "HK",
+      "name": "Hong Kong",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "HKD"
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "INR"
+    },
+    {
+      "code": "ID",
+      "name": "Indonesia",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "IDR"
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "ILS"
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "JM",
+      "name": "Jamaica",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "JP",
+      "name": "Japan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "JPY"
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KE",
+      "name": "Kenya",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KR",
+      "name": "Korea, Republic Of",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KG",
+      "name": "Kyrgyzstan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "LA",
+      "name": "Lao People's Democratic Republic",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "LR",
+      "name": "Liberia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "MO",
+      "name": "Macau",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MK",
+      "name": "Macedonia, The Former Yugoslav Republic Of",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MG",
+      "name": "Madagascar",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MW",
+      "name": "Malawi",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MY",
+      "name": "Malaysia",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "ML",
+      "name": "Mali",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "MR",
+      "name": "Mauritania",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MU",
+      "name": "Mauritius",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "MXN"
+    },
+    {
+      "code": "FM",
+      "name": "Micronesia, Federated States of",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MD",
+      "name": "Moldova, Republic Of",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MS",
+      "name": "Montserrat",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "MZ",
+      "name": "Mozambique",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NA",
+      "name": "Namibia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NP",
+      "name": "Nepal",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "NZD"
+    },
+    {
+      "code": "NI",
+      "name": "Nicaragua",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NE",
+      "name": "Niger",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NG",
+      "name": "Nigeria",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "NOK"
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PK",
+      "name": "Pakistan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PW",
+      "name": "Palau",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PA",
+      "name": "Panama",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PG",
+      "name": "Papua New Guinea",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PE",
+      "name": "Peru",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PH",
+      "name": "Philippines",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "RU",
+      "name": "Russia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "RUB"
+    },
+    {
+      "code": "LC",
+      "name": "Saint Lucia",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "SAR"
+    },
+    {
+      "code": "SN",
+      "name": "Senegal",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SC",
+      "name": "Seychelles",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SL",
+      "name": "Sierra Leone",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SG",
+      "name": "Singapore",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "SGD"
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "SB",
+      "name": "Solomon Islands",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "ZAR"
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "EUR"
+    },
+    {
+      "code": "LK",
+      "name": "Sri Lanka",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "KN",
+      "name": "St. Kitts and Nevis",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "VC",
+      "name": "St. Vincent and The Grenadines",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SR",
+      "name": "Suriname",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SZ",
+      "name": "Swaziland",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "SEK"
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "CHF"
+    },
+    {
+      "code": "ST",
+      "name": "São Tomé and Príncipe",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TW",
+      "name": "Taiwan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "TWD"
+    },
+    {
+      "code": "TJ",
+      "name": "Tajikistan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TZ",
+      "name": "Tanzania, United Republic Of",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "THB"
+    },
+    {
+      "code": "TT",
+      "name": "Trinidad and Tobago",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TR",
+      "name": "Turkey",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "TRY"
+    },
+    {
+      "code": "TM",
+      "name": "Turkmenistan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "TC",
+      "name": "Turks and Caicos",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "UG",
+      "name": "Uganda",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "AE",
+      "name": "United Arab Emirates",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "AED"
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom",
+      "region": "Europe",
+      "regionLocaleKey": "ITC.region.EUR",
+      "currencyCodeISO3A": "GBP"
+    },
+    {
+      "code": "US",
+      "name": "United States",
+      "region": "The United States and Canada",
+      "regionLocaleKey": "ITC.region.NAM",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistan",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "VE",
+      "name": "Venezuela",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "region": "Asia Pacific",
+      "regionLocaleKey": "ITC.region.APAC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "VG",
+      "name": "Virgin Islands, British",
+      "region": "Latin America and the Caribbean",
+      "regionLocaleKey": "ITC.region.LAMC",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "YE",
+      "name": "Yemen",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    },
+    {
+      "code": "ZW",
+      "name": "Zimbabwe",
+      "region": "Africa, Middle East, and India",
+      "regionLocaleKey": "ITC.region.AMEI",
+      "currencyCodeISO3A": "USD"
+    }
+  ],
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

@@ -47,6 +47,14 @@ module Fastlane
         ]
       end
 
+      def self.details
+        [
+          "This action allows you to update the URL schemes of the app before building it.",
+          "For example, you can use this to set a different url scheme for the alpha",
+          "or beta version of the app."
+        ].join("\n")
+      end
+
       def self.output
         []
       end
@@ -57,6 +65,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'update_url_schemes(
+            path: "path/to/Info.plist",
+            url_schemes: ["com.myapp"]
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

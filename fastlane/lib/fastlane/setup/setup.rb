@@ -2,6 +2,11 @@ module Fastlane
   class Setup
     # Start the setup process
     def run
+      if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
+        UI.important("fastlane is already set up at path #{FastlaneCore::FastlaneFolder.path}")
+        return
+      end
+
       platform = nil
       if is_ios?
         UI.message("Detected iOS/Mac project in current directory...")
@@ -42,3 +47,10 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
+require 'fastlane/setup/crashlytics_beta_ui'
+require 'fastlane/setup/crashlytics_beta'
+require 'fastlane/setup/crashlytics_project_parser'
+require 'fastlane/setup/crashlytics_beta_info'
+require 'fastlane/setup/crashlytics_beta_info_collector'
+require 'fastlane/setup/crashlytics_beta_command_line_handler'
+require 'fastlane/setup/crashlytics_beta_user_email_fetcher'

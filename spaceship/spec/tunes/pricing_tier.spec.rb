@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::PricingTier do
   before { Spaceship::Tunes.login }
 

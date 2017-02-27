@@ -114,11 +114,11 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             slather
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "does not require project if .slather.yml is found" do
-        File.write('../.slather.yml', '')
+        File.write('./.slather.yml', '')
 
         result = Fastlane::FastFile.new.parse("lane :test do
           slather
@@ -174,7 +174,7 @@ describe Fastlane do
       end
 
       after(:each) do
-        File.delete('../.slather.yml') if File.exist? '../.slather.yml'
+        File.delete('./.slather.yml') if File.exist?("./.slather.yml")
       end
     end
   end

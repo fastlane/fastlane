@@ -1,0 +1,75 @@
+{
+  "data": {
+    "sectionErrorKeys": [
+
+    ],
+    "sectionInfoKeys": [
+
+    ],
+    "sectionWarningKeys": [
+
+    ],
+    "countriesChanged": false,
+    "countries": [
+      {
+        "code": "FR",
+        "name": "France",
+        "region": "Europe",
+        "regionLocaleKey": "ITC.region.EUR",
+        "currencyCodeISO3A": "EUR"
+      },
+      {
+        "code": "GB",
+        "name": "United Kingdom",
+        "region": "Europe",
+        "regionLocaleKey": "ITC.region.EUR",
+        "currencyCodeISO3A": "GBP"
+      },
+      {
+        "code": "US",
+        "name": "United States",
+        "region": "The United States and Canada",
+        "regionLocaleKey": "ITC.region.NAM",
+        "currencyCodeISO3A": "USD"
+      }
+    ],
+    "b2BAppFlagDisabled": false,
+    "educationDiscountDisabledFlag": false,
+    "hotFudgeFeatureEnabled": true,
+    "coldFudgeFeatureEnabled": false,
+    "bitcodeAutoRecompileDisAllowed": false,
+    "b2bAppEnabled": false,
+    "educationalDiscount": true,
+    "theWorld": false,
+    "pricingIntervalsFieldTO": {
+      "value": [
+        {
+          "priceTierEffectiveDate": null,
+          "priceTierEndDate": null,
+          "tierStem": "0"
+        }
+      ],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "availableDate": 1476687600000,
+    "unavailableDate": -2,
+    "creatingApp": false,
+    "hasApprovedVersion": false,
+    "appVersionsForOTAByPlatforms": {
+      "iOS": [
+
+      ]
+    },
+    "b2bUsers": [
+
+    ]
+  },
+  "messages": {
+    "warn": null,
+    "info": null,
+    "error": null
+  },
+  "statusCode": "SUCCESS"
+}

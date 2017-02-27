@@ -35,15 +35,51 @@ module Spaceship
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
+      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
+        handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
       end
     end
 
+    def handle_two_factor(response)
+      two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
+      puts "Two Factor Authentication for account '#{self.user}' is enabled"
+      puts "If you're running this in a non-interactive session (e.g. server or CI)"
+      puts "check out #{two_factor_url}"
+
+      security_code = response.body["securityCode"]
+      # {"length"=>6,
+      #  "tooManyCodesSent"=>false,
+      #  "tooManyCodesValidated"=>false,
+      #  "securityCodeLocked"=>false}
+      code_length = security_code["length"]
+      code = ask("Please enter the #{code_length} digit code: ")
+      puts "Requesting session..."
+
+      # Send securityCode back to server to get a valid session
+      r = request(:post) do |req|
+        req.url "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode"
+        req.headers["Accept"] = "application/json"
+        req.headers['Content-Type'] = 'application/json'
+        req.headers["scnt"] = @scnt
+        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
+        req.body = { "securityCode" => { "code" => code.to_s } }.to_json
+      end
+
+      # we use `Spaceship::TunesClient.new.handle_itc_response`
+      # since this might be from the Dev Portal, but for 2 step
+      Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+      store_session
+
+      return true
+    end
+
     # Only needed for 2 step
     def load_session_from_file
       if File.exist?(persistent_cookie_path)
-        puts "Loading session from '#{persistent_cookie_path}'" if $verbose
+        puts "Loading session from '#{persistent_cookie_path}'" if Spaceship::Globals.verbose?
         @cookie.load(persistent_cookie_path)
         return true
       end
@@ -51,12 +87,11 @@ module Spaceship
     end
 
     def load_session_from_env
-      yaml_text = ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
-      return if yaml_text.to_s.length == 0
-      puts "Loading session from environment variable" if $verbose
+      return if self.class.spaceship_session_env.to_s.length == 0
+      puts "Loading session from environment variable" if Spaceship::Globals.verbose?
 
       file = Tempfile.new('cookie.yml')
-      file.write(yaml_text.gsub("\\n", "\n"))
+      file.write(self.class.spaceship_session_env.gsub("\\n", "\n"))
       file.close
 
       begin
@@ -68,6 +103,12 @@ module Spaceship
       ensure
         file.unlink
       end
+    end
+
+    # Fetch the session cookie from the environment
+    # (if exists)
+    def self.spaceship_session_env
+      ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
     def select_device(r, device_id)
@@ -126,6 +167,12 @@ module Spaceship
         raise ex
       end
 
+      store_session
+
+      return true
+    end
+
+    def store_session
       # If the request was successful, r.body is actually nil
       # The previous request will fail if the user isn't on a team
       # on iTunes Connect, but it still works, so we're good
@@ -148,8 +195,6 @@ module Spaceship
       # correct DES... cookie
 
       self.store_cookie
-
-      return true
     end
   end
 end

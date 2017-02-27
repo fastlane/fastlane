@@ -39,6 +39,17 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end
+
+      def self.example_code
+        [
+          'clear_derived_data',
+          'clear_derived_data(derived_data_path: "/custom/")'
+        ]
+      end
+
+      def self.category
+        :building
+      end
     end
   end
 end

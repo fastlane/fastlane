@@ -8,7 +8,7 @@ module Frameit
       result = {}
 
       # A .strings file is UTF-16 encoded. We only want to deal with UTF-8
-      content = `iconv -f UTF-16 -t UTF-8 '#{path}'`
+      content = `iconv -f UTF-16 -t UTF-8 '#{path}' 2>&1`
 
       content.split("\n").each_with_index do |line, index|
         begin
@@ -23,6 +23,10 @@ module Frameit
           UI.error "Error parsing #{path} line #{index + 1}: '#{line}'"
           UI.verbose "#{ex.message}\n#{ex.backtrace.join('\n')}"
         end
+      end
+
+      if result.empty?
+        UI.error "Empty parsing result for #{path}. Please make sure the file is valid and UTF16 Big-endian encoded"
       end
 
       result

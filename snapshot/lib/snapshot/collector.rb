@@ -26,11 +26,11 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        components = [device_name, launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
-
-        output_path = File.join(language_folder, components.join("-") + ".png")
+        components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+        screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
+        output_path = File.join(language_folder, screenshot_name)
         from_path = File.join(attachments_path, filename)
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
         else
           UI.success "Copying '#{output_path}'..."
@@ -73,8 +73,11 @@ module Snapshot
     end
 
     def self.check_activity(activity, to_store)
-      # We now check if it's the rotation gesture, because that's the only thing we care about
-      if activity["Title"] == "Set device orientation to Unknown"
+      # On iOS, we look for the "Unknown" rotation gesture that signals a snapshot was taken here.
+      # On tvOS, we look for "Browser" count.
+      # These are both events that are not normally triggered by UI testing, making it easy for us to
+      # locate where snapshot() was invoked.
+      if activity["Title"] == "Set device orientation to Unknown" || activity["Title"] == "Get number of matches for: Children matching type Browser"
         if activity["Attachments"]
           to_store << activity["Attachments"].last["FileName"]
         else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually

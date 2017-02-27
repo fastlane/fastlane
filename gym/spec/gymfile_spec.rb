@@ -1,6 +1,6 @@
 describe Gym do
   before(:all) do
-    options = { project: "./examples/multipleSchemes/Example.xcodeproj" }
+    options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
     @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
     @project = FastlaneCore::Project.new(@config)
   end

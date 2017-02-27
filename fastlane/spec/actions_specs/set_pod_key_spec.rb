@@ -43,7 +43,7 @@ describe Fastlane do
               value: '1234'
             )
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /'key'/)
       end
 
       it "requires a value" do
@@ -53,7 +53,7 @@ describe Fastlane do
               key: 'APIToken'
             )
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /'value'/)
       end
     end
   end

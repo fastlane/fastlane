@@ -54,7 +54,7 @@
 
     <div class="oneRow">
       <span class="download" id="ios">
-        <a href="itms-services://?action=download-manifest&url=itms-services://?action=download-manifest&url=<%= plist_url %>" id="text" class="btn btn-lg btn-default" onclick="document.getElementById('finished').id = '';">
+        <a href="itms-services://?action=download-manifest&url=<%= plist_url %>" id="text" class="btn btn-lg btn-default" onclick="document.getElementById('finished').id = '';">
           Install <%= title %> <%= bundle_version %>
         </a>
       </span>
@@ -63,7 +63,7 @@
       </span> -->
     </div>
 
-    <h3 id="desktop">Please open this page on your iPhone!</h3>
+    <h3 id="invalid-device">Please open this page on your iPhone!</h3>
 
     <p id="finished">
       App is being installed. Close Safari using the home button.
@@ -76,20 +76,30 @@
   </body>
 
   <script type='text/javascript'>
-    // if (/Android/i.test(navigator.userAgent))
-    // {
-    //   document.getElementById("ios").remove()
-    //   document.getElementById("desktop").remove()
-    // }
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent))
-    {
-      // document.getElementById("android").remove()
-      document.getElementById("desktop").remove()
+    // Array of supported devices, 1 is iPhone, 2 is iPad
+    var deviceFamily = <%= device_family %>;
+
+    function isIphoneValid() {
+      return deviceFamily.indexOf(1) != -1;
     }
-    else
-    {
-      document.getElementById("ios").remove()
-      // document.getElementById("android").remove()
+
+    function showError(error) {
+      document.getElementById("ios").remove();
+      document.getElementById("invalid-device").innerHTML = error;
+    }
+
+    function showInstallLink() {
+      document.getElementById("invalid-device").remove();
+    }
+
+    if (/iPhone|iPod/i.test(navigator.userAgent) && isIphoneValid() ) {
+      showInstallLink();
+    } else if (/iPad/i.test(navigator.userAgent)) {
+      // All apps (even "iPhone only") can be installed on iPads
+      showInstallLink()
+    } else {
+      var validDeviceName = isIphoneValid() ? "iOS device" : "iPad";
+      showError("Please open this page on your " + validDeviceName + "!");
     }
   </script>
 </html>
