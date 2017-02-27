@@ -17,7 +17,27 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        "#{format_string(datetime, severity)}#{msg}\n"
+        terminal_length = TTY::Screen.width
+        timestamp = format_string(datetime, severity)
+
+        colors = msg.scan(/(\e\[.*?m)/)
+        if colors && colors.length > 0
+          colors.each do |color|
+            msg.delete!(color.first)
+            msg.delete!(color.last)
+          end
+        else
+          colors = ["", ""]
+        end
+
+        max_msg_length = terminal_length - timestamp.length - 5 # 5 = padding
+        msg.gsub!(/(\S{#{max_msg_length}})(?=\S)/, '\1 ')
+        components = msg.scan(/.{1,#{max_msg_length}}(?:\s+|$)/)
+        final_msg = ""
+        components.each do |choped|
+          final_msg << timestamp << "#{colors.first[0]}#{choped}#{colors.last[0]}\n"
+        end
+        final_msg
       end
 
       @log
