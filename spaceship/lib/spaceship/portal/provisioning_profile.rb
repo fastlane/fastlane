@@ -276,7 +276,7 @@ module Spaceship
           return profiles if self == ProvisioningProfile
 
           # To distinguish between AppStore and AdHoc profiles, we need to send
-          # a details request (see `fetch_details`). This is an expensive operation
+          # a details request (see `profile_details`). This is an expensive operation
           # which we can't do for every single provisioning profile
           # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
           # Spaceship::ProvisioningProfile::AdHoc.all will return the same array as
@@ -460,8 +460,6 @@ module Spaceship
       end
 
       def devices
-        fetch_details
-
         if (@devices || []).empty?
           @devices = (self.profile_details["devices"] || []).collect do |device|
             Device.set_client(client).factory(device)
@@ -472,8 +470,6 @@ module Spaceship
       end
 
       def certificates
-        fetch_details
-
         if (@certificates || []).empty?
           @certificates = (profile_details["certificates"] || []).collect do |cert|
             Certificate.set_client(client).factory(cert)
@@ -484,8 +480,6 @@ module Spaceship
       end
 
       def app
-        fetch_details
-
         App.set_client(client).new(profile_details['appId'])
       end
 
@@ -497,12 +491,11 @@ module Spaceship
         return devices.count > 0
       end
 
-      private
-
-      def fetch_details
+      # This is an expensive operation as it triggers a new request
+      def profile_details
         # Since 15th September 2016 certificates and devices are hidden behind another request
         # see https://github.com/fastlane/fastlane/issues/6137 for more information
-        self.profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
+        @profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
       end
     end
   end
