@@ -90,7 +90,6 @@ module Match
       return unless @dir
 
       FileUtils.rm_rf(@dir)
-      UI.success "🔒  Successfully encrypted certificates repo" # so the user is happy
       @dir = nil
     end
 
