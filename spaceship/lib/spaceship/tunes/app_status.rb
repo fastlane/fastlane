@@ -32,9 +32,10 @@ module Spaceship
       PENDING_DEVELOPER_RELEASE = "Pending Developer Release"
       PROCESSING_FOR_APP_STORE = "Processing for App Store"
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
-      # METADATA_REJECTED = "Metadata Rejected"
+      # DATA_REJECTED = "Metadata Rejected"
       # REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
+      METADATA_REJECTED = "metadataRejected"
 
       # Get the app status matching based on a string (given by iTunes Connect)
       def self.get_from_string(text)
@@ -46,9 +47,10 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
-          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
+          'rejected' => REJECTED,
+          'metadataRejected' => METADATA_REJECTED
         }
-
         mapping.each do |k, v|
           return v if k == text
         end
