@@ -99,7 +99,7 @@ fastlane pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
 
 ## List builds
 
