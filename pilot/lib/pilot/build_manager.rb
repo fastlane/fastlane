@@ -84,7 +84,7 @@ module Pilot
       # distribute_result returns false if the build was not turned on and only submitted for external review
       if distribute_result
         UI.success("Successfully distributed build to #{type} testers 🚀")
-      elsif !distribute_result
+      else
         UI.success("Build submitted to beta review")
       end
     end
@@ -201,7 +201,7 @@ module Pilot
       end
     end
 
-    def distribute_build(uploaded_build, options, external_available = false)
+    def distribute_build(uploaded_build, options, external_available)
       UI.message("Distributing new build to testers")
 
       # Submit for review before external testflight is available
@@ -217,7 +217,7 @@ module Pilot
       # Submit for beta testing
       # We need to check if the user is attempting to turn on external builds and the status for external builds
       # If we attempt to make an unapproved external build available iTC will return an error
-      if external_available || options[:distribute_external] == 'internal'
+      if external_available || !options[:distribute_external]
         type = options[:distribute_external] ? 'external' : 'internal'
         uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
         work_status = true
