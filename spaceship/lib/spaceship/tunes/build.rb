@@ -67,6 +67,9 @@ module Spaceship
       # @return (Bool):
       attr_accessor :ready_to_install
 
+      # @return (String) State for external beta
+      attr_accessor :external_beta_state
+
       #####################################################
       # @!group Analytics
       #####################################################
@@ -109,7 +112,8 @@ module Spaceship
         'readyToInstall' => :ready_to_install,
         'internalTesting.value' => :internal_testing_enabled,
         'externalTesting.value' => :external_testing_enabled,
-        'buildTestInformationTO.externalStatus' => :external_testing_status
+        'buildTestInformationTO.externalStatus' => :external_testing_status,
+        'betaState' => :external_beta_state
       )
 
       def setup
