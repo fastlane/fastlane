@@ -17,6 +17,8 @@ def before_each_spaceship
   @cache_paths.each { |path| try_delete path }
   ENV["DELIVER_USER"] = "spaceship@krausefx.com"
   ENV["DELIVER_PASSWORD"] = "so_secret"
+  ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
+
   ENV.delete("FASTLANE_USER")
 
   TunesStubbing.itc_stub_login
