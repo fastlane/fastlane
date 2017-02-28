@@ -63,16 +63,18 @@ describe Spaceship::ProvisioningProfile do
 
     it 'should use the Xcode api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = nil
+      expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
+      expect(client).not_to receive(:provisioning_profiles)
+      expect(client).not_to receive(:provisioning_profile_details)
       Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
-      expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
-      expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfile.action')).to_not have_been_made
     end
 
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
+      expect(client).not_to receive(:provisioning_profiles_via_xcode_api)
+      expect(client).to receive(:provisioning_profiles).and_call_original
+      expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(6).times
       Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
-      expect(a_request(:post, /developerservices2.apple.com/)).to_not have_been_made
-      expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action')).to have_been_made.times(6)
     end
   end
 
