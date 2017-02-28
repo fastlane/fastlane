@@ -48,6 +48,7 @@ module Pilot
         # sort by upload_date
         builds.sort! { |a, b| a.upload_date <=> b.upload_date }
         build = builds.last
+        beta_state = build.external_beta_state
         if build.nil?
           UI.user_error!("No builds found.")
           return
@@ -71,11 +72,21 @@ module Pilot
           UI.success "Successfully set the changelog and/or description for build"
         end
       end
+      if beta_state == "waiting" || beta_state == "submitForReview"
+        external_available = false
+      end
 
       return if config[:skip_submission]
-      distribute_build(build, options)
+
+      distribute_result = distribute_build(build, options, external_available)
       type = options[:distribute_external] ? 'External' : 'Internal'
-      UI.success("Successfully distributed build to #{type} testers 🚀")
+      # distribute_result returns true if the build was approved for external testing and was turned on.
+      # distribute_result returns false if the build was not turned on and only submitted for external review
+      if distribute_result
+        UI.success("Successfully distributed build to #{type} testers 🚀")
+      elsif !distribute_result
+        UI.success("Build submitted to beta review")
+      end
     end
 
     def list(options)
@@ -92,7 +103,7 @@ module Pilot
 
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions", "Beta State"],
         rows: rows
       )
     end
@@ -115,7 +126,8 @@ module Pilot
              build.build_version,
              build.testing_status,
              build.install_count,
-             build.session_count]
+             build.session_count,
+             build.external_beta_state]
 
       return row
     end
@@ -189,7 +201,7 @@ module Pilot
       end
     end
 
-    def distribute_build(uploaded_build, options)
+    def distribute_build(uploaded_build, options, external_available = false)
       UI.message("Distributing new build to testers")
 
       # Submit for review before external testflight is available
@@ -203,9 +215,17 @@ module Pilot
       end
 
       # Submit for beta testing
-      type = options[:distribute_external] ? 'external' : 'internal'
-      uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
-      return true
+      # We need to check if the user is attempting to turn on external builds and the status for external builds
+      # If we attempt to make an unapproved external build available iTC will return an error
+      if external_available || options[:distribute_external] == 'internal'
+        type = options[:distribute_external] ? 'external' : 'internal'
+        uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
+        work_status = true
+      else
+        UI.important('Unable to turn on external testing before beta review approval')
+        work_status = false
+      end
+      return work_status
     end
   end
 end
