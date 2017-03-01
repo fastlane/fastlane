@@ -48,6 +48,7 @@ describe Fastlane do
           allow(setup).to receive(:app_identifier).and_return(app_identifier) # to also support linux (travis)
           project = "proj"
           allow(setup).to receive(:project).and_return(project)
+          allow(project).to receive(:mac?).and_return(false)
           allow(project).to receive(:schemes).and_return(["MyScheme"])
           allow(project).to receive(:default_app_identifier).and_return(app_identifier)
           allow(project).to receive(:default_app_name).and_return("Project Name")
