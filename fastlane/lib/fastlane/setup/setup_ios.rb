@@ -23,8 +23,11 @@ module Fastlane
       begin
         setup_project
         ask_for_apple_id
-        detect_if_app_is_available unless self.project.mac?
-        UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps") if self.project.mac?
+        if self.project.mac?
+          UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps")
+        else
+          detect_if_app_is_available
+        end
         print_config_table
         if UI.confirm("Please confirm the above values")
           default_setup
