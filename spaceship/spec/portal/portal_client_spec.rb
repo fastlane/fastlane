@@ -225,7 +225,7 @@ describe Spaceship::Client do
                                                 "proProPlatform",
                                                 "version",
                                                 "dateExpire",
-                                                "managingApp",
+                                                # "managingApp", not all profiles have it
                                                 "deviceIds",
                                                 "appId",
                                                 "certificateIds")
