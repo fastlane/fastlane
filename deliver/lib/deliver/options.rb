@@ -189,16 +189,18 @@ module Deliver
                                      optional: true,
                                      short_option: "-l",
                                      verify_block: proc do |value|
+                                       supported_picture_endings = [".png", ".jpg", ".jpeg"]
                                        UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
+                                       UI.user_error!("'#{value}' doesn't seem to be one of the supported files. supported: #{supported_picture_endings.join(',')}") unless supported_picture_endings.include?(File.extname(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
                                      description: "Metadata: The path to the Apple Watch app icon",
                                      optional: true,
                                      short_option: "-q",
                                      verify_block: proc do |value|
+                                       supported_picture_endings = [".png", ".jpg", ".jpeg"]
                                        UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
+                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless supported_picture_endings.include?(File.extname(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :copyright,
                                      description: "Metadata: The copyright notice",
