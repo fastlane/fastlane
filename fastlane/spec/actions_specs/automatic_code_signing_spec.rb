@@ -19,7 +19,7 @@ describe Fastlane do
       expect(root_attrs["771D79501D9E69C900D840FA"]["DevelopmentTeam"]).to eq("XXXX")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["DevelopmentTeam"]).to eq("XXXX")
     end
-    
+
     it "disable_automatic_code_signing for specific target" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use ProvisioningStyle 'Manual'")
@@ -35,7 +35,7 @@ describe Fastlane do
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Automatic")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["ProvisioningStyle"]).to eq("Manual")
     end
-    
+
     it "disable_automatic_code_signing" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use ProvisioningStyle 'Manual'")
@@ -49,7 +49,7 @@ describe Fastlane do
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Manual")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["ProvisioningStyle"]).to eq("Manual")
     end
-    
+
     it "sets team id" do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
