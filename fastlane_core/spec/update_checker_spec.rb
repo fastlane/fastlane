@@ -59,6 +59,11 @@ describe FastlaneCore do
         ENV["FASTLANE_SELF_CONTAINED"] = "true"
         expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
       end
+      
+      it "works with Mac app-installed fastlane" do
+        ENV["FASTLANE_SELF_CONTAINED"] = "false"
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version.")
+      end
     end
 
     describe "#p_hash?" do
