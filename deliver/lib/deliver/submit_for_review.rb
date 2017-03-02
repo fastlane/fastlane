@@ -29,7 +29,7 @@ module Deliver
 
     def select_build(options)
       app = options[:app]
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
 
       if options[:build_number] and options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
@@ -55,7 +55,7 @@ module Deliver
       start = Time.now
 
       loop do
-        build = find_build(app.latest_version.candidate_builds)
+        build = find_build(app.latest_version(platform: options[:platform]).candidate_builds)
         return build if build.processing == false
 
         UI.message("Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
