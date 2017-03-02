@@ -12,37 +12,7 @@ module Fastlane
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
         unless project.root_object.attributes["TargetAttributes"]
-          UI.error("Seems to be a very old project file format")
-          UI.error("PLEASE BACKUP ALL FILES before doing this.")
-          if ENV["FL_PROJECT_SIGNING_FORCE_UPGRADE"] || UI.confirm("Proceed with upgrade to xcode8 format?")
-            UI.important("Upgrading project to use xcode8 signing stuff")
-            unless params[:team_id]
-              UI.important("TEAM id is not set")
-              UI.error!("Provide :team_id")
-            end
-
-            # set upgrade market to xcdoe8
-            project.root_object.attributes["LastUpgradeCheck"] = "0800"
-            target_attr_hash = {}
-
-            # for each target add the TargetAttributes Entry
-            # setting team id, and signing mode
-            project.root_object.targets.each do |target|
-              new_hash = {}
-              new_hash["CreatedOnToolsVersion"] = "8.0"
-              new_hash["DevelopmentTeam"] = params[:team_id]
-              new_hash["ProvisioningStyle"] = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
-              target_attr_hash[target.uuid] = new_hash
-            end
-
-            # for each configuration set a signing identity
-            project.build_configurations.each do |config|
-              config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = config.name == "Release" ? 'iPhone Distribution' : "iPhone Development"
-            end
-            project.root_object.attributes["TargetAttributes"] = target_attr_hash
-          else
-            UI.user_error!("canceled upgrade")
-          end
+          UI.user_error!("Seems to be a very old project file format - please use xcode to upgrade to atlease 0800")
         end
 
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid } }
@@ -78,7 +48,7 @@ module Fastlane
         end
         params[:use_automatic_signing]
       end
-      
+
       def self.alias_used(action_alias, params)
         params[:use_automatic_signing] = true if action_alias == "enable_automatic_code_signing"
       end
@@ -86,7 +56,7 @@ module Fastlane
       def self.aliases
         ["enable_automatic_code_signing", "disable_automatic_code_signing"]
       end
-      
+
       def self.description
         "Updates the Xcode 8 Automatic Codesigning Flag"
       end
@@ -124,7 +94,7 @@ module Fastlane
 
       def self.output
       end
-      
+
       def self.example_code
         [
           '# enable automatic code signing
@@ -161,11 +131,11 @@ module Fastlane
 
         ]
       end
-      
+
       def self.category
         :code_signing
       end
-      
+
       def self.return_value
         "The current status (boolean) of codesigning after modification"
       end
