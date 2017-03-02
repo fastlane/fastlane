@@ -70,5 +70,22 @@ describe Fastlane do
       expect(root_attrs["771D79501D9E69C900D840FA"]["DevelopmentTeam"]).to eq("G3KGXDXQL9")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["DevelopmentTeam"]).to eq("G3KGXDXQL9")
     end
+
+    it "targets not found notice" do
+      allow(UI).to receive(:important)
+      expect(UI).to receive(:important).with("None of the specified targets has been modified")
+      result = Fastlane::FastFile.new.parse("lane :test do
+        disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', targets: ['not_found'])
+      end").runner.execute(:test)
+      expect(result).to eq(false)
+    end
+
+    it "raises exception on old projects" do
+      expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please use xcode to upgrade to atlease 0800")
+      result = Fastlane::FastFile.new.parse("lane :test do
+        disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic-code-signing-old.xcodeproj')
+      end").runner.execute(:test)
+      expect(result).to eq(false)
+    end
   end
 end

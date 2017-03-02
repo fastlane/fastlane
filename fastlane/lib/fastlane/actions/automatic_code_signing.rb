@@ -13,6 +13,7 @@ module Fastlane
 
         unless project.root_object.attributes["TargetAttributes"]
           UI.user_error!("Seems to be a very old project file format - please use xcode to upgrade to atlease 0800")
+          return false
         end
 
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid } }
