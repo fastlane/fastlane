@@ -28,7 +28,10 @@ module Fastlane
           end
 
           sett["ProvisioningStyle"] = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
-          sett["DevelopmentTeam"] = params[:team_id] if params[:team_id]
+          if params[:team_id]
+            sett["DevelopmentTeam"] = params[:team_id]
+            UI.important("Set Team id to: #{params[:team_id]} for target: #{found_target[:name]}")
+          end
           changed_targets << found_target[:name]
         end
         project.save
@@ -46,6 +49,7 @@ module Fastlane
             UI.success("\t * #{tar}")
           end
         end
+
         params[:use_automatic_signing]
       end
 
