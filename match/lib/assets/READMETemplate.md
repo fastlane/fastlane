@@ -47,6 +47,9 @@ fastlane match adhoc
 ```
 fastlane match development
 ```
+```
+fastlane match enterprise
+```
 
 For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match#readme)
 

@@ -250,6 +250,10 @@ match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
       type: "adhoc",
       app_identifier: "tools.fastlane.app")
 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+      type: "enterprise",
+      app_identifier: "tools.fastlane.app")
+
 # `match` should be called before building the app with `gym`
 gym
 ...
