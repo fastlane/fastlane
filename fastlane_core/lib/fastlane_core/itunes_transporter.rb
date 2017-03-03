@@ -269,7 +269,7 @@ module FastlaneCore
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
     def self.hide_transporter_output
-      @hide_transporter_output = !$verbose
+      @hide_transporter_output = !FastlaneCore::Globals.verbose?
     end
 
     def self.hide_transporter_output?
@@ -358,9 +358,7 @@ module FastlaneCore
       end
 
       if result
-        UI.success("-" * 102)
-        UI.success("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
-        UI.success("-" * 102)
+        UI.header("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
 
         FileUtils.rm_rf(actual_dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
       else

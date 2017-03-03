@@ -17,17 +17,22 @@ def before_each_spaceship
   @cache_paths.each { |path| try_delete path }
   ENV["DELIVER_USER"] = "spaceship@krausefx.com"
   ENV["DELIVER_PASSWORD"] = "so_secret"
+  ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
+
   ENV.delete("FASTLANE_USER")
 
-  PortalStubbing.adp_stub_login
-  PortalStubbing.adp_stub_provisioning
-  PortalStubbing.adp_stub_devices
-  PortalStubbing.adp_stub_certificates
-  PortalStubbing.adp_stub_apps
-  PortalStubbing.adp_stub_app_groups
-  PortalStubbing.adp_stub_persons
-
   TunesStubbing.itc_stub_login
+  PortalStubbing.adp_stub_login
+
+  PortalStubbing.adp_stub_app_groups
+  PortalStubbing.adp_stub_apps
+
+  PortalStubbing.adp_stub_provisioning
+  PortalStubbing.adp_stub_certificates
+  PortalStubbing.adp_stub_devices
+  PortalStubbing.adp_stub_persons
+  PortalStubbing.adp_stub_website_pushes
+
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions
   TunesStubbing.itc_stub_build_trains
@@ -45,6 +50,7 @@ def before_each_spaceship
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
   TunesStubbing.itc_stub_supported_countries
+  TunesStubbing.itc_stub_iap
 end
 
 def after_each_spaceship

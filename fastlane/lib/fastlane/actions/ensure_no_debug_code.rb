@@ -22,6 +22,12 @@ module Fastlane
 
         command << " --exclude #{params[:exclude]}" if params[:exclude]
 
+        if params[:exclude_dirs]
+          params[:exclude_dirs].each do |dir|
+            command << " --exclude-dir #{dir.shellescape}"
+          end
+        end
+
         return command if Helper.is_test?
 
         UI.important(command)
@@ -84,7 +90,13 @@ module Fastlane
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
                                        description: "Exclude a certain pattern from the search",
                                        optional: true,
-                                       is_string: true)
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :exclude_dirs,
+                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
+                                       description: "An array of dirs that should not be included in the search",
+                                       optional: true,
+                                       type: Array,
+                                       is_string: false)
         ]
       end
 

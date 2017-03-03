@@ -48,12 +48,6 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          return self.new(attrs)
-        end
-
         # @return (Array) Returns all apps available for this account
         def all
           client.applications.map { |application| self.factory(application) }
@@ -247,6 +241,16 @@ module Spaceship
       # The current availability.
       def availability
         client.availability(self.apple_id)
+      end
+
+      #####################################################
+      # @!group in_app_purchases
+      #####################################################
+      # Get base In-App-Purchases object
+      def in_app_purchases
+        attrs = {}
+        attrs[:application] = self
+        Tunes::IAP.factory(attrs)
       end
 
       #####################################################

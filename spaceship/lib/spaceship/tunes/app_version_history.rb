@@ -21,15 +21,6 @@ module Spaceship
         'items' => :items
       })
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
-
       # Returns an array of all builds that can be sent to review
       def items
         @items ||= fetch_items

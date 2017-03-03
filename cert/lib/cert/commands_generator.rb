@@ -20,13 +20,13 @@ module Cert
       program :help, 'GitHub', 'https://github.com/fastlane/cert'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-
-      FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :create do |c|
         c.syntax = 'fastlane cert create'
         c.description = 'Create new iOS code signing certificates'
+
+        FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
 
         c.action do |args, options|
           Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
@@ -37,6 +37,8 @@ module Cert
       command :revoke_expired do |c|
         c.syntax = 'fastlane cert revoke_expired'
         c.description = 'Revoke expired iOS code signing certificates'
+
+        FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
 
         c.action do |args, options|
           Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)

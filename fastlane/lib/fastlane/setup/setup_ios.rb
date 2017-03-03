@@ -23,7 +23,11 @@ module Fastlane
       begin
         setup_project
         ask_for_apple_id
-        detect_if_app_is_available
+        if self.project.mac?
+          UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps")
+        else
+          detect_if_app_is_available
+        end
         print_config_table
         if UI.confirm("Please confirm the above values")
           default_setup
@@ -62,7 +66,7 @@ module Fastlane
       copy_existing_files
       generate_appfile(manually: false)
       detect_installed_tools # after copying the existing files
-      if self.itc_ref.nil? && self.portal_ref.nil?
+      if !self.project.mac? && self.itc_ref.nil? && self.portal_ref.nil?
         create_app_if_necessary
       end
       enable_deliver
@@ -112,11 +116,11 @@ module Fastlane
       puts Terminal::Table.new(rows: rows, title: "Detected Values")
       puts ""
 
-      unless self.itc_ref
+      unless self.itc_ref || self.project.mac?
         UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
       end
 
-      unless self.portal_ref
+      unless self.portal_ref || self.project.mac?
         UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
       end
     end
@@ -191,7 +195,6 @@ module Fastlane
       config = {} # this has to be done like this
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
-
       produce_options_hash = {
         app_name: project.app_name,
         app_identifier: self.app_identifier

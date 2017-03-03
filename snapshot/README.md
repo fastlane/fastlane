@@ -280,7 +280,7 @@ to update your `SnapshotHelper.swift` files. In case you modified your `Snapshot
 
 ## Launch Arguments
 
-You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `NSProcessInfo.processInfo().arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `ProcessInfo.processInfo.arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `UserDefaults.standard`.
 
 ```ruby
 launch_arguments([
@@ -289,14 +289,14 @@ launch_arguments([
 ```
 
 ```swift
-name.text = NSUserDefaults.standardUserDefaults().stringForKey("firstName")
+name.text = UserDefaults.standard.string(forKey: "firstName")
 // name.text = "Felix"
 ```
 
 _snapshot_ includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by _snapshot_.
 
 ```swift
-if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
+if UserDefaults.standard.bool(forKey: "FASTLANE_SNAPSHOT") {
     // runtime check that we are in snapshot mode
 }
 ```

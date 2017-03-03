@@ -46,7 +46,7 @@ module Fastlane
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
-          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.")
+          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a mispelled or changed group/channel name or an expired SLACK_URL")
         end
       end
 

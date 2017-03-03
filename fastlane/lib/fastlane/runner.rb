@@ -58,10 +58,14 @@ module Fastlane
       rescue => ex
         Dir.chdir(path_to_use) do
           # Provide error block exception without colour code
-          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
-
-          error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
-          error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
+          begin
+            error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
+            error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
+          rescue => error_block_exception
+            UI.error("An error occured while executing the `error` block:")
+            UI.error(error_block_exception.to_s)
+            raise ex # raise the original error message
+          end
         end
 
         raise ex
@@ -258,12 +262,11 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
-          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-
+        # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        if platform
           unless class_ref.is_supported?(platform)
-            UI.user_error!("Action '#{name}' doesn't support required operating system '#{platform}'.")
+            UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
         end
       end

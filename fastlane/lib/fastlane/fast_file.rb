@@ -206,12 +206,12 @@ module Fastlane
 
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
 
-      collector.did_launch_action(:import)
-      parse(File.read(path), path)
-
-      # Check if we can also import local actions which are in the same directory as the Fastfile
+      # First check if there are local actions to import in the same directory as the Fastfile
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+
+      collector.did_launch_action(:import)
+      parse(File.read(path), path)
     end
 
     # @param url [String] The git URL to clone the repository from

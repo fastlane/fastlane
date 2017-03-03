@@ -53,7 +53,7 @@ module Gym
         print_full_log_path
         print_xcode_path_instructions
         print_xcode_version
-        UI.user_error!("Error building the application - see the log above")
+        UI.user_error!("Error building the application - see the log above", error_info: output)
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -84,7 +84,7 @@ module Gym
           print "provisioning profile and code signing identity."
         end
         print_full_log_path
-        UI.user_error!("Error packaging up the application")
+        UI.user_error!("Error packaging up the application", error_info: output)
       end
 
       def handle_empty_archive

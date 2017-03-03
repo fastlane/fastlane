@@ -120,6 +120,22 @@ Instead, you may verify the file is valid using OpenSSL:
 
     openssl pkcs12 -info -in my.p12
 
+If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to `pem` and back to `p12`:
+
+    % openssl pkcs12 -in my.p12 -out my.pem
+    Enter Import Password:
+      <hit enter: the p12 has no password>
+    MAC verified OK
+    Enter PEM pass phrase:
+      <enter a temporary password to encrypt the pem file>
+      
+    % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
+    Enter pass phrase for temp.pem:
+      <enter the temporary password to decrypt the pem file>
+
+    Enter Export Password:
+      <enter a password for encrypting the new p12 file>
+
 ##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
 
 ## Environment Variables

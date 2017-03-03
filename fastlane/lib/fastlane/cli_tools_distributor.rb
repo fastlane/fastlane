@@ -8,6 +8,10 @@ module Fastlane
         ARGV.include?('-v') || ARGV.include?('--version')
       end
 
+      def running_help_command?
+        ARGV.include?('-h') || ARGV.include?('--help')
+      end
+
       def take_off
         before_import_time = Time.now
 
@@ -17,6 +21,8 @@ module Fastlane
         if Time.now - before_import_time > 3 && !running_version_command?
           print_slow_fastlane_warning
         end
+
+        FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
@@ -58,6 +64,8 @@ module Fastlane
           require "fastlane/commands_generator"
           Fastlane::CommandsGenerator.start
         end
+      ensure
+        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable

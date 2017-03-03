@@ -59,7 +59,7 @@ describe Match::Generator do
 
       params = {
         app_identifier: 'app_identifier',
-        prov_type: :development,
+        type: :development,
         workspace: 'workspace',
         username: 'username',
         team_id: 'team_id',

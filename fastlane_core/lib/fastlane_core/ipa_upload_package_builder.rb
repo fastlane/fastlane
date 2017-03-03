@@ -26,7 +26,7 @@ module FastlaneCore
       xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
-      UI.success("Wrote XML data to '#{self.package_path}'") if $verbose
+      UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
 
       return package_path
     end

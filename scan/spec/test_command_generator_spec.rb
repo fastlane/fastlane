@@ -63,6 +63,8 @@ describe Scan do
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
+    allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
+
     allow(Scan).to receive(:project).and_return(@project)
   end
 
@@ -72,6 +74,39 @@ describe Scan do
         options = { project: "/notExistent" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end.to raise_error "Project file not found at path '/notExistent'"
+    end
+
+    describe "Supports toolchain" do
+      it "should fail if :xctestrun and :toolchain is set" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            scan(
+              project: './scan/examples/standard/app.xcodeproj',
+              xctestrun: './path/1.xctestrun',
+              toolchain: 'com.apple.dt.toolchain.Swift_2_3'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'toolchain' and 'xctestrun'")
+      end
+
+      it "passes the toolchain option to xcodebuild" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = Scan::TestCommandGenerator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-sdk '9.0'",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       :build,
+                                       :test
+                                     ])
+      end
     end
 
     it "supports additional parameters" do
@@ -170,6 +205,48 @@ describe Scan do
                                        :build,
                                        :test
                                      ])
+      end
+    end
+
+    describe "with Scan option :include_simulator_logs" do
+      context "extract system.logarchive" do
+        it "copies all device logs to the output directory" do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            include_simulator_logs: true,
+            devices: ["iPhone 6s", "iPad Air"],
+            project: './scan/examples/standard/app.xcodeproj'
+          })
+          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPhone 6s_iOS_10.0.logarchive/)
+          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPad Air_iOS_10.0.logarchive/)
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl getenv 021A465B-A294-4D9E-AD07-6BDC8E186343 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl getenv 2ABEAF08-E480-4617-894F-6BAB587E7963 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          expect(FastlaneCore::CommandExecutor).
+            to receive(:execute).
+            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect 2>/dev/null", print_all: false, print_command: true).
+            and_return("/tmp/folder")
+
+          mock_slack_poster = Object.new
+          allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
+          allow(mock_slack_poster).to receive(:run)
+          allow(Scan::TestCommandGenerator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
+
+          Scan::Runner.new.handle_results(0)
+        end
       end
     end
 
@@ -313,7 +390,7 @@ describe Scan do
       # FIXME: expect UI error starting "No simulators found that are equal to the version of specifier"
     end
 
-    describe "test-without-building and build-for-testing", now: true do
+    describe "test-without-building and build-for-testing" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
@@ -368,8 +445,6 @@ describe Scan do
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme app",
-                                       "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",

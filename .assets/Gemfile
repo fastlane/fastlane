@@ -2,10 +2,4 @@
 
 source "https://rubygems.org"
 
-local_fastlane_path = "<YOUR_LOCAL_FASTLANE_CLONE>"
-
-if File.exist?(File.join(File.expand_path(local_fastlane_path), "fastlane.gemspec"))
-  local_fastlane_path = File.expand_path("..", local_fastlane_path)
-end
-
-gem "fastlane", path: local_fastlane_path
+gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")

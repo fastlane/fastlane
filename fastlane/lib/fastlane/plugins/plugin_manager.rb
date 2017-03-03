@@ -169,9 +169,9 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle install"
-        cmd << " --quiet" unless $verbose
+        cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && echo 'Successfully installed plugins'"
-        UI.command(cmd) if $verbose
+        UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)
       end
     end
@@ -183,9 +183,9 @@ module Fastlane
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle update"
-        cmd << " --quiet" unless $verbose
+        cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && echo 'Successfully updated plugins'"
-        UI.command(cmd) if $verbose
+        UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)
       end
     end
@@ -241,12 +241,12 @@ module Fastlane
         fastlane_folder_name = "fastlane"
       end
       "plugins_path = File.join(File.dirname(__FILE__), '#{fastlane_folder_name}', '#{PluginManager::PLUGINFILE_NAME}')\n" \
-      "eval(File.read(plugins_path), binding) if File.exist?(plugins_path)"
+      "eval_gemfile(plugins_path) if File.exist?(plugins_path)"
     end
 
     # Makes sure, the user's Gemfile actually loads the Plugins file
     def plugins_attached?
-      gemfile_path && gemfile_content.include?(self.class.code_to_attach)
+      gemfile_path && gemfile_content.include?(PluginManager::PLUGINFILE_NAME)
     end
 
     def ensure_plugins_attached!
@@ -279,7 +279,7 @@ module Fastlane
 
           store_plugin_reference(gem_name)
           loaded_plugins = true
-        rescue => ex
+        rescue StandardError, ScriptError => ex # some errors, like ScriptError are not caught unless explicitly
           UI.error("Error loading plugin '#{gem_name}': #{ex}")
 
           # We'll still add it to the table, to make the error

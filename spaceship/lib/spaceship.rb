@@ -1,3 +1,4 @@
+require 'spaceship/globals'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'
@@ -20,6 +21,7 @@ module Spaceship
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
   AppGroup = Spaceship::Portal::AppGroup
+  WebsitePush = Spaceship::Portal::WebsitePush
   AppService = Spaceship::Portal::AppService
 
   # iTunes Connect

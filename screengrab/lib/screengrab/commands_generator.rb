@@ -20,15 +20,15 @@ module Screengrab
       program :help, 'GitHub', 'https://github.com/fastlane/screengrab'
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+      global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
       always_trace!
 
-      FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options)
-
       command :run do |c|
         c.syntax = 'fastlane screengrab'
-        c.description = 'Take new screenshots based on the screengrabfile.'
+        c.description = 'Take new screenshots based on the Screengrabfile.'
+
+        FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options, command: c)
 
         c.action do |args, options|
           o = options.__hash__.dup

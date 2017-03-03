@@ -10,7 +10,7 @@ module Fastlane
 
           return paths if Helper.is_test?
 
-          if (paths || []).count == 0
+          if paths.nil?
             Actions.sh('git reset --hard HEAD')
 
             clean_options = ['q', 'f', 'd']

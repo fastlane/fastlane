@@ -211,13 +211,13 @@ module Fastlane
     def self.print_lane_context
       return if Actions.lane_context.empty?
 
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         UI.important 'Lane Context:'.yellow
         UI.message Actions.lane_context
         return
       end
 
-      # Print a nice table unless in $verbose mode
+      # Print a nice table unless in FastlaneCore::Globals.verbose? mode
       rows = Actions.lane_context.collect do |key, content|
         [key, content.to_s]
       end
