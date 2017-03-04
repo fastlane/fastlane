@@ -94,7 +94,7 @@ module Fastlane
     def self.print_table(actions)
       return if actions.count == 0
 
-      require 'terminal-table'
+      
 
       rows = []
       actions.each_with_index do |current, i|
@@ -108,7 +108,7 @@ module Fastlane
       end
 
       puts ""
-      puts Terminal::Table.new(
+      puts FastlaneCore::TerminalTable.new(
         title: "fastlane summary".green,
         headings: ["Step", "Action", "Time (in s)"],
         rows: rows
@@ -131,7 +131,7 @@ module Fastlane
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
 
-      table = Terminal::Table.new(
+      table = FastlaneCore::TerminalTable.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
         rows: rows
@@ -223,8 +223,8 @@ module Fastlane
       end
       rows = FastlaneCore::PrintTable.limit_row_size(rows)
 
-      require 'terminal-table'
-      puts Terminal::Table.new({
+      
+      puts FastlaneCore::TerminalTable.new({
         title: "Lane Context".yellow,
         rows: rows
       })

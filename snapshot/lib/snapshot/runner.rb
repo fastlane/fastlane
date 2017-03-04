@@ -129,7 +129,7 @@ module Snapshot
         title: "snapshot results"
       }
       puts ""
-      puts Terminal::Table.new(params)
+      puts FastlaneCore::TerminalTable.new(params)
       puts ""
     end
 

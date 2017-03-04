@@ -1,7 +1,7 @@
 require 'pty'
 require 'open3'
 require 'fileutils'
-require 'terminal-table'
+
 
 module Scan
   class Runner
@@ -70,7 +70,7 @@ module Scan
         failures_str = result[:failures].to_s.green
       end
 
-      puts Terminal::Table.new({
+      puts FastlaneCore::TerminalTable.new({
         title: "Test Results",
         rows: [
           ["Number of tests", result[:tests]],

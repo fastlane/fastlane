@@ -11,7 +11,7 @@ require 'match/spaceship_ensure'
 require 'match/change_password'
 
 require 'fastlane_core'
-require 'terminal-table'
+
 require 'spaceship'
 
 module Match

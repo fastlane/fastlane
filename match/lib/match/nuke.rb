@@ -81,7 +81,7 @@ module Match
     def print_tables
       puts ""
       if self.certs.count > 0
-        puts Terminal::Table.new({
+        puts FastlaneCore::TerminalTable.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
           rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
@@ -90,7 +90,7 @@ module Match
       end
 
       if self.profiles.count > 0
-        puts Terminal::Table.new({
+        puts FastlaneCore::TerminalTable.new({
           title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
           rows: self.profiles.collect do |p|
@@ -103,7 +103,7 @@ module Match
       end
 
       if self.files.count > 0
-        puts Terminal::Table.new({
+        puts FastlaneCore::TerminalTable.new({
           title: "Files that are going to be deleted".green,
           headings: ["Type", "File Name"],
           rows: self.files.collect do |f|
