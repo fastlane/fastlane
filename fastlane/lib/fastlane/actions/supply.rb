@@ -5,11 +5,15 @@ module Fastlane
         require 'supply'
         require 'supply/options'
 
-        all_apk_paths = Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] || []
-        if all_apk_paths.length > 1
-          params[:apk_paths] ||= all_apk_paths
-        else
-          params[:apk] ||= Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+        # If no APK params were provided, try to fill in the values from lane context, preferring
+        # the multiple APKs over the single APK if set.
+        if params[:apk_paths].nil? && params[:apk].nil?
+          all_apk_paths = Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] || []
+          if all_apk_paths.size > 1
+            params[:apk_paths] = all_apk_paths
+          else
+            params[:apk] = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+          end
         end
 
         Supply.config = params # we already have the finished config
