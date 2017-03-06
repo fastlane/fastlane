@@ -38,8 +38,6 @@ module Snapshot
       system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
     end
 
-    private
-
     def available_devices
       # The order IS important, since those names are used to check for include?
       # and the iPhone 6 is inlucded in the iPhone 6 Plus
@@ -60,7 +58,7 @@ module Snapshot
         'iPadPro(9.7-inch)' => 'iPad Air Pro (9.7 inch)',
         'iPadPro(9.7inch)' => "iPad Pro (9.7 inch)",
         'iPadPro(12.9inch)' => "iPad Pro (12.9 inch)",
-        'iPad Pro' => "iPad Pro",
+        'iPadPro' => "iPad Pro",
         'iPad' => "iPad",
         'Mac' => "Mac"
       }
