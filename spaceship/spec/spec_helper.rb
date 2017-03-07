@@ -5,6 +5,18 @@ require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
 
+# Ensure that no ENV vars which interfere with testing are set
+#
+set_auth_vars = [
+  'FASTLANE_SESSION',
+  'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD',
+  'FASTLANE_PASSWORD'
+].select { |var| ENV.key?(var) }
+
+if set_auth_vars.any?
+  abort "[!] Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars.join(', ')}".red
+end
+
 @cache_paths = [
   File.expand_path("/tmp/spaceship_itc_service_key.txt")
 ]
