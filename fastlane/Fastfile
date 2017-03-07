@@ -228,18 +228,6 @@ end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do
-  # Ensure that no ENV vars which interefere with testing are set
-  #
-  set_auth_vars = [
-    'FASTLANE_SESSION',
-    'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD',
-    'FASTLANE_PASSWORD'
-  ].select { |var| ENV.key?(var) }
-
-  if set_auth_vars.any?
-    UI.user_error! "Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars.join(', ')}"
-  end
-
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
