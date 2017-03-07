@@ -73,6 +73,14 @@ describe Fastlane do
           "\n\t#{File.expand_path('~/Library/Keychains/test.keychain')}"
         )
       end
+
+      it "shows an error message if neither :name nor :keychain_path is given" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            delete_keychain
+          end").runner.execute(:test)
+        end.to raise_error('You either have to set :name or :keychain_path')
+      end
     end
   end
 end
