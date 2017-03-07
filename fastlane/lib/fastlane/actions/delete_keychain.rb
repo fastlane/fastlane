@@ -18,7 +18,7 @@ module Fastlane
         keychain_path = search_paths.find { |path| File.exist?(path) }
 
         if keychain_path.nil?
-          UI.user_error!("Unable to find the specified keychain. Looked in:\n\t" + search_paths.join("\n\t") )
+          UI.user_error!("Unable to find the specified keychain. Looked in:\n\t" + search_paths.join("\n\t"))
         end
 
         Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?

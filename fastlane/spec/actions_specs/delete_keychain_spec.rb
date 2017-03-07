@@ -21,7 +21,7 @@ describe Fastlane do
 
       it "works with keychain name found in ~/Library/Keychains" do
         allow(File).to receive(:exist?).with(/test.keychain/).and_return(false)
-        allow(File).to receive(:exist?).with(/Library\/Keychains\/test.keychain/).and_return(true)
+        allow(File).to receive(:exist?).with(%r{Library/Keychains/test.keychain}).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -68,8 +68,8 @@ describe Fastlane do
             })
           end").runner.execute(:test)
         end.to raise_error(
-          "Unable to find the specified keychain. Looked in:" +
-          "\n\t#{File.expand_path('test.keychain')}" +
+          "Unable to find the specified keychain. Looked in:" \
+          "\n\t#{File.expand_path('test.keychain')}" \
           "\n\t#{File.expand_path('~/Library/Keychains/test.keychain')}"
         )
       end
