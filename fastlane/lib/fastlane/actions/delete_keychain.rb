@@ -6,14 +6,19 @@ module Fastlane
       def self.run(params)
         original = Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN]
 
-        if params[:name]
-          keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:name]))
-        else
-          keychain_path = params[:keychain_path]
+        search_paths = []
+        search_paths << File.expand_path(params[:name]) if params[:name]
+        search_paths << File.expand_path(File.join("~", "Library", "Keychains", params[:name])) if params[:name]
+        search_paths << File.expand_path(params[:keychain_path]) if params[:keychain_path]
+
+        if search_paths.empty?
+          UI.user_error!("You either have to set :name or :keychain_path")
         end
 
+        keychain_path = search_paths.find { |path| File.exist?(path) }
+
         if keychain_path.nil?
-          UI.user_error!("You either have to set :name or :path")
+          UI.user_error!("Unable to find the specified keychain. Looked in:\n\t" + search_paths.join("\n\t") )
         end
 
         Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
