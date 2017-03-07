@@ -37,17 +37,17 @@ module Fastlane
         end
         project.save
 
-        if changed_targets.length == 0
+        if changed_targets.empty?
           UI.important("None of the specified targets has been modified")
           UI.important("available targets:")
-          target_dictionary.each do |tar|
-            UI.important("\t* #{tar[:name]}")
+          target_dictionary.each do |target|
+            UI.important("\t* #{target[:name]}")
           end
         else
           UI.success("Successfully updated project settings to use ProvisioningStyle '#{params[:use_automatic_signing] ? 'Automatic' : 'Manual'}'")
           UI.success("Modified Targets:")
-          changed_targets.each do |tar|
-            UI.success("\t * #{tar}")
+          changed_targets.each do |target|
+            UI.success("\t * #{target}")
           end
         end
 
