@@ -22,7 +22,7 @@ module Snapshot
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
 
       # Devices
-      unless config[:devices]
+      if config[:devices].nil? && !Snapshot.project.mac?
         config[:devices] = []
 
         # We only care about a subset of the simulators
@@ -50,7 +50,7 @@ module Snapshot
 
           config[:devices] << sim.name
         end
-        # as Snapshot can be run only on MacOS - we are always have host mac device
+      elsif Snapshot.project.mac?
         config[:devices] << "Mac"
       end
     end
