@@ -42,7 +42,7 @@ open class Snapshot: NSObject {
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            deviceLanguage = try String(contentsOf: path, encoding: String.Encoding.utf8).trimmingCharacters(in: trimCharacterSet)
+            deviceLanguage = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))"]
         } catch {
             print("Couldn't detect/set language...")
@@ -58,7 +58,7 @@ open class Snapshot: NSObject {
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            locale = try String(contentsOf: path, encoding: String.Encoding.utf8).trimmingCharacters(in: trimCharacterSet)
+            locale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
         } catch {
             print("Couldn't detect/set locale...")
         }
@@ -129,12 +129,12 @@ open class Snapshot: NSObject {
                 print("Couldn't find Snapshot configuration files - can't detect current user ")
                 return nil
             }
-        
-            guard let usersDir =  FileManager.default.urls(for:.userDirectory, in:.localDomainMask).first else {
+
+            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 print("Couldn't find Snapshot configuration files - can't detect `Users` dir")
                 return nil
             }
-            
+
             homeDir = usersDir.appendingPathComponent(user)
         #else
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
