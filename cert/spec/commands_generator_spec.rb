@@ -33,6 +33,32 @@ describe Cert::CommandsGenerator do
 
       expect(Cert.config[:platform]).to eq('macos')
     end
+
+    it "can use the generate_p12 flag from tool options" do
+      # leaving out the command name defaults to 'create'
+      stub_commander_runner_args(['--generate_p12', 'true'])
+
+      # launch takes no params, but we want to expect the call and prevent
+      # actual execution of the method
+      expect(runner).to receive(:launch)
+
+      Cert::CommandsGenerator.start
+
+      expect(Cert.config[:generate_p12]).to eq(true)
+    end
+
+    it "can use the p12_password flag from tool options" do
+      # leaving out the command name defaults to 'create'
+      stub_commander_runner_args(['--p12_password', 'a123456'])
+
+      # launch takes no params, but we want to expect the call and prevent
+      # actual execution of the method
+      expect(runner).to receive(:launch)
+
+      Cert::CommandsGenerator.start
+
+      expect(Cert.config[:p12_password]).to eq('a123456')
+    end
   end
 
   describe ":revoke_expired option handling" do
