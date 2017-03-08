@@ -1,6 +1,6 @@
 module Deliver
   class UploadAssets
-    SUPPORTED_ICON_EXTENSIONS = [".png", ".jpg"]
+    SUPPORTED_ICON_EXTENSIONS = [".png", ".jpg", ".jpeg"]
     def upload(options)
       return if options[:edit_live]
       app = options[:app]
