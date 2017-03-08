@@ -96,6 +96,25 @@ describe Fastlane do
 
         expect(result).to eq("cd 'Project' && bundle exec pod install")
       end
+
+      it "adds error_callback to command" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            error_callback: lambda { |result| puts 'failure' }
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install")
+      end
+
+      it "error_callback is executed on failure" do
+        error_callback = double('error_callback')
+
+        allow(Fastlane::Actions).to receive(:sh_control_output) {
+          expect(Fastlane::Actions).to have_received(:sh_control_output).with(kind_of(String),
+                                                                              hash_including(error_callback: error_callback))
+        }
+      end
     end
   end
 end
