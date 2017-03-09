@@ -30,7 +30,7 @@ end
 my_main = self
 RSpec.configure do |config|
   config.before(:each) do |current_test|
-    if current_test.id.match(/\/fastlane\//)
+    if current_test.id =~ %r{(\/fastlane\/spec\/(?!lane_manager))|(test_command_generator)}
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
     end
 
