@@ -30,6 +30,10 @@ end
 my_main = self
 RSpec.configure do |config|
   config.before(:each) do |current_test|
+    if current_test.id.match(/\/fastlane\//)
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+    end
+
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "before_each_#{tool_name}".to_sym
     begin
