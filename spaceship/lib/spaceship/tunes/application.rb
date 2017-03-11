@@ -67,8 +67,6 @@ module Spaceship
         #   This can't be longer than 255 characters.
         # @param primary_language (String): If localized app information isn't available in an
         #   App Store territory, the information from your primary language will be used instead.
-        # @param version (String): The version number is shown on the App Store and should
-        #   match the one you used in Xcode.
         # @param sku (String): A unique ID for your app that is not visible on the App Store.
         # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
         #   can't be changed after you submit your first build.
@@ -77,10 +75,9 @@ module Spaceship
         # @param platform (String): Platform one of (ios,osx)
         #  should it be an ios or an osx app
 
-        def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+        def create!(name: nil, primary_language: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
           client.create_application!(name: name,
                          primary_language: primary_language,
-                                  version: version,
                                       sku: sku,
                                 bundle_id: bundle_id,
                                 bundle_id_suffix: bundle_id_suffix,
