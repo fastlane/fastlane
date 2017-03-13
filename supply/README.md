@@ -141,7 +141,7 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 
 After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
 
-Here you can supply images with the following file names (extension can be png, jpg or jpeg):
+Inside of a given locale directory is a folder called `images`. Here you can supply images with the following file names (extension can be png, jpg or jpeg):
 
 - `featureGraphic`
 - `icon`
