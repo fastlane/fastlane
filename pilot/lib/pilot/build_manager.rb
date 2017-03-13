@@ -22,7 +22,7 @@ module Pilot
         UI.user_error!("Error uploading ipa file, for more information see above")
       end
 
-      UI.message("Successfully uploaded the new binary to iTunes Connect")
+      UI.success("Successfully uploaded the new binary to iTunes Connect")
 
       if config[:skip_waiting_for_build_processing]
         UI.important("Skip waiting for build processing")
@@ -61,7 +61,8 @@ module Pilot
           return
         end
 
-        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> External")
+        type = options[:distribute_external] ? 'External' : 'Internal'
+        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> #{type}")
       end
 
       unless config[:update_build_info_on_upload]
@@ -73,7 +74,8 @@ module Pilot
 
       return if config[:skip_submission]
       distribute_build(build, options)
-      UI.message("Successfully distributed build to beta testers 🚀")
+      type = options[:distribute_external] ? 'External' : 'Internal'
+      UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
     def list(options)

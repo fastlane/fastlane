@@ -262,12 +262,11 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
-          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-
+        # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        if platform
           unless class_ref.is_supported?(platform)
-            UI.user_error!("Action '#{name}' doesn't support required operating system '#{platform}'.")
+            UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
         end
       end

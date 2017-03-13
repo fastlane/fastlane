@@ -15,20 +15,20 @@ module Screengrab
       program :name, 'screengrab'
       program :version, Fastlane::VERSION
       program :description, 'CLI for \'screengrab\' - Automate taking localized screenshots of your Android app on emulators or real devices'
-      program :help, 'Authors', 'Andrea Falcone <afalcone@twitter.com>, Michael Furtak <mfurtak@twitter.com>'
+      program :help, 'Authors', 'Andrea Falcone <asfalcone@google.com>, Michael Furtak <mfurtak@google.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/screengrab'
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+      global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
       always_trace!
 
-      FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options)
-
       command :run do |c|
         c.syntax = 'fastlane screengrab'
-        c.description = 'Take new screenshots based on the screengrabfile.'
+        c.description = 'Take new screenshots based on the Screengrabfile.'
+
+        FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options, command: c)
 
         c.action do |args, options|
           o = options.__hash__.dup

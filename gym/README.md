@@ -192,7 +192,21 @@ lane :beta do
   gym(scheme: "MyApp")
   crashlytics
 end
+
+# error block is executed when a error occurs
+error do |lane, exception|
+  slack(
+    # message with short human friendly message
+    message: exception.to_s, 
+    success: false, 
+    # Output containing extended log output
+    payload: { "Output" => exception.error_info.to_s } 
+  )
+end
 ```
+
+When gym raises an error the `error_info` property will contain the process output
+in case you want to display the error in 3rd party tools such as Slack.
 
 You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
 

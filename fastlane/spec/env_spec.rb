@@ -39,5 +39,18 @@ describe Fastlane do
       expect(Fastlane::EnvironmentPrinter.anonymized_path('/Users/john/', '/Users/john')).to eq('~/')
       expect(Fastlane::EnvironmentPrinter.anonymized_path('/workspace/project/test', '/work')).to eq('/workspace/project/test')
     end
+
+    context 'FastlaneCore::Helper.xcode_version cannot be obtained' do
+      before do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_raise("Boom!")
+      end
+
+      it 'contains stack information other than Xcode Version' do
+        expect(env).to include("Bundler?")
+        expect(env).to include("Xcode Path")
+        expect(env).not_to include("Xcode Version")
+        expect(env).to include("OpenSSL")
+      end
+    end
   end
 end

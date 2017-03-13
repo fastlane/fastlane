@@ -8,7 +8,7 @@ module Fastlane
     def inspector_started_query(query, inspector)
       puts ""
       puts "Looking for related GitHub issues on #{inspector.repo_owner}/#{inspector.repo_name}..."
-      puts "Search query: #{query}" if $verbose
+      puts "Search query: #{query}" if FastlaneCore::Globals.verbose?
       puts ""
     end
 

@@ -57,10 +57,10 @@ module Fastlane
           Supply::Setup.new.perform_download
         rescue => ex
           UI.error(ex.to_s)
-          UI.error("supply failed, but don't worry, you can launch supply using `supply init` whenever you want.")
+          UI.error("supply failed, but don't worry, you can launch supply using `fastlane supply init` whenever you want.")
         end
       else
-        UI.success("You can run `supply init` to do so at a later point.")
+        UI.success("You can run `fastlane supply init` to do so at a later point.")
       end
     end
 

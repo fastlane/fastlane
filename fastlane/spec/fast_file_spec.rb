@@ -131,10 +131,9 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(nil)
       end
 
-      it "raises an exception if unsupported action is called in unsupported platform" do
-        expect do
-          @ff.runner.execute('unsupported_action', 'android')
-        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'."
+      it "logs a warning if and unsupported action is called on an non officially supported platform" do
+        expect(FastlaneCore::UI).to receive(:important).with("Action 'frameit' isn't known to support operating system 'android'.")
+        @ff.runner.execute('unsupported_action', 'android')
       end
     end
 
@@ -176,6 +175,20 @@ describe Fastlane do
         expect(File.read("/tmp/after_all.txt")).to eq(time)
         File.delete("/tmp/before_all.txt")
         File.delete("/tmp/after_all.txt")
+      end
+
+      it "allows the user to invent a new platform" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileNewPlatform')
+        expect do
+          ff.runner.execute(:crash, :windows)
+        end.to raise_error(":windows crash")
+      end
+
+      it "allows the user to set the platform in their Fastfile", focus: true do
+        expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
+        expect(UI).to receive(:message).with("echo :windows")
+        ff.runner.execute(:echo, :windows)
       end
 
       it "before_each and after_each are called every time" do
@@ -332,7 +345,7 @@ describe Fastlane do
         ff.import('./FastfileSytnaxError')
       end
 
-      it "imports actions associated with a Fastfile before their Fastfile", focus: true do
+      it "imports actions associated with a Fastfile before their Fastfile" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect do
           ff.import('./import1/Fastfile')

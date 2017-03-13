@@ -29,7 +29,7 @@ module Fastlane
       output << "</tr>"
       output << "<tr>"
       output << "<td width=\"33%\"><code>brew cask install fastlane</code></td>"
-      output << "<td width=\"33%\"><a href=\"https://download.fastlane.tools/fastlane.zip\">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>"
+      output << "<td width=\"33%\"><a href=\"https://download.fastlane.tools\">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>"
       output << "<td width=\"33%\"><code>sudo gem install fastlane -NV</code></td>"
       output << "</tr>"
       output << "</table>"
@@ -64,7 +64,7 @@ module Fastlane
       output << ""
 
       File.write(output_path, output.join("\n"))
-      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if $verbose
+      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
     end
 
     #####################################################

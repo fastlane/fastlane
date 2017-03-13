@@ -24,7 +24,7 @@ module FastlaneCore
     end
 
     def format_string(datetime, severity)
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
       elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
         return ""
@@ -70,7 +70,7 @@ module FastlaneCore
     end
 
     def verbose(message)
-      log.debug(message.to_s) if $verbose
+      log.debug(message.to_s) if FastlaneCore::Globals.verbose?
     end
 
     def header(message)

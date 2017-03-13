@@ -87,8 +87,6 @@ The guide will create all the necessary files for you, using the existing app me
 
 From now on, you can run `fastlane deliver` to deploy a new update, or just upload new app metadata and screenshots.
 
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/fastlane/blob/master/deliver/MigrationGuide.md).
-
 # Usage
 
 Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
@@ -123,6 +121,12 @@ Download existing screenshots from iTunes Connect
 
 ```
 fastlane deliver download_screenshots
+```
+
+Download existing metadata from iTunes Connect
+
+```
+fastlane deliver download_metadata
 ```
 
 To get a list of available options run

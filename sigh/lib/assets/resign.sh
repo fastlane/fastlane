@@ -703,7 +703,7 @@ function resign {
             # otherwise it interprets they key path as nested keys
             # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
             # shellcheck disable=SC2001
-            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\\./g')
+            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
             # Patch the ID value if specified

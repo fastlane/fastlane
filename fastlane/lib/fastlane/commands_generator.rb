@@ -10,41 +10,40 @@ module Fastlane
     def self.start
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
-      FastlaneCore::Swag.show_loader
-      $verbose = true if ARGV.include?("--verbose")
-
+      FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
+      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
       if ARGV.include?("--capture_output")
-        $capture_output = true
-        $verbose = true
+        FastlaneCore::Globals.verbose = true
+        FastlaneCore::Globals.capture_output = true
       end
+      FastlaneCore::Swag.show_loader
 
       # has to be checked here - in case we wan't to troubleshoot plugin related issues
       if ARGV.include?("--troubleshoot")
         self.confirm_troubleshoot
       end
 
-      if $capture_output
+      if FastlaneCore::Globals.capture_output?
         # Trace mode is enabled
         # redirect STDOUT and STDERR
         out_channel = StringIO.new
         $stdout = out_channel
         $stderr = out_channel
       end
-      FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+
       Fastlane.load_actions
       FastlaneCore::Swag.stop_loader
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
-      unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command?
+      unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command? || CLIToolsDistributor.running_help_command?
         # *after* loading the plugins
         Fastlane.plugin_manager.load_plugins
         Fastlane::PluginUpdateManager.start_looking_for_updates
       end
       self.new.run
     ensure
-      FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       Fastlane::PluginUpdateManager.show_update_status
-      if $capture_output
-        $captured_output = Helper.strip_ansi_colors($stdout.string)
+      if FastlaneCore::Globals.capture_output?
+        FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
         $stdout = STDOUT
         $stderr = STDERR
 
@@ -86,12 +85,13 @@ module Fastlane
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
-        $capture_output = true
-        $verbose = true
+        FastlaneCore::Globals.capture_output = true
+        FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 

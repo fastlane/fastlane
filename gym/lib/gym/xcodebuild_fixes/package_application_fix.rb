@@ -29,11 +29,11 @@ module Gym
           Dir[File.join(Gym::ROOT, "lib/assets/package_application_patches/*.diff")].each do |patch|
             UI.verbose "Applying Package Application patch: #{File.basename(patch)}"
             command = ["patch '#{@patched_package_application_path}' < '#{patch}'"]
-            Runner.new.print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
+            Runner.new.print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if FastlaneCore::Globals.verbose?
 
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: false,
-                                            print_command: $verbose,
+                                            print_command: FastlaneCore::Globals.verbose?,
                                                     error: proc do |output|
                                                       ErrorHandler.handle_package_error(output)
                                                     end)

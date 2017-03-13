@@ -1,3 +1,4 @@
+require 'spaceship/globals'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'

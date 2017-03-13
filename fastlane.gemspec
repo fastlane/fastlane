@@ -16,6 +16,9 @@ Gem::Specification.new do |spec|
   spec.description   = Fastlane::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
+  spec.metadata      = {
+    "docs_url" => "https://docs.fastlane.tools"
+  }
 
   spec.required_ruby_version = '>= 2.0.0'
 

@@ -26,7 +26,7 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
       return @teams if @teams
-      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action")
+      req = request(:post, "account/listTeams.action")
       @teams = parse_response(req, 'teams').sort_by do |team|
         [
           team['name'],
@@ -363,16 +363,15 @@ module Spaceship
     def create_device!(device_name, device_id, mac: false)
       ensure_csrf(Spaceship::Device)
 
-      req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/addDevice.action"
-        r.params = {
-          teamId: team_id,
-          deviceNumber: device_id,
-          name: device_name
-        }
-      end
+      req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
+        teamId: team_id,
+        deviceClasses: mac ? 'mac' : 'iphone',
+        deviceNumbers: device_id,
+        deviceNames: device_name,
+        register: 'single'
+      })
 
-      parse_response(req, 'device')
+      parse_response(req, 'devices').first
     end
 
     def disable_device!(device_id, device_udid, mac: false)
@@ -452,6 +451,26 @@ module Spaceship
     #####################################################
 
     def provisioning_profiles(mac: false)
+      paging do |page_number|
+        req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc',
+          includeInactiveProfiles: true,
+          onlyCountLists: true
+        })
+
+        parse_response(req, 'provisioningProfiles')
+      end
+    end
+
+    ##
+    # this endpoint is used by Xcode to fetch provisioning profiles.
+    # The response is an xml plist but has the added benefit of containing the appId of each provisioning profile.
+    #
+    # Use this method over `provisioning_profiles` if possible because no secondary API calls are necessary to populate the ProvisioningProfile data model.
+    def provisioning_profiles_via_xcode_api(mac: false)
       req = request(:post) do |r|
         r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
         r.params = {
@@ -541,27 +560,6 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
-    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
-    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
-    # This method is being called from all requests that modify, create or downloading provisioning
-    # profiles.
-    # Source https://github.com/fastlane/fastlane/issues/5903
-    def fetch_csrf_token_for_provisioning(mac: false)
-      req = request(:post) do |r|
-        r.url "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action"
-        r.params = {
-          teamId: team_id,
-          pageSize: 1,
-          pageNumber: 1,
-          sort: "name=asc"
-        }
-      end
-
-      parse_response(req, 'provisioningProfiles')
-      return nil
-    end
-
     private
 
     # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
@@ -593,6 +591,24 @@ module Spaceship
       block_given? ? yield : klass.all
 
       csrf_cache[klass] = self.csrf_tokens
+    end
+
+    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
+    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
+    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
+    # This method is being called from all requests that modify, create or downloading provisioning
+    # profiles.
+    # Source https://github.com/fastlane/fastlane/issues/5903
+    def fetch_csrf_token_for_provisioning(mac: false)
+      req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
+         teamId: team_id,
+         pageNumber: 1,
+         pageSize: 1,
+         sort: 'name=asc'
+       })
+
+      parse_response(req, 'provisioningProfiles')
+      return nil
     end
   end
   # rubocop:enable Metrics/ClassLength

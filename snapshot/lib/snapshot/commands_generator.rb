@@ -20,15 +20,15 @@ module Snapshot
       program :help, 'GitHub', 'https://github.com/fastlane/snapshot'
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+      global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
       always_trace!
-
-      FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options)
 
       command :run do |c|
         c.syntax = 'fastlane snapshot'
         c.description = 'Take new screenshots based on the Snapfile.'
+
+        FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)
@@ -62,7 +62,7 @@ module Snapshot
       command :reset_simulators do |c|
         c.syntax = 'fastlane snapshot reset_simulators'
         c.description = "This will remove all your existing simulators and re-create new ones"
-        c.option '-i', '--ios String', String, 'The comma separated list of iOS Versions you want to use'
+        c.option '-i', '--ios_version String', String, 'The comma separated list of iOS Versions you want to use'
         c.option '--force', 'Disables confirmation prompts'
 
         c.action do |args, options|
@@ -77,6 +77,8 @@ module Snapshot
       command :clear_derived_data do |c|
         c.syntax = 'fastlane snapshot clear_derived_data -f path'
         c.description = "Clear the directory where build products and other derived data will go"
+
+        FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)

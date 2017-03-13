@@ -1,0 +1,10 @@
+add_extra_platforms(platforms: [:windows, :neogeo])
+
+platform :windows do
+  lane :empty do
+  end
+
+  lane :echo do
+    UI.message "echo :windows"
+  end
+end

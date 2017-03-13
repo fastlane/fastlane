@@ -44,6 +44,12 @@ module Scan
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :toolchain,
+                                     env_name: "SCAN_TOOLCHAIN",
+                                     conflicting_options: [:xctestrun],
+                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :devices,
                                      optional: true,
                                      is_string: false,
@@ -246,12 +252,13 @@ module Scan
                                     description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                     is_string: false,
                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                    description: "Sets custom full report file name when generating a single report",
-                                    deprecated: "Use --output_files",
-                                    conflicting_options: [:output_files],
-                                    optional: true,
-                                    is_string: true)
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,                                     
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name when generating a single report",
+                                     deprecated: "Use --output_files",
+                                     conflicting_options: [:output_files],
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end
