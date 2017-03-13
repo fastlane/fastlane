@@ -156,6 +156,7 @@ desc "This SHOULD only be used for testing changes to the docs"
 lane :test_generate_docs do
   ENV['USE_ENHANCE_TEST_DATA'] = "true"
   generate_markdown_docs
+  ENV.delete("USE_ENHANCE_TEST_DATA")
 end
 
 desc "Update the actions.md on https://docs.fastlane.tools"
