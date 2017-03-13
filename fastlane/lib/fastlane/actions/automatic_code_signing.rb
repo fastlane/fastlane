@@ -126,11 +126,11 @@ module Fastlane
           ',
           ' # via generic action
           automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj"
+            path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: false
           )',
           'automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj"
+            path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: true
           )'
 
