@@ -259,10 +259,14 @@ module Spaceship
     #   This can't be longer than 255 characters.
     # @param primary_language (String): If localized app information isn't available in an
     #   App Store territory, the information from your primary language will be used instead.
+    # @param version *DEPRECATED: Use `Spaceship::Tunes::Application.ensure_version!` method instead*
+    #   (String): The version number is shown on the App Store and should match the one you used in Xcode.
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+      UI.deprecated("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
+
       # First, we need to fetch the data from Apple, which we then modify with the user's values
       primary_language ||= "English"
       platform ||= "ios"
