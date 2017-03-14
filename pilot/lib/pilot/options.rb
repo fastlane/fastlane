@@ -46,7 +46,11 @@ module Pilot
                                      short_option: "-d",
                                      optional: true,
                                      env_name: "PILOT_BETA_APP_DESCRIPTION",
-                                     description: "Provide the beta app description when uploading a new build"),
+                                     description: "Provide the beta app description when uploading a new build",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Beta App Description must be at least 10 characters long.") unless value.to_s.length >= 10
+                                       UI.user_error!("Beta App Description must be less than 4000 characters long.") unless value.to_s.length <= 4000
+                                     end),
         FastlaneCore::ConfigItem.new(key: :beta_app_feedback_email,
                                      short_option: "-n",
                                      optional: true,
