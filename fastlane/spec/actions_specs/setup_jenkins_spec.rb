@@ -32,6 +32,7 @@ describe Fastlane do
       end
 
       it "works when forced" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         stub_const("ENV", {})
 
         Fastlane::FastFile.new.parse("lane :test do
@@ -58,6 +59,7 @@ describe Fastlane do
       end
 
       it "works inside CI" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         stub_const("ENV", { "TRAVIS" => true })
 
         Fastlane::FastFile.new.parse("lane :test do

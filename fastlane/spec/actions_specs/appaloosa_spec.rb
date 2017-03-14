@@ -37,6 +37,7 @@ describe Fastlane do
         end
 
         it 'raises a Fastlane error for missing api_token' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/No value found for 'api_token'/)
@@ -56,6 +57,7 @@ describe Fastlane do
         end
 
         it 'raises a Fastlane error for missing store_id' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match("No value found for 'store_id'")
@@ -71,6 +73,7 @@ describe Fastlane do
         end
 
         it 'returns group_id errors' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match('ERROR: A group id is incorrect')
@@ -94,6 +97,7 @@ describe Fastlane do
         end
 
         it 'raises a Fastlane error for problem with API token or store id' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to eq(expect_error)
@@ -117,6 +121,7 @@ describe Fastlane do
         end
 
         it 'raises a Fastlane error for problem with API token or store id' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to eq(expect_error)
@@ -146,6 +151,7 @@ describe Fastlane do
         end
 
         it 'works with valid parameters' do
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
           Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test)
         end
       end

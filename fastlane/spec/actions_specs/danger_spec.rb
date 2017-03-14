@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "danger integration" do
       it "default use case" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger
         end").runner.execute(:test)
@@ -18,6 +19,7 @@ describe Fastlane do
       end
 
       it "appends verbose" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(verbose: true)
         end").runner.execute(:test)
@@ -26,6 +28,7 @@ describe Fastlane do
       end
 
       it "sets github token" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(github_api_token: '1234')
         end").runner.execute(:test)
@@ -35,6 +38,7 @@ describe Fastlane do
       end
 
       it "appends danger_id" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(danger_id: 'unit-tests')
         end").runner.execute(:test)
@@ -43,6 +47,7 @@ describe Fastlane do
       end
 
       it "appends dangerfile" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(dangerfile: 'test/OtherDangerfile')
         end").runner.execute(:test)
@@ -51,6 +56,7 @@ describe Fastlane do
       end
 
       it "appends fail-on-errors flag when set" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(fail_on_errors: true)
         end").runner.execute(:test)
@@ -59,6 +65,7 @@ describe Fastlane do
       end
 
       it "does not append fail-on-errors flag when unset" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(fail_on_errors: false)
         end").runner.execute(:test)

@@ -10,6 +10,7 @@ describe Fastlane do
       end
 
       it "raises an error if no api token was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
@@ -21,6 +22,7 @@ describe Fastlane do
       end
 
       it "raises an error if no target user was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
@@ -67,6 +69,7 @@ describe Fastlane do
       end
 
       it "works with valid parameters" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({
@@ -79,6 +82,7 @@ describe Fastlane do
       end
 
       it "works with valid parameters include optionals" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             deploygate({

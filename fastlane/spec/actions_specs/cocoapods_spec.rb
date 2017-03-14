@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Cocoapods Integration" do
       it "default use case" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
         end").runner.execute(:test)
@@ -18,6 +19,7 @@ describe Fastlane do
       end
 
       it "adds no-clean to command if clean is set to false" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             clean: false
@@ -28,6 +30,7 @@ describe Fastlane do
       end
 
       it "adds no-integrate to command if integrate is set to false" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             integrate: false
@@ -38,6 +41,7 @@ describe Fastlane do
       end
 
       it "adds repo-update to command if repo_update is set to true" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             repo_update: true
@@ -48,6 +52,7 @@ describe Fastlane do
       end
 
       it "adds silent to command if silent is set to true" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             silent: true
@@ -58,6 +63,7 @@ describe Fastlane do
       end
 
       it "adds verbose to command if verbose is set to true" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             verbose: true
@@ -68,6 +74,7 @@ describe Fastlane do
       end
 
       it "adds no-ansi to command if ansi is set to false" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             ansi: false
@@ -78,6 +85,7 @@ describe Fastlane do
       end
 
       it "changes directory if podfile is set to the Podfile path" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             podfile: 'Project/Podfile'
@@ -88,6 +96,7 @@ describe Fastlane do
       end
 
       it "changes directory if podfile is set to a directory" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             podfile: 'Project'
@@ -98,6 +107,7 @@ describe Fastlane do
       end
 
       it "adds error_callback to command" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
             error_callback: lambda { |result| puts 'failure' }
