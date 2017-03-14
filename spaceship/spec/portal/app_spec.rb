@@ -51,6 +51,8 @@ describe Spaceship::Portal::App do
       expect(app.app_groups_count).to eq(0)
       expect(app.cloud_containers_count).to eq(0)
       expect(app.identifiers_count).to eq(0)
+      expect(app.associated_groups.length).to eq(1)
+      expect(app.associated_groups[0].group_id).to eq("group.tools.fastlane")
     end
 
     it "allows modification of values and properly retrieving them" do
