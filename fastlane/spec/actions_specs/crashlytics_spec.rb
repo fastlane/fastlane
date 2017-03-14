@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Crashlytics Integration" do
       before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ENV.delete "CRASHLYTICS_API_TOKEN"
         ENV.delete "CRASHLYTICS_BUILD_SECRET"
         ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
@@ -9,10 +10,6 @@ describe Fastlane do
       end
 
       describe "Android" do
-        before :each do
-          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        end
-
         describe "Valid parameters" do
           it "works with valid parameters" do
             command = Fastlane::FastFile.new.parse('lane :test do
@@ -74,7 +71,6 @@ describe Fastlane do
 
       describe "iOS" do
         before :each do
-          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         end
 
         describe "Valid Parameters" do
@@ -280,7 +276,6 @@ describe Fastlane do
 
         describe "Invalid Parameters" do
           it "raises an error if no crashlytics path was given" do
-            allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
             expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
@@ -307,7 +302,6 @@ describe Fastlane do
           end
 
           it "raises an error if no api token was given" do
-            allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -320,7 +314,6 @@ describe Fastlane do
           end
 
           it "raises an error if no build secret was given" do
-            allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -333,7 +326,6 @@ describe Fastlane do
           end
 
           it "raises an error if no ipa path was given" do
-            allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -346,7 +338,6 @@ describe Fastlane do
           end
 
           it "raises an error if the given ipa path was not found" do
-            allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({

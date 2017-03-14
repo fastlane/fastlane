@@ -110,6 +110,7 @@ describe Fastlane do
 
     describe "version_bump_podspec" do
       before do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         @podspec_path = './fastlane/spec/fixtures/podspecs/test.podspec'
       end
 
@@ -122,7 +123,6 @@ describe Fastlane do
       end
 
       it "bumps patch version when only the path is given" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           version_bump_podspec(path: '#{@podspec_path}')
         end").runner.execute(:test)
@@ -131,7 +131,6 @@ describe Fastlane do
       end
 
       it "bumps patch version when bump_type is set to patch the path is given" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'patch')
         end").runner.execute(:test)
@@ -140,7 +139,6 @@ describe Fastlane do
       end
 
       it "bumps minor version when bump_type is set to minor the path is given" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'minor')
         end").runner.execute(:test)
@@ -149,7 +147,6 @@ describe Fastlane do
       end
 
       it "bumps major version when bump_type is set to major the path is given" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           version_bump_podspec(path: '#{@podspec_path}', bump_type: 'major')
         end").runner.execute(:test)
