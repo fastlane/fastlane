@@ -51,8 +51,10 @@ module Fastlane
                     end
           message += "\n#{result}" if print_command_output
 
-          error_callback.call(result) if error_callback
-          UI.user_error!(message)
+          callback_exit_status = error_callback.call(result) if error_callback
+          if callback_exit_status != 0
+            UI.user_error!(message)
+          end
         end
       end
 
