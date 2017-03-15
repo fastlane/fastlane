@@ -6,6 +6,7 @@ describe Fastlane do
       end
 
       it "works with keychain name found locally" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         allow(File).to receive(:exist?).with(/test.keychain/).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -35,6 +36,7 @@ describe Fastlane do
       end
 
       it "works with keychain name that contain spaces and `\"`" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         allow(File).to receive(:exist?).with(/\" test \".keychain/).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -61,6 +63,7 @@ describe Fastlane do
       end
 
       it "shows an error message if the keychain can't be found" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             delete_keychain ({

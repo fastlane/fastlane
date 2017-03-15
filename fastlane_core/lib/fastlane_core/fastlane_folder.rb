@@ -8,8 +8,6 @@ module FastlaneCore
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
-
-      value = nil if Helper.is_test? # this is required, as the tests would use the ./fastlane folder otherwise
       return value
     end
 

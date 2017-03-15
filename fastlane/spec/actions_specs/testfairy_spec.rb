@@ -10,6 +10,7 @@ describe Fastlane do
       end
 
       it "raises an error if no api key was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
@@ -20,6 +21,7 @@ describe Fastlane do
       end
 
       it "raises an error if no ipa path was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
@@ -41,6 +43,7 @@ describe Fastlane do
       end
 
       it "works with valid required parameters" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
@@ -52,6 +55,7 @@ describe Fastlane do
       end
 
       it "works with valid optional parameters" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
