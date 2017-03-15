@@ -70,9 +70,6 @@ describe Fastlane do
       end
 
       describe "iOS" do
-        before :each do
-        end
-
         describe "Valid Parameters" do
           it "works with valid parameters" do
             command = Fastlane::FastFile.new.parse("lane :test do
