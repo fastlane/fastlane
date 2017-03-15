@@ -55,7 +55,7 @@ Then to deploy a new 'beta' version of your app just run
 </h4>
 <hr />
 
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
+##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
 
 ## Installation
 Make sure you have the latest version of the Xcode command line tools installed:
