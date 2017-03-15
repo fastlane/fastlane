@@ -31,7 +31,7 @@ module Gym
 
       command :build do |c|
         c.syntax = "fastlane gym"
-        c.description = "Just builds your app"
+        c.description = "Build your iOS/macOS app"
 
         FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options, command: c)
 
