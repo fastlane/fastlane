@@ -3,6 +3,10 @@ require "xcodeproj"
 # 77C503031DD3175E00AC8FF0 = today
 describe Fastlane do
   describe "Automatic Code Signing" do
+    before :each do
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+    end
+
     it "enable_automatic_code_signing" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use ProvisioningStyle 'Automatic'")
