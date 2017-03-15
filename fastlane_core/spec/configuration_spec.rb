@@ -595,7 +595,7 @@ describe FastlaneCore do
           it "throws an error if it's invalid" do
             expect do
               @config.set(:output, 132)
-            end.to raise_error("'output' value must be a String! Found Integer instead.")
+            end.to raise_error("'output' value must be a String! Found #{123.class} instead.")
             expect do
               @config.set(:wait_processing_interval, -1)
             end.to raise_error("Please enter a valid positive number of seconds")
