@@ -95,7 +95,7 @@ fastlane release
 
 ###### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
+##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
 
 ## Installation
 Make sure you have the latest version of the Xcode command line tools installed:

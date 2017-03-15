@@ -61,7 +61,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 - **Associate** apps with App Groups on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Installation
 
@@ -218,7 +218,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

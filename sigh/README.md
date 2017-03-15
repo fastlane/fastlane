@@ -67,7 +67,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fastlane/tree/master/pem).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ### Why not let Xcode do the work?
 
@@ -228,7 +228,7 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

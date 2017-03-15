@@ -175,7 +175,7 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup.
