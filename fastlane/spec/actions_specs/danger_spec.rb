@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "danger integration" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "default use case" do
         result = Fastlane::FastFile.new.parse("lane :test do
           danger

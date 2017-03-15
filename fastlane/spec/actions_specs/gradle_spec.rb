@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "gradle" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       describe "output controls" do
         let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 

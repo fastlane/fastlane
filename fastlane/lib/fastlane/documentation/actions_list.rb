@@ -138,7 +138,7 @@ module Fastlane
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of?(Class) && c != :TestSampleCodeAction }
       action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 
