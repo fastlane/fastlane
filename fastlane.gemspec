@@ -73,7 +73,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
-  spec.add_development_dependency 'webmock', '~> 1.19.0'
+  spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
   spec.add_development_dependency 'rubocop', '~> 0.47'
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
