@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -44,6 +45,7 @@ Tired of manually creating and maintaining your push notification profiles for y
 To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
