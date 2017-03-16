@@ -17,7 +17,7 @@ else
   exit 1
 end
 
-set commands (string match --regex '.*lane\ \:([^\s]*)\ do' (cat $file))
+set commands (string match --regex '.*lane\ \:(?!private_)([^\s]*)\ do' (cat $file))
 
 set commands_string
 
