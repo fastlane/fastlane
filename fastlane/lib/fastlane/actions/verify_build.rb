@@ -42,9 +42,9 @@ module Fastlane
 
         parts = cert_info.strip.split(/\r?\n/)
         parts.each do |part|
-          if part =~ /\AAuthority=i(Phone|OS)/
+          if part.match?(/\AAuthority=i(Phone|OS)/)
             type = part.split('=')[1].split(':')[0]
-            values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
+            values['provisioning_type'] = type.downcase.match?(/distribution/i) ? "distribution" : "development"
           end
           if part.start_with? "TeamIdentifier"
             values['team_identifier'] = part.split('=')[1]

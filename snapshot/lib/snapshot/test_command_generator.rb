@@ -90,7 +90,7 @@ module Snapshot
       end
 
       def destination(device_name)
-        os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
+        os = device_name.match?(/^Apple TV/) ? "tvOS" : "iOS"
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
         device = find_device(device_name, os_version)

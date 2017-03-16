@@ -14,7 +14,7 @@ module Fastlane
 
         paths.reject { |file| file.nil? || !File.exist?(file) }.each do |file|
           if options[:exclude_pattern]
-            next if file.match(options[:exclude_pattern])
+            next if file.match?(options[:exclude_pattern])
           end
 
           UI.verbose("Cleaning up '#{file}'")
