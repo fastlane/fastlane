@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <b>match</b>
 </p>
+
 -------
 
 <p align="center">
@@ -42,6 +43,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
 [More information on how to get started with codesigning](/fastlane/docs/Codesigning)
 
 -------
+
 <p align="center">
     <a href="#why-match">Why?</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -77,8 +79,8 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 ### What does `match` do for you?
 
-              |  match
---------------------------|------------------------------------------------------------
+|          |  match  |
+|----------|---------|
 :arrows_counterclockwise:  | Automatically sync your iOS keys and profiles across all your team members using git
 :package:  | Handle all the heavy lifting of creating and storing your certificates and profiles
 :computer:  | Setup codesigning on a new machine in under a minute

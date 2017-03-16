@@ -20,11 +20,13 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
   <img src="assets/spaceship.png" width="470">
 </p>
+
 -------
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
@@ -36,6 +38,7 @@
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
 -------
+
 <p align="center">
     <a href="#whats-spaceship">Why?</a> &bull;
     <a href="#usage">Usage</a> &bull;
