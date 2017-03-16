@@ -30,8 +30,10 @@ end
 Then to deploy a new 'beta' version of your app just run
 `fastlane beta` :rocket:
 
-              |  fastlane
---------------------------|------------------------------------------------------------
+
+
+|          |  fastlane  |
+|----------|------------|
 :sparkles: | Connect iOS, Mac, and Android build tools into one workflow (both _fastlane_ tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds, or testing
 :ship: | Deploy from any computer, including a CI server
