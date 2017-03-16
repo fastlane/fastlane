@@ -4,25 +4,17 @@ module Fastlane
   module Actions
     class DeleteKeychainAction < Action
       def self.run(params)
-        original = Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN]
-
-        search_paths = []
-        search_paths << File.expand_path(params[:name]) if params[:name]
-        search_paths << File.expand_path(File.join("~", "Library", "Keychains", params[:name])) if params[:name]
-        search_paths << File.expand_path(params[:keychain_path]) if params[:keychain_path]
-
-        if search_paths.empty?
+        if params[:name].nil? && params[:keychain_path].nil?
           UI.user_error!("You either have to set :name or :keychain_path")
         end
 
-        keychain_path = search_paths.find { |path| File.exist?(path) }
+        original = Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN]
 
-        if keychain_path.nil?
-          UI.user_error!("Unable to find the specified keychain. Looked in:\n\t" + search_paths.join("\n\t"))
-        end
+        keychain = params[:name] || params[:keychain_path]
+        keychain_path = FastlaneCore::Helper.keychain_path(keychain)
 
         Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
-        Fastlane::Actions.sh "security delete-keychain #{keychain_path.shellescape}", log: false
+        Fastlane::Actions.sh("security delete-keychain #{keychain_path.shellescape}", log: false)
       end
 
       def self.details
