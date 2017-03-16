@@ -5,8 +5,12 @@ Style/ClassCheck:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-# This doesn't work with older versions of Ruby
+# This doesn't work with older versions of Ruby (pre 2.4.0)
 Style/SafeNavigation:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Performance/RegexpMatch:
   Enabled: false
 
 # .length == 0 is also good, we don't always want .zero?
