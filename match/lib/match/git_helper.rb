@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master")
+    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_user_name: nil, git_user_email: nil)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -20,6 +20,8 @@ module Match
         UI.command(command)
         UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
       end
+
+      add_user_config(git_user_name, git_user_email)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
@@ -135,6 +137,23 @@ module Match
     def self.copy_readme(directory)
       template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
       File.write(File.join(directory, "README.md"), template)
+    end
+
+    def self.add_user_config(user_name, user_email)
+      # Add git config if needed
+      commands = []
+      commands << "git config user.name \"#{user_name}\"" unless user_name.nil?
+      commands << "git config user.email \"#{user_email}\"" unless user_email.nil?
+
+      UI.message "Add git user config to local git repo..." unless commands.empty?
+
+      Dir.chdir(@dir) do
+        commands.each do |command|
+          FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: FastlaneCore::Globals.verbose?,
+                                                print_command: FastlaneCore::Globals.verbose?)
+        end
+      end
     end
   end
 end
