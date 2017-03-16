@@ -1,8 +1,3 @@
-unless ENV["DEBUG"]
-  $stdout.puts "Changing stdout to /tmp/fastlane_tests"
-  $stdout = File.open("/tmp/fastlane_tests", "w")
-end
-
 require 'shellwords'
 
 Fastlane.load_actions
