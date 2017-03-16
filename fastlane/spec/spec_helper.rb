@@ -10,9 +10,9 @@ Fastlane.load_actions
 def before_each_fastlane
   Fastlane::Actions.clear_lane_context
 
-  ENV.delete 'DELIVER_SCREENSHOTS_PATH'
-  ENV.delete 'DELIVER_SKIP_BINARY'
-  ENV.delete 'DELIVER_VERSION'
+  ENV.delete('DELIVER_SCREENSHOTS_PATH')
+  ENV.delete('DELIVER_SKIP_BINARY')
+  ENV.delete('DELIVER_VERSION')
 end
 
 def with_verbose(verbose)
