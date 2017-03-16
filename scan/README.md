@@ -20,6 +20,7 @@
   <b>scan</b> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -40,6 +41,7 @@ scan
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#whats-scan">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -101,8 +103,8 @@ scan
 
 `scan` uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
 
-              |  scan Features
---------------------------|------------------------------------------------------------
+|          |  scan Features  |
+|----------|-----------------|
 :checkered_flag: | Beautiful inline build output while running the tests
 :mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
 :bar_chart: | Support for HTML, JSON and JUnit reports
