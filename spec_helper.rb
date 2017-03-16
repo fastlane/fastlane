@@ -7,6 +7,11 @@ WebMock.disable_net_connect!(allow: 'coveralls.io')
 require "fastlane"
 UI = FastlaneCore::UI
 
+unless ENV["DEBUG"]
+  $stdout.puts "Changing stdout to /tmp/fastlane_tests, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
+  $stdout = File.open("/tmp/fastlane_tests", "w")
+end
+
 xcode_path = FastlaneCore::Helper.xcode_path
 unless xcode_path.include?("Contents/Developer")
   UI.error("Seems like you didn't set the developer tools path correctly")
