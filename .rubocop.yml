@@ -2,6 +2,13 @@
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby
+Style/SafeNavigation:
+  Enabled: false
+
 # .length == 0 is also good, we don't always want .zero?
 Style/NumericPredicate:
   Enabled: false
