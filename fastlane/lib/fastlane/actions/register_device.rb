@@ -19,7 +19,7 @@ module Fastlane
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
-        UI.user_error!("Passed invalid UDID: #{udid} for device: #{name}") unless UDID_REGEXP.match?(udid)
+        UI.user_error!("Passed invalid UDID: #{udid} for device: #{name}") unless UDID_REGEXP =~ udid
         Spaceship::Device.create!(name: name, udid: udid)
 
         UI.success("Successfully registered new device")

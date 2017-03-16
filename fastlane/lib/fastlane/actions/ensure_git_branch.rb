@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         branch = params[:branch]
         branch_expr = /#{branch}/
-        if Actions.git_branch.match?(branch_expr)
+        if Actions.git_branch =~ branch_expr
           UI.success("Git branch match `#{branch}`, all good! 💪")
         else
           UI.user_error!("Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.")

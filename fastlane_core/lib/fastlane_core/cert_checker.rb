@@ -20,7 +20,7 @@ module FastlaneCore
 
       available = list_available_identities
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
-      if /\b0 valid identities found\b/.match?(available)
+      if /\b0 valid identities found\b/ =~ available
         UI.error([
           "There are no local code signing identities found.",
           "You can run `security find-identity -v -p codesigning` to get this output.",

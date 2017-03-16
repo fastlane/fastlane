@@ -92,7 +92,7 @@ module FastlaneCore
       output_done = false
 
       re = Regexp.union(SKIP_ERRORS)
-      if line.match?(re)
+      if line.match(re)
         # Those lines will not be handle like errors or warnings
 
       elsif line =~ ERROR_REGEX
@@ -168,12 +168,14 @@ module FastlaneCore
     end
 
     def handle_error(password)
-      unless /^[0-9a-zA-Z\.\$\_]*$/.match?(password)
+      # rubocop:disable Style/CaseEquality
+      unless /^[0-9a-zA-Z\.\$\_]*$/ === password
         UI.error([
           "Password contains special characters, which may not be handled properly by iTMSTransporter.",
           "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
         ].join(' '))
       end
+      # rubocop:enable Style/CaseEquality
       UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
     end
 
