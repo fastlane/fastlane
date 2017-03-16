@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -40,8 +41,8 @@ frameit
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
-
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -51,6 +52,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 </p>
 
 -------
+
 <h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
