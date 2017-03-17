@@ -431,7 +431,7 @@ describe FastlaneCore do
           expect(config.values[:test]).to eq('123')
         end
 
-        it "takes the values frmo the environment if available" do
+        it "takes the values from the environment if available" do
           c = FastlaneCore::ConfigItem.new(key: :test,
                                       env_name: "FL_TEST")
           config = FastlaneCore::Configuration.create([c], {})
