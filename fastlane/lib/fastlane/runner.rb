@@ -101,6 +101,17 @@ module Fastlane
       nil
     end
 
+    # Pass a action alias symbol (e.g. :enable_automatic_code_signing)
+    # and this method will return a reference to the action class
+    # if it exists. In case the action with this alias can't be found
+    # this method will return nil.
+    def class_reference_from_action_alias(method_sym)
+      alias_found = find_alias(method_sym.to_s)
+      return nil unless alias_found
+
+      class_reference_from_action_name(alias_found.to_sym)
+    end
+
     # lookup if an alias exists
     def find_alias(action_name)
       Actions.alias_actions.each do |key, v|
@@ -119,15 +130,12 @@ module Fastlane
       # First, check if there is a predefined method in the actions folder
       class_ref = class_reference_from_action_name(method_sym)
       unless class_ref
-        alias_found = find_alias(method_sym.to_s)
-        if alias_found
+        class_ref = class_reference_from_action_alias(method_sym)
+        # notify action that it has been used by alias
+        if class_ref.respond_to?(:alias_used)
           orig_action = method_sym.to_s
-          class_ref = class_reference_from_action_name(alias_found.to_sym)
-          # notify action that it has been used by alias
-          if class_ref.respond_to?(:alias_used)
-            arguments = [{}] if arguments.empty?
-            class_ref.alias_used(orig_action, arguments.first)
-          end
+          arguments = [{}] if arguments.empty?
+          class_ref.alias_used(orig_action, arguments.first)
         end
       end
 
