@@ -75,7 +75,7 @@ module FastlaneCore
         # responds to `dup`, so we have to rescue the exception
         begin
           value = value.dup
-        rescue TypeError => ex
+        rescue TypeError
           # Nothing specific to do here, if we can't dupe, we just
           # deal with it (boolean values can't be from env variables anyway)
         end
