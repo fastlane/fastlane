@@ -125,6 +125,7 @@ module Fastlane
           class_ref = class_reference_from_action_name(alias_found.to_sym)
           # notify action that it has been used by alias
           if class_ref.respond_to?(:alias_used)
+            arguments = [{}] if arguments.empty?
             class_ref.alias_used(orig_action, arguments.first)
           end
         end
