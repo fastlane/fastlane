@@ -145,8 +145,9 @@ module Match
       commands << "git config user.name \"#{user_name}\"" unless user_name.nil?
       commands << "git config user.email \"#{user_email}\"" unless user_email.nil?
 
-      UI.message "Add git user config to local git repo..." unless commands.empty?
+      return if commands.empty?
 
+      UI.message "Add git user config to local git repo..."
       Dir.chdir(@dir) do
         commands.each do |command|
           FastlaneCore::CommandExecutor.execute(command: command,
