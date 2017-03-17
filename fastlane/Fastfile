@@ -288,7 +288,7 @@ desc "Print out the changelog since the last tagged release and open the GitHub 
 lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
-  changes = sh("git log --pretty='* %s' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
+  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
 
   github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
