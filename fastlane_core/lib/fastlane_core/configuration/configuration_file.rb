@@ -67,7 +67,7 @@ module FastlaneCore
 
         return if value.nil?
         self.modified_values[method_sym] = value
-        self.config[method_sym] = value
+        self.config[method_sym] = value.dup # to support frozen strings (e.g. ENV variables) too
       else
         # We can't set this value, maybe the tool using this configuration system has its own
         # way of handling this block, as this might be a special block (e.g. ipa block) that's only
