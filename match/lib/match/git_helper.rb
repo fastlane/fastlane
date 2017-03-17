@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_user_name: nil, git_user_email: nil)
+    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -21,7 +21,7 @@ module Match
         UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
       end
 
-      add_user_config(git_user_name, git_user_email)
+      add_user_config(git_full_name, git_user_email)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
 
