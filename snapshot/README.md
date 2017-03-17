@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -60,6 +61,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -83,7 +85,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 After _snapshot_ successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
 
@@ -360,7 +362,7 @@ Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has be
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Frame the screenshots
 

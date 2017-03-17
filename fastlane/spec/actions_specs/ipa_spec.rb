@@ -121,6 +121,7 @@ describe Fastlane do
       end
 
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
         result = Fastlane::FastFile.new.parse("lane :test do

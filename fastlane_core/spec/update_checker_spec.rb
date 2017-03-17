@@ -43,21 +43,29 @@ describe FastlaneCore do
       end
 
       it "works a custom gem name" do
-        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem update gym")
+        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem install gym")
       end
 
       it "works with system ruby" do
-        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem update fastlane")
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem install fastlane")
       end
 
       it "works with bundler" do
-        ENV["BUNDLE_BIN_PATH"] = "/tmp"
-        expect(FastlaneCore::UpdateChecker.update_command).to eq("bundle update fastlane")
+        with_env_values('BUNDLE_BIN_PATH' => '/tmp') do
+          expect(FastlaneCore::UpdateChecker.update_command).to eq("bundle update fastlane")
+        end
       end
 
       it "works with bundled fastlane" do
-        ENV["FASTLANE_SELF_CONTAINED"] = "true"
-        expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
+        with_env_values('FASTLANE_SELF_CONTAINED' => 'true') do
+          expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
+        end
+      end
+
+      it "works with Fabric.app installed fastlane" do
+        with_env_values('FASTLANE_SELF_CONTAINED' => 'false') do
+          expect(FastlaneCore::UpdateChecker.update_command).to eq("the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version.")
+        end
       end
     end
 

@@ -21,6 +21,14 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "alias does not crash with no param" do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        expect(UI).to receive(:important).with("modified")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          somealias
+        end").runner.execute(:test)
+      end
+
       it "alias can override option" do
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         expect(UI).to receive(:important).with("modified")
@@ -56,6 +64,7 @@ describe Fastlane do
 
     describe "Call another action from an action" do
       it "allows the user to call it using `other_action.rocket`" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromAction')
         Fastlane::Actions.executed_actions.clear

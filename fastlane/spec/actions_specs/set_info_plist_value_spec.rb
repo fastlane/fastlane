@@ -5,6 +5,7 @@ describe Fastlane do
       let (:new_value) { "NewValue#{Time.now.to_i}" }
 
       it "stores changes in the plist file" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         old_value = Fastlane::FastFile.new.parse("lane :test do
           get_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier')
         end").runner.execute(:test)

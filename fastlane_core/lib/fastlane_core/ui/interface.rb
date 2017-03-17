@@ -81,7 +81,7 @@ module FastlaneCore
     #####################################################
 
     # Is is possible to ask the user questions?
-    def interactive?(_message)
+    def interactive?
       not_implemented(__method__)
     end
 

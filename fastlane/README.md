@@ -16,6 +16,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 fastlane
@@ -25,11 +26,12 @@ fastlane
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 
-######*fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
+###### *fastlane* lets you define and run your deployment pipelines for different environments. It helps you unify your apps release process and automate the whole process. fastlane connects all fastlane tools and third party tools, like [CocoaPods](https://cocoapods.org/) and [Slack](https://slack.com).
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -73,8 +75,8 @@ To launch the `appstore` lane, just run:
 fastlane release
 ```
 
-              |  fastlane
---------------------------|------------------------------------------------------------
+|          |  fastlane  |
+|----------|------------|
 :sparkles: | Connect all iOS and Android build tools into one workflow (both `fastlane` tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds or testing
 :ship: | Deploy from any computer, including a CI-server
@@ -95,7 +97,7 @@ fastlane release
 
 ###### Take a look at the [fastlane website](https://fastlane.tools) for more information about why and when to use `fastlane`.
 
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
+##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
 
 ## Installation
 Make sure you have the latest version of the Xcode command line tools installed:
@@ -119,7 +121,7 @@ xcode-select --install
 </tr>
 <tr> 
 <td width="33%"><code>brew cask install fastlane</code></td>
-<td width="33%"><a href="https://download.fastlane.tools/fastlane.zip">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
+<td width="33%"><a href="https://download.fastlane.tools">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
 <td width="33%"><code>sudo gem install fastlane -NV</code></td>
 </tr>
 </table>

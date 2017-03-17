@@ -1,6 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     before do
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       @path = "./fastlane/spec/fixtures/actions/archive.rb"
     end
 

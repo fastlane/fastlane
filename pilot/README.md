@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -47,6 +48,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 `pilot` uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
 
 -------
+
 <p align="center">
     <a href="#installation">Installation</a> &bull;
     <a href="#usage">Usage</a> &bull;
@@ -99,7 +101,7 @@ fastlane pilot upload --skip_submission
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
+`pilot` uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
 
 ## List builds
 
@@ -242,7 +244,7 @@ fastlane pilot import -c ~/Desktop/testers.csv
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Debug information
 

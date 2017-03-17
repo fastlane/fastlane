@@ -78,6 +78,7 @@ describe Scan do
 
     describe "Supports toolchain" do
       it "should fail if :xctestrun and :toolchain is set" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             scan(
@@ -428,6 +429,7 @@ describe Scan do
                                      ])
       end
       it "should raise an exception if two build_modes are set" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             scan(

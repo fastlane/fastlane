@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -44,6 +45,7 @@ Tired of manually creating and maintaining your push notification profiles for y
 To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -136,7 +138,7 @@ If you need the `p12` in your keychain, perhaps to test push with an app like [K
     Enter Export Password:
       <enter a password for encrypting the new p12 file>
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Environment Variables
 
@@ -167,7 +169,7 @@ Run `fastlane pem --help` to get a list of available environment variables.
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
