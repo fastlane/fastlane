@@ -9,6 +9,9 @@ module Fastlane
     # @return [Hash] All the lanes available, first the platform, then the lane
     attr_accessor :lanes
 
+    # @return [Hash] All the environment variables to set, first the platform, then the variable name
+    attr_accessor :environment_variables
+
     def full_lane_name
       [current_platform, current_lane].reject(&:nil?).join(' ')
     end
@@ -43,6 +46,10 @@ module Fastlane
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
+          environment_variables[current_platform] ||= {}
+          environment_variables[current_platform].each do |name, key|
+            ENV[name] = key
+          end
           execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
           execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
@@ -306,6 +313,11 @@ module Fastlane
       lanes[lane.platform][lane.name] = lane
     end
 
+    def add_env(platform, name, value)
+      environment_variables[platform] ||= {}
+      environment_variables[platform][name] = value
+    end
+
     def set_before_each(platform, block)
       before_each_blocks[platform] = block
     end
@@ -328,6 +340,10 @@ module Fastlane
 
     def lanes
       @lanes ||= {}
+    end
+
+    def environment_variables
+      @environment_variables ||= {}
     end
 
     def before_each_blocks

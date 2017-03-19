@@ -1,0 +1,21 @@
+env 'FASTLANE_TEST_ENV_GLOBAL', 'foobar'
+
+lane :echo do
+  puts 'global'
+end
+
+platform :ios do
+  env 'FASTLANE_TEST_ENV_PLATFORM', 'ios'
+
+  lane :echo do
+    puts 'ios'
+  end
+end
+
+platform :android do
+  env 'FASTLANE_TEST_ENV_PLATFORM', 'android'
+
+  lane :echo do
+    puts 'android'
+  end
+end
