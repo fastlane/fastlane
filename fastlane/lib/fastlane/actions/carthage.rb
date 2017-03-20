@@ -27,7 +27,7 @@ module Fastlane
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
-        cmd << "--cache-builds" if params[:cache_builds] == true
+        cmd << "--cache-builds" if params[:cache_builds]
 
         Actions.sh(cmd.join(' '))
       end
@@ -132,7 +132,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :cache_builds,
                                        env_name: "FL_CARTHAGE_CACHE_BUILDS",
-                                       description: "By default Carthage will rebuild a dependency regardless of whether it\'s the same resolved version as before. Passing the --cache-builds will cause carthage to avoid rebuilding a dependency if it can",
+                                       description: "By default Carthage will rebuild a dependency regardless of whether it's the same resolved version as before. Passing the --cache-builds will cause carthage to avoid rebuilding a dependency if it can",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :frameworks,
@@ -183,7 +183,7 @@ module Fastlane
             verbose: false,                                 # Print xcodebuild output inline
             platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
             configuration: "Release",                       # Build configuration to use when building
-            cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether it\'s the same resolved version as before.
+            cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
           )'
         ]
