@@ -51,6 +51,9 @@ module Spaceship
       # @return (Fixnum) Number of associated identifiers
       attr_accessor :identifiers_count
 
+      # @return (Array of Spaceship::Portal::AppGroup) Associated groups
+      attr_accessor :associated_groups
+
       attr_mapping(
         'appIdId' => :app_id,
         'name' => :name,
@@ -68,6 +71,14 @@ module Spaceship
       )
 
       class << self
+        # Create a new object based on a hash.
+        # This is used to create a new object based on the server response.
+        def factory(attrs)
+          obj = self.new(attrs)
+          obj.unfold_associated_groups(attrs['associatedApplicationGroups'])
+          return obj
+        end
+
         # @param mac [Bool] Fetches Mac apps if true
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
@@ -100,6 +111,12 @@ module Spaceship
             return app if app.bundle_id.casecmp(bundle_id) == 0
           end
         end
+      end
+
+      def unfold_associated_groups(attrs)
+        return unless attrs
+        unfolded_associated_groups = attrs.map { |info| Spaceship::Portal::AppGroup.new(info) }
+        instance_variable_set(:@associated_groups, unfolded_associated_groups)
       end
 
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
