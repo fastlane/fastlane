@@ -60,25 +60,25 @@ describe FastlaneCore do
       it "supports modifying of frozen strings too" do
         # Test that a value can be modified (this isn't the case by default if it's set via ENV)
         app_identifier = "com.krausefx.yolo"
-        ENV["SOMETHING_RANDOM_APP_IDENTIFIER"] = app_identifier
-        config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileEnv')
-        expect(config[:app_identifier]).to eq(app_identifier)
-        config[:app_identifier].gsub!("yolo", "yoLiveTwice")
-        expect(config[:app_identifier]).to eq("com.krausefx.yoLiveTwice")
-        ENV.delete("SOMETHING_RANDOM_APP_IDENTIFIER")
+        with_env_values('SOMETHING_RANDOM_APP_IDENTIFIER' => app_identifier) do
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileEnv')
+          expect(config[:app_identifier]).to eq(app_identifier)
+          config[:app_identifier].gsub!("yolo", "yoLiveTwice")
+          expect(config[:app_identifier]).to eq("com.krausefx.yoLiveTwice")
+        end
       end
 
       it "supports modifying of frozen strings that are returned via blocks too" do
         # Test that a value can be modified (this isn't the case by default if it's set via ENV)
         ios_version = "9.1"
-        ENV["SOMETHING_RANDOM_IOS_VERSION"] = ios_version
-        config = FastlaneCore::Configuration.create(options, {})
-        config.load_configuration_file('ConfigFileEnv')
-        expect(config[:ios_version]).to eq(ios_version)
-        config[:ios_version].gsub!(".1", ".2")
-        expect(config[:ios_version]).to eq("9.2")
-        ENV.delete("SOMETHING_RANDOM_IOS_VERSION")
+        with_env_values('SOMETHING_RANDOM_IOS_VERSION' => ios_version) do
+          config = FastlaneCore::Configuration.create(options, {})
+          config.load_configuration_file('ConfigFileEnv')
+          expect(config[:ios_version]).to eq(ios_version)
+          config[:ios_version].gsub!(".1", ".2")
+          expect(config[:ios_version]).to eq("9.2")
+        end
       end
 
       it "properly loads boolean values" do
