@@ -13,6 +13,7 @@ describe Fastlane do
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{keychain_path.shellescape} &> /dev/null"
 
         allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: false)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: false)
@@ -38,6 +39,7 @@ describe Fastlane do
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{keychain_path.shellescape} &> /dev/null"
 
         allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: false)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: false)
@@ -63,6 +65,7 @@ describe Fastlane do
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{keychain_path.shellescape}"
 
         allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: true)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: true)
