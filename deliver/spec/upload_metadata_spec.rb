@@ -3,10 +3,10 @@ require 'tempfile'
 
 describe Deliver::UploadMetadata do
   let(:uploader) { Deliver::UploadMetadata.new }
+  let(:tmpdir) { Dir.mktmpdir }
 
   describe '#load_from_filesystem' do
     context 'with review information' do
-      let(:tmpdir) { Dir.mktmpdir }
       let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
 
       def create_metadata(path, text)
@@ -60,6 +60,76 @@ describe Deliver::UploadMetadata do
 
       after do
         FileUtils.remove_entry_secure(tmpdir)
+      end
+    end
+  end
+
+  describe "#set_review_information" do
+    let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
+    let(:version) { double("version") }
+
+    before do
+      allow(version).to receive(:review_first_name=)
+      allow(version).to receive(:review_last_name=)
+      allow(version).to receive(:review_phone_number=)
+      allow(version).to receive(:review_email=)
+      allow(version).to receive(:review_demo_user=)
+      allow(version).to receive(:review_demo_password=)
+      allow(version).to receive(:review_notes=)
+      allow(version).to receive(:review_user_needed=)
+      allow(version).to receive(:review_demo_user).and_return(app_review_information[:demo_user])
+      allow(version).to receive(:review_demo_password).and_return(app_review_information[:demo_password])
+    end
+
+    context "with review_information" do
+      let(:app_review_information) do
+        { first_name: "Alice",
+          last_name: "Smith",
+          phone_number: "+819012345678",
+          email_address: "deliver@example.com",
+          demo_user: "user",
+          demo_password: "password",
+          notes: "This is a note" }
+      end
+
+      it "set review information" do
+        uploader.send("set_review_information", version, options)
+        expect(version).to have_received(:review_first_name=).with(app_review_information[:first_name])
+        expect(version).to have_received(:review_last_name=).with(app_review_information[:last_name])
+        expect(version).to have_received(:review_phone_number=).with(app_review_information[:phone_number])
+        expect(version).to have_received(:review_email=).with(app_review_information[:email_address])
+        expect(version).to have_received(:review_demo_user=).with(app_review_information[:demo_user])
+        expect(version).to have_received(:review_demo_password=).with(app_review_information[:demo_password])
+        expect(version).to have_received(:review_notes=).with(app_review_information[:notes])
+      end
+    end
+
+    context "with demo_user and demo_password" do
+      context "with string" do
+        let(:app_review_information) { { demo_user: "user", demo_password: "password" } }
+
+        it "review_user_needed is true" do
+          uploader.send("set_review_information", version, options)
+          expect(version).to have_received(:review_user_needed=).with(true)
+        end
+      end
+
+      context "with empty string" do
+        let(:app_review_information) { { demo_user: "", demo_password: "" } }
+
+        it "review_user_needed is false" do
+          uploader.send("set_review_information", version, options)
+          expect(version).to have_received(:review_user_needed=).with(false)
+        end
+      end
+
+      context "with newline" do
+        let(:app_review_information) { { demo_user: "\n", demo_password: "\n" } }
+
+        it "review_user_needed is false" do
+          uploader.send("set_review_information", version, options)
+          expect(version).to have_received(:review_user_needed=).with(false)
+        end
       end
     end
   end
