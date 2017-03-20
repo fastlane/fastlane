@@ -5,39 +5,60 @@ describe Fastlane do
         allow(File).to receive(:exist?).and_return(false)
       end
 
-      it "works with keychain name found locally" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        allow(File).to receive(:exist?).with(/test.keychain/).and_return(true)
+      # Run this series of tests for each possible input option that we accept
+      ['name', 'keychain_path'].each do |option_name|
+        describe "using the #{option_name} option" do
+          # Use a variety of keychain naming styles - an absolute path is handled separately below
+          ['.keychain', '.keychain-db', '-db', ''].each do |suffix|
+            name = 'test' + suffix
+            description = suffix.empty? ? 'undecorated' : suffix
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          delete_keychain ({
-            name: 'test.keychain'
-          })
-        end").runner.execute(:test)
+            describe "with a #{description} keychain name" do
+              # Ensure that we can find it in each of the possible keychain locations
+              FastlaneCore::Helper.possible_keychain_paths(name).each do |location|
+                it "can find it in #{location}" do
+                  allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+                  allow(File).to receive(:exist?).with(location).and_return(true)
 
-        keychain = File.expand_path('test.keychain')
+                  result = Fastlane::FastFile.new.parse("lane :test do
+                    delete_keychain ({
+                      #{option_name}: '#{name}'
+                    })
+                  end").runner.execute(:test)
 
-        expect(result).to eq("security delete-keychain #{keychain}")
-      end
+                  expect(result).to eq("security delete-keychain #{location.shellescape}")
+                end
+              end
+            end
+          end
 
-      it "works with keychain name found in ~/Library/Keychains" do
-        allow(File).to receive(:exist?).with(/test.keychain/).and_return(false)
-        allow(File).to receive(:exist?).with(%r{Library/Keychains/test.keychain}).and_return(true)
+          describe "with an absolute path" do
+            name = File.expand_path('test')
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          delete_keychain ({
-            name: 'test.keychain'
-          })
-        end").runner.execute(:test)
+            # Ensure that we can find it in each of the possible keychain locations
+            FastlaneCore::Helper.possible_keychain_paths(name).each do |location|
+              it "can find it in #{location}" do
+                allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+                allow(File).to receive(:exist?).with(location).and_return(true)
 
-        keychain = File.expand_path('~/Library/Keychains/test.keychain')
+                result = Fastlane::FastFile.new.parse("lane :test do
+                  delete_keychain ({
+                    #{option_name}: '#{name}'
+                  })
+                end").runner.execute(:test)
 
-        expect(result).to eq("security delete-keychain #{keychain}")
+                expect(result).to eq("security delete-keychain #{location.shellescape}")
+              end
+            end
+          end
+        end
       end
 
       it "works with keychain name that contain spaces and `\"`" do
+        keychain = File.expand_path('" test ".keychain')
+
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        allow(File).to receive(:exist?).with(/\" test \".keychain/).and_return(true)
+        allow(File).to receive(:exist?).with(keychain).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -45,21 +66,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        keychain = File.expand_path('\\"\\ test\\ \\".keychain')
-
-        expect(result).to eq %(security delete-keychain #{keychain})
-      end
-
-      it "works with absolute keychain path" do
-        allow(File).to receive(:exist?).with('/projects/test.keychain').and_return(true)
-
-        result = Fastlane::FastFile.new.parse("lane :test do
-          delete_keychain ({
-            keychain_path: '/projects/test.keychain'
-          })
-        end").runner.execute(:test)
-
-        expect(result).to eq("security delete-keychain /projects/test.keychain")
+        expect(result).to eq %(security delete-keychain #{keychain.shellescape})
       end
 
       it "shows an error message if the keychain can't be found" do
@@ -71,9 +78,15 @@ describe Fastlane do
             })
           end").runner.execute(:test)
         end.to raise_error(
-          "Unable to find the specified keychain. Looked in:" \
-          "\n\t#{File.expand_path('test.keychain')}" \
-          "\n\t#{File.expand_path('~/Library/Keychains/test.keychain')}"
+          "Could not locate the provided keychain. Tried:" \
+          "\n\t#{File.expand_path('~/Library/Keychains/test-db')}" \
+          "\n\t#{File.expand_path('~/Library/Keychains/test.keychain-db')}" \
+          "\n\t#{File.expand_path('~/Library/Keychains/test')}" \
+          "\n\t#{File.expand_path('~/Library/Keychains/test.keychain')}" \
+          "\n\t#{File.expand_path('test-db')}" \
+          "\n\t#{File.expand_path('test.keychain-db')}" \
+          "\n\t#{File.expand_path('test')}" \
+          "\n\t#{File.expand_path('test.keychain')}"
         )
       end
 

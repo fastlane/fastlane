@@ -177,7 +177,7 @@ module FastlaneCore
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
 
-    def self.keychain_path(name)
+    def self.possible_keychain_paths(name)
       # Existing code expects that a keychain name will be expanded into a default path to Libary/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
@@ -207,7 +207,11 @@ module FastlaneCore
         keychain_paths << location
         keychain_paths << "#{location}.keychain"
       end
+      keychain_paths
+    end
 
+    def self.keychain_path(name)
+      keychain_paths = possible_keychain_paths(name)
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
