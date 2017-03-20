@@ -11,7 +11,7 @@ module Fastlane
           "ios-deploy",
           params[:extra],
           "--bundle",
-          params[:ipa]
+          params[:ipa].gsub(/ /, '\ ')
         ]
         taxi_cmd << "--no-wifi" if params[:skip_wifi]
         taxi_cmd << ["--id", params[:device_id]] if params[:device_id]
