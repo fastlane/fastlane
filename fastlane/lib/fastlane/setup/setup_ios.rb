@@ -36,7 +36,15 @@ module Fastlane
           manual_setup
         end
         UI.success('Successfully finished setting up fastlane')
+      rescue Spaceship::Client::InsufficientPermissions, Spaceship::Client::ProgramLicenseAgreementUpdated => ex
+        # We don't want to fallback to manual onboarding for this
+        # as the user needs to first accept the agreement / get more permissions
+        # Let's re-raise the exception to properly show the error message
+        raise ex
       rescue => ex # this will also be caused by Ctrl + C
+        UI.message("Ran into error while trying to connect to iTunes Connect / Dev Portal: #{ex}")
+        UI.message("Falling back to manual onboarding")
+
         if is_manual_setup
           handle_exception(exception: ex)
         else
@@ -45,7 +53,6 @@ module Fastlane
           try_manual_setup
         end
       end
-      # rubocop:enable Lint/RescueException
     end
 
     def handle_exception(exception: nil)

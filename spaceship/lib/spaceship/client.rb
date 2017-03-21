@@ -51,6 +51,12 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
+    class ProgramLicenseAgreementUpdated < BasicPreferredInfoError
+      def show_github_issues
+        false
+      end
+    end
+
     # User doesn't have enough permission for given action
     class InsufficientPermissions < BasicPreferredInfoError
       TITLE = 'Insufficient permissions for your Apple ID:'.freeze
@@ -446,10 +452,7 @@ module Spaceship
         content = expected_key ? response.body[expected_key] : response.body
       end
       if content.nil?
-        # Check if the failure is due to missing permissions (iTunes Connect)
-        if response.body && response.body["messages"] && response.body["messages"]["error"].include?("Forbidden")
-          raise_insuffient_permission_error!
-        end
+        detect_most_common_errors_and_raise_exceptions(response.body) if response.body
         raise UnexpectedResponse, response.body
       elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
         # example content when doing a Developer Portal action with not enough permission
@@ -466,6 +469,15 @@ module Spaceship
       else
         store_csrf_tokens(response)
         content
+      end
+    end
+
+    def detect_most_common_errors_and_raise_exceptions(body)
+      # Check if the failure is due to missing permissions (iTunes Connect)
+      if body["messages"] && body["messages"]["error"].include?("Forbidden")
+        raise_insuffient_permission_error!
+      elsif (body["resultString"] || "").include?("Program License Agreement")
+        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
       end
     end
 
