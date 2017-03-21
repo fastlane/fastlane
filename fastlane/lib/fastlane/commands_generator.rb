@@ -309,7 +309,7 @@ module Fastlane
     def ensure_fastfile
       return true if FastlaneCore::FastlaneFolder.setup?
 
-      create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
+      create = UI.confirm('Could not find fastlane in current directory. Make sure to have your fastlane configuration files inside a folder called "fastlane". Would you like to set fastlane up?')
       Fastlane::Setup.new.run if create
       return false
     end
