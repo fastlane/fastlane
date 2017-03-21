@@ -107,6 +107,7 @@ module Spaceship
         # @param mac [Bool] Searches Mac apps if true
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
+          raise "`bundle_id` parameter must not be nil" if bundle_id.nil?
           all(mac: mac).find do |app|
             return app if app.bundle_id.casecmp(bundle_id) == 0
           end
