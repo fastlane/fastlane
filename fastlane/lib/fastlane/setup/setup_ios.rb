@@ -14,7 +14,8 @@ module Fastlane
     attr_accessor :app_identifier
     attr_accessor :app_name
 
-    def run
+    def run(user: nil)
+      self.apple_id = user
       show_infos
 
       FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
@@ -178,7 +179,7 @@ module Fastlane
     def detect_if_app_is_available
       require 'spaceship'
 
-      UI.important "Verifying if app is available on the Apple Developer Portal and iTunes Connect..."
+      UI.important "Verifying that app is available on the Apple Developer Portal and iTunes Connect..."
       UI.message "Starting login with user '#{self.apple_id}'"
       Spaceship.login(self.apple_id, nil)
       self.dev_portal_team = Spaceship.select_team
