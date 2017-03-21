@@ -64,7 +64,7 @@ This will:
 #### Plugin Source
 
 Your `fastlane/Pluginfile` contains the list of all `fastlane` plugins your project uses. The `Pluginfile` is a [Gemfile](http://bundler.io/gemfile.html) that gets imported from your main `Gemfile`.
-You specificy all dependencies, including the required version numbers:
+You specify all dependencies, including the required version numbers:
 
 ```ruby
 # Fetched from RubyGems.org
