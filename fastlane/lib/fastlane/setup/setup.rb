@@ -1,7 +1,7 @@
 module Fastlane
   class Setup
     # Start the setup process
-    def run
+    def run(user: nil)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
         UI.important("fastlane is already set up at path #{FastlaneCore::FastlaneFolder.path}")
         return
@@ -21,7 +21,7 @@ module Fastlane
       end
 
       if platform == :ios
-        SetupIos.new.run
+        SetupIos.new.run(user: user)
       elsif platform == :android
         SetupAndroid.new.run
       else
