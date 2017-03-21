@@ -111,6 +111,8 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
+        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+
         CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
@@ -118,7 +120,7 @@ module Fastlane
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
-            Fastlane::Setup.new.run
+            Fastlane::Setup.new.run(user: options.user)
           end
         end
       end
