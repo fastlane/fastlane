@@ -8,7 +8,7 @@ describe Fastlane do
       describe "output controls" do
         let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 
-        it "prints the command and the command's output by default", nower: true do
+        it "prints the command and the command's output by default" do
           expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true, error_callback: nil).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
