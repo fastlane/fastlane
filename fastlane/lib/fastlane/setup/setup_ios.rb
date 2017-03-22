@@ -1,3 +1,5 @@
+require 'spaceship'
+
 module Fastlane
   class SetupIos < Setup
     # the tools that are already enabled
@@ -184,8 +186,6 @@ module Fastlane
 
     # Detect if the app was created on the Dev Portal / iTC
     def detect_if_app_is_available
-      require 'spaceship'
-
       UI.important "Verifying that app is available on the Apple Developer Portal and iTunes Connect..."
       UI.message "Starting login with user '#{self.apple_id}'"
       Spaceship.login(self.apple_id, nil)
