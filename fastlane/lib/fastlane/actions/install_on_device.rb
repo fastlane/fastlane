@@ -9,10 +9,11 @@ module Fastlane
         end
         taxi_cmd = [
           "ios-deploy",
-          params[:extra],
           "--bundle",
           params[:ipa]
         ]
+
+        taxi_cmd.insert(1, params[:extra]) if params[:extra]
         taxi_cmd << "--no-wifi" if params[:skip_wifi]
         taxi_cmd << ["--id", params[:device_id]] if params[:device_id]
         return taxi_cmd.join(" ") if Helper.test?
