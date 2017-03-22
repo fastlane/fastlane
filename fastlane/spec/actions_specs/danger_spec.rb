@@ -69,6 +69,38 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec danger")
       end
+
+      it "appends new-comment flag when set" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(new_comment: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger --new-comment")
+      end
+
+      it "does not append new-comment flag when unset" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(new_comment: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger")
+      end
+
+      it "appends base" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(base: 'master')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger --base=master")
+      end
+
+      it "appends head" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(head: 'master')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger --head=master")
+      end
     end
   end
 end
