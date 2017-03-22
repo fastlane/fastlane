@@ -11,9 +11,9 @@ module Pilot
 
       platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
-                                                                      ipa_path: config[:ipa],
-                                                                  package_path: "/tmp",
-                                                                      platform: platform)
+                                                                        ipa_path: config[:ipa],
+                                                                        package_path: "/tmp",
+                                                                        platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(app.apple_id, package_path)
@@ -91,9 +91,9 @@ module Pilot
       rows = builds.collect { |build| describe_build(build) }
 
       puts Terminal::Table.new(
-        title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
-        rows: rows
+          title: "#{app.name} Builds".green,
+          headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+          rows: rows
       )
     end
 
@@ -195,10 +195,14 @@ module Pilot
       # Submit for review before external testflight is available
       if options[:distribute_external]
         uploaded_build.client.submit_testflight_build_for_review!(
-          app_id: uploaded_build.build_train.application.apple_id,
-          train: uploaded_build.build_train.version_string,
-          build_number: uploaded_build.build_version,
-          platform: uploaded_build.platform
+            app_id: uploaded_build.build_train.application.apple_id,
+            train: uploaded_build.build_train.version_string,
+            build_number: uploaded_build.build_version,
+            platform: uploaded_build.platform,
+            first_name: options[:review_contact_info][:review_first_name],
+            last_name: options[:review_contact_info][:review_last_name],
+            phone_number: options[:review_contact_info][:review_phone_number],
+            review_email: options[:review_contact_info][:review_contact_email]
         )
       end
 

@@ -47,8 +47,8 @@ module Spaceship
     def teams
       user_details_data['associatedAccounts'].sort_by do |team|
         [
-          team['contentProvider']['name'],
-          team['contentProvider']['contentProviderId']
+            team['contentProvider']['name'],
+            team['contentProvider']['contentProviderId']
         ]
       end
     end
@@ -85,8 +85,8 @@ module Spaceship
       response = request(:post) do |req|
         req.url "ra/v1/session/webSession"
         req.body = {
-          contentProviderId: team_id,
-          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+            contentProviderId: team_id,
+            dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -169,9 +169,9 @@ module Spaceship
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
-         data.fetch('sectionInfoKeys', []).count == 0 and
-         data.fetch('sectionWarningKeys', []).count == 0 and
-         data.fetch('validationErrors', []).count == 0
+          data.fetch('sectionInfoKeys', []).count == 0 and
+          data.fetch('sectionWarningKeys', []).count == 0 and
+          data.fetch('validationErrors', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -302,9 +302,9 @@ module Spaceship
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/platforms/#{platform}/versions/create/"
         req.body = {
-          version: {
-            value: version_number.to_s
-          }
+            version: {
+                value: version_number.to_s
+            }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -390,8 +390,8 @@ module Spaceship
     def delete_member!(user_id, email)
       payload = []
       payload << {
-        dsId: user_id,
-        email: email
+          dsId: user_id,
+          email: email
       }
       request(:post) do |req|
         req.url "ra/users/itc/delete"
@@ -749,9 +749,9 @@ module Spaceship
       # we need to catch those errors and retry
       # https://github.com/fastlane/fastlane/issues/6419
       retry_error_messages = [
-        "ITC.response.error.OPERATION_FAILED",
-        "Internal Server Error",
-        "Service Unavailable"
+          "ITC.response.error.OPERATION_FAILED",
+          "Internal Server Error",
+          "Service Unavailable"
       ].freeze
 
       if retry_error_messages.any? { |message| ex.to_s.include?(message) }
@@ -877,28 +877,33 @@ module Spaceship
         current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
 
+      build_info['reviewPhone']['value'] = phone_number if phone_number
+      build_info['reviewEmail']['value'] = review_email if review_email
+      build_info['reviewFirstName']['value'] = first_name if first_name
+      build_info['reviewLastName']['value'] = last_name if last_name
+
       review_info = {
-        "significantChange" => {
-          "value" => significant_change
-        },
-        "buildTestInformationTO" => build_info,
-        "exportComplianceTO" => {
-          "usesEncryption" => {
-            "value" => encryption
+          "significantChange" => {
+              "value" => significant_change
           },
-          "encryptionUpdated" => {
-            "value" => encryption_updated
-          },
-          "isExempt" => {
-            "value" => is_exempt
-          },
-          "containsProprietaryCryptography" => {
-            "value" => proprietary
-          },
-          "containsThirdPartyCryptography" => {
-            "value" => third_party
+          "buildTestInformationTO" => build_info,
+          "exportComplianceTO" => {
+              "usesEncryption" => {
+                  "value" => encryption
+              },
+              "encryptionUpdated" => {
+                  "value" => encryption_updated
+              },
+              "isExempt" => {
+                  "value" => is_exempt
+              },
+              "containsProprietaryCryptography" => {
+                  "value" => proprietary
+              },
+              "containsThirdPartyCryptography" => {
+                  "value" => third_party
+              }
           }
-        }
       }
 
       r = request(:post) do |req| # same URL, but a POST request
@@ -1086,7 +1091,7 @@ module Spaceship
                   tierStem: interval[:tier].to_s,
                   priceTierEndDate: interval[:end_date],
                   priceTierEffectiveDate: interval[:begin_date]
-                }
+              }
           }
         end
       end
@@ -1094,11 +1099,11 @@ module Spaceship
       versions_array = []
       versions.each do |k, v|
         versions_array << {
-                  value: {
-                    description: { value: v[:description] },
-                    name: { value: v[:name] },
-                    localeCode: k.to_s
-                  }
+            value: {
+                description: { value: v[:description] },
+                name: { value: v[:name] },
+                localeCode: k.to_s
+            }
         }
       end
       data["versions"][0]["details"]["value"] = versions_array
@@ -1109,16 +1114,16 @@ module Spaceship
         upload_file = UploadFile.from_path review_screenshot
         screenshot_data = upload_purchase_review_screenshot(app_id, upload_file)
         new_screenshot = {
-          "value" => {
-            "assetToken" => screenshot_data["token"],
-            "sortOrder" => 0,
-            "type" => "SortedScreenShot",
-            "originalFileName" => upload_file.file_name,
-            "size" => screenshot_data["length"],
-            "height" => screenshot_data["height"],
-            "width" => screenshot_data["width"],
-            "checksum" => screenshot_data["md5"]
-          }
+            "value" => {
+                "assetToken" => screenshot_data["token"],
+                "sortOrder" => 0,
+                "type" => "SortedScreenShot",
+                "originalFileName" => upload_file.file_name,
+                "size" => screenshot_data["length"],
+                "height" => screenshot_data["height"],
+                "width" => screenshot_data["width"],
+                "checksum" => screenshot_data["md5"]
+            }
         }
 
         data["versions"][0]["reviewScreenshot"] = new_screenshot
@@ -1163,18 +1168,18 @@ module Spaceship
       raise "Action not provided for this tester type." unless url
 
       tester_data = {
-        emailAddress: {
-          value: email
-        },
-        firstName: {
-          value: first_name || ""
-        },
-        lastName: {
-          value: last_name || ""
-        },
-        testing: {
-          value: true
-        }
+          emailAddress: {
+              value: email
+          },
+          firstName: {
+              value: first_name || ""
+          },
+          lastName: {
+              value: last_name || ""
+          },
+          testing: {
+              value: true
+          }
       }
 
       if groups
@@ -1193,10 +1198,10 @@ module Spaceship
           end
 
           {
-            "id" => group_id,
-            "name" => {
-              "value" => group_name
-            }
+              "id" => group_id,
+              "name" => {
+                  "value" => group_name
+              }
           }
         end
       end
@@ -1218,22 +1223,22 @@ module Spaceship
       raise "Action not provided for this tester type." unless url
 
       data = [
-        {
-          emailAddress: {
-            value: tester.email
-          },
-          firstName: {
-            value: tester.first_name
-          },
-          lastName: {
-            value: tester.last_name
-          },
-          testing: {
-            value: false
-          },
-          userName: tester.email,
-          testerId: tester.tester_id
-        }
+          {
+              emailAddress: {
+                  value: tester.email
+              },
+              firstName: {
+                  value: tester.first_name
+              },
+              lastName: {
+                  value: tester.last_name
+              },
+              testing: {
+                  value: false
+              },
+              userName: tester.email,
+              testerId: tester.tester_id
+          }
       ]
 
       r = request(:post) do |req|
@@ -1268,19 +1273,19 @@ module Spaceship
       r = request(:post) do |req|
         req.url url
         req.body = {
-          user: {
-            emailAddress: { value: email },
-            password: { value: password },
-            confirmPassword: { value: password },
-            firstName: { value: first_name },
-            lastName: { value: last_name },
-            storeFront: { value: country },
-            birthDay: { value: 1 },
-            birthMonth: { value: 1 },
-            secretQuestion: { value: SecureRandom.hex },
-            secretAnswer: { value: SecureRandom.hex },
-            sandboxAccount: nil
-          }
+            user: {
+                emailAddress: { value: email },
+                password: { value: password },
+                confirmPassword: { value: password },
+                firstName: { value: first_name },
+                lastName: { value: last_name },
+                storeFront: { value: country },
+                birthDay: { value: 1 },
+                birthMonth: { value: 1 },
+                secretQuestion: { value: SecureRandom.hex },
+                secretAnswer: { value: SecureRandom.hex },
+                sandboxAccount: nil
+            }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -1293,9 +1298,9 @@ module Spaceship
         req.url url
         req.body = emails.map do |email|
           {
-            emailAddress: {
-              value: email
-            }
+              emailAddress: {
+                  value: email
+              }
           }
         end.to_json
         req.headers['Content-Type'] = 'application/json'
@@ -1326,8 +1331,8 @@ module Spaceship
 
     def generate_app_version_promocodes!(app_id: nil, version_id: nil, quantity: nil)
       data = {
-        numberOfCodes: { value: quantity },
-        agreedToContract: { value: true }
+          numberOfCodes: { value: quantity },
+          agreedToContract: { value: true }
       }
       url = "ra/apps/#{app_id}/promocodes/versions/#{version_id}"
       r = request(:post) do |req|
@@ -1400,22 +1405,22 @@ module Spaceship
     def update_tester_from_app!(tester, app_id, testing)
       url = tester.class.url(app_id)[:update_by_app]
       data = {
-        users: [
-          {
-            emailAddress: {
-              value: tester.email
-            },
-            firstName: {
-              value: tester.first_name
-            },
-            lastName: {
-              value: tester.last_name
-            },
-            testing: {
-              value: testing
-            }
-          }
-        ]
+          users: [
+              {
+                  emailAddress: {
+                      value: tester.email
+                  },
+                  firstName: {
+                      value: tester.first_name
+                  },
+                  lastName: {
+                      value: tester.last_name
+                  },
+                  testing: {
+                      value: testing
+                  }
+              }
+          ]
       }
 
       r = request(:post) do |req|
