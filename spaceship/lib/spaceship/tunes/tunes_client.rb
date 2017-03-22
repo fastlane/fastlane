@@ -47,8 +47,8 @@ module Spaceship
     def teams
       user_details_data['associatedAccounts'].sort_by do |team|
         [
-            team['contentProvider']['name'],
-            team['contentProvider']['contentProviderId']
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
         ]
       end
     end
@@ -169,9 +169,9 @@ module Spaceship
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
 
       if data.fetch('sectionErrorKeys', []).count == 0 and
-          data.fetch('sectionInfoKeys', []).count == 0 and
-          data.fetch('sectionWarningKeys', []).count == 0 and
-          data.fetch('validationErrors', []).count == 0
+         data.fetch('sectionInfoKeys', []).count == 0 and
+         data.fetch('sectionWarningKeys', []).count == 0 and
+         data.fetch('validationErrors', []).count == 0
 
         logger.debug("Request was successful")
       end
@@ -749,9 +749,9 @@ module Spaceship
       # we need to catch those errors and retry
       # https://github.com/fastlane/fastlane/issues/6419
       retry_error_messages = [
-          "ITC.response.error.OPERATION_FAILED",
-          "Internal Server Error",
-          "Service Unavailable"
+        "ITC.response.error.OPERATION_FAILED",
+        "Internal Server Error",
+        "Service Unavailable"
       ].freeze
 
       if retry_error_messages.any? { |message| ex.to_s.include?(message) }
@@ -1223,22 +1223,22 @@ module Spaceship
       raise "Action not provided for this tester type." unless url
 
       data = [
-          {
-              emailAddress: {
-                  value: tester.email
-              },
-              firstName: {
-                  value: tester.first_name
-              },
-              lastName: {
-                  value: tester.last_name
-              },
-              testing: {
-                  value: false
-              },
-              userName: tester.email,
-              testerId: tester.tester_id
-          }
+        {
+            emailAddress: {
+                value: tester.email
+            },
+            firstName: {
+                value: tester.first_name
+            },
+            lastName: {
+                value: tester.last_name
+            },
+            testing: {
+                value: false
+            },
+            userName: tester.email,
+            testerId: tester.tester_id
+        }
       ]
 
       r = request(:post) do |req|
@@ -1406,20 +1406,20 @@ module Spaceship
       url = tester.class.url(app_id)[:update_by_app]
       data = {
           users: [
-              {
-                  emailAddress: {
-                      value: tester.email
-                  },
-                  firstName: {
-                      value: tester.first_name
-                  },
-                  lastName: {
-                      value: tester.last_name
-                  },
-                  testing: {
-                      value: testing
-                  }
-              }
+            {
+                emailAddress: {
+                    value: tester.email
+                },
+                firstName: {
+                    value: tester.first_name
+                },
+                lastName: {
+                    value: tester.last_name
+                },
+                testing: {
+                    value: testing
+                }
+            }
           ]
       }
 
