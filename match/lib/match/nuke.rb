@@ -35,7 +35,7 @@ module Match
           UI.error "Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!" if had_app_identifier
           UI.error "---"
         end
-        if params[:skip_confirmation] || agree("(y/n)", true)
+        if params[:skip_confirmation] || UI.confirm("Do you really want to nuke everything listed above?")
           nuke_it_now!
           UI.success "Successfully cleaned your account ♻️"
         else

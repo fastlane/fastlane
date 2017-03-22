@@ -95,14 +95,14 @@ module Fastlane
 
     def ask_to_enable_other_tools
       if self.itc_ref.nil? && self.portal_ref.nil?
-        wants_to_create_app = agree('Would you like to create your app on iTunes Connect and the Developer Portal? (y/n)', true)
+        wants_to_create_app = UI.confirm('Would you like to create your app on iTunes Connect and the Developer Portal?')
         if wants_to_create_app
           create_app_if_necessary
           detect_if_app_is_available # check if the app was, in fact, created.
         end
       end
       if self.itc_ref && self.portal_ref
-        wants_to_setup_deliver = agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
+        wants_to_setup_deliver = UI.confirm("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already")
         enable_deliver if wants_to_setup_deliver
       end
     end
