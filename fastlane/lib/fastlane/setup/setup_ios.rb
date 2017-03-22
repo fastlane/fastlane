@@ -21,9 +21,11 @@ module Fastlane
       FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
       is_manual_setup = false
 
+      setup_project
+      react_native_pre_checks
+      ask_for_apple_id
+
       begin
-        setup_project
-        ask_for_apple_id
         if self.project.mac?
           UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps")
         else
@@ -68,6 +70,29 @@ module Fastlane
       manual_setup
     rescue => ex
       handle_exception(exception: ex)
+    end
+
+    # React Native specific code
+    # Make it easy for people to onboard
+    def react_native_pre_checks
+      return unless project_uses_react_native?
+      if app_identifier.to_s.length == 0
+        error_message = []
+        error_message << "Could not detect bundle identifier of your react-native app."
+        error_message << "Make sure to open the Xcode project and update the bundle identifier"
+        error_message << "in the `General` section of your project settings."
+        error_message << "Restart `fastlane init` once you're done!"
+        UI.user_error!(error_message.join(" "))
+      end
+    end
+
+    def project_uses_react_native?(path: Dir.pwd)
+      package_json = File.join(path, "..", "package.json")
+      return unless File.basename(path) == "ios"
+      return unless File.exist?(package_json)
+      package_content = File.read(package_json)
+      return true if package_content.include?("react-native")
+      false
     end
 
     def default_setup
