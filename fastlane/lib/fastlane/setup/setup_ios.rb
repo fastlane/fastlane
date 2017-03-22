@@ -36,6 +36,7 @@ module Fastlane
           default_setup
         else
           is_manual_setup = true
+          UI.message("Falling back to manual onboarding")
           manual_setup
         end
         UI.success('Successfully finished setting up fastlane')
