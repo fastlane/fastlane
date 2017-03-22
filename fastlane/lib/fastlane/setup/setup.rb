@@ -15,8 +15,8 @@ module Fastlane
         UI.message("Detected Android project in current directory...")
         platform = :android
       else
-        UI.message("Couldn't automatically detect the platform")
-        val = agree("Is this project an iOS project? (y/n) ".yellow, true)
+        UI.important("Couldn't automatically detect the platform")
+        val = UI.confirm("Is this project an iOS project?")
         platform = (val ? :ios : :android)
       end
 
