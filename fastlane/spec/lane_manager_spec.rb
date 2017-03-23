@@ -1,3 +1,5 @@
+fastlane_folder = File.absolute_path('./fastlane/spec/fixtures/fastfiles/')
+
 describe Fastlane do
   describe Fastlane::LaneManager do
     describe "#init" do
@@ -70,7 +72,11 @@ describe Fastlane do
 
       describe "successfull init" do
         before do
-          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
+        end
+
+        after(:all) do
+          FileUtils.rm(File.join(fastlane_folder, 'README.md'))
         end
 
         it "Successfully collected all actions" do

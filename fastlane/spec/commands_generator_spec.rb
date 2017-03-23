@@ -1,10 +1,15 @@
 require 'fastlane/commands_generator'
 
+fastlane_folder = File.absolute_path('./fastlane/spec/fixtures/dotenvs/withFastfiles/parentonly/fastlane')
+
 describe Fastlane::CommandsGenerator do
   before(:each) do
     ENV['DOTENV'] = nil
-    fastlane_folder = File.absolute_path('./fastlane/spec/fixtures/dotenvs/withFastfiles/parentonly/fastlane')
     allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
+  end
+
+  after(:all) do
+    FileUtils.rm(File.join(fastlane_folder, 'README.md'))
   end
 
   describe ":trigger option handling" do

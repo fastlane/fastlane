@@ -50,6 +50,8 @@ describe Fastlane::CLIToolsDistributor do
       expect do
         Fastlane::CLIToolsDistributor.take_off
       end.to raise_error(SystemExit)
+
+      `git checkout fastlane/README.md`
     end
   end
 end
