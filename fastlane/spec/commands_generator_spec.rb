@@ -19,7 +19,9 @@ describe Fastlane::CommandsGenerator do
   describe ":list option handling" do
     it "cannot use the env flag from tool options" do
       stub_commander_runner_args(['list', '--env', 'DOTENV'])
-      Fastlane::CommandsGenerator.start
+      expect do
+        Fastlane::CommandsGenerator.start
+      end.to raise_exception(OptionParser::InvalidOption, 'invalid option: --env')
 
       expect(ENV['DOTENV']).to be_nil
     end
