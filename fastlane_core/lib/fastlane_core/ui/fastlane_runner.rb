@@ -66,6 +66,8 @@ module Commander
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
+      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        display_user_error!(e, e.to_s)
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
