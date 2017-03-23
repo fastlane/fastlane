@@ -1,0 +1,3 @@
+desc "Empty lane for testing fastlane command"
+lane :command_test do |options|
+end
