@@ -68,6 +68,18 @@ describe Commander::Runner do
       end
       expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneError".red + "\n")
     end
+
+    it "calls the tool collector lifecycle methods for a test failure" do
+      expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
+      expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
+
+      stdout, stderr = capture_stds do
+        expect do
+          CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneTestFailure).run
+        end.to raise_error(SystemExit)
+      end
+      expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneTestFailure".red + "\n")
+    end
   end
 
   describe '#handle_unknown_error' do

@@ -38,6 +38,22 @@ describe Scan do
           @scan.handle_results(0)
         end
       end
+
+      describe "Test Failure" do
+        it "raises a FastlaneTestFailure instead of a crash or UserError" do
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj'
+            })
+            custom_parser = "custom_parser"
+            expect(Scan::TestResultParser).to receive(:new).and_return(custom_parser)
+            expect(custom_parser).to receive(:parse_result).and_return({tests: 5, failures: 3})
+
+            @scan.handle_results(0)
+          end.to raise_error FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed"
+        end
+      end
     end
   end
 end
