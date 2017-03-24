@@ -89,8 +89,8 @@ module Fastlane
 
     def self.project_uses_react_native?(path: Dir.pwd)
       package_json = File.join(path, "..", "package.json")
-      return unless File.basename(path) == "ios"
-      return unless File.exist?(package_json)
+      return false unless File.basename(path) == "ios"
+      return false unless File.exist?(package_json)
       package_content = File.read(package_json)
       return true if package_content.include?("react-native")
       false

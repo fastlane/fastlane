@@ -15,7 +15,7 @@ module Fastlane
         UI.message("Detected Android project in current directory...")
         platform = :android
       elsif is_react_native?
-        UI.important("Detectedj react-native app. To set up fastlane, please run")
+        UI.important("Detected react-native app. To set up fastlane, please run")
         UI.command("fastlane init")
         UI.important("in the sub-folder for each platform (\"ios\" or \"android\")")
         UI.user_error!("Please navigate to the platform subfolder and run `fastlane init` again")
