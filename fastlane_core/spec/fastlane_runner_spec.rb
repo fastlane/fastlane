@@ -71,7 +71,8 @@ describe Commander::Runner do
 
     it "calls the tool collector lifecycle methods for a test failure" do
       expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-      expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
+      # Notice how we don't expect `:did_raise_error` to be called here
+      # TestFailures don't count as failures/crashes
 
       stdout, stderr = capture_stds do
         expect do
