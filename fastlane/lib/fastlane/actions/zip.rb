@@ -6,10 +6,15 @@ module Fastlane
 
         params[:output_path] ||= "#{params[:path]}.zip"
 
+        absolute_output_path = File.expand_path(params[:output_path])
+
+        absolute_output_dir = File.expand_path("..", absolute_output_path)
+        FileUtils.mkdir_p(absolute_output_dir)
+
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
 
-          Actions.sh "zip -#{zip_options} #{params[:output_path].shellescape} #{File.basename(params[:path]).shellescape}"
+          Actions.sh "zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}"
         end
 
         UI.success "Successfully generated zip file at path '#{File.expand_path(params[:output_path])}'"
