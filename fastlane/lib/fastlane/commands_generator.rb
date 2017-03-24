@@ -91,7 +91,6 @@ module Fastlane
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
-      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
@@ -178,7 +177,7 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
+            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane."
             Fastlane::DocsGenerator.run(ff)
           end
         end

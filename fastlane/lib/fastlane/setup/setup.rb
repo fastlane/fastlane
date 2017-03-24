@@ -20,8 +20,8 @@ module Fastlane
         UI.important("in the sub-folder for each platform (\"ios\" or \"android\")")
         UI.user_error!("Please navigate to the platform subfolder and run `fastlane init` again")
       else
-        UI.message("Couldn't automatically detect the platform")
-        val = UI.confirm("Is this project an iOS project? (y/n) ")
+        UI.important("Couldn't automatically detect the platform")
+        val = UI.confirm("Is this project an iOS project?")
         platform = (val ? :ios : :android)
       end
 

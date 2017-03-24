@@ -108,7 +108,7 @@ module Sigh
         if Helper.ci?
           UI.user_error! "On a CI server, cleanup cannot be used without the --force option"
         else
-          delete = agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
+          delete = UI.confirm("Delete these provisioning profiles #{profiles.length}?")
         end
       end
 

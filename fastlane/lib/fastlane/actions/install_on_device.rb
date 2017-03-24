@@ -15,6 +15,7 @@ module Fastlane
         ]
         taxi_cmd << "--no-wifi" if params[:skip_wifi]
         taxi_cmd << ["--id", params[:device_id]] if params[:device_id]
+        taxi_cmd.compact!
         return taxi_cmd.join(" ") if Helper.test?
         Actions.sh(taxi_cmd.join(" "))
         UI.message("Deployed #{params[:ipa]} to device!")
