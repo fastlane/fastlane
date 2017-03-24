@@ -156,5 +156,28 @@ module Match
         end
       end
     end
+
+    # Checks push permission to git repo
+    def self.repo_pushable?(path, branch = "master")
+      Dir.chdir(path) do
+        command = "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape} --dry-run"
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                              print_all: FastlaneCore::Globals.verbose?,
+                                              print_command: FastlaneCore::Globals.verbose?)
+      end
+      return true
+    rescue => ex
+      UI.error("No permission to push...")
+      UI.error(ex)
+      return false
+    end
+
+    def self.check_push_repo_permission(path, branch = "master")
+      unless repo_pushable?(path, branch)
+        UI.error "You do not have push permission to git repository"
+        UI.error "Match will create a new certificate or profiles, but if you do not have permission to puth to git, occur a difference between Apple Developer Portal and git repository."
+        UI.user_error! "Grant push permission to git repository to users who create or update certificates/profiles"
+      end
+    end
   end
 end
