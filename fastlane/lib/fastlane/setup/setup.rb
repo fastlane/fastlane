@@ -15,13 +15,13 @@ module Fastlane
         UI.message("Detected Android project in current directory...")
         platform = :android
       elsif is_react_native?
-        UI.important("Detect react-native app. To set up fastlane, please run")
+        UI.important("Detectedj react-native app. To set up fastlane, please run")
         UI.command("fastlane init")
         UI.important("in the sub-folder for each platform (\"ios\" or \"android\")")
         UI.user_error!("Please navigate to the platform subfolder and run `fastlane init` again")
       else
         UI.message("Couldn't automatically detect the platform")
-        val = agree("Is this project an iOS project? (y/n) ".yellow, true)
+        val = UI.confirm("Is this project an iOS project? (y/n) ")
         platform = (val ? :ios : :android)
       end
 
@@ -43,7 +43,7 @@ module Fastlane
     end
 
     def is_react_native?
-      SetupIos.new.project_uses_react_native?(path: "./ios")
+      SetupIos.project_uses_react_native?(path: "./ios")
     end
 
     def show_analytics

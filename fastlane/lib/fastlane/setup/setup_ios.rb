@@ -76,7 +76,7 @@ module Fastlane
     # React Native specific code
     # Make it easy for people to onboard
     def react_native_pre_checks
-      return unless project_uses_react_native?
+      return unless self.class.project_uses_react_native?
       if app_identifier.to_s.length == 0
         error_message = []
         error_message << "Could not detect bundle identifier of your react-native app."
@@ -87,7 +87,7 @@ module Fastlane
       end
     end
 
-    def project_uses_react_native?(path: Dir.pwd)
+    def self.project_uses_react_native?(path: Dir.pwd)
       package_json = File.join(path, "..", "package.json")
       return unless File.basename(path) == "ios"
       return unless File.exist?(package_json)
