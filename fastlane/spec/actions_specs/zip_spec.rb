@@ -7,7 +7,7 @@ describe Fastlane do
 
     describe "zip" do
       it "generates a valid zip command" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -r #{@path}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with("zip -r #{File.expand_path(@path)}.zip archive.rb")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}')
@@ -15,7 +15,7 @@ describe Fastlane do
       end
 
       it "generates a valid zip command without verbose output" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -rq #{@path}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with("zip -rq #{File.expand_path(@path)}.zip archive.rb")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: 'false')
