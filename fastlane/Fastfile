@@ -133,8 +133,8 @@ lane :release do
   donate_food
 
   puts "You can now tweet:".green
-  tag_url = "https://github.com/fastlane/fastlane/releases/tag/fastlane/#{version}"
-  puts "[fastlane] #{github_release['name']} #{tag_url}"
+  releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
+  puts "[fastlane] #{github_release['name']} #{releases_url}"
 
   update_docs
 end
