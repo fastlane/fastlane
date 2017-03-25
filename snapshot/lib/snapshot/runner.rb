@@ -59,7 +59,7 @@ module Snapshot
 
       print_results(results)
 
-      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
+      UI.test_failure!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
