@@ -50,6 +50,8 @@ module Snapshot
 
           config[:devices] << sim.name
         end
+        # as Snapshot can be run only on MacOS - we are always have host mac device
+        config[:devices] << "Mac"
       end
     end
   end
