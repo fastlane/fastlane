@@ -174,9 +174,9 @@ module Match
 
     def self.check_push_repo_permission(path, branch = "master")
       unless repo_pushable?(path, branch)
-        UI.error "You do not have push permission to git repository"
-        UI.error "Match will create a new certificate or profiles, but if you do not have permission to puth to git, occur a difference between Apple Developer Portal and git repository."
-        UI.user_error! "Grant push permission to git repository to users who create or update certificates/profiles"
+        UI.error("You do not have push permission to git repository provided")
+        UI.error("_match_ needs to create a new certificate or provisioning profile, however without push access to the git repo, the generated certificate can't be stored properly, resulting in an unused certificate")
+        UI.user_error!("Please grant push access for the current git user to the git repo, so that _match_ can update and create certificates for you")
       end
     end
   end
