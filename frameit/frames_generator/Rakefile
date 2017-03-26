@@ -72,4 +72,4 @@ def convert_image_resource(path)
   image.write(path)
 end
 
-task :default => [:generate_device_frames]
+task default: [:generate_device_frames]
