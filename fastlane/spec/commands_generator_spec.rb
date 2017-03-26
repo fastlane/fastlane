@@ -5,8 +5,6 @@ describe Fastlane::CommandsGenerator do
     ENV['DOTENV'] = nil
     fastlane_folder = File.absolute_path('./fastlane/spec/fixtures/dotenvs/withFastfiles/parentonly/fastlane')
     allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
-    allow(FastlaneCore::Env).to receive(:truthy?).and_return(:default)
-    allow(FastlaneCore::Env).to receive(:truthy?).with('FASTLANE_SKIP_DOCS').and_return(true)
   end
 
   describe ":trigger option handling" do

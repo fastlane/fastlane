@@ -71,8 +71,6 @@ describe Fastlane do
       describe "successfull init" do
         before do
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
-          allow(FastlaneCore::Env).to receive(:truthy?).and_return(:default)
-          allow(FastlaneCore::Env).to receive(:truthy?).with('FASTLANE_SKIP_DOCS').and_return(true)
         end
 
         it "Successfully collected all actions" do

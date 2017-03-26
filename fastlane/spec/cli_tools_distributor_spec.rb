@@ -43,8 +43,6 @@ describe Fastlane::CLIToolsDistributor do
     end
 
     it "checks for updates even if the lane has an error" do
-      allow(FastlaneCore::Env).to receive(:truthy?).and_return(:default)
-      allow(FastlaneCore::Env).to receive(:truthy?).with('FASTLANE_SKIP_DOCS').and_return(true)
       FastlaneSpec::Env.with_ARGV(["beta"])
       expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
       expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
