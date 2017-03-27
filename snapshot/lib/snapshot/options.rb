@@ -43,9 +43,8 @@ module Snapshot
                                      verify_block: proc do |value|
                                        available = FastlaneCore::DeviceManager.simulators
                                        value.each do |current|
-                                         device = current.strip
-                                         unless available.any? { |d| d.name.strip == device } || device == "Mac"
-                                           UI.user_error!("Device '#{device}' not in list of available simulators '#{available.join(', ')}'")
+                                         unless available.any? { |d| d.name.strip == current.strip }
+                                           UI.user_error!("Device '#{current}' not in list of available simulators '#{available.join(', ')}'")
                                          end
                                        end
                                      end),

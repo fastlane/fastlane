@@ -6,8 +6,6 @@ Information about project "Example":
     Targets:
         Example
         ExampleUITests
-        ExampleMacOS
-        ExampleMacOSUITests
     Build Configurations:
         Debug
         Release
@@ -15,7 +13,6 @@ Information about project "Example":
     Schemes:
         Example
         ExampleUITests
-        ExampleMacOS
 EOS
   allow_any_instance_of(FastlaneCore::Project).to receive(:raw_info).and_return fake_result
 end
