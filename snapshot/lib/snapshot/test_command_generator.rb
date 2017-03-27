@@ -90,6 +90,9 @@ module Snapshot
       end
 
       def destination(device_name)
+        # on Mac we will always run on host machine, so should specify only platform
+        return ["-destination 'platform=macOS'"] if device_name =~ /^Mac/
+
         os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
