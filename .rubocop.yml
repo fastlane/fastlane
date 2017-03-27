@@ -81,12 +81,15 @@ Style/DotPosition:
 Style/DoubleNegation:
   Enabled: false
 
+# Prevent to replace [] into %i
 Style/SymbolArray:
   Enabled: false
 
+# We still support Ruby 2.0.0
 Style/IndentHeredoc:
   Enabled: false
 
+# This cop would not work fine with rspec
 Style/MixinGrouping:
   Exclude:
     - '**/spec/**/*'
@@ -208,6 +211,7 @@ AllCops:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
 
+# They have not to be snake_case
 Style/FileName:
   Exclude:
     - '**/Dangerfile'
