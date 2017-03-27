@@ -119,7 +119,7 @@ describe Snapshot do
       end
     end
 
-    describe "Valid iOS Configuration" do
+    describe "Valid Configuration" do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
 
       def configure(options)
@@ -205,30 +205,6 @@ describe Snapshot do
           command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
-      end
-    end
-
-    describe "Valid macOS Configuration" do
-      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS" } }
-
-      it "uses default parameters on macOS" do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
-        expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-        command = Snapshot::TestCommandGenerator.generate(device_type: "Mac")
-        expect(command).to eq(
-          [
-            "set -o pipefail &&",
-            "xcodebuild",
-            "-scheme ExampleMacOS",
-            "-project ./snapshot/example/Example.xcodeproj",
-            "-derivedDataPath '/tmp/path/to/snapshot_derived'",
-            "-destination 'platform=macOS'",
-            "FASTLANE_SNAPSHOT=YES",
-            :build,
-            :test,
-            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS.log")} | xcpretty "
-          ]
-        )
       end
     end
   end
