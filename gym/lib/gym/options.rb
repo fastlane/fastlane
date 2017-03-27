@@ -251,7 +251,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :analyze_build_time,
                                      env_name: "GYM_ANALYZE_BUILD_TIME",
-                                     description: "Analyze the project build time and store the output in culprit.txt file",
+                                     description: "Analyze the project build time and store the output in culprits.txt file",
                                      optional: true,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
