@@ -4,6 +4,7 @@ describe Fastlane do
       xcodebuild_archive = 'MyApp.xcarchive'
 
       before(:each) do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::XCODEBUILD_ARCHIVE] = xcodebuild_archive
       end
 

@@ -30,8 +30,10 @@ end
 Then to deploy a new 'beta' version of your app just run
 `fastlane beta` :rocket:
 
-              |  fastlane
---------------------------|------------------------------------------------------------
+
+
+|          |  fastlane  |
+|----------|------------|
 :sparkles: | Connect iOS, Mac, and Android build tools into one workflow (both _fastlane_ tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds, or testing
 :ship: | Deploy from any computer, including a CI server
@@ -55,7 +57,7 @@ Then to deploy a new 'beta' version of your app just run
 </h4>
 <hr />
 
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx).
+##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
 
 ## Installation
 Make sure you have the latest version of the Xcode command line tools installed:

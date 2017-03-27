@@ -230,7 +230,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
+      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
     end
 
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead

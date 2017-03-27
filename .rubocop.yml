@@ -2,6 +2,17 @@
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Style/SafeNavigation:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Performance/RegexpMatch:
+  Enabled: false
+
 # .length == 0 is also good, we don't always want .zero?
 Style/NumericPredicate:
   Enabled: false
@@ -70,12 +81,28 @@ Style/DotPosition:
 Style/DoubleNegation:
   Enabled: false
 
+# Prevent to replace [] into %i
+Style/SymbolArray:
+  Enabled: false
+
+# We still support Ruby 2.0.0
+Style/IndentHeredoc:
+  Enabled: false
+
+# This cop would not work fine with rspec
+Style/MixinGrouping:
+  Exclude:
+    - '**/spec/**/*'
+
 # Sometimes we allow a rescue block that doesn't contain code
 Lint/HandleExceptions:
   Enabled: false
 
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 # Needed for $verbose
@@ -183,6 +210,18 @@ AllCops:
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
+
+# They have not to be snake_case
+Style/FileName:
+  Exclude:
+    - '**/Dangerfile'
+    - '**/Brewfile'
+    - '**/Gemfile'
+    - '**/Podfile'
+    - '**/Rakefile'
+    - '**/Fastfile'
+    - '**/Deliverfile'
+    - '**/Snapfile'
 
 # We're not there yet
 Style/Documentation:

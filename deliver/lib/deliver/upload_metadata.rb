@@ -220,7 +220,7 @@ module Deliver
       REVIEW_INFORMATION_VALUES.each do |key, option_name|
         v.send("#{key}=", info[option_name]) if info[option_name]
       end
-      v.review_user_needed = (v.review_demo_user.to_s + v.review_demo_password.to_s).length > 0
+      v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
     end
 
     def set_app_rating(v, options)

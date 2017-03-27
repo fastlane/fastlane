@@ -66,12 +66,12 @@ module Scan
 
       copy_simulator_logs
 
-      unless tests_exit_status == 0
-        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
+      if result[:failures] > 0
+        UI.test_failure!("Tests have failed")
       end
 
-      unless result[:failures] == 0
-        UI.user_error!("Tests failed")
+      unless tests_exit_status == 0
+        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
       if Scan.cache[:open_html_report_path]

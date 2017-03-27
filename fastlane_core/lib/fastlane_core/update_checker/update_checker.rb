@@ -84,7 +84,7 @@ module FastlaneCore
       elsif Helper.mac_app?
         "the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version."
       else
-        "sudo gem update #{gem_name.downcase}"
+        "sudo gem install #{gem_name.downcase}"
       end
     end
 
