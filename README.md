@@ -31,7 +31,6 @@ Then to deploy a new 'beta' version of your app just run
 `fastlane beta` :rocket:
 
 
-
 |          |  fastlane  |
 |----------|------------|
 :sparkles: | Connect iOS, Mac, and Android build tools into one workflow (both _fastlane_ tools and third party tools)
@@ -79,7 +78,7 @@ xcode-select --install
 <td width="33%" align="center">macOS</td>
 <td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
 </tr>
-<tr> 
+<tr>
 <td width="33%"><code>brew cask install fastlane</code></td>
 <td width="33%"><a href="https://download.fastlane.tools/">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
 <td width="33%"><code>sudo gem install fastlane -NV</code></td>
@@ -149,7 +148,7 @@ Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contrib
 
 ## Speakers
 
-Are you giving a talk on fastlane? Great! [Let us know](https://fastlane.tools/speaking) so we can help you give the best possible presentation. 
+Are you giving a talk on fastlane? Great! [Let us know](https://fastlane.tools/speaking) so we can help you give the best possible presentation.
 
 ## Code of Conduct
 
