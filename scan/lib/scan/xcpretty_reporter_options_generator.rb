@@ -1,7 +1,7 @@
 module Scan
   class XCPrettyReporterOptionsGenerator
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
-    
+
     def self.generate_from_scan_config
       self.new(Scan.config[:open_report],
                Scan.config[:output_types],
@@ -31,7 +31,7 @@ module Scan
       unless @output_types.length == @output_files.length
         UI.important("WARNING: output_types and output_files do not have the same number of items. Default values will be substituted as needed.")
       end
-      
+
       (@output_types - SUPPORTED_REPORT_TYPES).each do |type|
         UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
       end

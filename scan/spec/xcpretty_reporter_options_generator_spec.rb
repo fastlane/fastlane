@@ -237,6 +237,8 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           Scan.cache[:temp_junit_report] = nil
 
+          expect(FastlaneCore::UI).to receive(:important).with("WARNING: output_types and output_files do not have the same number of items. Default values will be substituted as needed.")
+
           reporter_options = Scan::XCPrettyReporterOptionsGenerator.generate_from_scan_config.generate_reporter_options
           expect(reporter_options).to eq([
             "--report junit",
