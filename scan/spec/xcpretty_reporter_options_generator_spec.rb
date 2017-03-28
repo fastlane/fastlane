@@ -3,6 +3,7 @@ describe Scan do
     before(:all) do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      Scan.cache[:temp_junit_report] = nil
     end
 
     describe "xcpretty reporter options generation" do

@@ -74,7 +74,7 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
-      if Scan.cache[:open_html_report_path]
+      if !Helper.is_ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
     end

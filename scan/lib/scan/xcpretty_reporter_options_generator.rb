@@ -23,19 +23,18 @@ module Scan
       unless @output_types.length == @output_files.length
         UI.important("WARNING: output_types and output_files do not have the same number of items. Default values will be substituted as needed.")
       end
+      
+      (@output_types - SUPPORTED_REPORT_TYPES).each do |type|
+        UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
+      end
     end
 
     def generate_reporter_options
       reporter = []
 
-      @output_types.each do |raw_type|
+      valid_types = @output_types & SUPPORTED_REPORT_TYPES
+      valid_types.each do |raw_type|
         type = raw_type.strip
-
-        unless SUPPORTED_REPORT_TYPES.include?(type)
-          UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
-          next
-        end
-
         output_path = File.join(File.expand_path(@output_directory), determine_output_file_name(type))
         reporter << "--report #{type}"
         reporter << "--output #{output_path}"
@@ -54,14 +53,15 @@ module Scan
       return reporter
     end
 
-    def determine_output_file_name(type)
-      if @use_clang_report_name && type == "json-compilation-database"
-        return "compile_commands.json"
-      end
+    private
+      def determine_output_file_name(type)
+        if @use_clang_report_name && type == "json-compilation-database"
+          return "compile_commands.json"
+        end
 
-      index = @output_types.index(type)
-      file = @output_files[index]
-      file || "report.#{type}"
-    end
+        index = @output_types.index(type)
+        file = @output_files[index]
+        file || "report.#{type}"
+      end
   end
 end
