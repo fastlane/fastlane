@@ -1,5 +1,4 @@
 describe Scan do
-
   describe Scan::XCPrettyReporterOptionsGenerator do
     before(:all) do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
@@ -15,9 +14,9 @@ describe Scan do
 
         expect(temp_junit_report).not_to be_nil
         expect(reporter_options).to end_with([
-          "--report junit",
-          "--output #{temp_junit_report}"
-        ])
+                                               "--report junit",
+                                               "--output #{temp_junit_report}"
+                                             ])
       end
 
       it "generates options for a custom junit report with default file name" do
@@ -25,9 +24,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report junit",
-          "--output /test_output/report.junit"
-        ])
+                                                 "--report junit",
+                                                 "--output /test_output/report.junit"
+                                               ])
       end
 
       it "generates options for a custom junit report with custom file name" do
@@ -35,9 +34,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report junit",
-          "--output /test_output/junit.xml"
-        ])
+                                                 "--report junit",
+                                                 "--output /test_output/junit.xml"
+                                               ])
       end
 
       it "generates options for a custom html report with default file name" do
@@ -45,9 +44,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report html",
-          "--output /test_output/report.html"
-        ])
+                                                 "--report html",
+                                                 "--output /test_output/report.html"
+                                               ])
       end
 
       it "generates options for a custom html report with custom file name" do
@@ -55,9 +54,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report html",
-          "--output /test_output/custom_report.html"
-          ])
+                                                 "--report html",
+                                                 "--output /test_output/custom_report.html"
+                                               ])
       end
 
       it "generates options for a custom json-compilation-database file with default file name" do
@@ -65,9 +64,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report json-compilation-database",
-          "--output /test_output/report.json-compilation-database"
-        ])
+                                                 "--report json-compilation-database",
+                                                 "--output /test_output/report.json-compilation-database"
+                                               ])
       end
 
       it "generates options for a custom json-compilation-database file with a custom file name" do
@@ -75,9 +74,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report json-compilation-database",
-          "--output /test_output/custom_report.json"
-        ])
+                                                 "--report json-compilation-database",
+                                                 "--output /test_output/custom_report.json"
+                                               ])
       end
 
       it "generates options for a custom json-compilation-database file with a clang naming convention" do
@@ -85,9 +84,9 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report json-compilation-database",
-          "--output /test_output/compile_commands.json"
-        ])
+                                                 "--report json-compilation-database",
+                                                 "--output /test_output/compile_commands.json"
+                                               ])
       end
 
       it "generates options for a multiple reports with default file names" do
@@ -95,11 +94,11 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report html",
-          "--output /test_output/report.html",
-          "--report junit",
-          "--output /test_output/report.junit"
-        ])
+                                                 "--report html",
+                                                 "--output /test_output/report.html",
+                                                 "--report junit",
+                                                 "--output /test_output/report.junit"
+                                               ])
       end
 
       it "generates options for a multiple reports with default file names" do
@@ -107,11 +106,11 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
-          "--report html",
-          "--output /test_output/custom_report.html",
-          "--report junit",
-          "--output /test_output/junit.xml"
-        ])
+                                                 "--report html",
+                                                 "--output /test_output/custom_report.html",
+                                                 "--report junit",
+                                                 "--output /test_output/junit.xml"
+                                               ])
       end
 
       context "options passed as arrays" do
@@ -122,9 +121,9 @@ describe Scan do
 
           expect(temp_junit_report).not_to be_nil
           expect(reporter_options).to end_with([
-            "--report junit",
-            "--output #{temp_junit_report}"
-          ])
+                                                 "--report junit",
+                                                 "--output #{temp_junit_report}"
+                                               ])
         end
 
         it "generates options for a custom junit report with default file name" do
@@ -132,9 +131,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report junit",
-            "--output /test_output/report.junit"
-          ])
+                                                   "--report junit",
+                                                   "--output /test_output/report.junit"
+                                                 ])
         end
 
         it "generates options for a custom junit report with custom file name" do
@@ -142,9 +141,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report junit",
-            "--output /test_output/junit.xml"
-          ])
+                                                   "--report junit",
+                                                   "--output /test_output/junit.xml"
+                                                 ])
         end
 
         it "generates options for a custom html report with default file name" do
@@ -152,9 +151,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report html",
-            "--output /test_output/report.html"
-          ])
+                                                   "--report html",
+                                                   "--output /test_output/report.html"
+                                                 ])
         end
 
         it "generates options for a custom html report with custom file name" do
@@ -162,9 +161,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report html",
-            "--output /test_output/custom_report.html"
-          ])
+                                                   "--report html",
+                                                   "--output /test_output/custom_report.html"
+                                                 ])
         end
 
         it "generates options for a custom json-compilation-database file with default file name" do
@@ -172,9 +171,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report json-compilation-database",
-            "--output /test_output/report.json-compilation-database"
-          ])
+                                                   "--report json-compilation-database",
+                                                   "--output /test_output/report.json-compilation-database"
+                                                 ])
         end
 
         it "generates options for a custom json-compilation-database file with a custom file name" do
@@ -182,9 +181,9 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report json-compilation-database",
-            "--output /test_output/custom_report.json"
-          ])
+                                                   "--report json-compilation-database",
+                                                   "--output /test_output/custom_report.json"
+                                                 ])
         end
 
         it "generates options for a custom json-compilation-database file with a clang naming convention" do
@@ -195,9 +194,9 @@ describe Scan do
           expect(reporter_options).to include("--output /test_output/compile_commands.json")
 
           expect(reporter_options).to start_with([
-            "--report json-compilation-database",
-            "--output /test_output/compile_commands.json"
-          ])
+                                                   "--report json-compilation-database",
+                                                   "--output /test_output/compile_commands.json"
+                                                 ])
         end
 
         it "generates options for a multiple reports with default file names" do
@@ -205,11 +204,11 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report html",
-            "--output /test_output/report.html",
-            "--report junit",
-            "--output /test_output/report.junit"
-          ])
+                                                   "--report html",
+                                                   "--output /test_output/report.html",
+                                                   "--report junit",
+                                                   "--output /test_output/report.junit"
+                                                 ])
         end
 
         it "generates options for a multiple reports with custom file names" do
@@ -217,11 +216,11 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
-            "--report html",
-            "--output /test_output/custom_report.html",
-            "--report junit",
-            "--output /test_output/junit.xml"
-          ])
+                                                   "--report html",
+                                                   "--output /test_output/custom_report.html",
+                                                   "--report junit",
+                                                   "--output /test_output/junit.xml"
+                                                 ])
         end
       end
 
@@ -241,13 +240,13 @@ describe Scan do
 
           reporter_options = Scan::XCPrettyReporterOptionsGenerator.generate_from_scan_config.generate_reporter_options
           expect(reporter_options).to eq([
-            "--report junit",
-            "--output /test_output/junit.xml",
-            "--report html",
-            "--output /test_output/report.html",
-            "--report junit",
-            "--output #{Scan.cache[:temp_junit_report]}"
-          ])
+                                           "--report junit",
+                                           "--output /test_output/junit.xml",
+                                           "--report html",
+                                           "--output /test_output/report.html",
+                                           "--report junit",
+                                           "--output #{Scan.cache[:temp_junit_report]}"
+                                         ])
         end
       end
     end

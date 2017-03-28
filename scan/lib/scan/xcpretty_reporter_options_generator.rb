@@ -62,14 +62,15 @@ module Scan
     end
 
     private
-      def determine_output_file_name(type)
-        if @use_clang_report_name && type == "json-compilation-database"
-          return "compile_commands.json"
-        end
 
-        index = @output_types.index(type)
-        file = @output_files[index]
-        file || "report.#{type}"
+    def determine_output_file_name(type)
+      if @use_clang_report_name && type == "json-compilation-database"
+        return "compile_commands.json"
       end
+
+      index = @output_types.index(type)
+      file = @output_files[index]
+      file || "report.#{type}"
+    end
   end
 end
