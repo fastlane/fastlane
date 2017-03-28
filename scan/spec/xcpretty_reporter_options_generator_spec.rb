@@ -180,6 +180,30 @@ describe Scan do
           expect(reporter_options).to include("--output /test_output/junit.xml")
         end
       end
+
+      context "generator created from Scan.config" do
+        it "generates options for a single reports while using custom_report_file_name" do
+          options = {
+            project: "./scan/examples/standard/app.xcodeproj",
+            output_types: "junit,html",
+            custom_report_file_name: "junit.xml",
+            output_directory: "/test_output"
+          }
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          Scan.cache[:temp_junit_report] = nil
+
+          reporter_options = Scan::XCPrettyReporterOptionsGenerator.generate_from_scan_config.generate_reporter_options
+          expect(reporter_options).to eq([
+            "--report junit",
+            "--output /test_output/junit.xml",
+            "--report html",
+            "--output /test_output/report.html",
+            "--report junit",
+            "--output #{Scan.cache[:temp_junit_report]}"
+          ])
+        end
+      end
     end
   end
 end

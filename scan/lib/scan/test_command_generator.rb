@@ -106,7 +106,6 @@ module Scan
                                                                           Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                                                                           Scan.config[:output_directory],
                                                                           Scan.config[:use_clang_report_name])
-        reporter_options = reporter_options_generator.generate_reporter_options
         return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
       end
 

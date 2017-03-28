@@ -1,6 +1,14 @@
 module Scan
   class XCPrettyReporterOptionsGenerator
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
+    
+    def self.generate_from_scan_config
+      self.new(Scan.config[:open_report],
+               Scan.config[:output_types],
+               Scan.config[:output_files] || Scan.config[:custom_report_file_name],
+               Scan.config[:output_directory],
+               Scan.config[:use_clang_report_name])
+    end
 
     # Intialize with values from Scan.config matching these param names
     def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name)
