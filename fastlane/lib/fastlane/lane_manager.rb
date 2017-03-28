@@ -61,13 +61,17 @@ module Fastlane
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) if !Helper.test? && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)
 
       return ff
+    end
+
+    def self.skip_docs?
+      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # All the finishing up that needs to be done
