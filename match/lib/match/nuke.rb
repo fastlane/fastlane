@@ -26,6 +26,8 @@ module Match
         UI.user_error!("`fastlane match nuke` doesn't delete anything when running with --readonly enabled")
       end
 
+      GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
+
       if (self.certs + self.profiles + self.files).count > 0
         unless params[:skip_confirmation]
           UI.error "---"

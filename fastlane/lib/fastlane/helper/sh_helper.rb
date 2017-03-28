@@ -5,7 +5,7 @@ module Fastlane
     # Just an alias for sh_no_action
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
-    # @param error_callback [Block] a callback invoked with the command ouptut if there is a non-zero exit status
+    # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     def self.sh(command, log: true, error_callback: nil)
       sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
