@@ -16,7 +16,7 @@ module Pilot
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      result = transporter.upload(app.apple_id, package_path)
+      result = transporter.upload(app.apple_id, package_path, options[:retry])
 
       unless result
         UI.user_error!("Error uploading ipa file, for more information see above")
