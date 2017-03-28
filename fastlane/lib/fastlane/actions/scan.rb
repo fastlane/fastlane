@@ -9,6 +9,7 @@ module Fastlane
     class ScanAction < Action
       def self.run(values)
         require 'scan'
+        plist_files_before = []
 
         begin
           destination = values[:destination] # save destination value which can be later overridden
