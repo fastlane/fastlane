@@ -54,6 +54,7 @@ module Gym
         print_full_log_path
         print_xcode_path_instructions
         print_xcode_version
+        raise_legacy_build_api_error(output) if Gym.config[:use_legacy_build_api]
         UI.user_error!("Error building the application - see the log above", error_info: output)
       end
 
@@ -137,6 +138,13 @@ module Gym
         FastlaneCore::PrintTable.print_values(config: values,
                                            hide_keys: [],
                                                title: "Build environment".yellow)
+      end
+
+      def raise_legacy_build_api_error(output)
+        UI.error("You enabled the legacy build API in _gym_")
+        UI.error("This option has been deprecated for about a year")
+        UI.error("and broke with one of the most recent Xcode releases")
+        UI.user_error!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
       end
 
       def print_xcode_path_instructions
