@@ -87,7 +87,7 @@ module Spaceship
           }
         end
 
-        raw_data.set(["versions"], [{ "details" => { "value" => new_versions } }])
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, "details" => { "value" => new_versions}, "id" => raw_data["versions"].first["id"] }])
       end
 
       # transforms user-set intervals to iTC ones
