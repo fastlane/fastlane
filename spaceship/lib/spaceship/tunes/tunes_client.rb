@@ -333,7 +333,6 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      parse_response(r, 'data')
     end
 
     def update_developer_response!(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: "")
@@ -345,7 +344,6 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      parse_response(r, 'data')
     end
 
     def get_reviews(app_id, platform, storefront, versionId = '')
