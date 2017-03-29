@@ -50,12 +50,10 @@ module Spaceship
       # @return (Array) of Review Objects
       def reviews(store_front, versionId = '')
         raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, versionId)
-        reviews = []
-        raw_reviews.each do |review|
+        reviews = raw_reviews.map do |review|
           review["value"]["application"] = self.application
-          reviews << AppReview.factory(review["value"])
+          AppReview.factory(review["value"])
         end
-        reviews
       end
     end
 
@@ -77,11 +75,11 @@ module Spaceship
       })
 
       def create!(text)
-        client.create_developer_response(app_id: application.apple_id, platform: application.platform, review_id: review_id, response: text)
+        client.create_developer_response!(app_id: application.apple_id, platform: application.platform, review_id: review_id, response: text)
       end
 
-      def update(text)
-        client.update_developer_response(app_id: application.apple_id, platform: application.platform, review_id: review_id, response_id: id, response: text)
+      def update!(text)
+        client.update_developer_response!(app_id: application.apple_id, platform: application.platform, review_id: review_id, response_id: id, response: text)
       end
     end
 
@@ -102,10 +100,10 @@ module Spaceship
       attr_accessor :developer_response
 
       attr_mapping({
-        'id'       => :id,
-        'rating'   => :rating,
-        'title'    => :title,
-        'review'   => :review,
+        'id' => :id,
+        'rating' => :rating,
+        'title' => :title,
+        'review' => :review,
         'nickname' => :nickname,
         'storeFront' => :store_front,
         'appVersionString' => :app_version,
@@ -121,10 +119,7 @@ module Spaceship
         def factory(attrs)
           obj = self.new(attrs)
           response_attrs = {}
-
-          if obj.raw_developer_response
-            response_attrs = obj.raw_developer_response
-          end
+          response_attrs = obj.raw_developer_response if obj.raw_developer_response
           response_attrs[:application] = obj.application
           response_attrs[:review_id] = obj.id
           obj.developer_response = DeveloperResponse.factory(response_attrs)
@@ -132,9 +127,8 @@ module Spaceship
         end
       end
 
-      def response?
+      def responded?
         return true if raw_developer_response
-        return false
       end
     end
 

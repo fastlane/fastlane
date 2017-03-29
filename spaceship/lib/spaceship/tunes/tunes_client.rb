@@ -323,7 +323,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def create_developer_response(app_id: nil, platform: nil, review_id: nil, response: "")
+    def create_developer_response!(app_id: nil, platform: nil, review_id: nil, response: "")
       data = {
         responseText: response,
         reviewId: review_id
@@ -336,7 +336,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def update_developer_response(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: "")
+    def update_developer_response!(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: "")
       data = {
         responseText: response
       }
@@ -353,13 +353,13 @@ module Spaceship
       per_page = 100 # apple default
       all_fetched = false
       all_reviews = []
-      until all_fetched
+      loop do
         r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
         all_reviews.concat(parse_response(r, 'data')['reviews'])
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
         else
-          all_fetched = true
+          break
         end
       end
       all_reviews
