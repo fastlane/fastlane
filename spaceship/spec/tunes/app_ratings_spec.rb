@@ -1,6 +1,7 @@
 describe Spaceship::Tunes::AppRatings do
   before { Spaceship::Tunes.login }
   let(:app) { Spaceship::Application.all.first }
+  let(:client) { Spaceship::Application.client }
 
   describe "successfully loads rating summary" do
     it "contains the right information" do
@@ -45,6 +46,29 @@ describe Spaceship::Tunes::AppRatings do
       expect(reviews.first.review).to eq("Review 1")
       expect(reviews.first.last_modified).to eq(1_463_887_020_000)
       expect(reviews.first.nickname).to eq("Reviewer1")
+    end
+  end
+
+  describe "Manages Developer Response" do
+    it "Can Read Response" do
+      TunesStubbing.itc_stub_ratings
+      review = app.ratings.reviews("US").first
+      expect(review.response?).to eq(true)
+      expect(review.developer_response.response).to eq("Thank You")
+    end
+
+    it "Can edit a response" do
+      TunesStubbing.itc_stub_ratings
+      expect(client).to receive(:update_developer_response).with(app_id: app.apple_id, platform: app.platform, review_id: 1_000_000_000, response_id: 28_516, response: "Awesome")
+      review = app.ratings.reviews("US").first
+      review.developer_response.update("Awesome")
+    end
+
+    it "Can add a response" do
+      TunesStubbing.itc_stub_ratings
+      expect(client).to receive(:create_developer_response).with(app_id: app.apple_id, platform: app.platform, review_id: 1_000_000_000, response: "Awesome Dude")
+      review = app.ratings.reviews("US").first
+      review.developer_response.create!("Awesome Dude")
     end
   end
 end
