@@ -323,9 +323,46 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def create_developer_response(app_id: nil, platform: nil, review_id: nil, response: "")
+      data = {
+        responseText: response,
+        reviewId: review_id
+      }
+      r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')
+    end
+
+    def update_developer_response(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: "")
+      data = {
+        responseText: response
+      }
+      r = request(:put) do |req|
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses/#{response_id}"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(r, 'data')
+    end
+
     def get_reviews(app_id, platform, storefront, versionId = '')
-      r = request(:get, "ra/apps/#{app_id}/reviews?platform=#{platform}&storefront=#{storefront}&versionId=#{versionId}")
-      parse_response(r, 'data')['reviews']
+      index = 0
+      per_page = 100 # apple default
+      all_fetched = false
+      all_reviews = []
+      until all_fetched
+        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        all_reviews.concat(parse_response(r, 'data')['reviews'])
+        if all_reviews.count < parse_response(r, 'data')['reviewCount']
+          index += per_page
+        else
+          all_fetched = true
+        end
+      end
+      all_reviews
     end
 
     #####################################################
