@@ -38,15 +38,13 @@ describe Spaceship::Tunes::AppRatings do
       reviews = ratings.reviews("US")
 
       expect(reviews.count).to eq(4)
-      expect(reviews.first).to eq({
-        "id" => 1_000_000_000,
-        "rating" => 2,
-        "title" => "Title 1",
-        "review" => "Review 1",
-        "created" => 1_463_887_020_000,
-        "nickname" => "Reviewer1",
-        "storeFront" => "NZ"
-      })
+      expect(reviews.first.store_front).to eq("NZ")
+      expect(reviews.first.id).to eq(1_000_000_000)
+      expect(reviews.first.rating).to eq(2)
+      expect(reviews.first.title).to eq("Title 1")
+      expect(reviews.first.review).to eq("Review 1")
+      expect(reviews.first.last_modified).to eq(1_463_887_020_000)
+      expect(reviews.first.nickname).to eq("Reviewer1")
     end
   end
 end

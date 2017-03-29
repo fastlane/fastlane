@@ -105,6 +105,7 @@ module Spaceship
         'id'       => :id,
         'rating'   => :rating,
         'title'    => :title,
+        'review'   => :review,
         'nickname' => :nickname,
         'storeFront' => :store_front,
         'appVersionString' => :app_version,
