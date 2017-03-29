@@ -476,6 +476,8 @@ module Spaceship
       # Check if the failure is due to missing permissions (iTunes Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
+      elsif body.to_s.include?("Internal Server Error - Read")
+        raise AppleTimeoutError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
       end
