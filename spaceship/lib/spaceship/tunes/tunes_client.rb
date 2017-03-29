@@ -349,7 +349,6 @@ module Spaceship
     def get_reviews(app_id, platform, storefront, versionId = '')
       index = 0
       per_page = 100 # apple default
-      all_fetched = false
       all_reviews = []
       loop do
         r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
