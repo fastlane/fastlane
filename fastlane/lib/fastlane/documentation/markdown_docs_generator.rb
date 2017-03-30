@@ -1,6 +1,6 @@
 module Fastlane
   class MarkdownDocsGenerator
-    ENHANCER_URL = "https://fastlane-enhancer.herokuapp.com"
+    ENHANCER_URL = "https://enhancer.fastlane.tools"
 
     attr_accessor :categories
 
