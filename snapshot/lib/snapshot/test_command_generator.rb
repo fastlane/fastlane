@@ -32,7 +32,11 @@ module Snapshot
         config = Snapshot.config
 
         options = []
-        options += project_path_array
+        if config[:xctestrun]
+          options << "-xctestrun '#{config[:xctestrun]}'"
+        else
+          options += project_path_array
+        end
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
         options << config[:xcargs] if config[:xcargs]
@@ -50,10 +54,16 @@ module Snapshot
       end
 
       def actions
+        config = Snapshot.config
+
         actions = []
         actions << :clean if Snapshot.config[:clean]
-        actions << :build # https://github.com/fastlane/snapshot/issues/246
-        actions << :test
+        if config[:test_without_building] || config[:xctestrun]
+          actions << "test-without-building"
+        else
+          actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << :test
+        end
 
         actions
       end

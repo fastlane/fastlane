@@ -170,7 +170,21 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :test_target_name,
                                      env_name: "SNAPSHOT_TEST_TARGET_NAME",
                                      description: "The name of the target you want to test (if you desire to override the Target Application from Xcode)",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :test_without_building,
+                                     short_option: "-T",
+                                     env_name: "SNAPSHOT_TEST_WITHOUT_BUILDING",
+                                     description: "Test without building the project",
+                                     is_string: false,
+                                     default_value: false,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xctestrun,
+                                     short_option: "-R",
+                                     env_name: "SCAN_XCTESTRUN",
+                                     description: "Run tests using the provided .xctestrun file",
+                                     is_string: true,
+                                     optional: true
+                                     )
       ]
     end
   end
