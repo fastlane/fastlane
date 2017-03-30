@@ -183,8 +183,7 @@ module Snapshot
                                      env_name: "SCAN_XCTESTRUN",
                                      description: "Run tests using the provided .xctestrun file",
                                      is_string: true,
-                                     optional: true
-                                     )
+                                     optional: true)
       ]
     end
   end

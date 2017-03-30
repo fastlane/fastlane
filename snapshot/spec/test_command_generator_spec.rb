@@ -226,20 +226,20 @@ describe Snapshot do
         Snapshot.config = @config
 
         command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
-          id = command.join('').match(/id=(.+?),/)[1]
-          ios = command.join('').match(/OS=(\d+.\d+)/)[1]
-          expect(command).to eq(
-            [
-              "set -o pipefail &&",
-              "xcodebuild",
-              "-xctestrun './snapshot/example/Example.xctestrun'",
-              "-derivedDataPath 'fake/derived/path'",
-              "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
-              "FASTLANE_SNAPSHOT=YES",
-              "test-without-building",
-              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
-            ]
-          )
+        id = command.join('').match(/id=(.+?),/)[1]
+        ios = command.join('').match(/OS=(\d+.\d+)/)[1]
+        expect(command).to eq(
+          [
+            "set -o pipefail &&",
+            "xcodebuild",
+            "-xctestrun './snapshot/example/Example.xctestrun'",
+            "-derivedDataPath 'fake/derived/path'",
+            "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
+            "FASTLANE_SNAPSHOT=YES",
+            "test-without-building",
+            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+          ]
+        )
       end
     end
   end
