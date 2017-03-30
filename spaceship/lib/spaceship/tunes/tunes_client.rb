@@ -323,7 +323,11 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def create_developer_response!(app_id: nil, platform: nil, review_id: nil, response: "")
+    def create_developer_response!(app_id: nil, platform: "ios", review_id: nil, response: nil)
+      raise "app_id is required" unless app_id
+      raise "review_id is required" unless review_id
+      raise "response is required" unless response
+
       data = {
         responseText: response,
         reviewId: review_id
@@ -335,7 +339,12 @@ module Spaceship
       end
     end
 
-    def update_developer_response!(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: "")
+    def update_developer_response!(app_id: nil, platform: "ios", review_id: nil, response_id: nil, response: nil)
+      raise "app_id is required" unless app_id
+      raise "review_id is required" unless review_id
+      raise "response_id is required" unless response_id
+      raise "response is required" unless response
+
       data = {
         responseText: response
       }
