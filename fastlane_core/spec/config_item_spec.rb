@@ -5,7 +5,6 @@ describe FastlaneCore do
         result = FastlaneCore::ConfigItem.new(key: :foo,
                                      short_option: "-f",
                                      description: "foo")
-        expect(result).to be_a(FastlaneCore::ConfigItem)
         expect(result.key).to eq(:foo)
         expect(result.short_option).to eq("-f")
         expect(result.description).to eq("foo")
