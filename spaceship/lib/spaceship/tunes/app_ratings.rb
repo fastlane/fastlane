@@ -50,7 +50,7 @@ module Spaceship
       # @return (Array) of Review Objects
       def reviews(store_front, versionId = '')
         raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, versionId)
-        reviews = raw_reviews.map do |review|
+        raw_reviews.map do |review|
           review["value"]["application"] = self.application
           AppReview.factory(review["value"])
         end
@@ -129,6 +129,7 @@ module Spaceship
 
       def responded?
         return true if raw_developer_response
+        false
       end
     end
 

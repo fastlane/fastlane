@@ -328,7 +328,7 @@ module Spaceship
         responseText: response,
         reviewId: review_id
       }
-      r = request(:post) do |req|
+      request(:post) do |req|
         req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
@@ -339,7 +339,7 @@ module Spaceship
       data = {
         responseText: response
       }
-      r = request(:put) do |req|
+      request(:put) do |req|
         req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses/#{response_id}"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
