@@ -9,7 +9,7 @@ if Gem::Version.new(FastlaneCore::Helper.xcode_version) < Gem::Version.new("8.3"
       allow(Gym).to receive(:project).and_return(@project)
     end
 
-    describe Gym::PackageCommandGeneratorLegacy, now: true do
+    describe Gym::PackageCommandGeneratorLegacy do
       it "works with the example project with no additional parameters" do
         options = { project: "./gym/examples/standard/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
