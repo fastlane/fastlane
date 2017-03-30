@@ -143,7 +143,9 @@ module Gym
       def raise_legacy_build_api_error(output)
         UI.error("You enabled the legacy build API in _gym_")
         UI.error("This option has been deprecated for about a year")
-        UI.error("and broke with one of the most recent Xcode releases")
+        UI.error("and was removed with Xcode 8.3")
+        UI.error("Please update your Fastfile to include the export_type too")
+        UI.error("more information about how to migrate away: https://github.com/fastlane/fastlane/releases/tag/2.24.0")
         UI.user_error!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
       end
 
