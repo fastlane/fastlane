@@ -363,3 +363,37 @@ password has been deleted.
 ## Gitignore
 
 The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md).
+
+## Directory behavior
+
+_fastlane_ was designed in a way that you can run _fastlane_ from both the root directory of the project, and from the `fastlane` sub-folder.
+
+Take this example `Fastfile` on the path `fastlane/Fastfile`
+```ruby
+sh "pwd" # => "[root]/fastlane"
+puts Dir.pwd # => "[root]/fastlane"
+
+lane :something do
+  sh "pwd" # => "[root]/fastlane"
+  puts Dir.pwd # => "[root]/fastlane"
+
+  my_action
+end
+```
+
+The implementation of `my_action` looks like this:
+```ruby
+def run(params)
+  puts Dir.pwd # => "[root]"
+end
+```
+
+Notice how every action and every plugin's code runs in the root of the project, while all user code from the `Fastfile` runs inside the `fastlane` directory. This is important to consider when migrating existing code from your `Fastfile` into your own action or plugin. To change the directory manually you can use standard Ruby blocks:
+
+```ruby
+Dir.chdir("..") do
+  # code here runs in the parent directory
+end
+```
+
+This behavior isn't great, and has been like this since the very early days of _fastlane_. As much as we'd like to change it, there is no good way to do so, without breaking thousands of production setups, so we decided to keep it as is for now.
