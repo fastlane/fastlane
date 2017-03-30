@@ -51,7 +51,7 @@ module Snapshot
 
       def actions
         actions = []
-        actions << :clean if Snapshot.config[:clean]
+        actions << :clean if Snapshot.config[:clean] || clean_from_first_run?
         actions << :build # https://github.com/fastlane/snapshot/issues/246
         actions << :test
 
@@ -118,6 +118,10 @@ module Snapshot
 
       def derived_data_path
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
+      end
+
+      def clean_from_first_run?
+        Snapshot.config[:clean_first_build] && Snapshot.cache[:current_run] == 1
       end
     end
   end

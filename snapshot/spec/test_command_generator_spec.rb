@@ -206,6 +206,34 @@ describe Snapshot do
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
       end
+
+      context "clean on first build" do
+        context "with option true" do
+          before { configure options.merge(clean_first_build: true) }
+
+          it "cleans on first build" do
+            Snapshot.cache[:current_run] = 1
+            command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+            expect(command).to include(:clean)
+          end
+
+          it "does not clean on second build" do
+            Snapshot.cache[:current_run] = 2
+            command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+            expect(command).to_not include(:clean)
+          end
+        end
+
+        context "with option false" do
+          before { configure options.merge(clean_first_build: false) }
+
+          it "does not clean on first build if option false" do
+            Snapshot.cache[:current_run] = 1
+            command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+            expect(command).to_not include(:clean)
+          end
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
