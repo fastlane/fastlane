@@ -32,7 +32,7 @@ describe FastlaneCore do
        env_name: "asdf",
     description: "Set the profile name."
           )], {})
-        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well"
+        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name"
       end
 
       describe "config conflicts" do
