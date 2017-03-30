@@ -59,6 +59,7 @@ module Frameit
     end
 
     # Make sure the paths/colors are valid
+    # rubocop:disable Metrics/PerceivedComplexity
     def validate_values(values)
       values.each do |key, value|
         if value.kind_of?(Hash)
@@ -87,9 +88,12 @@ module Frameit
             UI.user_error! "show_complete_frame must be a Boolean" unless [true, false].include?(value)
           when 'font_scale_factor'
             UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
+          when 'font_height_factor'
+            UI.user_error!("font_height_factor must be numeric") unless value.kind_of?(Numeric)
           end
         end
       end
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

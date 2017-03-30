@@ -217,12 +217,12 @@ module Frameit
       vertical_padding = vertical_frame_padding
       keyword_top_space = vertical_padding
 
-      spacing_between_title_and_keyword = (title.height / 2)
-      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
+      spacing_between_title_and_keyword = (text_height(title) / 2)
+      title_top_space = vertical_padding + text_height(keyword) + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title_width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
 
-      self.top_space_above_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
+      self.top_space_above_device += text_height(title) + text_height(keyword) + spacing_between_title_and_keyword + vertical_padding
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose "Over"
@@ -266,7 +266,7 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding
-      top_space = vertical_padding + (actual_font_size - title.height) / 2
+      top_space = vertical_padding + (actual_font_size - text_height(title)) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
       self.top_space_above_device += actual_font_size + vertical_padding
@@ -292,6 +292,14 @@ module Frameit
     def actual_font_size
       font_scale_factor = fetch_config['font_scale_factor'] || 0.1
       [@image.width * font_scale_factor].max.round
+    end
+
+    def text_height(text)
+      font_height_factor = fetch_config['font_height_factor']
+      if font_height_factor
+        return [actual_font_size * font_height_factor].max.round
+      end
+      text.height
     end
 
     # The space between the keyword and the title
