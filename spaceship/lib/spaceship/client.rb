@@ -97,6 +97,9 @@ module Spaceship
     # Raised when 401 is received from portal request
     class UnauthorizedAccessError < BasicPreferredInfoError; end
 
+    # Raised when 500 is received from iTunes Connect
+    class InternalServerError < BasicPreferredInfoError; end
+
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
     # on.
@@ -476,6 +479,8 @@ module Spaceship
       # Check if the failure is due to missing permissions (iTunes Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
+      elsif body.to_s.include?("Internal Server Error - Read")
+        raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
       end
