@@ -16,6 +16,8 @@ module Gym
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
+        return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
+
         package_app
         fix_package
         compress_and_move_dsym
