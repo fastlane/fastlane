@@ -18,7 +18,7 @@ module Fastlane
         zipped_bundle = Actions::ZipAction.run(path: app_path,
                                         output_path: File.join(tmp_path, "Result.zip"))
 
-        Actions::AppetizeAction.run(path: zipped_bundle,
+        other_action.appetize(path: zipped_bundle,
                                api_token: params[:api_token])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
