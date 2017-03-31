@@ -54,9 +54,9 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and exits the program' do
-            expect(ui).to receive(:user_error!).with("Tests failed", show_github_issues: false).and_call_original
+            expect(ui).to receive(:test_failure!).with("Tests failed for locale en-US on device #{device_serial}").and_call_original
 
-            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_error
+            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
           end
         end
 
