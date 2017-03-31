@@ -77,11 +77,12 @@ module Screengrab
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
       devices.reject! do |device|
         [
-          'server is out of date',   # The adb server is out of date and must be restarted
-          'unauthorized',            # The device has not yet accepted ADB control
-          'offline',                 # The device is offline, skip it
-          '* daemon',                # Messages printed when the daemon is starting up
-          'List of devices attached' # Header of table for data we want
+          'server is out of date',    # The adb server is out of date and must be restarted
+          'unauthorized',             # The device has not yet accepted ADB control
+          'offline',                  # The device is offline, skip it
+          '* daemon',                 # Messages printed when the daemon is starting up
+          'List of devices attached', # Header of table for data we want
+          "doesn't match this client" # Message printed when there is an ADB client/server version mismatch
         ].any? { |status| device.include? status }
       end
 
