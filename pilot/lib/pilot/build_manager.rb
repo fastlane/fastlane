@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 module Pilot
   class BuildManager < Manager
     def upload(options)
@@ -9,10 +11,12 @@ module Pilot
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
+      dir = Dir.mktmpdir
+
       platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
-                                                                  package_path: "/tmp",
+                                                                  package_path: dir,
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
