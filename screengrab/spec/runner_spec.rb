@@ -115,6 +115,22 @@ describe Screengrab::Runner do
       end
     end
 
+    context 'one device with spurious ADB output mixed in' do
+      it 'finds an active device' do
+        adb_response = <<-ADB_OUTPUT.strip_heredoc
+          List of devices attached
+          adb server version (39) doesn't match this client (36); killing...
+          * daemon started successfully
+          T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
+
+
+        ADB_OUTPUT
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
+
+        expect(@runner.select_device).to eq('T065002LTT')
+      end
+    end
+
     context 'one device' do
       it 'finds an active device' do
         adb_response = <<-ADB_OUTPUT.strip_heredoc
