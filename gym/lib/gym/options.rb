@@ -86,7 +86,7 @@ module Gym
                                      env_name: "GYM_SKIP_PACKAGE_IPA",
                                      description: "Should we skip packaging the ipa?",
                                      is_string: false,
-                                     optional: true),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",

@@ -12,31 +12,30 @@ module Gym
         build_app
       end
       verify_archive
-      output_path = File.expand_path(Gym.config[:output_directory])
-      FileUtils.mkdir_p(output_path)
+      FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
-        if Gym.config[:skip_package_ipa]
-          return BuildCommandGenerator.archive_path
-        end
+        return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
+
         package_app
         fix_package
         compress_and_move_dsym
-        output_path = move_ipa
+        path = move_ipa
         move_manifest
         move_app_thinning
         move_app_thinning_size_report
         move_apps_folder
       elsif Gym.project.mac?
+        path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app?
           copy_mac_app
-          return output_path
+          return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
-      output_path
+      path
     end
 
     #####################################################
