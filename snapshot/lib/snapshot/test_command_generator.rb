@@ -109,7 +109,7 @@ module Snapshot
       end
 
       def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
-        name_components = [ Snapshot.project.app_name, Snapshot.config[:scheme] ]
+        name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
         name_components << device_type if device_type
         name_components << language if language
         name_components << locale if locale

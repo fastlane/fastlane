@@ -239,7 +239,7 @@ describe Snapshot do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: nil)
         expect(log_path).to eq(
-          "#{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log")}"
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log").to_s
         )
       end
 
@@ -247,7 +247,7 @@ describe Snapshot do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: "pt_BR")
         expect(log_path).to eq(
-          "#{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log")}"
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log").to_s
         )
       end
 
@@ -255,7 +255,7 @@ describe Snapshot do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path
         expect(log_path).to eq(
-          "#{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")}"
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s
         )
       end
     end
