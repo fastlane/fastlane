@@ -132,7 +132,7 @@ fastlane screengrab --help
 
 # Tips
 
-# UI Tests
+## UI Tests
 
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
@@ -168,6 +168,10 @@ When using JUnit 3 you'll need to add a bit more code:
 - Use `Screengrab.screenshot("name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
 
 If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup.
+
+## Clean Status Bar
+
+You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
