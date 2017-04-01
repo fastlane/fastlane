@@ -144,7 +144,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee -a #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
             ]
           )
         end
@@ -167,7 +167,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee -a #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
             ]
           )
         end
@@ -189,7 +189,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee -a #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
             ]
           )
         end
@@ -226,7 +226,7 @@ describe Snapshot do
             "FASTLANE_SNAPSHOT=YES",
             :build,
             :test,
-            "| tee -a #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS.log")} | xcpretty "
+            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS.log")} | xcpretty "
           ]
         )
       end
