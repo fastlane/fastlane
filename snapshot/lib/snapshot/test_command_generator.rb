@@ -2,7 +2,7 @@ module Snapshot
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
     class << self
-      def generate(device_type: nil)
+      def generate(device_type: nil, language: nil, locale: nil)
         parts = prefix
         parts << "xcodebuild"
         parts += options
@@ -10,7 +10,7 @@ module Snapshot
         parts += build_settings
         parts += actions
         parts += suffix
-        parts += pipe
+        parts += pipe(device_type, language, locale)
 
         parts
       end
@@ -62,8 +62,8 @@ module Snapshot
         []
       end
 
-      def pipe
-        ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+      def pipe(device_type, language, locale)
+        ["| tee #{xcodebuild_log_path(device_type: device_type, language: language, locale: locale).shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
       def find_device(device_name, os_version = Snapshot.config[:ios_version])
