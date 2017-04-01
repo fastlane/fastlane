@@ -171,7 +171,7 @@ module Snapshot
 
       open_simulator_for_device(device_type)
 
-      command = TestCommandGenerator.generate(device_type: device_type)
+      command = TestCommandGenerator.generate(device_type: device_type, language: language, locale: locale)
 
       if locale
         UI.header("#{device_type} - #{language} (#{locale})")
@@ -208,7 +208,7 @@ module Snapshot
                                                 end
                                               end)
 
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
+      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
 
       dir_name = locale || language
 
