@@ -63,7 +63,7 @@ module Snapshot
       end
 
       def pipe
-        ["| tee -a #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+        ["| tee #{xcodebuild_log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
       def find_device(device_name, os_version = Snapshot.config[:ios_version])
