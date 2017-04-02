@@ -125,14 +125,10 @@ module Fastlane
     def self.choose_lane(ff, platform)
       available = []
 
-      if platform
-        available = ff.runner.lanes[platform.to_sym].to_a.reject { |lane| lane.last.is_private }
-      else
-        # If we still have no platform here, try all supported.
-        # This can be the case if no default platform is given, when multiple platforms are available and plain "fastlane" is called.
-        Fastlane::SupportedPlatforms.all.each do |platform|
-          available += ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
-        end
+      # nil is the key for lanes that are not under a specific platform
+      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms.each do |p|
+        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
       end
 
       if available.empty?
