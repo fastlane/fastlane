@@ -62,7 +62,7 @@ module FastlaneCore
           end
         end
 
-        true
+        destination
       end
 
       private

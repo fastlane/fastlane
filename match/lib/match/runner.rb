@@ -8,7 +8,7 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
+      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch], git_full_name: params[:git_full_name], git_user_email: params[:git_user_email])
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username])
@@ -74,6 +74,7 @@ module Match
       if certs.count == 0 or keys.count == 0
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
         cert_path = Generator.generate_certificate(params, cert_type)
         self.changes_to_commit = true
       else
@@ -127,6 +128,8 @@ module Match
           UI.error "If you are certain that a profile should exist, double-check the recent changes to your match repository"
           UI.user_error! "No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information."
         end
+
+        GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
@@ -134,7 +137,7 @@ module Match
         self.changes_to_commit = true
       end
 
-      FastlaneCore::ProvisioningProfile.install(profile)
+      installed_profile = FastlaneCore::ProvisioningProfile.install(profile)
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
@@ -162,6 +165,11 @@ module Match
                                                                                     type: prov_type,
                                                                                 platform: params[:platform]),
                              parsed["Name"])
+
+      Utils.fill_environment(Utils.environment_variable_name_profile_path(app_identifier: app_identifier,
+                                                                                    type: prov_type,
+                                                                                platform: params[:platform]),
+                             installed_profile)
 
       return uuid
     end

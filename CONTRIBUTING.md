@@ -13,6 +13,10 @@ Some people might also use the [_fastlane_ tag on StackOverflow](https://stackov
 - To start working on _fastlane_, check out [YourFirstPR.md][firstpr]
 - For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
 
+### Google Contributor License Agreement (CLA)
+Upon your first pull request to _fastlane_, the [googlebot](https://github.com/googlebot) will ask you to sign the Google Contributor License Agreement. Once the CLA has been accepted, the PR will be available to merge and you will not be asked to sign it again unless your GitHub username or email address changes.
+
+
 ### New Actions
 
 Please be aware that we don’t accept submissions for new actions at the moment. You can find more information about that [here][submit action].
@@ -26,6 +30,17 @@ Thanks! We would really appreciate the help! Feel free to read our document on h
 It's not you, it's us! _fastlane_ and its related tools receive a lot of issues and PRs. In order to effectively work through them and give each the prompt attention it deserves, we need to keep a sharp focus on the work we have outstanding.
 
 One way we do this is by closing issues that we don't feel are immediately actionable. This might mean that we need more information in order to investigate. Or, it might mean that we haven't been able to reproduce it using the provided info. In this case we might close the issue while we wait for others to reproduce the problem and possibly provide some more info that unlocks the mystery.
+
+<a id="fastlane-bot"/>
+
+Another way we do this is by having an [automated bot](https://github.com/fastlane/issue-bot) go through our issues and PRs. The main goal of the bot is to ensure that the issues are still relevant and reproducible. Issues can be opened, and later fall idle for a variety of reasons:
+
+* The user later decided not to use _fastlane_
+* A workaround was found, making it a low priority for the user
+* The user changed projects and/or companies
+* A new version of _fastlane_ has been released that fixed the problem
+
+No matter the reason, the _fastlane_ bot will ask for confirmation that an issue is still relevant after two months of inactivity. If the ticket becomes active again, it will remain open. If another 10 days pass with no activity, however, the ticket will be automatically closed.
 
 In any case, **a closed issue is not necessarily the end of the story!** If more info becomes available after an issue is closed, it can be reopened for further consideration.
 

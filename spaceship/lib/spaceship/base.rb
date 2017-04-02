@@ -24,6 +24,10 @@ module Spaceship
         @hash = hash || {}
       end
 
+      def key?(key)
+        @hash.key?(key)
+      end
+
       def get(*keys)
         lookup(keys)
       end

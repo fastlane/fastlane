@@ -54,9 +54,9 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and exits the program' do
-            expect(ui).to receive(:user_error!).with("Tests failed", show_github_issues: false).and_call_original
+            expect(ui).to receive(:test_failure!).with("Tests failed for locale en-US on device #{device_serial}").and_call_original
 
-            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_error
+            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
           end
         end
 
@@ -112,6 +112,22 @@ describe Screengrab::Runner do
         expect(ui).to receive(:user_error!).with(/no connected.* devices/).and_call_original
 
         expect { @runner.select_device }.to raise_fastlane_error
+      end
+    end
+
+    context 'one device with spurious ADB output mixed in' do
+      it 'finds an active device' do
+        adb_response = <<-ADB_OUTPUT.strip_heredoc
+          List of devices attached
+          adb server version (39) doesn't match this client (36); killing...
+          * daemon started successfully
+          T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
+
+
+        ADB_OUTPUT
+        mock_adb_response_for_command(adb_list_devices_command, adb_response)
+
+        expect(@runner.select_device).to eq('T065002LTT')
       end
     end
 

@@ -26,6 +26,7 @@ module Match
       {
         Utils.environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) => "Profile UUID",
         Utils.environment_variable_name_profile_name(app_identifier: app_identifier, type: type, platform: platform) => "Profile Name",
+        Utils.environment_variable_name_profile_path(app_identifier: app_identifier, type: type, platform: platform) => "Profile Path",
         Utils.environment_variable_name_team_id(app_identifier: app_identifier, type: type, platform: platform) => "Development Team ID"
       }.each do |env_key, name|
         rows << [name, env_key, ENV[env_key]]

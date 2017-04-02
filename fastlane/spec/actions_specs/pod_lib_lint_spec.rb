@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Pod Lib Lint action" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "generates the correct pod lib lint command with no parameters" do
         result = Fastlane::FastFile.new.parse("lane :test do
           pod_lib_lint

@@ -133,6 +133,7 @@ describe Fastlane do
       end
 
       it "runs the action as expected if the plugin is available" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         # We don't need to set this, since this method shouldn't even be called when the plugin is available
         # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
 
@@ -201,6 +202,7 @@ describe Fastlane do
       end
 
       it "shows an appropriate error message when a plugin is really broken" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ex = ScriptError.new
         pm = Fastlane::PluginManager.new
         plugin_name = "broken"
