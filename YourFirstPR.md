@@ -16,7 +16,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 - Clone your fork:
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
-  - Run `bundle install` in the project root
+  - Run `bundle install --path .bundle` in the project root
   - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
   - If there are dependency errors, you might also need to run `bundle update`
 - Create a new branch to work on:
