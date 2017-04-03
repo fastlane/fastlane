@@ -99,6 +99,7 @@ describe Fastlane do
       end
 
       it "gets the version from a podspec file" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           version_get_podspec(path: './fastlane/spec/fixtures/podspecs/test.podspec')
         end").runner.execute(:test)
@@ -109,6 +110,7 @@ describe Fastlane do
 
     describe "version_bump_podspec" do
       before do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         @podspec_path = './fastlane/spec/fixtures/podspecs/test.podspec'
       end
 

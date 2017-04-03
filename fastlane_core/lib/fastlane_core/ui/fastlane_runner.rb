@@ -66,6 +66,15 @@ module Commander
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
+      rescue Errno::ENOENT => e
+        # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
+        puts ""
+        FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
+        FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
+        puts ""
+        raise e
+      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        display_user_error!(e, e.to_s)
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e

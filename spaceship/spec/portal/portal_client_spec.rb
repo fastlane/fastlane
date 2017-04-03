@@ -194,6 +194,45 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#provisioning_profiles' do
+      it 'makes a call to the developer portal API' do
+        profiles = subject.provisioning_profiles
+        expect(profiles).to be_instance_of(Array)
+        expect(profiles.sample.keys).to include("provisioningProfileId",
+                                                "name",
+                                                "status",
+                                                "type",
+                                                "distributionMethod",
+                                                "proProPlatform",
+                                                "version",
+                                                "dateExpire",
+                                                "managingApp",
+                                                "deviceIds",
+                                                "certificateIds")
+        expect(a_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action')).to have_been_made
+      end
+    end
+
+    describe '#provisioning_profiles_via_xcode_api' do
+      it 'makes a call to the developer portal API' do
+        profiles = subject.provisioning_profiles_via_xcode_api
+        expect(profiles).to be_instance_of(Array)
+        expect(profiles.sample.keys).to include("provisioningProfileId",
+                                                "name",
+                                                "status",
+                                                "type",
+                                                "distributionMethod",
+                                                "proProPlatform",
+                                                "version",
+                                                "dateExpire",
+                                                # "managingApp", not all profiles have it
+                                                "deviceIds",
+                                                "appId",
+                                                "certificateIds")
+        expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
+      end
+    end
+
     describe "#create_provisioning_profile" do
       it "works when the name is free" do
         response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'])

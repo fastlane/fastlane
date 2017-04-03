@@ -25,6 +25,7 @@ describe Fastlane do
       end
 
       it "doesn't expose the private lanes in `fastlane lanes`" do
+        require 'fastlane/lane_list'
         result = Fastlane::LaneList.generate(path)
         expect(result).to include("such smooth")
         expect(result).to_not include("private call")

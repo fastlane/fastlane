@@ -27,7 +27,7 @@ module Fastlane
 
         changelog = params[:changelog]
         unless changelog
-          path = "./fastlane/changelog.txt"
+          path = default_changelog_path
           UI.message("Looking for changelog in '#{path}'...")
           if File.exist? path
             changelog = File.read(path)
@@ -65,6 +65,10 @@ module Fastlane
         UI.success("👼 Successfully pushed the new changelog to #{v.url}")
       end
 
+      def self.default_changelog_path
+        File.join(FastlaneCore::FastlaneFolder.path.to_s, 'changelog.txt')
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -76,7 +80,7 @@ module Fastlane
       def self.details
         [
           "This is useful if you have only one changelog for all languages.",
-          "You can store the changelog in `./fastlane/changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages."
+          "You can store the changelog in `#{default_changelog_path}` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages."
         ].join("\n")
       end
 

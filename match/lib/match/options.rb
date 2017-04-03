@@ -64,6 +64,16 @@ module Match
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :git_full_name,
+                                     env_name: "MATCH_GIT_FULL_NAME",
+                                     description: "git user full name to commit",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :git_user_email,
+                                     env_name: "MATCH_GIT_USER_EMAIL",
+                                     description: "git user email to commit",
+                                     optional: true,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "FASTLANE_TEAM_NAME",

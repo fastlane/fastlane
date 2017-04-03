@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Hockey Integration" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "raises an error if no build file was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

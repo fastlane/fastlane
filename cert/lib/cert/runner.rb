@@ -146,11 +146,12 @@ module Cert
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
+        type_name = (Cert.config[:development] ? "Development" : "Distribution")
         if ex.to_s.include?("You already have a current")
-          type_name = (Cert.config[:development] ? "Development" : "Distribution")
           UI.user_error!("Could not create another #{type_name} certificate, reached the maximum number of available #{type_name} certificates.", show_github_issues: true)
+        elsif ex.to_s.include?("You are not allowed to perform this operation.") && type_name == "Distribution"
+          UI.user_error!("You do not have permission to create this certificate. Only Team Admins can create Distribution certificates\n 🔍 See https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html for more information.")
         end
-
         raise ex
       end
 

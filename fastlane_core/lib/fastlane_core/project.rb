@@ -131,17 +131,23 @@ module FastlaneCore
         elsif Helper.is_ci?
           UI.error("Multiple schemes found but you haven't specified one.")
           UI.error("Since this is a CI, please pass one using the `scheme` option")
+          show_scheme_shared_information
           UI.user_error!("Multiple schemes found")
         else
           puts "Select Scheme: "
           options[:scheme] = choose(*schemes)
         end
       else
-        UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
-        UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
+        show_scheme_shared_information
 
         UI.user_error!("No Schemes found")
       end
+    end
+
+    def show_scheme_shared_information
+      UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
+      UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
+      UI.error("Afterwards make sure to commit the changes into version control")
     end
 
     # Get all available configurations in an array

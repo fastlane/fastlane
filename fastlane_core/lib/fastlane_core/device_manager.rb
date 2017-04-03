@@ -224,7 +224,11 @@ module FastlaneCore
         logs_destination_dir = File.expand_path(logs_destination_dir)
         os_version = FastlaneCore::CommandExecutor.execute(command: 'sw_vers -productVersion', print_all: false, print_command: false)
 
-        if Gem::Version.new(os_version) >= Gem::Version.new('10.12.0')
+        host_computer_supports_logarchives = Gem::Version.new(os_version) >= Gem::Version.new('10.12.0')
+        device_supports_logarchives = Gem::Version.new(device.os_version) >= Gem::Version.new('10.0')
+
+        are_logarchives_supported = device_supports_logarchives && host_computer_supports_logarchives
+        if are_logarchives_supported
           copy_logarchive(device, log_identity, logs_destination_dir)
         else
           copy_logfile(device, log_identity, logs_destination_dir)

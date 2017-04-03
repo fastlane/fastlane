@@ -6,7 +6,7 @@ module Snapshot
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       sure = true if FastlaneCore::Env.truthy?("SNAPSHOT_FORCE_DELETE") || force
-      sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! (y/n)".red, true) unless sure
+      sure = UI.confirm("Are you sure? All your simulators will be DELETED and new ones will be created!") unless sure
       UI.user_error!("User cancelled action") unless sure
 
       devices.each do |device|

@@ -26,6 +26,8 @@ module Match
         UI.user_error!("`fastlane match nuke` doesn't delete anything when running with --readonly enabled")
       end
 
+      GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
+
       if (self.certs + self.profiles + self.files).count > 0
         unless params[:skip_confirmation]
           UI.error "---"
@@ -35,7 +37,7 @@ module Match
           UI.error "Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!" if had_app_identifier
           UI.error "---"
         end
-        if params[:skip_confirmation] || agree("(y/n)", true)
+        if params[:skip_confirmation] || UI.confirm("Do you really want to nuke everything listed above?")
           nuke_it_now!
           UI.success "Successfully cleaned your account ♻️"
         else
