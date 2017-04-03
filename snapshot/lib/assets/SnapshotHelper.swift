@@ -141,11 +141,7 @@ open class Snapshot: NSObject {
                 print("Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable.")
                 return nil
             }
-            guard let homeDirUrl = URL(string: simulatorHostHome) else {
-                print("Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?")
-                return nil
-            }
-            homeDir = homeDirUrl
+            homeDir = URL(fileURLWithPath: simulatorHostHome)
         #endif
         return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
