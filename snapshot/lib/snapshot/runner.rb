@@ -292,6 +292,7 @@ module Snapshot
 
     # rubocop:disable Style/Next
     def verify_helper_is_current
+      return if Snapshot.config[:skip_helper_version_check]
       current_version = version_of_bundled_helper
       UI.verbose "Checking that helper files contain #{current_version}"
 
