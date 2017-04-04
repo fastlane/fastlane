@@ -45,8 +45,6 @@ module Spaceship
     def handle_two_factor(response)
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
       puts "Two Factor Authentication for account '#{self.user}' is enabled"
-      puts "If you're running this in a non-interactive session (e.g. server or CI)"
-      puts "check out #{two_factor_url}"
 
       if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
         puts "If you're running this in a non-interactive session (e.g. server or CI)"
