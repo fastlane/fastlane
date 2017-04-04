@@ -21,7 +21,7 @@ module Gym
       UI.error '     gym(scheme: "MyScheme", export_method: "development")'
       UI.important "== In-House Enterprise Builds =="
       UI.error '     gym(scheme: "MyScheme", export_method: "enterprise")'
-      UI.important "If you run into a code signing error, please check out our troubleshooting guide and common issue and how to solve them."
+      UI.important "If you run into a code signing error, please check out our troubleshooting guide for more information on how to solve the most common issues"
       UI.error "    https://docs.fastlane.tools/codesigning/troubleshooting/ 🚀"
       UI.important ""
       UI.user_error! "legacy_build_api removed!"
