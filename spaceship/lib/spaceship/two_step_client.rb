@@ -48,6 +48,14 @@ module Spaceship
       puts "If you're running this in a non-interactive session (e.g. server or CI)"
       puts "check out #{two_factor_url}"
 
+      if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
+        puts "If you're running this in a non-interactive session (e.g. server or CI)"
+        puts "check out #{two_factor_url}"
+      else
+        # If the cookie is set but still required, the cookie is expired
+        puts "Your session cookie has been expired."
+      end
+
       security_code = response.body["securityCode"]
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,
