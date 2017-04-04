@@ -10,7 +10,7 @@ module Fastlane
 
       def self.run(params)
         if is_git?
-          command = 'git rev-list HEAD --count'
+          command = 'git rev-list --all --count'
         else
           UI.user_error!("Not in a git repository.")
         end
