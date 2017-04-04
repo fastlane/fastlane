@@ -87,7 +87,7 @@ module Spaceship
           }
         end
 
-        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, "details" => { "value" => new_versions }, "id" => raw_data["versions"].first["id"] }])
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, contentHosting: raw_data['versions'].first['contentHosting'], "details" => { "value" => new_versions }, "id" => raw_data["versions"].first["id"] }])
       end
 
       # transforms user-set intervals to iTC ones
@@ -155,7 +155,7 @@ module Spaceship
           }
         end
 
-        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, "details" => { "value" => versions_array }, id: raw_data["versions"].first["id"] }])
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, contentHosting: raw_data['versions'].first[:contentHosting], "details" => { "value" => versions_array }, id: raw_data["versions"].first["id"] }])
 
         # transform pricingDetails
         intervals_array = []
