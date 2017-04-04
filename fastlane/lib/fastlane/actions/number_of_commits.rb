@@ -34,7 +34,7 @@ module Fastlane
       end
 
       def self.authors
-        ["onevcat"]
+        ["onevcat", "samuelbeek"]
       end
 
       def self.is_supported?(platform)
