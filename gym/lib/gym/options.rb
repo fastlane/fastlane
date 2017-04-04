@@ -10,7 +10,8 @@ module Gym
     end
 
     def self.legacy_api_note
-      UI.important "Unfortunately the legacy build API was removed with Xcode 8.3. Please make sure to remove use_legacy_build_api from your ./fastlane/Fastfile"
+      UI.important "Unfortunately the legacy build API was removed with Xcode 8.3."
+      UI.important "Please make sure to remove use_legacy_build_api from your ./fastlane/Fastfile"
       UI.important "and update the gym call to include the export method like this:"
       UI.important "== App Store Builds =="
       UI.error '     gym(scheme: "MyScheme", export_method: "app-store")'
