@@ -65,6 +65,14 @@ describe Fastlane do
             expect(ENV["FASTLANE_TEST_ENV_PLATFORM"]).to eq("android")
           end
         end
+
+        context "with environment variable in lane" do
+          it "Do not set environment variable" do
+            expect(ENV["FASTLANE_INNER_ENV"]).to be_nil
+            @ff.runner.execute('inner_env', 'ios')
+            expect(ENV["FASTLANE_INNER_ENV"]).to be_nil
+          end
+        end
       end
     end
 

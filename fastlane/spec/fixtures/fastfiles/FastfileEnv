@@ -10,6 +10,10 @@ platform :ios do
   lane :echo do
     puts 'ios'
   end
+
+  lane :inner_env do
+    env 'FASTLANE_INNER_ENV', true
+  end
 end
 
 platform :android do
