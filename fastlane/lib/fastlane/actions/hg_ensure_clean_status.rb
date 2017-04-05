@@ -17,7 +17,7 @@ module Fastlane
       end
 
       def self.description
-        "Raises an exception if there are uncommited hg changes"
+        "Raises an exception if there are uncommitted hg changes"
       end
 
       def self.details

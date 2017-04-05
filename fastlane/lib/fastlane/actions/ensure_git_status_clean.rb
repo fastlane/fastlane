@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.description
-        "Raises an exception if there are uncommited git changes"
+        "Raises an exception if there are uncommitted git changes"
       end
 
       def self.details

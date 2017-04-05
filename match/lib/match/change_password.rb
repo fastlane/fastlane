@@ -27,7 +27,7 @@ module Match
         else
           return password
         end
-        UI.error("Passhprases differ. Try again")
+        UI.error("Passphrases differ. Try again")
       end
     end
 
