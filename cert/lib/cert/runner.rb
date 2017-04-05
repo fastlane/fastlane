@@ -169,7 +169,7 @@ module Cert
         p12_cert_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
         p12 = OpenSSL::PKCS12.create(Cert.config[:p12_password], type_name, pkey, certificate.download)
         File.write(p12_cert_path, p12.to_der)
-        UI.message("p12 certificate: #{p12_cert_path}")
+        UI.success "p12 certificate: #{p12_cert_path}"
       end
 
       # Import all the things into the Keychain
