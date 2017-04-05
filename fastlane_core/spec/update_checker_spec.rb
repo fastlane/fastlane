@@ -43,11 +43,11 @@ describe FastlaneCore do
       end
 
       it "works a custom gem name" do
-        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem update gym")
+        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem install gym")
       end
 
       it "works with system ruby" do
-        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem update fastlane")
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem install fastlane")
       end
 
       it "works with bundler" do
@@ -103,24 +103,24 @@ describe FastlaneCore do
       end
 
       it "generated the correct URL with no parameters, no platform value and no p_hash" do
-        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://fastlane-refresher.herokuapp.com/fastlane")
+        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://refresher.fastlane.tools/fastlane")
       end
 
       it "uses the bundle identifier and hashes the value if available" do
         ENV["PILOT_APP_IDENTIFIER"] = "com.krausefx.app"
-        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://fastlane-refresher.herokuapp.com/fastlane?p_hash=50925b8f18defc356dad507b1729bc185f9582513537346424b0be09b1f12b2f&platform=ios")
+        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://refresher.fastlane.tools/fastlane?p_hash=50925b8f18defc356dad507b1729bc185f9582513537346424b0be09b1f12b2f&platform=ios")
       end
 
       describe "#platform" do
         it "ios" do
           FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
-            expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://fastlane-refresher.herokuapp.com/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://refresher.fastlane.tools/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
           end
         end
 
         it "android" do
           FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
-            expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://fastlane-refresher.herokuapp.com/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+            expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://refresher.fastlane.tools/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
           end
         end
       end

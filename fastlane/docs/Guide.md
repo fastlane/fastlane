@@ -1,12 +1,14 @@
 This guide will help you get started with `fastlane` in no time :rocket:
 
 -------
+
 <p align="center">
     <a href="#installation">Installation</a> &bull;
     <a href="#setting-up-fastlane">Setting up</a> &bull;
     <a href="#example-projects">Example Projects</a> &bull;
     <a href="#help">Help</a>
 </p>
+
 -------
 
 ## Notes about this guide

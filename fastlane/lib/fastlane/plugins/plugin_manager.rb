@@ -313,6 +313,7 @@ module Fastlane
         end
       end
 
+      require 'terminal-table'
       puts Terminal::Table.new({
         rows: rows,
         title: "Used plugins".green,

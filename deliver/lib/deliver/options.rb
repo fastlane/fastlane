@@ -190,7 +190,7 @@ module Deliver
                                      short_option: "-l",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
+                                       UI.user_error!("'#{value}' doesn't seem to be one of the supported files. supported: #{Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.join(',')}") unless Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.include?(File.extname(value).downcase)
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
                                      description: "Metadata: The path to the Apple Watch app icon",
@@ -198,7 +198,7 @@ module Deliver
                                      short_option: "-q",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be a png file") unless value.end_with?(".png")
+                                       UI.user_error!("'#{value}' doesn't seem to be one of the supported files. supported: #{Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.join(',')}") unless Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.include?(File.extname(value).downcase)
                                      end),
         FastlaneCore::ConfigItem.new(key: :copyright,
                                      description: "Metadata: The copyright notice",

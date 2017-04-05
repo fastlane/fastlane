@@ -98,35 +98,37 @@ module Sigh
       return results if Sigh.config[:skip_certificate_verification]
 
       UI.message "Verifying certificates..."
-      return results.find_all do |a|
+      return results.find_all do |current_profile|
         installed = false
 
         # Attempts to download all certificats from this profile
         # for checking if they are installed.
         # `cert.download_raw` can fail if the user is a
         # "member" and not an a "admin"
-        raw_certs = a.certificates.map do |cert|
+        raw_certs = current_profile.certificates.map do |cert|
           begin
             raw_cert = cert.download_raw
           rescue => error
             UI.important("Cannot download cert #{cert.id} - #{error.message}")
             raw_cert = nil
           end
-          raw_cert
-        end.compact
+          { downloaded: raw_cert, cert: cert }
+        end
 
         # Makes sure we have the certificate installed on the local machine
-        raw_certs.each do |raw_cert|
+        raw_certs.each do |current_cert|
+          # Skip certificates that failed to download
+          next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(raw_cert)
+          file.write(current_cert[:downloaded])
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
+            UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && a.certificate_valid?
+        installed && current_profile.certificate_valid?
       end
     end
 

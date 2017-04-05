@@ -32,7 +32,7 @@ describe FastlaneCore do
        env_name: "asdf",
     description: "Set the profile name."
           )], {})
-        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well"
+        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name"
       end
 
       describe "config conflicts" do
@@ -431,7 +431,7 @@ describe FastlaneCore do
           expect(config.values[:test]).to eq('123')
         end
 
-        it "takes the values frmo the environment if available" do
+        it "takes the values from the environment if available" do
           c = FastlaneCore::ConfigItem.new(key: :test,
                                       env_name: "FL_TEST")
           config = FastlaneCore::Configuration.create([c], {})
@@ -595,7 +595,7 @@ describe FastlaneCore do
           it "throws an error if it's invalid" do
             expect do
               @config.set(:output, 132)
-            end.to raise_error("'output' value must be a String! Found Fixnum instead.")
+            end.to raise_error("'output' value must be a String! Found #{123.class} instead.")
             expect do
               @config.set(:wait_processing_interval, -1)
             end.to raise_error("Please enter a valid positive number of seconds")

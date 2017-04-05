@@ -75,17 +75,32 @@ module Snapshot
     def self.check_activity(activity, to_store)
       # On iOS, we look for the "Unknown" rotation gesture that signals a snapshot was taken here.
       # On tvOS, we look for "Browser" count.
-      # These are both events that are not normally triggered by UI testing, making it easy for us to
+      # On OSX we look for type `Fn` key on keyboard, it shouldn't change anything for app
+      # These are events that are not normally triggered by UI testing, making it easy for us to
       # locate where snapshot() was invoked.
-      if activity["Title"] == "Set device orientation to Unknown" || activity["Title"] == "Get number of matches for: Children matching type Browser"
-        if activity["Attachments"]
-          to_store << activity["Attachments"].last["FileName"]
-        else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
-          to_store << "Screenshot_#{activity['UUID']}.png"
-        end
+      ios_detected = activity["Title"] == "Set device orientation to Unknown"
+      tvos_detected = activity["Title"] == "Get number of matches for: Children matching type Browser"
+      osx_detected = activity["Title"] == "Type 'Fn' key (XCUIKeyboardKeySecondaryFn) with no modifiers"
+      if ios_detected || tvos_detected || osx_detected
+        find_screenshot = find_screenshot(activity)
+        to_store << find_screenshot
       end
+
       (activity["SubActivities"] || []).each do |subactivity|
         check_activity(subactivity, to_store)
+      end
+    end
+
+    def self.find_screenshot(activity)
+      (activity["SubActivities"] || []).each do |subactivity|
+        # we are interested in `Synthesize event` part of event in subactivities
+        return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
+      end
+
+      if activity["Attachments"]
+        return activity["Attachments"].last["FileName"]
+      else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
+        return "Screenshot_#{activity['UUID']}.png"
       end
     end
   end

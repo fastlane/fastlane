@@ -17,7 +17,6 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
   - Run `bundle install` in the project root
-  - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
   - If there are dependency errors, you might also need to run `bundle update`
 - Create a new branch to work on:
   - `git checkout -b <YOUR_BRANCH_NAME>`
@@ -82,7 +81,6 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 
 When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
 
-- Create a separate PR for each tool that you’ve worked on
 - Use a descriptive title
 - Link the issues that are related to your PR in the body
 

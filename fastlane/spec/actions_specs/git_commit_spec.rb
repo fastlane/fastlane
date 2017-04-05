@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "git_commit" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "generates the correct git command" do
         result = Fastlane::FastFile.new.parse("lane :test do
           git_commit(path: './fastlane/README.md', message: 'message')

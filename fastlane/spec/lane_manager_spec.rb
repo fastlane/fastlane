@@ -54,8 +54,6 @@ describe Fastlane do
         end
 
         def ensure_dot_env_value_from_folders(folders, envs, expected_values)
-          # current limitation in FastlaneFolder.
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
           folders.each do |dir|
             expected_values.each do |k, v|
               ENV.delete(k.to_s)
