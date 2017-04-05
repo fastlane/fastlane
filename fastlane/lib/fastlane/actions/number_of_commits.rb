@@ -26,15 +26,25 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Return the total number of all commits in current git branch"
+        "See number_of_commits --help for details"
       end
 
       def self.return_value
         "The total number of all commits in current git branch"
       end
 
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :all,
+                                       env_name: "FL_NUMBER_OF_COMMITS_ALL",
+                                       optional: true,
+                                       is_string: false,
+                                       description: "Returns number of all commits instead of current branch")
+        ]
+      end
+
       def self.details
-        "You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. If you want all the commits in the current repo, set the `all` parameter to true."
+        "You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. See number_of_commits --help for more details"
       end
 
       def self.authors
