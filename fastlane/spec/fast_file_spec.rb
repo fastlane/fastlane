@@ -227,7 +227,7 @@ describe Fastlane do
       it "Exception in error block are swallowed and shown, and original exception is re-raised" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileErrorInError')
 
-        expect(FastlaneCore::UI).to receive(:error).with("An error occured while executing the `error` block:")
+        expect(FastlaneCore::UI).to receive(:error).with("An error occurred while executing the `error` block:")
         expect(FastlaneCore::UI).to receive(:error).with("Error in error")
 
         expect do

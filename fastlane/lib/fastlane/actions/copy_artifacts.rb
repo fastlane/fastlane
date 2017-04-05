@@ -48,7 +48,7 @@ module Fastlane
 
       def self.details
         [
-          "This action copies artifacs to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
+          "This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
           "Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list"
         ].join("\n")
       end

@@ -26,7 +26,7 @@ module Fastlane
         end
 
         if params[:select_reqex]
-          UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
+          UI.important("'select_reqex' parameter is deprecated. Please use 'select_regex' instead.")
           select_regex = params[:select_reqex]
         end
 
