@@ -28,7 +28,7 @@ module Fastlane
       end
 
       def bump_version(bump_type)
-        UI.user_error!("Do not support bump of 'appendix', please use `set_version_appendix(appendix)` instead") if bump_type == 'appendix'
+        UI.user_error!("Do not support bump of 'appendix', please use `update_version_appendix(appendix)` instead") if bump_type == 'appendix'
 
         major = version_match[:major].to_i
         minor = version_match[:minor].to_i || 0
@@ -49,7 +49,7 @@ module Fastlane
         @version_value = "#{major}.#{minor}.#{patch}"
       end
 
-      def set_version_appendix(appendix = nil)
+      def update_version_appendix(appendix = nil)
         new_appendix = appendix || @version_value[:appendix]
         return if new_appendix.nil?
 

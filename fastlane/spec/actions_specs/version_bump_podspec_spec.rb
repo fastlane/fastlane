@@ -71,7 +71,7 @@ describe Fastlane do
           s.version = "1.3.2"
         end'
           @version_podspec_file.parse(test_content)
-          result = @version_podspec_file.set_version_appendix('5.10')
+          result = @version_podspec_file.update_version_appendix('5.10')
           expect(result).to eq('1.3.2.5.10')
           expect(@version_podspec_file.version_value).to eq('1.3.2.5.10')
         end
@@ -147,7 +147,7 @@ describe Fastlane do
           s.version = "1.3.2.1"
         end'
           @version_podspec_file.parse(test_content)
-          result = @version_podspec_file.set_version_appendix('11.10')
+          result = @version_podspec_file.update_version_appendix('11.10')
           expect(result).to eq('1.3.2.11.10')
           expect(@version_podspec_file.version_value).to eq('1.3.2.11.10')
         end

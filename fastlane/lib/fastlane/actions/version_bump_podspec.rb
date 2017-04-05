@@ -15,7 +15,7 @@ module Fastlane
         if params[:version_number]
           new_version = params[:version_number]
         elsif params[:version_appendix]
-          new_version = version_podspec_file.set_version_appendix(params[:version_appendix])
+          new_version = version_podspec_file.update_version_appendix(params[:version_appendix])
         else
           new_version = version_podspec_file.bump_version(params[:bump_type])
         end
