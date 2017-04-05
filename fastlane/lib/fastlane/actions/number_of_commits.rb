@@ -14,6 +14,7 @@ module Fastlane
             command = 'git rev-list --all --count'
           else
             command = 'git rev-list HEAD --count'
+          end
         else
           UI.user_error!("Not in a git repository.")
         end
