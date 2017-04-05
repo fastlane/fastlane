@@ -484,7 +484,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', frameworks: ['myframework', 'myframework2'])
                 end").runner.execute(:test)
-            end.to raise_error("Frameworks option is avaialble only for 'archive' command.")
+            end.to raise_error("Frameworks option is available only for 'archive' command.")
           end
         end
 
@@ -496,7 +496,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', frameworks: ['myframework', 'myframework2'])
                 end").runner.execute(:test)
-            end.to raise_error("Frameworks option is avaialble only for 'archive' command.")
+            end.to raise_error("Frameworks option is available only for 'archive' command.")
           end
         end
 
@@ -508,7 +508,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', frameworks: ['myframework', 'myframework2'])
                 end").runner.execute(:test)
-            end.to raise_error("Frameworks option is avaialble only for 'archive' command.")
+            end.to raise_error("Frameworks option is available only for 'archive' command.")
           end
         end
       end
@@ -533,7 +533,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', output: 'bla.framework.zip')
                 end").runner.execute(:test)
-            end.to raise_error("Output option is avaialble only for 'archive' command.")
+            end.to raise_error("Output option is available only for 'archive' command.")
           end
         end
 
@@ -545,7 +545,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', output: 'bla.framework.zip')
                 end").runner.execute(:test)
-            end.to raise_error("Output option is avaialble only for 'archive' command.")
+            end.to raise_error("Output option is available only for 'archive' command.")
           end
         end
 
@@ -557,7 +557,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                   carthage(command: '#{command}', output: 'bla.framework.zip')
                 end").runner.execute(:test)
-            end.to raise_error("Output option is avaialble only for 'archive' command.")
+            end.to raise_error("Output option is available only for 'archive' command.")
           end
         end
       end

@@ -84,9 +84,9 @@ module Fastlane
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"
 
-            UI.user_error!("Coulnd't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
+            UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
-            UI.success "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'"
+            UI.success "Successfully downloaded Crashlytics Support Library to '#{jar_path}'"
           rescue => ex
             UI.user_error!("Error fetching remote file: #{ex}")
           end

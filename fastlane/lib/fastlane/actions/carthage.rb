@@ -36,10 +36,10 @@ module Fastlane
       def self.validate(params)
         command_name = params[:command]
         if command_name != "archive" && params[:frameworks].count > 0
-          UI.user_error!("Frameworks option is avaialble only for 'archive' command.")
+          UI.user_error!("Frameworks option is available only for 'archive' command.")
         end
         if command_name != "archive" && params[:output]
-          UI.user_error!("Output option is avaialble only for 'archive' command.")
+          UI.user_error!("Output option is available only for 'archive' command.")
         end
       end
 

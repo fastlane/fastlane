@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.description
-        "Resets git repo to a clean state by discarding uncommited changes"
+        "Resets git repo to a clean state by discarding uncommitted changes"
       end
 
       def self.details

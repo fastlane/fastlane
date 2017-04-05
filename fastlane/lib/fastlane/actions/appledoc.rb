@@ -159,7 +159,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :docset_publisher_id, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_ID", description: "DocSet publisher identifier", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_publisher_name, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_NAME", description: "DocSet publisher name", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_min_xcode_version, env_name: "FL_APPLEDOC_DOCSET_MIN_XCODE_VERSION", description: "DocSet min. Xcode version", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform familiy", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform family", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_cert_issuer, env_name: "FL_APPLEDOC_DOCSET_CERT_ISSUER", description: "DocSet certificate issuer", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_cert_signer, env_name: "FL_APPLEDOC_DOCSET_CERT_SIGNER", description: "DocSet certificate signer", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_bundle_filename, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_FILENAME", description: "DocSet bundle filename", is_string: true, optional: true),

@@ -8,7 +8,7 @@ Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` ac
 
 ```ruby
 UI.message "Neutral message (usually white)"
-UI.success "Succesully finished processing (usually green)"
+UI.success "Successfully finished processing (usually green)"
 UI.error "Wahaha, what's going on here! (usually red)"
 UI.important "Make sure to use Windows (usually yellow)"
 

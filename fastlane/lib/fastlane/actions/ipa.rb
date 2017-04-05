@@ -76,7 +76,7 @@ module Fastlane
             "-------------------------------------------------------",
             "Original Error:",
             " => " + ex.to_s,
-            "A build error occured. You are using legacy `shenzhen` for building",
+            "A build error occurred. You are using legacy `shenzhen` for building",
             "it is recommended to upgrade to _gym_: ",
             "https://github.com/fastlane/fastlane/tree/master/gym",
             core_command,
@@ -86,7 +86,7 @@ module Fastlane
           end
 
           # Raise a custom exception, as the the normal one is useless for the user
-          UI.user_error!("A build error occured, this is usually related to code signing. Take a look at the error above")
+          UI.user_error!("A build error occurred, this is usually related to code signing. Take a look at the error above")
         end
       end
 
