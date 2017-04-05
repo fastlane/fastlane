@@ -17,7 +17,7 @@ module Cert
                                      env_name: "CERT_GENERATE_P12_FILE",
                                      description: "Generate a p12 file additionally to a PEM file",
                                      is_string: false,
-                                     default_value: true),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :p12_password,
                                      env_name: "CERT_P12_PASSWORD",
                                      sensitive: true,
