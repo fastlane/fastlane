@@ -43,7 +43,7 @@ module Fastlane
           file_ruby = file.gsub('\ ', ' ')
           File.exist?(file_ruby) and
             (!select_regex or file_ruby =~ select_regex) and
-            (!exclude_regex or !(file_ruby =~ exclude_regex))
+            (!exclude_regex or file_ruby !~ exclude_regex)
         end
 
         command_prefix = [

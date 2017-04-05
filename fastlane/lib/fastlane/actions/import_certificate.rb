@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        keychain_path = File.expand_path(File.join("~", "Library", "Keychains", params[:keychain_name]))
+        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
       end

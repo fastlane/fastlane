@@ -9,6 +9,24 @@ module Gym
       @options = plain_options
     end
 
+    def self.legacy_api_note!
+      UI.important "Unfortunately the legacy build API was removed with Xcode 8.3."
+      UI.important "Please make sure to remove use_legacy_build_api from your ./fastlane/Fastfile"
+      UI.important "and update the gym call to include the export method like this:"
+      UI.important "== App Store Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "app-store")'
+      UI.important "==  Ad Hoc Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "ad-hoc")'
+      UI.important "== Development Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "development")'
+      UI.important "== In-House Enterprise Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "enterprise")'
+      UI.important "If you run into a code signing error, please check out our troubleshooting guide for more information on how to solve the most common issues"
+      UI.error "    https://docs.fastlane.tools/codesigning/troubleshooting/ 🚀"
+      UI.important ""
+      UI.user_error! "legacy_build_api removed!"
+    end
+
     def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -103,6 +121,9 @@ module Gym
                                      verify_block: proc do |value|
                                        if value
                                          UI.important "Don't use this option any more, as it's deprecated by Apple"
+                                       end
+                                       if Gym::Xcode.legacy_api_deprecated?
+                                         Gym::Options.legacy_api_note!
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_method,

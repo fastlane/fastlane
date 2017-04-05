@@ -465,6 +465,24 @@ module Spaceship
       end
     end
 
+    ##
+    # this endpoint is used by Xcode to fetch provisioning profiles.
+    # The response is an xml plist but has the added benefit of containing the appId of each provisioning profile.
+    #
+    # Use this method over `provisioning_profiles` if possible because no secondary API calls are necessary to populate the ProvisioningProfile data model.
+    def provisioning_profiles_via_xcode_api(mac: false)
+      req = request(:post) do |r|
+        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
+        r.params = {
+          teamId: team_id,
+          includeInactiveProfiles: true,
+          onlyCountLists: true
+        }
+      end
+
+      parse_response(req, 'provisioningProfiles')
+    end
+
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
       r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
         teamId: team_id,
@@ -474,7 +492,9 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       params = {
         teamId: team_id,
@@ -491,7 +511,9 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
@@ -506,7 +528,9 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
@@ -516,7 +540,9 @@ module Spaceship
     end
 
     def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile)
+      ensure_csrf(Spaceship::ProvisioningProfile) do
+        fetch_csrf_token_for_provisioning
+      end
 
       params = {
           teamId: team_id,
@@ -565,6 +591,24 @@ module Spaceship
       block_given? ? yield : klass.all
 
       csrf_cache[klass] = self.csrf_tokens
+    end
+
+    # We need a custom way to fetch the csrf token for the provisioning profile requests, since
+    # we use a separate API endpoint (host of Xcode API) to fetch the provisioning profiles
+    # All we do is fetch one profile (if exists) to get a valid csrf token with its time stamp
+    # This method is being called from all requests that modify, create or downloading provisioning
+    # profiles.
+    # Source https://github.com/fastlane/fastlane/issues/5903
+    def fetch_csrf_token_for_provisioning(mac: false)
+      req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
+         teamId: team_id,
+         pageNumber: 1,
+         pageSize: 1,
+         sort: 'name=asc'
+       })
+
+      parse_response(req, 'provisioningProfiles')
+      return nil
     end
   end
   # rubocop:enable Metrics/ClassLength

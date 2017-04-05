@@ -133,8 +133,8 @@ lane :release do
   donate_food
 
   puts "You can now tweet:".green
-  tag_url = "https://github.com/fastlane/fastlane/releases/tag/fastlane/#{version}"
-  puts "[fastlane] #{github_release['name']} #{tag_url}"
+  releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
+  puts "[fastlane] #{github_release['name']} #{releases_url}"
 
   update_docs
 end
@@ -156,6 +156,7 @@ desc "This SHOULD only be used for testing changes to the docs"
 lane :test_generate_docs do
   ENV['USE_ENHANCE_TEST_DATA'] = "true"
   generate_markdown_docs
+  ENV.delete("USE_ENHANCE_TEST_DATA")
 end
 
 desc "Update the actions.md on https://docs.fastlane.tools"
@@ -287,7 +288,7 @@ desc "Print out the changelog since the last tagged release and open the GitHub 
 lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
-  changes = sh("git log --pretty='* %s' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
+  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
 
   github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"

@@ -67,6 +67,18 @@ module FastlaneCore
 
         return if value.nil?
         self.modified_values[method_sym] = value
+
+        # to support frozen strings (e.g. ENV variables) too
+        # we have to dupe the value
+        # in < Ruby 2.4.0 `.dup` is not support by boolean values
+        # and there is no good way to check if a class actually
+        # responds to `dup`, so we have to rescue the exception
+        begin
+          value = value.dup
+        rescue TypeError
+          # Nothing specific to do here, if we can't dupe, we just
+          # deal with it (boolean values can't be from env variables anyway)
+        end
         self.config[method_sym] = value
       else
         # We can't set this value, maybe the tool using this configuration system has its own

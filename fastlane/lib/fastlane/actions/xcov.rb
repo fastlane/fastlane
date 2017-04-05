@@ -5,7 +5,7 @@ module Fastlane
         Actions.verify_gem!('xcov')
         require 'xcov'
 
-        Xcov::Manager.new.work(values)
+        Xcov::Manager.new(values).run
       end
 
       def self.description

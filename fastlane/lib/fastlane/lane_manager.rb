@@ -61,13 +61,17 @@ module Fastlane
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) unless FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)
 
       return ff
+    end
+
+    def self.skip_docs?
+      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # All the finishing up that needs to be done
@@ -119,7 +123,14 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      available = []
+
+      # nil is the key for lanes that are not under a specific platform
+      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms.each do |p|
+        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+      end
+
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end

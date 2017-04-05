@@ -9,7 +9,7 @@ module Scan
     end
 
     def self.available_options
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
 
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -223,7 +223,9 @@ module Scan
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
+                                       if !value.to_s.empty? && !value.start_with?("https://")
+                                         UI.user_error!("Invalid URL, must start with https://")
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_channel,
                                      short_option: "-e",
@@ -248,9 +250,10 @@ module Scan
                                     is_string: false,
                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                    description: "Sets custom full report file name",
-                                    optional: true,
-                                    is_string: true)
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name",
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end

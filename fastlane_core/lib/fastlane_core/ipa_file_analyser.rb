@@ -28,7 +28,7 @@ module FastlaneCore
 
     def self.fetch_info_plist_file(path)
       UI.user_error!("Could not find file at path '#{path}'") unless File.exist?(path)
-      Zip::File.open(path) do |zipfile|
+      Zip::File.open(path, "rb") do |zipfile|
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
 
@@ -37,7 +37,9 @@ module FastlaneCore
         Dir.mktmpdir("fastlane") do |tmp|
           # The XML file has to be properly unpacked first
           tmp_path = File.join(tmp, "Info.plist")
-          File.write(tmp_path, zipfile.read(file))
+          File.open(tmp_path, 'wb') do |output|
+            output.write zipfile.read(file)
+          end
           system("plutil -convert xml1 #{tmp_path}")
           result = Plist.parse_xml(tmp_path)
 

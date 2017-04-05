@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "upload_symbols_to_crashlytics" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "extracts zip files" do
         binary_path = './fastlane/spec/fixtures/screenshots/screenshot1.png'
         dsym_path = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'

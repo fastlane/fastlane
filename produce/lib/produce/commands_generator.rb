@@ -38,7 +38,7 @@ module Produce
       command :enable_services do |c|
         c.syntax = 'fastlane produce enable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Enable specific Application Services for a specific app on the Apple Developer Portal'
-        c.example 'Enable HealthKit, HomeKit and Passbook', 'produce enable_services -a com.example.app --healthkit --homekit --passbook'
+        c.example 'Enable HealthKit, HomeKit and Passbook', 'fastlane produce enable_services -a com.example.app --healthkit --homekit --passbook'
 
         c.option '--app-group', 'Enable App Groups'
         c.option '--apple-pay', 'Enable Apple Pay'
@@ -71,7 +71,7 @@ module Produce
       command :disable_services do |c|
         c.syntax = 'fastlane produce disable_services -a APP_IDENTIFIER SERVICE1, SERVICE2, ...'
         c.description = 'Disable specific Application Services for a specific app on the Apple Developer Portal'
-        c.example 'Disable HealthKit', 'produce disable_services -a com.example.app --healthkit'
+        c.example 'Disable HealthKit', 'fastlane produce disable_services -a com.example.app --healthkit'
 
         c.option '--app-group', 'Disable App Groups'
         c.option '--apple-pay', 'Disable Apple Pay'
@@ -104,7 +104,7 @@ module Produce
       command :group do |c|
         c.syntax = 'fastlane produce group'
         c.description = 'Ensure that a specific App Group exists'
-        c.example 'Create group', 'produce group -g group.example.app -n "Example App Group"'
+        c.example 'Create group', 'fastlane produce group -g group.example.app -n "Example App Group"'
 
         c.option '-n', '--group_name STRING', String, 'Name for the group that is created (PRODUCE_GROUP_NAME)'
         c.option '-g', '--group_identifier STRING', String, 'Group identifier for the group (PRODUCE_GROUP_IDENTIFIER)'
@@ -123,7 +123,7 @@ module Produce
       command :associate_group do |c|
         c.syntax = 'fastlane produce associate_group -a APP_IDENTIFIER GROUP_IDENTIFIER1, GROUP_IDENTIFIER2, ...'
         c.description = 'Associate with a group, which is created if needed or simply located otherwise'
-        c.example 'Associate with group', 'produce associate-group -a com.example.app group.example.com'
+        c.example 'Associate with group', 'fastlane produce associate-group -a com.example.app group.example.com'
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 

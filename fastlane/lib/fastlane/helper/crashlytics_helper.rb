@@ -51,7 +51,7 @@ module Fastlane
 
           # Optional
           command << "-betaDistributionEmails '#{params[:emails]}'" if params[:emails]
-          command << "-betaDistributionReleaseNotesFilePath '#{params[:notes_path]}'" if params[:notes_path]
+          command << "-betaDistributionReleaseNotesFilePath '#{File.expand_path(params[:notes_path])}'" if params[:notes_path]
           command << "-betaDistributionGroupAliases '#{params[:groups]}'" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 

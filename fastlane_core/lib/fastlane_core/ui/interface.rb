@@ -81,7 +81,7 @@ module FastlaneCore
     #####################################################
 
     # Is is possible to ask the user questions?
-    def interactive?(_message)
+    def interactive?
       not_implemented(__method__)
     end
 
@@ -126,6 +126,10 @@ module FastlaneCore
       end
     end
 
+    # raised from test_failure!
+    class FastlaneTestFailure < StandardError
+    end
+
     # Pass an exception to this method to exit the program
     #   using the given exception
     # Use this method instead of user_error! if this error is
@@ -144,6 +148,15 @@ module FastlaneCore
     # and want to show a nice error message to the user
     def user_error!(error_message, options = {})
       raise FastlaneError.new(options), error_message.to_s
+    end
+
+    # Use this method to exit the program because of a test failure
+    # that's caused by the source code of the user. Example for this
+    # is that scan will fail when the tests fail.
+    # By using this method we'll get more accurate results on the
+    # fastlane failures on enhancer
+    def test_failure!(error_message)
+      raise FastlaneTestFailure.new, error_message
     end
 
     #####################################################

@@ -1,6 +1,6 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://fastlane-enhancer.herokuapp.com"
+    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://enhancer.fastlane.tools"
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -146,9 +146,15 @@ module FastlaneCore
     end
 
     def self.determine_version(name)
-      require 'fastlane'
-      return Fastlane::VERSION if Fastlane::ActionsList.find_action_named(name.to_s)
+      unless name.to_s.start_with?("fastlane-plugin")
+        # In the early days before the mono gem this was more complicated
+        # Now we have a mono version number, which makes this method easy
+        # for all built-in actions and tools
+        require 'fastlane/version'
+        return Fastlane::VERSION
+      end
 
+      # For plugins we still need to load the specific version
       begin
         name = name.to_s.downcase
 

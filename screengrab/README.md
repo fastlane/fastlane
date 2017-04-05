@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -131,7 +132,7 @@ fastlane screengrab --help
 
 # Tips
 
-# UI Tests
+## UI Tests
 
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
@@ -168,6 +169,10 @@ When using JUnit 3 you'll need to add a bit more code:
 
 If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup.
 
+## Clean Status Bar
+
+You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
+
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
 - [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
@@ -175,7 +180,7 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup.

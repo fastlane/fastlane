@@ -58,8 +58,8 @@ module Fastlane
         # Removes .plist files that matched the given expression in the 'ignore' parameter
         ignore_expression = params[:ignore]
         if ignore_expression
-          info_plist_files.select! do |info_plist_file|
-            !info_plist_file.match(ignore_expression)
+          info_plist_files.reject! do |info_plist_file|
+            info_plist_file.match(ignore_expression)
           end
         end
 

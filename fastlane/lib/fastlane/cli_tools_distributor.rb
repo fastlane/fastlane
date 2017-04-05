@@ -22,6 +22,8 @@ module Fastlane
           print_slow_fastlane_warning
         end
 
+        FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
@@ -62,6 +64,8 @@ module Fastlane
           require "fastlane/commands_generator"
           Fastlane::CommandsGenerator.start
         end
+      ensure
+        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable
