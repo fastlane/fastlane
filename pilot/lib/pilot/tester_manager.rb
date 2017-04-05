@@ -46,6 +46,8 @@ module Pilot
              UI.success("Existing tester #{tester.email}")
            else
              attrs = {}
+             config[:first_name] ||= ""
+             config[:last_name] ||= ""
              attrs["emailAddress"] = { "value" => config[:email] }
              attrs["firstName"] = { "value" => config[:first_name] }
              attrs["lastName"] = { "value" => config[:last_name] }
