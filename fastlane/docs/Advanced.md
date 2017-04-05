@@ -174,7 +174,7 @@ If you just want to try an action without adding them to your `Fastfile` yet, yo
 fastlane run notification message:"My Text" title:"The Title"
 ```
 
-To get the avaiable options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
+To get the available options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
 
 ## Shell interaction
 
