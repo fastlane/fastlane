@@ -28,6 +28,8 @@ module Fastlane
       end
 
       def bump_version(bump_type)
+        UI.user_error!("Do not support bump of 'appendix', please use `set_version_appendix(appendix)` instead") if bump_type == 'appendix'
+
         major = version_match[:major].to_i
         minor = version_match[:minor].to_i || 0
         patch = version_match[:patch].to_i || 0
@@ -45,6 +47,18 @@ module Fastlane
         end
 
         @version_value = "#{major}.#{minor}.#{patch}"
+      end
+
+      def set_version_appendix(appendix = nil)
+        new_appendix = appendix || @version_value[:appendix]
+        return if new_appendix.nil?
+
+        new_appendix = new_appendix.sub(".", "") if new_appendix.start_with?(".")
+        major = version_match[:major].to_i
+        minor = version_match[:minor].to_i || 0
+        patch = version_match[:patch].to_i || 0
+
+        @version_value = "#{major}.#{minor}.#{patch}.#{new_appendix}"
       end
 
       def update_podspec(version = nil)

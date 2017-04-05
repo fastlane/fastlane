@@ -66,6 +66,16 @@ describe Fastlane do
         end')
         end
 
+        it "allows to set a specific appendix" do
+          test_content = 'Pod::Spec.new do |s|
+          s.version = "1.3.2"
+        end'
+          @version_podspec_file.parse(test_content)
+          result = @version_podspec_file.set_version_appendix('5.10')
+          expect(result).to eq('1.3.2.5.10')
+          expect(@version_podspec_file.version_value).to eq('1.3.2.5.10')
+        end
+
         it "allows to set a specific version" do
           test_content = 'Pod::Spec.new do |s|
           s.version = "1.3.2"
@@ -130,6 +140,16 @@ describe Fastlane do
           expect(@version_podspec_file.update_podspec).to eq('Pod::Spec.new do |s|
           s.version = "1.3.2.1"
         end')
+        end
+
+        it "allows to set a specific appendix" do
+          test_content = 'Pod::Spec.new do |s|
+          s.version = "1.3.2.1"
+        end'
+          @version_podspec_file.parse(test_content)
+          result = @version_podspec_file.set_version_appendix('11.10')
+          expect(result).to eq('1.3.2.11.10')
+          expect(@version_podspec_file.version_value).to eq('1.3.2.11.10')
         end
 
         it "allows to set a specific version" do
@@ -231,6 +251,14 @@ describe Fastlane do
 
           expect(result).to eq('2.0.0')
         end
+
+        it "bumps the version when version appendix is given" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            version_bump_podspec(path: '#{@podspec_path}', version_appendix: '5.1')
+          end").runner.execute(:test)
+
+          expect(result).to eq('1.5.1.5.1')
+        end
       end
 
       context "when not semantic version" do
@@ -269,6 +297,14 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq('2.0.0')
+        end
+
+        it "bumps the version when version appendix is given" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            version_bump_podspec(path: '#{@podspec_path}', version_appendix: '5.1')
+          end").runner.execute(:test)
+
+          expect(result).to eq('1.5.1.5.1')
         end
       end
     end
