@@ -64,9 +64,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
-  # Lock `activesupport` (transitive dependency via `xcodeproj`) to keep supporting system ruby
-  spec.add_dependency 'activesupport', '< 5'
-
   # Development only
   spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
