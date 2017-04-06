@@ -22,7 +22,6 @@ describe Match do
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier]).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path).and_return(destination)
-      expect(Match::GitHelper).to receive(:check_push_repo_permission).with(repo_dir, "master").twice
       expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore and platform ios", git_url, "master")
 
       spaceship = "spaceship"
@@ -60,7 +59,6 @@ describe Match do
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil).and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
-      expect(Match::GitHelper).to_not receive(:check_push_repo_permission)
       expect(Match::GitHelper).to_not receive(:commit_changes)
 
       # To also install the certificate, fake that
