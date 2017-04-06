@@ -167,6 +167,7 @@ module Match
       end
       return true
     rescue => ex
+      return true if ex.include?("Updates were rejected because the remote contains work that you do")
       UI.error("No permission to push...")
       UI.error(ex)
       return false
