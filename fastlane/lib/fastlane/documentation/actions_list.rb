@@ -77,11 +77,21 @@ module Fastlane
         print_all # show all available actions instead
 
         if !filter.nil? && filter.length > 1
-          candidates = []
+          action_names = []
           all_actions(nil) do |action_ref, action_name|
-            candidates << action_name if action_name.include? filter
+            action_names << action_name
           end
-          puts "Available actions with matching name: #{candidates.join(', ')}".green unless candidates.empty?
+
+          corrections = []
+
+          if !Gem.loaded_specs["did_you_mean"].nil? && Gem.loaded_specs["did_you_mean"].version >= Gem::Version.new('1.1.0')
+            spell_checker = DidYouMean::SpellChecker.new(dictionary: action_names)
+            corrections << spell_checker.correct(filter).compact
+          end
+
+          corrections << action_names.select { |name| name.include? filter }
+
+          puts "Did you mean: #{corrections.flatten.uniq.join(', ')}".green unless corrections.flatten.empty?
         end
 
       end
