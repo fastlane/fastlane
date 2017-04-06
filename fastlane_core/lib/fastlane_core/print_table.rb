@@ -4,7 +4,7 @@ module FastlaneCore
       # This method prints out all the user inputs in a nice table. Useful to summarize the run
       # You can pass an array to `hide_keys` if you don't want certain elements to show up (symbols or strings)
       # You can pass an array to `mask_keys` if you want to mask certain elements (symbols or strings)
-      def print_values(config: nil, title: nil, hide_keys: [], mask_keys: [])
+      def print_values(config: nil, title: nil, hide_keys: [], mask_keys: [], transform: :newline)
         require 'terminal-table'
 
         options = {}
@@ -24,7 +24,14 @@ module FastlaneCore
         rows = self.collect_rows(options: options, hide_keys: hide_keys.map(&:to_s), mask_keys: mask_keys.map(&:to_s), prefix: '')
 
         params = {}
-        params[:rows] = limit_row_size(rows)
+        transform = false if FastlaneCore::Env.truthy?("FL_SKIP_TABLE_TRANSFORM")
+
+        if transform
+          params[:rows] = transform_output(rows, transform)
+        else
+          params[:rows] = rows
+        end
+
         params[:title] = title.green if title
 
         puts ""
@@ -34,16 +41,60 @@ module FastlaneCore
         return params
       end
 
-      def limit_row_size(rows, max_length = 100)
-        require 'fastlane_core/string_filters'
-
-        max_key_length = rows.map { |e| e[0].length }.max || 0
-        max_allowed_value_length = max_length - max_key_length - 7
-        rows.map do |e|
-          value = e[1]
-          value = value.to_s.truncate(max_allowed_value_length) unless [true, false].include?(value)
-          [e[0], value]
+      def colorize_array(array, colors)
+        value = ""
+        array.each do  |l|
+          colored_line = l
+          colored_line = "#{colors.first[0]}#{l}#{colors.last[0]}" if colors.length > 0
+          value << colored_line
+          value << "\n"
         end
+        return value
+      end
+
+      def transform_output(rows, transform)
+        require 'fastlane_core/string_filters'
+        require 'tty-screen'
+
+        return_array = []
+        tcols = TTY::Screen.width
+
+        col_count = rows.map(&:length).first || 1
+
+        # -4 per column - as tt adds "| " and " |"
+        terminal_table_padding = 4
+        max_length = tcols - (col_count * terminal_table_padding)
+
+        max_value_length = (max_length / col_count)
+
+        rows.map do |row|
+          new_row = []
+          row.each do |col|
+            value = col.to_s.dup
+            if transform == :truncate_middle
+              value = value.middle_truncate(max_value_length)
+            elsif transform == :newline && value
+              # remove all fixed newlines as it may mess up the output
+              value.tr!("\n", " ") if value.kind_of?(String)
+              if value.length >= max_value_length
+                colors = value.scan(/(\e\[.*?m)/)
+                if colors && colors.length > 0
+                  colors.each do |color|
+                    value.delete!(color.first)
+                    value.delete!(color.last)
+                  end
+                end
+                lines = value.wordwrap(max_value_length)
+                value = colorize_array(lines, colors)
+              end
+            end
+            new_row << value
+          end
+          return_array << new_row
+          return_array << :separator
+        end
+        return_array.pop
+        return return_array
       end
 
       def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********')

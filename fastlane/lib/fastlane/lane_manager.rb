@@ -232,7 +232,7 @@ module Fastlane
       rows = Actions.lane_context.collect do |key, content|
         [key, content.to_s]
       end
-      rows = FastlaneCore::PrintTable.limit_row_size(rows)
+      rows = FastlaneCore::PrintTable.print_values(config: rows)
 
       require 'terminal-table'
       puts Terminal::Table.new({
