@@ -79,7 +79,7 @@ module Fastlane
         if !filter.nil? && filter.length > 1
           candidates = []
           all_actions(nil) do |a, action_name|
-            candidates << [action_name] if action_name.include? filter
+            candidates << action_name if action_name.include? filter
           end
           puts "Available actions with matching name: #{candidates.join(', ')}".green unless candidates.empty?
         end
