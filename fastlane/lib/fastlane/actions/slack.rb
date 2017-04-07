@@ -91,7 +91,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",
-                                       description: "Add additional information to this post. payload must be a hash containg any key with any value",
+                                       description: "Add additional information to this post. payload must be a hash containing any key with any value",
                                        default_value: {},
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :default_payloads,

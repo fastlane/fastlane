@@ -40,7 +40,7 @@ module Supply
     # Initializes the android_publisher and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     # @param path_to_key: The path to your p12 file (@deprecated)
-    # @param issuer: Email addresss for oauth (@deprecated)
+    # @param issuer: Email address for oauth (@deprecated)
     def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
       scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 

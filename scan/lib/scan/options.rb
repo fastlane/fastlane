@@ -135,7 +135,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :test_without_building,
                                      short_option: "-T",
                                      env_name: "SCAN_TEST_WITHOUT_BUILDING",
-                                     description: "Test without building, requires a derrived data path",
+                                     description: "Test without building, requires a derived data path",
                                      is_string: false,
                                      conflicting_options: [:build_for_testing],
                                      optional: true),

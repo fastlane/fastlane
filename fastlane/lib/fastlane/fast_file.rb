@@ -136,7 +136,7 @@ module Fastlane
       @runner.set_after_each(@current_platform, block)
     end
 
-    # Is executed if an error occured during fastlane execution
+    # Is executed if an error occurred during fastlane execution
     def error(&block)
       @runner.set_error(@current_platform, block)
     end

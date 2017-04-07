@@ -55,7 +55,7 @@ module Fastlane
           handle_exception(exception: ex)
         else
           UI.error(ex.to_s)
-          UI.error('An error occured during the setup process. Falling back to manual setup!')
+          UI.error('An error occurred during the setup process. Falling back to manual setup!')
           try_manual_setup
         end
       end
