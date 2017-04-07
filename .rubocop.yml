@@ -56,7 +56,7 @@ Style/NumericLiteralPrefix:
 Style/TernaryParentheses:
   Enabled: false
 
-# sometimes it is usefull to have those empty methods
+# sometimes it is useful to have those empty methods
 Style/EmptyMethod:
   Enabled: false
 

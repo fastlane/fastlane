@@ -98,7 +98,7 @@ module Fastlane
       Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
     end
 
-    # Documentation category, availabe values defined in AVAILABLE_CATEGORIES
+    # Documentation category, available values defined in AVAILABLE_CATEGORIES
     def self.category
       :undefined
     end

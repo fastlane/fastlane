@@ -109,7 +109,7 @@ module Cert
           UI.error "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
 
-        File.delete(path) # as apparantly this certificate is pretty useless without a private key
+        File.delete(path) # as apparently this certificate is pretty useless without a private key
       end
 
       UI.important "Couldn't find an existing certificate... creating a new one"
