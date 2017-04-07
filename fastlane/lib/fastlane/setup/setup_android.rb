@@ -1,7 +1,7 @@
 module Fastlane
   class SetupAndroid < Setup
     def run
-      response = UI.confirm('Do you have everything commited in version control? If not please do so now!')
+      response = UI.confirm('Do you have everything committed in version control? If not please do so now!')
       return unless response
 
       FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?

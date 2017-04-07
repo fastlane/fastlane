@@ -68,7 +68,7 @@ describe Fastlane do
         end
       end
 
-      describe "successfull init" do
+      describe "successful init" do
         before do
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
         end

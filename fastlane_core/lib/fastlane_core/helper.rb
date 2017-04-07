@@ -178,7 +178,7 @@ module FastlaneCore
     end
 
     def self.keychain_path(name)
-      # Existing code expects that a keychain name will be expanded into a default path to Libary/Keychains
+      # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
       #
