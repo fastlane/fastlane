@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Setup Jenkins Integration" do
       before :each do
-        # Clean all used environemnt variables
+        # Clean all used environment variables
         Fastlane::Actions::SetupJenkinsAction::USED_ENV_NAMES + Fastlane::Actions::SetupJenkinsAction.available_options.map(&:env_name).each do |key|
           ENV.delete(key)
         end
@@ -189,7 +189,7 @@ describe Fastlane do
       end
 
       after :all do
-        # Clean all used environemnt variables
+        # Clean all used environment variables
         Fastlane::Actions::SetupJenkinsAction::USED_ENV_NAMES + Fastlane::Actions::SetupJenkinsAction.available_options.map(&:env_name).each do |key|
           ENV.delete(key)
         end
