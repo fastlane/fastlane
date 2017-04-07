@@ -315,7 +315,7 @@ module Fastlane
 
       require 'terminal-table'
       puts Terminal::Table.new({
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Used plugins".green,
         headings: ["Plugin", "Version", "Action"]
       })

@@ -59,7 +59,7 @@ module Gym
       puts Terminal::Table.new(
         title: title.green,
         headings: ["Option", "Value"],
-        rows: rows.delete_if { |c| c.to_s.empty? }
+        rows: FastlaneCore::PrintTable.transform_output(rows.delete_if { |c| c.to_s.empty? })
       )
     end
 

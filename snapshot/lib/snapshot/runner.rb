@@ -124,7 +124,7 @@ module Snapshot
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         headings: ["Device"] + results.values.first.keys,
         title: "snapshot results"
       }

@@ -115,7 +115,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "fastlane summary".green,
         headings: ["Step", "Action", "Time (in s)"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
       puts ""
     end
@@ -145,7 +145,7 @@ module Fastlane
       table = Terminal::Table.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
       UI.message "Welcome to fastlane! Here's what your app is setup to do:"
@@ -232,12 +232,12 @@ module Fastlane
       rows = Actions.lane_context.collect do |key, content|
         [key, content.to_s]
       end
-      rows = FastlaneCore::PrintTable.print_values(config: rows)
 
+      # TODO: do we print twice here?
       require 'terminal-table'
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       })
     end
   end
