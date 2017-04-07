@@ -52,7 +52,35 @@ module FastlaneCore
       end
 
       def should_transform?
-        !FastlaneCore::Env.truthy?("FL_SKIP_TABLE_TRANSFORM")
+        return !FastlaneCore::Env.truthy?("FL_SKIP_TABLE_TRANSFORM")
+      end
+
+      def transform_row(column, transform, max_value_length)
+        return column if column.nil? # we want to keep the nil and not convert it to a string
+        return column if transform.nil? 
+
+        value = column.to_s.dup
+
+        if transform == :truncate_middle
+          return value.middle_truncate(max_value_length)
+        elsif transform == :newline
+          # remove all fixed newlines as it may mess up the output
+          value.tr!("\n", " ") if value.kind_of?(String)
+          if value.length >= max_value_length
+            colors = value.scan(/(\e\[.*?m)/)
+            if colors && colors.length > 0
+              colors.each do |color|
+                value.delete!(color.first)
+                value.delete!(color.last)
+              end
+            end
+            lines = value.wordwrap(max_value_length)
+            return  colorize_array(lines, colors)
+          end
+        elsif transform
+          UI.user_error!("Unknown transform value '#{transform}'")
+        end
+        return value
       end
 
       def transform_output(rows, transform: :newline)
@@ -66,39 +94,14 @@ module FastlaneCore
         col_count = rows.map(&:length).first || 1
 
         # -4 per column - as tt adds "| " and " |"
-        terminal_table_padding = 4
+        terminal_table_padding = 0
         max_length = number_of_cols - (col_count * terminal_table_padding)
 
         max_value_length = (max_length / col_count)
 
         return_array = rows.map do |row|
-          row.map do |col|
-            if col.nil?
-              col # we want to keep the nil and not convert it to a string
-            else
-              value = col.to_s.dup
-
-              if transform == :truncate_middle
-                value = value.middle_truncate(max_value_length)
-              elsif transform == :newline
-                # remove all fixed newlines as it may mess up the output
-                value.tr!("\n", " ") if value.kind_of?(String)
-                if value.length >= max_value_length
-                  colors = value.scan(/(\e\[.*?m)/)
-                  if colors && colors.length > 0
-                    colors.each do |color|
-                      value.delete!(color.first)
-                      value.delete!(color.last)
-                    end
-                  end
-                  lines = value.wordwrap(max_value_length)
-                  value = colorize_array(lines, colors)
-                end
-              elsif transform
-                UI.user_error!("Unknown transform value '#{transform}'")
-              end
-              value
-            end
+          row.map do |column|
+            transform_row(column, transform, max_value_length)
           end
         end
         return return_array
