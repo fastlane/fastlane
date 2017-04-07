@@ -52,6 +52,7 @@ module FastlaneCore
       end
 
       def should_transform?
+        return false if FastlaneCore::Helper.ci?
         return !FastlaneCore::Env.truthy?("FL_SKIP_TABLE_TRANSFORM")
       end
 
