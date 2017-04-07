@@ -73,28 +73,32 @@ module FastlaneCore
 
         return_array = rows.map do |row|
           row.map do |col|
-            value = col.to_s.dup
+            if col.nil?
+              col # we want to keep the nil and not convert it to a string
+            else
+              value = col.to_s.dup
 
-            if transform == :truncate_middle
-              value = value.middle_truncate(max_value_length)
-            elsif transform == :newline
-              # remove all fixed newlines as it may mess up the output
-              value.tr!("\n", " ") if value.kind_of?(String)
-              if value.length >= max_value_length
-                colors = value.scan(/(\e\[.*?m)/)
-                if colors && colors.length > 0
-                  colors.each do |color|
-                    value.delete!(color.first)
-                    value.delete!(color.last)
+              if transform == :truncate_middle
+                value = value.middle_truncate(max_value_length)
+              elsif transform == :newline
+                # remove all fixed newlines as it may mess up the output
+                value.tr!("\n", " ") if value.kind_of?(String)
+                if value.length >= max_value_length
+                  colors = value.scan(/(\e\[.*?m)/)
+                  if colors && colors.length > 0
+                    colors.each do |color|
+                      value.delete!(color.first)
+                      value.delete!(color.last)
+                    end
                   end
+                  lines = value.wordwrap(max_value_length)
+                  value = colorize_array(lines, colors)
                 end
-                lines = value.wordwrap(max_value_length)
-                value = colorize_array(lines, colors)
+              elsif transform
+                UI.user_error!("Unknown transform value '#{transform}'")
               end
-            elsif transform
-              UI.user_error!("Unknown transform value '#{transform}'")
+              value
             end
-            value
           end
         end
         return return_array
