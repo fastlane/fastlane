@@ -5,7 +5,7 @@ module Fastlane
         def discover_default_crashlytics_path
           path = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
           unless path
-            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Crashlytics' pod to your 'Gemfile' and run `pod update`")
+            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Podfile' pod to your 'Gemfile' and run `pod update`")
           end
           return path
         end
