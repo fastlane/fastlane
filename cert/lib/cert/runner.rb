@@ -160,17 +160,10 @@ module Cert
       request_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.certSigningRequest"))
       File.write(request_path, csr.to_pem)
 
-      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.pkey"))
+      private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       File.write(private_key_path, pkey)
 
       cert_path = store_certificate(certificate)
-
-      if Cert.config[:generate_p12]
-        p12_cert_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
-        p12 = OpenSSL::PKCS12.create(Cert.config[:p12_password], type_name, pkey, certificate.download)
-        File.write(p12_cert_path, p12.to_der)
-        UI.success "p12 certificate: #{p12_cert_path}"
-      end
 
       # Import all the things into the Keychain
       keychain = File.expand_path(Cert.config[:keychain_path])
