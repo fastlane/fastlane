@@ -67,7 +67,7 @@ describe Pilot::TesterManager do
             tester.last_name,
             tester.email,
             tester.group_names,
-            tester.devices.count,
+            tester.devices.count.to_s,
             tester.full_version,
             tester.pretty_install_date
           ]

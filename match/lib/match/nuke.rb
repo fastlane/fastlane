@@ -81,39 +81,42 @@ module Match
     def print_tables
       puts ""
       if self.certs.count > 0
+        rows = self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
         puts Terminal::Table.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
-          rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
+          rows: FastlaneCore::PrintTable.transform_output(rows)
         })
         puts ""
       end
 
       if self.profiles.count > 0
+        rows = self.profiles.collect do |p|
+          status = p.status == 'Active' ? p.status.green : p.status.red
+
+          [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
+        end
         puts Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
-          rows: self.profiles.collect do |p|
-            status = p.status == 'Active' ? p.status.green : p.status.red
-
-            [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
-          end
+          rows: FastlaneCore::PrintTable.transform_output(rows)
         })
         puts ""
       end
 
       if self.files.count > 0
+        rows = self.files.collect do |f|
+          components = f.split(File::SEPARATOR)[-3..-1]
+
+          # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
+          file_type = components[0..1].reverse.join(" ")[0..-2]
+
+          [file_type, components[2]]
+        end
         puts Terminal::Table.new({
           title: "Files that are going to be deleted".green,
           headings: ["Type", "File Name"],
-          rows: self.files.collect do |f|
-            components = f.split(File::SEPARATOR)[-3..-1]
-
-            # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
-            file_type = components[0..1].reverse.join(" ")[0..-2]
-
-            [file_type, components[2]]
-          end
+          rows: rows
         })
         puts ""
       end
