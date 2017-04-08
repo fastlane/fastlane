@@ -233,7 +233,6 @@ module Fastlane
         [key, content.to_s]
       end
 
-      # TODO: do we print twice here?
       require 'terminal-table'
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
