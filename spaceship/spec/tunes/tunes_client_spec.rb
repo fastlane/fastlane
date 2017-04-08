@@ -55,4 +55,25 @@ describe Spaceship::TunesClient do
       end
     end
   end
+
+  describe "Select team" do
+    it "crashes when running in non-interactive shell" do
+      ENV["CI"] = "1"
+      allow(subject).to receive(:teams).and_return([
+        {
+          'contentProvider' => {
+            'name' => 'Tom',
+            'contentProviderId' => 1111111111,
+          }
+        },
+        {
+          'contentProvider' => {
+            'name' => 'Jerry',
+            'contentProviderId' => 2222222222,
+          }
+        }
+      ])
+      expect { subject.select_team }.to raise_error "Running in non-interactive shell"
+    end
+  end
 end
