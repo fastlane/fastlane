@@ -20,7 +20,7 @@ module Spaceship
           (result || {}).fetch('name', nil)
         end
 
-        # Converts the langauge "UK English" (user facing) to "English_UK" (value)
+        # Converts the language "UK English" (user facing) to "English_UK" (value)
         def from_itc_readable_to_itc(from)
           readable_mapping.each do |key, value|
             return key if value == from
@@ -28,7 +28,7 @@ module Spaceship
           nil
         end
 
-        # Converts the langauge "English_UK" (value) to "UK English" (user facing)
+        # Converts the language "English_UK" (value) to "UK English" (user facing)
         def from_itc_to_itc_readable(from)
           readable_mapping[from]
         end

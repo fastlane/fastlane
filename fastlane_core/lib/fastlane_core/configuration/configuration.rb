@@ -156,7 +156,7 @@ module FastlaneCore
     # Take a look at how `gym` uses this method
     #
     # @param config_file_name [String] The name of the configuration file to use (optional)
-    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
+    # @param block_for_missing [Block] A ruby block that is called when there is an unknown method
     #   in the configuration file
     def load_configuration_file(config_file_name = nil, block_for_missing = nil)
       return unless config_file_name

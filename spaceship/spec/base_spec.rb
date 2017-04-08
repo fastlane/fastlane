@@ -40,7 +40,7 @@ describe Spaceship::Base do
       expect(test_base.to_s).to eq("<TestBase \n\tchild=<TestBase \n\t#<Object ...>>>")
     end
 
-    it "doesn't leak state when throwing expections while inspecting objects" do
+    it "doesn't leak state when throwing exceptions while inspecting objects" do
       # an object with a broken inspect
       test_base2 = TestBase.new
       error = "faked inspect error"

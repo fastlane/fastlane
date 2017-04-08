@@ -493,7 +493,7 @@ function resign {
         log "Profile team identifier is '$TEAM_IDENTIFIER'"
     fi
 
-    # Make a copy of old embedded provisioning profile for futher use
+    # Make a copy of old embedded provisioning profile for further use
     cp -f "$APP_PATH/embedded.mobileprovision" "$TEMP_DIR/old-embedded.mobileprovision"
 
     # Replace embedded provisioning profile with new file
