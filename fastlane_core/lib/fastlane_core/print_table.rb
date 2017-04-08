@@ -58,7 +58,7 @@ module FastlaneCore
 
       def transform_row(column, transform, max_value_length)
         return column if column.nil? # we want to keep the nil and not convert it to a string
-        return column if transform.nil? 
+        return column if transform.nil?
 
         value = column.to_s.dup
 
