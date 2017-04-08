@@ -28,6 +28,7 @@ module Fastlane
 
           input_format: '--input-format',
           scheme: '--scheme',
+          configuration: '--configuration',
           workspace: '--workspace',
           binary_file: '--binary-file',
           binary_basename: '--binary-basename',
@@ -120,6 +121,10 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_SLATHER_CONFIGURATION", # The name of the environment variable
+                                       description: "Configuration to use when calling slather",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable

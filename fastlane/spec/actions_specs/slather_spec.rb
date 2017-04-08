@@ -8,6 +8,7 @@ describe Fastlane do
             build_directory: 'foo',
             input_format: 'bah',
             scheme: 'Foo',
+            configuration: 'Bar',
             buildkite: true,
             jenkins: true,
             travis: true,
@@ -51,6 +52,7 @@ describe Fastlane do
                     --verbose
                     --input-format bah
                     --scheme Foo
+                    --configuration Bar
                     --workspace foo.xcworkspace
                     --binary-file you
                     --binary-basename YourApp
@@ -67,6 +69,7 @@ describe Fastlane do
             build_directory: 'foo',
             input_format: 'bah',
             scheme: 'Foo',
+            configuration: 'Bar',
             buildkite: true,
             jenkins: true,
             travis: true,
@@ -104,6 +107,7 @@ describe Fastlane do
                     --ignore nothing
                     --input-format bah
                     --scheme Foo
+                    --configuration Bar
                     --workspace foo.xcworkspace
                     --binary-file you
                     --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, ' ')
