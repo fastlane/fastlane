@@ -48,13 +48,14 @@ module Fastlane
             require File.join(tool_name, "commands_generator")
 
             # Call the tool's CommandsGenerator class and let it do its thing
-            Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
+            commands_generator_ref = Object.const_get(tool_name.fastlane_module)::CommandsGenerator
           rescue LoadError
             # This will only happen if the tool we call here, doesn't provide
             # a CommandsGenerator class yet
             # When we launch this feature, this should never be the case
             abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
           end
+          commands_generator_ref.start
         elsif tool_name == "fastlane-credentials"
           require 'credentials_manager'
           ARGV.shift
