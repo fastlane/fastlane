@@ -93,6 +93,7 @@ describe FastlaneCore do
       before do
         @config[:cert_name] = long_breakable_text
         allow(TTY::Screen).to receive(:width).and_return(200)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false) # because we don't transform on CI
       end
 
       it "middle truncate", nower: true do
