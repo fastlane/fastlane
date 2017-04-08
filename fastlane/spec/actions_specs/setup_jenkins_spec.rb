@@ -20,6 +20,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to be_nil
         expect(ENV["DERIVED_DATA_PATH"]).to be_nil
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to be_nil
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to be_nil
         expect(ENV["GYM_BUILD_PATH"]).to be_nil
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to be_nil
@@ -47,6 +48,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
         expect(ENV["GYM_BUILD_PATH"]).to eq(output)
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
@@ -72,6 +74,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
         expect(ENV["GYM_BUILD_PATH"]).to eq(output)
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
@@ -171,6 +174,7 @@ describe Fastlane do
 
           expect(ENV["DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq("/tmp/derived_data")
+          expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq("/tmp/derived_data")
           expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
