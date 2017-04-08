@@ -48,12 +48,12 @@ describe FastlaneCore do
 
       value = FastlaneCore::PrintTable.print_values(config: @config, title: title, hide_keys: [:a_sensitive])
       expect(value[:title]).to eq(title.green)
-      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", "true"]])
+      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", true]])
     end
 
     it "automatically masks sensitive options" do
       value = FastlaneCore::PrintTable.print_values(config: @config)
-      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", "true"], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", true], ["a_sensitive", "********"]])
     end
 
     it "supports mask_keys property with symbols and strings" do
@@ -84,7 +84,7 @@ describe FastlaneCore do
       @config[:cert_name] = nil # compulsory without default
       @config[:output] = nil    # compulsory with default
       value = FastlaneCore::PrintTable.print_values(config: @config)
-      expect(value[:rows]).to eq([["output", "."], ["a_bool", "true"], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["output", "."], ["a_bool", true], ["a_sensitive", "********"]])
     end
 
     describe "Breaks down lines" do
@@ -96,6 +96,7 @@ describe FastlaneCore do
       end
 
       it "middle truncate", nower: true do
+        expect(FastlaneCore::PrintTable).to receive(:should_transform?).and_return(true)
         value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:output, :a_bool, :a_sensitive], transform: :truncate_middle)
         expect(value[:rows].count).to eq(1)
         expect(value[:rows][0][1]).to include("...")
@@ -103,6 +104,7 @@ describe FastlaneCore do
       end
 
       it "newline" do
+        expect(FastlaneCore::PrintTable).to receive(:should_transform?).and_return(true)
         value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:output, :a_bool, :a_sensitive], transform: :newline)
         expect(value[:rows].count).to eq(1)
         expect(value[:rows][0][1]).to include("\n")
@@ -131,6 +133,7 @@ describe FastlaneCore do
       end
 
       it "raises an exception for invalid transform" do
+        expect(FastlaneCore::PrintTable).to receive(:should_transform?).and_return(true)
         expect do
           FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], transform: :something_random)
         end.to raise_error("Unknown transform value 'something_random'")

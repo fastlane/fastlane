@@ -120,7 +120,7 @@ describe FastlaneCore do
 
         it "prints out a table of all the set values" do
           expect(Terminal::Table).to receive(:new).with({
-            rows: [["app_identifier", "com.krausefx.app"], ["apple_id", "from_le_block"]],
+            rows: [[:app_identifier, "com.krausefx.app"], [:apple_id, "from_le_block"]],
             title: "Detected Values from './fastlane_core/spec/fixtures/ConfigFileValid'"
           })
 
