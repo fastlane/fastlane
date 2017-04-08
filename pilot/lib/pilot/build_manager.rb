@@ -97,7 +97,7 @@ module Pilot
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
         headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
     end
 
