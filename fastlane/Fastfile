@@ -59,18 +59,24 @@ end
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
+  slack_train_start(distance: 13,
+                       train: "🚀",
+           reverse_direction: true,
+                        rail: "✨")
+
   update_fastlane
+  slack_train
 
   # Git verification
   #
-  ensure_git_status_clean
+  # ensure_git_status_clean
   ensure_git_branch(branch: 'master')
   git_pull
 
-  # Verifying RubyGems version
-  #
   validate_repo
 
+  # Verifying RubyGems version
+  #
   require "../fastlane/lib/fastlane/version.rb"
   version = Fastlane::VERSION
   old_version = current_version
@@ -82,6 +88,7 @@ lane :release do
   # Then push to git remote
   #
   push_to_git_remote
+  slack_train
 
   # Preparing GitHub Release
   #
@@ -100,6 +107,7 @@ lane :release do
       description: description,
       is_draft: false
     )
+    slack_train
 
     # Actual release of the gem
     #
@@ -128,6 +136,7 @@ lane :release do
     )
     slack(channel: "action", default_payloads: [], message: slack_message)
   end
+  slack_train
 
   clubmate
   donate_food
@@ -137,6 +146,7 @@ lane :release do
   puts "[fastlane] #{github_release['name']} #{releases_url}"
 
   update_docs
+  slack_train
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
@@ -225,6 +235,7 @@ error do |lane, exception|
   if ENV['SLACK_URL']
     slack(channel: "testing", message: exception.to_s, success: false)
   end
+  slack_train_crash
 end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
@@ -236,7 +247,9 @@ private_lane :validate_repo do
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
 
+  slack_train
   rubocop
+  slack_train
 
   # Verifying the --help command
   #
@@ -256,21 +269,26 @@ private_lane :validate_repo do
   Dir.chdir("..") do
     # Install the bundle and the actual gem
     sh "bundle check || bundle install"
+    slack_train
     sh "rake install"
 
+    slack_train
     # Run the tests
     #
     sh "bundle exec rake test_all"
+    slack_train
 
     # Verify shell code style
     sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
   test_generate_docs
+  slack_train
   ensure_code_samples
 
   # Verify docs are still working
   verify_docs
+  slack_train
 end
 
 desc "Get the version number of the last release"
