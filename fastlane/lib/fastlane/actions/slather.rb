@@ -53,7 +53,22 @@ module Fastlane
         File.file?('.slather.yml')
       end
 
+      def self.slather_version(params)
+        command = []
+        command.push("bundle exec") if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        command.push("slather version")
+        Gem::Version.create(`#{command.join(' ')}`.split(' ')[1])
+      end
+
+      def self.configuration_available?(params)
+        Gem::Version.create('2.4.1') <= slather_version(params)
+      end
+
       def self.validate_params!(params)
+        if params[:configuration]
+          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?(params)
+        end
+
         if params[:proj] || has_config_file
           true
         else
@@ -124,7 +139,7 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        env_name: "FL_SLATHER_CONFIGURATION", # The name of the environment variable
-                                       description: "Configuration to use when calling slather",
+                                       description: "Configuration to use when calling slather (since slather-2.4.1)",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
