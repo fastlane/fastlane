@@ -115,7 +115,7 @@ module Fastlane
     # Allows the user to call an action from an action
     def self.method_missing(method_sym, *arguments, &_block)
       UI.error("Unknown method '#{method_sym}'")
-      UI.user_error!("To call another action from an action use `OtherAction.#{method_sym}` instead")
+      UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
     end
 
     # When shelling out from the actoin, should we use `bundle exec`?
