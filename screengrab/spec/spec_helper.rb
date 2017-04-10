@@ -37,6 +37,8 @@ end
 # All credit for this method goes to the original authors.
 # The code is used under the MIT license.
 #
+# Strips indentation by removing the amount of leading whitespace in the least indented non-empty line in the whole string
+#
 def strip_heredoc(str)
   str.gsub(/^#{str.scan(/^[ \t]*(?=\S)/).min}/, "".freeze)
 end
