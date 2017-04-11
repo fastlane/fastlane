@@ -33,7 +33,7 @@ module Fastlane
       output << "<td width=\"33%\"><code>sudo gem install fastlane -NV</code></td>"
       output << "</tr>"
       output << "</table>"
-
+      output << ""
       output << "# Available Actions"
 
       all_keys = ff.runner.lanes.keys.reject(&:nil?)
