@@ -7,7 +7,7 @@ module Scan
 
       require 'slack-notifier'
       notifier = Slack::Notifier.new(Scan.config[:slack_url])
-      notifier.username = 'fastlane'
+      notifier.username = Scan.config[:slack_username]
 
       if Scan.config[:slack_channel].to_s.length > 0
         notifier.channel = Scan.config[:slack_channel]
