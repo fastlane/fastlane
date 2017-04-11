@@ -9,7 +9,7 @@ module Scan
     end
 
     def self.available_options
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
 
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -135,7 +135,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :test_without_building,
                                      short_option: "-T",
                                      env_name: "SCAN_TEST_WITHOUT_BUILDING",
-                                     description: "Test without building, requires a derrived data path",
+                                     description: "Test without building, requires a derived data path",
                                      is_string: false,
                                      conflicting_options: [:build_for_testing],
                                      optional: true),
@@ -223,7 +223,9 @@ module Scan
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
+                                       if !value.to_s.empty? && !value.start_with?("https://")
+                                         UI.user_error!("Invalid URL, must start with https://")
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_channel,
                                      short_option: "-e",

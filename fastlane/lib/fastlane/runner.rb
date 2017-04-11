@@ -62,7 +62,7 @@ module Fastlane
             error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
             error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
           rescue => error_block_exception
-            UI.error("An error occured while executing the `error` block:")
+            UI.error("An error occurred while executing the `error` block:")
             UI.error(error_block_exception.to_s)
             raise ex # raise the original error message
           end
@@ -254,6 +254,8 @@ module Fastlane
         end
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
+        raise e
+      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else

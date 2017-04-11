@@ -22,7 +22,7 @@ module Snapshot
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
 
       # Devices
-      unless config[:devices]
+      if config[:devices].nil? && !Snapshot.project.mac?
         config[:devices] = []
 
         # We only care about a subset of the simulators
@@ -43,13 +43,16 @@ module Snapshot
 
           # Filter iPhones
           # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
-          next if sim.name.include?("6s") # same screen resolution as iPhone 6, or iPhone 6s Plus
           next if sim.name.include?("5s") # same screen resolution as iPhone 5
+          next if sim.name.include?("SE") # duplicate of iPhone 5
+          next if sim.name.include?("iPhone 6") # same as iPhone 7
 
           next if sim.name.include?("Apple TV")
 
           config[:devices] << sim.name
         end
+      elsif Snapshot.project.mac?
+        config[:devices] << "Mac"
       end
     end
   end

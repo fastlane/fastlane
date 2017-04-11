@@ -1,6 +1,6 @@
 module FastlaneCore
   class ConfigItem
-    # [Symbol] the key which is used as command paramters or key in the fastlane tools
+    # [Symbol] the key which is used as command parameters or key in the fastlane tools
     attr_accessor :key
 
     # [String] the name of the environment variable, which is only used if no other values were found
@@ -40,7 +40,7 @@ module FastlaneCore
     attr_accessor :allow_shell_conversion
 
     # Creates a new option
-    # @param key (Symbol) the key which is used as command paramters or key in the fastlane tools
+    # @param key (Symbol) the key which is used as command parameters or key in the fastlane tools
     # @param env_name (String) the name of the environment variable, which is only used if no other values were found
     # @param description (String) A description shown to the user
     # @param short_option (String) A string of length 1 which is used for the command parameters (e.g. -f)
@@ -60,10 +60,12 @@ module FastlaneCore
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
       if short_option
-        UI.user_error!("short_option must be a String of length 1") unless short_option.kind_of? String and short_option.delete('-').length == 1
+        UI.user_error!("short_option for key :#{key} must of type String") unless short_option.kind_of?(String)
+        UI.user_error!("short_option for key :#{key} must be a string of length 1") unless short_option.delete('-').length == 1
       end
+
       if description
-        UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well") if description[-1] == '.'
+        UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well for key :#{key}") if description[-1] == '.'
       end
 
       if conflicting_options
@@ -71,6 +73,7 @@ module FastlaneCore
           UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of? Symbol
         end
       end
+
       if deprecated
         # deprecated options are automatically optional
         optional = true if optional.nil?

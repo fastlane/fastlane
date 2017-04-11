@@ -91,7 +91,7 @@ module Spaceship
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
         def all_ios_profile_devices
-          all.select { |device| device.device_type != "tvOS" }
+          all.reject { |device| device.device_type == "tvOS" }
         end
 
         # @return (Array) Returns all devices matching the provided profile_type

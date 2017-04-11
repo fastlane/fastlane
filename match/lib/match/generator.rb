@@ -75,7 +75,7 @@ module Match
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore
       return "InHouse" if type == :enterprise
-      return "Unkown"
+      return "Unknown"
     end
   end
 end

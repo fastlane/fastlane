@@ -48,7 +48,7 @@ module Screengrab
 
         c.action do |args, options|
           require 'screengrab/setup'
-          path = (Screengrab::Helper.fastlane_enabled? ? './fastlane' : '.')
+          path = Screengrab::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           Screengrab::Setup.create(path)
         end
       end

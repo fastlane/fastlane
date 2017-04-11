@@ -50,7 +50,7 @@ module Fastlane
                                          is_string: false,
                                          default_value: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
-                                         description: "Allow ouput detail in console",
+                                         description: "Allow output detail in console",
                                          optional: true,
                                          is_string: false),
           FastlaneCore::ConfigItem.new(key: :allow_warnings,
@@ -101,7 +101,7 @@ module Fastlane
       def self.example_code
         [
           'pod_lib_lint',
-          '# Allow ouput detail in console
+          '# Allow output detail in console
           pod_lib_lint(verbose: true)',
           '# Allow warnings during pod lint
           pod_lib_lint(allow_warnings: true)',

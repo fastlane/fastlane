@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path('../fastlane/lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
@@ -44,9 +45,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
   spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander', '>= 4.4.0', '< 5.0.0' # CLI parser
+  spec.add_dependency 'commander-fastlane', '>= 4.4.0', '< 5.0.0' # CLI parser
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0.0' # Great HTTP Client
-  spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'  
+  spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '>= 1.6' # fetch the image sizes from the screenshots, note: we also support > 2.0
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
   spec.add_dependency 'google-api-client', '~> 0.9.2' # Google API Client to access Play Publishing API
@@ -63,7 +64,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
-  # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
+  # Lock `activesupport` (transitive dependency via `xcodeproj`) to keep supporting system ruby
   spec.add_dependency 'activesupport', '< 5'
 
   # Development only
@@ -75,7 +76,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '~> 0.47'
+  spec.add_development_dependency 'rubocop', '0.48.1'
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'

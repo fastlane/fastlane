@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 module Pilot
   class BuildManager < Manager
     def upload(options)
@@ -9,10 +11,12 @@ module Pilot
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
+      dir = Dir.mktmpdir
+
       platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
-                                                                  package_path: "/tmp",
+                                                                  package_path: dir,
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
@@ -48,7 +52,6 @@ module Pilot
         # sort by upload_date
         builds.sort! { |a, b| a.upload_date <=> b.upload_date }
         build = builds.last
-        beta_state = build.external_beta_state
         if build.nil?
           UI.user_error!("No builds found.")
           return
@@ -72,21 +75,11 @@ module Pilot
           UI.success "Successfully set the changelog and/or description for build"
         end
       end
-      if beta_state == "waiting" || beta_state == "submitForReview"
-        external_available = false
-      end
 
       return if config[:skip_submission]
-
-      distribute_result = distribute_build(build, options, external_available)
+      distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
-      # distribute_result returns true if the build was approved for external testing and was turned on.
-      # distribute_result returns false if the build was not turned on and only submitted for external review
-      if distribute_result
-        UI.success("Successfully distributed build to #{type} testers 🚀")
-      else
-        UI.success("Build submitted to beta review")
-      end
+      UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
     def list(options)
@@ -103,8 +96,8 @@ module Pilot
 
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions", "Beta State"],
-        rows: rows
+        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
     end
 
@@ -126,8 +119,7 @@ module Pilot
              build.build_version,
              build.testing_status,
              build.install_count,
-             build.session_count,
-             build.external_beta_state]
+             build.session_count]
 
       return row
     end
@@ -158,8 +150,8 @@ module Pilot
           UI.message("New application; waiting for build train to appear on iTunes Connect")
         else
           builds = app.all_processing_builds(platform: platform)
-          break if builds.count == 0
-          latest_build = builds.last
+          latest_build = builds.last unless latest_build
+          break unless builds.include?(latest_build)
 
           if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary
@@ -201,7 +193,7 @@ module Pilot
       end
     end
 
-    def distribute_build(uploaded_build, options, external_available)
+    def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers")
 
       # Submit for review before external testflight is available
@@ -215,17 +207,9 @@ module Pilot
       end
 
       # Submit for beta testing
-      # We need to check if the user is attempting to turn on external builds and the status for external builds
-      # If we attempt to make an unapproved external build available iTC will return an error
-      if external_available || !options[:distribute_external]
-        type = options[:distribute_external] ? 'external' : 'internal'
-        uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
-        work_status = true
-      else
-        UI.important('Unable to turn on external testing before beta review approval')
-        work_status = false
-      end
-      return work_status
+      type = options[:distribute_external] ? 'external' : 'internal'
+      uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
+      return true
     end
   end
 end

@@ -58,8 +58,8 @@ module Fastlane
         # Removes .plist files that matched the given expression in the 'ignore' parameter
         ignore_expression = params[:ignore]
         if ignore_expression
-          info_plist_files.select! do |info_plist_file|
-            !info_plist_file.match(ignore_expression)
+          info_plist_files.reject! do |info_plist_file|
+            info_plist_file.match(ignore_expression)
           end
         end
 
@@ -88,7 +88,7 @@ module Fastlane
         unless changed_files_as_expected
           unless params[:force]
             error = [
-              "Found unexpected uncommited changes in the working directory. Expected these files to have ",
+              "Found unexpected uncommitted changes in the working directory. Expected these files to have ",
               "changed: \n#{expected_changed_files.join("\n")}.\nBut found these actual changes: ",
               "#{git_dirty_files.join("\n")}.\nMake sure you have cleaned up the build artifacts and ",
               "are only left with the changed version files at this stage in your lane, and don't touch the ",

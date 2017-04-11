@@ -21,7 +21,7 @@ module Deliver
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
 
-    # This method takes care of creating a new 'deliver' folder, containg the app metadata
+    # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
