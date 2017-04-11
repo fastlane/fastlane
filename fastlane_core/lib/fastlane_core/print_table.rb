@@ -97,10 +97,10 @@ module FastlaneCore
         col_count = rows.map(&:length).first || 1
 
         # -4 per column - as tt adds "| " and " |"
-        terminal_table_padding = 0
+        terminal_table_padding = 4
         max_length = number_of_cols - (col_count * terminal_table_padding)
 
-        max_value_length = (max_length / col_count)
+        max_value_length = (max_length / col_count) - 1
 
         return_array = rows.map do |row|
           row.map do |column|
