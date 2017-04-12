@@ -103,7 +103,7 @@ describe Screengrab::Runner do
 
     context 'no devices' do
       it 'does not find any active devices' do
-        adb_response = <<-ADB_OUTPUT.strip_heredoc
+        adb_response = strip_heredoc <<-ADB_OUTPUT
         List of devices attached
 
         ADB_OUTPUT
@@ -117,7 +117,7 @@ describe Screengrab::Runner do
 
     context 'one device with spurious ADB output mixed in' do
       it 'finds an active device' do
-        adb_response = <<-ADB_OUTPUT.strip_heredoc
+        adb_response = strip_heredoc <<-ADB_OUTPUT
           List of devices attached
           adb server version (39) doesn't match this client (36); killing...
           * daemon started successfully
@@ -133,7 +133,7 @@ describe Screengrab::Runner do
 
     context 'one device' do
       it 'finds an active device' do
-        adb_response = <<-ADB_OUTPUT.strip_heredoc
+        adb_response = strip_heredoc <<-ADB_OUTPUT
           List of devices attached
           T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
 
@@ -147,7 +147,7 @@ describe Screengrab::Runner do
 
     context 'multiple devices' do
       it 'finds an active device' do
-        adb_response = <<-ADB_OUTPUT.strip_heredoc
+        adb_response = strip_heredoc <<-ADB_OUTPUT
           List of devices attached
           emulator-5554          device product:sdk_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64
           T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
@@ -161,7 +161,7 @@ describe Screengrab::Runner do
 
     context 'one device booting' do
       it 'finds an active device' do
-        adb_response = <<-ADB_OUTPUT.strip_heredoc
+        adb_response = strip_heredoc <<-ADB_OUTPUT
           List of devices attached
           emulator-5554 offline
           T065002LTT  device
@@ -177,7 +177,7 @@ describe Screengrab::Runner do
 
   describe :run_adb_command do
     it 'filters out lines which are ADB warnings' do
-      adb_response = <<-ADB_OUTPUT.strip_heredoc
+      adb_response = strip_heredoc <<-ADB_OUTPUT
             adb: /home/me/rubystack-2.3.1-4/common/lib/libcrypto.so.1.0.0: no version information available (required by adb)
             List of devices attached
             e1dbf228               device usb:1-1.2 product:a33gdd model:SM_A300H device:a33g
