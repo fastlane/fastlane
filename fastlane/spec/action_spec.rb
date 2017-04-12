@@ -91,7 +91,7 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromActionInvalid')
         expect do
           ff.runner.execute(:something, :ios)
-        end.to raise_error("To call another action from an action use `OtherAction.rocket` instead")
+        end.to raise_error("To call another action from an action use `other_action.rocket` instead")
       end
     end
   end

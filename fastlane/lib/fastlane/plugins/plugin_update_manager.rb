@@ -42,7 +42,7 @@ module Fastlane
       end
 
       puts Terminal::Table.new({
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Plugin updates available".yellow,
         headings: ["Plugin", "Your Version", "Latest Version"]
       })
