@@ -47,16 +47,6 @@ describe Snapshot do
       it 'copies all device log archives to the output directory on macOS 10.12 (Siera)' do
         Snapshot.config = @config
 
-        expect(FileUtils).
-          to receive(:cp_r).
-          with(/.*/, %r{de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).
-          and_return(true)
-
-        expect(FileUtils).
-          to receive(:cp_r).
-          with(/.*/, %r{en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}).
-          and_return(true)
-
         allow(FastlaneCore::CommandExecutor).
           to receive(:execute).
           with(command: "sw_vers -productVersion", print_all: false, print_command: false).
@@ -64,23 +54,11 @@ describe Snapshot do
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl getenv 33333 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-          and_return("/tmp/folder")
+          with(command: "xcrun simctl spawn 33333 log collect --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn 33333 log collect 2>/dev/null", print_all: false, print_command: true).
-          and_return("/tmp/folder")
-
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(command: "xcrun simctl getenv 98765 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-          and_return("/tmp/folder")
-
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(command: "xcrun simctl spawn 98765 log collect 2>/dev/null", print_all: false, print_command: true).
-          and_return("/tmp/folder")
+          with(command: "xcrun simctl spawn 98765 log collect --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
 
         Snapshot::Runner.new.copy_simulator_logs("iPhone 6 (10.1)", "de-DE", nil, 0)
         Snapshot::Runner.new.copy_simulator_logs("iPhone 6s (10.1)", "en-US", nil, 0)
@@ -119,7 +97,7 @@ describe Snapshot do
       end
     end
 
-    describe "Valid Configuration" do
+    describe "Valid iOS Configuration" do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
 
       def configure(options)
@@ -205,6 +183,30 @@ describe Snapshot do
           command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
+      end
+    end
+
+    describe "Valid macOS Configuration" do
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS" } }
+
+      it "uses default parameters on macOS" do
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
+        expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+        command = Snapshot::TestCommandGenerator.generate(device_type: "Mac")
+        expect(command).to eq(
+          [
+            "set -o pipefail &&",
+            "xcodebuild",
+            "-scheme ExampleMacOS",
+            "-project ./snapshot/example/Example.xcodeproj",
+            "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+            "-destination 'platform=macOS'",
+            "FASTLANE_SNAPSHOT=YES",
+            :build,
+            :test,
+            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS.log")} | xcpretty "
+          ]
+        )
       end
     end
   end

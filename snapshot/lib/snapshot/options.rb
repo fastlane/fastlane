@@ -43,8 +43,9 @@ module Snapshot
                                      verify_block: proc do |value|
                                        available = FastlaneCore::DeviceManager.simulators
                                        value.each do |current|
-                                         unless available.any? { |d| d.name.strip == current.strip }
-                                           UI.user_error!("Device '#{current}' not in list of available simulators '#{available.join(', ')}'")
+                                         device = current.strip
+                                         unless available.any? { |d| d.name.strip == device } || device == "Mac"
+                                           UI.user_error!("Device '#{device}' not in list of available simulators '#{available.join(', ')}'")
                                          end
                                        end
                                      end),
@@ -77,6 +78,11 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SNAPSHOT_SKIP_OPEN_SUMMARY',
                                      description: "Don't open the HTML summary after running _snapshot_",
+                                     default_value: false,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :skip_helper_version_check,
+                                     env_name: 'SNAPSHOT_SKIP_SKIP_HELPER_VERSION_CHECK',
+                                     description: "Do not check for most recent SnapshotHelper code",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :clear_previous_screenshots,

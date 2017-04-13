@@ -55,7 +55,7 @@ module Fastlane
           handle_exception(exception: ex)
         else
           UI.error(ex.to_s)
-          UI.error('An error occured during the setup process. Falling back to manual setup!')
+          UI.error('An error occurred during the setup process. Falling back to manual setup!')
           try_manual_setup
         end
       end
@@ -149,7 +149,8 @@ module Fastlane
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values")
+      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values")
       puts ""
 
       unless self.itc_ref || self.project.mac?

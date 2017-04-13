@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency 'slack-notifier', '>= 1.3', '< 2.0.0' # Slack notifications
-  spec.add_dependency 'xcodeproj', '>= 0.20', '< 2.0.0' # Needed for commit_version_bump action
+  spec.add_dependency 'xcodeproj', '>= 1.4.4', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '>= 1.6.2', '< 2.0.0' # macOS notifications
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
@@ -64,9 +64,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
-  # Lock `activesupport` (transitive depedency via `xcodeproj`) to keep supporting system ruby
-  spec.add_dependency 'activesupport', '< 5'
-
   # Development only
   spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
@@ -76,7 +73,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '~> 0.48'
+  spec.add_development_dependency 'rubocop', '0.48.1'
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'

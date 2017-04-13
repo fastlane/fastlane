@@ -306,7 +306,7 @@ module FastlaneCore
     # @param dir [String] the path in which the package file should be stored
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transfering
+    #   when transferring
     def download(app_id, dir = nil)
       dir ||= "/tmp"
 
@@ -340,7 +340,7 @@ module FastlaneCore
     # @param dir [String] the path in which the package file is located
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transfering
+    #   when transferring
     def upload(app_id, dir)
       actual_dir = File.join(dir, "#{app_id}.itmsp")
 

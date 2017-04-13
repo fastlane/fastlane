@@ -1,3 +1,6 @@
+Style/PercentLiteralDelimiters:
+  Enabled: false
+  
 # kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
@@ -53,7 +56,7 @@ Style/NumericLiteralPrefix:
 Style/TernaryParentheses:
   Enabled: false
 
-# sometimes it is usefull to have those empty methods
+# sometimes it is useful to have those empty methods
 Style/EmptyMethod:
   Enabled: false
 

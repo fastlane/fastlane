@@ -220,7 +220,7 @@ module Fastlane
         UI.important("fastlane will create a new Gemfile at path '#{path_to_gemfile}'")
       end
 
-      UI.important("This change is neccessary for fastlane plugins to work")
+      UI.important("This change is necessary for fastlane plugins to work")
 
       unless UI.confirm("Should fastlane modify the Gemfile at path '#{path_to_gemfile}' for you?")
         UI.important("Please add the following code to '#{path_to_gemfile}':")
@@ -315,7 +315,7 @@ module Fastlane
 
       require 'terminal-table'
       puts Terminal::Table.new({
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Used plugins".green,
         headings: ["Plugin", "Version", "Action"]
       })

@@ -61,13 +61,17 @@ module Fastlane
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) unless FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)
 
       return ff
+    end
+
+    def self.skip_docs?
+      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # All the finishing up that needs to be done
@@ -111,7 +115,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "fastlane summary".green,
         headings: ["Step", "Action", "Time (in s)"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
       puts ""
     end
@@ -119,7 +123,14 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      available = []
+
+      # nil is the key for lanes that are not under a specific platform
+      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms.each do |p|
+        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+      end
+
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end
@@ -134,7 +145,7 @@ module Fastlane
       table = Terminal::Table.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
       UI.message "Welcome to fastlane! Here's what your app is setup to do:"
@@ -221,12 +232,11 @@ module Fastlane
       rows = Actions.lane_context.collect do |key, content|
         [key, content.to_s]
       end
-      rows = FastlaneCore::PrintTable.limit_row_size(rows)
 
       require 'terminal-table'
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       })
     end
   end

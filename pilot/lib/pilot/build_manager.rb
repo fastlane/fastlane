@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 module Pilot
   class BuildManager < Manager
     def upload(options)
@@ -9,10 +11,12 @@ module Pilot
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
+      dir = Dir.mktmpdir
+
       platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
-                                                                  package_path: "/tmp",
+                                                                  package_path: dir,
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
@@ -93,7 +97,7 @@ module Pilot
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
         headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
     end
 
@@ -146,8 +150,8 @@ module Pilot
           UI.message("New application; waiting for build train to appear on iTunes Connect")
         else
           builds = app.all_processing_builds(platform: platform)
-          break if builds.count == 0
-          latest_build = builds.last
+          latest_build = builds.last unless latest_build
+          break unless builds.include?(latest_build)
 
           if latest_build.valid and must_update_build_info
             # Set the changelog and/or description if necessary

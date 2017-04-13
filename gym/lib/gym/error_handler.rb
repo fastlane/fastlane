@@ -54,6 +54,7 @@ module Gym
         print_full_log_path
         print_xcode_path_instructions
         print_xcode_version
+        raise_legacy_build_api_error(output) if Gym.config[:use_legacy_build_api]
         UI.user_error!("Error building the application - see the log above", error_info: output)
       end
 
@@ -101,6 +102,15 @@ module Gym
       def find_standard_output_path(output)
         m = /Created bundle at path '(.*)'/.match(output)
         return File.join(m[1], 'IDEDistribution.standard.log') unless m.nil?
+      end
+
+      def raise_legacy_build_api_error(output)
+        UI.error("You enabled the legacy build API in _gym_")
+        UI.error("This option has been deprecated for about a year")
+        UI.error("and was removed with Xcode 8.3")
+        UI.error("Please update your Fastfile to include the export_method too")
+        UI.error("more information about how to migrate away: https://github.com/fastlane/fastlane/releases/tag/2.24.0")
+        UI.user_error!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
       end
 
       private

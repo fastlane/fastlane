@@ -156,28 +156,5 @@ module Match
         end
       end
     end
-
-    # Checks push permission to git repo
-    def self.repo_pushable?(path, branch = "master")
-      Dir.chdir(path) do
-        command = "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape} --dry-run"
-        FastlaneCore::CommandExecutor.execute(command: command,
-                                              print_all: FastlaneCore::Globals.verbose?,
-                                              print_command: FastlaneCore::Globals.verbose?)
-      end
-      return true
-    rescue => ex
-      UI.error("No permission to push...")
-      UI.error(ex)
-      return false
-    end
-
-    def self.check_push_repo_permission(path, branch = "master")
-      unless repo_pushable?(path, branch)
-        UI.error("You do not have push permission to git repository provided")
-        UI.error("_match_ needs to create a new certificate or provisioning profile, however without push access to the git repo, the generated certificate can't be stored properly, resulting in an unused certificate")
-        UI.user_error!("Please grant push access for the current git user to the git repo, so that _match_ can update and create certificates for you")
-      end
-    end
   end
 end

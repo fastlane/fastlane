@@ -71,7 +71,7 @@ module Snapshot
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
-    # @return true/false depending on if the tests succeded
+    # @return true/false depending on if the tests succeeded
     def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
       return launch(language, locale, device, launch_arguments)
     rescue => ex
@@ -124,7 +124,7 @@ module Snapshot
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         headings: ["Device"] + results.values.first.keys,
         title: "snapshot results"
       }
@@ -133,7 +133,7 @@ module Snapshot
       puts ""
     end
 
-    # Returns true if it succeded
+    # Returns true if it succeeded
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -146,22 +146,24 @@ module Snapshot
       File.write(File.join(prefix, "locale.txt"), locale || "")
       File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
-      # Kill and shutdown all currently running simulators so that the following settings
-      # changes will be picked up when they are started again.
-      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
-      `xcrun simctl shutdown booted &> /dev/null`
+      unless device_type == "Mac"
+        # Kill and shutdown all currently running simulators so that the following settings
+        # changes will be picked up when they are started again.
+        Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+        `xcrun simctl shutdown booted &> /dev/null`
 
-      Fixes::SimulatorZoomFix.patch
-      Fixes::HardwareKeyboardFix.patch
+        Fixes::SimulatorZoomFix.patch
+        Fixes::HardwareKeyboardFix.patch
 
-      if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
-        erase_simulator(device_type)
-        if Snapshot.config[:localize_simulator]
-          localize_simulator(device_type, language, locale)
+        if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
+          erase_simulator(device_type)
+          if Snapshot.config[:localize_simulator]
+            localize_simulator(device_type, language, locale)
+          end
+        elsif Snapshot.config[:reinstall_app]
+          # no need to reinstall if device has been erased
+          uninstall_app(device_type)
         end
-      elsif Snapshot.config[:reinstall_app]
-        # no need to reinstall if device has been erased
-        uninstall_app(device_type)
       end
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
@@ -290,6 +292,7 @@ module Snapshot
 
     # rubocop:disable Style/Next
     def verify_helper_is_current
+      return if Snapshot.config[:skip_helper_version_check]
       current_version = version_of_bundled_helper
       UI.verbose "Checking that helper files contain #{current_version}"
 
