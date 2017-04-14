@@ -35,7 +35,13 @@ module Commander
 
       begin
         collector.did_launch_action(@program[:name])
-        run_active_command
+        # PILOT_MAINTENANCE Temporaroy `begin/rescue` block for pilot mainenance mode
+        begin
+          run_active_command
+        rescue => e
+          raise e unless @program[:name] == 'pilot'
+          raise_pilot_maintenance_mode_exception!(e)
+        end
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
@@ -44,10 +50,10 @@ module Commander
         else
           abort "#{e}. Use --help for more information"
         end
-      rescue Interrupt => ex
+      rescue Interrupt => e
         # We catch it so that the stack trace is hidden by default when using ctrl + c
         if FastlaneCore::Globals.verbose?
-          raise ex
+          raise e
         else
           puts "\nCancelled... use --verbose to show the stack trace"
         end
@@ -88,6 +94,27 @@ module Commander
         handle_unknown_error!(e)
       ensure
         collector.did_finish
+      end
+    end
+
+    # PILOT_MAINTENANCE Remove after pilot migration is done
+    def raise_pilot_maintenance_mode_exception!(e)
+      FastlaneCore::UI.important("-------------")
+      FastlaneCore::UI.important("pilot crashed")
+      FastlaneCore::UI.important("-------------")
+      FastlaneCore::UI.error("Unfortunately the TestFlight update from 11th April 2017 changed")
+      FastlaneCore::UI.error("the way Testers, Groups and Builds are managed on iTunes connect.")
+      FastlaneCore::UI.error("We're busy working on migrating _pilot_ to work with the new system")
+      FastlaneCore::UI.error("however it requires lots of changes and refactors from our side")
+      FastlaneCore::UI.error("to ensure that everything keeps working for you as it did before")
+      FastlaneCore::UI.error("")
+      FastlaneCore::UI.error("Please follow the WIP pull request on GitHub to stay up to date: https://github.com/fastlane/fastlane/pull/8871")
+      FastlaneCore::UI.error("")
+      FastlaneCore::UI.error("Original error message: #{e}")
+      if FastlaneCore::Globals.verbose?
+        raise e # on verbose mode, we want to show the original stack trace
+      else
+        FastlaneCore::UI.user_error!("pilot doesn't work with the latest TestFlight yet, we're busy working on upgrading it!")
       end
     end
 
