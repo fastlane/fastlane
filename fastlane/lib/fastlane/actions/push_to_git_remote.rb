@@ -52,7 +52,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tags,
                                        env_name: "FL_PUSH_GIT_TAGS",
-                                       description: "Wether tags are pushed to remote. Defaults to true",
+                                       description: "Whether tags are pushed to remote. Defaults to true",
                                        is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :remote,
