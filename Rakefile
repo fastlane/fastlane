@@ -10,6 +10,9 @@ task :yolo do
   Spaceship::Tunes.login('mnpirri@gmail.com')
   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
 
+  build = Testflight::Build.find('223760', '1226094227', '19168452')
+  binding.pry
+=begin
   build = app.builds.find { |build| build.build_version == "2" }
 
   build.client.submit_testflight_build_for_review!(
@@ -26,6 +29,7 @@ task :yolo do
     # demo_account_required: "true",
     notes: "notes!!"
     )
+=end
 end
 
 

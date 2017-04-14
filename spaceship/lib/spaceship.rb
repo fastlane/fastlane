@@ -11,6 +11,8 @@ require 'spaceship/portal/spaceship'
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
 
+require 'spaceship/testflight'
+
 # To support legacy code
 module Spaceship
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))

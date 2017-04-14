@@ -840,6 +840,10 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    def put_export_compliance_did_not_change(provider_id, app_id, build_id, build_info)
+
+    end
+    
     def put_test_info(provider_id, app_id, test_info)
       url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/testInfo"
       r = request(:put) do |req|
@@ -928,6 +932,7 @@ module Spaceship
       put_test_info(provider_id, app_id, test_info)
       build_info = get_new_build_info_for_review(provider_id, app_id, build_id)
       
+      put_export_compliance_did_not_change(provider_id, app_id, build_id, build_info)
       submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new, test_info['betaReviewInfo'])
     end
                                           
