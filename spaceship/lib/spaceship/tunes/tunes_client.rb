@@ -860,8 +860,9 @@ module Spaceship
       r.body['data']
     end
 
-    def submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new)
+    def submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new, beta_review_info)
       build_info['testInfo'][0]['whatsNew'] = whats_new
+      build_info['betaReviewInfo'] = beta_review_info
       url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
       r = request(:post) do |req|
         req.url url
@@ -874,16 +875,17 @@ module Spaceship
     # rubocop:disable Metrics/ParameterLists
     def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, build_id: nil, platform: 'ios',
                                             # Required Metadata:
-                                            changelog: nil,
+                                            whats_new: nil,
                                             description: nil,
                                             feedback_email: nil,
+                                            contact_email: nil,
                                             marketing_url: nil,
                                             first_name: nil,
                                             last_name: nil,
                                             review_email: nil,
                                             phone_number: nil,
                                             significant_change: false,
-
+                                            notes: nil,
                                             # Optional Metadata:
                                             privacy_policy_url: nil,
                                             review_user_name: nil,
@@ -916,17 +918,17 @@ module Spaceship
       test_info['betaReviewInfo']['contactFirstName'] = first_name
       test_info['betaReviewInfo']['contactLastName'] = last_name
       test_info['betaReviewInfo']['contactPhone'] = phone_number
-      test_info['betaReviewInfo']['contactEmail'] = review_email
-      test_info['betaReviewInfo']['demoAccountName'] = nil
-      test_info['betaReviewInfo']['demoAccountPassword'] = nil
+      test_info['betaReviewInfo']['contactEmail'] = contact_email
+      # test_info['betaReviewInfo']['demoAccountName'] = nil
+      # test_info['betaReviewInfo']['demoAccountPassword'] = nil
       test_info['betaReviewInfo']['demoAccountRequired'] = false
-      test_info['betaReviewInfo']['notes'] = false
+      test_info['betaReviewInfo']['notes'] = notes
       # TODO: what to do with the rest of the parameters?
 
       put_test_info(provider_id, app_id, test_info)
       build_info = get_new_build_info_for_review(provider_id, app_id, build_id)
       
-      submit_build_for_review(provider_id, app_id, build_id, build_info, changelog)
+      submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new, test_info['betaReviewInfo'])
     end
                                           
 

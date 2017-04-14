@@ -12,7 +12,20 @@ task :yolo do
 
   build = app.builds.find { |build| build.build_version == "2" }
 
-  build.client.submit_testflight_build_for_review!(app_id: app.apple_id, build_id: build.id, feedback_email: "feedback@email.com", changelog: "time to face the changes")
+  build.client.submit_testflight_build_for_review!(
+    app_id: app.apple_id, 
+    build_id: build.id, 
+    whats_new: "time to face the changes",
+    contact_email: "contact@email.com", 
+    feedback_email: "feedback@email.com", 
+    first_name: "First",
+    last_name: "Last",
+    phone_number: "16038179676",
+    # demo_account_name: "demo",
+    # demo_account_password: "password",
+    # demo_account_required: "true",
+    notes: "notes!!"
+    )
 end
 
 
