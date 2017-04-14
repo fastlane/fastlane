@@ -7,7 +7,6 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to include("git push origin")
-        expect(result).to include("--tags")
       end
 
       it "works with options specified" do
