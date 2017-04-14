@@ -5,6 +5,105 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
+task :yolo do
+  require 'spaceship'
+  Spaceship::Tunes.login('mnpirri@gmail.com')
+  app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
+
+  build = app.builds.find { |build| build.build_version == "2" }
+
+  build.client.submit_testflight_build_for_review!(app_id: app.apple_id, build_id: build.id, feedback_email: "feedback@email.com", changelog: "time to face the changes")
+end
+
+
+# def get_new_build_info_for_review(client: nil, provider_id: nil, app_id: nil, build_id: nil)
+#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
+#   r = client.request(:get) do |req|
+#     req.url url
+#     req.headers['Content-Type'] = 'application/json'
+#   end
+
+#   r.body['data']
+# end
+
+# def post_test_info(client: nil, provider_id: nil, app_id: nil)
+#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/testInfo"
+#   r = client.request(:put) do |req|
+#     req.url url
+#     req.body = {
+#       primaryLocale: "en-US",
+#       details: [{
+#         locale: "en-US",
+#         feedbackEmail: "mnpirri@gmail.com",
+#         marketingUrl: nil,
+#         privacyPolicyUrl: nil,
+#         privacyPolicy: nil,
+#         description: nil
+#       }],
+#       eula: nil,
+#       betaReviewInfo: {
+#         contactFirstName: "First Name",
+#         contactLastName: "Last Name",
+#         contactPhone: "0987654321",
+#         contactEmail: "Email",
+#         demoAccountName: "User Name",
+#         demoAccountPassword: "Password",
+#         demoAccountRequired: true,
+#         notes: "notes!"
+#       }
+#     }.to_json
+#     req.headers['Content-Type'] = 'application/json'
+#   end
+# end
+
+# def start_app_review(client: nil, provider_id: nil, app_id: nil, build_id: nil, build_info: nil)
+#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
+#   r = client.request(:post) do |req|
+#     req.url url
+#     req.body = build_info.to_json()
+#     req.headers['Content-Type'] = 'application/json'
+#   end
+# end
+
+# task :yolo2 do
+#   require 'spaceship'
+#   Spaceship::Tunes.login("mnpirri@gmail.com")
+#   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
+
+#   build = app.builds.find { |build| build.build_version == "2" }
+  
+#   userDetailsData = build.client.user_details_data
+#   providerId = userDetailsData['contentProviderId']
+
+#   post_test_info(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id)
+
+#   info = get_new_build_info_for_review(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id, build_id: build.id)
+#   start_app_review(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id, build_id: build.id, build_info: info)
+
+#   require 'pry'
+#   binding.pry
+#   puts 'hi'
+
+#   # build.update_build_information!(whats_new: "new stuff", description: "app description", feedback_email: "feedback@email.org")
+
+  
+
+#   # build.client.submit_testflight_build_for_review!(
+#   #         app_id: build.build_train.application.apple_id,
+#   #         marketing_url: "http://www.apple.com",
+#   #         changelog: "changes",
+#   #         train: build.build_train.version_string,
+#   #         build_number: build.id,
+#   #         platform: build.platform, 
+#   #         feedback_email: "hi@there.com"
+#   #       )
+
+  
+#   #  build.build_train.update_testing_status!(true, 'external', build)
+
+  
+# end
+
 task :rubygems_admins do
   names = ["KrauseFx", "ohayon", "asfalcone", "mpirri", "mfurtak", "milch"]
   (GEMS + ["krausefx-shenzhen", "commander-fastlane"]).each do |gem_name|
