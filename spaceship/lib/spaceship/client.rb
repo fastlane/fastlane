@@ -126,14 +126,23 @@ module Spaceship
       raise "You must implemented self.hostname"
     end
 
-    def initialize
+    ##
+    # Instantiates a client but with a cookie derived from another client.
+    #
+    # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
+    # TODO: come up with a better way to share the cookie instance
+    def self.client_with_authorization_from(another_client)
+      self.new(cookie: another_client.instance_variable_get(:@cookie))
+    end
+
+    def initialize(cookie: nil)
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
-      @cookie = HTTP::CookieJar.new
+      @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
