@@ -52,9 +52,9 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tags,
                                        env_name: "FL_PUSH_GIT_TAGS",
-                                       description: "Wether tags are pushed to remote. Defaults to true",
+                                       description: "Wether tags are pushed to remote. Defaults to false",
                                        is_string: false,
-                                       default_value: true),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to. Defaults to `origin`",
@@ -86,7 +86,7 @@ module Fastlane
             local_branch: "develop",  # optional, aliased by "branch", default: "master"
             remote_branch: "develop", # optional, default is set to local_branch
             force: true,              # optional, default: false
-            tags: false               # optional, default: true
+            tags: false               # optional, default: false
           )'
         ]
       end
