@@ -10,10 +10,16 @@ task :yolo do
   require 'spaceship'
   Spaceship::Tunes.login('mnpirri@gmail.com')
   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
-  build = Testflight::Build.find('223760', '1226094227', '19199165')
+  tunes_build = app.builds.find { |build| build.build_version == "11" }
+  provider_id = '223760'
+
+  build = Testflight::Build.find(provider_id, app.apple_id, tunes_build.id)
+  build.test_info.whats_new = "some new shit for build 11"
   build.export_compliance.encryption_updated = false
-  build.beta_review_info.contact_email = 'rake-test@email.com'
-  build.client.put_build('223760', '1226094227', '19199165', build.raw_data.to_h)
+  client = build.client
+  data = client.put_build(provider_id, app.apple_id, tunes_build.id, build)
+  build = Testflight::Build.new(data)
+  client.post_for_review(provider_id, app.apple_id, tunes_build.id, build)
   require 'pry'; binding.pry;
   0
 =begin
