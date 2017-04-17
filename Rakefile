@@ -6,26 +6,30 @@ RAILS = %w(boarding refresher enhancer)
 SECONDS_PER_DAY = 60 * 60 * 24
 
 task :yolo do
+  require 'dotenv'; Dotenv.load
   require 'spaceship'
   Spaceship::Tunes.login('mnpirri@gmail.com')
   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
-
-  build = Testflight::Build.find('223760', '1226094227', '19168452')
-  binding.pry
+  build = Testflight::Build.find('223760', '1226094227', '19199165')
+  build.export_compliance.encryption_updated = false
+  build.beta_review_info.contact_email = 'rake-test@email.com'
+  build.client.put_build('223760', '1226094227', '19199165', build.raw_data.to_h)
+  require 'pry'; binding.pry;
+  0
 =begin
   build = app.builds.find { |build| build.build_version == "2" }
 
   build.client.submit_testflight_build_for_review!(
-    app_id: app.apple_id, 
-    build_id: build.id, 
+    app_id: app.apple_id,
+    build_id: build.id,
     whats_new: "time to face the changes",
-    contact_email: "contact@email.com", 
-    feedback_email: "feedback@email.com", 
+    contact_email: "contact@email.com",
+    feedback_email: "feedback@email.com",
     first_name: "First",
     last_name: "Last",
     phone_number: "16038179676",
     # demo_account_name: "demo",
-    # demo_account_password: "password",
+    # demo_account_password: "password",revi`
     # demo_account_required: "true",
     notes: "notes!!"
     )
@@ -88,7 +92,7 @@ end
 #   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
 
 #   build = app.builds.find { |build| build.build_version == "2" }
-  
+
 #   userDetailsData = build.client.user_details_data
 #   providerId = userDetailsData['contentProviderId']
 
@@ -103,7 +107,7 @@ end
 
 #   # build.update_build_information!(whats_new: "new stuff", description: "app description", feedback_email: "feedback@email.org")
 
-  
+
 
 #   # build.client.submit_testflight_build_for_review!(
 #   #         app_id: build.build_train.application.apple_id,
@@ -111,14 +115,14 @@ end
 #   #         changelog: "changes",
 #   #         train: build.build_train.version_string,
 #   #         build_number: build.id,
-#   #         platform: build.platform, 
+#   #         platform: build.platform,
 #   #         feedback_email: "hi@there.com"
 #   #       )
 
-  
+
 #   #  build.build_train.update_testing_status!(true, 'external', build)
 
-  
+
 # end
 
 task :rubygems_admins do

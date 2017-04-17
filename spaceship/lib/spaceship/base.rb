@@ -55,6 +55,10 @@ module Spaceship
         h.delete(:application)
         h.to_json(*a)
       end
+
+      def to_h
+        @hash.dup
+      end
     end
 
     class << self
