@@ -25,8 +25,6 @@ module Testflight
         req.headers['Content-Type'] = 'application/json'
       end
       response.body['data']
-      require 'pry'; binding.pry
-      puts ''
     end
   end
 

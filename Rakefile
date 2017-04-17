@@ -5,21 +5,25 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
+BUILD_NUMBER='15'
+
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
   Spaceship::Tunes.login('mnpirri@gmail.com')
   app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
-  tunes_build = app.builds.find { |build| build.build_version == "11" }
+  tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
   provider_id = '223760'
 
   build = Testflight::Build.find(provider_id, app.apple_id, tunes_build.id)
-  build.test_info.whats_new = "some new shit for build 11"
+  build.test_info.whats_new = "some new shit for build #{BUILD_NUMBER}"
   build.export_compliance.encryption_updated = false
   client = build.client
-  data = client.put_build(provider_id, app.apple_id, tunes_build.id, build)
-  build = Testflight::Build.new(data)
-  client.post_for_review(provider_id, app.apple_id, tunes_build.id, build)
+  #data = client.put_build(provider_id, app.apple_id, tunes_build.id, build)
+  #build = Testflight::Build.new(data)
+  build.beta_review_info.demo_account_required = false
+  resp = client.post_for_review(provider_id, app.apple_id, tunes_build.id, build)
+  puts resp
   require 'pry'; binding.pry;
   0
 =begin
