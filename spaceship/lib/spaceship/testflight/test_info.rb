@@ -8,6 +8,7 @@ module Testflight
       'whatsNew' => :whats_new
     })
 
+    #TODO: handle multiple testInfo's for each locale
     def whats_new
       raw_data.first['whatsNew']
     end

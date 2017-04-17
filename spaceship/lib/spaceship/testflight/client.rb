@@ -5,8 +5,8 @@ module Testflight
     end
 
     def get_build(provider_id, app_id, build_id)
-      r = request(:get, "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}")
-      r.body['data']
+      response = request(:get, "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}")
+      response.body['data']
     end
 
     def put_build(provider_id, app_id, build_id, build)
@@ -24,8 +24,28 @@ module Testflight
         req.body = build.to_json
         req.headers['Content-Type'] = 'application/json'
       end
+      response.body
+    end
+
+    def get_groups(provider_id, app_id)
+      response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
       response.body['data']
     end
+
+    def add_group_to_build(provider_id, app_id, group_id, build_id)
+      # TODO: if no group specified default to isDefaultExternalGroup
+      body = {
+        'groupId' => group_id,
+        'buildId' => build_id
+      }
+      response = request(:put) do |req|
+        req.url "providers/#{provider_id}/apps/#{app_id}/groups/#{group_id}/builds/#{build_id}"
+        req.body = body.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      response.body
+    end
+
   end
 
   # def groups(app_id)

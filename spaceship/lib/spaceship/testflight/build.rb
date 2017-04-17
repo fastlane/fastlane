@@ -19,7 +19,7 @@ module Testflight
 
     def self.find(provider_id, app_id, build_id)
       attrs = client.get_build(provider_id, app_id, build_id)
-      self.new(attrs)
+      self.new(attrs) if attrs
     end
 
     def beta_review_info
