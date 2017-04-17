@@ -5,17 +5,17 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
-BUILD_NUMBER='16'
+BUILD_NUMBER='5'
 
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
-  Spaceship::Tunes.login('mnpirri@gmail.com')
-  app = Spaceship::Tunes::Application.find("com.markpirri.pilot-tst")
+  Spaceship::Tunes.login('ohayon@me.com')
+  app = Spaceship::Tunes::Application.find("com.thirty-one-parkton.Activate")
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-  provider_id = '223760'
+  provider_id = '103020806'
 
-  group = Testflight::Group.find(provider_id, app.apple_id, "Yolo")
+  group = Testflight::Group.default_external_group(provider_id, app.apple_id)
 
   build = Testflight::Build.find(provider_id, app.apple_id, tunes_build.id)
   client = build.client
@@ -27,26 +27,8 @@ task :yolo do
 
   resp = client.add_group_to_build(provider_id, app.apple_id, group.id, tunes_build.id)
 
-  # require 'pry'; binding.pry;
-  # 0
-=begin
-  build = app.builds.find { |build| build.build_version == "2" }
-
-  build.client.submit_testflight_build_for_review!(
-    app_id: app.apple_id,
-    build_id: build.id,
-    whats_new: "time to face the changes",
-    contact_email: "contact@email.com",
-    feedback_email: "feedback@email.com",
-    first_name: "First",
-    last_name: "Last",
-    phone_number: "16038179676",
-    # demo_account_name: "demo",
-    # demo_account_password: "password",revi`
-    # demo_account_required: "true",
-    notes: "notes!!"
-    )
-=end
+  require 'pry'; binding.pry;
+  0
 end
 
 
