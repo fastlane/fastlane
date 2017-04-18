@@ -11,7 +11,7 @@ require 'spaceship/portal/spaceship'
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
 
-require 'spaceship/testflight'
+require 'spaceship/test_flight'
 
 # To support legacy code
 module Spaceship
