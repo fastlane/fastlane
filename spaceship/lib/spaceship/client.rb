@@ -579,13 +579,13 @@ module Spaceship
     end
 
     # TODO: Check out Python's decorator pattern for implmenting this check
-    #def assert_required_params(*params)
+    # def assert_required_params(*params)
     #  params.each do |param|
     #    if local_variable_get(param).nil?
     #      raise ArgumentError.new "`#{param}` is a required parameter"
     #    end
     #  end
-    #end
+    # end
   end
 end
 

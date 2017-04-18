@@ -65,10 +65,10 @@ module TestFlight
     })
 
     BUILD_STATES = {
-      :processing => 'testflight.build.state.processing',
-      :active => 'testflight.build.state.testing.active',
-      :ready => 'testflight.build.state.submit.ready',
-      :export_compliance_missing => 'testflight.build.state.export.compliance.missing'
+      processing: 'testflight.build.state.processing',
+      active: 'testflight.build.state.testing.active',
+      ready: 'testflight.build.state.submit.ready',
+      export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
     def self.latest(provider_id: nil, app_id: nil, build_id: nil, platform: platform)
@@ -83,52 +83,22 @@ module TestFlight
       self.new(attrs) if attrs
     end
 
+    def self.all_builds(provider_id: nil, app_id: nil, platform: nil)
+      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
+      return trains.values.flatten.collect { |build| self.new(build) }
+    end
+
     # Just the builds, as a flat array, that are still processing
     def self.all_processing_builds(provider_id: nil, app_id: nil, platform: nil)
-      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
-      all_builds = trains.values.flatten
-      all_builds.find_all do |build_data|
-        build_data['externalState'] == "testflight.build.state.processing"
-      end
+      return self.all_builds(provider_id: provider_id, app_id: app_id, platform: platform).find_all(&:processing?)
     end
 
-    #TODO[snatchev] : make this work instead of `all_processing_build`
-    def self.all_in_state(state)
-      BuildTrain.all.filter_trains do |build_data|
-        build_data['externalState'] == BUILD_STATES[state]
-      end
+    def ready_to_submit?
+      external_state == BUILD_STATES[:ready]
     end
 
-    # @param train_version and build_version are used internally
-    def self.wait_for_build_processing_to_be_complete(provider_id, app_id, train_version: nil, build_version: nil, platform: nil)
-      # TODO: do we want to move this somewhere else?
-      processing = all_processing_builds(provider_id: provider_id, app_id: app_id, platform: platform)
-      return if processing.count == 0
-
-      if train_version && build_version
-        # We already have a specific build we wait for, use that one
-        build_data = processing.find { |bd| bd['trainVersion'] == train_version && bd['buildVersion'] == build_version }
-        return if build_data.nil? # wohooo, the build doesn't show up in the `processing` list any more, we're good
-      else
-        # Fetch the most recent build, as we want to wait for that one
-        # any previous builds might be there since they're stuck
-        build_data = processing.sort_by { |bd| Time.parse(bd['uploadDate']) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
-      end
-
-      # We got the build we want to wait for, wait now...
-      sleep(10)
-      # TODO: we really should move this somewhere else, so that we can print out what we used to print
-      puts("Waiting for iTunes Connect to finish processing the new build (#{train_version} - #{build_version})")
-      # we don't have access to FastlaneCore::UI in spaceship
-      wait_for_build_processing_to_be_complete(provider_id, app_id,
-                                               build_version: build_data['buildVersion'],
-                                               train_version: build_data['trainVersion'],
-                                               platform: platform)
-
-      # Also when it's finished we used to do
-      # UI.success("Successfully finished processing the build")
-      # UI.message("You can now tweet: ")
-      # UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
+    def processing?
+      external_state == BUILD_STATES[:processing]
     end
 
     def beta_review_info
@@ -151,7 +121,7 @@ module TestFlight
       client.put_build(provider_id, app_id, id, self)
     end
 
-    #TODO: handle locales and multiple TestInfo properties
+    # TODO: handle locales and multiple TestInfo properties
     def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
       test_info.description = description
       test_info.feedback_email = feedback_email

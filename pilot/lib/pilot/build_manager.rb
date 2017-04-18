@@ -35,14 +35,8 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      TestFlight::Build.wait_for_build_processing_to_be_complete(Spaceship::Application.client.team_id, app.apple_id, platform: platform) # TODO: Remove the call to Spaceship::Application.client.team_id
-      # TODO: set build metadata here
-      # used to be
-      #   uploaded_build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-      # We don't actually get the build here, let's try to figure out how to do that best, ideally the method wait_for_build_processing_to_be_complete does that
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(Spaceship::Application.client.team_id, app.apple_id, platform: platform) # TODO: Remove the call to Spaceship::Application.client.team_id
 
-      # TODO: the distribute method has to be updated
-      latest_build = TestFlight::Build.latest(provider_id: Spaceship::Application.client.team_id, app_id: app.apple_id, platform: platform)
       distribute(options, latest_build)
     end
 
@@ -112,7 +106,7 @@ module Pilot
     end
 
     def distribute_build(uploaded_build, options)
-      UI.message("Distributing new build to testers")
+      UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
       # TODO: do something about encryption and demo account
       uploaded_build.export_compliance.encryption_updated = false
@@ -122,6 +116,8 @@ module Pilot
       if options[:distribute_external]
         external_group = TestFlight::Group.default_external_group(uploaded_build.provider_id, uploaded_build.app_id)
         uploaded_build.add_group!(external_group)
+        
+        
       end
 
       return true

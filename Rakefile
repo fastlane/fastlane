@@ -5,7 +5,7 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
-BUILD_NUMBER='6'
+BUILD_NUMBER = '6'
 
 task :yolo do
   require 'dotenv'; Dotenv.load
@@ -27,10 +27,9 @@ task :yolo do
   group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
   resp = client.add_group_to_build(provider_id, app.apple_id, group.id, tunes_build.id)
 
-  require 'pry'; binding.pry;
+  require 'pry'
   0
 end
-
 
 # def get_new_build_info_for_review(client: nil, provider_id: nil, app_id: nil, build_id: nil)
 #   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
@@ -102,8 +101,6 @@ end
 
 #   # build.update_build_information!(whats_new: "new stuff", description: "app description", feedback_email: "feedback@email.org")
 
-
-
 #   # build.client.submit_testflight_build_for_review!(
 #   #         app_id: build.build_train.application.apple_id,
 #   #         marketing_url: "http://www.apple.com",
@@ -114,9 +111,7 @@ end
 #   #         feedback_email: "hi@there.com"
 #   #       )
 
-
 #   #  build.build_train.update_testing_status!(true, 'external', build)
-
 
 # end
 

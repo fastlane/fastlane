@@ -1,6 +1,5 @@
 module TestFlight
   class BuildTrains < Base
-
     include Enumerable
 
     # This returns hashes that are partial versions of TestFlight::Build objects
@@ -23,7 +22,7 @@ module TestFlight
     def get(key)
       @trains[key]
     end
-    alias_method :[], :get
+    alias [] get
 
     def values
       @trains.values

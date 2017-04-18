@@ -45,7 +45,7 @@ module TestFlight
       end
     end
 
-    #def remove_tester_from_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
+    # def remove_tester_from_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(provider_id: nil, group_id: nil, tester_id: nil, app_id: nil)
       url = "providers/#{provider_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
@@ -70,19 +70,15 @@ module TestFlight
     end
 
     def post_for_review(provider_id, app_id, build_id, build)
-      begin
-        response = request(:post) do |req|
-          req.url "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
-          req.body = build.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-        response.body
-        require 'pry'; binding.pry
-        puts ''
-      rescue => e
-        require 'pry'; binding.pry
-        puts ''
+      response = request(:post) do |req|
+        req.url "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
+        req.body = build.to_json
+        req.headers['Content-Type'] = 'application/json'
       end
+      response.body
+      require 'pry';        puts ''
+    rescue => e
+      require 'pry';        puts ''
     end
 
     def get_groups(provider_id, app_id)
