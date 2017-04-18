@@ -27,7 +27,7 @@ module TestFlight
       # is not enough to add the tester to a group. If this isn't done the next request would fail.
       # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
       url = "providers/#{team_id}/apps/#{app_id}/testers"
-      request(:post) do |req|
+      resp = request(:post) do |req|
         req.url url
         req.body = {
           "email" => tester.email,
@@ -36,6 +36,9 @@ module TestFlight
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
+      tester = Spaceship::Tunes::Tester::External.factory(resp.body["data"])
+      # TODO: go on with returned tester so we have a id, required from boarding, as it comes in without id
+
       # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
 
       # Then we can add the tester to the group that allows the app to test
