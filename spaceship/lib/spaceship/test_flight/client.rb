@@ -9,18 +9,15 @@ module TestFlight
       platform ||= "ios"
       response = request(:get, "providers/#{provider_id}/apps/#{app_id}/platforms/#{platform}/trains")
       response.body['data']
+      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
-    # Iterates over all build trains and lists all available builds for each train
-    def all_builds(provider_id: nil, app_id: nil, platform: nil)
+    def all_builds_for_train(provider_id: nil, app_id: nil, platform: nil, train_version: nil)
       platform ||= "ios"
-      build_trains = all_build_trains(provider_id: provider_id, app_id: app_id, platform: platform)
-      result = {}
-      build_trains.each do |current_train_number|
-        response = request(:get, "providers/#{provider_id}/apps/#{app_id}/platforms/#{platform}/trains/#{current_train_number}/builds")
-        result[current_train_number] = response.body['data']
-      end
-      return result
+
+      response = request(:get, "providers/#{provider_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
+      response.body['data']
+      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
     def add_tester_to_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
