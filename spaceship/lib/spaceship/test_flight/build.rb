@@ -1,3 +1,5 @@
+require 'time'
+
 module TestFlight
   class Build < Base
     # @example
@@ -44,6 +46,8 @@ module TestFlight
     attr_accessor :upload_date # TODO: can we auto-parse this? Just using `Time.new(...)` works for free
 
     attr_mapping({
+      'appAdamId' => :app_id,
+      'providerId' => :provider_id,
       'bundleId' => :bundle_id,
       'trainVersion' => :train_version,
       'buildVersion' => :build_version,
@@ -60,21 +64,21 @@ module TestFlight
       'id' => :id
     })
 
+    def self.latest(provider_id: nil, app_id: nil, build_id: nil)
+      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
+      latest_build_data = trains.values.flatten.sort_by { |build| build.upload_date }.last
+
+      find(provider_id, app_id, latest_build_data['id'])
+    end
+
     def self.find(provider_id, app_id, build_id)
       attrs = client.get_build(provider_id, app_id, build_id)
       self.new(attrs) if attrs
     end
 
-    def self.all_builds_for_train(provider_id: nil, app_id: nil, platform: nil, train_version: train_version)
-      builds = client.get_builds_for_train(provider_id: provider_id, app_id: app_id, platform: platform, train_version: train_version)
-      builds.map do |build|
-        self.new(build)
-      end
-    end
-
     # Just the builds, as a flat array, that are still processing
     def self.all_processing_builds(provider_id: nil, app_id: nil, platform: nil)
-      trains = BuildTrains.new
+      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
       all_builds = trains.values.flatten
       all_builds.find_all do |build|
         build.external_state == "testflight.build.state.processing"
@@ -123,6 +127,30 @@ module TestFlight
 
     def test_info
       TestInfo.new(super)
+    end
+
+    def upload_date
+      Time.parse(super)
+    end
+
+    def save!
+      client.put_build(provider_id, app_id, id, self)
+    end
+
+    #TODO: handle locales and multiple TestInfo properties
+    def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
+      test_info.description = description
+      test_info.feedback_email = feedback_email
+      test_info.whats_new = whats_new
+      save!
+    end
+
+    def submit_for_review!
+      client.post_for_review(provider_id, app_id, id, self)
+    end
+
+    def add_group!(group)
+      client.add_group_to_build(provider_id, app_id, group.id, id)
     end
   end
 end

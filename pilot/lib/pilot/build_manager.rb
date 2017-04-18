@@ -41,38 +41,15 @@ module Pilot
       #   uploaded_build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
       # We don't actually get the build here, let's try to figure out how to do that best, ideally the method wait_for_build_processing_to_be_complete does that
 
-      # TODO: we don't have the upload_build, also the distribute method has to be updated
-      distribute(options, uploaded_build)
+      # TODO: the distribute method has to be updated
+      latest_build = Build.latest(provider_id: Spaceship::Application.client.team_id, app_id: app.apple_id, platform: platform)
+      distribute(options, latest_build)
     end
 
-    def distribute(options, build = nil)
+    def distribute(options, build)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
-      end
-
-      # All this error handling below can probably be removed/simplified! This is from the legacy build processing system on iTC
-      if build.nil?
-        platform = fetch_app_platform(required: false)
-        builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
-        # sort by upload_date
-        builds.sort! { |a, b| a.upload_date <=> b.upload_date }
-        build = builds.last
-        if build.nil?
-          UI.user_error!("No builds found.")
-          return
-        end
-        if build.processing
-          UI.user_error!("Build #{build.train_version}(#{build.build_version}) is still processing.")
-          return
-        end
-        if build.testing_status == "External"
-          UI.user_error!("Build #{build.train_version}(#{build.build_version}) has already been distributed.")
-          return
-        end
-
-        type = options[:distribute_external] ? 'External' : 'Internal'
-        UI.message("Distributing build #{build.train_version}(#{build.build_version}) from #{build.testing_status} -> #{type}")
       end
 
       unless config[:update_build_info_on_upload]
@@ -137,19 +114,16 @@ module Pilot
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers")
 
-      # Submit for review before external testflight is available
+      # TODO: do something about encryption and demo account
+      uploaded_build.export_compliance.encryption_updated = false
+      uploaded_build.beta_review_info.demo_account_required = false
+      uploaded_build.submit_for_review!
+
       if options[:distribute_external]
-        uploaded_build.client.submit_testflight_build_for_review!(
-          app_id: uploaded_build.build_train.application.apple_id,
-          train: uploaded_build.build_train.version_string,
-          build_number: uploaded_build.build_version,
-          platform: uploaded_build.platform
-        )
+        external_group = TestFlight::Group.default_external_group(uploaded_build.provider_id, uploaded_build.app_id)
+        uploaded_build.add_group!(external_group)
       end
 
-      # Submit for beta testing
-      type = options[:distribute_external] ? 'external' : 'internal'
-      uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
       return true
     end
   end

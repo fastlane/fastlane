@@ -15,8 +15,6 @@ task :yolo do
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
   provider_id = ENV['TEAM_ID']
 
-  group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
-
   build = TestFlight::Build.find(provider_id, app.apple_id, tunes_build.id)
   client = build.client
 
@@ -25,6 +23,8 @@ task :yolo do
   build.beta_review_info.demo_account_required = false
   resp = client.post_for_review(provider_id, app.apple_id, tunes_build.id, build)
 
+  # if distribute to external?
+  group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
   resp = client.add_group_to_build(provider_id, app.apple_id, group.id, tunes_build.id)
 
   require 'pry'; binding.pry;
