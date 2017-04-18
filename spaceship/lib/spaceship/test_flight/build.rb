@@ -71,26 +71,26 @@ module TestFlight
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
-    def self.latest(provider_id: nil, app_id: nil, build_id: nil, platform: nil)
-      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
+    def self.latest(app_id: nil, build_id: nil, platform: nil)
+      trains = BuildTrains.all(app_id: app_id, platform: platform)
       latest_build_data = trains.values.flatten.sort_by { |build| Time.parse(build['uploadDate']) }.last
 
-      find(provider_id, app_id, latest_build_data['id'])
+      find(app_id, latest_build_data['id'])
     end
 
-    def self.find(provider_id, app_id, build_id)
-      attrs = client.get_build(provider_id, app_id, build_id)
+    def self.find(app_id, build_id)
+      attrs = client.get_build(app_id, build_id)
       self.new(attrs) if attrs
     end
 
-    def self.all_builds(provider_id: nil, app_id: nil, platform: nil)
-      trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
+    def self.all_builds(app_id: nil, platform: nil)
+      trains = BuildTrains.all(app_id: app_id, platform: platform)
       return trains.values.flatten.collect { |build| self.new(build) }
     end
 
     # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(provider_id: nil, app_id: nil, platform: nil)
-      return self.all_builds(provider_id: provider_id, app_id: app_id, platform: platform).find_all(&:processing?)
+    def self.all_processing_builds(app_id: nil, platform: nil)
+      return self.all_builds(app_id: app_id, platform: platform).find_all(&:processing?)
     end
 
     def ready_to_submit?
