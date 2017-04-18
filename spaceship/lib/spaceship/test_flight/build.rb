@@ -16,6 +16,11 @@ module TestFlight
     #   "testflight.build.state.processing"
     attr_accessor :external_state
 
+    # Internal build ID (int)
+    # @example
+    #   19285309
+    attr_accessor :id
+
     # @example
     #   "1.0"
     attr_accessor :train_version
@@ -36,6 +41,8 @@ module TestFlight
 
     attr_accessor :did_notify
 
+    attr_accessor :upload_date # TODO: can we auto-parse this? Just using `Time.new(...)` works for free
+
     attr_mapping({
       'bundleId' => :bundle_id,
       'trainVersion' => :train_version,
@@ -48,7 +55,9 @@ module TestFlight
       'installCount' => :install_count,
       'inviteCount' => :invite_count,
       'crashCount' => :crash_count,
-      'didNotify' => :did_notify
+      'didNotify' => :did_notify,
+      'uploadDate' => :upload_date,
+      'id' => :id
     })
 
     def self.find(provider_id, app_id, build_id)
@@ -89,6 +98,33 @@ module TestFlight
         end
       end
       return result
+    end
+
+    # @param train_version and build_version are used internally
+    def self.wait_for_build_processing_to_be_complete(provider_id, app_id, train_version: nil, build_version: nil, platform: nil)
+      # TODO: do we want to move this somewhere else?
+      processing = all_processing_builds(provider_id, app_id, platform: platform)
+      return if processing.count == 0
+
+      if train_version && build_version
+        # We already have a specific build we wait for, use that one
+        build = processing.find { |b| b.train_version == train_version && b.build_version == build_version }
+        return if build.nil? # wohooo, the build doesn't show up in the `processing` list any more, we're good
+      else
+        # Fetch the most recent build, as we want to wait for that one
+        # any previous builds might be there since they're stuck
+        build = processing.sort_by { |b| Time.new(b.upload_date) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
+      end
+      
+      # We got the build we want to wait for, wait now...
+      sleep(10) 
+      # TODO: we really should move this somewhere else, so that we can print out what we used to print
+      # UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
+      # we don't have access to FastlaneCore::UI in spaceship
+      wait_for_build_processing_to_be_complete(provider_id, app_id, 
+                                                build_version: build.build_version, 
+                                                train_version: build.train_version, 
+                                                platform: platform)
     end
 
     def beta_review_info
