@@ -2,17 +2,21 @@ describe Gym do
   describe Gym::DetectValues do
     day = Time.now.strftime("%F")
 
-    describe 'Xcode config handling' do
+    describe 'Xcode config handling', :stuff do
       it "fetches the custom build path from the Xcode config" do
-        options = { xcode_preference_plist_path: "./gym/spec/fixtures/com.apple.dt.Xcode.plist", project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
+        expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({ "IDECustomDistributionArchivesLocation" => "/test/path" })
+
+        options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         path = Gym.config[:build_path]
         expect(path).to eq("/test/path/#{day}")
       end
 
-      it "fetches the default build path from the Xcode config" do
-        options = { xcode_preference_plist_path: "./gym/spec/fixtures/com.apple.dt.Xcode.empty.plist", project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
+      it "fetches the default build path from the Xcode config when preference files exists but not archive location defined" do
+        expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({})
+
+        options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
@@ -21,7 +25,9 @@ describe Gym do
       end
 
       it "fetches the default build path from the Xcode config when missing Xcode preferences plit" do
-        options = { xcode_preference_plist_path: "", project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
+        expect(Gym::DetectValues).to receive(:xcode_preference_plist_path).and_return(nil)
+
+        options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
