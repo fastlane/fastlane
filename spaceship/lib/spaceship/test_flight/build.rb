@@ -41,7 +41,7 @@ module TestFlight
 
     attr_accessor :did_notify
 
-    attr_accessor :upload_date # TODO: can we auto-parse this? Just using `Time.new(...)` works for free
+    attr_accessor :upload_date
 
     attr_mapping({
       'bundleId' => :bundle_id,
@@ -59,6 +59,16 @@ module TestFlight
       'uploadDate' => :upload_date,
       'id' => :id
     })
+
+
+    def self.factory(attrs)
+      # Parse the dates
+      # rubocop:disable Style/RescueModifier
+      attrs['uploadDate'] = (Time.parse(attrs['uploadDate']) rescue attrs['uploadDate'])
+      # rubocop:enable Style/RescueModifier
+
+      obj = self.new(attrs)
+    end
 
     def self.find(app_id, build_id)
       attrs = client.get_build(app_id, build_id)
@@ -113,7 +123,7 @@ module TestFlight
       else
         # Fetch the most recent build, as we want to wait for that one
         # any previous builds might be there since they're stuck
-        build = processing.sort_by { |b| Time.new(b.upload_date) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
+        build = processing.sort_by { |b| b.upload_date }.last
       end
 
       # We got the build we want to wait for, wait now...
