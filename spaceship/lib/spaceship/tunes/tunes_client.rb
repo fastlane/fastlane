@@ -1284,7 +1284,7 @@ module Spaceship
       end
 
       data = parse_response(r, 'data')['testers']
-      handle_itc_response(data) || data[0]
+      return tester.find(email) # we need to fetch it again, so that we actually get the group_id
     end
 
     def delete_tester!(tester)
