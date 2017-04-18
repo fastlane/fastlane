@@ -60,8 +60,8 @@ module TestFlight
       'id' => :id
     })
 
-    def self.find(provider_id, app_id, build_id)
-      attrs = client.get_build(provider_id, app_id, build_id)
+    def self.find(app_id, build_id)
+      attrs = client.get_build(app_id, build_id)
       self.new(attrs) if attrs
     end
 
@@ -76,11 +76,11 @@ module TestFlight
     #       Build3
     #     ]
     #   }
-    def self.all(provider_id, app_id, platform: nil)
-      build_trains = client.all_build_trains(provider_id: provider_id, app_id: app_id, platform: platform)
+    def self.all(app_id, platform: nil)
+      build_trains = client.all_build_trains(app_id: app_id, platform: platform)
       result = {}
       build_trains.each do |train_version|
-        builds = client.all_builds_for_train(provider_id: provider_id, app_id: app_id, platform: platform, train_version: train_version)
+        builds = client.all_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
         result[train_version] = builds.collect do |current_build|
           self.factory(current_build) # TODO: when inspecting those builds, something's wrong, it doesn't expose the attributes. I don't know why
         end
@@ -89,8 +89,8 @@ module TestFlight
     end
 
     # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(provider_id, app_id, platform: nil)
-      all_builds = self.all(provider_id, app_id, platform: platform)
+    def self.all_processing_builds(app_id, platform: nil)
+      all_builds = self.all(app_id, platform: platform)
       result = []
       all_builds.each do |train_version, builds|
         result += builds.find_all do |build|
@@ -101,9 +101,9 @@ module TestFlight
     end
 
     # @param train_version and build_version are used internally
-    def self.wait_for_build_processing_to_be_complete(provider_id, app_id, train_version: nil, build_version: nil, platform: nil)
+    def self.wait_for_build_processing_to_be_complete(app_id, train_version: nil, build_version: nil, platform: nil)
       # TODO: do we want to move this somewhere else?
-      processing = all_processing_builds(provider_id, app_id, platform: platform)
+      processing = all_processing_builds(app_id, platform: platform)
       return if processing.count == 0
 
       if train_version && build_version
@@ -121,7 +121,7 @@ module TestFlight
       # TODO: we really should move this somewhere else, so that we can print out what we used to print
       # UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
       # we don't have access to FastlaneCore::UI in spaceship
-      wait_for_build_processing_to_be_complete(provider_id, app_id,
+      wait_for_build_processing_to_be_complete(app_id,
                                                build_version: build.build_version,
                                                train_version: build.train_version,
                                                platform: platform)

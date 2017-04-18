@@ -16,8 +16,8 @@ module TestFlight
       'isDefaultExternalGroup' => :is_default_external_group
     })
 
-    def self.all(provider_id, app_id)
-      groups = client.all_groups(provider_id, app_id)
+    def self.all(app_id)
+      groups = client.all_groups(app_id)
       groups.map do |g|
         current_element = self.new(g)
         current_element.app_id = app_id
@@ -25,22 +25,22 @@ module TestFlight
       end
     end
 
-    def self.find(provider_id, app_id, group_name)
-      groups = self.all(provider_id, app_id)
+    def self.find(app_id, group_name)
+      groups = self.all(app_id)
       groups.find { |g| g.name == group_name }
     end
 
-    def self.default_external_group(provider_id, app_id)
-      groups = self.all(provider_id, app_id)
+    def self.default_external_group(app_id)
+      groups = self.all(app_id)
       groups.find(&:default_external_group?)
     end
 
-    def add_tester!(provider_id, tester)
-      client.add_tester_to_group!(provider_id: provider_id, group: self, tester: tester, app_id: self.app_id)
+    def add_tester!(tester)
+      client.add_tester_to_group!(group: self, tester: tester, app_id: self.app_id)
     end
 
-    def remove_tester!(provider_id, tester)
-      client.remove_tester_from_group!(provider_id: provider_id, group: self, tester: tester, app_id: self.app_id)
+    def remove_tester!(tester)
+      client.remove_tester_from_group!(group: self, tester: tester, app_id: self.app_id)
     end
 
     def default_external_group?

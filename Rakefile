@@ -13,27 +13,26 @@ task :yolo do
   Spaceship::Tunes.login('secret')
   app = Spaceship::Tunes::Application.find("com.thirty-one-parkton.Activate")
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-  provider_id = '103020806'
 
-  group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
+  group = TestFlight::Group.default_external_group(app.apple_id)
 
-  build = TestFlight::Build.find(provider_id, app.apple_id, tunes_build.id)
+  build = TestFlight::Build.find(app.apple_id, tunes_build.id)
   client = build.client
 
   build.test_info.whats_new = "some new shit for build #{BUILD_NUMBER}"
   build.export_compliance.encryption_updated = false
   build.beta_review_info.demo_account_required = false
-  resp = client.post_for_review(provider_id, app.apple_id, tunes_build.id, build)
+  resp = client.post_for_review(app.apple_id, tunes_build.id, build)
 
-  resp = client.add_group_to_build(provider_id, app.apple_id, group.id, tunes_build.id)
+  resp = client.add_group_to_build(app.apple_id, group.id, tunes_build.id)
 
   require 'pry'; binding.pry;
   0
 end
 
 
-# def get_new_build_info_for_review(client: nil, provider_id: nil, app_id: nil, build_id: nil)
-#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
+# def get_new_build_info_for_review(client: nil, app_id: nil, build_id: nil)
+#   url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
 #   r = client.request(:get) do |req|
 #     req.url url
 #     req.headers['Content-Type'] = 'application/json'
@@ -42,8 +41,8 @@ end
 #   r.body['data']
 # end
 
-# def post_test_info(client: nil, provider_id: nil, app_id: nil)
-#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/testInfo"
+# def post_test_info(client: nil, app_id: nil)
+#   url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/testInfo"
 #   r = client.request(:put) do |req|
 #     req.url url
 #     req.body = {
@@ -72,8 +71,8 @@ end
 #   end
 # end
 
-# def start_app_review(client: nil, provider_id: nil, app_id: nil, build_id: nil, build_info: nil)
-#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
+# def start_app_review(client: nil, app_id: nil, build_id: nil, build_info: nil)
+#   url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
 #   r = client.request(:post) do |req|
 #     req.url url
 #     req.body = build_info.to_json()
@@ -89,12 +88,12 @@ end
 #   build = app.builds.find { |build| build.build_version == "2" }
 
 #   userDetailsData = build.client.user_details_data
-#   providerId = userDetailsData['contentProviderId']
+#   teamId = userDetailsData['contentProviderId']
 
-#   post_test_info(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id)
+#   post_test_info(client: build.client, app_id: build.build_train.application.apple_id)
 
-#   info = get_new_build_info_for_review(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id, build_id: build.id)
-#   start_app_review(client: build.client, provider_id: providerId, app_id: build.build_train.application.apple_id, build_id: build.id, build_info: info)
+#   info = get_new_build_info_for_review(client: build.client, app_id: build.build_train.application.apple_id, build_id: build.id)
+#   start_app_review(client: build.client, app_id: build.build_train.application.apple_id, build_id: build.id, build_info: info)
 
 #   require 'pry'
 #   binding.pry

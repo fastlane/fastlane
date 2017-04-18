@@ -840,11 +840,11 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def put_export_compliance_did_not_change(provider_id, app_id, build_id, build_info)
+    def put_export_compliance_did_not_change(app_id, build_id, build_info)
     end
 
-    def put_test_info(provider_id, app_id, test_info)
-      url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/testInfo"
+    def put_test_info(app_id, test_info)
+      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/testInfo"
       r = request(:put) do |req|
         req.url url
         req.body = test_info.to_json
@@ -853,8 +853,8 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def get_new_build_info_for_review(provider_id, app_id, build_id)
-      url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
+    def get_new_build_info_for_review(app_id, build_id)
+      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
       r = request(:get) do |req|
         req.url url
         req.headers['Content-Type'] = 'application/json'
@@ -863,10 +863,10 @@ module Spaceship
       r.body['data']
     end
 
-    def submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new, beta_review_info)
+    def submit_build_for_review(app_id, build_id, build_info, whats_new, beta_review_info)
       build_info['testInfo'][0]['whatsNew'] = whats_new
       build_info['betaReviewInfo'] = beta_review_info
-      url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}/review"
+      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
       r = request(:post) do |req|
         req.url url
         req.body = build_info.to_json
@@ -899,7 +899,6 @@ module Spaceship
                                             is_exempt: false,
                                             proprietary: false,
                                             third_party: false)
-      provider_id = user_details_data['contentProviderId']
 
       # TODO: how do locales work
       locale = "en-US"
@@ -928,11 +927,11 @@ module Spaceship
       test_info['betaReviewInfo']['notes'] = notes
       # TODO: what to do with the rest of the parameters?
 
-      put_test_info(provider_id, app_id, test_info)
-      build_info = get_new_build_info_for_review(provider_id, app_id, build_id)
+      put_test_info(app_id, test_info)
+      build_info = get_new_build_info_for_review(app_id, build_id)
 
-      put_export_compliance_did_not_change(provider_id, app_id, build_id, build_info)
-      submit_build_for_review(provider_id, app_id, build_id, build_info, whats_new, test_info['betaReviewInfo'])
+      put_export_compliance_did_not_change(app_id, build_id, build_info)
+      submit_build_for_review(app_id, build_id, build_info, whats_new, test_info['betaReviewInfo'])
     end
 
     # def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
