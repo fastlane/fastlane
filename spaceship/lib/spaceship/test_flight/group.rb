@@ -39,6 +39,10 @@ module TestFlight
       client.add_tester_to_group!(provider_id: provider_id, group: self, tester: tester, app_id: self.app_id)
     end
 
+    def remove_tester!(provider_id, tester)
+      client.remove_tester_from_group!(provider_id: provider_id, group: self, tester: tester, app_id: self.app_id)
+    end
+
     def default_external_group?
       is_default_external_group
     end

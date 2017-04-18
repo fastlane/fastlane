@@ -55,6 +55,15 @@ module TestFlight
       # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
+    def remove_tester_from_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
+      url = "providers/#{provider_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
+      response = request(:delete) do |req|
+        req.url url
+        req.headers['Content-Type'] = 'application/json'
+      end
+      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
+    end
+
     def get_build(provider_id, app_id, build_id)
       response = request(:get, "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}")
       response.body['data']
