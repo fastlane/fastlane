@@ -1271,28 +1271,8 @@ module Spaceship
         }
       }
 
-      if groups
-        tester_data[:groups] = groups.map do |group_name_or_group_id|
-          if self.groups.value?(group_name_or_group_id)
-            # This is an existing group, let's use that, the user specified the group name
-            group_name = group_name_or_group_id
-            group_id = self.groups.key(group_name_or_group_id)
-          elsif self.groups.key?(group_name_or_group_id)
-            # This is an existing group, let's use that, the user specified the group ID
-            group_name = self.groups[group_name_or_group_id]
-            group_id = group_name_or_group_id
-          else
-            group_name = group_name_or_group_id
-            group_id = nil # this is expected by the iTC API
-          end
-
-          {
-            "id" => group_id,
-            "name" => {
-              "value" => group_name
-            }
-          }
-        end
+      unless groups.nil?
+        puts "With the most recent TestFlight change, adding groups when creating testers are currently not supported, we're working on implementing it again"
       end
 
       data = { testers: [tester_data] }
