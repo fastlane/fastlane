@@ -13,7 +13,8 @@ module TestFlight
     attr_mapping({
       'id' => :id,
       'name' => :name,
-      'isDefaultExternalGroup' => :is_default_external_group
+      'isDefaultExternalGroup' => :is_default_external_group,
+      'isInternalGroup' => :is_default_internal_group
     })
 
     def self.all(app_id)
@@ -35,6 +36,11 @@ module TestFlight
       groups.find(&:default_external_group?)
     end
 
+    def self.default_internal_group(app_id)
+      groups = self.all(app_id)
+      groups.find(&:default_internal_group?)
+    end
+
     def add_tester!(tester)
       client.add_tester_to_group!(group: self, tester: tester, app_id: self.app_id)
     end
@@ -45,6 +51,10 @@ module TestFlight
 
     def default_external_group?
       is_default_external_group
+    end
+
+    def default_internal_group?
+      is_default_internal_group
     end
   end
 end

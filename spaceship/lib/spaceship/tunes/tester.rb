@@ -56,16 +56,11 @@ module Spaceship
       attr_accessor :latest_installed_version_number
 
       attr_mapping(
-        'testerId' => :tester_id,
-        'emailAddress.value' => :email,
-        'firstName.value' => :first_name,
-        'lastName.value' => :last_name,
-        'groups' => :groups,
-        'devices' => :devices,
-        'latestInstalledAppAdamId' => :latest_install_app_id,
-        'latestInstalledDate' => :latest_install_date,
-        'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number
+        'id' => :tester_id,
+        'email' => :email,
+        'firstName' => :first_name,
+        'lastName' => :last_name,
+        'groups' => :groups
       )
 
       class << self
@@ -157,9 +152,11 @@ module Spaceship
       #####################################################
       class External < Tester
         def self.url(app_id = nil)
+          team_id = TestFlight::Build.client.team_id
+          group_id = Application.find(app_id).default_external_group.id
           {
             index: "ra/users/pre/ext",
-            index_by_app: "ra/user/externalTesters/#{app_id}/",
+            index_by_app: "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers?order=asc&sort=status",
             create: "ra/users/pre/create",
             delete: "ra/users/pre/ext/delete",
             update_by_app: "ra/user/externalTesters/#{app_id}/"
@@ -169,9 +166,11 @@ module Spaceship
 
       class Internal < Tester
         def self.url(app_id = nil)
+          team_id = TestFlight::Build.client.team_id
+          group_id = Application.find(app_id).default_internal_group.id
           {
             index: "ra/users/pre/int",
-            index_by_app: "ra/user/internalTesters/#{app_id}/",
+            index_by_app: "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers?order=asc&sort=status",
             create: nil,
             delete: nil,
             update_by_app: "ra/user/internalTesters/#{app_id}/"

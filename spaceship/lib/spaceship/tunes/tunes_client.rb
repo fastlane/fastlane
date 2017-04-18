@@ -882,13 +882,13 @@ module Spaceship
       locale = "en-US"
 
       unless build_id
-       all_builds = TestFlight::Build.client.all_builds_for_train(app_id: app_id, train_version: train, platform: platform) 
-       all_builds.collect do | build |
-         temp_build = TestFlight::Build.factory(build) 
-         if temp_build.build_version.to_s == build_number.to_s
-           build_id = temp_build.id
-         end
-       end
+        all_builds = TestFlight::Build.client.all_builds_for_train(app_id: app_id, train_version: train, platform: platform)
+        all_builds.collect do |build|
+          temp_build = TestFlight::Build.factory(build)
+          if temp_build.build_version.to_s == build_number.to_s
+            build_id = temp_build.id
+          end
+        end
       end
 
       raise "Build-ID not specified" unless build_id
@@ -1226,7 +1226,7 @@ module Spaceship
     def testers_by_app(tester, app_id)
       url = tester.url(app_id)[:index_by_app]
       r = request(:get, url)
-      parse_response(r, 'data')['users']
+      parse_response(r, 'data')
     end
 
     # Returns a list of available testing groups
