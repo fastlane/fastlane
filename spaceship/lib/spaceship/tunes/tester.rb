@@ -106,7 +106,8 @@ module Spaceship
                                    first_name: first_name,
                                     last_name: last_name,
                                        groups: groups)
-          self.factory(data)
+          # We don't need to do additional parsing here, as `create_tester!` automatically
+          # re-fetches the newly created tester
         end
 
         #####################################################
