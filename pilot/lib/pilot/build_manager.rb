@@ -35,7 +35,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(Spaceship::Application.client.team_id, app.apple_id, platform: platform) # TODO: Remove the call to Spaceship::Application.client.team_id
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
 
       distribute(options, latest_build)
     end
