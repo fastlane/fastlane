@@ -13,7 +13,7 @@ module FastlaneCore
     end
 
     # @param train_version and build_version are used internally
-    def self.wait_for_build_processing_to_be_complete(app_id, train_version: nil, build_version: nil, platform: nil, start_time: Time.now)
+    def self.wait_for_build_processing_to_be_complete(app_id, train_version: nil, build_version: nil, platform: nil, start_time: Time.now, build_to_look_for: nil)
       processing = all_processing_builds(app_id, platform: platform)
       if processing.count == 0
         UI.success "No Builds in processing state"
@@ -29,6 +29,8 @@ module FastlaneCore
           UI.success("Successfully finished processing the build")
           UI.message("You can now tweet: ")
           UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
+          # Return the Build
+          return build_to_look_for
         end
       else
         # Fetch the most recent build, as we want to wait for that one
@@ -43,7 +45,8 @@ module FastlaneCore
                                                build_version: build.build_version,
                                                train_version: build.train_version,
                                                platform: platform,
-                                               start_time: start_time)
+                                               start_time: start_time,
+                                               build_to_look_for: build)
     end
   end
 end

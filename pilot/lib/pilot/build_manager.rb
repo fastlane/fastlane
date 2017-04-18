@@ -35,13 +35,13 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
+      uploaded_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
       # TODO: set build metadata here
       # used to be
       #   uploaded_build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-      # We don't actually get the build here, let's try to figure out how to do that best, ideally the method wait_for_build_processing_to_be_complete does that
+      # uploaded_build contains the finished build
 
-      # TODO: we don't have the upload_build, also the distribute method has to be updated
+      # TODO: uploaded_build should be here distribute needs some love
       distribute(options, uploaded_build)
     end
 
