@@ -35,7 +35,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      TestFlight::Build.wait_for_build_processing_to_be_complete(Spaceship::Application.client.team_id, app.apple_id, platform: platform) # TODO: Remove the call to Spaceship::Application.client.team_id
+      TestFlight::Build.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
       # TODO: set build metadata here
       # used to be
       #   uploaded_build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])

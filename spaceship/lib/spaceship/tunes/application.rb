@@ -371,7 +371,7 @@ module Spaceship
       #####################################################
 
       def default_external_group
-        TestFlight::Group.default_external_group(self.client.team_id, self.apple_id) # TODO: remove self.client.team_id
+        TestFlight::Group.default_external_group(self.apple_id)
       end
 
       #####################################################
