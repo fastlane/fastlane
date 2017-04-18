@@ -881,8 +881,18 @@ module Spaceship
       # ],
       locale = "en-US"
 
-      # TODO: handle the case that the caller provides only a build_number
-      #  and not a build_id (legacy callers)
+      unless build_id
+       all_builds = TestFlight::Build.client.all_builds_for_train(app_id: app_id, train_version: train, platform: platform) 
+       all_builds.collect do | build |
+         temp_build = TestFlight::Build.factory(build) 
+         if temp_build.build_version.to_s == build_number.to_s
+           build_id = temp_build.id
+         end
+       end
+      end
+
+      raise "Build-ID not specified" unless build_id
+
       test_info = { 'details' => [{}], 'betaReviewInfo' => {} }
 
       test_info['primaryLocale'] = locale
