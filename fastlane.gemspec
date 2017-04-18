@@ -11,7 +11,7 @@ rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Felix Krause", "Michael Furtak", "Andrea Falcone", "David Ohayon", "Mark Pirri", "Hemal Shah", "Manuel Wallner"]
+  spec.authors       = ["Felix Krause", "Michael Furtak", "Andrea Falcone", "David Ohayon", "Mark Pirri", "Hemal Shah", "Manuel Wallner", "Joshua Liebowitz"]
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
   spec.description   = Fastlane::DESCRIPTION
