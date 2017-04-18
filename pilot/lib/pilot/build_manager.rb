@@ -42,7 +42,7 @@ module Pilot
       # We don't actually get the build here, let's try to figure out how to do that best, ideally the method wait_for_build_processing_to_be_complete does that
 
       # TODO: the distribute method has to be updated
-      latest_build = Build.latest(provider_id: Spaceship::Application.client.team_id, app_id: app.apple_id, platform: platform)
+      latest_build = TestFlight::Build.latest(provider_id: Spaceship::Application.client.team_id, app_id: app.apple_id, platform: platform)
       distribute(options, latest_build)
     end
 

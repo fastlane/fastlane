@@ -1,5 +1,5 @@
 module TestFlight
-  class BuildTrains
+  class BuildTrains < Base
 
     include Enumerable
 

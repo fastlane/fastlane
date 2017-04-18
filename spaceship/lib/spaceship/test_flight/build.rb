@@ -64,9 +64,9 @@ module TestFlight
       'id' => :id
     })
 
-    def self.latest(provider_id: nil, app_id: nil, build_id: nil)
+    def self.latest(provider_id: nil, app_id: nil, build_id: nil, platform: platform)
       trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
-      latest_build_data = trains.values.flatten.sort_by { |build| build.upload_date }.last
+      latest_build_data = trains.values.flatten.sort_by { |build| Time.parse(build['uploadDate']) }.last
 
       find(provider_id, app_id, latest_build_data['id'])
     end
