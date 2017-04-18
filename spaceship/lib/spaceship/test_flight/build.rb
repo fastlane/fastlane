@@ -65,39 +65,20 @@ module TestFlight
       self.new(attrs) if attrs
     end
 
-    # All build trains, each with its builds
-    # @example
-    #   {
-    #     "1.0" => [
-    #       Build1,
-    #       Build2
-    #     ],
-    #     "1.1" => [
-    #       Build3
-    #     ]
-    #   }
-    def self.all(provider_id, app_id, platform: nil)
-      build_trains = client.all_build_trains(provider_id: provider_id, app_id: app_id, platform: platform)
-      result = {}
-      build_trains.each do |train_version|
-        builds = client.all_builds_for_train(provider_id: provider_id, app_id: app_id, platform: platform, train_version: train_version)
-        result[train_version] = builds.collect do |current_build|
-          self.factory(current_build) # TODO: when inspecting those builds, something's wrong, it doesn't expose the attributes. I don't know why
-        end
+    def self.all_builds_for_train(provider_id: nil, app_id: nil, platform: nil, train_version: train_version)
+      builds = client.get_builds_for_train(provider_id: provider_id, app_id: app_id, platform: platform, train_version: train_version)
+      builds.map do |build|
+        self.new(build)
       end
-      return result
     end
 
     # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(provider_id, app_id, platform: nil)
-      all_builds = self.all(provider_id, app_id, platform: platform)
-      result = []
-      all_builds.each do |train_version, builds|
-        result += builds.find_all do |build|
-          build.external_state == "testflight.build.state.processing"
-        end
+    def self.all_processing_builds(provider_id: nil, app_id: nil, platform: nil)
+      trains = BuildTrains.new
+      all_builds = trains.values.flatten
+      all_builds.find_all do |build|
+        build.external_state == "testflight.build.state.processing"
       end
-      return result
     end
 
     # @param train_version and build_version are used internally

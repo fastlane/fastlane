@@ -5,15 +5,15 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
-BUILD_NUMBER='5'
+BUILD_NUMBER='6'
 
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
-  Spaceship::Tunes.login('secret')
-  app = Spaceship::Tunes::Application.find("com.thirty-one-parkton.Activate")
+  Spaceship::Tunes.login(ENV['APPLE_ID'])
+  app = Spaceship::Tunes::Application.find(ENV['BUNDLE_ID'])
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-  provider_id = '103020806'
+  provider_id = ENV['TEAM_ID']
 
   group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
 

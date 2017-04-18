@@ -577,6 +577,15 @@ module Spaceship
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }.merge(headers)
       return params, headers
     end
+
+    # TODO: Check out Python's decorator pattern for implmenting this check
+    #def assert_required_params(*params)
+    #  params.each do |param|
+    #    if local_variable_get(param).nil?
+    #      raise ArgumentError.new "`#{param}` is a required parameter"
+    #    end
+    #  end
+    #end
   end
 end
 
