@@ -4,6 +4,12 @@ module TestFlight
     attr_accessor :name
     attr_accessor :is_default_external_group
 
+    # TODO: is it ok to have a reference here? Every group is specific to
+    # an Spaceship::Application object from my understanding
+    # We need a reference to the app to build the complete URLs, for example
+    # to add testers to a group. Please remove comment and replace with docs if ok
+    attr_accessor :app_id
+
     attr_mapping({
       'id' => :id,
       'name' => :name,
@@ -12,7 +18,11 @@ module TestFlight
 
     def self.all(provider_id, app_id)
       groups = client.all_groups(provider_id, app_id)
-      groups.map { |g| self.new(g) }
+      groups.map do |g| 
+        current_element = self.new(g)
+        current_element.app_id = app_id
+        current_element
+      end
     end
 
     def self.find(provider_id, app_id, group_name)
