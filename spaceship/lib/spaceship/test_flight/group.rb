@@ -35,6 +35,10 @@ module TestFlight
       groups.find(&:default_external_group?)
     end
 
+    def add_tester!(provider_id, tester)
+      client.add_tester_to_group!(provider_id: provider_id, group: self, tester: tester, app_id: self.app_id)
+    end
+
     def default_external_group?
       is_default_external_group
     end

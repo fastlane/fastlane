@@ -41,7 +41,7 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            tester.add_to_app!(app.apple_id)
+            app.default_external_group.add_tester!(Spaceship::Application.client.team_id, tester) # TODO: remove fetching of the TEAM ID here
             UI.success("Successfully added tester to app #{app_filter}")
           rescue => ex
             UI.error("Could not add #{tester.email} to app: #{ex}")

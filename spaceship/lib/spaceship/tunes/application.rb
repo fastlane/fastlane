@@ -370,6 +370,10 @@ module Spaceship
       # @!group Testers
       #####################################################
 
+      def default_external_group
+        TestFlight::Group.default_external_group(self.client.team_id, self.apple_id) # TODO: remove self.client.team_id
+      end
+
       #####################################################
       # @!group Promo codes
       #####################################################
