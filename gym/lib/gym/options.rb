@@ -228,12 +228,6 @@ module Gym
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :xcode_preference_plist_path,
-                                     env_name: "GYM_XCCODE_PREFERENCE_PLIST_PATH",
-                                     description: "User's Xcode preferences plist path",
-                                     optional: true,
-                                     is_string: true,
-                                     default_value: "~/Library/Preferences/com.apple.dt.Xcode.plist"),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      short_option: "-r",
                                      env_name: "SUPPRESS_OUTPUT",
