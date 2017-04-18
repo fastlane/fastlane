@@ -46,7 +46,7 @@ module TestFlight
       response.body
     end
 
-    def get_groups(provider_id, app_id)
+    def all_groups(provider_id, app_id)
       response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
       response.body['data']
     end
