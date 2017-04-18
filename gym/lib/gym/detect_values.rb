@@ -1,3 +1,4 @@
+require 'cfpropertylist'
 module Gym
   # This class detects all kinds of default values
   class DetectValues
@@ -33,7 +34,32 @@ module Gym
 
       config[:output_name] ||= Gym.project.app_name
 
+      if Gym.config[:build_path].nil? # maybe we manually passed it in somewhere?
+        config[:build_path] = archive_path_from_local_xcode_preferences
+      end
+
       return config
+    end
+
+    def self.archive_path_from_local_xcode_preferences
+      day = Time.now.strftime("%F") # e.g. 2015-08-07
+      archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
+
+      # during unit testing we pass in "" as one test (length == 0), we want path to be nil in this instance
+      path = File.expand_path(Gym.config[:xcode_preference_plist_path]) if Gym.config[:xcode_preference_plist_path].length > 0
+
+      unless File.exist?(path.to_s) # this file only exists when you edit the Xcode preferences to set custom values
+        return archive_path
+      end
+
+      xcode_preferences_dictionary = CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
+      custom_archive_path = xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
+
+      unless custom_archive_path.to_s.length > 0
+        return archive_path
+      end
+
+      return File.join(custom_archive_path, day)
     end
 
     # Helper Methods
