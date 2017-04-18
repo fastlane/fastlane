@@ -848,6 +848,37 @@ module Spaceship
                                             third_party: false)
 
       # TODO: how do locales work
+      # hjanuschka: locales work with providing multiple elements in the 'details' array each of them
+      #  proposal:
+      #  change signature to accept a hash e.g:
+      #   {
+      #     'en-US': {
+      #         feedback_email: "helmut@januschka.com",
+      #         marketing_url: "http://somewhere.com",
+      #         privacy_policy_url: "http://www.somewhere.com",
+      #         description: "Description in this locale",
+      #     }
+      #   }
+      #
+      #  Sample Result from iTC with 2 locales:
+      #  "details": [
+      #     {
+      #       "locale": "de-DE",
+      #       "feedbackEmail": "de@de.de",
+      #       "marketingUrl": "http:\/\/de.marketing.url",
+      #       "privacyPolicyUrl": "http:\/\/de.privacy.url",
+      #       "privacyPolicy": null,
+      #       "description": "This is the de-DE description"
+      #    },
+      #    {
+      #     "locale": "da",
+      #     "feedbackEmail": "da@da.da",
+      #     "marketingUrl": "http:\/\/da.marketing.url",
+      #     "privacyPolicyUrl": "http:\/\/da.privacy.url",
+      #     "privacyPolicy": null,
+      #     "description": "danish description 'da' locale"
+      #   }
+      # ],
       locale = "en-US"
 
       # TODO: handle the case that the caller provides only a build_number
