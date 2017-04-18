@@ -1,16 +1,16 @@
 module TestFlight
   class Build < Base
-    # @example 
+    # @example
     #   "com.sample.app"
     attr_accessor :bundle_id
 
-    # @example 
+    # @example
     #   "testflight.build.state.testing.active"
     # @example
     #   "testflight.build.state.processing"
     attr_accessor :internal_state
 
-    # @example 
+    # @example
     #   "testflight.build.state.submit.ready"
     # @example
     #   "testflight.build.state.processing"
@@ -87,7 +87,7 @@ module TestFlight
       end
       return result
     end
-    
+
     # Just the builds, as a flat array, that are still processing
     def self.all_processing_builds(provider_id, app_id, platform: nil)
       all_builds = self.all(provider_id, app_id, platform: platform)
@@ -115,18 +115,18 @@ module TestFlight
         # any previous builds might be there since they're stuck
         build = processing.sort_by { |b| Time.new(b.upload_date) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
       end
-      
+
       # We got the build we want to wait for, wait now...
-      sleep(10) 
+      sleep(10)
       # TODO: we really should move this somewhere else, so that we can print out what we used to print
       # UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
       # we don't have access to FastlaneCore::UI in spaceship
-      wait_for_build_processing_to_be_complete(provider_id, app_id, 
-                                                build_version: build.build_version, 
-                                                train_version: build.train_version, 
-                                                platform: platform)
+      wait_for_build_processing_to_be_complete(provider_id, app_id,
+                                               build_version: build.build_version,
+                                               train_version: build.train_version,
+                                               platform: platform)
 
-      # Also when it's finished we used to do 
+      # Also when it's finished we used to do
       # UI.success("Successfully finished processing the build")
       # UI.message("You can now tweet: ")
       # UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")

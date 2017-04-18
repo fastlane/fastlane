@@ -32,7 +32,7 @@ module TestFlight
         req.body = {
           "email" => tester.email,
           "firstName" => tester.last_name,
-          "lastName" => tester.first_name,
+          "lastName" => tester.first_name
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
