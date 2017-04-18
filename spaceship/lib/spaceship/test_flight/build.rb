@@ -64,6 +64,13 @@ module TestFlight
       'id' => :id
     })
 
+    BUILD_STATES = {
+      :processing => 'testflight.build.state.processing',
+      :active => 'testflight.build.state.testing.active',
+      :ready => 'testflight.build.state.submit.ready',
+      :export_compliance_missing => 'testflight.build.state.export.compliance.missing'
+    }
+
     def self.latest(provider_id: nil, app_id: nil, build_id: nil, platform: platform)
       trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
       latest_build_data = trains.values.flatten.sort_by { |build| Time.parse(build['uploadDate']) }.last
@@ -80,35 +87,42 @@ module TestFlight
     def self.all_processing_builds(provider_id: nil, app_id: nil, platform: nil)
       trains = BuildTrains.all(provider_id: provider_id, app_id: app_id, platform: platform)
       all_builds = trains.values.flatten
-      all_builds.find_all do |build|
-        build.external_state == "testflight.build.state.processing"
+      all_builds.find_all do |build_data|
+        build_data['externalState'] == "testflight.build.state.processing"
+      end
+    end
+
+    #TODO[snatchev] : make this work instead of `all_processing_build`
+    def self.all_in_state(state)
+      BuildTrain.all.filter_trains do |build_data|
+        build_data['externalState'] == BUILD_STATES[state]
       end
     end
 
     # @param train_version and build_version are used internally
     def self.wait_for_build_processing_to_be_complete(provider_id, app_id, train_version: nil, build_version: nil, platform: nil)
       # TODO: do we want to move this somewhere else?
-      processing = all_processing_builds(provider_id, app_id, platform: platform)
+      processing = all_processing_builds(provider_id: provider_id, app_id: app_id, platform: platform)
       return if processing.count == 0
 
       if train_version && build_version
         # We already have a specific build we wait for, use that one
-        build = processing.find { |b| b.train_version == train_version && b.build_version == build_version }
-        return if build.nil? # wohooo, the build doesn't show up in the `processing` list any more, we're good
+        build_data = processing.find { |bd| bd['trainVersion'] == train_version && bd['buildVersion'] == build_version }
+        return if build_data.nil? # wohooo, the build doesn't show up in the `processing` list any more, we're good
       else
         # Fetch the most recent build, as we want to wait for that one
         # any previous builds might be there since they're stuck
-        build = processing.sort_by { |b| Time.new(b.upload_date) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
+        build_data = processing.sort_by { |bd| Time.parse(bd['uploadDate']) }.last # TODO: Remove the `Time.new` once we can auto-parse it (see attr_accessor for upload_date)
       end
 
       # We got the build we want to wait for, wait now...
       sleep(10)
       # TODO: we really should move this somewhere else, so that we can print out what we used to print
-      # UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
+      puts("Waiting for iTunes Connect to finish processing the new build (#{train_version} - #{build_version})")
       # we don't have access to FastlaneCore::UI in spaceship
       wait_for_build_processing_to_be_complete(provider_id, app_id,
-                                               build_version: build.build_version,
-                                               train_version: build.train_version,
+                                               build_version: build_data['buildVersion'],
+                                               train_version: build_data['trainVersion'],
                                                platform: platform)
 
       # Also when it's finished we used to do

@@ -17,7 +17,7 @@ module TestFlight
     })
 
     def self.all(provider_id, app_id)
-      groups = client.all_groups(provider_id, app_id)
+      groups = client.get_groups(provider_id, app_id)
       groups.map do |g|
         current_element = self.new(g)
         current_element.app_id = app_id
