@@ -1320,14 +1320,6 @@ module Spaceship
       handle_itc_response(data) || data[0]
     end
 
-    def add_tester_to_app!(tester, app_id)
-      update_tester_from_app!(tester, app_id, true)
-    end
-
-    def remove_tester_from_app!(tester, app_id)
-      update_tester_from_app!(tester, app_id, false)
-    end
-
     #####################################################
     # @!group Sandbox Testers
     #####################################################
@@ -1469,37 +1461,6 @@ module Spaceship
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
       @sso_token_for_video ||= ref_data.sso_token_for_video
-    end
-
-    def update_tester_from_app!(tester, app_id, testing)
-      url = tester.class.url(app_id)[:update_by_app]
-      data = {
-        users: [
-          {
-            emailAddress: {
-              value: tester.email
-            },
-            firstName: {
-              value: tester.first_name
-            },
-            lastName: {
-              value: tester.last_name
-            },
-            testing: {
-              value: testing
-            }
-          }
-        ]
-      }
-
-      r = request(:post) do |req|
-        req.url url
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      data = parse_response(r, 'data')
-      handle_itc_response(data)
     end
   end
   # rubocop:enable Metrics/ClassLength
