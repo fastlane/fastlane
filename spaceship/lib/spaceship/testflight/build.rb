@@ -21,6 +21,13 @@ module Testflight
       self.new(attrs) if attrs
     end
 
+    def self.all(provider_id, app_id, platform: nil)
+      attrs = client.all_builds(provider_id: provider_id, app_id: app_id, platform: platform)
+      attrs.each do |current_build|
+        self.new(attrs)
+      end
+    end
+
     def beta_review_info
       BetaReviewInfo.new(super)
     end

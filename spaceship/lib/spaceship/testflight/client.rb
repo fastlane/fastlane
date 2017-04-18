@@ -4,6 +4,25 @@ module Testflight
       'https://itunesconnect.apple.com/testflight/v2/'
     end
 
+    # Returns an array of all available build trains (not the builds they include)
+    def all_build_trains(provider_id: nil, app_id: nil, platform: nil)
+      platform ||= "ios"
+      response = request(:get, "providers/#{provider_id}/apps/#{app_id}/platforms/#{platform}/trains")
+      response.body['data']
+    end
+
+    # Iterates over all build trains and lists all available builds for each train
+    def all_builds(provider_id: nil, app_id: nil, platform: nil)
+      platform ||= "ios"
+      build_trains = all_build_trains(provider_id: provider_id, app_id: app_id, platform: platform)
+      result = {}
+      build_trains.each do |current_train_number|
+        response = request(:get, "providers/#{provider_id}/apps/#{app_id}/platforms/#{platform}/trains/#{current_train_number}/builds")
+        result[current_train_number] = response.body['data']
+      end
+      return result
+    end
+
     def get_build(provider_id, app_id, build_id)
       response = request(:get, "providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}")
       response.body['data']
