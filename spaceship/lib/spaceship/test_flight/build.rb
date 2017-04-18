@@ -98,50 +98,6 @@ module TestFlight
       return result
     end
 
-    # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(app_id, platform: nil)
-      all_builds = self.all(app_id, platform: platform)
-      result = []
-      all_builds.each do |train_version, builds|
-        result += builds.find_all do |build|
-          build.external_state == "testflight.build.state.processing"
-        end
-      end
-      return result
-    end
-
-    # @param train_version and build_version are used internally
-    def self.wait_for_build_processing_to_be_complete(app_id, train_version: nil, build_version: nil, platform: nil)
-      # TODO: do we want to move this somewhere else?
-      processing = all_processing_builds(app_id, platform: platform)
-      return if processing.count == 0
-
-      if train_version && build_version
-        # We already have a specific build we wait for, use that one
-        build = processing.find { |b| b.train_version == train_version && b.build_version == build_version }
-        return if build.nil? # wohooo, the build doesn't show up in the `processing` list any more, we're good
-      else
-        # Fetch the most recent build, as we want to wait for that one
-        # any previous builds might be there since they're stuck
-        build = processing.sort_by { |b| b.upload_date }.last
-      end
-
-      # We got the build we want to wait for, wait now...
-      sleep(10)
-      # TODO: we really should move this somewhere else, so that we can print out what we used to print
-      # UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
-      # we don't have access to FastlaneCore::UI in spaceship
-      wait_for_build_processing_to_be_complete(app_id,
-                                               build_version: build.build_version,
-                                               train_version: build.train_version,
-                                               platform: platform)
-
-      # Also when it's finished we used to do
-      # UI.success("Successfully finished processing the build")
-      # UI.message("You can now tweet: ")
-      # UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
-    end
-
     def beta_review_info
       BetaReviewInfo.new(super) # TODO: please document on what this `super` does, I didn't see it before in this context
     end
