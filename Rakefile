@@ -10,7 +10,7 @@ BUILD_NUMBER='5'
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
-  Spaceship::Tunes.login('ohayon@me.com')
+  Spaceship::Tunes.login('secret')
   app = Spaceship::Tunes::Application.find("com.thirty-one-parkton.Activate")
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
   provider_id = '103020806'
