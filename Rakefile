@@ -15,9 +15,9 @@ task :yolo do
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
   provider_id = '103020806'
 
-  group = Testflight::Group.default_external_group(provider_id, app.apple_id)
+  group = TestFlight::Group.default_external_group(provider_id, app.apple_id)
 
-  build = Testflight::Build.find(provider_id, app.apple_id, tunes_build.id)
+  build = TestFlight::Build.find(provider_id, app.apple_id, tunes_build.id)
   client = build.client
 
   build.test_info.whats_new = "some new shit for build #{BUILD_NUMBER}"

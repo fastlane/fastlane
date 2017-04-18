@@ -1,4 +1,4 @@
-module Testflight
+module TestFlight
   class Build < Base
     attr_accessor :bundle_id, :internal_state, :external_state
     attr_accessor :build_version

@@ -1,4 +1,4 @@
-module Testflight
+module TestFlight
   class BetaReviewInfo < Base
     attr_accessor :contact_first_name, :contact_last_name, :contact_phone, :contact_email
     attr_accessor :demo_account_name, :demo_account_password, :demo_account_required

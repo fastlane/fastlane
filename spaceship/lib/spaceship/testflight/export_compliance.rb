@@ -1,4 +1,4 @@
-module Testflight
+module TestFlight
   class ExportCompliance < Base
     attr_accessor :uses_encryption, :encryption_updated
 
