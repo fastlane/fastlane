@@ -125,6 +125,11 @@ module TestFlight
                                                 build_version: build.build_version, 
                                                 train_version: build.train_version, 
                                                 platform: platform)
+
+      # Also when it's finished we used to do 
+      # UI.success("Successfully finished processing the build")
+      # UI.message("You can now tweet: ")
+      # UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
     end
 
     def beta_review_info
