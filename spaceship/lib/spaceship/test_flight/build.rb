@@ -60,14 +60,12 @@ module TestFlight
       'id' => :id
     })
 
-
     def self.factory(attrs)
       # Parse the dates
       # rubocop:disable Style/RescueModifier
       attrs['uploadDate'] = (Time.parse(attrs['uploadDate']) rescue attrs['uploadDate'])
       # rubocop:enable Style/RescueModifier
-
-      obj = self.new(attrs)
+      self.new(attrs)
     end
 
     def self.find(app_id, build_id)

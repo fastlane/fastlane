@@ -185,9 +185,6 @@ module Spaceship
       @current_team_id = team_id
     end
 
-
-
-    ##
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.

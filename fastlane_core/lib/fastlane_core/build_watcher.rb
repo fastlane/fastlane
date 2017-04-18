@@ -23,7 +23,7 @@ module FastlaneCore
       if train_version && build_version
         # We already have a specific build we wait for, use that one
         build = processing.find { |b| b.train_version == train_version && b.build_version == build_version }
-        if build.nil? 
+        if build.nil?
           # wohooo, the build doesn't show up in the `processing` list any more, we're good
           minutes = ((Time.now - start_time) / 60).round
           UI.success("Successfully finished processing the build")
@@ -33,7 +33,7 @@ module FastlaneCore
       else
         # Fetch the most recent build, as we want to wait for that one
         # any previous builds might be there since they're stuck
-        build = processing.sort_by { |b| b.upload_date }.last
+        build = processing.sort_by(&:upload_date).last
       end
 
       # We got the build we want to wait for, wait now...
@@ -44,8 +44,6 @@ module FastlaneCore
                                                train_version: build.train_version,
                                                platform: platform,
                                                start_time: start_time)
-
-      end
+    end
   end
 end
-
