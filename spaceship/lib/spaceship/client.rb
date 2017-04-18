@@ -123,7 +123,7 @@ module Spaceship
     end
 
     def self.hostname
-      raise "You must implemented self.hostname"
+      raise "You must implement self.hostname"
     end
 
     def initialize
