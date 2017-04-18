@@ -1,6 +1,5 @@
 module Testflight
   class Build < Base
-
     attr_accessor :bundle_id, :internal_state, :external_state
     attr_accessor :build_version
     attr_accessor :beta_review_info
@@ -33,6 +32,5 @@ module Testflight
     def test_info
       TestInfo.new(super)
     end
-
   end
 end

@@ -1,6 +1,5 @@
 module Testflight
   class Group < Base
-
     attr_accessor :id
     attr_accessor :name
     attr_accessor :is_default_external_group
@@ -23,7 +22,7 @@ module Testflight
 
     def self.default_external_group(provider_id, app_id)
       groups = self.all(provider_id, app_id)
-      groups.find { |g| g.default_external_group? }
+      groups.find(&:default_external_group?)
     end
 
     def default_external_group?

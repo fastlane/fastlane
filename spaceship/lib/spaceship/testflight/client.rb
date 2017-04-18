@@ -45,12 +45,11 @@ module Testflight
       end
       response.body
     end
-
   end
 
   # def groups(app_id)
-#   return @cached_groups if @cached_groups
-#   r = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
-#   @cached_groups = parse_response(r, 'data')
-# end
+  #   return @cached_groups if @cached_groups
+  #   r = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
+  #   @cached_groups = parse_response(r, 'data')
+  # end
 end
