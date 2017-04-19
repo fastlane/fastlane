@@ -113,23 +113,19 @@ module Spaceship::TestFlight
     end
 
     def handle_response(response)
-      if (200..300).include?(response.status) && response.body.empty?
+      if (200..300).cover?(response.status) && response.body.empty?
         return
       end
 
-      unless response.body.is_a?(Hash)
-        raise UnexpectedResponse.new(response.body)
+      unless response.body.kind_of?(Hash)
+        raise UnexpectedResponse, response.body
       end
 
-      if error = response.body['error']
-        raise UnexpectedResponse.new(error)
-      end
+      raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-      if data = response.body['data']
-        return data
-      end
+      return response.body['data'] if response.body['data']
 
-      response.body
+      return response.body
     end
 
     private

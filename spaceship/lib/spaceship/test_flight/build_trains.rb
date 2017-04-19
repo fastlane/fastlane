@@ -7,7 +7,7 @@ module Spaceship::TestFlight
       trains = {}
       data.each do |train_version|
         builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
-        trains[train_version] = builds_data.map { |data| Build.new(data) }
+        trains[train_version] = builds_data.map { |attrs| Build.new(attrs) }
       end
 
       self.new(trains)

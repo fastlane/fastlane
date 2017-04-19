@@ -101,7 +101,7 @@ module Spaceship
         #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name: "Bennett", groups: ["Testers"])
         # @return (Tester): The newly created tester
         def create!(email: nil, first_name: nil, last_name: nil, groups: nil)
-          data = client.create_tester!(tester: self,
+          return client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
                                     last_name: last_name,

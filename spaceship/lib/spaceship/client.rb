@@ -19,6 +19,7 @@ if ENV["SPACESHIP_DEBUG"]
 end
 
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
@@ -185,9 +186,6 @@ module Spaceship
       @current_team_id = team_id
     end
 
-
-
-    ##
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
@@ -649,6 +647,7 @@ module Spaceship
     #  end
     # end
   end
+  # rubocop:enable Metrics/ClassLength
 end
 
 require 'spaceship/two_step_client'
