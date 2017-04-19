@@ -1,3 +1,5 @@
+require 'time'
+
 module TestFlight
   class Build < Base
     # @example
@@ -44,6 +46,8 @@ module TestFlight
     attr_accessor :upload_date
 
     attr_mapping({
+      'appAdamId' => :app_id,
+      'providerId' => :provider_id,
       'bundleId' => :bundle_id,
       'trainVersion' => :train_version,
       'buildVersion' => :build_version,
@@ -60,12 +64,19 @@ module TestFlight
       'id' => :id
     })
 
-    def self.factory(attrs)
-      # Parse the dates
-      # rubocop:disable Style/RescueModifier
-      attrs['uploadDate'] = (Time.parse(attrs['uploadDate']) rescue attrs['uploadDate'])
-      # rubocop:enable Style/RescueModifier
-      self.new(attrs)
+
+    BUILD_STATES = {
+      processing: 'testflight.build.state.processing',
+      active: 'testflight.build.state.testing.active',
+      ready: 'testflight.build.state.submit.ready',
+      export_compliance_missing: 'testflight.build.state.export.compliance.missing'
+    }
+
+    def self.latest(app_id: nil, build_id: nil, platform: nil)
+      trains = BuildTrains.all(app_id: app_id, platform: platform)
+      latest_build_data = trains.values.flatten.sort_by { |build| Time.parse(build['uploadDate']) }.last
+
+      find(app_id, latest_build_data['id'])
     end
 
     def self.find(app_id, build_id)
@@ -73,27 +84,22 @@ module TestFlight
       self.new(attrs) if attrs
     end
 
-    # All build trains, each with its builds
-    # @example
-    #   {
-    #     "1.0" => [
-    #       Build1,
-    #       Build2
-    #     ],
-    #     "1.1" => [
-    #       Build3
-    #     ]
-    #   }
-    def self.all(app_id, platform: nil)
-      build_trains = client.all_build_trains(app_id: app_id, platform: platform)
-      result = {}
-      build_trains.each do |train_version|
-        builds = client.all_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
-        result[train_version] = builds.collect do |current_build|
-          self.factory(current_build) # TODO: when inspecting those builds, something's wrong, it doesn't expose the attributes. I don't know why
-        end
-      end
-      return result
+    def self.all_builds(app_id: nil, platform: nil)
+      trains = BuildTrains.all(app_id: app_id, platform: platform)
+      return trains.values.flatten.collect { |build| self.new(build) }
+    end
+
+    # Just the builds, as a flat array, that are still processing
+    def self.all_processing_builds(app_id: nil, platform: nil)
+      return self.all_builds(app_id: app_id, platform: platform).find_all(&:processing?)
+    end
+
+    def ready_to_submit?
+      external_state == BUILD_STATES[:ready]
+    end
+
+    def processing?
+      external_state == BUILD_STATES[:processing]
     end
 
     def beta_review_info
@@ -106,6 +112,30 @@ module TestFlight
 
     def test_info
       TestInfo.new(super)
+    end
+
+    def upload_date
+      Time.parse(super)
+    end
+
+    def save!
+      client.put_build(app_id, id, self)
+    end
+
+    # TODO: handle locales and multiple TestInfo properties
+    def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
+      test_info.description = description
+      test_info.feedback_email = feedback_email
+      test_info.whats_new = whats_new
+      save!
+    end
+
+    def submit_for_review!
+      client.post_for_review(app_id, id, self)
+    end
+
+    def add_group!(group)
+      client.add_group_to_build(app_id, group.id, id)
     end
   end
 end

@@ -1,52 +1,37 @@
 module FastlaneCore
   class BuildWatcher
-    # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(app_id, platform: nil)
-      all_builds = TestFlight::Build.all(app_id, platform: platform)
-      result = []
-      all_builds.each do |train_version, builds|
-        result += builds.find_all do |build|
-          build.external_state == "testflight.build.state.processing"
-        end
-      end
-      return result
-    end
+    # @return The build we waited for. This method will always return a build
+    def self.wait_for_build_processing_to_be_complete(app_id, platform: nil)
+      start_time = Time.now
+      # First, find the train and build version we want to watch for
+      processing_builds = TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
 
-    # @param train_version and build_version are used internally
-    def self.wait_for_build_processing_to_be_complete(app_id, train_version: nil, build_version: nil, platform: nil, start_time: Time.now, build_to_look_for: nil)
-      processing = all_processing_builds(app_id, platform: platform)
-      if processing.count == 0
-        UI.success "No Builds in processing state"
-        return
-      end
+      watching_build = processing_builds.sort_by(&:upload_date).last # either it's still processing
+      watching_build ||= TestFlight::Build.latest(app_id: app_id, platform: platform) # or we fallback to the most recent uplaod
 
-      if train_version && build_version
-        # We already have a specific build we wait for, use that one
-        build = processing.find { |b| b.train_version == train_version && b.build_version == build_version }
-        if build.nil?
-          # wohooo, the build doesn't show up in the `processing` list any more, we're good
+      loop do
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{watching_build.train_version} - #{watching_build.build_version})")
+
+        # Due to iTunes Connect, builds disappear from the build list alltogether
+        # after they finished processing. Before returning this build, we have to
+        # wait for the build to appear in the build list again
+        # As this method is very often used to wait for a build, and then do something
+        # with it, we have to be sure that the build actually is ready
+        all_builds = TestFlight::Build.all_builds(app_id: app_id, platform: platform)
+        matching_build = all_builds.find { |b| b.train_version == watching_build.train_version && b.build_version == watching_build.build_version }
+
+        if matching_build.nil?
+          UI.message("Build doesn't show up in the build list any more, waiting for it to appear again")
+        elsif matching_build.ready_to_submit?          
           minutes = ((Time.now - start_time) / 60).round
-          UI.success("Successfully finished processing the build")
+          UI.success("Successfully finished processing the build #{matching_build.train_version} - #{matching_build.build_version}")
           UI.message("You can now tweet: ")
           UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
-          # Return the Build
-          return build_to_look_for
+          return matching_build
         end
-      else
-        # Fetch the most recent build, as we want to wait for that one
-        # any previous builds might be there since they're stuck
-        build = processing.sort_by(&:upload_date).last
-      end
 
-      # We got the build we want to wait for, wait now...
-      sleep(10)
-      UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
-      wait_for_build_processing_to_be_complete(app_id,
-                                               build_version: build.build_version,
-                                               train_version: build.train_version,
-                                               platform: platform,
-                                               start_time: start_time,
-                                               build_to_look_for: build)
+        sleep 3
+      end
     end
   end
 end

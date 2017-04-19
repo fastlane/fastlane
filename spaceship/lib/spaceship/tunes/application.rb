@@ -255,6 +255,7 @@ module Spaceship
 
       #####################################################
       # @!group Builds
+      # TODO[snatchev]: deprecate these methods.
       #####################################################
 
       # TestFlight: A reference to all the build trains

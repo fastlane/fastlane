@@ -8,6 +8,23 @@ module TestFlight
     })
 
     # TODO: handle multiple testInfo's for each locale
+
+    def description
+      raw_data.first['description']
+    end
+
+    def description=(value)
+      raw_data.first['description'] = value
+    end
+
+    def feedback_email
+      raw_data.first['feedback_email']
+    end
+
+    def feedback_email=(value)
+      raw_data.first['feedback_email'] = value
+    end
+
     def whats_new
       raw_data.first['whatsNew']
     end

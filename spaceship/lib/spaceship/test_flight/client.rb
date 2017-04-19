@@ -5,14 +5,14 @@ module TestFlight
     end
 
     # Returns an array of all available build trains (not the builds they include)
-    def all_build_trains(app_id: nil, platform: nil)
+    def get_build_trains(app_id: nil, platform: nil)
       platform ||= "ios"
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
       response.body['data']
       # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
-    def all_builds_for_train(app_id: nil, platform: nil, train_version: nil)
+    def get_builds_for_train(app_id: nil, platform: nil, train_version: nil)
       platform ||= "ios"
 
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
@@ -20,14 +20,9 @@ module TestFlight
       # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
-    def add_tester_to_group!(group: nil, tester: nil, app_id: nil)
-      # First we need to add the tester to the app
-      # It's ok if the tester already exists, we just have to do this... don't ask
-      # This will enable testing for the tester for a given app, as just creating the tester on an account-level
-      # is not enough to add the tester to a group. If this isn't done the next request would fail.
-      # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
+    def post_tester(app_id: nil, tester: nil)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
-      resp = request(:post) do |req|
+      request(:post) do |req|
         req.url url
         req.body = {
           "email" => tester.email,
@@ -36,27 +31,23 @@ module TestFlight
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      tester = Spaceship::Tunes::Tester::External.factory(resp.body["data"])
-      # TODO: go on with returned tester so we have a id, required from boarding, as it comes in without id
+    end
 
-      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
-
-      # Then we can add the tester to the group that allows the app to test
-      # This is easy enough, we already have all this data. We don't need any response from the previous request
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
+    def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       request(:put) do |req|
         req.url url
         req.body = {
-          "groupId" => group.id,
-          "testerId" => tester.tester_id
+          "groupId" => group_id,
+          "testerId" => tester_id
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
-    def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
+    # def remove_tester_from_group!( group: nil, tester: nil, app_id: nil)
+    def delete_tester_from_group( group_id: nil, tester_id: nil, app_id: nil)
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
         req.url url
         req.headers['Content-Type'] = 'application/json'
@@ -85,9 +76,12 @@ module TestFlight
         req.headers['Content-Type'] = 'application/json'
       end
       response.body
+      require 'pry';        puts ''
+    rescue => e
+      require 'pry';        puts ''
     end
 
-    def all_groups(app_id)
+    def get_groups(app_id)
       response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
       response.body['data']
     end
@@ -106,10 +100,4 @@ module TestFlight
       response.body
     end
   end
-
-  # def groups(app_id)
-  #   return @cached_groups if @cached_groups
-  #   r = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
-  #   @cached_groups = parse_response(r, 'data')
-  # end
 end

@@ -5,17 +5,15 @@ RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
-BUILD_NUMBER='5'
+BUILD_NUMBER = '6'
 
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
-  Spaceship::Tunes.login('secret')
-  app = Spaceship::Tunes::Application.find("com.thirty-one-parkton.Activate")
+  Spaceship::Tunes.login(ENV['APPLE_ID'])
+  app = Spaceship::Tunes::Application.find(ENV['BUNDLE_ID'])
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-
   group = TestFlight::Group.default_external_group(app.apple_id)
-
   build = TestFlight::Build.find(app.apple_id, tunes_build.id)
   client = build.client
 
@@ -24,15 +22,16 @@ task :yolo do
   build.beta_review_info.demo_account_required = false
   resp = client.post_for_review(app.apple_id, tunes_build.id, build)
 
+  # if distribute to external?
+  group = TestFlight::Group.default_external_group(app.apple_id)
   resp = client.add_group_to_build(app.apple_id, group.id, tunes_build.id)
 
-  require 'pry'; binding.pry;
+  require 'pry'
   0
 end
 
-
 # def get_new_build_info_for_review(client: nil, app_id: nil, build_id: nil)
-#   url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
+#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
 #   r = client.request(:get) do |req|
 #     req.url url
 #     req.headers['Content-Type'] = 'application/json'
@@ -101,8 +100,6 @@ end
 
 #   # build.update_build_information!(whats_new: "new stuff", description: "app description", feedback_email: "feedback@email.org")
 
-
-
 #   # build.client.submit_testflight_build_for_review!(
 #   #         app_id: build.build_train.application.apple_id,
 #   #         marketing_url: "http://www.apple.com",
@@ -113,9 +110,7 @@ end
 #   #         feedback_email: "hi@there.com"
 #   #       )
 
-
 #   #  build.build_train.update_testing_status!(true, 'external', build)
-
 
 # end
 
