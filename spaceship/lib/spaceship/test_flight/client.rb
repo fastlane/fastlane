@@ -41,7 +41,7 @@ module Spaceship::TestFlight
     def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       request(:put) do |req|
         req.url url
         req.body = {
@@ -54,7 +54,7 @@ module Spaceship::TestFlight
 
     # def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
         req.url url
         req.headers['Content-Type'] = 'application/json'
@@ -92,7 +92,6 @@ module Spaceship::TestFlight
     end
 
     def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
-      # TODO: if no group specified default to isDefaultExternalGroup
       body = {
         'groupId' => group_id,
         'buildId' => build_id
