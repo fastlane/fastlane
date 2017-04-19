@@ -1,20 +1,18 @@
 module Spaceship::TestFlight
   class TestInfo < Base
-    attr_accessor :locale, :primary_locale, :description, :feedback_email
-    attr_accessor :marketing_url, :privacy_policy_url, :privacy_policy, :whats_new
+    # TestInfo Contains a collection of info for testers. There is one "testInfo" for each locale.
+    #
+    # For now, when we set a value it sets the same value for all locales
+    # When getting a value, we return the first locale values
 
-    attr_mapping({
-      'whatsNew' => :whats_new
-    })
-
-    # TODO: handle multiple testInfo's for each locale
+    attr_accessor :description, :feedback_email, :whats_new
 
     def description
       raw_data.first['description']
     end
 
     def description=(value)
-      raw_data.first['description'] = value
+      raw_data.each { |locale| locale['description'] = value }
     end
 
     def feedback_email
@@ -22,7 +20,7 @@ module Spaceship::TestFlight
     end
 
     def feedback_email=(value)
-      raw_data.first['feedback_email'] = value
+      raw_data.each { |locale| locale['feedback_email'] = value }
     end
 
     def whats_new
@@ -30,7 +28,7 @@ module Spaceship::TestFlight
     end
 
     def whats_new=(value)
-      raw_data.first['whatsNew'] = value
+      raw_data.each { |locale| locale['whatsNew'] = value }
     end
   end
 end

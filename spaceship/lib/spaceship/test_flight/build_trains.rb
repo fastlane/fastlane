@@ -1,5 +1,15 @@
 module Spaceship::TestFlight
   class BuildTrains < Base
+
+    ##
+    # BuildTrains represent the collection of builds for a `train_version`
+    #
+    # Note: builds returned by BuildTrains are _partially_ complete. Properties
+    # such as `exportCompliance`, `testInfo` and many others are not provided.
+    # It is the responsibility of Build to lazy-load the necessary properties.
+    #
+    # See `Spaceship::TestFlight::Build#reload`
+
     include Enumerable
 
     def self.all(app_id: nil, platform: nil)
