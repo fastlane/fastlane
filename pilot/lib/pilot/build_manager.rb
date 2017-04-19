@@ -116,11 +116,18 @@ module Pilot
       if options[:distribute_external]
         external_group = TestFlight::Group.default_external_group(uploaded_build.provider_id, uploaded_build.app_id)
         uploaded_build.add_group!(external_group)
-        
-        
       end
 
-      return true
+      if options[:groups]
+        groups = Group.filter_groups(uploaded_build.provider_id, uploaded_build.app_id) do |group|
+          options[:groups].include?(group.name)
+        end
+        groups.each do |group|
+          uploaded_build.add_group!(group)
+        end
+      end
+
+      true
     end
   end
 end
