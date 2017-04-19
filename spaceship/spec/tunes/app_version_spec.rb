@@ -173,6 +173,10 @@ describe Spaceship::AppVersion, all: true do
       it "parses pendingDeveloperRelease" do
         expect(Spaceship::Tunes::AppStatus.get_from_string('pendingDeveloperRelease')).to eq(Spaceship::Tunes::AppStatus::PENDING_DEVELOPER_RELEASE)
       end
+
+      it "parses metadataRejected" do
+        expect(Spaceship::Tunes::AppStatus.get_from_string('metadataRejected')).to eq(Spaceship::Tunes::AppStatus::METADATA_REJECTED)
+      end
     end
 
     describe "Screenshots" do
