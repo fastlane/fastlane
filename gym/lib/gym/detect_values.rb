@@ -20,7 +20,7 @@ module Gym
         config.load_configuration_file(Gym.gymfile_name)
       end
 
-      config[:use_legacy_build_api] = true if Xcode.pre_7?
+      config[:use_legacy_build_api] = true if FastlaneCore::Xcode.pre_7?
 
       if config[:use_legacy_build_api]
         UI.deprecated("the use_legacy_build_api option is deprecated")

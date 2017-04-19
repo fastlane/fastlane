@@ -10,7 +10,7 @@ describe Gym do
     it "raises an exception when Xcode >= 8.3 and use_legacy_build_api is used" do
       expect do
         options = { workspace: "./gym/examples/cocoapods/Example.xcworkspace", use_legacy_build_api: true }
-        expect(Gym::Xcode).to receive(:legacy_api_deprecated?).and_return(true)
+        expect(FastlaneCore::Xcode).to receive(:higher_than_8_3?).and_return(true)
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       end.to raise_error "legacy_build_api removed!"
     end
@@ -18,7 +18,7 @@ describe Gym do
     it "legacy api still works on old xcode < 8.3" do
       expect do
         options = { scheme: "Example", workspace: "./gym/examples/cocoapods/Example.xcworkspace", use_legacy_build_api: true }
-        expect(Gym::Xcode).to receive(:legacy_api_deprecated?).and_return(false)
+        expect(FastlaneCore::Xcode).to receive(:higher_than_8_3?).twice.and_return(false)
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       end.to_not raise_error
     end
