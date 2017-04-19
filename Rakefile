@@ -10,20 +10,14 @@ BUILD_NUMBER = '6'
 task :yolo do
   require 'dotenv'; Dotenv.load
   require 'spaceship'
+  require 'fastlane_core'
+
   Spaceship::Tunes.login(ENV['APPLE_ID'])
+  Spaceship::Tunes.select_team
   app = Spaceship::Tunes::Application.find(ENV['BUNDLE_ID'])
-  tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-  build = TestFlight::Build.find(app.apple_id, tunes_build.id)
-  client = build.client
+  watcher = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: :ios)
 
-  build.test_info.whats_new = "some new shit for build #{BUILD_NUMBER}"
-  build.export_compliance.encryption_updated = false
-  build.beta_review_info.demo_account_required = false
-  resp = client.post_for_review(app.apple_id, tunes_build.id, build)
-
-  # if distribute to external?
-  group = TestFlight::Group.default_external_group(app.apple_id)
-  resp = client.add_group_to_build(app.apple_id, group.id, tunes_build.id)
+  require 'pry'; binding.pry
 
   0
 end

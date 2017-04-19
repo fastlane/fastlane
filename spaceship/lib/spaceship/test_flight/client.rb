@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class Client < Spaceship::Client
     def self.hostname
       'https://itunesconnect.apple.com/testflight/v2/'
@@ -53,7 +53,7 @@ module TestFlight
       end
     end
 
-    # def remove_tester_from_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
+    # def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
       response = request(:delete) do |req|
