@@ -114,7 +114,7 @@ module Pilot
       uploaded_build.submit_for_review!
 
       if options[:distribute_external]
-        external_group = Spaceship::TestFlight::Group.default_external_group(uploaded_build.app_id)
+        external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
 
         if external_group.nil? && options[:groups].nil?
           UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
@@ -124,7 +124,7 @@ module Pilot
       end
 
       if options[:groups]
-        groups = Group.filter_groups(uploaded_build.app_id) do |group|
+        groups = Group.filter_groups(app_id: uploaded_build.app_id) do |group|
           options[:groups].include?(group.name)
         end
         groups.each do |group|
