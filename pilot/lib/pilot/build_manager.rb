@@ -35,7 +35,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform) # TODO: Remove the call to Spaceship::Application.client.team_id
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
       distribute(options, latest_build)
     end
 
@@ -107,9 +107,34 @@ module Pilot
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
-      # TODO: do something about encryption and demo account
+      # Set Build Submission Information
+      # Default Values
+      # sample:
+      #  -> properties from ExportCompliance and BetaReviewInfo Object
+      # {
+      #   export_compliance: {
+      #       encryption_updated: true,
+      #       uses_encryption: true
+      #   },
+      #   beta_review_info: {
+      #     demo_account_required: false
+      #     contact_phone: "+43000000000",
+      #     contact_first_name: "helmut",
+      #     contact_last_name: "J",
+      #     ....
+      #   }
+      # }
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
+      if options[:submission_information]
+        options[:submission_information].each do |key, bucket|
+          bucket.each do |bucket_key, bucket_value|
+            UI.message("Setting '#{key}.#{bucket_key}' to '#{bucket_value}'...")
+            uploaded_build.send("#{key}.#{bucket_key}=", bucket_value)
+          end
+        end
+      end
+
       uploaded_build.submit_for_review!
 
       if options[:distribute_external]
