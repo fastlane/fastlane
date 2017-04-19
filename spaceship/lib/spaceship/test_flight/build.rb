@@ -71,11 +71,9 @@ module Spaceship::TestFlight
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
-    def reload
-      self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
-    end
-
-    # TODO: assert_params, if build_id is nil, then it actually returns a collection
+    # Find a Build by `build_id`. Returns `nil` if can't find it.
+    #
+    # @return (Spaceship::TestFlight::Build)
     def self.find(app_id: nil, build_id: nil)
       attrs = client.get_build(app_id: app_id, build_id: build_id)
       self.new(attrs) if attrs
@@ -100,6 +98,17 @@ module Spaceship::TestFlight
       all(app_id: app_id, platform: platform).sort_by(&:upload_date).last
     end
 
+    # reload the raw_data resource for this build.
+    # This is useful when we start with a partial build response as returned by the BuildTrains,
+    # but then need to look up some attributes on the full build representation.
+    #
+    # Note: this will overwrite any non-saved changes to the object
+    #
+    # @return (Spaceceship::Base::DataHash) the raw_data of the build.
+    def reload
+      self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
+    end
+
     def ready_to_submit?
       external_state == BUILD_STATES[:ready]
     end
@@ -117,25 +126,30 @@ module Spaceship::TestFlight
     # any of the variables below, because they are not inlcuded in the partial Build objects
     #
     # `super` here calls `beta_review_info` as defined by the `attr_mapping` above.
+    # @return (Spaceship::TestFlight::BetaReviewInfo)
     def beta_review_info
       super || reload
       BetaReviewInfo.new(super)
     end
 
+    # @return (Spaceship::TestFlight::ExportCompliance)
     def export_compliance
       super || reload
       ExportCompliance.new(super)
     end
 
+    # @return (Spaceship::TestFlight::TestInfo)
     def test_info
       super || reload
       TestInfo.new(super)
     end
 
+    # @return (Time) an parsed Time value for the upload_date
     def upload_date
       Time.parse(super)
     end
 
+    # saves the changes to the Build object to TestFlight
     def save!
       client.put_build(app_id: app_id, build_id: id, build: self)
     end
