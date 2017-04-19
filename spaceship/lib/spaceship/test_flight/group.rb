@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class Group < Base
     attr_accessor :id
     attr_accessor :name

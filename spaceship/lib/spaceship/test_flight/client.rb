@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class Client < Spaceship::Client
     def self.hostname
       'https://itunesconnect.apple.com/testflight/v2/'

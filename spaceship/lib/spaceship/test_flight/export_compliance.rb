@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class ExportCompliance < Base
     attr_accessor :uses_encryption, :encryption_updated
 

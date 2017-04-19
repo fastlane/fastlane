@@ -1,6 +1,6 @@
 require 'time'
 
-module TestFlight
+module Spaceship::TestFlight
   class Build < Base
     # @example
     #   "com.sample.app"
@@ -71,26 +71,33 @@ module TestFlight
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
-    def self.latest(app_id: nil, platform: nil)
-      trains = BuildTrains.all(app_id: app_id, platform: platform)
-      latest_build_data = trains.values.flatten.sort_by { |build| Time.parse(build['uploadDate']) }.last
-
-      find(app_id, latest_build_data['id'])
+    def reload
+      self.raw_data = self.class.find(app_id, id).raw_data
     end
 
-    def self.find(app_id, build_id)
+    # TODO: assert_params, if build_id is nil, then it actually returns a collection
+    def self.find(app_id: nil, build_id: nil)
       attrs = client.get_build(app_id, build_id)
       self.new(attrs) if attrs
     end
 
-    def self.all_builds(app_id: nil, platform: nil)
+    def self.all(app_id: nil, platform: nil)
       trains = BuildTrains.all(app_id: app_id, platform: platform)
-      return trains.values.flatten.collect { |build| self.new(build) }
+      trains.values.flatten
+    end
+
+    def self.builds_for_train(app_id: nil, platform: nil, train_version: nil)
+      builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
+      builds_data.map { |data| self.new(data) }
     end
 
     # Just the builds, as a flat array, that are still processing
     def self.all_processing_builds(app_id: nil, platform: nil)
-      return self.all_builds(app_id: app_id, platform: platform).find_all(&:processing?)
+      all(app_id: app_id, platform: platform).find_all(&:processing?)
+    end
+
+    def self.latest(app_id: nil, platform: nil)
+      all(app_id: app_id, platform: platform).sort_by(&:upload_date).last
     end
 
     def ready_to_submit?
@@ -101,15 +108,23 @@ module TestFlight
       external_state == BUILD_STATES[:processing]
     end
 
+    # Getting builds from BuildTrains only gets a partial Build object
+    # We are then requesting the full build from iTC when we need to access
+    # any of the variables below, because they are not inlcuded in the partial Build objects
+    #
+    # `super` here calls `beta_review_info` as defined by the `attr_mapping` above.
     def beta_review_info
-      BetaReviewInfo.new(super) # TODO: please document on what this `super` does, I didn't see it before in this context
+      super || reload
+      BetaReviewInfo.new(super)
     end
 
     def export_compliance
+      super || reload
       ExportCompliance.new(super)
     end
 
     def test_info
+      super || reload
       TestInfo.new(super)
     end
 

@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class TestInfo < Base
     attr_accessor :locale, :primary_locale, :description, :feedback_email
     attr_accessor :marketing_url, :privacy_policy_url, :privacy_policy, :whats_new

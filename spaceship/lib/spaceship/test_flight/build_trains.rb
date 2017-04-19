@@ -1,15 +1,13 @@
-module TestFlight
+module Spaceship::TestFlight
   class BuildTrains < Base
     include Enumerable
 
-    # This returns hashes that are partial versions of TestFlight::Build objects
-    # We are using hashes here for now because we dont want
-    # Them to be misinterpreted as Build objects.
     def self.all(app_id: nil, platform: nil)
       data = client.get_build_trains(app_id: app_id, platform: platform)
       trains = {}
       data.each do |train_version|
-        trains[train_version] = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
+        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
+        trains[train_version] = builds_data.map { |data| Build.new(data) }
       end
 
       self.new(trains)

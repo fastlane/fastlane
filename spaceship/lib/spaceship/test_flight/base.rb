@@ -1,4 +1,4 @@
-module TestFlight
+module Spaceship::TestFlight
   class Base < Spaceship::Base
     def self.client
       @client ||= TestFlight::Client.client_with_authorization_from(Spaceship::Tunes.client)
