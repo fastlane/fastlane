@@ -1,6 +1,6 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil)
+    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, disable_encryption: false)
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -38,7 +38,7 @@ module Match
       end
 
       copy_readme(@dir) unless skip_docs
-      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
+      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password, disable_encryption: disable_encryption)
 
       return @dir
     end
@@ -61,11 +61,11 @@ module Match
       end
     end
 
-    def self.commit_changes(path, message, git_url, branch = "master")
+    def self.commit_changes(path, message, git_url, branch = "master", disable_encryption = false)
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
-        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+        Encrypt.new.encrypt_repo(path: path, git_url: git_url, disable_encryption: disable_encryption)
         File.write("match_version.txt", Fastlane::VERSION) # unencrypted
 
         commands = []

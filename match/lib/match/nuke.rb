@@ -151,7 +151,7 @@ module Match
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch])
+      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch], params[:disable_encryption])
     end
 
     private

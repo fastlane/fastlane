@@ -46,7 +46,7 @@ module Match
       # Done
       if self.changes_to_commit and !params[:readonly]
         message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
+        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch], params[:disable_encryption])
       end
 
       # Print a summary table for each app_identifier

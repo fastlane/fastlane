@@ -11,7 +11,7 @@ module Match
       Encrypt.new.store_password(params[:git_url], to)
 
       message = "[fastlane] Changed passphrase"
-      GitHelper.commit_changes(workspace, message, params[:git_url], params[:git_branch])
+      GitHelper.commit_changes(workspace, message, params[:git_url], params[:git_branch], params[:disable_encryption])
     end
 
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
