@@ -185,21 +185,23 @@ module Spaceship
       @current_team_id = team_id
     end
 
+    ##
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
     # TODO: come up with a better way to share the cookie instance
     def self.client_with_authorization_from(another_client)
-      self.new(cookie: another_client.instance_variable_get(:@cookie))
+      self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
     end
 
-    def initialize(cookie: nil)
+    def initialize(cookie: nil, current_team_id: nil)
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
+      @current_team_id = current_team_id
       @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response :json, content_type: /\bjson$/

@@ -21,6 +21,12 @@ module TestFlight
     end
 
     def post_tester(app_id: nil, tester: nil)
+
+      # First we need to add the tester to the app
+      # It's ok if the tester already exists, we just have to do this... don't ask
+      # This will enable testing for the tester for a given app, as just creating the tester on an account-level
+      # is not enough to add the tester to a group. If this isn't done the next request would fail.
+      # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       request(:post) do |req|
         req.url url
@@ -34,7 +40,9 @@ module TestFlight
     end
 
     def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
+      # Then we can add the tester to the group that allows the app to test
+      # This is easy enough, we already have all this data. We don't need any response from the previous request
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
       request(:put) do |req|
         req.url url
         req.body = {
@@ -45,9 +53,9 @@ module TestFlight
       end
     end
 
-    # def remove_tester_from_group!( group: nil, tester: nil, app_id: nil)
+    # def remove_tester_from_group!(provider_id: nil, group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group.id}/testers/#{tester.tester_id}"
       response = request(:delete) do |req|
         req.url url
         req.headers['Content-Type'] = 'application/json'

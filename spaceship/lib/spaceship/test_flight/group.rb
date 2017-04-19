@@ -18,7 +18,7 @@ module TestFlight
     })
 
     def self.all(app_id)
-      groups = client.get_groups(app_id)
+      groups = client.all_groups(app_id)
       groups.map do |g|
         current_element = self.new(g)
         current_element.app_id = app_id
@@ -44,10 +44,6 @@ module TestFlight
     def self.filter_groups(app_id, &block)
       groups = self.all(app_id)
       groups.select(&block)
-    end
-
-    def add_tester!(tester)
-      client.add_tester_to_group!(group: self, tester: tester, app_id: self.app_id)
     end
 
     def add_tester!(tester)

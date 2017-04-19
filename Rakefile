@@ -13,7 +13,6 @@ task :yolo do
   Spaceship::Tunes.login(ENV['APPLE_ID'])
   app = Spaceship::Tunes::Application.find(ENV['BUNDLE_ID'])
   tunes_build = app.builds.find { |build| build.build_version == BUILD_NUMBER }
-  group = TestFlight::Group.default_external_group(app.apple_id)
   build = TestFlight::Build.find(app.apple_id, tunes_build.id)
   client = build.client
 
@@ -26,12 +25,11 @@ task :yolo do
   group = TestFlight::Group.default_external_group(app.apple_id)
   resp = client.add_group_to_build(app.apple_id, group.id, tunes_build.id)
 
-  require 'pry'
   0
 end
 
 # def get_new_build_info_for_review(client: nil, app_id: nil, build_id: nil)
-#   url = "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/builds/#{build_id}"
+#   url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
 #   r = client.request(:get) do |req|
 #     req.url url
 #     req.headers['Content-Type'] = 'application/json'
