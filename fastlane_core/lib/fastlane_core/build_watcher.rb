@@ -1,7 +1,7 @@
 module FastlaneCore
   class BuildWatcher
     # @return The build we waited for. This method will always return a build
-    def self.wait_for_build_processing_to_be_complete(app_id, platform: nil)
+    def self.wait_for_build_processing_to_be_complete(app_id: nil, platform: nil)
       # First, find the train and build version we want to watch for
       processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
 

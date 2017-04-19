@@ -16,7 +16,7 @@ task :yolo do
   Spaceship::Tunes.select_team
   app = Spaceship::Tunes::Application.find(ENV['BUNDLE_ID'])
 
-  watcher = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: :ios)
+  watcher = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: :ios)
 
   require 'pry'; binding.pry
 

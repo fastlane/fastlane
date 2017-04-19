@@ -62,12 +62,12 @@ module Spaceship::TestFlight
       # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
     end
 
-    def get_build(app_id, build_id)
+    def get_build(app_id: nil, build_id: nil)
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
       response.body['data']
     end
 
-    def put_build(app_id, build_id, build)
+    def put_build(app_id: nil, build_id: nil, build: nil)
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
         req.body = build.to_json
@@ -76,25 +76,22 @@ module Spaceship::TestFlight
       response.body['data']
     end
 
-    def post_for_review(app_id, build_id, build)
+    def post_for_review(app_id: nil, build_id: nil, build: nil)
       response = request(:post) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
         req.body = build.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       response.body
-      require 'pry';        puts ''
-    rescue => e
-      require 'pry';        puts ''
     end
 
 
-    def get_groups(app_id)
+    def get_groups(app_id: nil)
       response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
       response.body['data']
     end
 
-    def add_group_to_build(app_id, group_id, build_id)
+    def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
       # TODO: if no group specified default to isDefaultExternalGroup
       body = {
         'groupId' => group_id,
