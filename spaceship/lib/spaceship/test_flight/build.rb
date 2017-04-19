@@ -154,7 +154,6 @@ module Spaceship::TestFlight
       client.put_build(app_id: app_id, build_id: id, build: self)
     end
 
-    # TODO: handle locales and multiple TestInfo properties
     def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
       test_info.description = description
       test_info.feedback_email = feedback_email
