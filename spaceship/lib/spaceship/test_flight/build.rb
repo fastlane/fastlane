@@ -104,6 +104,10 @@ module Spaceship::TestFlight
       external_state == BUILD_STATES[:ready]
     end
 
+    def active?
+      external_state == BUILD_STATES[:active]
+    end
+
     def processing?
       external_state == BUILD_STATES[:processing]
     end

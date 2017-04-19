@@ -22,6 +22,9 @@ module FastlaneCore
 
         if matching_build.nil?
           UI.message("Build doesn't show up in the build list any more, waiting for it to appear again")
+        elsif matching_build.active?
+          UI.success("Build #{matching_build.train_version} - #{matching_build.build_version} is already being tested")
+          return matching_build
         elsif matching_build.ready_to_submit?
           UI.success("Successfully finished processing the build #{matching_build.train_version} - #{matching_build.build_version}")
           return matching_build

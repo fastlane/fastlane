@@ -8,16 +8,14 @@ module Spaceship::TestFlight
     def get_build_trains(app_id: nil, platform: nil)
       platform ||= "ios"
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
-      response.body['data']
-      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
+      handle_response(response)
     end
 
     def get_builds_for_train(app_id: nil, platform: nil, train_version: nil)
       platform ||= "ios"
 
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
-      response.body['data']
-      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
+      handle_response(response)
     end
 
     def post_tester(app_id: nil, tester: nil)
@@ -27,7 +25,7 @@ module Spaceship::TestFlight
       # is not enough to add the tester to a group. If this isn't done the next request would fail.
       # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
       url = "providers/#{team_id}/apps/#{app_id}/testers"
-      request(:post) do |req|
+      response = request(:post) do |req|
         req.url url
         req.body = {
           "email" => tester.email,
@@ -36,13 +34,14 @@ module Spaceship::TestFlight
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
+      handle_response(response)
     end
 
     def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
-      request(:put) do |req|
+      response = request(:put) do |req|
         req.url url
         req.body = {
           "groupId" => group_id,
@@ -50,6 +49,7 @@ module Spaceship::TestFlight
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
+      handle_response(response)
     end
 
     # def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
@@ -59,12 +59,12 @@ module Spaceship::TestFlight
         req.url url
         req.headers['Content-Type'] = 'application/json'
       end
-      # TODO: add error handling here: https://github.com/fastlane/fastlane/pull/8871#issuecomment-294669432
+      handle_response(response)
     end
 
     def get_build(app_id: nil, build_id: nil)
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
-      response.body['data']
+      handle_response(response)
     end
 
     def put_build(app_id: nil, build_id: nil, build: nil)
@@ -73,7 +73,7 @@ module Spaceship::TestFlight
         req.body = build.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      response.body['data']
+      handle_response(response)
     end
 
     def post_for_review(app_id: nil, build_id: nil, build: nil)
@@ -82,13 +82,13 @@ module Spaceship::TestFlight
         req.body = build.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      response.body
+      handle_response(response)
     end
 
 
     def get_groups(app_id: nil)
       response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
-      response.body['data']
+      handle_response(response)
     end
 
     def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
@@ -101,6 +101,26 @@ module Spaceship::TestFlight
         req.body = body.to_json
         req.headers['Content-Type'] = 'application/json'
       end
+      handle_response(response)
+    end
+
+    def handle_response(response)
+      if (200..300).include?(response.status) && response.body.empty?
+        return
+      end
+
+      unless response.body.is_a?(Hash)
+        raise UnexpectedResponse.new(response.body)
+      end
+
+      if error = response.body['error']
+        raise UnexpectedResponse.new(error)
+      end
+
+      if data = response.body['data']
+        return data
+      end
+
       response.body
     end
   end
