@@ -35,7 +35,8 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app.apple_id, platform: platform)
+
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
       distribute(options, latest_build)
     end
 
@@ -138,7 +139,7 @@ module Pilot
       uploaded_build.submit_for_review!
 
       if options[:distribute_external]
-        external_group = Spaceship::TestFlight::Group.default_external_group(uploaded_build.app_id)
+        external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
 
         if external_group.nil? && options[:groups].nil?
           UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
@@ -148,7 +149,7 @@ module Pilot
       end
 
       if options[:groups]
-        groups = Group.filter_groups(uploaded_build.app_id) do |group|
+        groups = Group.filter_groups(app_id: uploaded_build.app_id) do |group|
           options[:groups].include?(group.name)
         end
         groups.each do |group|

@@ -72,12 +72,12 @@ module Spaceship::TestFlight
     }
 
     def reload
-      self.raw_data = self.class.find(app_id, id).raw_data
+      self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
     end
 
     # TODO: assert_params, if build_id is nil, then it actually returns a collection
     def self.find(app_id: nil, build_id: nil)
-      attrs = client.get_build(app_id, build_id)
+      attrs = client.get_build(app_id: app_id, build_id: build_id)
       self.new(attrs) if attrs
     end
 
@@ -133,7 +133,7 @@ module Spaceship::TestFlight
     end
 
     def save!
-      client.put_build(app_id, id, self)
+      client.put_build(app_id: app_id, build_id: id, build: self)
     end
 
     # TODO: handle locales and multiple TestInfo properties
@@ -145,11 +145,11 @@ module Spaceship::TestFlight
     end
 
     def submit_for_review!
-      client.post_for_review(app_id, id, self)
+      client.post_for_review(app_id: app_id, build_id: id, build: self)
     end
 
     def add_group!(group)
-      client.add_group_to_build(app_id, group.id, id)
+      client.add_group_to_build(app_id: app_id, group_id: group.id, build_id: id)
     end
   end
 end

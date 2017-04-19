@@ -17,8 +17,8 @@ module Spaceship::TestFlight
       'isInternalGroup' => :is_default_internal_group
     })
 
-    def self.all(app_id)
-      groups = client.all_groups(app_id)
+    def self.all(app_id: nil)
+      groups = client.get_groups(app_id: app_id)
       groups.map do |g|
         current_element = self.new(g)
         current_element.app_id = app_id
@@ -26,13 +26,13 @@ module Spaceship::TestFlight
       end
     end
 
-    def self.find(app_id, group_name)
-      groups = self.all(app_id)
+    def self.find(app_id: nil, group_name: nil)
+      groups = self.all(app_id: app_id)
       groups.find { |g| g.name == group_name }
     end
 
-    def self.default_external_group(app_id)
-      groups = self.all(app_id)
+    def self.default_external_group(app_id: nil)
+      groups = self.all(app_id: app_id)
       groups.find(&:default_external_group?)
     end
 
@@ -41,8 +41,8 @@ module Spaceship::TestFlight
       groups.find(&:default_internal_group?)
     end
 
-    def self.filter_groups(app_id, &block)
-      groups = self.all(app_id)
+    def self.filter_groups(app_id: nil, &block)
+      groups = self.all(app_id: app_id)
       groups.select(&block)
     end
 
