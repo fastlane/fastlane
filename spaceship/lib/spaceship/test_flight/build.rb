@@ -118,7 +118,7 @@ module TestFlight
     end
 
     def save!
-      client.put_build(provider_id, app_id, id, self)
+      client.put_build(app_id, id, self)
     end
 
     # TODO: handle locales and multiple TestInfo properties
@@ -130,11 +130,11 @@ module TestFlight
     end
 
     def submit_for_review!
-      client.post_for_review(provider_id, app_id, id, self)
+      client.post_for_review(app_id, id, self)
     end
 
     def add_group!(group)
-      client.add_group_to_build(provider_id, app_id, group.id, id)
+      client.add_group_to_build(app_id, group.id, id)
     end
   end
 end
