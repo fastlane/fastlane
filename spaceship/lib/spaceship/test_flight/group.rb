@@ -39,7 +39,7 @@ module TestFlight
     def self.default_internal_group(app_id)
       groups = self.all(app_id)
       groups.find(&:default_internal_group?)
-    end      
+    end
 
     def self.filter_groups(app_id, &block)
       groups = self.all(app_id)

@@ -64,7 +64,6 @@ module TestFlight
       'id' => :id
     })
 
-
     BUILD_STATES = {
       processing: 'testflight.build.state.processing',
       active: 'testflight.build.state.testing.active',

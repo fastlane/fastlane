@@ -46,7 +46,7 @@ module TestFlight
     end
 
     # def remove_tester_from_group!( group: nil, tester: nil, app_id: nil)
-    def delete_tester_from_group( group_id: nil, tester_id: nil, app_id: nil)
+    def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
         req.url url
