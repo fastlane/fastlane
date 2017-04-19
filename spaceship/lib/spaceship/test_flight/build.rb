@@ -43,7 +43,7 @@ module Spaceship::TestFlight
 
     attr_accessor :did_notify
 
-    attr_accessor :upload_date # TODO: can we auto-parse this? Just using `Time.new(...)` works for free
+    attr_accessor :upload_date
 
     attr_mapping({
       'appAdamId' => :app_id,

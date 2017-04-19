@@ -191,14 +191,12 @@ module Spaceship
       # Add current tester to list of the app testers
       # @param app_id (String) (required): The id of the application to which want to modify the list
       def add_to_app!(app_id)
-        # TODO: make sure this makes sense after finishing the migration
         raise "`[tester].add_to_app!` got removed from spaceship as the TestFlight API changed, please use `app.default_external_group.add_tester!(tester)` instead"
       end
 
       # Remove current tester from list of the app testers
       # @param app_id (String) (required): The id of the application to which want to modify the list
       def remove_from_app!(app_id)
-        # TODO: make sure this makes sense after finishing the migration
         raise "`[tester].remove_from_app!` got removed from spaceship as the TestFlight API changed, please use `app.default_external_group.remove_tester!(tester)` instead"
       end
 

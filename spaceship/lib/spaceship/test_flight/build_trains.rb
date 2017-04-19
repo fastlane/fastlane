@@ -1,6 +1,5 @@
 module Spaceship::TestFlight
   class BuildTrains < Base
-
     ##
     # BuildTrains represent the collection of builds for a `train_version`
     #
