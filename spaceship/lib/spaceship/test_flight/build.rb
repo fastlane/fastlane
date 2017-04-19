@@ -161,8 +161,8 @@ module Spaceship::TestFlight
       save!
     end
 
-    def submit_for_review!
-      client.post_for_review(app_id: app_id, build_id: id, build: self)
+    def submit_for_testflight_review!
+      client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
     end
 
     def add_group!(group)

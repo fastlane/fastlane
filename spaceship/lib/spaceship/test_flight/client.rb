@@ -83,7 +83,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def post_for_review(app_id: nil, build_id: nil, build: nil)
+    def post_for_testflight_review(app_id: nil, build_id: nil, build: nil)
       assert_required_params(__method__, binding)
       response = request(:post) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"

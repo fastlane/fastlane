@@ -111,7 +111,7 @@ module Pilot
       # TODO: do something about encryption and demo account
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
-      uploaded_build.submit_for_review!
+      uploaded_build.submit_for_testflight_review!
 
       if options[:distribute_external]
         external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
