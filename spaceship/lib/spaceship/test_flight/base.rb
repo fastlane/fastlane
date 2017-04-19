@@ -1,7 +1,7 @@
 module Spaceship::TestFlight
   class Base < Spaceship::Base
     def self.client
-      @client ||= TestFlight::Client.client_with_authorization_from(Spaceship::Tunes.client)
+      @client ||= Client.client_with_authorization_from(Spaceship::Tunes.client)
     end
 
     def to_json
