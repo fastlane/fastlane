@@ -19,35 +19,58 @@ module Pilot
       end
 
       begin
-        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+         current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
 
-        if tester
-          UI.success("Existing tester #{tester.email}")
-        else
-          tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
-                                                              first_name: config[:first_name],
-                                                              last_name: config[:last_name],
-                                                              groups: config[:groups])
-          UI.success("Successfully invited tester: #{tester.email}")
-        end
+         app_filter = (config[:apple_id] || config[:app_identifier])
+         if app_filter
+           app = Spaceship::Application.find(app_filter)
+         end
 
-        app_filter = (config[:apple_id] || config[:app_identifier])
-        if app_filter
-          begin
-            app = Spaceship::Application.find(app_filter)
-            UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            tester.add_to_app!(app.apple_id)
-            UI.success("Successfully added tester to app #{app_filter}")
-          rescue => ex
-            UI.error("Could not add #{tester.email} to app: #{ex}")
-            raise ex
-          end
-        end
-      rescue => ex
-        UI.error("Could not create tester #{config[:email]}")
-        raise ex
-      end
+         if current_user.roles.include?("admin")
+           tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+           tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+           if tester
+             UI.success("Existing tester #{tester.email}")
+           else
+             tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
+                                                                 first_name: config[:first_name],
+                                                                 last_name: config[:last_name],
+                                                                 groups: config[:groups])
+             UI.success("Successfully invited tester: #{tester.email}")
+           end
+         else
+           UI.user_error!("neither app_id nor app_identifier set on an unpriviliged account") unless app
+           tester = Spaceship::Tunes::Tester::Internal.find_by_app(app.apple_id, config[:email])
+           tester ||= Spaceship::Tunes::Tester::External.find_by_app(app.apple_id, config[:email])
+           if tester
+             UI.success("Existing tester #{tester.email}")
+           else
+             attrs = {}
+             config[:first_name] ||= ""
+             config[:last_name] ||= ""
+             attrs["emailAddress"] = { "value" => config[:email] }
+             attrs["firstName"] = { "value" => config[:first_name] }
+             attrs["lastName"] = { "value" => config[:last_name] }
+             attrs["groups"] = config[:groups]
+             tester = Spaceship::Tunes::Tester::External.factory(attrs)
+             UI.success("Successfully invited tester: #{tester.email}")
+           end
+         end
+
+         if app
+           begin
+             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
+             tester.add_to_app!(app.apple_id)
+             UI.success("Successfully added tester to app #{app_filter}")
+           rescue => ex
+             UI.error("Could not add #{tester.email} to app: #{ex}")
+             raise ex
+           end
+         end
+       rescue => ex
+         UI.error("Could not create tester #{config[:email]}")
+         raise ex
+       end
     end
 
     def find_tester(options)
