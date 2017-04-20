@@ -214,7 +214,7 @@ module FastlaneCore
     end
 
     # @return true if XCode version is higher than 8.3
-    def self.xcode_atleast?(version)
+    def self.xcode_at_least?(version)
       FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
       v = xcode_version
       Gem::Version.new(v) >= Gem::Version.new(version)

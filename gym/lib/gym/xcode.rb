@@ -18,7 +18,7 @@ module Gym
       end
 
       def legacy_api_deprecated?
-        FastlaneCore::Helper.xcode_atleast?('8.3')
+        FastlaneCore::Helper.xcode_at_least?('8.3')
       end
     end
   end

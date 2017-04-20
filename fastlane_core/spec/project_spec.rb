@@ -296,19 +296,19 @@ describe FastlaneCore do
     end
 
     describe "build_settings() can handle empty lines" do
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on XCode >= 8.3" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode >= 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Helper).to receive(:xcode_atleast?).and_return(true)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 10, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
 
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on XCode < 8.3" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode < 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Helper).to receive(:xcode_atleast?).and_return(false)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
         command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 10, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
