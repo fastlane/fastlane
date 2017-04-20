@@ -1,4 +1,4 @@
-unless Gym::Xcode.legacy_api_deprecated? # only run those tests on pre Xcode 8.3
+unless FastlaneCore::Xcode.higher_than_8_3? # only run those tests on pre Xcode 8.3
   describe Gym do
     before(:all) do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
