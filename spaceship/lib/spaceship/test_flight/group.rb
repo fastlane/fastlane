@@ -37,7 +37,7 @@ module Spaceship::TestFlight
     end
 
     def add_tester!(tester)
-      client.put_test_to_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
+      client.put_tester_to_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
     end
 
     def remove_tester!(tester)

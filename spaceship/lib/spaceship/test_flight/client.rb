@@ -40,7 +40,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
+    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil)
       assert_required_params(__method__, binding)
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
