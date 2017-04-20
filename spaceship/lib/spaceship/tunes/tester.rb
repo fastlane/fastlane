@@ -106,8 +106,9 @@ module Spaceship
                             first_name: first_name,
                              last_name: last_name,
                                 groups: groups)
-          # We don't need to do additional parsing here, as `create_tester!` automatically
-          # re-fetches the newly created tester
+          # The response of the client request is a hash but doesn't contain all of the necessary data (like testerId, etc)
+          # use #find to get an instance of Tester with all of the data.
+          find(email)
         end
 
         #####################################################

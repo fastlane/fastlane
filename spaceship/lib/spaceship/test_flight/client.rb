@@ -22,11 +22,6 @@ module Spaceship::TestFlight
 
     def post_tester(app_id: nil, tester: nil)
       assert_required_params(__method__, binding)
-      # First we need to add the tester to the app
-      # It's ok if the tester already exists, we just have to do this... don't ask
-      # This will enable testing for the tester for a given app, as just creating the tester on an account-level
-      # is not enough to add the tester to a group. If this isn't done the next request would fail.
-      # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url
@@ -40,7 +35,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_test_to_group(app_id: nil, tester_id: nil, group_id: nil)
+    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil)
       assert_required_params(__method__, binding)
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
@@ -56,7 +51,6 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    # def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
