@@ -108,6 +108,8 @@ module Spaceship
                                 groups: groups)
           # We don't need to do additional parsing here, as `create_tester!` automatically
           # re-fetches the newly created tester
+
+          # TODO: that doesn't seem to be the case any more... Needs to be parsed for pilot not to fail
         end
 
         #####################################################

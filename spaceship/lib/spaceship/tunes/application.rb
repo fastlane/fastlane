@@ -371,7 +371,7 @@ module Spaceship
       #####################################################
 
       def default_external_group
-        TestFlight::Group.default_external_group(self.apple_id)
+        TestFlight::Group.default_external_group(app_id: self.apple_id)
       end
 
       #####################################################

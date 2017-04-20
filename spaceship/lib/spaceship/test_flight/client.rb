@@ -56,7 +56,6 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    # def remove_tester_from_group!(group: nil, tester: nil, app_id: nil)
     def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
