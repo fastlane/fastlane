@@ -280,7 +280,7 @@ module FastlaneCore
       # We also need to pass the workspace and scheme to this command.
       #
       # The 'clean' portion of this command was a workaround for an xcodebuild bug with Core Data projects.
-      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary
+      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
       if FastlaneCore::Helper.xcode_at_least?('8.3')
         command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
