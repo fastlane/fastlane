@@ -20,6 +20,8 @@ module Spaceship
   # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
     class DataHash
+      include Enumerable
+
       def initialize(hash)
         @hash = hash || {}
       end
@@ -50,10 +52,18 @@ module Spaceship
         end
       end
 
+      def each(&block)
+        @hash.each(&block)
+      end
+
       def to_json(*a)
         h = @hash.dup
         h.delete(:application)
         h.to_json(*a)
+      end
+
+      def to_h
+        @hash.dup
       end
     end
 
