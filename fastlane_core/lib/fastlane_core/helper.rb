@@ -214,10 +214,10 @@ module FastlaneCore
     end
 
     # @return true if XCode version is higher than 8.3
-    def self.xcode_higher_than_8_3?
+    def self.xcode_atleast?(version)
       FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
       v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new('8.3.0')
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable

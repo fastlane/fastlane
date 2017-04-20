@@ -277,7 +277,7 @@ module FastlaneCore
     #####################################################
 
     def build_xcodebuild_showbuildsettings_command
-      if FastlaneCore::Helper.xcode_higher_than_8_3?
+      if FastlaneCore::Helper.xcode_atleast?('8.3')
         command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
