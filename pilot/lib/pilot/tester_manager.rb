@@ -8,14 +8,8 @@ module Pilot
       start(options)
 
       if config[:groups]
-        groups = Spaceship::Tunes::Tester::External.groups
-        selected_groups = []
-        config[:groups].each do |group|
-          group_id = groups.find { |k, v| v == group || k == group }
-          raise "Group '#{group}' not found for #{config[:email]}" unless group_id
-          selected_groups.push(group_id[0])
-        end
-        config[:groups] = selected_groups
+        UI.important("Currently pilot doesn't support groups yet, we're working on restoring that functionality")
+        config[:groups] = nil
       end
 
       begin
@@ -27,8 +21,7 @@ module Pilot
         else
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
-                                                              last_name: config[:last_name],
-                                                              groups: config[:groups])
+                                                              last_name: config[:last_name])
           UI.success("Successfully invited tester: #{tester.email}")
         end
 
@@ -37,7 +30,7 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            tester.add_to_app!(app.apple_id)
+            app.default_external_group.add_tester!(tester)
             UI.success("Successfully added tester to app #{app_filter}")
           rescue => ex
             UI.error("Could not add #{tester.email} to app: #{ex}")
@@ -74,7 +67,7 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            tester.remove_from_app!(app.apple_id)
+            app.default_external_group.remove_tester!(tester)
             UI.success("Successfully removed tester #{tester.email} from app #{app_filter}")
           rescue => ex
             UI.error("Could not remove #{tester.email} from app: #{ex}")
