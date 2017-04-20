@@ -7,17 +7,6 @@ module Pilot
     def add_tester(options)
       start(options)
 
-      # if config[:groups]
-      #   groups = Spaceship::Tunes::Tester::External.groups
-      #   selected_groups = []
-      #   config[:groups].each do |group|
-      #     group_id = groups.find { |k, v| v == group || k == group }
-      #     raise "Group '#{group}' not found for #{config[:email]}" unless group_id
-      #     selected_groups.push(group_id[0])
-      #   end
-      #   config[:groups] = selected_groups
-      # end
-
       if config[:groups]
         UI.important("Currently pilot doesn't support groups yet, we're working on restoring that functionality")
         config[:groups] = nil

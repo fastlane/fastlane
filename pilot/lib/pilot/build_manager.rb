@@ -108,6 +108,7 @@ module Pilot
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
+      # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
       uploaded_build.submit_for_testflight_review!
