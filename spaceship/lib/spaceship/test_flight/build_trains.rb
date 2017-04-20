@@ -38,9 +38,5 @@ module Spaceship::TestFlight
     def each(&bock)
       @tains.each(&block)
     end
-
-    def filter_trains(&block)
-      values.flatten.select(&block)
-    end
   end
 end
