@@ -503,8 +503,8 @@ module Spaceship
         {
           keywords: :keywords,
           description: :description,
-          supportURL: :support_url,
-          marketingURL: :marketing_url,
+          supportUrl: :support_url,
+          marketingUrl: :marketing_url,
           releaseNotes: :release_notes
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
