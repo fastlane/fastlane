@@ -127,6 +127,7 @@ module Pilot
       # }
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
+
       if options[:submission_information]
         options[:submission_information].each do |key, bucket|
           bucket.each do |bucket_key, bucket_value|
@@ -136,7 +137,7 @@ module Pilot
         end
       end
 
-      uploaded_build.submit_for_review!
+      uploaded_build.submit_for_testflight_review!
 
       if options[:distribute_external]
         external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)

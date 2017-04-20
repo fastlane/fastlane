@@ -69,14 +69,6 @@ module Spaceship
           raise "You have to use a subclass: Internal or External"
         end
 
-        def add_to_app!(app_id)
-          raise "You have to use a subclass: Internal or External"
-        end
-
-        def remove_from_app!(app_id)
-          raise "You have to use a subclass: Internal or External"
-        end
-
         # @return (Array) Returns all beta testers available for this account
         def all
           client.testers(self).map { |tester| self.factory(tester) }
@@ -104,7 +96,7 @@ module Spaceship
         #   Spaceship::Tunes::Tester.external.create!(email: "tester@mathiascarignani.com", first_name: "Cary", last_name: "Bennett", groups: ["Testers"])
         # @return (Tester): The newly created tester
         def create!(email: nil, first_name: nil, last_name: nil, groups: nil)
-          data = client.create_tester!(tester: self,
+          return client.create_tester!(tester: self,
                                         email: email,
                                    first_name: first_name,
                                     last_name: last_name,
@@ -170,18 +162,6 @@ module Spaceship
             update_by_app: "ra/user/externalTesters/#{app_id}/"
           }
         end
-
-        # Add current tester to list of the app testers
-        # @param app_id (String) (required): The id of the application to which want to modify the list
-        def add_to_app!(app_id)
-          Application.find(app_id).default_external_group.add_tester!(self)
-        end
-
-        # Remove current tester from list of the app testers
-        # @param app_id (String) (required): The id of the application to which want to modify the list
-        def remove_from_app!(app_id)
-          Application.find(app_id).default_external_group.remove_tester!(self)
-        end
       end
 
       class Internal < Tester
@@ -196,18 +176,6 @@ module Spaceship
             update_by_app: "ra/user/internalTesters/#{app_id}/"
           }
         end
-
-        # Add current tester to list of the app testers
-        # @param app_id (String) (required): The id of the application to which want to modify the list
-        def add_to_app!(app_id)
-          Application.find(app_id).default_internal_group.add_tester!(self)
-        end
-
-        # Remove current tester from list of the app testers
-        # @param app_id (String) (required): The id of the application to which want to modify the list
-        def remove_from_app!(app_id)
-          Application.find(app_id).default_internal_group.remove_tester!(self)
-        end
       end
 
       # Delete current tester
@@ -218,6 +186,19 @@ module Spaceship
       #####################################################
       # @!group App
       #####################################################
+
+
+      # Add current tester to list of the app testers
+      # @param app_id (String) (required): The id of the application to which want to modify the list
+      def add_to_app!(app_id)
+        raise "`[tester].add_to_app!` got removed from spaceship as the TestFlight API changed, please use `app.default_external_group.add_tester!(tester)` instead"
+      end
+
+      # Remove current tester from list of the app testers
+      # @param app_id (String) (required): The id of the application to which want to modify the list
+      def remove_from_app!(app_id)
+        raise "`[tester].remove_from_app!` got removed from spaceship as the TestFlight API changed, please use `app.default_external_group.remove_tester!(tester)` instead"
+      end
 
       #####################################################
       # @!group Helpers
