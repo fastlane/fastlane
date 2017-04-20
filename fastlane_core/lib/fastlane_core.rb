@@ -6,6 +6,7 @@ require 'fastlane_core/globals'
 require 'fastlane_core/core_ext/string'
 
 require 'fastlane_core/env'
+
 require 'fastlane_core/feature/feature'
 require 'fastlane_core/features'
 require 'fastlane_core/helper'
@@ -30,6 +31,7 @@ require 'fastlane_core/tool_collector'
 require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/keychain_importer'
 require 'fastlane_core/swag'
+require 'fastlane_core/xcode'
 
 # Third Party code
 require 'colored'

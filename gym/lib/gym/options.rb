@@ -122,7 +122,7 @@ module Gym
                                        if value
                                          UI.important "Don't use this option any more, as it's deprecated by Apple"
                                        end
-                                       if Gym::Xcode.legacy_api_deprecated?
+                                       if FastlaneCore::Xcode.pre_8_3?
                                          Gym::Options.legacy_api_note!
                                        end
                                      end),
