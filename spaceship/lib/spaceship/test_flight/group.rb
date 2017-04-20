@@ -4,10 +4,6 @@ module Spaceship::TestFlight
     attr_accessor :name
     attr_accessor :is_default_external_group
 
-    # TODO: is it ok to have a reference here? Every group is specific to
-    # an Spaceship::Application object from my understanding
-    # We need a reference to the app to build the complete URLs, for example
-    # to add testers to a group. Please remove comment and replace with docs if ok
     attr_accessor :app_id
 
     attr_mapping({
