@@ -9,8 +9,6 @@ module Spaceship::TestFlight
     #
     # See `Spaceship::TestFlight::Build#reload`
 
-    include Enumerable
-
     def self.all(app_id: nil, platform: nil)
       data = client.get_build_trains(app_id: app_id, platform: platform)
       trains = {}
@@ -33,10 +31,6 @@ module Spaceship::TestFlight
 
     def values
       @trains.values
-    end
-
-    def each(&bock)
-      @tains.each(&block)
     end
   end
 end
