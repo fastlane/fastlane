@@ -22,11 +22,6 @@ module Spaceship::TestFlight
 
     def post_tester(app_id: nil, tester: nil)
       assert_required_params(__method__, binding)
-      # First we need to add the tester to the app
-      # It's ok if the tester already exists, we just have to do this... don't ask
-      # This will enable testing for the tester for a given app, as just creating the tester on an account-level
-      # is not enough to add the tester to a group. If this isn't done the next request would fail.
-      # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url

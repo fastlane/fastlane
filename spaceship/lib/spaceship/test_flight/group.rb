@@ -36,7 +36,13 @@ module Spaceship::TestFlight
       groups.select(&block)
     end
 
+    # First we need to add the tester to the app
+    # It's ok if the tester already exists, we just have to do this... don't ask
+    # This will enable testing for the tester for a given app, as just creating the tester on an account-level
+    # is not enough to add the tester to a group. If this isn't done the next request would fail.
+    # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
     def add_tester!(tester)
+      client.post_tester(app_id: self.app_id, tester: tester)
       client.put_tester_to_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
     end
 
