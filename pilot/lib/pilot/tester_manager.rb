@@ -30,9 +30,9 @@ module Pilot
           app = Spaceship::Application.find(app_filter)
           UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
 
-          add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-
-          UI.success("Successfully added tester to app #{app_filter}")
+          groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
+          group_names = groups.map { |g| g.name }.join(", ")
+          UI.success("Successfully added tester to app #{app_filter} in group(s) #{group_names}")
         rescue => ex
           UI.error("Could not add #{tester.email} to app: #{app.name}")
           raise ex
@@ -64,8 +64,9 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
-            UI.success("Successfully removed tester #{tester.email} from app #{app_filter}")
+            groups = remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
+            group_names = groups.map { |g| g.name }.join(", ")
+            UI.success("Successfully removed tester #{tester.email} from app #{app_filter} in group(s) #{group_names}")
           rescue => ex
             UI.error("Could not remove #{tester.email} from app: #{ex}")
             raise ex
