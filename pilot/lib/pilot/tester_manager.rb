@@ -31,7 +31,7 @@ module Pilot
           UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
 
           groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-          group_names = groups.map { |g| g.name }.join(", ")
+          group_names = groups.map(&:name).join(", ")
           UI.success("Successfully added tester to app #{app_filter} in group(s) #{group_names}")
         rescue => ex
           UI.error("Could not add #{tester.email} to app: #{app.name}")
@@ -65,7 +65,7 @@ module Pilot
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
             groups = remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
-            group_names = groups.map { |g| g.name }.join(", ")
+            group_names = groups.map(&:name).join(", ")
             UI.success("Successfully removed tester #{tester.email} from app #{app_filter} in group(s) #{group_names}")
           rescue => ex
             UI.error("Could not remove #{tester.email} from app: #{ex}")
@@ -116,7 +116,7 @@ module Pilot
     end
 
     def remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      perform_for_groups_in_app(app: app, groups: groups)  { |group| group.remove_tester!(tester) }
+      perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
     end
 
     def list_testers_by_app(app_filter)
