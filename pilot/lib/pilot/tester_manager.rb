@@ -7,11 +7,6 @@ module Pilot
     def add_tester(options)
       start(options)
 
-      if config[:groups]
-        UI.important("Currently pilot doesn't support groups yet, we're working on restoring that functionality")
-        config[:groups] = nil
-      end
-
       begin
         tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
         tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
@@ -30,7 +25,9 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            app.default_external_group.add_tester!(tester)
+
+            add_tester_to_groups(tester: tester, app: app)
+
             UI.success("Successfully added tester to app #{app_filter}")
           rescue => ex
             UI.error("Could not add #{tester.email} to app: #{ex}")
@@ -40,6 +37,27 @@ module Pilot
       rescue => ex
         UI.error("Could not create tester #{config[:email]}")
         raise ex
+      end
+    end
+
+    def add_tester_to_groups(tester: nil, app: nil)
+      default_external_group = app.default_external_group
+      if default_external_group.nil? && config[:groups].nil?
+        UI.error("The app #{app.name} does not have a default external group.")
+        UI.error("Please make sure to pass group names to the `:groups` option.")
+        return
+      end
+
+      default_external_group.add_tester!(tester)
+
+      return if config[:groups].nil?
+
+      groups = TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
+        config[:groups].include?(group.name)
+      end
+
+      groups.each do |group|
+        group.add_tester!(tester)
       end
     end
 
