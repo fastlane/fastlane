@@ -58,7 +58,7 @@ module Pilot
 
       tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
       UI.user_error!("#{tester.email} is an internal tester; pilot does not support internal testers") unless tester.nil?
-      
+
       tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
 
       if tester
