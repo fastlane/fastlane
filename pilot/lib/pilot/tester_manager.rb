@@ -92,7 +92,7 @@ module Pilot
 
     # private
 
-    def add_or_remove_tester_in_group!(tester: nil, app: nil, groups: nil, method: nil)
+    def perform_for_groups_in_app(app: nil, groups: nil, &block)
       if groups.nil?
         default_external_group = app.default_external_group
         if default_external_group.nil?
@@ -106,20 +106,16 @@ module Pilot
 
         UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
       end
-      
-      test_flight_groups.each do |group|
-        method.bind(group).call(tester)
-      end  
+
+      test_flight_groups.each(&block)
     end
 
     def add_tester_to_groups!(tester: nil, app: nil, groups: nil)
-      add = Spaceship::TestFlight::Group.instance_method(:add_tester!)
-      add_or_remove_tester_in_group!(tester: tester, app: app, groups: groups, method: add)
+      perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
     end
 
     def remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      remove = Spaceship::TestFlight::Group.instance_method(:remove_tester!)
-      add_or_remove_tester_in_group!(tester: tester, app: app, groups: groups, method: remove)
+      perform_for_groups_in_app(app: app, groups: groups)  { |group| group.remove_tester!(tester) }
     end
 
     def list_testers_by_app(app_filter)
