@@ -4,7 +4,6 @@ require_relative 'client_stubbing'
 require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
-
 # Ensure that no ENV vars which interfere with testing are set
 #
 set_auth_vars = [
