@@ -19,24 +19,24 @@ module Pilot
                                                               last_name: config[:last_name])
           UI.success("Successfully added tester: #{tester.email} to your account")
         end
-
-        app_filter = (config[:apple_id] || config[:app_identifier])
-        if app_filter
-          begin
-            app = Spaceship::Application.find(app_filter)
-            UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-
-            add_tester_to_groups(tester: tester, app: app, groups: config[:groups])
-
-            UI.success("Successfully added tester to app #{app_filter}")
-          rescue => ex
-            UI.error("Could not add #{tester.email} to app: #{ex}")
-            raise ex
-          end
-        end
       rescue => ex
         UI.error("Could not create tester #{config[:email]}")
         raise ex
+      end
+
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      if app_filter
+        begin
+          app = Spaceship::Application.find(app_filter)
+          UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
+
+          add_tester_to_groups(tester: tester, app: app, groups: config[:groups])
+
+          UI.success("Successfully added tester to app #{app_filter}")
+        rescue => ex
+          UI.error("Could not add #{tester.email} to app: #{app.name}")
+          raise ex
+        end
       end
     end
 
