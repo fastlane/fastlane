@@ -43,8 +43,8 @@ module Pilot
     def add_tester_to_groups(tester: nil, app: nil)
       default_external_group = app.default_external_group
       if default_external_group.nil? && config[:groups].nil?
-        UI.error("The app #{app.name} does not have a default external group.")
-        UI.error("Please make sure to pass group names to the `:groups` option.")
+        UI.user_error!("The app #{app.name} does not have a default external group.")
+        UI.user_error!("Please make sure to pass group names to the `:groups` option.")
         return
       end
 
