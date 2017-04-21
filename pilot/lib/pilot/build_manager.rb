@@ -108,23 +108,8 @@ module Pilot
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
-      # Set Build Submission Information
-      # Default Values
-      # sample:
-      #  -> properties from ExportCompliance and BetaReviewInfo Object
-      # {
-      #   export_compliance: {
-      #       encryption_updated: true,
-      #       uses_encryption: true
-      #   },
-      #   beta_review_info: {
-      #     demo_account_required: false
-      #     contact_phone: "+43000000000",
-      #     contact_first_name: "helmut",
-      #     contact_last_name: "J",
-      #     ....
-      #   }
-      # }
+
+      # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
 
@@ -141,12 +126,12 @@ module Pilot
 
       if options[:distribute_external]
         external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
+        uploaded_build.add_group!(external_group) unless external_group.nil?
 
         if external_group.nil? && options[:groups].nil?
           UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
         end
 
-        uploaded_build.add_group!(external_group)
       end
 
       if options[:groups]

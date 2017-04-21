@@ -16,11 +16,11 @@ module Spaceship::TestFlight
     end
 
     def feedback_email
-      raw_data.first['feedback_email']
+      raw_data.first['feedbackEmail']
     end
 
     def feedback_email=(value)
-      raw_data.each { |locale| locale['feedback_email'] = value }
+      raw_data.each { |locale| locale['feedbackEmail'] = value }
     end
 
     def whats_new

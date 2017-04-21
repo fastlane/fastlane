@@ -189,7 +189,6 @@ module Spaceship
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
-    # TODO: come up with a better way to share the cookie instance
     def self.client_with_authorization_from(another_client)
       self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
     end

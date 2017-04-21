@@ -43,6 +43,59 @@ module Spaceship
       "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
+    # @return (Array) A list of all available teams
+    def teams
+      user_details_data['associatedAccounts'].sort_by do |team|
+        [
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
+        ]
+      end
+    end
+
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+    end
+
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider id
+      #
+      available_teams = teams.collect do |team|
+        (team["contentProvider"] || {})["contentProviderId"]
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
+      response = request(:post) do |req|
+        req.url "ra/v1/session/webSession"
+        req.body = {
+          contentProviderId: team_id,
+          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(response.body)
+
+      @current_team_id = team_id
+    end
+
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
     def select_team
@@ -787,55 +840,19 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def put_export_compliance_did_not_change(app_id, build_id, build_info)
-    end
-
-    def put_test_info(app_id, test_info)
-      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/testInfo"
-      r = request(:put) do |req|
-        req.url url
-        req.body = test_info.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
-    end
-
-    def get_new_build_info_for_review(app_id, build_id)
-      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
-      r = request(:get) do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
-      r.body['data']
-    end
-
-    def submit_build_for_review(app_id, build_id, build_info, whats_new, beta_review_info)
-      build_info['testInfo'][0]['whatsNew'] = whats_new
-      build_info['betaReviewInfo'] = beta_review_info
-      url = "/testflight/v2/providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
-      r = request(:post) do |req|
-        req.url url
-        req.body = build_info.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-      handle_itc_response(r.body)
-    end
-
     # rubocop:disable Metrics/ParameterLists
-    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, build_id: nil, platform: 'ios',
+    def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
                                             # Required Metadata:
-                                            whats_new: nil,
+                                            changelog: nil,
                                             description: nil,
                                             feedback_email: nil,
-                                            contact_email: nil,
                                             marketing_url: nil,
                                             first_name: nil,
                                             last_name: nil,
                                             review_email: nil,
                                             phone_number: nil,
                                             significant_change: false,
-                                            notes: nil,
+
                                             # Optional Metadata:
                                             privacy_policy_url: nil,
                                             review_user_name: nil,
@@ -847,151 +864,54 @@ module Spaceship
                                             proprietary: false,
                                             third_party: false)
 
-      # TODO: how do locales work
-      # hjanuschka: locales work with providing multiple elements in the 'details' array each of them
-      #  proposal:
-      #  change signature to accept a hash e.g:
-      #   {
-      #     'en-US': {
-      #         feedback_email: "helmut@januschka.com",
-      #         marketing_url: "http://somewhere.com",
-      #         privacy_policy_url: "http://www.somewhere.com",
-      #         description: "Description in this locale",
-      #     }
-      #   }
-      #
-      #  Sample Result from iTC with 2 locales:
-      #  "details": [
-      #     {
-      #       "locale": "de-DE",
-      #       "feedbackEmail": "de@de.de",
-      #       "marketingUrl": "http:\/\/de.marketing.url",
-      #       "privacyPolicyUrl": "http:\/\/de.privacy.url",
-      #       "privacyPolicy": null,
-      #       "description": "This is the de-DE description"
-      #    },
-      #    {
-      #     "locale": "da",
-      #     "feedbackEmail": "da@da.da",
-      #     "marketingUrl": "http:\/\/da.marketing.url",
-      #     "privacyPolicyUrl": "http:\/\/da.privacy.url",
-      #     "privacyPolicy": null,
-      #     "description": "danish description 'da' locale"
-      #   }
-      # ],
-      locale = "en-US"
+      build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
+      # Now fill in the values provided by the user
 
-      unless build_id
-        all_builds = TestFlight::Build.client.all_builds_for_train(app_id: app_id, train_version: train, platform: platform)
-        all_builds.collect do |build|
-          temp_build = TestFlight::Build.factory(build)
-          if temp_build.build_version.to_s == build_number.to_s
-            build_id = temp_build.id
-          end
-        end
+      # First the localised values:
+      build_info['details'].each do |current|
+        current['whatsNew']['value'] = changelog if changelog
+        current['description']['value'] = description if description
+        current['feedbackEmail']['value'] = feedback_email if feedback_email
+        current['marketingUrl']['value'] = marketing_url if marketing_url
+        current['privacyPolicyUrl']['value'] = privacy_policy_url if privacy_policy_url
+        current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
       end
 
-      raise "Build-ID not specified" unless build_id
+      review_info = {
+        "significantChange" => {
+          "value" => significant_change
+        },
+        "buildTestInformationTO" => build_info,
+        "exportComplianceTO" => {
+          "usesEncryption" => {
+            "value" => encryption
+          },
+          "encryptionUpdated" => {
+            "value" => encryption_updated
+          },
+          "isExempt" => {
+            "value" => is_exempt
+          },
+          "containsProprietaryCryptography" => {
+            "value" => proprietary
+          },
+          "containsThirdPartyCryptography" => {
+            "value" => third_party
+          }
+        }
+      }
 
-      test_info = { 'details' => [{}], 'betaReviewInfo' => {} }
+      r = request(:post) do |req| # same URL, but a POST request
+        req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/review/submit"
 
-      test_info['primaryLocale'] = locale
-      test_info['eula'] = nil
-
-      test_info['details'][0]['locale'] = locale
-      test_info['details'][0]['feedbackEmail'] = feedback_email
-      test_info['details'][0]['marketingUrl'] = marketing_url
-      test_info['details'][0]['privacyPolicyURL'] = privacy_policy_url
-      test_info['details'][0]['privacyPolicy'] = nil
-      test_info['details'][0]['description'] = description
-
-      test_info['betaReviewInfo']['contactFirstName'] = first_name
-      test_info['betaReviewInfo']['contactLastName'] = last_name
-      test_info['betaReviewInfo']['contactPhone'] = phone_number
-      test_info['betaReviewInfo']['contactEmail'] = contact_email
-      # test_info['betaReviewInfo']['demoAccountName'] = nil
-      # test_info['betaReviewInfo']['demoAccountPassword'] = nil
-      test_info['betaReviewInfo']['demoAccountRequired'] = false
-      test_info['betaReviewInfo']['notes'] = notes
-      # TODO: what to do with the rest of the parameters?
-
-      put_test_info(app_id, test_info)
-      build_info = get_new_build_info_for_review(app_id, build_id)
-
-      put_export_compliance_did_not_change(app_id, build_id, build_info)
-      submit_build_for_review(app_id, build_id, build_info, whats_new, test_info['betaReviewInfo'])
+        req.body = review_info.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
     end
 
-    # def submit_testflight_build_for_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios',
-    #                                         # Required Metadata:
-    #                                         changelog: nil,
-    #                                         description: nil,
-    #                                         feedback_email: nil,
-    #                                         marketing_url: nil,
-    #                                         first_name: nil,
-    #                                         last_name: nil,
-    #                                         review_email: nil,
-    #                                         phone_number: nil,
-    #                                         significant_change: false,
-
-    #                                         # Optional Metadata:
-    #                                         privacy_policy_url: nil,
-    #                                         review_user_name: nil,
-    #                                         review_password: nil,
-    #                                         review_notes: nil,
-    #                                         encryption: false,
-    #                                         encryption_updated: false,
-    #                                         is_exempt: false,
-    #                                         proprietary: false,
-    #                                         third_party: false)
-
-    #   build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
-    #   # Now fill in the values provided by the user
-
-    #   # First the localised values:
-    #   build_info['details'].each do |current|
-    #     current['whatsNew']['value'] = changelog if changelog
-    #     current['description']['value'] = description if description
-    #     current['feedbackEmail']['value'] = feedback_email if feedback_email
-    #     current['marketingUrl']['value'] = marketing_url if marketing_url
-    #     current['privacyPolicyUrl']['value'] = privacy_policy_url if privacy_policy_url
-    #     current['pageLanguageValue'] = current['language'] # There is no valid reason why we need this, only iTC being iTC
-    #   end
-
-    #   review_info = {
-    #     "significantChange" => {
-    #       "value" => significant_change
-    #     },
-    #     "buildTestInformationTO" => build_info,
-    #     "exportComplianceTO" => {
-    #       "usesEncryption" => {
-    #         "value" => encryption
-    #       },
-    #       "encryptionUpdated" => {
-    #         "value" => encryption_updated
-    #       },
-    #       "isExempt" => {
-    #         "value" => is_exempt
-    #       },
-    #       "containsProprietaryCryptography" => {
-    #         "value" => proprietary
-    #       },
-    #       "containsThirdPartyCryptography" => {
-    #         "value" => third_party
-    #       }
-    #     }
-    #   }
-
-    #   r = request(:post) do |req| # same URL, but a POST request
-    #     req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/review/submit"
-
-    #     req.body = review_info.to_json
-    #     req.headers['Content-Type'] = 'application/json'
-    #   end
-    #   handle_itc_response(r.body)
-    # end
+    
     # rubocop:enable Metrics/ParameterLists
-
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
       r = request(:get) do |req|
@@ -1258,8 +1178,28 @@ module Spaceship
         }
       }
 
-      unless groups.nil?
-        puts "With the most recent TestFlight change, adding groups when creating testers are currently not supported, we're working on implementing it again"
+      if groups
+        tester_data[:groups] = groups.map do |group_name_or_group_id|
+          if self.groups.value?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group name
+            group_name = group_name_or_group_id
+            group_id = self.groups.key(group_name_or_group_id)
+          elsif self.groups.key?(group_name_or_group_id)
+            # This is an existing group, let's use that, the user specified the group ID
+            group_name = self.groups[group_name_or_group_id]
+            group_id = group_name_or_group_id
+          else
+            group_name = group_name_or_group_id
+            group_id = nil # this is expected by the iTC API
+          end
+
+          {
+            "id" => group_id,
+            "name" => {
+              "value" => group_name
+            }
+          }
+        end
       end
 
       data = { testers: [tester_data] }
@@ -1271,7 +1211,7 @@ module Spaceship
       end
 
       data = parse_response(r, 'data')['testers']
-      return tester.find(email) # we need to fetch it again, so that we actually get the group_id
+      handle_itc_response(data) || data[0]
     end
 
     def delete_tester!(tester)
@@ -1305,6 +1245,14 @@ module Spaceship
 
       data = parse_response(r, 'data')['testers']
       handle_itc_response(data) || data[0]
+    end
+
+    def add_tester_to_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, true)
+    end
+
+    def remove_tester_from_app!(tester, app_id)
+      update_tester_from_app!(tester, app_id, false)
     end
 
     #####################################################
@@ -1448,6 +1396,37 @@ module Spaceship
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
       @sso_token_for_video ||= ref_data.sso_token_for_video
+    end
+
+    def update_tester_from_app!(tester, app_id, testing)
+      url = tester.class.url(app_id)[:update_by_app]
+      data = {
+        users: [
+          {
+            emailAddress: {
+              value: tester.email
+            },
+            firstName: {
+              value: tester.first_name
+            },
+            lastName: {
+              value: tester.last_name
+            },
+            testing: {
+              value: testing
+            }
+          }
+        ]
+      }
+
+      r = request(:post) do |req|
+        req.url url
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
     end
   end
   # rubocop:enable Metrics/ClassLength
