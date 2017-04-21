@@ -103,18 +103,18 @@ module Commander
       FastlaneCore::UI.important("pilot crashed")
       FastlaneCore::UI.important("-------------")
       FastlaneCore::UI.error("Unfortunately the TestFlight update from 11th April 2017 changed")
-      FastlaneCore::UI.error("the way Testers, Groups and Builds are managed on iTunes connect.")
-      FastlaneCore::UI.error("We're busy working on migrating _pilot_ to work with the new system")
-      FastlaneCore::UI.error("however it requires lots of changes and refactors from our side")
-      FastlaneCore::UI.error("to ensure that everything keeps working for you as it did before")
+      FastlaneCore::UI.error("the way Testers, Groups, and Builds are managed on iTunesConnect.")
+      FastlaneCore::UI.error("We have already fixed a number of features including submitting")
+      FastlaneCore::UI.error("builds for testing, adding and removing testers from groups, and")
+      FastlaneCore::UI.error("waiting for builds to process.")
       FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Please follow the WIP pull request on GitHub to stay up to date: https://github.com/fastlane/fastlane/pull/8871")
+      FastlaneCore::UI.error("Please stay tuned for more updates from _fastlane_ as we fix more issues!")
       FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Original error message: #{e}")
       if FastlaneCore::Globals.verbose?
         raise e # on verbose mode, we want to show the original stack trace
       else
-        FastlaneCore::UI.user_error!("pilot doesn't work with the latest TestFlight yet, we're busy working on upgrading it!")
+        FastlaneCore::UI.error("Original error message:")
+        FastlaneCore::UI.user_error!(e.message)
       end
     end
 
