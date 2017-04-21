@@ -279,9 +279,14 @@ module FastlaneCore
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command.
       #
-      # The 'clean' portion of this command is a workaround for an xcodebuild bug with Core Data projects.
+      # The 'clean' portion of this command was a workaround for an xcodebuild bug with Core Data projects.
+      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
-      command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      if FastlaneCore::Helper.xcode_at_least?('8.3')
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      else
+        command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      end
       command += " 2> /dev/null" if xcodebuild_suppress_stderr
       command
     end
