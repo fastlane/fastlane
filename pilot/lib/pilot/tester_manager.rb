@@ -17,7 +17,7 @@ module Pilot
           tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
                                                               first_name: config[:first_name],
                                                               last_name: config[:last_name])
-          UI.success("Successfully invited tester: #{tester.email}")
+          UI.success("Successfully added tester: #{tester.email} to your account")
         end
 
         app_filter = (config[:apple_id] || config[:app_identifier])
