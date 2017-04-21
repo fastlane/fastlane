@@ -107,6 +107,8 @@ module Pilot
         groups.include?(group.name)
       end
 
+      UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
+
       test_flight_groups.each do |group|
         group.add_tester!(tester)
       end
