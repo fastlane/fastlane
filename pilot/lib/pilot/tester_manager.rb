@@ -47,7 +47,7 @@ module Pilot
         return
       end
 
-      default_external_group.add_tester!(tester)
+      default_external_group.add_tester!(tester) unless default_external_group.nil?
 
       return if config[:groups].nil?
 
