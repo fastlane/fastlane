@@ -27,8 +27,8 @@ module Spaceship::TestFlight
         req.url url
         req.body = {
           "email" => tester.email,
-          "firstName" => tester.last_name,
-          "lastName" => tester.first_name
+          "firstName" => tester.first_name,
+          "lastName" => tester.last_name
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
