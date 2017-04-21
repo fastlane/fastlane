@@ -2,6 +2,8 @@ module FastlaneCore
   class BuildWatcher
     # @return The build we waited for. This method will always return a build
     def self.wait_for_build_processing_to_be_complete(app_id: nil, platform: nil)
+      start_time = Time.now
+
       # First, find the train and build version we want to watch for
       processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
 
@@ -27,6 +29,8 @@ module FastlaneCore
           return matching_build
         elsif matching_build.ready_to_submit?
           UI.success("Successfully finished processing the build #{matching_build.train_version} - #{matching_build.build_version}")
+          UI.message("You can now tweet: ")
+          UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
           return matching_build
         end
 

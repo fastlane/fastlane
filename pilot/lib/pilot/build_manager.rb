@@ -35,8 +35,8 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
 
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
       distribute(options, latest_build)
     end
 
@@ -108,9 +108,20 @@ module Pilot
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
+
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build.export_compliance.encryption_updated = false
       uploaded_build.beta_review_info.demo_account_required = false
+
+      if options[:submission_information]
+        options[:submission_information].each do |key, bucket|
+          bucket.each do |bucket_key, bucket_value|
+            UI.message("Setting '#{key}.#{bucket_key}' to '#{bucket_value}'...")
+            uploaded_build.send("#{key}.#{bucket_key}=", bucket_value)
+          end
+        end
+      end
+
       uploaded_build.submit_for_testflight_review!
 
       if options[:distribute_external]

@@ -909,8 +909,9 @@ module Spaceship
       end
       handle_itc_response(r.body)
     end
-    # rubocop:enable Metrics/ParameterLists
 
+    
+    # rubocop:enable Metrics/ParameterLists
     def get_build_info_for_review(app_id: nil, train: nil, build_number: nil, platform: 'ios')
       url = "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/testInformation"
       r = request(:get) do |req|
@@ -1145,7 +1146,7 @@ module Spaceship
     def testers_by_app(tester, app_id)
       url = tester.url(app_id)[:index_by_app]
       r = request(:get, url)
-      parse_response(r, 'data')['users']
+      parse_response(r, 'data')
     end
 
     # Returns a list of available testing groups

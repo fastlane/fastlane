@@ -37,6 +37,11 @@ module Pilot
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),
+        FastlaneCore::ConfigItem.new(key: :submission_information,
+                                     short_option: "-b",
+                                     description: "Extra information for the submission (e.g. third party content)",
+                                     is_string: false,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
                                      optional: true,

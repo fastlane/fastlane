@@ -9,7 +9,8 @@ module Spaceship::TestFlight
     attr_mapping({
       'id' => :id,
       'name' => :name,
-      'isDefaultExternalGroup' => :is_default_external_group
+      'isDefaultExternalGroup' => :is_default_external_group,
+      'isInternalGroup' => :is_default_internal_group
     })
 
     def self.all(app_id: nil)
@@ -31,6 +32,11 @@ module Spaceship::TestFlight
       groups.find(&:default_external_group?)
     end
 
+    def self.default_internal_group(app_id)
+      groups = self.all(app_id)
+      groups.find(&:default_internal_group?)
+    end
+
     def self.filter_groups(app_id: nil, &block)
       groups = self.all(app_id: app_id)
       groups.select(&block)
@@ -46,6 +52,10 @@ module Spaceship::TestFlight
 
     def default_external_group?
       is_default_external_group
+    end
+
+    def default_internal_group?
+      is_default_internal_group
     end
   end
 end

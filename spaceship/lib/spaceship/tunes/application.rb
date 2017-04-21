@@ -374,7 +374,10 @@ module Spaceship
         TestFlight::Group.default_external_group(self.apple_id)
       end
 
-      #####################################################
+      def default_internal_group
+        TestFlight::Group.default_internal_group(self.apple_id)
+      end #####################################################
+
       # @!group Promo codes
       #####################################################
       def promocodes
