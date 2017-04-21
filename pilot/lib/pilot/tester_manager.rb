@@ -9,8 +9,9 @@ module Pilot
 
       begin
         tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+        UI.user_error!("#{tester.email} is an internal tester; pilot does not support internal testers") unless tester.nil?
 
+        tester = Spaceship::Tunes::Tester::External.find(config[:email])
         if tester
           UI.success("Existing tester #{tester.email}")
         else
@@ -55,8 +56,10 @@ module Pilot
     def remove_tester(options)
       start(options)
 
-      tester = Spaceship::Tunes::Tester::External.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
+      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+      UI.user_error!("#{tester.email} is an internal tester; pilot does not support internal testers") unless tester.nil?
+      
+      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
 
       if tester
         app_filter = (config[:apple_id] || config[:app_identifier])
