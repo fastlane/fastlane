@@ -128,6 +128,8 @@ module Spaceship::TestFlight
     #
     # @raises NameError if the values are nil
     def assert_required_params(method_name, binding)
+      return if RUBY_VERSION < '2.1.0' # Ruby 2.0 does not respond to Binding#local_variable_get
+
       parameter_names = Hash[method(method_name).parameters].values
       parameter_names.each do |name|
         if binding.local_variable_get(name).nil?
