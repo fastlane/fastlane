@@ -51,7 +51,7 @@ module Pilot
 
       return if config[:groups].nil?
 
-      groups = TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
+      groups = Spaceship::TestFlight::Group.filter_groups(app_id: app.apple_id) do |group|
         config[:groups].include?(group.name)
       end
 
