@@ -91,7 +91,7 @@ module Pilot
       end
     end
 
-    # private
+    private
 
     def perform_for_groups_in_app(app: nil, groups: nil, &block)
       if groups.nil?
