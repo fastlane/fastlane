@@ -26,7 +26,7 @@ module Pilot
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
 
-            add_tester_to_groups(tester: tester, app: app)
+            add_tester_to_groups(tester: tester, app: app, groups: config[:groups])
 
             UI.success("Successfully added tester to app #{app_filter}")
           rescue => ex
@@ -37,26 +37,6 @@ module Pilot
       rescue => ex
         UI.error("Could not create tester #{config[:email]}")
         raise ex
-      end
-    end
-
-    def add_tester_to_groups(tester: nil, app: nil)
-      default_external_group = app.default_external_group
-      if default_external_group.nil? && config[:groups].nil?
-        UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
-        return
-      end
-
-      default_external_group.add_tester!(tester) unless default_external_group.nil?
-
-      return if config[:groups].nil?
-
-      groups = Spaceship::TestFlight::Group.filter_groups(app_id: app.apple_id) do |group|
-        config[:groups].include?(group.name)
-      end
-
-      groups.each do |group|
-        group.add_tester!(tester)
       end
     end
 
@@ -111,6 +91,26 @@ module Pilot
     end
 
     # private
+
+    def add_tester_to_groups(tester: nil, app: nil, groups: nil)
+      default_external_group = app.default_external_group
+      if default_external_group.nil? && groups.nil?
+        UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
+        return
+      end
+
+      default_external_group.add_tester!(tester) unless default_external_group.nil?
+
+      return if groups.nil?
+
+      test_flight_groups = Spaceship::TestFlight::Group.filter_groups(app_id: app.apple_id) do |group|
+        groups.include?(group.name)
+      end
+
+      test_flight_groups.each do |group|
+        group.add_tester!(tester)
+      end
+    end
 
     def list_testers_by_app(app_filter)
       app = Spaceship::Application.find(app_filter)
