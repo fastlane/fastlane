@@ -29,9 +29,9 @@ module Pilot
         begin
           mgr.public_send(action, config)
         rescue => ex
-          message = "[#{address}]: #{ex}"
+          # no need to show the email address in the message if only one specified
+          message = (args.count > 1) ? "[#{address}]: #{ex}" : ex
           failures << message
-          UI.error(message)
         end
       end
       UI.user_error!("Some operations failed: #{failures.join(', ')}") unless failures.empty?
