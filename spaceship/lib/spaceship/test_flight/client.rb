@@ -128,11 +128,19 @@ module Spaceship::TestFlight
     #
     # @raises NameError if the values are nil
     def assert_required_params(method_name, binding)
-      parameter_names = Hash[method(method_name).parameters].values
+      parameter_names = method(method_name).parameters.map { |k, v| v }
       parameter_names.each do |name|
-        if binding.local_variable_get(name).nil?
+        if local_variable_get(binding, name).nil?
           raise NameError, "`#{name}' is a required parameter"
         end
+      end
+    end
+
+    def local_variable_get(binding, name)
+      if binding.respond_to?(:local_variable_get)
+        binding.local_variable_get(name)
+      else
+        binding.eval(name.to_s)
       end
     end
   end
