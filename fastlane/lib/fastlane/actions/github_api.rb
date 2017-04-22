@@ -91,6 +91,7 @@ module Fastlane
         }.merge(params)
 
         Excon.defaults[:ssl_verify_peer] = opts[:secure]
+        middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
 
         UI.message("#{http_method} : #{url}")
 
@@ -98,6 +99,7 @@ module Fastlane
         connection.request(
           method: http_method,
           headers: headers,
+          middlewares: middlewares,
           body: body,
           debug_request: opts[:debug],
           debug_response: opts[:debug]
