@@ -15,5 +15,17 @@ module MockAPI
         response.body = JSON.dump(response.body)
       end
     end
+
+    not_found do
+      content_type :html
+      status 404
+      <<-HTML
+        <html>
+          <body>
+            HTTP ERROR: 404
+          </body>
+        </html>
+      HTML
+    end
   end
 end
