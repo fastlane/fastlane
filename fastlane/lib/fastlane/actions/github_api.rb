@@ -48,7 +48,7 @@ module Fastlane
           end
           yield(result) if block_given?
         else
-          if handled_error = handled_errors[status_code]
+          if handled_error = handled_errors[status_code] || handled_errors['*']
             handled_error.call(result)
           else
             UI.error("---")
@@ -159,7 +159,7 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :errors,
-                                       description: "Optional error handling hash based on status code",
+                                       description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
                                        is_string: false,
                                        default_value: {},
                                        optional: true),
@@ -211,6 +211,9 @@ module Fastlane
             errors: {
               404 => Proc.new do |result|
                 UI.message("Something went wrong - I couldn\'t find it...")
+              end,
+              \'*\' => Proc.new do |result|
+                UI.message("Handle all error codes other than 404")
               end
             }
           ) do |result|

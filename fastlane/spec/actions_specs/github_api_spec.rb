@@ -165,6 +165,38 @@ describe Fastlane do
           end
         end
 
+        it "allows custom error handling for all other errors" do
+          expect do
+            Fastlane::FastFile.new.parse("
+              lane :test do
+                github_api(
+                  api_token: '123456789',
+                  secure: false,
+                  debug: true,
+                  http_method: 'PUT',
+                  path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                  body: {
+                    path: 'TEST_FILE.md',
+                    message: 'File committed',
+                    content: 'VGVzdCBDb250ZW50Cg==\n',
+                    branch: 'test-branch'
+                  },
+                  errors: {
+                    '*' => Proc.new {|result|
+                      UI.user_error!(\"Custom error handled for all errors\")
+                    },
+                    404 => Proc.new do |result|
+                      UI.message('not found')
+                    end
+                  }
+                )
+              end
+            ").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to match("Custom error handled for all errors")
+          end
+        end
+
         it "doesn't raise on custom error handling" do
           result = Fastlane::FastFile.new.parse("
             lane :test do
