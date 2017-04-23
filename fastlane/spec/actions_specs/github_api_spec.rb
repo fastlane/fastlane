@@ -90,6 +90,39 @@ describe Fastlane do
             end
           )
         end
+
+        context 'optional params' do
+          let(:response_body) { File.read("./fastlane/spec/fixtures/requests/github_upload_release_asset_response.json") }
+
+          before do
+            stub_request(:post, "https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md").
+            with(body: "test raw content of file",
+                 headers: {
+                    'Authorization' => 'Basic MTIzNDU2Nzg5',
+                    'Host' => 'uploads.github.com:443',
+                    'User-Agent'=>'fastlane-github_api'
+                }).
+            to_return(status: 200, body: response_body, headers: {})
+          end
+
+          it 'allows calling with full url instead of relative path and raw body' do
+            result = Fastlane::FastFile.new.parse(%{
+              lane :test do
+                github_api(
+                  api_token: '123456789',
+                  http_method: 'POST',
+                  url: 'https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md',
+                  raw_body: 'test raw content of file'
+                  )
+              end
+            }).runner.execute(:test)
+
+            expect(result[:status]).to eq(200)
+            expect(result[:response]).to be_a(Excon::Response)
+            expect(result[:response].body).to eq(response_body)
+            expect(result[:json]).to eq(JSON.parse(response_body))
+          end
+        end
       end
 
       context 'failures' do
@@ -219,6 +252,23 @@ describe Fastlane do
           expect(result[:response]).to be_a(Excon::Response)
           expect(result[:response].body).to eq(error_response_body)
           expect(result[:json]).to eq(JSON.parse(error_response_body))
+        end
+
+        it "raises when path and url aren't set" do
+          expect do
+            Fastlane::FastFile.new.parse("
+              lane :test do
+                github_api(
+                  api_token: '123456789',
+                  http_method: 'PUT',
+                )
+              end
+            ").runner.execute(:test)
+          end.to(
+            raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+              expect(error.message).to match("Please provide either 'path' or full 'url' for github api endpoint")
+            end
+          )
         end
       end
     end

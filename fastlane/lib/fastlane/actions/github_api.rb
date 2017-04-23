@@ -13,23 +13,31 @@ module Fastlane
         server = params[:server_url]
         http_method = (params[:http_method] || 'GET').to_s.upcase
         body = params[:body] || {}
-        path = params[:path]
-        url = File.join(server, path)
         headers = self.headers(params[:api_token])
         handled_errors = params[:errors] || {}
 
-        if body.kind_of?(Hash)
-          request_json = body.to_json
+        path = params[:path]
+        if path
+          url = File.join(server, path)
+        else
+          url = params[:url]
+        end
+        UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless url
+
+        request_body = if params[:raw_body]
+          params[:raw_body]
+        elsif body.kind_of?(Hash)
+          body.to_json
         else
           UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
-          request_json = body
+          body
         end
 
         response = call_endpoint(
           url,
           http_method,
           headers,
-          request_json,
+          request_body,
           { secure: params[:secure], debug: params[:debug] }
         )
 
@@ -152,11 +160,19 @@ module Fastlane
                                        is_string: false,
                                        default_value: {},
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :raw_body,
+                                       env_name: "FL_GITHUB_API_REQUEST_RAW_BODY",
+                                       description: "The request body taken vertabim instead of as JSON, useful for file uploads",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_GITHUB_API_PATH",
                                        description: "The endpoint path. e.g. '/repos/:owner/:repo/readme'",
-                                       default_value: "https://api.github.com",
-                                       optional: false),
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :url,
+                                       env_name: "FL_GITHUB_API_URL",
+                                       description: "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :errors,
                                        description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
                                        is_string: false,
