@@ -20,8 +20,6 @@ describe Fastlane do
               lane :test do
                 github_api(
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: {
@@ -47,8 +45,6 @@ describe Fastlane do
               lane :test do
                 github_api(
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: '{
@@ -75,8 +71,6 @@ describe Fastlane do
                 Fastlane::Actions::GithubApiAction.run(
                   server_url: 'https://api.github.com',
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: '{
@@ -117,8 +111,6 @@ describe Fastlane do
               lane :test do
                 github_api(
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: {
@@ -143,8 +135,6 @@ describe Fastlane do
               lane :test do
                 github_api(
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: {
@@ -177,8 +167,6 @@ describe Fastlane do
               lane :test do
                 github_api(
                   api_token: '123456789',
-                  secure: false,
-                  debug: true,
                   http_method: 'PUT',
                   path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                   body: {
@@ -210,8 +198,6 @@ describe Fastlane do
             lane :test do
               github_api(
                 api_token: '123456789',
-                secure: false,
-                debug: true,
                 http_method: 'PUT',
                 path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
                 body: {
