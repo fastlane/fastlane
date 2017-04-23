@@ -8,7 +8,7 @@ describe Fastlane do
           stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/test/assets/TEST_FILE.md").
             with(body: "{\"path\":\"/test/assets/TEST_FILE.md\",\"message\":\"Add my new file\",\"content\":\"dGVzdA==\\n\",\"branch\":\"master\"}",
               headers: {
-                'Authorization' => 'Basic Zjg3NDQ5MzE5NzI4YjFiMGFkOGY2ZTY0ZWNkZDNiMDVkNTM4OWFiMA==',
+                'Authorization' => 'Basic MTIzNDVhYmNkZQ==',
                 'Host' => 'api.github.com:443',
                 'User-Agent' => 'fastlane-github_api'
               }).
@@ -25,7 +25,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("
             lane :test do
               commit_github_file(
-                api_token: '123456789',
+                api_token: '12345abcde',
                 repository_name: 'fastlane/fastlane',
                 message: 'Add my new file',
                 path: '/test/assets/TEST_FILE.md'
