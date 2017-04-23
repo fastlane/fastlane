@@ -33,20 +33,20 @@ module Fastlane
           body: body,
           errors: {
             422 => proc do |result|
-              UI.error(result[:response].body)
+              UI.error(result[:body])
               UI.error("Release on tag #{tag_name} already exists!")
               return nil
             end,
             404 => proc do |result|
-              UI.error(result[:response].body)
+              UI.error(result[:body])
               UI.user_error!("Repository #{repo_name} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)")
             end,
             401 => proc do |result|
-              UI.error(result[:response].body)
+              UI.error(result[:body])
               UI.user_error!("You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
             end,
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:response].body}")
+              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
               return nil
             end
           }
@@ -75,7 +75,7 @@ module Fastlane
               path: "repos/#{repo_name}/releases/#{release_id}",
               errors: {
                 '*' => proc do |get_result|
-                  UI.error("GitHub responded with #{get_result[:status]}:#{get_result[:response].body}")
+                  UI.error("GitHub responded with #{get_result[:status]}:#{get_result[:body]}")
                   UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
                 end
               }
@@ -85,7 +85,7 @@ module Fastlane
               return get_result[:json]
             end
           else
-            return json || result[:response].body
+            return json || result[:body]
           end
         end
       end
@@ -131,7 +131,7 @@ module Fastlane
           raw_body: File.read(file),
           errors: {
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:response].body}")
+              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
               UI.user_error!("Failed to upload asset #{file_name} to GitHub.")
             end
           }

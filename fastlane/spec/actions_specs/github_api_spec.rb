@@ -33,8 +33,7 @@ describe Fastlane do
             ").runner.execute(:test)
 
             expect(result[:status]).to eq(200)
-            expect(result[:response]).to be_a(Excon::Response)
-            expect(result[:response].body).to eq(response_body)
+            expect(result[:body]).to eq(response_body)
             expect(result[:json]).to eq(JSON.parse(response_body))
           end
         end
@@ -58,8 +57,7 @@ describe Fastlane do
             }).runner.execute(:test)
 
             expect(result[:status]).to eq(200)
-            expect(result[:response]).to be_a(Excon::Response)
-            expect(result[:response].body).to eq(response_body)
+            expect(result[:body]).to eq(response_body)
             expect(result[:json]).to eq(JSON.parse(response_body))
           end
         end
@@ -80,7 +78,7 @@ describe Fastlane do
                       "branch":"test-branch"
                     }'
                   ) do |result|
-                    UI.user_error!("Success block triggered with \#{result[:response].body}")
+                    UI.user_error!("Success block triggered with \#{result[:body]}")
                   end
               end
             }).runner.execute(:test)
@@ -122,8 +120,7 @@ describe Fastlane do
               }).runner.execute(:test)
 
               expect(result[:status]).to eq(200)
-              expect(result[:response]).to be_a(Excon::Response)
-              expect(result[:response].body).to eq(response_body)
+              expect(result[:body]).to eq(response_body)
               expect(result[:json]).to eq(JSON.parse(response_body))
             end
           end
@@ -155,8 +152,7 @@ describe Fastlane do
               }).runner.execute(:test)
 
               expect(result[:status]).to eq(200)
-              expect(result[:response]).to be_a(Excon::Response)
-              expect(result[:response].body).to eq(response_body)
+              expect(result[:body]).to eq(response_body)
               expect(result[:json]).to eq(JSON.parse(response_body))
             end
           end
@@ -216,7 +212,7 @@ describe Fastlane do
                   },
                   errors: {
                     401 => proc {|result|
-                      UI.user_error!(\"Custom error handled for 401 \#{result[:response].body}\")
+                      UI.user_error!(\"Custom error handled for 401 \#{result[:body]}\")
                     },
                     404 => proc do |result|
                       UI.message('not found')
@@ -287,8 +283,7 @@ describe Fastlane do
           ").runner.execute(:test)
 
           expect(result[:status]).to eq(401)
-          expect(result[:response]).to be_a(Excon::Response)
-          expect(result[:response].body).to eq(error_response_body)
+          expect(result[:body]).to eq(error_response_body)
           expect(result[:json]).to eq(JSON.parse(error_response_body))
         end
 

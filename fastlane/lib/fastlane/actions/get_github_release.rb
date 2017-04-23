@@ -23,7 +23,7 @@ module Fastlane
               return nil
             end,
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:response].body}")
+              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
               return nil
             end
           }

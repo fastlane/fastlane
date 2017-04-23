@@ -27,7 +27,7 @@ module Fastlane
         status_code = response[:status]
         result = {
           status: status_code,
-          response: response,
+          body: response.body || "",
           json: parse_json(response.body) || {}
         }
 
@@ -54,7 +54,7 @@ module Fastlane
         end
 
         Actions.lane_context[SharedValues::GITHUB_API_STATUS_CODE] = result[:status]
-        Actions.lane_context[SharedValues::GITHUB_API_RESPONSE] = result[:response]
+        Actions.lane_context[SharedValues::GITHUB_API_RESPONSE] = result[:body]
         Actions.lane_context[SharedValues::GITHUB_API_JSON] = result[:json]
 
         return result
@@ -203,13 +203,13 @@ module Fastlane
       def self.output
         [
           ['GITHUB_API_STATUS_CODE', 'The status code returned from the request'],
-          ['GITHUB_API_RESPONSE', 'The full (excon) response object'],
-          ['GITHUB_API_JSON', 'The raw json returned from Github']
+          ['GITHUB_API_RESPONSE', 'The full response body'],
+          ['GITHUB_API_JSON', 'The parsed json returned from Github']
         ]
       end
 
       def self.return_value
-        "A hash including the HTTP status code (:status), the full (excon) response object (:response), and if valid JSON has been returned the parsed JSON (:json)."
+        "A hash including the HTTP status code (:status), the response body (:body), and if valid JSON has been returned the parsed JSON (:json)."
       end
 
       def self.authors
