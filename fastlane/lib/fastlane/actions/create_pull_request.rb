@@ -6,7 +6,6 @@ module Fastlane
 
     class CreatePullRequestAction < Action
       def self.run(params)
-
         UI.message("Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'")
 
         request_body = {

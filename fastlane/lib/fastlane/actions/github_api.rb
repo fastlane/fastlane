@@ -175,7 +175,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :url,
                                        env_name: "FL_GITHUB_API_URL",
                                        description: "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include? "//"
+                                       end),
           FastlaneCore::ConfigItem.new(key: :errors,
                                        description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
                                        is_string: false,
