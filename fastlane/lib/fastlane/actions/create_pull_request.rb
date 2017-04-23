@@ -6,35 +6,36 @@ module Fastlane
 
     class CreatePullRequestAction < Action
       def self.run(params)
-        require 'excon'
-        require 'base64'
 
         UI.message("Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'")
 
-        url = "#{params[:api_url]}/repos/#{params[:repo]}/pulls"
-        headers = { 'User-Agent' => 'fastlane-create_pull_request' }
-        headers['Authorization'] = "Basic #{Base64.strict_encode64(params[:api_token])}" if params[:api_token]
-
-        data = {
+        request_body = {
           'title' => params[:title],
           'head' => params[:head],
           'base' => params[:base]
         }
+        request_body['body'] = params[:body] if params[:body]
 
-        data['body'] = params[:body] if params[:body]
-
-        response = Excon.post(url, headers: headers, body: data.to_json)
-
-        if response[:status] == 201
-          body = JSON.parse(response.body)
-          number = body['number']
-          html_url = body['html_url']
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'POST',
+          path: "repos/#{params[:repo]}/pulls",
+          body: request_body,
+          errors: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        ) do |result|
+          json = result[:json]
+          number = json['number']
+          html_url = json['html_url']
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
-          return body
-        elsif response[:status] != 200
-          UI.error("GitHub responded with #{response[:status]}: #{response[:body]}")
+          return json
         end
       end
 

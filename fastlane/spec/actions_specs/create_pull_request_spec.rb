@@ -11,7 +11,7 @@ describe Fastlane do
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
                 'Host' => 'api.github.com:443',
-                'User-Agent' => 'fastlane-create_pull_request'
+                'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: response_body, headers: {})
         end
