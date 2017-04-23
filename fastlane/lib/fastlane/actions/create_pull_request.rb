@@ -32,6 +32,7 @@ module Fastlane
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
+          return body
         elsif response[:status] != 200
           UI.error("GitHub responded with #{response[:status]}: #{response[:body]}")
         end
@@ -91,11 +92,15 @@ module Fastlane
       end
 
       def self.author
-        ["seei"]
+        ["seei", "tommeier"]
       end
 
       def self.is_supported?(platform)
         return true
+      end
+
+      def self.return_value
+        "The parsed JSON when successful"
       end
 
       def self.example_code
