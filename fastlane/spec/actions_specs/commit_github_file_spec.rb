@@ -25,6 +25,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("
             lane :test do
               commit_github_file(
+                api_token: '123456789',
                 repository_name: 'fastlane/fastlane',
                 message: 'Add my new file',
                 path: '/test/assets/TEST_FILE.md'
