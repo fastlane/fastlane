@@ -93,34 +93,68 @@ describe Fastlane do
 
         context 'optional params' do
           let(:response_body) { File.read("./fastlane/spec/fixtures/requests/github_upload_release_asset_response.json") }
+          let(:headers) { {
+            'Authorization' => 'Basic MTIzNDU2Nzg5',
+            'Host' => 'uploads.github.com:443',
+            'User-Agent'=>'fastlane-github_api'
+          } }
 
           before do
             stub_request(:post, "https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md").
             with(body: "test raw content of file",
-                 headers: {
-                    'Authorization' => 'Basic MTIzNDU2Nzg5',
-                    'Host' => 'uploads.github.com:443',
-                    'User-Agent'=>'fastlane-github_api'
-                }).
+                 headers: headers).
             to_return(status: 200, body: response_body, headers: {})
           end
 
-          it 'allows calling with full url instead of relative path and raw body' do
-            result = Fastlane::FastFile.new.parse(%{
-              lane :test do
-                github_api(
-                  api_token: '123456789',
-                  http_method: 'POST',
-                  url: 'https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md',
-                  raw_body: 'test raw content of file'
-                  )
-              end
-            }).runner.execute(:test)
+          context 'full url and raw body' do
+            it 'allows overrides and sends raw full values' do
+              result = Fastlane::FastFile.new.parse(%{
+                lane :test do
+                  github_api(
+                    api_token: '123456789',
+                    http_method: 'POST',
+                    url: 'https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md',
+                    raw_body: 'test raw content of file'
+                    )
+                end
+              }).runner.execute(:test)
 
-            expect(result[:status]).to eq(200)
-            expect(result[:response]).to be_a(Excon::Response)
-            expect(result[:response].body).to eq(response_body)
-            expect(result[:json]).to eq(JSON.parse(response_body))
+              expect(result[:status]).to eq(200)
+              expect(result[:response]).to be_a(Excon::Response)
+              expect(result[:response].body).to eq(response_body)
+              expect(result[:json]).to eq(JSON.parse(response_body))
+            end
+          end
+
+          context 'overridable headers' do
+            let(:headers) { {
+              'Authorization' => 'custom',
+              'Host' => 'uploads.github.com:443',
+              'User-Agent' => 'fastlane-github_api',
+              'Content-Type' => 'text/plain'
+            } }
+
+            it 'allows calling with custom headers and override auth' do
+              result = Fastlane::FastFile.new.parse(%{
+                lane :test do
+                  github_api(
+                    api_token: '123456789',
+                    http_method: 'POST',
+                    headers: {
+                      'Content-Type' => 'text/plain',
+                      'Authorization' => 'custom'
+                    },
+                    url: 'https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md',
+                    raw_body: 'test raw content of file'
+                    )
+                end
+              }).runner.execute(:test)
+
+              expect(result[:status]).to eq(200)
+              expect(result[:response]).to be_a(Excon::Response)
+              expect(result[:response].body).to eq(response_body)
+              expect(result[:json]).to eq(JSON.parse(response_body))
+            end
           end
         end
       end

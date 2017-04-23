@@ -13,7 +13,7 @@ module Fastlane
         server = params[:server_url]
         http_method = (params[:http_method] || 'GET').to_s.upcase
         body = params[:body] || {}
-        headers = self.headers(params[:api_token])
+        headers = self.headers(params[:api_token]).merge(params[:headers] || {})
         handled_errors = params[:errors] || {}
 
         path = params[:path]
@@ -175,6 +175,11 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :errors,
                                        description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
+                                       is_string: false,
+                                       default_value: {},
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :headers,
+                                       description: "Optional headers to apply",
                                        is_string: false,
                                        default_value: {},
                                        optional: true),
