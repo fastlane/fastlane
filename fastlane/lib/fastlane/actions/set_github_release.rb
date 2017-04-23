@@ -262,7 +262,7 @@ module Fastlane
       end
 
       def self.category
-        :source_code
+        :source_control
       end
     end
   end
