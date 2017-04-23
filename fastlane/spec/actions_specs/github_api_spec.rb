@@ -93,17 +93,19 @@ describe Fastlane do
 
         context 'optional params' do
           let(:response_body) { File.read("./fastlane/spec/fixtures/requests/github_upload_release_asset_response.json") }
-          let(:headers) { {
-            'Authorization' => 'Basic MTIzNDU2Nzg5',
-            'Host' => 'uploads.github.com:443',
-            'User-Agent'=>'fastlane-github_api'
-          } }
+          let(:headers) do
+            {
+              'Authorization' => 'Basic MTIzNDU2Nzg5',
+              'Host' => 'uploads.github.com:443',
+              'User-Agent' => 'fastlane-github_api'
+            }
+          end
 
           before do
             stub_request(:post, "https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md").
-            with(body: "test raw content of file",
+              with(body: "test raw content of file",
                  headers: headers).
-            to_return(status: 200, body: response_body, headers: {})
+              to_return(status: 200, body: response_body, headers: {})
           end
 
           context 'full url and raw body' do
@@ -127,12 +129,14 @@ describe Fastlane do
           end
 
           context 'overridable headers' do
-            let(:headers) { {
-              'Authorization' => 'custom',
-              'Host' => 'uploads.github.com:443',
-              'User-Agent' => 'fastlane-github_api',
-              'Content-Type' => 'text/plain'
-            } }
+            let(:headers) do
+              {
+                'Authorization' => 'custom',
+                'Host' => 'uploads.github.com:443',
+                'User-Agent' => 'fastlane-github_api',
+                'Content-Type' => 'text/plain'
+              }
+            end
 
             it 'allows calling with custom headers and override auth' do
               result = Fastlane::FastFile.new.parse(%{

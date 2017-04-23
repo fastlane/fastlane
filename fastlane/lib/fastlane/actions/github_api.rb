@@ -10,28 +10,11 @@ module Fastlane
       def self.run(params)
         require 'json'
 
-        server = params[:server_url]
         http_method = (params[:http_method] || 'GET').to_s.upcase
-        body = params[:body] || {}
-        headers = self.headers(params[:api_token]).merge(params[:headers] || {})
+        url = self.parse_url(params[:server_url], params[:path], params[:url])
+        headers = self.parse_headers(params[:api_token], params[:headers])
+        request_body = self.parse_body(params[:body], params[:raw_body])
         handled_errors = params[:errors] || {}
-
-        path = params[:path]
-        if path
-          url = File.join(server, path)
-        else
-          url = params[:url]
-        end
-        UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless url
-
-        request_body = if params[:raw_body]
-          params[:raw_body]
-        elsif body.kind_of?(Hash)
-          body.to_json
-        else
-          UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
-          body
-        end
 
         response = call_endpoint(
           url,
@@ -77,11 +60,31 @@ module Fastlane
         return result
       end
 
-      def self.headers(api_token)
+      def self.parse_headers(api_token, overrides)
         require 'base64'
         headers = { 'User-Agent' => 'fastlane-github_api' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
-        headers
+        headers.merge(overrides || {})
+      end
+
+      def self.parse_url(server_url, path, url)
+        return_url = path ? File.join(server_url, path) : url
+
+        UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless return_url
+        return_url
+      end
+
+      def self.parse_body(body, raw_body)
+        body ||= {}
+
+        if raw_body
+          raw_body
+        elsif body.kind_of?(Hash)
+          body.to_json
+        else
+          UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
+          body
+        end
       end
 
       def self.parse_json(value)
