@@ -14,15 +14,15 @@ module Fastlane
           http_method: 'GET',
           path: "repos/#{params[:url]}/releases",
           errors: {
-            404 => Proc.new do |result|
+            404 => proc do |result|
               UI.error("Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).")
               return nil
             end,
-            401 => Proc.new do |result|
+            401 => proc do |result|
               UI.error("You are not authorized to access #{params[:url]}, please make sure you provided a valid API token.")
               return nil
             end,
-            '*' => Proc.new do |result|
+            '*' => proc do |result|
               UI.error("GitHub responded with #{result[:status]}:#{result[:response].body}")
               return nil
             end

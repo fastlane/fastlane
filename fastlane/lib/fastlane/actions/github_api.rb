@@ -18,7 +18,7 @@ module Fastlane
         headers = self.headers(params[:api_token])
         handled_errors = params[:errors] || {}
 
-        if body.is_a?(Hash)
+        if body.kind_of?(Hash)
           request_json = body.to_json
         else
           UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
@@ -37,7 +37,7 @@ module Fastlane
         result = {
           status: status_code,
           response: response,
-          json: parse_json(response.body) || {},
+          json: parse_json(response.body) || {}
         }
 
         if status_code.between?(200, 299)
@@ -48,7 +48,8 @@ module Fastlane
           end
           yield(result) if block_given?
         else
-          if handled_error = handled_errors[status_code] || handled_errors['*']
+          handled_error = handled_errors[status_code] || handled_errors['*']
+          if handled_error
             handled_error.call(result)
           else
             UI.error("---")
@@ -76,11 +77,9 @@ module Fastlane
       end
 
       def self.parse_json(value)
-        begin
-          JSON.parse(value)
-        rescue JSON::ParserError => e
-          nil
-        end
+        JSON.parse(value)
+      rescue JSON::ParserError
+        nil
       end
 
       def self.call_endpoint(url, http_method, headers, body, params = {})
@@ -143,9 +142,9 @@ module Fastlane
                                        default_value: "GET",
                                        optional: true,
                                        verify_block: proc do |value|
-                                        unless %w( GET POST PUT DELETE HEAD CONNECT ).include?(value.to_s.upcase)
-                                          UI.user_error!("Unrecognised HTTP method")
-                                        end
+                                         unless %w(GET POST PUT DELETE HEAD CONNECT).include?(value.to_s.upcase)
+                                           UI.user_error!("Unrecognised HTTP method")
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :body,
                                        env_name: "FL_GITHUB_API_REQUEST_BODY",
@@ -209,10 +208,10 @@ module Fastlane
             http_method: "GET",
             path: "/repos/:owner/:repo/readme",
             errors: {
-              404 => Proc.new do |result|
+              404 => proc do |result|
                 UI.message("Something went wrong - I couldn\'t find it...")
               end,
-              \'*\' => Proc.new do |result|
+              \'*\' => proc do |result|
                 UI.message("Handle all error codes other than 404")
               end
             }
