@@ -37,13 +37,13 @@ describe Spaceship::TestFlight::Build do
 
   context 'collections' do
     before do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains') do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains') do
         {
           data: ['1.0', '1.1'],
           error: nil
         }
       end
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.0/builds') do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains/1.0/builds') do
         {
           data: [
             {
@@ -55,7 +55,7 @@ describe Spaceship::TestFlight::Build do
           error: nil
         }
       end
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.1/builds') do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains/1.1/builds') do
         {
           data: [
             {
@@ -71,9 +71,9 @@ describe Spaceship::TestFlight::Build do
 
     context '.all' do
       it 'contains all of the builds across all build trains' do
-        builds = Spaceship::TestFlight::Build.all(platform: 'ios')
+        builds = Spaceship::TestFlight::Build.all(app_id: 10, platform: 'ios')
         expect(builds.size).to eq(2)
-        expect(builds.any).to be_instance_of(Spaceship::TestFlight::Build)
+        expect(builds.sample).to be_instance_of(Spaceship::TestFlight::Build)
         expect(builds.map(&:train_version)).to eq(['1.0', '1.1'])
       end
     end
@@ -91,6 +91,11 @@ describe Spaceship::TestFlight::Build do
         end
         expect(build).to be_ready_to_submit
       end
+
+    end
+
+    context 'lazy loaded attributes' do
+      it ''
     end
 
     context '#save!' do
