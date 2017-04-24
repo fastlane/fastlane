@@ -82,7 +82,8 @@ module Pilot
             raise ex
           end
         else
-          UI.user_error!("You must specify either a bundle ID with the `:app_identifier` option or the AppleID of the app with the `:apple_id` option in order to remove a tester from an app.")
+          tester.delete!
+          UI.success("Successfully removed tester #{tester.email}")
         end
       else
         internal_tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
