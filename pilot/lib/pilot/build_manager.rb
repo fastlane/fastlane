@@ -124,7 +124,7 @@ module Pilot
       end
 
       if options[:groups]
-        groups = Group.filter_groups(app_id: uploaded_build.app_id) do |group|
+        groups = Spaceship::TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
           options[:groups].include?(group.name)
         end
         groups.each do |group|
