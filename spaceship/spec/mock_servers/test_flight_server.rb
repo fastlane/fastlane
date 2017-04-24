@@ -22,6 +22,7 @@ module MockAPI
       <<-HTML
         <html>
           <body>
+            #{request.request_method} : #{request.url}
             HTTP ERROR: 404
           </body>
         </html>
