@@ -121,6 +121,10 @@ module Spaceship::TestFlight
       external_state == BUILD_STATES[:processing]
     end
 
+    def export_compliance_missing?
+      external_state == BUILD_STATES[:export_compliance_missing]
+    end
+
     # Getting builds from BuildTrains only gets a partial Build object
     # We are then requesting the full build from iTC when we need to access
     # any of the variables below, because they are not inlcuded in the partial Build objects

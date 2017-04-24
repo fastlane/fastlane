@@ -25,7 +25,7 @@ module FastlaneCore
         elsif matching_build.active?
           UI.success("Build #{matching_build.train_version} - #{matching_build.build_version} is already being tested")
           return matching_build
-        elsif matching_build.ready_to_submit?
+        elsif matching_build.ready_to_submit? || matching_build.export_compliance_missing?
           UI.success("Successfully finished processing the build #{matching_build.train_version} - #{matching_build.build_version}")
           return matching_build
         end
