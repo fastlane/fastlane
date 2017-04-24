@@ -108,6 +108,10 @@ module Commander
       FastlaneCore::UI.error("builds for testing, adding and removing testers from groups, and")
       FastlaneCore::UI.error("waiting for builds to process.")
       FastlaneCore::UI.error("")
+      FastlaneCore::UI.error("Please open an issue on https://github.com/fastlane/fastlane/issues")
+      FastlaneCore::UI.error("if you believe this failure is the result of a bug in _pilot_ and we")
+      FastlaneCore::UI.error("will be happy to look into this further.")
+      FastlaneCore::UI.error("")
       FastlaneCore::UI.error("Please stay tuned for more updates from _fastlane_ as we fix more issues!")
       FastlaneCore::UI.error("")
       if FastlaneCore::Globals.verbose?
