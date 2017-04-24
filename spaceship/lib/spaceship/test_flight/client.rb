@@ -20,6 +20,13 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def testers_for_app(app_id: nil)
+      assert_required_params(__method__, binding)
+      url = "providers/#{team_id}/apps/#{app_id}/testers"
+      response = request(:get, url)
+      handle_response(response)
+    end
+
     def post_tester(app_id: nil, tester: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
