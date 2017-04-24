@@ -164,7 +164,7 @@ module Spaceship::TestFlight
     protected
 
     def handle_response(response)
-      if (200...300).include?(response.status) && response.body.empty?
+      if (200...300).include?(response.status) && (response.body.nil? || response.body.empty?)
         return
       end
 

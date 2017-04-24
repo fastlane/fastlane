@@ -5,8 +5,7 @@ describe Spaceship::TestFlight::Build do
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Build.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
-    Spaceship::TestFlight::BuildTrains.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
+    Spaceship::TestFlight::Base.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
   end
 
   context '.find' do
@@ -25,13 +24,14 @@ describe Spaceship::TestFlight::Build do
       expect(build.bundle_id).to eq('com.foo.bar')
     end
 
-    it 'returns nil when the build cannot be found' do
+    it 'returns raises when the build cannot be found' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
         halt 404
       end
 
-      Spaceship::TestFlight::Build.find(app_id: 123, build_id: 456)
-      # TODO: should we return nil or raise an exception?
+      expect {
+        Spaceship::TestFlight::Build.find(app_id: 123, build_id: 456)
+      }.to raise_error(Spaceship::Client::UnexpectedResponse)
     end
   end
 
@@ -115,6 +115,22 @@ describe Spaceship::TestFlight::Build do
 
   context 'instances' do
     let(:build) { Spaceship::TestFlight::Build.find(app_id: 'some-app-id', build_id: 'some-build-id')  }
+    before do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
+        {
+          id: 'some-build-id',
+          appAdamId: 'some-app-id',
+          testInfo: [
+            {
+              locale: 'en-US',
+              description: 'test info',
+              feedbackEmail: 'email@example.com',
+              whatsNew: 'this is new!',
+            }
+          ]
+        }
+      end
+    end
 
     it 'reloads a build' do
       build = Spaceship::TestFlight::Build.new
@@ -134,7 +150,6 @@ describe Spaceship::TestFlight::Build do
         end
         expect(build).to be_ready_to_submit
       end
-
     end
 
     context 'lazy loaded attributes' do
@@ -143,9 +158,10 @@ describe Spaceship::TestFlight::Build do
 
     context '#save!' do
       it 'saves via the client' do
-
+        expect(build.client).to receive(:put_build).with(app_id: 'some-app-id', build_id: 'some-build-id', build: instance_of(Spaceship::TestFlight::Build))
+        build.test_info.whats_new = 'changes!'
+        build.save!
       end
     end
   end
-
 end

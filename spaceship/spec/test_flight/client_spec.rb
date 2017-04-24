@@ -3,7 +3,7 @@ require_relative '../mock_servers'
 
 ##
 # subclass the client we want to test so we can make test-methods easier
-class TestClient < Spaceship::TestFlight::Client
+class TestFlightTestClient < Spaceship::TestFlight::Client
   def test_request(some_param: nil, another_param: nil)
     assert_required_params(__method__, binding)
   end
@@ -19,7 +19,7 @@ class TestClient < Spaceship::TestFlight::Client
 end
 
 describe Spaceship::TestFlight::Client do
-  subject { TestClient.new(current_team_id: 'fake-team-id') }
+  subject { TestFlightTestClient.new(current_team_id: 'fake-team-id') }
   let(:app_id) { 'some-app-id' }
   let(:platform) { 'ios' }
   let(:json) { subject.last_response.body }
@@ -62,6 +62,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#get_build_trains' do
     it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains') { }
       subject.get_build_trains(app_id: app_id, platform: platform)
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains')
     end
@@ -69,6 +70,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#get_builds_for_train' do
     it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains/1.0/builds') { }
       subject.get_builds_for_train(app_id: app_id, platform: platform, train_version: '1.0')
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains/1.0/builds')
     end
