@@ -12,7 +12,7 @@ module Spaceship::TestFlight
 
     attr_mapping(
       'id' => :tester_id,
-      'email' => :email,
+      'email' => :email
     )
 
     # @return (Array) Returns all beta testers available for this account
