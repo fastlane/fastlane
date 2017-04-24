@@ -105,7 +105,7 @@ module Spaceship::TestFlight
     #
     # Note: this will overwrite any non-saved changes to the object
     #
-    # @return (Spaceceship::Base::DataHash) the raw_data of the build.
+    # @return (Spaceship::Base::DataHash) the raw_data of the build.
     def reload
       self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
     end
