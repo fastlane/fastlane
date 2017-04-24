@@ -1,7 +1,7 @@
 require "fastlane_core"
 require "pilot/tester_util"
 require 'terminal-table'
-
+require 'dotenv'; Dotenv.load
 module Pilot
   class TesterManager < Manager
     def add_tester(options)
@@ -65,16 +65,24 @@ module Pilot
           begin
             app = Spaceship::Application.find(app_filter)
             UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-            groups = remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
-            group_names = groups.map(&:name).join(", ")
-            UI.success("Successfully removed tester #{tester.email} from app #{app_filter} in group(s) #{group_names}")
+
+            # If no groups are passed to options, remove the tester from the app-level,
+            # otherwise remove the tester from the groups specified.
+            if config[:groups].nil?
+              test_flight_tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: tester.email)
+              test_flight_tester.remove_from_app!(app_id: app.apple_id)
+              UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app_filter}")
+            else
+              groups = remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
+              group_names = groups.map(&:name).join(", ")
+              UI.success("Successfully removed tester #{tester.email} from app #{app_filter} in group(s) #{group_names}")
+            end
           rescue => ex
             UI.error("Could not remove #{tester.email} from app: #{ex}")
             raise ex
           end
         else
-          tester.delete!
-          UI.success("Successfully removed tester #{tester.email}")
+          UI.user_error!("You must specify either a bundle ID with the `:app_identifier` option or the AppleID of the app with the `:apple_id` option in order to remove a tester from an app.")
         end
       else
         internal_tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
