@@ -27,9 +27,9 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def delete_tester_from_app(app_id: nil, tester: nil)
+    def delete_tester_from_app(app_id: nil, tester_id: nil)
       assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester.tester_id}"
+      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
       response = request(:delete, url)
       handle_response(response)
     end
