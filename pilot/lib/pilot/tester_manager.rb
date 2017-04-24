@@ -1,7 +1,7 @@
 require "fastlane_core"
 require "pilot/tester_util"
 require 'terminal-table'
-require 'dotenv'; Dotenv.load
+
 module Pilot
   class TesterManager < Manager
     def add_tester(options)
