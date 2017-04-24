@@ -51,7 +51,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_PKG_PATH",
                                      description: "Path to your pkg file",
-                                     default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
