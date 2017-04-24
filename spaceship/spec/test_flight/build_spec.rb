@@ -4,7 +4,9 @@ require_relative '../mock_servers'
 describe Spaceship::TestFlight::Build do
 
   before do
+    # Use a simple client for all data models
     Spaceship::TestFlight::Build.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
+    Spaceship::TestFlight::BuildTrains.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
   end
 
   context '.find' do
@@ -34,7 +36,46 @@ describe Spaceship::TestFlight::Build do
   end
 
   context 'collections' do
+    before do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains') do
+        {
+          data: ['1.0', '1.1'],
+          error: nil
+        }
+      end
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.0/builds') do
+        {
+          data: [
+            {
+              id: 1,
+              appAdamId: 10,
+              trainVersion: '1.0'
+            }
+          ],
+          error: nil
+        }
+      end
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.1/builds') do
+        {
+          data: [
+            {
+              id: 2,
+              appAdamId: 10,
+              trainVersion: '1.1'
+            }
+          ],
+          error: nil
+        }
+      end
+    end
+
     context '.all' do
+      it 'contains all of the builds across all build trains' do
+        builds = Spaceship::TestFlight::Build.all(platform: 'ios')
+        expect(builds.size).to eq(2)
+        expect(builds.any).to be_instance_of(Spaceship::TestFlight::Build)
+        expect(builds.map(&:train_version)).to eq(['1.0', '1.1'])
+      end
     end
   end
 
