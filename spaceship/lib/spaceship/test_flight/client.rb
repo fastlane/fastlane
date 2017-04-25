@@ -1,5 +1,16 @@
 module Spaceship::TestFlight
   class Client < Spaceship::Client
+    ##
+    # Spaceship HTTP client for the testflight API.
+    #
+    # This client is solely responsible for the making HTTP requests and
+    # parsing their responses. Parameters should be either named parameters, or
+    # for large request data bodies, pass in anything that can resond to
+    # `to_json`.
+    #
+    # Each request method should validate the required parameters. A required parameter is one that would result in 400-range response if it is not supplied.
+    # Each request method should make only one request. For more high-level logic, put code in the data models.
+
     def self.hostname
       'https://itunesconnect.apple.com/testflight/v2/'
     end
