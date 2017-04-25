@@ -46,11 +46,9 @@ module Pilot
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      unless config[:update_build_info_on_upload]
-        if should_update_build_information(options)
-          build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-          UI.success "Successfully set the changelog and/or description for build"
-        end
+      if should_update_build_information(options)
+        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
+        UI.success "Successfully set the changelog and/or description for build"
       end
 
       return if config[:skip_submission]
