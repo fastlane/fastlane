@@ -46,6 +46,7 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
+          'rejected' => REJECTED,
           'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
           'metadataRejected' => METADATA_REJECTED
         }
