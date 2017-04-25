@@ -67,3 +67,13 @@ end
 def after_each_spaceship
   @cache_paths.each { |path| try_delete path }
 end
+
+RSpec.configure do |config|
+
+  def mock_client_response(method_name, &block)
+    hash = block.call
+    hash = JSON.load(hash.to_json)
+    allow(mock_client).to receive(method_name).and_return(hash)
+  end
+
+end

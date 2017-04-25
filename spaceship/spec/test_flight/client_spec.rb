@@ -9,12 +9,7 @@ class TestFlightTestClient < Spaceship::TestFlight::Client
   end
 
   def handle_response(response)
-    @last_response = response
     super(response)
-  end
-
-  def last_response
-    @last_response
   end
 end
 
@@ -22,7 +17,6 @@ describe Spaceship::TestFlight::Client do
   subject { TestFlightTestClient.new(current_team_id: 'fake-team-id') }
   let(:app_id) { 'some-app-id' }
   let(:platform) { 'ios' }
-  let(:json) { subject.last_response.body }
 
   context '#assert_required_params' do
     it 'requires named parameters to be passed' do

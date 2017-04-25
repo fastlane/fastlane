@@ -152,8 +152,28 @@ describe Spaceship::TestFlight::Build do
       end
     end
 
-    context 'lazy loaded attributes' do
-      it ''
+    context '#upload_date' do
+      it 'parses the string value' do
+        expect(build.upload_date).to be_instance_of(Time)
+      end
+    end
+
+    context 'lazy loading attribute' do
+      it 'loads TestInfo' do
+        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
+        expect(build).to receive(:reload).once
+        expect(build.test_info).to be_instance_of(Spaceship::TestFlight::TestInfo)
+      end
+      it 'loads BetaReviewInfo' do
+        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
+        expect(build).to receive(:reload).once
+        expect(build.test_info).to be_instance_of(Spaceship::TestFlight::BetaReviewInfo)
+      end
+      it 'loads ExportCompliance' do
+        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
+        expect(build).to receive(:reload).once
+        expect(build.test_info).to be_instance_of(Spaceship::TestFlight::ExportCompliance)
+      end
     end
 
     context '#save!' do
