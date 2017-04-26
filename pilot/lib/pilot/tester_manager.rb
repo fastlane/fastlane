@@ -6,30 +6,11 @@ module Pilot
   class TesterManager < Manager
     def add_tester(options)
       start(options)
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      if app_filter
-        app = Spaceship::Application.find(app_filter)
-        UI.user_error!("Could not find an app by #{app_filter}") unless app
-      else
-        UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)")
-      end
 
-      begin
-        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+      app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
+      UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)") unless app
 
-        if tester
-          UI.success("Existing tester #{tester.email}")
-        else
-          tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
-                                                              first_name: config[:first_name],
-                                                              last_name: config[:last_name])
-          UI.success("Successfully added tester: #{tester.email} to your account")
-        end
-      rescue => ex
-        UI.error("Could not create tester #{config[:email]}")
-        raise ex
-      end
+      tester = find_or_create_tester(email: config[:email], first_name: config[:first_name], last_name: config[:last_name])
 
       begin
         groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
@@ -64,11 +45,8 @@ module Pilot
       tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
       UI.user_error!("Tester not found: #{config[:email]}") if tester.nil?
 
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      if app_filter
-        app = Spaceship::Application.find(app_filter)
-        UI.user_error!("Could not find an app by #{app_filter}") unless app
-      else
+      app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
+      unless app
         tester.delete!
         UI.success("Successfully removed tester #{tester.email}")
       end
@@ -103,6 +81,35 @@ module Pilot
     end
 
     private
+
+    def find_app(app_filter: nil)
+      if app_filter
+        app = Spaceship::Application.find(app_filter)
+        UI.user_error!("Could not find an app by #{app_filter}") unless app
+        return app
+      end
+      nil
+    end
+
+    def find_or_create_tester(email: nil, first_name: nil, last_name: nil)
+      begin
+        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+
+        if tester
+          UI.success("Existing tester #{tester.email}")
+        else
+          tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
+                                                              first_name: config[:first_name],
+                                                              last_name: config[:last_name])
+          UI.success("Successfully added tester: #{tester.email} to your account")
+        end
+        return tester
+      rescue => ex
+        UI.error("Could not create tester #{config[:email]}")
+        raise ex
+      end
+    end
 
     def perform_for_groups_in_app(app: nil, groups: nil, &block)
       if groups.nil?
