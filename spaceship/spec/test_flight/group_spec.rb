@@ -5,7 +5,7 @@ describe Spaceship::TestFlight::Group do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Group.client = mock_client
+    Spaceship::TestFlight::Base.client = mock_client
   end
 
   context 'attr_mapping' do
@@ -28,7 +28,7 @@ describe Spaceship::TestFlight::Group do
 
   context 'collections' do
     before do
-      mock_client_response(:get_groups) do
+      mock_client_response(:get_groups, with: { app_id: 'app-id' }) do
         [
           {
             id: 1,
@@ -41,7 +41,7 @@ describe Spaceship::TestFlight::Group do
             isDefaultExternalGroup: false,
           }
         ]
-      end.with(app_id: 'app-id')
+      end
     end
 
     context '.all' do
@@ -89,7 +89,7 @@ describe Spaceship::TestFlight::Group do
 
     context '#add_tester!' do
       it 'adds a tester via client' do
-        expect(mock_client).to receive(:post_tester).with(app_id: 1, tester: tester)
+        expect(mock_client).to receive(:post_tester).with(app_id: 1, tester: tester).and_return('id' => 'some-tester-id')
         expect(mock_client).to receive(:put_tester_to_group).with(group_id: 2, tester_id: 'some-tester-id', app_id: 1)
         group.add_tester!(tester)
       end
