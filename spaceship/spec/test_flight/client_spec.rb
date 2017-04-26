@@ -114,4 +114,49 @@ describe Spaceship::TestFlight::Client do
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id')
     end
   end
+
+  ##
+  # @!group Testers API
+  ##
+
+  context '#testers_for_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') { }
+      subject.testers_for_app(app_id: app_id)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
+    end
+  end
+
+  context '#delete_tester_from_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id') { }
+      subject.delete_tester_from_app(app_id: app_id, tester_id: 'fake-tester-id')
+      expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id')
+    end
+  end
+
+  context '#post_tester' do
+    let(:tester) { double('Tester', email: 'fake@email.com', first_name: 'Fake', last_name: 'Name') }
+    it 'executes the request' do
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') { }
+      subject.post_tester(app_id: app_id, tester: tester)
+      expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
+    end
+  end
+
+  context '#put_tester_to_group' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') { }
+      subject.put_tester_to_group(app_id: app_id, tester_id: 'fake-tester-id', group_id: 'fake-group-id')
+      expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
+    end
+  end
+
+  context '#delete_tester_from_group' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') { }
+      subject.delete_tester_from_group(app_id: app_id, tester_id: 'fake-tester-id', group_id: 'fake-group-id')
+      expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
+    end
+  end
 end
