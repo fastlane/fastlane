@@ -54,6 +54,10 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  ##
+  # @!group Build Trains API
+  ##
+
   context '#get_build_trains' do
     it 'executes the request' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains') {}
@@ -67,6 +71,47 @@ describe Spaceship::TestFlight::Client do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains/1.0/builds') {}
       subject.get_builds_for_train(app_id: app_id, platform: platform, train_version: '1.0')
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains/1.0/builds')
+    end
+  end
+
+  ##
+  # @!group Builds API
+  ##
+
+  context '#get_build' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') { }
+      subject.get_build(app_id: app_id, build_id: 1)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1')
+    end
+  end
+
+  context '#put_build' do
+    let(:build) { double('Build', to_json: "") }
+    it 'executes the request' do
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') { }
+      subject.put_build(app_id: app_id, build_id: 1, build: build)
+      expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1')
+    end
+  end
+
+  ##
+  # @!group Groups API
+  ##
+
+  context '#get_groups' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') { }
+      subject.get_groups(app_id: app_id)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups')
+    end
+  end
+
+  context '#add_group_to_build' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id') { }
+      subject.add_group_to_build(app_id: app_id, group_id: 'fake-group-id', build_id: 'fake-build-id')
+      expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id')
     end
   end
 end
