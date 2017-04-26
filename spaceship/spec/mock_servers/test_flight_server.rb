@@ -11,7 +11,7 @@ module MockAPI
     end
 
     after do
-      if response.body.is_a?(Hash)
+      if response.body.kind_of?(Hash)
         response.body = JSON.dump(response.body)
       end
     end

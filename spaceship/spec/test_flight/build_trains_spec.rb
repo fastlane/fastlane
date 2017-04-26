@@ -15,7 +15,7 @@ describe Spaceship::TestFlight::BuildTrains do
           appAdamId: 10,
           trainVersion: '1.0',
           uploadDate: '2017-01-01T12:00:00.000+0000',
-          externalState: 'testflight.build.state.export.compliance.missing',
+          externalState: 'testflight.build.state.export.compliance.missing'
         }
       ]
     end
@@ -26,14 +26,14 @@ describe Spaceship::TestFlight::BuildTrains do
           appAdamId: 10,
           trainVersion: '1.1',
           uploadDate: '2017-01-02T12:00:00.000+0000',
-          externalState: 'testflight.build.state.submit.ready',
+          externalState: 'testflight.build.state.submit.ready'
         },
         {
           id: 3,
           appAdamId: 10,
           trainVersion: '1.1',
           uploadDate: '2017-01-03T12:00:00.000+0000',
-          externalState: 'testflight.build.state.processing',
+          externalState: 'testflight.build.state.processing'
         }
       ]
     end
