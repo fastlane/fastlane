@@ -40,10 +40,15 @@ module Pilot
       distribute(options, latest_build)
     end
 
-    def distribute(options, build)
+    def distribute(options, build = nil)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
+      end
+
+      build ||= Spaceship::TestFlight::Build.latest(app_id: app.apple_id, platform: fetch_app_platform)
+      if build.nil?
+        UI.user_error!("No build to distribute!")
       end
 
       if should_update_build_information(options)
