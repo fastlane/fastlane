@@ -159,4 +159,17 @@ describe Spaceship::TestFlight::Client do
       expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
     end
   end
+
+  ##
+  # @!group TestInfo
+  ##
+
+  context '#put_testinfo' do
+    let(:testinfo) { double('TestInfo', to_json: '')}
+    it 'executes the request' do
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo') { }
+      subject.put_testinfo(app_id: app_id, testinfo: testinfo)
+      expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo')
+    end
+  end
 end
