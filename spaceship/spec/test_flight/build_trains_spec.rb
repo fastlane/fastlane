@@ -2,48 +2,40 @@ require 'spec_helper'
 require_relative '../mock_servers'
 
 describe Spaceship::TestFlight::BuildTrains do
+  let(:mock_client) { double('MockClient') }
   before do
-    Spaceship::TestFlight::Base.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
-    MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains') do
-      {
-        data: ['1.0', '1.1'],
-        error: nil
-      }
+    Spaceship::TestFlight::Base.client = mock_client
+    mock_client_response(:get_build_trains, with: { app_id: 'some-app-id', platform: 'ios' }) do
+      ['1.0', '1.1']
     end
-    MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.0/builds') do
-      {
-        data: [
-          {
-            id: 1,
-            appAdamId: 10,
-            trainVersion: '1.0',
-            uploadDate: '2017-01-01T12:00:00.000+0000',
-            externalState: 'testflight.build.state.export.compliance.missing',
-          }
-        ],
-        error: nil
-      }
+    mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.0')) do
+      [
+        {
+          id: 1,
+          appAdamId: 10,
+          trainVersion: '1.0',
+          uploadDate: '2017-01-01T12:00:00.000+0000',
+          externalState: 'testflight.build.state.export.compliance.missing',
+        }
+      ]
     end
-    MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/platforms/ios/trains/1.1/builds') do
-      {
-        data: [
-          {
-            id: 2,
-            appAdamId: 10,
-            trainVersion: '1.1',
-            uploadDate: '2017-01-02T12:00:00.000+0000',
-            externalState: 'testflight.build.state.submit.ready',
-          },
-          {
-            id: 3,
-            appAdamId: 10,
-            trainVersion: '1.1',
-            uploadDate: '2017-01-03T12:00:00.000+0000',
-            externalState: 'testflight.build.state.processing',
-          }
-        ],
-        error: nil
-      }
+    mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.1')) do
+      [
+        {
+          id: 2,
+          appAdamId: 10,
+          trainVersion: '1.1',
+          uploadDate: '2017-01-02T12:00:00.000+0000',
+          externalState: 'testflight.build.state.submit.ready',
+        },
+        {
+          id: 3,
+          appAdamId: 10,
+          trainVersion: '1.1',
+          uploadDate: '2017-01-03T12:00:00.000+0000',
+          externalState: 'testflight.build.state.processing',
+        }
+      ]
     end
   end
 
