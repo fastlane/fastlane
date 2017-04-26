@@ -67,7 +67,7 @@ module Spaceship::TestFlight
     BUILD_STATES = {
       processing: 'testflight.build.state.processing',
       active: 'testflight.build.state.testing.active',
-      ready: 'testflight.build.state.submit.ready',
+      ready: 'testflight.build.state.testing.ready',
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
@@ -166,6 +166,7 @@ module Spaceship::TestFlight
     end
 
     def submit_for_testflight_review!
+      return if ready_to_submit?
       client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
     end
 
