@@ -158,7 +158,7 @@ module Spaceship::TestFlight
     end
 
     ##
-    # @!group Testinfo
+    # @!group TestInfo
     ##
 
     def put_testinfo(app_id: nil, testinfo: nil)
