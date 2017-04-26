@@ -1,5 +1,17 @@
 skip_docs
 
+class DemoReceiver
+  def event_receiver(evnt)
+    puts "EVNT: #{evnt.inspect}"
+  end
+end
+
+lane :pubsub do
+  d = DemoReceiver.new
+  Fastlane::PluginEventManager.subscribe(d)
+  Fastlane::PluginEventManager.publish("category", {payload: 123})
+end
+
 desc "Runs the unit tests and other verifications for the fastlane repo"
 lane :test do |options|
   validate_repo
