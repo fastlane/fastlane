@@ -10,17 +10,15 @@ module Fastlane
   class PluginEventManager
     attr_accessor :all_subscribers
     def self.all_subscribers
-      @all_subscribers ||= []
+        @all_subscribers ||= []
     end
-
     def self.subscribe(listener)
-      all_subscribers << listener
+        all_subscribers << listener
     end
-
-    def self.publish(event)
-      all_subscribers.each do |subscriber|
+    def self.publish(category, payload)
+      all_subscribers.each do | subscriber |
         if subscriber.respond_to? "event_receiver"
-          subscriber.event_receiver(event)
+          subscriber.event_receiver(PluginEvent.new(category, payload))
         end
       end
     end
