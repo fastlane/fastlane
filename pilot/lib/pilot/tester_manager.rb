@@ -92,23 +92,21 @@ module Pilot
     end
 
     def find_or_create_tester(email: nil, first_name: nil, last_name: nil)
-      begin
-        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+      tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
-        if tester
-          UI.success("Existing tester #{tester.email}")
-        else
-          tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
-                                                              first_name: config[:first_name],
-                                                              last_name: config[:last_name])
-          UI.success("Successfully added tester: #{tester.email} to your account")
-        end
-        return tester
-      rescue => ex
-        UI.error("Could not create tester #{config[:email]}")
-        raise ex
+      if tester
+        UI.success("Existing tester #{tester.email}")
+      else
+        tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
+                                                            first_name: config[:first_name],
+                                                            last_name: config[:last_name])
+        UI.success("Successfully added tester: #{tester.email} to your account")
       end
+      return tester
+    rescue => ex
+      UI.error("Could not create tester #{config[:email]}")
+      raise ex
     end
 
     def perform_for_groups_in_app(app: nil, groups: nil, &block)
