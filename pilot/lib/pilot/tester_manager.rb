@@ -14,7 +14,7 @@ module Pilot
 
       begin
         groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-        if tester.is_a?(Spaceship::Tunes::Tester::Internal)
+        if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
           UI.success("Successfully added tester to app #{app.name}")
         else
           group_names = groups.map(&:name).join(", ")
@@ -54,7 +54,7 @@ module Pilot
       begin
         # If no groups are passed to options, remove the tester from the app-level,
         # otherwise remove the tester from the groups specified.
-        if config[:groups].nil? && tester.is_a?(Spaceship::Tunes::Tester::External)
+        if config[:groups].nil? && tester.kind_of?(Spaceship::Tunes::Tester::External)
           test_flight_tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: tester.email)
           test_flight_tester.remove_from_app!(app_id: app.apple_id)
           UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app.name}")
@@ -130,7 +130,7 @@ module Pilot
     end
 
     def add_tester_to_groups!(tester: nil, app: nil, groups: nil)
-      if tester.is_a?(Spaceship::Tunes::Tester::Internal)
+      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
         Spaceship::TestFlight::Group.internal_group(app_id: app.apple_id).add_tester!(tester)
       else
         perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
@@ -138,7 +138,7 @@ module Pilot
     end
 
     def remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      if tester.is_a?(Spaceship::Tunes::Tester::Internal)
+      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
         Spaceship::TestFlight::Group.internal_group(app_id: app.apple_id).remove_tester!(tester)
       else
         perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
