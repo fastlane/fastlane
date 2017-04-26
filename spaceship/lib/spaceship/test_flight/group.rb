@@ -3,12 +3,14 @@ module Spaceship::TestFlight
     attr_accessor :id
     attr_accessor :name
     attr_accessor :is_default_external_group
+    attr_accessor :is_internal_group
 
     attr_accessor :app_id
 
     attr_mapping({
       'id' => :id,
       'name' => :name,
+      'isInternalGroup' => :is_internal_group,
       'isDefaultExternalGroup' => :is_default_external_group
     })
 
@@ -36,6 +38,11 @@ module Spaceship::TestFlight
       groups.select(&block)
     end
 
+    def self.internal_group(app_id: nil)
+      groups = self.all(app_id: app_id)
+      groups.find(&:internal_group?)
+    end
+
     # First we need to add the tester to the app
     # It's ok if the tester already exists, we just have to do this... don't ask
     # This will enable testing for the tester for a given app, as just creating the tester on an account-level
@@ -43,9 +50,9 @@ module Spaceship::TestFlight
     # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
     def add_tester!(tester)
       # This post request makes the account-level tester available to the app
-      client.post_tester(app_id: self.app_id, tester: tester)
+      tester_data = client.post_tester(app_id: self.app_id, tester: tester)
       # This put request adds the tester to the group
-      client.put_tester_to_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
+      client.put_tester_to_group(group_id: self.id, tester_id: tester_data['id'], app_id: self.app_id)
     end
 
     def remove_tester!(tester)
@@ -54,6 +61,10 @@ module Spaceship::TestFlight
 
     def default_external_group?
       is_default_external_group
+    end
+
+    def internal_group?
+      is_internal_group
     end
   end
 end
