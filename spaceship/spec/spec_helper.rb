@@ -70,10 +70,14 @@ end
 
 RSpec.configure do |config|
 
-  def mock_client_response(method_name, &block)
-    hash = block.call
-    hash = JSON.load(hash.to_json)
-    allow(mock_client).to receive(method_name).and_return(hash)
+  def mock_client_response(method_name, with: anything)
+    mock_method = allow(mock_client).to receive(method_name)
+    mock_method = mock_method.with(with)
+    if block_given?
+      mock_method.and_return(JSON.load(yield.to_json))
+    else
+      mock_method
+    end
   end
 
 end

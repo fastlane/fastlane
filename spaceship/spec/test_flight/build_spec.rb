@@ -2,15 +2,16 @@ require 'spec_helper'
 require_relative '../mock_servers'
 
 describe Spaceship::TestFlight::Build do
+  let(:mock_client) { double('MockClient') }
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Base.client = Spaceship::TestFlight::Client.new(current_team_id: 1)
+    Spaceship::TestFlight::Base.client = mock_client
   end
 
   context '.find' do
     it 'finds a build by a build_id' do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
+      mock_client_response(:get_build) do
         {
           id: 456,
           bundleId: 'com.foo.bar',
@@ -25,9 +26,7 @@ describe Spaceship::TestFlight::Build do
     end
 
     it 'returns raises when the build cannot be found' do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
-        halt 404
-      end
+      mock_client_response(:get_build).and_raise(Spaceship::Client::UnexpectedResponse)
 
       expect {
         Spaceship::TestFlight::Build.find(app_id: 123, build_id: 456)
@@ -37,46 +36,39 @@ describe Spaceship::TestFlight::Build do
 
   context 'collections' do
     before do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains') do
-        {
-          data: ['1.0', '1.1'],
-          error: nil
-        }
+      mock_client_response(:get_build_trains) do
+        ['1.0', '1.1']
       end
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains/1.0/builds') do
-        {
-          data: [
-            {
-              id: 1,
-              appAdamId: 10,
-              trainVersion: '1.0',
-              uploadDate: '2017-01-01T12:00:00.000+0000',
-              externalState: 'testflight.build.state.export.compliance.missing',
-            }
-          ],
-          error: nil
-        }
+
+      mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.0')) do
+        [
+          {
+            id: 1,
+            appAdamId: 10,
+            trainVersion: '1.0',
+            uploadDate: '2017-01-01T12:00:00.000+0000',
+            externalState: 'testflight.build.state.export.compliance.missing',
+          }
+        ]
       end
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/10/platforms/ios/trains/1.1/builds') do
-        {
-          data: [
-            {
-              id: 2,
-              appAdamId: 10,
-              trainVersion: '1.1',
-              uploadDate: '2017-01-02T12:00:00.000+0000',
-              externalState: 'testflight.build.state.submit.ready',
-            },
-            {
-              id: 3,
-              appAdamId: 10,
-              trainVersion: '1.1',
-              uploadDate: '2017-01-03T12:00:00.000+0000',
-              externalState: 'testflight.build.state.processing',
-            }
-          ],
-          error: nil
-        }
+
+      mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.1')) do
+        [
+          {
+            id: 2,
+            appAdamId: 10,
+            trainVersion: '1.1',
+            uploadDate: '2017-01-02T12:00:00.000+0000',
+            externalState: 'testflight.build.state.submit.ready',
+          },
+          {
+            id: 3,
+            appAdamId: 10,
+            trainVersion: '1.1',
+            uploadDate: '2017-01-03T12:00:00.000+0000',
+            externalState: 'testflight.build.state.processing',
+          }
+        ]
       end
     end
 
@@ -115,11 +107,23 @@ describe Spaceship::TestFlight::Build do
 
   context 'instances' do
     let(:build) { Spaceship::TestFlight::Build.find(app_id: 'some-app-id', build_id: 'some-build-id')  }
+
     before do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
+      mock_client_response(:get_build) do
         {
-          id: 'some-build-id',
+          id: 1,
+          bundleId: 'some-bundle-id',
           appAdamId: 'some-app-id',
+          uploadDate: '2017-01-01T12:00:00.000+0000',
+          betaReviewInfo: {
+            contactFirstName: 'Dev',
+            contactLastName: 'Toolio',
+            contactEmail: 'dev-toolio@fabric.io'
+          },
+          exportCompliance: {
+            usesEncryption: true,
+            encryptionUpdated: false,
+          },
           testInfo: [
             {
               locale: 'en-US',
@@ -127,7 +131,7 @@ describe Spaceship::TestFlight::Build do
               feedbackEmail: 'email@example.com',
               whatsNew: 'this is new!',
             }
-          ]
+          ],
         }
       end
     end
@@ -136,14 +140,14 @@ describe Spaceship::TestFlight::Build do
       build = Spaceship::TestFlight::Build.new
       build.id = 1
       build.app_id = 2
-      expect(build.client).to receive(:get_build).with(app_id: 2, build_id: 1).and_return({'bundleId' => 'reloaded'})
-      build.reload
-      expect(build.bundle_id).to eq('reloaded')
+      expect {
+        build.reload
+      }.to change(build, :bundle_id).from(nil).to('some-bundle-id')
     end
 
     context '#ready_to_submit?' do
       it 'is ready to submit' do
-        MockAPI::TestFlightServer.get('/testflight/v2/providers/:team_id/apps/:app_id/builds/:build_id') do
+        mock_client_response(:get_build) do
           {
             'externalState': 'testflight.build.state.submit.ready'
           }
@@ -154,31 +158,29 @@ describe Spaceship::TestFlight::Build do
 
     context '#upload_date' do
       it 'parses the string value' do
-        expect(build.upload_date).to be_instance_of(Time)
+        expect(build.upload_date).to eq(Time.utc(2017,1,1,12))
       end
     end
 
     context 'lazy loading attribute' do
+      let(:build) { Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1) }
       it 'loads TestInfo' do
-        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
-        expect(build).to receive(:reload).once
+        expect(build).to receive(:reload).once.and_call_original
         expect(build.test_info).to be_instance_of(Spaceship::TestFlight::TestInfo)
       end
       it 'loads BetaReviewInfo' do
-        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
-        expect(build).to receive(:reload).once
-        expect(build.test_info).to be_instance_of(Spaceship::TestFlight::BetaReviewInfo)
+        expect(build).to receive(:reload).once.and_call_original
+        expect(build.beta_review_info).to be_instance_of(Spaceship::TestFlight::BetaReviewInfo)
       end
       it 'loads ExportCompliance' do
-        build = Spaceship::TestFlight::Build.new('bundleId' => 1, 'appAdamId' => 1)
-        expect(build).to receive(:reload).once
-        expect(build.test_info).to be_instance_of(Spaceship::TestFlight::ExportCompliance)
+        expect(build).to receive(:reload).once.and_call_original
+        expect(build.export_compliance).to be_instance_of(Spaceship::TestFlight::ExportCompliance)
       end
     end
 
     context '#save!' do
       it 'saves via the client' do
-        expect(build.client).to receive(:put_build).with(app_id: 'some-app-id', build_id: 'some-build-id', build: instance_of(Spaceship::TestFlight::Build))
+        expect(build.client).to receive(:put_build).with(app_id: 'some-app-id', build_id: 1, build: instance_of(Spaceship::TestFlight::Build))
         build.test_info.whats_new = 'changes!'
         build.save!
       end

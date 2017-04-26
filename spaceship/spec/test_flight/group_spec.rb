@@ -5,7 +5,7 @@ describe Spaceship::TestFlight::Group do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Group.stub(:client).and_return(mock_client)
+    Spaceship::TestFlight::Group.client = mock_client
   end
 
   context 'attr_mapping' do
