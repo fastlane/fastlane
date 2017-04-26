@@ -1,7 +1,7 @@
 require "fastlane_core"
 require "pilot/tester_util"
 require 'terminal-table'
-
+require 'dotenv'; Dotenv.load
 module Pilot
   class TesterManager < Manager
     def add_tester(options)
@@ -15,8 +15,8 @@ module Pilot
       end
 
       begin
-        tester = Spaceship::Tunes::Tester::External.find(config[:email])
-        tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
+        tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
+        tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
 
         if tester
           UI.success("Existing tester #{tester.email}")
@@ -33,8 +33,12 @@ module Pilot
 
       begin
         groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-        group_names = groups.map(&:name).join(", ")
-        UI.success("Successfully added tester to app #{app_filter} in group(s) #{group_names}")
+        if tester.is_a?(Spaceship::Tunes::Tester::Internal)
+          UI.success("Successfully added tester to app #{app_filter}")
+        else
+          group_names = groups.map(&:name).join(", ")
+          UI.success("Successfully added tester to app #{app_filter} in group(s) #{group_names}")
+        end
       rescue => ex
         UI.error("Could not add #{tester.email} to app: #{app.name}")
         raise ex
