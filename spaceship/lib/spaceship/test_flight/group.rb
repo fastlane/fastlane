@@ -48,18 +48,18 @@ module Spaceship::TestFlight
     # This will enable testing for the tester for a given app, as just creating the tester on an account-level
     # is not enough to add the tester to a group. If this isn't done the next request would fail.
     # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
-    def self.add_tester!(tester)
+    def add_tester!(tester)
       # This post request makes the account-level tester available to the app
       tester_data = client.post_tester(app_id: self.app_id, tester: tester)
       # This put request adds the tester to the group
       client.put_tester_to_group(group_id: self.id, tester_id: tester_data['id'], app_id: self.app_id)
     end
 
-    def self.remove_tester!(tester)
+    def remove_tester!(tester)
       client.delete_tester_from_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
     end
 
-    def add_tester_to_groups!(tester: nil, app: nil, groups: nil)
+    def self.add_tester_to_groups!(tester: nil, app: nil, groups: nil)
       if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
         self.internal_group(app_id: app.apple_id).add_tester!(tester)
       else
@@ -67,7 +67,7 @@ module Spaceship::TestFlight
       end
     end
 
-    def remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
+    def self.remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
       if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
         self.internal_group(app_id: app.apple_id).remove_tester!(tester)
       else
@@ -83,26 +83,22 @@ module Spaceship::TestFlight
       is_internal_group
     end
 
-    class << self
-      private
-
-      def perform_for_groups_in_app(app: nil, groups: nil, &block)
-        if groups.nil?
-          default_external_group = app.default_external_group
-          if default_external_group.nil?
-            UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
-          end
-          test_flight_groups = [default_external_group]
-        else
-          test_flight_groups = self.filter_groups(app_id: app.apple_id) do |group|
-            groups.include?(group.name)
-          end
-
-          UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
+    def self.perform_for_groups_in_app(app: nil, groups: nil, &block)
+      if groups.nil?
+        default_external_group = app.default_external_group
+        if default_external_group.nil?
+          UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
+        end
+        test_flight_groups = [default_external_group]
+      else
+        test_flight_groups = self.filter_groups(app_id: app.apple_id) do |group|
+          groups.include?(group.name)
         end
 
-        test_flight_groups.each(&block)
+        UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
       end
+
+      test_flight_groups.each(&block)
     end
   end
 end
