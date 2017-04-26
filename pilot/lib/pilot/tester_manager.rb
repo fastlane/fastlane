@@ -1,7 +1,7 @@
 require "fastlane_core"
 require "pilot/tester_util"
 require 'terminal-table'
-
+require 'dotenv'; Dotenv.load
 module Pilot
   class TesterManager < Manager
     def add_tester(options)
@@ -15,10 +15,10 @@ module Pilot
       begin
         groups = add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
         if tester.is_a?(Spaceship::Tunes::Tester::Internal)
-          UI.success("Successfully added tester to app #{app_filter}")
+          UI.success("Successfully added tester to app #{app.name}")
         else
           group_names = groups.map(&:name).join(", ")
-          UI.success("Successfully added tester to app #{app_filter} in group(s) #{group_names}")
+          UI.success("Successfully added tester to app #{app.name} in group(s) #{group_names}")
         end
       rescue => ex
         UI.error("Could not add #{tester.email} to app: #{app.name}")
@@ -57,11 +57,11 @@ module Pilot
         if config[:groups].nil? && tester.is_a?(Spaceship::Tunes::Tester::External)
           test_flight_tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: tester.email)
           test_flight_tester.remove_from_app!(app_id: app.apple_id)
-          UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app_filter}")
+          UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app.name}")
         else
           groups = remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
           group_names = groups.map(&:name).join(", ")
-          UI.success("Successfully removed tester #{tester.email} from app #{app_filter} in group(s) #{group_names}")
+          UI.success("Successfully removed tester #{tester.email} from app #{app.name} in group(s) #{group_names}")
         end
       rescue => ex
         UI.error("Could not remove #{tester.email} from app: #{ex}")
