@@ -80,7 +80,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#get_build' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') { }
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') {}
       subject.get_build(app_id: app_id, build_id: 1)
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1')
     end
@@ -89,7 +89,7 @@ describe Spaceship::TestFlight::Client do
   context '#put_build' do
     let(:build) { double('Build', to_json: "") }
     it 'executes the request' do
-      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') { }
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1') {}
       subject.put_build(app_id: app_id, build_id: 1, build: build)
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1')
     end
@@ -101,7 +101,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#get_groups' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') { }
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') {}
       subject.get_groups(app_id: app_id)
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups')
     end
@@ -109,7 +109,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#add_group_to_build' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id') { }
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id') {}
       subject.add_group_to_build(app_id: app_id, group_id: 'fake-group-id', build_id: 'fake-build-id')
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id')
     end
@@ -121,7 +121,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#testers_for_app' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') { }
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
       subject.testers_for_app(app_id: app_id)
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
     end
@@ -129,7 +129,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#delete_tester_from_app' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id') { }
+      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id') {}
       subject.delete_tester_from_app(app_id: app_id, tester_id: 'fake-tester-id')
       expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id')
     end
@@ -138,7 +138,7 @@ describe Spaceship::TestFlight::Client do
   context '#post_tester' do
     let(:tester) { double('Tester', email: 'fake@email.com', first_name: 'Fake', last_name: 'Name') }
     it 'executes the request' do
-      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') { }
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
       subject.post_tester(app_id: app_id, tester: tester)
       expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
     end
@@ -146,7 +146,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#put_tester_to_group' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') { }
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') {}
       subject.put_tester_to_group(app_id: app_id, tester_id: 'fake-tester-id', group_id: 'fake-group-id')
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
     end
@@ -154,7 +154,7 @@ describe Spaceship::TestFlight::Client do
 
   context '#delete_tester_from_group' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') { }
+      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') {}
       subject.delete_tester_from_group(app_id: app_id, tester_id: 'fake-tester-id', group_id: 'fake-group-id')
       expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
     end
@@ -165,9 +165,9 @@ describe Spaceship::TestFlight::Client do
   ##
 
   context '#put_testinfo' do
-    let(:testinfo) { double('TestInfo', to_json: '')}
+    let(:testinfo) { double('TestInfo', to_json: '') }
     it 'executes the request' do
-      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo') { }
+      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo') {}
       subject.put_testinfo(app_id: app_id, testinfo: testinfo)
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo')
     end

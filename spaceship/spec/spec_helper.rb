@@ -69,7 +69,6 @@ def after_each_spaceship
 end
 
 RSpec.configure do |config|
-
   def mock_client_response(method_name, with: anything)
     mock_method = allow(mock_client).to receive(method_name)
     mock_method = mock_method.with(with)
@@ -79,5 +78,4 @@ RSpec.configure do |config|
       mock_method
     end
   end
-
 end
