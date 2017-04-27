@@ -73,7 +73,7 @@ RSpec.configure do |config|
     mock_method = allow(mock_client).to receive(method_name)
     mock_method = mock_method.with(with)
     if block_given?
-      mock_method.and_return(JSON.load(yield.to_json))
+      mock_method.and_return(JSON.parse(yield.to_json))
     else
       mock_method
     end

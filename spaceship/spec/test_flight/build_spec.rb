@@ -15,7 +15,7 @@ describe Spaceship::TestFlight::Build do
         {
           id: 456,
           bundleId: 'com.foo.bar',
-          trainVersion: '1.0',
+          trainVersion: '1.0'
         }
       end
 
@@ -28,9 +28,9 @@ describe Spaceship::TestFlight::Build do
     it 'returns raises when the build cannot be found' do
       mock_client_response(:get_build).and_raise(Spaceship::Client::UnexpectedResponse)
 
-      expect {
+      expect do
         Spaceship::TestFlight::Build.find(app_id: 123, build_id: 456)
-      }.to raise_error(Spaceship::Client::UnexpectedResponse)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse)
     end
   end
 
@@ -47,7 +47,7 @@ describe Spaceship::TestFlight::Build do
             appAdamId: 10,
             trainVersion: '1.0',
             uploadDate: '2017-01-01T12:00:00.000+0000',
-            externalState: 'testflight.build.state.export.compliance.missing',
+            externalState: 'testflight.build.state.export.compliance.missing'
           }
         ]
       end
@@ -59,14 +59,14 @@ describe Spaceship::TestFlight::Build do
             appAdamId: 10,
             trainVersion: '1.1',
             uploadDate: '2017-01-02T12:00:00.000+0000',
-            externalState: 'testflight.build.state.submit.ready',
+            externalState: 'testflight.build.state.submit.ready'
           },
           {
             id: 3,
             appAdamId: 10,
             trainVersion: '1.1',
             uploadDate: '2017-01-03T12:00:00.000+0000',
-            externalState: 'testflight.build.state.processing',
+            externalState: 'testflight.build.state.processing'
           }
         ]
       end
@@ -100,13 +100,13 @@ describe Spaceship::TestFlight::Build do
     context '.latest' do
       it 'returns the latest build across all build trains' do
         latest_build = Spaceship::TestFlight::Build.latest(app_id: 10, platform: 'ios')
-        expect(latest_build.upload_date).to eq(Time.utc(2017,1,3,12))
+        expect(latest_build.upload_date).to eq(Time.utc(2017, 1, 3, 12))
       end
     end
   end
 
   context 'instances' do
-    let(:build) { Spaceship::TestFlight::Build.find(app_id: 'some-app-id', build_id: 'some-build-id')  }
+    let(:build) { Spaceship::TestFlight::Build.find(app_id: 'some-app-id', build_id: 'some-build-id') }
 
     before do
       mock_client_response(:get_build) do
@@ -122,16 +122,16 @@ describe Spaceship::TestFlight::Build do
           },
           exportCompliance: {
             usesEncryption: true,
-            encryptionUpdated: false,
+            encryptionUpdated: false
           },
           testInfo: [
             {
               locale: 'en-US',
               description: 'test info',
               feedbackEmail: 'email@example.com',
-              whatsNew: 'this is new!',
+              whatsNew: 'this is new!'
             }
-          ],
+          ]
         }
       end
     end
@@ -140,16 +140,16 @@ describe Spaceship::TestFlight::Build do
       build = Spaceship::TestFlight::Build.new
       build.id = 1
       build.app_id = 2
-      expect {
+      expect do
         build.reload
-      }.to change(build, :bundle_id).from(nil).to('some-bundle-id')
+      end.to change(build, :bundle_id).from(nil).to('some-bundle-id')
     end
 
     context 'submission state' do
       it 'is ready to submit' do
         mock_client_response(:get_build) do
           {
-            'externalState': 'testflight.build.state.submit.ready'
+            'externalState' => 'testflight.build.state.submit.ready'
           }
         end
         expect(build).to be_ready_to_submit
@@ -158,7 +158,7 @@ describe Spaceship::TestFlight::Build do
       it 'is ready to test' do
         mock_client_response(:get_build) do
           {
-            'externalState': 'testflight.build.state.testing.ready'
+            'externalState' => 'testflight.build.state.testing.ready'
           }
         end
         expect(build).to be_ready_to_test
@@ -167,7 +167,7 @@ describe Spaceship::TestFlight::Build do
       it 'is active' do
         mock_client_response(:get_build) do
           {
-            'externalState': 'testflight.build.state.testing.active'
+            'externalState' => 'testflight.build.state.testing.active'
           }
         end
         expect(build).to be_active
@@ -176,7 +176,7 @@ describe Spaceship::TestFlight::Build do
       it 'is processing' do
         mock_client_response(:get_build) do
           {
-            'externalState': 'testflight.build.state.processing'
+            'externalState' => 'testflight.build.state.processing'
           }
         end
         expect(build).to be_processing
@@ -185,7 +185,7 @@ describe Spaceship::TestFlight::Build do
       it 'is has missing export compliance' do
         mock_client_response(:get_build) do
           {
-            'externalState': 'testflight.build.state.export.compliance.missing'
+            'externalState' => 'testflight.build.state.export.compliance.missing'
           }
         end
         expect(build).to be_export_compliance_missing
@@ -194,7 +194,7 @@ describe Spaceship::TestFlight::Build do
 
     context '#upload_date' do
       it 'parses the string value' do
-        expect(build.upload_date).to eq(Time.utc(2017,1,1,12))
+        expect(build.upload_date).to eq(Time.utc(2017, 1, 1, 12))
       end
     end
 
