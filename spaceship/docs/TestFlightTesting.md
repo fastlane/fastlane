@@ -9,40 +9,61 @@ To run the tests, in your terminal run:
 bundle exec rspec spaceship/spec
 ```
 
+## Overview
+
+Spaceship wraps various APIs using the following pattern:
+
+A simple `client` and various data models, usually suclassed from a `Base` model (e.g. Spaceship::TestFlight::Base)
+The `client` is responsible for making HTTP requests for a given API or domain. It should be very simple and have no logic.
+It is only responsible for creating the request and parsing the response. The best practice is for each method to have a single request and return the data from the response.
+
+The data models generally map to a REST resource or some logical grouping of data. Each data model has an instance of `client` which it can use to put or get data. It should encapsulate all interactions with the API, so other _fastlane_ tools interface with the data models, and not the `client` directly.
+
+
 ## Adding Tests
 ### Models
+
+Since the data models expect the client to return JSON data as a Ruby hash, we can reasonably mock the client response using RSpec doubles. We should *not* rely on HTTP fixtures because they are brittle, introduce global state, are not easily decomposable and are difficult to maintain. Instead, use the helper method `mock_client_response` to set up the expected data returned by the API. This design also leads the client to be as thin and logic-free as possible.
+
+Defining the response near the test site makes it easy to understand and maintain. Try not to include any more data than is necessary for the spec to pass.
+
 **Examples:**
 
-Mocked responses:
+At the top of your data model, set the client to be a `mock_client`:
 
+```ruby
+describe Spaceship::TestFlight::Tester do
+  let(:mock_client) { double('MockClient') }
+  before do
+    Spaceship::TestFlight::Base.client = mock_client
+  end
+end
 ```
-mock_client_response(:get_build) do
-  {
-	id: 1,
-	bundleId: 'some-bundle-id',
-	appAdamId: 'some-app-id',
-	uploadDate: '2017-01-01T12:00:00.000+0000',
-	betaReviewInfo: {
-	  contactFirstName: 'Dev',
-	  contactLastName: 'Toolio',
-	  contactEmail: 'dev-toolio@fabric.io'
-	},
-	exportCompliance: {
-	  usesEncryption: true,
-	  encryptionUpdated: false
-	},
-	testInfo: [
-	  {
-	    locale: 'en-US',
-	    description: 'test info',
-	    feedbackEmail: 'email@example.com',
-	    whatsNew: 'this is new!'
-	  }
-	]
-  }
+Now, anytime we use a data model that is a subclass of `Spaceship::TestFlight::Base`, it has a `client` that is our mock.
+
+We then configure the response for a given client method like this:
+
+```ruby
+before do
+  mock_client_response(:get_tester, with: { tester_id: 1 }) do
+    {
+      id: 1,
+      name: 'Mr. Tester'
+    }
+  end
 end
 ```
 
+The first parameter is the name of the method we are mocking, and `with:` parameter specifies some required parameter to that method. If you don't give it a `with:`, the mock will accept any parameter. The block is the return value of calling `client.get_tester`.
+
+Now we can test our data model method that uses the client:
+
+```ruby
+it 'finds the test by id' do
+  tester = Spaceship::TestFlight::Tester.find(1)
+  expect(tester.name).to eq('Mr. Tester')
+end
+```
 
 Collection methods:
 
@@ -66,9 +87,6 @@ context '#upload_date' do
   end
 end
 ```
-
-#### How model tests work
-`mock_client_response` takes a method symbol and a block that defines the minimum amount of data necessary to execute the test.
 
 ### Client
 **Examples:**
