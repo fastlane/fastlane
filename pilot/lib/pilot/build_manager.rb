@@ -37,10 +37,10 @@ module Pilot
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
 
-      distribute(options, latest_build)
+      distribute(options, build: latest_build)
     end
 
-    def distribute(options, build = nil)
+    def distribute(options, build: nil)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
