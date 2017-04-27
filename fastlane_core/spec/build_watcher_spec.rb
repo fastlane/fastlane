@@ -14,23 +14,16 @@ describe FastlaneCore::BuildWatcher do
   # Build#export_compliance_missing?
 
   context '.wait_for_build_processing_to_be_complete' do
-    let(:build) { double('Build', processing?: false, active?: true, train_version: '1.0', build_version: '2') }
-    it 'returns a processed build' do
-      # allow(Spaceship::TestFlight::Build).to receive(:all_processing_builds) do
-      #   [
-      #     double('Build', processing?: true),
-      #     double('Build', processing?: true),
-      #     double('Build', processing?: true)
-      #   ]
-      # end
-      # builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: 'fake-app-id', platform: :ios)
-      # require 'pry'; binding.pry
-      # puts ''
-      allow(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
-      allow(Spaceship::TestFlight::Build).to receive(:latest).and_return(build)
-      allow(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([build])
+    let(:build) { double('Build', processed?: true, active?: true, train_version: '1.0', build_version: '2') }
+    it 'returns an already-active build' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(build)
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([build])
 
-      build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, delay: 0)
+      expect(UI).to receive(:success).with('Build 1.0 - 2 is already being tested')
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, delay: 0)
+
+      expect(found_build).to eq(build)
     end
   end
 end
