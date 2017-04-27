@@ -24,7 +24,7 @@ describe FastlaneCore::BuildWatcher do
         train_version: '1.0',
         build_version: '0',
         upload_date: 0
-        )
+      )
     end
     let(:active_build) do
       double(
@@ -115,7 +115,7 @@ describe FastlaneCore::BuildWatcher do
 
       expect(UI).to receive(:message).with("Build doesn't show up in the build list any more, waiting for it to appear again")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
-      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)      
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
 
       expect(found_build).to eq(ready_build)
     end
@@ -147,7 +147,7 @@ describe FastlaneCore::BuildWatcher do
       expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
       expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(nil)
 
-      expect(UI).to receive(:crash!).with("Could not find a build for app: some-app-id on platform: #{:ios}").and_call_original
+      expect(UI).to receive(:crash!).with("Could not find a build for app: some-app-id on platform: ios").and_call_original
       expect { FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios) }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
     end
   end
