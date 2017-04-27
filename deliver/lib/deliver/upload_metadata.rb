@@ -15,6 +15,23 @@ module Deliver
                                 :primary_first_sub_category, :primary_second_sub_category,
                                 :secondary_first_sub_category, :secondary_second_sub_category]
 
+    # Trade Representative Contact Information values
+    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES = {
+        trade_representative_trade_name: :trade_name,
+        trade_representative_first_name: :first_name,
+        trade_representative_last_name: :last_name,
+        trade_representative_address_line_1: :adderss_line1,
+        trade_representative_address_line_2: :adderss_line2,
+        trade_representative_address_line_3: :adderss_line3,
+        trade_representative_city_name: :city_name,
+        trade_representative_state: :state,
+        trade_representative_country: :country,
+        trade_representative_postal_code: :postal_code,
+        trade_representative_phone_number: :phone_number,
+        trade_representative_email: :email_address,
+        trade_representative_is_displayed_on_app_store: :is_displayed_on_app_store
+    }
+
     # Review information values
     REVIEW_INFORMATION_VALUES = {
       review_first_name: :first_name,
@@ -31,6 +48,9 @@ module Deliver
 
     # Non localized app details values, that are editable in live state
     NON_LOCALISED_LIVE_VALUES = [:privacy_url]
+
+    # Directory name it contains trade representative contact information
+    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR = "trade_representative_contact_information"
 
     # Directory name it contains review information
     REVIEW_INFORMATION_DIR = "review_information"
