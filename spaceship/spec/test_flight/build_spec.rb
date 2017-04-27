@@ -156,6 +156,17 @@ describe Spaceship::TestFlight::Build do
       end
     end
 
+    context '#ready_to_test?' do
+      it 'is ready to test' do
+        mock_client_response(:get_build) do
+          {
+            'externalState': 'testflight.build.state.testing.ready'
+          }
+        end
+        expect(build).to be_ready_to_test
+      end
+    end
+
     context '#upload_date' do
       it 'parses the string value' do
         expect(build.upload_date).to eq(Time.utc(2017,1,1,12))
