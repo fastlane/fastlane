@@ -14,7 +14,7 @@ describe FastlaneCore::BuildWatcher do
   # Build#export_compliance_missing?
 
   context '.wait_for_build_processing_to_be_complete' do
-    let(:build) { double('Build', processing?: true, train_version: '1.0', build_version: '2') }
+    let(:build) { double('Build', processing?: false, active?: true, train_version: '1.0', build_version: '2') }
     it 'returns a processed build' do
       # allow(Spaceship::TestFlight::Build).to receive(:all_processing_builds) do
       #   [
@@ -30,9 +30,7 @@ describe FastlaneCore::BuildWatcher do
       allow(Spaceship::TestFlight::Build).to receive(:latest).and_return(build)
       allow(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([build])
 
-      build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
-      require 'pry'; binding.pry
-      puts ''
+      build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, delay: 0)
     end
   end
 end
