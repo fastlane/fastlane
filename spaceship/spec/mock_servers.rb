@@ -8,7 +8,6 @@ RSpec.configure do |config|
   end
 
   config.after do
-    # TODO[snatchev]: There might be a better way to reset the routes. Unforuntately, `Sinatra::Base.reset!` resets too much.
     MockAPI::TestFlightServer.instance_variable_set(:@routes, {})
   end
 end

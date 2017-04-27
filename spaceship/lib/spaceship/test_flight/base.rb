@@ -9,8 +9,6 @@ module Spaceship::TestFlight
     #
     # Essentially, we are making a class-inheritable-accessor as described here:
     # https://apidock.com/rails/v4.2.7/Class/class_attribute
-    #
-    # TODO[snatchev]: move this into spaceship/base.rb once all the tests pass
     def self.inherited(subclass)
       this_class = self
       subclass.define_singleton_method(:client) do
