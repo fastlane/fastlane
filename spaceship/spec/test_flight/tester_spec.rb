@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Spaceship::TestFlight::Tester do
-  let(:tester) { Spaceship::TestFlight::Tester.new }
   let(:mock_client) { double('MockClient') }
 
   before do
