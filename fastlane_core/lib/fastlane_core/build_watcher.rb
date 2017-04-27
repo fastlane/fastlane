@@ -3,14 +3,16 @@ module FastlaneCore
     # @return The build we waited for. This method will always return a build
     def self.wait_for_build_processing_to_be_complete(app_id: nil, platform: nil)
       # First, find the train and build version we want to watch for
-      watching_build = watching_build(app_id: app_id, platform: platform)
+      watched_build = watching_build(app_id: app_id, platform: platform)
 
       loop do
-        matching_build = matching_build(watching_build: watching_build, app_id: app_id, platform: platform)
+        matched_build = matching_build(watched_build: watched_build, app_id: app_id, platform: platform)
 
-        report_status(build: matching_build)
+        report_status(build: matched_build)
 
-        return matching_build if matching_build.processed?
+        if matched_build && matched_build.processed?
+          return matched_build
+        end
 
         sleep 10
       end
@@ -18,9 +20,16 @@ module FastlaneCore
 
     private
 
-    def self.matching_build(watching_build: nil, app_id: nil, platform: nil)
-      matching_builds = Spaceship::TestFlight::Build.builds_for_train(app_id: app_id, platform: platform, train_version: watching_build.train_version)
-      matching_build = matching_builds.find { |build| build.build_version == watching_build.build_version }
+    def self.watching_build(app_id: nil, platform: nil)
+      processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
+
+      watched_build = processing_builds.sort_by(&:upload_date).last
+      watched_build ||= Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)
+    end
+
+    def self.matching_build(watched_build: nil, app_id: nil, platform: nil)
+      matched_builds = Spaceship::TestFlight::Build.builds_for_train(app_id: app_id, platform: platform, train_version: watched_build.train_version)
+      matched_builds.find { |build| build.build_version == watched_build.build_version }
     end
 
     def self.report_status(build: nil)
@@ -36,15 +45,8 @@ module FastlaneCore
       elsif build.ready_to_submit? || build.export_compliance_missing?
         UI.success("Successfully finished processing the build #{build.train_version} - #{build.build_version}")
       else
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{watching_build.train_version} - #{watching_build.build_version})")
+        UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
       end
-    end
-
-    def self.watching_build(app_id: nil, platform: nil)
-      processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
-
-      watching_build = processing_builds.sort_by(&:upload_date).last
-      watching_build ||= Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)
     end
   end
 end

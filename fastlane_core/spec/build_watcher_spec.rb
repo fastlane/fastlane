@@ -1,29 +1,118 @@
 require 'spec_helper'
 
 describe FastlaneCore::BuildWatcher do
-
-  # methods that need mocking:
-  # Build.all_processing_builds
-  # Build.latest
-  # Build.builds_for_train
-  # Build#upload_date
-  # Build#train_version
-  # Build#build_version
-  # Build#active?
-  # Build#ready_to_submit?
-  # Build#export_compliance_missing?
-
   context '.wait_for_build_processing_to_be_complete' do
-    let(:build) { double('Build', processed?: true, active?: true, train_version: '1.0', build_version: '2') }
+    let(:processing_build) do
+      double(
+        'Processing Build',
+        processed?: false,
+        active?: false,
+        ready_to_submit?: false,
+        export_compliance_missing?: false,
+        train_version: '1.0',
+        build_version: '1',
+        upload_date: 1
+      )
+    end
+    let(:active_build) do
+      double(
+        'Active Build',
+        processed?: true,
+        active?: true,
+        ready_to_submit?: false,
+        export_compliance_missing?: false,
+        train_version: '1.0',
+        build_version: '1',
+        upload_date: 1
+      )
+    end
+    let(:ready_build) do
+      double(
+        'Ready Build',
+        processed?: true,
+        active?: false,
+        ready_to_submit?: true,
+        export_compliance_missing?: false,
+        train_version: '1.0',
+        build_version: '1',
+        upload_date: 1
+      )
+    end
+    let(:export_compliance_required_build) do
+      double(
+        'Export Compliance Required Build',
+        processed?: true,
+        active?: false,
+        ready_to_submit?: false,
+        export_compliance_missing?: true,
+        train_version: '1.0',
+        build_version: '1',
+        upload_date: 1
+      )
+    end
+
     it 'returns an already-active build' do
       expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
-      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(build)
-      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([build])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(active_build)
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([active_build])
 
-      expect(UI).to receive(:success).with('Build 1.0 - 2 is already being tested')
-      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, delay: 0)
+      expect(UI).to receive(:success).with("Build #{active_build.train_version} - #{active_build.build_version} is already being tested")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
 
-      expect(found_build).to eq(build)
+      expect(found_build).to eq(active_build)
     end
+
+    it 'returns a ready to submit build' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(ready_build)
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([ready_build])
+
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+
+      expect(found_build).to eq(ready_build)
+    end
+
+    it 'returns a export-compliance-missing build' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(export_compliance_required_build)
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([export_compliance_required_build])
+
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{export_compliance_required_build.train_version} - #{export_compliance_required_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+
+      expect(found_build).to eq(export_compliance_required_build)
+    end
+
+    it 'waits when a build is still processing' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build])
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([processing_build], [ready_build])
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(10)
+
+      expect(UI).to receive(:message).with("Waiting for iTunes Connect to finish processing the new build (#{ready_build.train_version} - #{ready_build.build_version})")
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+
+      expect(found_build).to eq(ready_build)
+    end
+
+    it 'waits when the build disappears' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build])
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([], [ready_build])
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(10)
+
+      expect(UI).to receive(:message).with("Build doesn't show up in the build list any more, waiting for it to appear again")
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)      
+
+      expect(found_build).to eq(ready_build)
+    end
+
+    it 'watches the latest build when more than one build is processing' do
+    end
+
+    it 'watches the latest build when no builds are processing' do
+    end
+
   end
 end
