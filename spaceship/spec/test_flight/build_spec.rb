@@ -145,7 +145,7 @@ describe Spaceship::TestFlight::Build do
       }.to change(build, :bundle_id).from(nil).to('some-bundle-id')
     end
 
-    context '#ready_to_submit?' do
+    context 'submission state' do
       it 'is ready to submit' do
         mock_client_response(:get_build) do
           {
@@ -154,9 +154,7 @@ describe Spaceship::TestFlight::Build do
         end
         expect(build).to be_ready_to_submit
       end
-    end
 
-    context '#ready_to_test?' do
       it 'is ready to test' do
         mock_client_response(:get_build) do
           {
@@ -164,6 +162,33 @@ describe Spaceship::TestFlight::Build do
           }
         end
         expect(build).to be_ready_to_test
+      end
+
+      it 'is active' do
+        mock_client_response(:get_build) do
+          {
+            'externalState': 'testflight.build.state.testing.active'
+          }
+        end
+        expect(build).to be_active
+      end
+
+      it 'is processing' do
+        mock_client_response(:get_build) do
+          {
+            'externalState': 'testflight.build.state.processing'
+          }
+        end
+        expect(build).to be_processing
+      end
+
+      it 'is has missing export compliance' do
+        mock_client_response(:get_build) do
+          {
+            'externalState': 'testflight.build.state.export.compliance.missing'
+          }
+        end
+        expect(build).to be_export_compliance_missing
       end
     end
 
