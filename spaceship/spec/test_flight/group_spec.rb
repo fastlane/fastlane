@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Spaceship::TestFlight::Group do
-  let(:group) { Spaceship::TestFlight::Group.new }
   let(:mock_client) { double('MockClient') }
 
   before do
