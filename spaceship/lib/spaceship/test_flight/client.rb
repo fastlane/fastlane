@@ -20,18 +20,16 @@ module Spaceship::TestFlight
     ##
 
     # Returns an array of all available build trains (not the builds they include)
-    def get_build_trains(app_id: nil, platform: nil)
+    def get_build_trains(app_id: nil, platform: "ios")
       assert_required_params(__method__, binding)
 
-      platform ||= "ios"
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: nil, train_version: nil)
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil)
       assert_required_params(__method__, binding)
 
-      platform ||= "ios"
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
       handle_response(response)
     end
