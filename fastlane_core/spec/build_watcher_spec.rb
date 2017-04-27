@@ -16,7 +16,7 @@ describe FastlaneCore::BuildWatcher do
     end
     let(:old_processing_build) do
       double(
-        'Processing Build',
+        'Old Processing Build',
         processed?: false,
         active?: false,
         ready_to_submit?: false,
