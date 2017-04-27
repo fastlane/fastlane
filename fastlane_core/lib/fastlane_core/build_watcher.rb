@@ -8,16 +8,9 @@ module FastlaneCore
       loop do
         UI.message("Waiting for iTunes Connect to finish processing the new build (#{watching_build.train_version} - #{watching_build.build_version})")
 
-        # Due to iTunes Connect, builds disappear from the build list alltogether
-        # after they finished processing. Before returning this build, we have to
-        # wait for the build to appear in the build list again
-        # As this method is very often used to wait for a build, and then do something
-        # with it, we have to be sure that the build actually is ready
+        matching_build = matching_build(watching_build: watching_build, app_id: app_id, platform: platform)
 
-        matching_builds = Spaceship::TestFlight::Build.builds_for_train(app_id: app_id, platform: platform, train_version: watching_build.train_version)
-        matching_build = matching_builds.find { |build| build.build_version == watching_build.build_version }
-
-        report_status(matching_build)
+        report_status(build: matching_build)
 
         return matching_build if processing_complete?(matching_build)
 
@@ -28,16 +21,23 @@ module FastlaneCore
     private
 
     def self.matching_build(watching_build: nil, app_id: nil, platform: nil)
+      matching_builds = Spaceship::TestFlight::Build.builds_for_train(app_id: app_id, platform: platform, train_version: watching_build.train_version)
+      matching_build = matching_builds.find { |build| build.build_version == watching_build.build_version }
     end
 
     def self.report_status(build: nil)
+      # Due to iTunes Connect, builds disappear from the build list alltogether
+      # after they finished processing. Before returning this build, we have to
+      # wait for the build to appear in the build list again
+      # As this method is very often used to wait for a build, and then do something
+      # with it, we have to be sure that the build actually is ready
       if matching_build.nil?
         UI.message("Build doesn't show up in the build list any more, waiting for it to appear again")
       elsif matching_build.active?
         UI.success("Build #{matching_build.train_version} - #{matching_build.build_version} is already being tested")
       elsif matching_build.ready_to_submit? || matching_build.export_compliance_missing?
         UI.success("Successfully finished processing the build #{matching_build.train_version} - #{matching_build.build_version}")
-      end      
+      end
     end
 
     def self.processing_complete?(build: nil)
@@ -48,7 +48,7 @@ module FastlaneCore
       processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
 
       watching_build = processing_builds.sort_by(&:upload_date).last
-      watching_build ||= Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)      
+      watching_build ||= Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)
     end
   end
 end
