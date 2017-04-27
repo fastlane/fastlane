@@ -4,6 +4,7 @@ module FastlaneCore
     def self.wait_for_build_processing_to_be_complete(app_id: nil, platform: nil)
       # First, find the train and build version we want to watch for
       watched_build = watching_build(app_id: app_id, platform: platform)
+      UI.crash!("Could not find a build for app: #{app_id} on platform: #{platform}") if watched_build.nil?
 
       loop do
         matched_build = matching_build(watched_build: watched_build, app_id: app_id, platform: platform)

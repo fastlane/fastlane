@@ -14,6 +14,18 @@ describe FastlaneCore::BuildWatcher do
         upload_date: 1
       )
     end
+    let(:old_processing_build) do
+      double(
+        'Processing Build',
+        processed?: false,
+        active?: false,
+        ready_to_submit?: false,
+        export_compliance_missing?: false,
+        train_version: '1.0',
+        build_version: '0',
+        upload_date: 0
+        )
+    end
     let(:active_build) do
       double(
         'Active Build',
@@ -109,10 +121,34 @@ describe FastlaneCore::BuildWatcher do
     end
 
     it 'watches the latest build when more than one build is processing' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build, old_processing_build])
+      # Mock `:builds_for_train` to return a build in the ready state because this will terminate the wait loop.
+      # Note that ready_build and processing_build have same build train and build number.
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([ready_build])
+
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+
+      expect(found_build).to eq(ready_build)
     end
 
     it 'watches the latest build when no builds are processing' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(ready_build)
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([ready_build])
+
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+
+      expect(found_build).to eq(ready_build)
     end
 
+    it 'crashes if it cannot find a build to watch' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(nil)
+
+      expect(UI).to receive(:crash!).with("Could not find a build for app: some-app-id on platform: #{:ios}").and_call_original
+      expect { FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios) }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
+    end
   end
 end
