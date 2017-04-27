@@ -99,7 +99,7 @@ describe FastlaneCore::BuildWatcher do
     it 'waits when a build is still processing' do
       expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build])
       expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([processing_build], [ready_build])
-      expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(10)
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep)
 
       expect(UI).to receive(:message).with("Waiting for iTunes Connect to finish processing the new build (#{ready_build.train_version} - #{ready_build.build_version})")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
