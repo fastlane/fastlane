@@ -65,7 +65,7 @@ module Fastlane
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
         if platform == :ios or platform.nil?
-          ipa_path_default = Dir["*.ipa"].last
+          ipa_path_default = Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last
         end
 
         if platform == :android
