@@ -56,12 +56,46 @@ module Spaceship::TestFlight
       client.delete_tester_from_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
     end
 
+    def self.add_tester_to_groups!(tester: nil, app: nil, groups: nil)
+      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
+        self.internal_group(app_id: app.apple_id).add_tester!(tester)
+      else
+        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
+      end
+    end
+
+    def self.remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
+      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
+        self.internal_group(app_id: app.apple_id).remove_tester!(tester)
+      else
+        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
+      end
+    end
+
     def default_external_group?
       is_default_external_group
     end
 
     def internal_group?
       is_internal_group
+    end
+
+    def self.perform_for_groups_in_app(app: nil, groups: nil, &block)
+      if groups.nil?
+        default_external_group = app.default_external_group
+        if default_external_group.nil?
+          UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
+        end
+        test_flight_groups = [default_external_group]
+      else
+        test_flight_groups = self.filter_groups(app_id: app.apple_id) do |group|
+          groups.include?(group.name)
+        end
+
+        UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
+      end
+
+      test_flight_groups.each(&block)
     end
   end
 end
