@@ -80,4 +80,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
+  spec.add_development_dependency 'sinatra', '~> 1.4.8'
 end

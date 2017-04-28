@@ -72,12 +72,12 @@ module Spaceship::TestFlight
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
-    # Find a Build by `build_id`. Returns `nil` if can't find it.
+    # Find a Build by `build_id`.
     #
     # @return (Spaceship::TestFlight::Build)
     def self.find(app_id: nil, build_id: nil)
       attrs = client.get_build(app_id: app_id, build_id: build_id)
-      self.new(attrs) if attrs
+      self.new(attrs)
     end
 
     def self.all(app_id: nil, platform: nil)
@@ -105,7 +105,7 @@ module Spaceship::TestFlight
     #
     # Note: this will overwrite any non-saved changes to the object
     #
-    # @return (Spaceceship::Base::DataHash) the raw_data of the build.
+    # @return (Spaceship::Base::DataHash) the raw_data of the build.
     def reload
       self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
     end
@@ -128,6 +128,10 @@ module Spaceship::TestFlight
 
     def export_compliance_missing?
       external_state == BUILD_STATES[:export_compliance_missing]
+    end
+
+    def self.processed?
+      active? || ready_to_submit? || export_compliance_missing?
     end
 
     # Getting builds from BuildTrains only gets a partial Build object
