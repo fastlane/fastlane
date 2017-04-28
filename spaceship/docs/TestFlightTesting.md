@@ -13,7 +13,7 @@ bundle exec rspec spaceship/spec
 
 Spaceship wraps various APIs using the following pattern:
 
-A simple `client` and various data models, usually suclassed from a `Base` model (e.g. Spaceship::TestFlight::Base)
+A simple `client` and various data models, usually subclassed from a `Base` model (e.g. Spaceship::TestFlight::Base)
 The `client` is responsible for making HTTP requests for a given API or domain. It should be very simple and have no logic.
 It is only responsible for creating the request and parsing the response. The best practice is for each method to have a single request and return the data from the response.
 
@@ -29,7 +29,7 @@ Defining the response near the test site makes it easy to understand and maintai
 
 **Examples:**
 
-At the top of your data model, set the client to be a `mock_client`:
+At the top of your data model spec, set the client to be a `mock_client`:
 
 ```ruby
 describe Spaceship::TestFlight::Tester do
@@ -41,7 +41,7 @@ end
 ```
 Now, anytime we use a data model that is a subclass of `Spaceship::TestFlight::Base`, it has a `client` that is our mock.
 
-We then configure the response for a given client method like this:
+We then configure the response for a given client method using the `mock_client_response` method defined in `spaceship/spec/spec_helper.rb` which can be required by `require 'spec_helper`. This method is defined within an RSpec configuration block:
 
 ```ruby
 before do
@@ -54,7 +54,7 @@ before do
 end
 ```
 
-The first parameter is the name of the method we are mocking, and `with:` parameter specifies some required parameter to that method. If you don't give it a `with:`, the mock will accept any parameter. The block is the return value of calling `client.get_tester`.
+The first parameter is the name of the method we are mocking, and `with:` parameter specifies required parameters to that method. If you don't give it a `with:`, the mock will accept any parameters. The block is the return value of calling `client.get_tester`.
 
 Now we can test our data model method that uses the client:
 
