@@ -221,5 +221,48 @@ describe Spaceship::TestFlight::Build do
         build.save!
       end
     end
+
+    RSpec::Matchers.define :same_test_info do |other_test_info|
+      match do |args|
+        args[:build].test_info.to_s == other_test_info.to_s
+      end
+    end
+
+    context '#update_build_information!' do
+      it 'updates description' do
+        updated_test_info = build.test_info.deep_copy
+        updated_test_info.description = 'a newer description'
+
+        expect(build.client).to receive(:put_build).with(same_test_info(updated_test_info))
+
+        build.update_build_information!(description: 'a newer description')
+      end
+
+      it 'updates feedback_email' do
+        updated_test_info = build.test_info.deep_copy
+        updated_test_info.feedback_email = 'new_email@example.com'
+
+        expect(build.client).to receive(:put_build).with(same_test_info(updated_test_info))
+
+        build.update_build_information!(feedback_email: 'new_email@example.com')
+      end
+
+      it 'updates whats_new' do
+        updated_test_info = build.test_info.deep_copy
+        updated_test_info.whats_new = 'this fixture data is new'
+
+        expect(build.client).to receive(:put_build).with(same_test_info(updated_test_info))
+
+        build.update_build_information!(whats_new: 'this fixture data is new')
+      end
+
+      it 'does nothing if nothing is passed' do
+        updated_test_info = build.test_info.deep_copy
+
+        expect(build.client).to receive(:put_build).with(same_test_info(updated_test_info))
+
+        build.update_build_information!
+      end
+    end
   end
 end

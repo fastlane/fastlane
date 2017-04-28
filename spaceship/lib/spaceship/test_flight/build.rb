@@ -168,9 +168,9 @@ module Spaceship::TestFlight
     end
 
     def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
-      test_info.description = description
-      test_info.feedback_email = feedback_email
-      test_info.whats_new = whats_new
+      test_info.description = description if description
+      test_info.feedback_email = feedback_email if feedback_email
+      test_info.whats_new = whats_new if whats_new
       save!
     end
 
