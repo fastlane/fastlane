@@ -86,7 +86,7 @@ describe Snapshot::ResetSimulators do
       it 'calls out to simctl pair' do
         expected_command = "xcrun simctl pair C8250DD7-8C4E-4803-838A-731B42785262 0311D4EC-14E7-443B-9F27-F32E72342799"
 
-        # By checking against all_devices, we expect those which are in an unusuable state
+        # By checking against all_devices, we expect those which are in an unusable state
         # NOT to be selected!
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(all_devices)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)

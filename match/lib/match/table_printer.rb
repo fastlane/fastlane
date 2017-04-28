@@ -33,7 +33,7 @@ module Match
       end
 
       params = {}
-      params[:rows] = rows
+      params[:rows] = FastlaneCore::PrintTable.transform_output(rows)
       params[:title] = "Installed Provisioning Profile".green
       params[:headings] = ['Parameter', 'Environment Variable', 'Value']
 

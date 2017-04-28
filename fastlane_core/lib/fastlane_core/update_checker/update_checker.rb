@@ -59,7 +59,7 @@ module FastlaneCore
       else
         puts "# An update for #{gem_name} is available. You are on #{current_version}.".green
       end
-      puts "# It is recommended to use the latest version.".green
+      puts "# You should use the latest version.".green
       puts "# Please update using `#{self.update_command(gem_name: gem_name)}`.".green
 
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")

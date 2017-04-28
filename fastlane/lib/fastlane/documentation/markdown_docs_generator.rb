@@ -94,7 +94,7 @@ module Fastlane
         conn = Faraday.new(ENHANCER_URL)
         conn.basic_auth(ENV["ENHANCER_USER"], ENV["ENHANCER_PASSWORD"])
         begin
-          @launches = JSON.parse(conn.get('/index.json').body)
+          @launches = JSON.parse(conn.get('/index.json?minimum_launches=0').body)
         rescue
           UI.user_error!("Couldn't fetch usage data, make sure to have ENHANCER_USER and ENHANCER_PASSWORD")
         end

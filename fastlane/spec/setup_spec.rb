@@ -21,7 +21,7 @@ describe Fastlane do
         ENV['DELIVER_USER'] = 'felix@sunapps.net'
       end
 
-      it "setup is successful and generated inital Fastfile" do
+      it "setup is successful and generated initial Fastfile" do
         expect(FastlaneCore::UI).to receive(:input).and_return("y") # iOS project, yeah
 
         require 'produce'

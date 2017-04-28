@@ -32,7 +32,7 @@ module Spaceship
       PENDING_DEVELOPER_RELEASE = "Pending Developer Release"
       PROCESSING_FOR_APP_STORE = "Processing for App Store"
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
-      # METADATA_REJECTED = "Metadata Rejected"
+      METADATA_REJECTED = "Metadata Rejected"
       # REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
 
@@ -46,7 +46,9 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
-          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE
+          'rejected' => REJECTED,
+          'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
+          'metadataRejected' => METADATA_REJECTED
         }
 
         mapping.each do |k, v|

@@ -149,7 +149,8 @@ module Fastlane
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values")
+      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values")
       puts ""
 
       unless self.itc_ref || self.project.mac?

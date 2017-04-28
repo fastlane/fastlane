@@ -24,7 +24,7 @@ describe FastlaneCore do
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
 
-        # We are implicity also checking that the error was not rethrown because that would
+        # We are implicitly also checking that the error was not rethrown because that would
         # have crashed the test
         expect(result).to eq('a_filename')
       end

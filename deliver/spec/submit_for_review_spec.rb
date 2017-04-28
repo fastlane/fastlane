@@ -1,6 +1,4 @@
 require 'deliver/submit_for_review'
-require 'active_support/core_ext/numeric/time.rb'
-require 'active_support/core_ext/time/calculations.rb'
 require 'ostruct'
 
 describe Deliver::SubmitForReview do
@@ -10,7 +8,7 @@ describe Deliver::SubmitForReview do
   # the builds will be in date ascending order
   def make_fake_builds(number_of_builds)
     (0...number_of_builds).map do |num|
-      OpenStruct.new({ upload_date: num.minutes.from_now })
+      OpenStruct.new({ upload_date: Time.now.utc + 60 * num }) # minutes_from_now
     end
   end
 

@@ -101,7 +101,7 @@ module Sigh
       return results.find_all do |current_profile|
         installed = false
 
-        # Attempts to download all certificats from this profile
+        # Attempts to download all certificates from this profile
         # for checking if they are installed.
         # `cert.download_raw` can fail if the user is a
         # "member" and not an a "admin"

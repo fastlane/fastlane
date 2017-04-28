@@ -127,7 +127,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :serial,
                                        env_name: 'FL_ANDROID_SERIAL',
-                                       description: 'Android serial, wich device should be used for this command',
+                                       description: 'Android serial, which device should be used for this command',
                                        is_string: true,
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :print_command,

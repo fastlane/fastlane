@@ -124,7 +124,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :shield_no_resize,
                                        env_name: "FL_BADGE_SHIELD_NO_RESIZE",
-                                       description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrinked to not exceed the icon graphic",
+                                       description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrunk to not exceed the icon graphic",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|

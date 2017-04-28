@@ -47,7 +47,8 @@ module FastlaneCore
       end.compact
 
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values from '#{path}'")
+      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values from '#{path}'")
       puts ""
     end
 

@@ -17,7 +17,7 @@
  */
 
 // This file contains significant modifications from the original work
-// Modifications Copyright 2015, Twitter Inc
+// Modifications Copyright 2017, Google
 
 package tools.fastlane.screengrab;
 
