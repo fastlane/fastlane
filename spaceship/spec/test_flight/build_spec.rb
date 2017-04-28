@@ -190,6 +190,33 @@ describe Spaceship::TestFlight::Build do
         end
         expect(build).to be_export_compliance_missing
       end
+
+      it 'is processed on active' do
+        mock_client_response(:get_build) do
+          {
+            'externalState' => 'testflight.build.state.testing.active'
+          }
+        end
+        expect(build).to be_processed
+      end
+
+      it 'is processed on ready to submit' do
+        mock_client_response(:get_build) do
+          {
+            'externalState' => 'testflight.build.state.submit.ready'
+          }
+        end
+        expect(build).to be_processed
+      end
+
+      it 'is processed on export compliance missing' do
+        mock_client_response(:get_build) do
+          {
+            'externalState' => 'testflight.build.state.export.compliance.missing'
+          }
+        end
+        expect(build).to be_processed
+      end
     end
 
     context '#upload_date' do

@@ -130,7 +130,7 @@ module Spaceship::TestFlight
       external_state == BUILD_STATES[:export_compliance_missing]
     end
 
-    def self.processed?
+    def processed?
       active? || ready_to_submit? || export_compliance_missing?
     end
 
