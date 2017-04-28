@@ -30,5 +30,9 @@ module Spaceship::TestFlight
     def whats_new=(value)
       raw_data.each { |locale| locale['whatsNew'] = value }
     end
+
+    def deep_copy
+      TestInfo.new(raw_data.map(&:dup))
+    end
   end
 end
