@@ -118,11 +118,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
