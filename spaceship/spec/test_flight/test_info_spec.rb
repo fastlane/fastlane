@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../mock_servers'
 
 describe Spaceship::TestFlight::TestInfo do
   let(:test_info) do
