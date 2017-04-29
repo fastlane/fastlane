@@ -138,7 +138,11 @@ The setup assistant will create all the necessary files for you, using the exist
 - Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` with [actions](https://docs.fastlane.tools/actions).
 
-For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
+For more details, follow our new Getting Started guides:
+
+- [Getting Started fastlane guide for iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
+- [Getting Started fastlane guide for Android](https://docs.fastlane.tools/getting-started/android/setup/)
+
 
 There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
