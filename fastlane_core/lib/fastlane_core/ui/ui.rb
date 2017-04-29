@@ -22,5 +22,3 @@ require 'fastlane_core/ui/interface'
 Dir[File.expand_path('implementations/*.rb', File.dirname(__FILE__))].each do |file|
   require file
 end
-
-require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
