@@ -29,7 +29,7 @@ describe Spaceship::TestFlight::Client do
   context '#handle_response' do
     it 'handles successful responses with json' do
       response = double('Response', status: 200)
-      response.stub(:body).and_return({ 'data' => 'value' })
+      allow(response).to receive(:body).and_return({ 'data' => 'value' })
       expect(subject.handle_response(response)).to eq('value')
     end
 
@@ -40,7 +40,7 @@ describe Spaceship::TestFlight::Client do
 
     it 'raises an exception on an API error' do
       response = double('Response', status: 400)
-      response.stub(:body).and_return({ 'data' => nil, 'error' => 'Bad Request' })
+      allow(response).to receive(:body).and_return({ 'data' => nil, 'error' => 'Bad Request' })
       expect do
         subject.handle_response(response)
       end.to raise_error(Spaceship::Client::UnexpectedResponse)
