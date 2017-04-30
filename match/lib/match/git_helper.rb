@@ -24,6 +24,7 @@ module Match
       elsif clone_branch_directly
         command += " -b #{branch.shellescape} --single-branch"
       end
+      command << " --verbose" if FastlaneCore::Globals.verbose?
 
       UI.message "Cloning remote git repo..."
 
