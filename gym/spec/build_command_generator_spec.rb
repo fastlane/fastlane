@@ -209,10 +209,11 @@ describe Gym do
                                "-project ./gym/examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\" | grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\"",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               "| xcpretty"
+                               "| xcpretty",
+                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt"
                              ])
       end
     end
