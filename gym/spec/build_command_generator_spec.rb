@@ -212,8 +212,8 @@ describe Gym do
                                "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\"",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               "| xcpretty",
-                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt"
+                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "| xcpretty"
                              ])
       end
     end
