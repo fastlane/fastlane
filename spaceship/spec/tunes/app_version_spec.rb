@@ -181,6 +181,10 @@ describe Spaceship::AppVersion, all: true do
       it "parses metadataRejected" do
         expect(Spaceship::Tunes::AppStatus.get_from_string('metadataRejected')).to eq(Spaceship::Tunes::AppStatus::METADATA_REJECTED)
       end
+
+      it "parses removedFromSale" do
+        expect(Spaceship::Tunes::AppStatus.get_from_string('removedFromSale')).to eq(Spaceship::Tunes::AppStatus::REMOVED_FROM_SALE)
+      end
     end
 
     describe "Screenshots" do
