@@ -41,6 +41,7 @@ module Gym
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
+        options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\" | grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if config[:analyze_build_time]
 
         options
       end
