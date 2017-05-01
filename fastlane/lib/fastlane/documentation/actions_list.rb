@@ -37,7 +37,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "Available fastlane actions".green,
         headings: ['Action', 'Description', 'Author'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
       puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
@@ -97,7 +97,7 @@ module Fastlane
       authors = Array(action.author || action.authors)
       rows << ["Created by #{authors.join(', ').green}"] unless authors.empty?
 
-      puts Terminal::Table.new(title: name.green, rows: rows)
+      puts Terminal::Table.new(title: name.green, rows: FastlaneCore::PrintTable.transform_output(rows))
       puts ""
     end
 
@@ -108,7 +108,7 @@ module Fastlane
         puts Terminal::Table.new(
           title: "#{name} Options".green,
           headings: ['Key', 'Description', 'Env Var', 'Default'],
-          rows: options
+          rows: FastlaneCore::PrintTable.transform_output(options)
         )
       else
         puts "No available options".yellow
@@ -123,7 +123,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "#{name} Output Variables".green,
         headings: ['Key', 'Description'],
-        rows: output.map { |key, desc| [key.yellow, desc] }
+        rows: FastlaneCore::PrintTable.transform_output(output.map { |key, desc| [key.yellow, desc] })
       )
       puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
       puts ""
@@ -132,13 +132,14 @@ module Fastlane
     def self.print_return_value(action, name)
       return unless action.return_value
 
-      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
+      puts Terminal::Table.new(title: "#{name} Return Value".green,
+                                rows: FastlaneCore::PrintTable.transform_output([[action.return_value]]))
       puts ""
     end
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of?(Class) && c != :TestSampleCodeAction }
       action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 

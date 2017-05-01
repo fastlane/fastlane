@@ -6,7 +6,7 @@ module FastlaneCore
     include Commander::Methods
 
     # Calls the appropriate methods for commander to show the available parameters
-    def generate(options)
+    def generate(options, command: nil)
       # First, enable `always_trace`, to show the stack trace
       always_trace!
 
@@ -64,8 +64,12 @@ module FastlaneCore
         # automatically coerced or otherwise handled by the ConfigItem for others.
         args = [short_switch, long_switch, (type || String), description].compact
 
-        # This is the call to Commander to set up the option we've been building.
-        global_option(*args)
+        if command
+          command.option(*args)
+        else
+          # This is the call to Commander to set up the option we've been building.
+          global_option(*args)
+        end
       end
     end
 

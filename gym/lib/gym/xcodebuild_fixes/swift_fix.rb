@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 # from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
@@ -55,7 +56,7 @@ module Gym
           # Add "SwiftSupport" to the .ipa archive
           Dir.chdir(tmpdir) do
             command_parts = ["zip --recurse-paths '#{PackageCommandGenerator.ipa_path}' SwiftSupport"]
-            command_parts << "> /dev/null" unless $verbose
+            command_parts << "> /dev/null" unless FastlaneCore::Globals.verbose?
 
             FastlaneCore::CommandExecutor.execute(command: command_parts,
                                                 print_all: false,

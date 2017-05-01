@@ -6,6 +6,7 @@ module Fastlane
 
     class EnsureXcodeVersionAction < Action
       def self.run(params)
+        Actions.verify_gem!('xcode-install')
         required_version = params[:version]
         selected_version = sh("xcversion selected").match(/^Xcode (.*)$/)[1]
 

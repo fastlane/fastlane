@@ -8,6 +8,10 @@ module Fastlane
         ARGV.include?('-v') || ARGV.include?('--version')
       end
 
+      def running_help_command?
+        ARGV.include?('-h') || ARGV.include?('--help')
+      end
+
       def take_off
         before_import_time = Time.now
 
@@ -17,6 +21,8 @@ module Fastlane
         if Time.now - before_import_time > 3 && !running_version_command?
           print_slow_fastlane_warning
         end
+
+        FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
@@ -42,13 +48,14 @@ module Fastlane
             require File.join(tool_name, "commands_generator")
 
             # Call the tool's CommandsGenerator class and let it do its thing
-            Object.const_get(tool_name.fastlane_module)::CommandsGenerator.start
+            commands_generator = Object.const_get(tool_name.fastlane_module)::CommandsGenerator
           rescue LoadError
             # This will only happen if the tool we call here, doesn't provide
             # a CommandsGenerator class yet
             # When we launch this feature, this should never be the case
             abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
           end
+          commands_generator.start
         elsif tool_name == "fastlane-credentials"
           require 'credentials_manager'
           ARGV.shift
@@ -58,6 +65,8 @@ module Fastlane
           require "fastlane/commands_generator"
           Fastlane::CommandsGenerator.start
         end
+      ensure
+        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable

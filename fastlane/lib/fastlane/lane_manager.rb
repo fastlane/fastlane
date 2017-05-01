@@ -61,13 +61,17 @@ module Fastlane
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) unless FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(ff, duration, e)
 
       return ff
+    end
+
+    def self.skip_docs?
+      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # All the finishing up that needs to be done
@@ -111,7 +115,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "fastlane summary".green,
         headings: ["Step", "Action", "Time (in s)"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
       puts ""
     end
@@ -119,7 +123,14 @@ module Fastlane
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      available = []
+
+      # nil is the key for lanes that are not under a specific platform
+      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms.each do |p|
+        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+      end
+
       if available.empty?
         UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
       end
@@ -134,7 +145,7 @@ module Fastlane
       table = Terminal::Table.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
       UI.message "Welcome to fastlane! Here's what your app is setup to do:"
@@ -161,52 +172,71 @@ module Fastlane
       end
     end
 
-    def self.load_dot_env(env)
-      # find the first directory of [fastlane, its parent] containing dotenv files
+    # @param env_cl_param [String] an optional list of dotenv environment names separated by commas, without space
+    def self.load_dot_env(env_cl_param)
+      base_path = find_dotenv_directory
+
+      return unless base_path
+
+      load_dot_envs_from(env_cl_param, base_path)
+    end
+
+    # finds the first directory of [fastlane, its parent] containing dotenv files
+    def self.find_dotenv_directory
       path = FastlaneCore::FastlaneFolder.path
       search_paths = [path]
       search_paths << path + "/.." unless path.nil?
       search_paths.compact!
-      base_path = search_paths.find do |dir|
+      search_paths.find do |dir|
         Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
       end
-      return unless base_path
-      require 'dotenv'
+    end
 
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
+    # loads the dotenvs. First the .env and .env.default and
+    # then override with all speficied extra environments
+    def self.load_dot_envs_from(env_cl_param, base_path)
+      require 'dotenv'
 
       # Making sure the default '.env' and '.env.default' get loaded
       env_file = File.join(base_path, '.env')
       env_default_file = File.join(base_path, '.env.default')
       Dotenv.load(env_file, env_default_file)
 
-      # Loads .env file for the environment passed in through options
-      if env
+      return unless env_cl_param
+
+      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env_cl_param
+
+      # multiple envs?
+      envs = env_cl_param.split(",")
+
+      # Loads .env file for the environment(s) passed in through options
+      envs.each do |env|
         env_file = File.join(base_path, ".env.#{env}")
         UI.success "Loading from '#{env_file}'"
         Dotenv.overload(env_file)
       end
     end
 
+    private_class_method :find_dotenv_directory, :load_dot_envs_from
+
     def self.print_lane_context
       return if Actions.lane_context.empty?
 
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         UI.important 'Lane Context:'.yellow
         UI.message Actions.lane_context
         return
       end
 
-      # Print a nice table unless in $verbose mode
+      # Print a nice table unless in FastlaneCore::Globals.verbose? mode
       rows = Actions.lane_context.collect do |key, content|
         [key, content.to_s]
       end
-      rows = FastlaneCore::PrintTable.limit_row_size(rows)
 
       require 'terminal-table'
       puts Terminal::Table.new({
         title: "Lane Context".yellow,
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       })
     end
   end

@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 _fastlane_complete() {
   local word completions
   word="$1"

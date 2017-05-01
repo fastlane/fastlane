@@ -51,6 +51,8 @@ describe Spaceship::Portal::App do
       expect(app.app_groups_count).to eq(0)
       expect(app.cloud_containers_count).to eq(0)
       expect(app.identifiers_count).to eq(0)
+      expect(app.associated_groups.length).to eq(1)
+      expect(app.associated_groups[0].group_id).to eq("group.tools.fastlane")
     end
 
     it "allows modification of values and properly retrieving them" do
@@ -63,6 +65,12 @@ describe Spaceship::Portal::App do
   describe "Filter app based on app identifier" do
     it "works with specific App IDs" do
       app = Spaceship::Portal::App.find("net.sunapps.151")
+      expect(app.app_id).to eq("B7JBD8LHAA")
+      expect(app.is_wildcard).to eq(false)
+    end
+
+    it "works with specific App IDs even with different case" do
+      app = Spaceship::Portal::App.find("net.sunaPPs.151")
       expect(app.app_id).to eq("B7JBD8LHAA")
       expect(app.is_wildcard).to eq(false)
     end
@@ -118,7 +126,7 @@ describe Spaceship::Portal::App do
     it 'updates the name of the app by given bundle_id' do
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/updateAppIdName.action").
         with(body: { "appIdId" => "B7JBD8LHAA", "name" => "The New Name", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: JSON.parse(PortalStubbing.adp_read_fixture_file('updateAppIdName.action.json')), headers: {})
+        to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('updateAppIdName.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       app = subject.update_name!('The New Name')
       expect(app.app_id).to eq('B7JBD8LHAA')

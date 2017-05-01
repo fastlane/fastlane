@@ -1,8 +1,3 @@
-unless ENV["DEBUG"]
-  $stdout.puts "Changing stdout to /tmp/fastlane_tests"
-  $stdout = File.open("/tmp/fastlane_tests", "w")
-end
-
 require 'shellwords'
 
 Fastlane.load_actions
@@ -10,17 +5,17 @@ Fastlane.load_actions
 def before_each_fastlane
   Fastlane::Actions.clear_lane_context
 
-  ENV.delete 'DELIVER_SCREENSHOTS_PATH'
-  ENV.delete 'DELIVER_SKIP_BINARY'
-  ENV.delete 'DELIVER_VERSION'
+  ENV.delete('DELIVER_SCREENSHOTS_PATH')
+  ENV.delete('DELIVER_SKIP_BINARY')
+  ENV.delete('DELIVER_VERSION')
 end
 
 def with_verbose(verbose)
-  orig_verbose = $verbose
-  $verbose = verbose
+  orig_verbose = FastlaneCore::Globals.verbose?
+  FastlaneCore::Globals.verbose = verbose
   yield if block_given?
 ensure
-  $verbose = orig_verbose
+  FastlaneCore::Globals.verbose = orig_verbose
 end
 
 def stub_plugin_exists_on_rubygems(plugin_name, exists)

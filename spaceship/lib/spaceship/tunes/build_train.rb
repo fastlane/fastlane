@@ -41,12 +41,6 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param application (Spaceship::Tunes::Application) The app this train is for
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id, platform: nil)

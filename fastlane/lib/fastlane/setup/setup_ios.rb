@@ -1,3 +1,5 @@
+require 'spaceship'
+
 module Fastlane
   class SetupIos < Setup
     # the tools that are already enabled
@@ -14,34 +16,49 @@ module Fastlane
     attr_accessor :app_identifier
     attr_accessor :app_name
 
-    def run
+    def run(user: nil)
+      self.apple_id = user
       show_infos
 
       FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
       is_manual_setup = false
 
+      setup_project
+      react_native_pre_checks
+      ask_for_apple_id
+
       begin
-        setup_project
-        ask_for_apple_id
-        detect_if_app_is_available
+        if self.project.mac?
+          UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps")
+        else
+          detect_if_app_is_available
+        end
         print_config_table
         if UI.confirm("Please confirm the above values")
           default_setup
         else
           is_manual_setup = true
+          UI.message("Falling back to manual onboarding")
           manual_setup
         end
         UI.success('Successfully finished setting up fastlane')
+      rescue Spaceship::Client::InsufficientPermissions, Spaceship::Client::ProgramLicenseAgreementUpdated => ex
+        # We don't want to fallback to manual onboarding for this
+        # as the user needs to first accept the agreement / get more permissions
+        # Let's re-raise the exception to properly show the error message
+        raise ex
       rescue => ex # this will also be caused by Ctrl + C
+        UI.message("Ran into error while trying to connect to iTunes Connect / Dev Portal: #{ex}")
+        UI.message("Falling back to manual onboarding")
+
         if is_manual_setup
           handle_exception(exception: ex)
         else
           UI.error(ex.to_s)
-          UI.error('An error occured during the setup process. Falling back to manual setup!')
+          UI.error('An error occurred during the setup process. Falling back to manual setup!')
           try_manual_setup
         end
       end
-      # rubocop:enable Lint/RescueException
     end
 
     def handle_exception(exception: nil)
@@ -58,11 +75,34 @@ module Fastlane
       handle_exception(exception: ex)
     end
 
+    # React Native specific code
+    # Make it easy for people to onboard
+    def react_native_pre_checks
+      return unless self.class.project_uses_react_native?
+      if app_identifier.to_s.length == 0
+        error_message = []
+        error_message << "Could not detect bundle identifier of your react-native app."
+        error_message << "Make sure to open the Xcode project and update the bundle identifier"
+        error_message << "in the `General` section of your project settings."
+        error_message << "Restart `fastlane init` once you're done!"
+        UI.user_error!(error_message.join(" "))
+      end
+    end
+
+    def self.project_uses_react_native?(path: Dir.pwd)
+      package_json = File.join(path, "..", "package.json")
+      return false unless File.basename(path) == "ios"
+      return false unless File.exist?(package_json)
+      package_content = File.read(package_json)
+      return true if package_content.include?("react-native")
+      false
+    end
+
     def default_setup
       copy_existing_files
       generate_appfile(manually: false)
       detect_installed_tools # after copying the existing files
-      if self.itc_ref.nil? && self.portal_ref.nil?
+      if !self.project.mac? && self.itc_ref.nil? && self.portal_ref.nil?
         create_app_if_necessary
       end
       enable_deliver
@@ -81,14 +121,14 @@ module Fastlane
 
     def ask_to_enable_other_tools
       if self.itc_ref.nil? && self.portal_ref.nil?
-        wants_to_create_app = agree('Would you like to create your app on iTunes Connect and the Developer Portal? (y/n)', true)
+        wants_to_create_app = UI.confirm('Would you like to create your app on iTunes Connect and the Developer Portal?')
         if wants_to_create_app
           create_app_if_necessary
           detect_if_app_is_available # check if the app was, in fact, created.
         end
       end
       if self.itc_ref && self.portal_ref
-        wants_to_setup_deliver = agree("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already. (y/n)".yellow, true)
+        wants_to_setup_deliver = UI.confirm("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already")
         enable_deliver if wants_to_setup_deliver
       end
     end
@@ -109,14 +149,15 @@ module Fastlane
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values")
+      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values")
       puts ""
 
-      unless self.itc_ref
+      unless self.itc_ref || self.project.mac?
         UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
       end
 
-      unless self.portal_ref
+      unless self.portal_ref || self.project.mac?
         UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
       end
     end
@@ -172,9 +213,7 @@ module Fastlane
 
     # Detect if the app was created on the Dev Portal / iTC
     def detect_if_app_is_available
-      require 'spaceship'
-
-      UI.important "Verifying if app is available on the Apple Developer Portal and iTunes Connect..."
+      UI.important "Verifying that app is available on the Apple Developer Portal and iTunes Connect..."
       UI.message "Starting login with user '#{self.apple_id}'"
       Spaceship.login(self.apple_id, nil)
       self.dev_portal_team = Spaceship.select_team
@@ -191,7 +230,6 @@ module Fastlane
       config = {} # this has to be done like this
       FastlaneCore::Project.detect_projects(config)
       project = FastlaneCore::Project.new(config)
-
       produce_options_hash = {
         app_name: project.app_name,
         app_identifier: self.app_identifier

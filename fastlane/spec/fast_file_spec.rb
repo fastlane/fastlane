@@ -131,10 +131,9 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(nil)
       end
 
-      it "raises an exception if unsupported action is called in unsupported platform" do
-        expect do
-          @ff.runner.execute('unsupported_action', 'android')
-        end.to raise_error "Action 'frameit' doesn't support required operating system 'android'."
+      it "logs a warning if and unsupported action is called on an non officially supported platform" do
+        expect(FastlaneCore::UI).to receive(:important).with("Action 'frameit' isn't known to support operating system 'android'.")
+        @ff.runner.execute('unsupported_action', 'android')
       end
     end
 
@@ -178,6 +177,20 @@ describe Fastlane do
         File.delete("/tmp/after_all.txt")
       end
 
+      it "allows the user to invent a new platform" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileNewPlatform')
+        expect do
+          ff.runner.execute(:crash, :windows)
+        end.to raise_error(":windows crash")
+      end
+
+      it "allows the user to set the platform in their Fastfile", focus: true do
+        expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
+        expect(UI).to receive(:message).with("echo :windows")
+        ff.runner.execute(:echo, :windows)
+      end
+
       it "before_each and after_each are called every time" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneBlocks')
         ff.runner.execute(:run_ios, :ios)
@@ -209,6 +222,17 @@ describe Fastlane do
 
         expect(File.read("/tmp/error.txt")).to eq(time)
         File.delete("/tmp/error.txt")
+      end
+
+      it "Exception in error block are swallowed and shown, and original exception is re-raised" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileErrorInError')
+
+        expect(FastlaneCore::UI).to receive(:error).with("An error occurred while executing the `error` block:")
+        expect(FastlaneCore::UI).to receive(:error).with("Error in error")
+
+        expect do
+          ff.runner.execute(:beta, nil, {})
+        end.to raise_error("Original error")
       end
 
       describe "supports switching lanes" do
@@ -303,6 +327,7 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
@@ -316,9 +341,17 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
+      end
+
+      it "imports actions associated with a Fastfile before their Fastfile" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
+        expect do
+          ff.import('./import1/Fastfile')
+        end.not_to raise_error
       end
 
       it "raises an error if lane is not available" do
@@ -334,6 +367,7 @@ describe Fastlane do
       end
 
       it "runs pod install" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect(Fastlane::Actions).to receive(:verify_gem!).with("cocoapods")
 
         result = Fastlane::FastFile.new.parse("lane :test do

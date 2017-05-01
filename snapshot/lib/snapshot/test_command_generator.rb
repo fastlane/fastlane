@@ -44,7 +44,7 @@ module Snapshot
 
         build_settings = []
         build_settings << "FASTLANE_SNAPSHOT=YES"
-        build_settings << "TEST_TARGET_NAME='#{config[:test_target_name]}'" if config[:test_target_name]
+        build_settings << "TEST_TARGET_NAME=#{config[:test_target_name].shellescape}" if config[:test_target_name]
 
         build_settings
       end
@@ -90,6 +90,9 @@ module Snapshot
       end
 
       def destination(device_name)
+        # on Mac we will always run on host machine, so should specify only platform
+        return ["-destination 'platform=macOS'"] if device_name =~ /^Mac/
+
         os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 

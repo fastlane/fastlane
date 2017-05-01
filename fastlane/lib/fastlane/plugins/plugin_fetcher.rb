@@ -30,17 +30,6 @@ module Fastlane
 
       return plugins
     end
-
-    def self.update_md_file!(output_path: "docs/AvailablePlugins.md")
-      @plugins = fetch_gems
-
-      template_path = File.join(Fastlane::ROOT, "lib/assets/AvailablePlugins.md.erb")
-      md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
-
-      puts md
-      File.write(output_path, md)
-      FastlaneCore::UI.success("Successfully written plugin file to '#{output_path}'")
-    end
   end
 
   class FastlanePlugin

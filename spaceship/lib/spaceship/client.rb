@@ -8,6 +8,7 @@ require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
+require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -18,6 +19,7 @@ if ENV["SPACESHIP_DEBUG"]
 end
 
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
@@ -50,6 +52,27 @@ module Spaceship
     # Raised when no user credentials were passed at all
     class NoUserCredentialsError < BasicPreferredInfoError; end
 
+    class ProgramLicenseAgreementUpdated < BasicPreferredInfoError
+      def show_github_issues
+        false
+      end
+    end
+
+    # User doesn't have enough permission for given action
+    class InsufficientPermissions < BasicPreferredInfoError
+      TITLE = 'Insufficient permissions for your Apple ID:'.freeze
+
+      def preferred_error_info
+        message ? [TITLE, message] : nil
+      end
+
+      # We don't want to show similar GitHub issues, as the error message
+      # should be pretty clear
+      def show_github_issues
+        false
+      end
+    end
+
     class UnexpectedResponse < StandardError
       attr_reader :error_info
 
@@ -75,6 +98,9 @@ module Spaceship
     # Raised when 401 is received from portal request
     class UnauthorizedAccessError < BasicPreferredInfoError; end
 
+    # Raised when 500 is received from iTunes Connect
+    class InternalServerError < BasicPreferredInfoError; end
+
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
     # on.
@@ -98,17 +124,84 @@ module Spaceship
     end
 
     def self.hostname
-      raise "You must implemented self.hostname"
+      raise "You must implement self.hostname"
     end
 
-    def initialize
+    # @return (Array) A list of all available teams
+    def teams
+      user_details_data['associatedAccounts'].sort_by do |team|
+        [
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
+        ]
+      end
+    end
+
+    def user_details_data
+      return @_cached_user_details if @_cached_user_details
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
+      @_cached_user_details = parse_response(r, 'data')
+    end
+
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+    end
+
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider id
+      #
+      available_teams = teams.collect do |team|
+        (team["contentProvider"] || {})["contentProviderId"]
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
+      response = request(:post) do |req|
+        req.url "ra/v1/session/webSession"
+        req.body = {
+          contentProviderId: team_id,
+          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(response.body)
+
+      @current_team_id = team_id
+    end
+
+    # Instantiates a client but with a cookie derived from another client.
+    #
+    # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
+    def self.client_with_authorization_from(another_client)
+      self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+    end
+
+    def initialize(cookie: nil, current_team_id: nil)
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
-      @cookie = HTTP::CookieJar.new
+      @current_team_id = current_team_id
+      @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
@@ -379,7 +472,7 @@ module Spaceship
     rescue UnauthorizedAccessError => ex
       if @loggedin && !(tries -= 1).zero?
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
-        puts msg if $verbose
+        puts msg if Spaceship::Globals.verbose?
         logger.warn msg
 
         if self.class.spaceship_session_env.to_s.length > 0
@@ -422,15 +515,63 @@ module Spaceship
       if response.body
         # If we have an `expected_key`, select that from response.body Hash
         # Else, don't.
+
+        # the returned error message and info, is html encoded ->  &quot;issued&quot; -> make this readable ->  "issued"
+        response.body["userString"] = CGI.unescapeHTML(response.body["userString"]) if response.body["userString"]
+        response.body["resultString"] = CGI.unescapeHTML(response.body["resultString"]) if response.body["resultString"]
+
         content = expected_key ? response.body[expected_key] : response.body
       end
-
       if content.nil?
+        detect_most_common_errors_and_raise_exceptions(response.body) if response.body
         raise UnexpectedResponse, response.body
+      elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
+        # example content when doing a Developer Portal action with not enough permission
+        # => {"responseId"=>"e5013d83-c5cb-4ba0-bb62-734a8d56007f",
+        #    "resultCode"=>1200,
+        #    "resultString"=>"webservice.certificate.downloadNotAllowed",
+        #    "userString"=>"You are not permitted to download this certificate.",
+        #    "creationTimestamp"=>"2017-01-26T22:44:13Z",
+        #    "protocolVersion"=>"QH65B2",
+        #    "userLocale"=>"en_US",
+        #    "requestUrl"=>"https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action",
+        #    "httpCode"=>200}
+        raise_insuffient_permission_error!(additional_error_string: content["userString"])
       else
         store_csrf_tokens(response)
         content
       end
+    end
+
+    def detect_most_common_errors_and_raise_exceptions(body)
+      # Check if the failure is due to missing permissions (iTunes Connect)
+      if body["messages"] && body["messages"]["error"].include?("Forbidden")
+        raise_insuffient_permission_error!
+      elsif body.to_s.include?("Internal Server Error - Read")
+        raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
+      elsif (body["resultString"] || "").include?("Program License Agreement")
+        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
+      end
+    end
+
+    # This also gets called from subclasses
+    def raise_insuffient_permission_error!(additional_error_string: nil)
+      # get the method name of the request that failed
+      # `block in` is used very often for requests when surrounded for paging or retrying blocks
+      # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
+      # Using `sub` instead of `delete` as we don't want to allow multiple matches
+      calling_method_name = caller_locations(2, 2).first.label.sub("block in", "").delete("!").strip
+      begin
+        team_id = "(Team ID #{self.team_id}) "
+      rescue
+        # Showing the team ID is something that's nice to have, however it might cause an exception
+        # when the user doesn't have any permission at all (e.g. failing at login)
+        # we still want the error message to show the actual string, but without the team_id in that case
+        team_id = ""
+      end
+      error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
+      error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
+      raise InsufficientPermissions, error_message
     end
 
     private
@@ -496,6 +637,7 @@ module Spaceship
       return params, headers
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
 
 require 'spaceship/two_step_client'

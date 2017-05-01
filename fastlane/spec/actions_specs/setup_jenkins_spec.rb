@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Setup Jenkins Integration" do
       before :each do
-        # Clean all used environemnt variables
+        # Clean all used environment variables
         Fastlane::Actions::SetupJenkinsAction::USED_ENV_NAMES + Fastlane::Actions::SetupJenkinsAction.available_options.map(&:env_name).each do |key|
           ENV.delete(key)
         end
@@ -20,6 +20,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to be_nil
         expect(ENV["DERIVED_DATA_PATH"]).to be_nil
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to be_nil
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to be_nil
         expect(ENV["GYM_BUILD_PATH"]).to be_nil
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to be_nil
@@ -32,6 +33,7 @@ describe Fastlane do
       end
 
       it "works when forced" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         stub_const("ENV", {})
 
         Fastlane::FastFile.new.parse("lane :test do
@@ -46,6 +48,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
         expect(ENV["GYM_BUILD_PATH"]).to eq(output)
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
@@ -58,6 +61,7 @@ describe Fastlane do
       end
 
       it "works inside CI" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         stub_const("ENV", { "TRAVIS" => true })
 
         Fastlane::FastFile.new.parse("lane :test do
@@ -70,6 +74,7 @@ describe Fastlane do
         expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
         expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
         expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
+        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
         expect(ENV["GYM_BUILD_PATH"]).to eq(output)
         expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
         expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
@@ -169,6 +174,7 @@ describe Fastlane do
 
           expect(ENV["DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq("/tmp/derived_data")
+          expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq("/tmp/derived_data")
           expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
           expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
@@ -187,7 +193,7 @@ describe Fastlane do
       end
 
       after :all do
-        # Clean all used environemnt variables
+        # Clean all used environment variables
         Fastlane::Actions::SetupJenkinsAction::USED_ENV_NAMES + Fastlane::Actions::SetupJenkinsAction.available_options.map(&:env_name).each do |key|
           ENV.delete(key)
         end

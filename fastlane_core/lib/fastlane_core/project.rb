@@ -131,17 +131,23 @@ module FastlaneCore
         elsif Helper.is_ci?
           UI.error("Multiple schemes found but you haven't specified one.")
           UI.error("Since this is a CI, please pass one using the `scheme` option")
+          show_scheme_shared_information
           UI.user_error!("Multiple schemes found")
         else
           puts "Select Scheme: "
           options[:scheme] = choose(*schemes)
         end
       else
-        UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
-        UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
+        show_scheme_shared_information
 
         UI.user_error!("No Schemes found")
       end
+    end
+
+    def show_scheme_shared_information
+      UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
+      UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
+      UI.error("Afterwards make sure to commit the changes into version control")
     end
 
     # Get all available configurations in an array
@@ -241,8 +247,12 @@ module FastlaneCore
     end
 
     def supported_platforms
-      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS").split
-      supported_platforms.map do |platform|
+      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
+      if supported_platforms.nil?
+        UI.important("Could not read the \"SUPPORTED_PLATFORMS\" build setting, assuming that the project supports iOS only.")
+        return [:iOS]
+      end
+      supported_platforms.split.map do |platform|
         case platform
         when "macosx" then :macOS
         when "iphonesimulator", "iphoneos" then :iOS
@@ -269,9 +279,14 @@ module FastlaneCore
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command.
       #
-      # The 'clean' portion of this command is a workaround for an xcodebuild bug with Core Data projects.
+      # The 'clean' portion of this command was a workaround for an xcodebuild bug with Core Data projects.
+      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
-      command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      if FastlaneCore::Helper.xcode_at_least?('8.3')
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      else
+        command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      end
       command += " 2> /dev/null" if xcodebuild_suppress_stderr
       command
     end
@@ -288,6 +303,9 @@ module FastlaneCore
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
           @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !self.xcodebuild_list_silent)
+          if @build_settings.empty?
+            UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
+          end
         rescue Timeout::Error
           UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
             " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \

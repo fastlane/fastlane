@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "ensure_no_debug_code" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "handles extension and extensions parameters correctly" do
         result = Fastlane::FastFile.new.parse("lane :test do
           ensure_no_debug_code(text: 'pry', path: '.', extension: 'rb', extensions: ['m', 'h'])
@@ -41,6 +45,34 @@ describe Fastlane do
           ensure_no_debug_code(text: 'pry', path: '.')
         end").runner.execute(:test)
         expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}'")
+      end
+
+      it "handles the exclude_dirs parameter with no elements correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: [])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}'")
+      end
+
+      it "handles the exclude_dirs parameter with a single element correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['.bundle'])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir .bundle")
+      end
+
+      it "shellescapes the exclude_dirs correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['My Dir'])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir My\\ Dir")
+      end
+
+      it "handles the exclude_dirs parameter with multiple  elements correctly" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['.bundle', 'Packages/'])
+        end").runner.execute(:test)
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir .bundle --exclude-dir Packages/")
       end
     end
   end

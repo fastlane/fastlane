@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2155
 
 # Copyright (c) 2011 Float Mobile Learning
 # http://www.floatlearning.com/
@@ -65,7 +66,7 @@
 log() {
     # Make sure it returns 0 code even when verose mode is off (test 1)
     # To use like [[ condition ]] && log "x" && something
-    [[ -n "$VERBOSE" ]] && echo -e "$@" || test 1
+    if [[ -n "$VERBOSE" ]]; then echo -e "$@"; else test 1; fi
 }
 
 error() {
@@ -79,6 +80,7 @@ warning() {
 
 function checkStatus {
 
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ];
     then
         error "Encountered an error, aborting!"
@@ -86,7 +88,7 @@ function checkStatus {
 }
 
 usage() {
-    echo -e "Usage: $(basename $0) source identity -p|--provisioning provisioning" >&2
+    echo -e "Usage: $(basename "$0") source identity -p|--provisioning provisioning" >&2
     echo -e "\t\t[-e|--entitlements entitlements]" >&2
     echo -e "\t\t[-k|--keychain keychain]" >&2
     echo -e "\t\t[-d|--display-name displayName]" >&2
@@ -96,7 +98,7 @@ usage() {
     echo -e "\t\t[-b|--bundle-id bundleId]" >&2
     echo -e "\t\t[--use-app-entitlements]" >&2
     echo -e "\t\toutputIpa" >&2
-    echo "Usage: $(basename $0) -h|--help" >&2
+    echo "Usage: $(basename "$0") -h|--help" >&2
     echo "Options:" >&2
     echo -e "\t-p, --provisioning provisioning\t\tProvisioning profile option, may be provided multiple times." >&2
     echo -e "\t\t\t\t\t\tYou can specify provisioning profile file name." >&2
@@ -224,7 +226,7 @@ then
 fi
 
 # Log the options
-for provision in ${RAW_PROVISIONS[@]}; do
+for provision in "${RAW_PROVISIONS[@]}"; do
     if [[ "$provision" =~ .+=.+ ]]; then
         log "Specified provisioning profile: '${provision#*=}' for bundle identifier: '${provision%%=*}'"
     else
@@ -291,15 +293,17 @@ fi
 # check the keychain
 if [ "${KEYCHAIN}" != "" ];
 then
-    security list-keychains -s $KEYCHAIN
-    security unlock $KEYCHAIN
-    security default-keychain -s $KEYCHAIN
+    security list-keychains -s "$KEYCHAIN"
+    security unlock "$KEYCHAIN"
+    security default-keychain -s "$KEYCHAIN"
 fi
 
 # Set the app name
 # In Payload directory may be another file except .app file, such as StoreKit folder.
 # Search the first .app file within the Payload directory
-APP_NAME=$(ls "$TEMP_DIR/Payload/"|grep ".app$"| head -1)
+# TODO: Replace with glob or call to 'find'; and remove shellcheck directive
+# shellcheck disable=SC2010
+APP_NAME=$(ls "$TEMP_DIR/Payload/" | grep ".app$" | head -1)
 
 # Make sure that PATH includes the location of the PlistBuddy helper tool as its location is not standard
 export PATH=$PATH:/usr/libexec
@@ -308,6 +312,7 @@ export PATH=$PATH:/usr/libexec
 # The first one may contain the wildcard character '*', in which case pattern matching will be used unless the third parameter is "STRICT"
 function does_bundle_id_match {
 
+    # shellcheck disable=SC2049
     if [[ "$1" == "$2" ]]; then
         return 0
     elif [[ "$3" != STRICT && "$1" =~ \* ]]; then
@@ -335,7 +340,7 @@ function provision_for_bundle_id {
 # Find the bundle identifier contained inside a provisioning profile
 function bundle_id_for_provison {
 
-    local FULL_BUNDLE_ID=`PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< $(security cms -D -i "$1")`
+    local FULL_BUNDLE_ID=$(PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< "$(security cms -D -i "$1")")
     checkStatus
     echo "${FULL_BUNDLE_ID#*.}"
 }
@@ -346,7 +351,7 @@ function add_provision_for_bundle_id {
     local PROVISION="$1"
     local BUNDLE_ID="$2"
 
-    local CURRENT_PROVISION=`provision_for_bundle_id "$BUNDLE_ID" STRICT`
+    local CURRENT_PROVISION=$(provision_for_bundle_id "$BUNDLE_ID" STRICT)
 
     if [[ "$CURRENT_PROVISION" != "" && "$CURRENT_PROVISION" != "$PROVISION" ]]; then
         error "Conflicting provisioning profiles '$PROVISION' and '$CURRENT_PROVISION' for bundle identifier '$BUNDLE_ID'."
@@ -371,7 +376,7 @@ function add_provision {
         error "Provisioning profile '$PROVISION' file does not exist"
     fi
 
-    local BUNDLE_ID=`bundle_id_for_provison "$PROVISION"`
+    local BUNDLE_ID=$(bundle_id_for_provison "$PROVISION")
     add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
 }
 
@@ -405,9 +410,9 @@ function resign {
     cp -f "$APP_PATH/Info.plist" "$TEMP_DIR/oldInfo.plist"
 
     # Read in current values from the app
-    local CURRENT_NAME=`PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist"`
-    local CURRENT_BUNDLE_IDENTIFIER=`PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist"`
-    local NEW_PROVISION=`provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}"`
+    local CURRENT_NAME=$(PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist")
+    local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
+    local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
 
     if [[ "$NEW_PROVISION" == "" && "$NESTED" != NESTED ]]; then
         NEW_PROVISION="$DEFAULT_PROVISION"
@@ -422,10 +427,11 @@ function resign {
         error "Use the -p option (example: -p com.example.app=xxxx.mobileprovision)"
     fi
 
-    local PROVISION_BUNDLE_IDENTIFIER=`bundle_id_for_provison "$NEW_PROVISION"`
+    local PROVISION_BUNDLE_IDENTIFIER=$(bundle_id_for_provison "$NEW_PROVISION")
 
     # Use provisioning profile's bundle identifier
     if [ "$BUNDLE_IDENTIFIER" == "" ]; then
+        # shellcheck disable=SC2049
         if [[ "$PROVISION_BUNDLE_IDENTIFIER" =~ \* ]]; then
             log "Bundle Identifier contains a *, using the current bundle identifier"
             BUNDLE_IDENTIFIER="$CURRENT_BUNDLE_IDENTIFIER"
@@ -447,7 +453,7 @@ function resign {
         if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
         then
             log "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'"
-            `PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"`
+            PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"
         fi
     fi
 
@@ -456,10 +462,10 @@ function resign {
     security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
     checkStatus
 
-    APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
+    APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
     if [ "$APP_IDENTIFIER_PREFIX" == "" ];
     then
-        APP_IDENTIFIER_PREFIX=`PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist"`
+        APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist")
         if [ "$APP_IDENTIFIER_PREFIX" == "" ];
         then
             error "Failed to extract any app identifier prefix from '$NEW_PROVISION'"
@@ -473,10 +479,10 @@ function resign {
     # Set new app identifer prefix if such entry exists in plist file
     PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
 
-    TEAM_IDENTIFIER=`PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n'`
+    TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
     if [ "$TEAM_IDENTIFIER" == "" ];
     then
-        TEAM_IDENTIFIER=`PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist"`
+        TEAM_IDENTIFIER=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist")
         if [ "$TEAM_IDENTIFIER" == "" ];
         then
             warning "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher"
@@ -487,7 +493,7 @@ function resign {
         log "Profile team identifier is '$TEAM_IDENTIFIER'"
     fi
 
-    # Make a copy of old embedded provisioning profile for futher use
+    # Make a copy of old embedded provisioning profile for further use
     cp -f "$APP_PATH/embedded.mobileprovision" "$TEMP_DIR/old-embedded.mobileprovision"
 
     # Replace embedded provisioning profile with new file
@@ -497,19 +503,19 @@ function resign {
     if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
     then
         log "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'"
-        `PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"`
+        PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"
         checkStatus
     fi
 
     # Update the version number properties in the Info.plist if a version number has been provided
     if [ "$VERSION_NUMBER" != "" ];
     then
-        CURRENT_VERSION_NUMBER=`PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist"`
+        CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")
         if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
         then
             log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
-            `PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"`
-            `PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"`
+            PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"
+            PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"
         fi
     fi
 
@@ -545,6 +551,9 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
             then
+                log "Resigning '$framework'"
+                # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
@@ -555,20 +564,21 @@ function resign {
 
     # Check for and update bundle identifiers for extensions and associated nested apps
     log "Fixing nested app and extension references"
-    for key in ${NESTED_APP_REFERENCE_KEYS[@]}; do
+    for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
-        REF_BUNDLE_ID=`PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null`
+        REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
         if [ -n "$REF_BUNDLE_ID" ];
         then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
-            REF_PROVISION=`provision_for_bundle_id $REF_BUNDLE_ID`
+            REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
             # Map to the new bundle id
-            NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
+            NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
+            # shellcheck disable=SC2049
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
-                `PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
+                PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
             fi
         fi
     done
@@ -578,7 +588,7 @@ function resign {
         if [ -n "$APP_IDENTIFIER_PREFIX" ];
         then
             # sanity check the 'application-identifier' is present in the provided entitlements and matches the provisioning profile value
-            ENTITLEMENTS_APP_ID_PREFIX=`PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n'`
+            ENTITLEMENTS_APP_ID_PREFIX=$(PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
             if [ "$ENTITLEMENTS_APP_ID_PREFIX" == "" ];
             then
                 error "Provided entitlements file is missing a value for the required 'application-identifier' key"
@@ -591,7 +601,7 @@ function resign {
         if [ -n "$TEAM_IDENTIFIER" ];
         then
             # sanity check the 'com.apple.developer.team-identifier' is present in the provided entitlements and matches the provisioning profile value
-            ENTITLEMENTS_TEAM_IDENTIFIER=`PlistBuddy -c "Print :com.apple.developer.team-identifier" "$ENTITLEMENTS" | tr -d '\n'`
+            ENTITLEMENTS_TEAM_IDENTIFIER=$(PlistBuddy -c "Print :com.apple.developer.team-identifier" "$ENTITLEMENTS" | tr -d '\n')
             if [ "$ENTITLEMENTS_TEAM_IDENTIFIER" == "" ];
             then
                 error "Provided entitlements file is missing a value for the required 'com.apple.developer.team-identifier' key"
@@ -670,9 +680,9 @@ function resign {
             "keychain-access-groups|APP_ID")
 
         # Loop over all the entitlement keys that need to be transferred from app entitlements
-        for RULE in ${ENTITLEMENTS_TRANSFER_RULES[@]}; do
-            KEY=$(echo $RULE | cut -d'|' -f1)
-            ID_TYPE=$(echo $RULE | cut -d'|' -f2)
+        for RULE in "${ENTITLEMENTS_TRANSFER_RULES[@]}"; do
+            KEY=$(echo "$RULE" | cut -d'|' -f1)
+            ID_TYPE=$(echo "$RULE" | cut -d'|' -f2)
 
             # Get the entry from app's entitlements
             # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
@@ -691,7 +701,9 @@ function resign {
             # Add new entry to patched entitlements
             # plutil needs dots in the key path to be escaped (e.g. com\.apple\.security\.application-groups)
             # otherwise it interprets they key path as nested keys
-            PLUTIL_KEY=`echo "$KEY" | sed 's/\./\\\\./g'`
+            # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
+            # shellcheck disable=SC2001
+            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
             # Patch the ID value if specified
@@ -715,6 +727,33 @@ function resign {
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
         sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
 
+        log "Removing blacklisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
+        BLACKLISTED_KEYS=(\
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            "com.apple.developer.icloud-container-environment" \
+            "com.apple.developer.icloud-container-identifiers" \
+            "com.apple.developer.icloud-services" \
+            "com.apple.developer.restricted-resource-mode" \
+            "com.apple.developer.ubiquity-container-identifiers" \
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            "inter-app-audio" \
+            "com.apple.developer.homekit" \
+            "com.apple.developer.healthkit" \
+            "com.apple.developer.in-app-payments" \
+            "com.apple.developer.maps" \
+            "com.apple.external-accessory.wireless-configuration"
+        )
+
+        # Blacklisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in "${BLACKLISTED_KEYS[@]}"; do
+            log "Removing blacklisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
+
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
@@ -728,6 +767,8 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
         cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
+        # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+        # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
@@ -762,6 +803,8 @@ log "Repackaging as $NEW_FILE"
 # Zip all the contents, saving the zip file in the above directory
 # Navigate back to the orignating directory (sending the output to null)
 pushd "$TEMP_DIR" > /dev/null
+# TODO: Fix shellcheck warning and remove directive
+# shellcheck disable=SC2035
 zip -qry "../$TEMP_DIR.ipa" *
 popd > /dev/null
 

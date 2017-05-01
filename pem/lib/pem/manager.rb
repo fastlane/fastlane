@@ -10,12 +10,12 @@ module PEM
         login
 
         existing_certificate = certificate.all.detect do |c|
-          c.name == PEM.config[:app_identifier]
+          c.owner_name == PEM.config[:app_identifier]
         end
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
-          UI.message "Existing push notification profile '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
+          UI.message "Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
           if remaining_days > 30
             if PEM.config[:force]
               UI.success "You already have an existing push certificate, but a new one will be created since the --force option has been set."

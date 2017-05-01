@@ -1,0 +1,11 @@
+
+default_platform :windows
+
+platform :windows do
+  lane :empty do
+  end
+
+  lane :crash do
+    raise ":windows crash"
+  end
+end

@@ -10,7 +10,7 @@ module Fastlane
 
           return paths if Helper.is_test?
 
-          if (paths || []).count == 0
+          if paths.nil?
             Actions.sh('git reset --hard HEAD')
 
             clean_options = ['q', 'f', 'd']
@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.description
-        "Resets git repo to a clean state by discarding uncommited changes"
+        "Resets git repo to a clean state by discarding uncommitted changes"
       end
 
       def self.details

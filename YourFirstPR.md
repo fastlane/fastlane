@@ -17,14 +17,25 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
   - Run `bundle install` in the project root
-  - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
   - If there are dependency errors, you might also need to run `bundle update`
 - Create a new branch to work on:
   - `git checkout -b <YOUR_BRANCH_NAME>`
   - A good name for a branch describes the thing you’ll be working on, e.g. `docs-fixes`, `fix-deliver-upload`, `gym-build-android-app`, etc.
-- That’s it! Now you’re ready to work on _fastlane_ 
+- That’s it! Now you’re ready to work on _fastlane_
 
 ## Testing your local changes
+
+### Checking it all
+
+The `Fastfile` included at the top of the fastlane project allows you to run several validation steps, such as automated tests, code style and more.
+
+```
+bundle exec fastlane test
+```
+
+You can also run those steps independently or on a more fine grained way.
+
+### Automated tests
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
@@ -36,6 +47,8 @@ bundle exec rspec
 
 If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
 
+### Code style
+
 To verify and auto-fix the code style
 
 ```
@@ -44,11 +57,13 @@ bundle exec rubocop -a
 
 If you want to run code style verification only for one tool, use `bundle exec rubocop -a [tool_name]`
 
+### Test the changes for your application
+
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application.
 
 Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local _fastlane_ clone and drop it into your project's root folder.
 
-Make sure to change the `local_fastlane_path` variable to point to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
+Make sure to replace `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` with the path to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
 ```
 bundle update
 ```
@@ -66,8 +81,7 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 
 When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
 
-- Create a separate PR for each tool that you’ve worked on
-- Use a descriptive title 
+- Use a descriptive title
 - Link the issues that are related to your PR in the body
 
 ## After the review

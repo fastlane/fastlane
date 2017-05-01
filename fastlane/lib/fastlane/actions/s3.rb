@@ -6,11 +6,13 @@ require 'cgi'
 module Fastlane
   module Actions
     module SharedValues
-      S3_IPA_OUTPUT_PATH = :S3_IPA_OUTPUT_PATH
-      S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
-      S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
-      S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
-      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
+      # Using ||= because these MAY be defined by the the
+      # preferred aws_s3 plugin
+      S3_IPA_OUTPUT_PATH ||= :S3_IPA_OUTPUT_PATH
+      S3_DSYM_OUTPUT_PATH ||= :S3_DSYM_OUTPUT_PATH
+      S3_PLIST_OUTPUT_PATH ||= :S3_PLIST_OUTPUT_PATH
+      S3_HTML_OUTPUT_PATH ||= :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH ||= :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -382,7 +384,7 @@ module Fastlane
                                        default_value: ENV['AWS_REGION']),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",
-                                       description: "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  ",
+                                       description: "S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  ",
                                        optional: true,
                                        default_value: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'),
           FastlaneCore::ConfigItem.new(key: :source,

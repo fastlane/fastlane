@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "OCLint Integration" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "raises an exception when the default compile_commands.json is not present" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

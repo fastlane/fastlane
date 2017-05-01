@@ -16,7 +16,6 @@ module Scan
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first) if Scan.devices
-
       command = TestCommandGenerator.generate
       prefix_hash = [
         {
@@ -80,24 +79,26 @@ module Scan
       })
       puts ""
 
+      copy_simulator_logs
+
       report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
 
-      if Scan.config[:include_simulator_logs]
-        Scan.devices.each do |device|
-          sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-          if File.exist?(sim_device_logfilepath_source)
-            sim_device_logfilepath_dest = File.join(Scan.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-            FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-          end
-        end
+      if result[:failures] > 0
+        UI.test_failure!("Tests have failed")
       end
 
       unless tests_exit_status == 0
-        UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}")
+        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
+    end
 
-      unless result[:failures] == 0
-        UI.user_error!("Tests failed")
+    def copy_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
       end
     end
 

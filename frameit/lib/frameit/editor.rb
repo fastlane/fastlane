@@ -70,7 +70,7 @@ module Frameit
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot)
+      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
 
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
@@ -104,19 +104,33 @@ module Frameit
     def complex_framing
       background = generate_background
 
+      self.top_space_above_device = vertical_frame_padding
+
+      if fetch_config['title']
+        background = put_title_into_background(background, fetch_config['stack_title'])
+      end
+
       if self.frame # we have no frame on le mac
         resize_frame!
         put_into_frame
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
-        @image.resize "#{frame_width}x"
-      end
+        frame_height = background.height - top_space_above_device - vertical_frame_padding
 
-      self.top_space_above_device = vertical_frame_padding
-
-      if fetch_config['title']
-        background = put_title_into_background(background)
+        if fetch_config['show_complete_frame']
+          # calculate the final size of the screenshot to resize in one go
+          # it may be limited either by the width or height of the frame
+          image_aspect_ratio = @image.width.to_f / @image.height.to_f
+          image_width = [frame_width, @image.width].min
+          image_height = [frame_height, image_width / image_aspect_ratio].min
+          image_width = image_height * image_aspect_ratio
+          @image.resize "#{image_width}x#{image_height}" if image_width < @image.width || image_height < @image.height
+        else
+          # the screenshot size is only limited by width.
+          # If higher than the frame, the screenshot is cut off at the bottom
+          @image.resize "#{frame_width}x" if frame_width < @image.width
+        end
       end
 
       @image = put_device_into_background(background)
@@ -127,7 +141,7 @@ module Frameit
     # Horizontal adding around the frames
     def horizontal_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[0].to_i
       end
       return scale_padding(padding)
@@ -136,13 +150,16 @@ module Frameit
     # Vertical adding around the frames
     def vertical_frame_padding
       padding = fetch_config['padding']
-      unless padding.kind_of?(Integer)
+      if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[1].to_i
       end
       return scale_padding(padding)
     end
 
     def scale_padding(padding)
+      if padding.kind_of?(String) && padding.end_with?('%')
+        padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
+      end
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
@@ -159,12 +176,6 @@ module Frameit
     end
 
     def put_device_into_background(background)
-      show_complete_frame = fetch_config['show_complete_frame']
-      if show_complete_frame
-        max_height = background.height - top_space_above_device
-        image.resize "x#{max_height}>"
-      end
-
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
@@ -181,17 +192,60 @@ module Frameit
 
       multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
-      frame.resize "#{new_frame_width.round}x" # resize it to the calculated witdth
+      frame.resize "#{new_frame_width.round}x" # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
+    def resize_text(text)
+      width = text.width
+      ratio = (width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
+      if ratio > 1.0
+        # too large - resizing now
+        smaller = (1.0 / ratio)
+        text.resize "#{(smaller * text.width).round}x"
+      end
+    end
     # Add the title above the device
-    def put_title_into_background(background)
-      title_images = build_title_images(image.width, image.height)
+
+    def put_title_into_background_stacked(background, title, keyword)
+      resize_text(title)
+      resize_text(keyword)
+
+      title_width = title.width
+      keyword_width = keyword.width
+
+      vertical_padding = vertical_frame_padding
+      keyword_top_space = vertical_padding
+
+      spacing_between_title_and_keyword = (title.height / 2)
+      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
+      title_left_space = (background.width / 2.0 - title_width / 2.0).round
+      keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
+
+      self.top_space_above_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
+      # keyword
+      background = background.composite(keyword, "png") do |c|
+        c.compose "Over"
+        c.geometry "+#{keyword_left_space}+#{keyword_top_space}"
+      end
+      # Then, put the title on top of the screenshot next to the keyword
+      background = background.composite(title, "png") do |c|
+        c.compose "Over"
+        c.geometry "+#{title_left_space}+#{title_top_space}"
+      end
+      background
+    end
+
+    def put_title_into_background(background, stack_title)
+      title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = title_images[:keyword]
       title = title_images[:title]
 
+      if stack_title && !keyword.nil? && !title.nil? && keyword.width > 0 && title.width > 0
+        background = put_title_into_background_stacked(background, title, keyword)
+        return background
+      end
       # sum_width: the width of both labels together including the space inbetween
       #   is used to calculate the ratio
       sum_width = title.width
@@ -199,7 +253,7 @@ module Frameit
 
       # Resize the 2 labels if necessary
       smaller = 1.0 # default
-      ratio = (sum_width + keyword_padding * 2) / image.width.to_f
+      ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
       if ratio > 1.0
         # too large - resizing now
         smaller = (1.0 / ratio)
@@ -212,10 +266,10 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding
-      top_space = vertical_padding
+      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.top_space_above_device += title.height + vertical_padding
+      self.top_space_above_device += actual_font_size + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
@@ -236,12 +290,13 @@ module Frameit
     end
 
     def actual_font_size
-      [@image.width / 10.0].max.round
+      font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      [@image.width * font_scale_factor].max.round
     end
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 2.0).round
+      (actual_font_size / 3.0).round
     end
 
     # This will build 2 individual images with the title, which will then be added to the real image

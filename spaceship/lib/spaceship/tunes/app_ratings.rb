@@ -85,15 +85,6 @@ module Spaceship
         'ratingFiveCount' => :five_star_rating_count
       })
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
-
       # @return (Float) the average rating for this summary (rounded to 2 decimal places)
       def average_rating
         ((self.one_star_rating_count +

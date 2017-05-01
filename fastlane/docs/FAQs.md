@@ -90,6 +90,9 @@ lane :deploy_all do
 end
 ```
 
+And you can combine multiple envs in one go
+Ex: `fastlane build --env app1,env1,env2` will use `.env.app1` `.env.env1` and `.env.env2`
+
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
 
 ### Disable colored output

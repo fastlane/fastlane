@@ -51,20 +51,18 @@ module Snapshot
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
             results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
+
+            copy_simulator_logs(device, language, locale, launch_arguments)
           end
         end
       end
 
       print_results(results)
 
-      UI.user_error!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
+      UI.test_failure!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
-
-      if Snapshot.config[:output_simulator_logs]
-        output_simulator_logs
-      end
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
@@ -73,7 +71,7 @@ module Snapshot
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
-    # @return true/false depending on if the tests succeded
+    # @return true/false depending on if the tests succeeded
     def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
       return launch(language, locale, device, launch_arguments)
     rescue => ex
@@ -83,7 +81,7 @@ module Snapshot
         UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
         run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
       else
-        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if $verbose
+        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if FastlaneCore::Globals.verbose?
         self.collected_errors << ex
         raise ex if Snapshot.config[:stop_after_first_error]
         return false # for the results
@@ -100,15 +98,17 @@ module Snapshot
       end
     end
 
-    def output_simulator_logs
-      Snapshot.config[:devices].each do |device_name|
-        device = TestCommandGenerator.find_device(device_name)
-        sim_device_logfilepath_source = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
-        next unless File.exist?(sim_device_logfilepath_source)
+    def copy_simulator_logs(device_name, language, locale, launch_arguments)
+      return unless Snapshot.config[:output_simulator_logs]
 
-        sim_device_logfilepath_dest = File.join(Snapshot.config[:output_directory], "#{device.name}_#{device.os_type}_#{device.os_version}_system.log")
-        FileUtils.cp(sim_device_logfilepath_source, sim_device_logfilepath_dest)
-      end
+      detected_language = locale || language
+      language_folder = File.join(Snapshot.config[:output_directory], detected_language)
+      device = TestCommandGenerator.find_device(device_name)
+      components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
+
+      UI.header("Collecting system logs #{device_name} - #{language}")
+      log_identity = Digest::MD5.hexdigest(components.join("-"))
+      FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
     end
 
     def print_results(results)
@@ -124,7 +124,7 @@ module Snapshot
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         headings: ["Device"] + results.values.first.keys,
         title: "snapshot results"
       }
@@ -133,7 +133,7 @@ module Snapshot
       puts ""
     end
 
-    # Returns true if it succeded
+    # Returns true if it succeeded
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -146,22 +146,24 @@ module Snapshot
       File.write(File.join(prefix, "locale.txt"), locale || "")
       File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
-      # Kill and shutdown all currently running simulators so that the following settings
-      # changes will be picked up when they are started again.
-      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
-      `xcrun simctl shutdown booted &> /dev/null`
+      unless device_type == "Mac"
+        # Kill and shutdown all currently running simulators so that the following settings
+        # changes will be picked up when they are started again.
+        Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+        `xcrun simctl shutdown booted &> /dev/null`
 
-      Fixes::SimulatorZoomFix.patch
-      Fixes::HardwareKeyboardFix.patch
+        Fixes::SimulatorZoomFix.patch
+        Fixes::HardwareKeyboardFix.patch
 
-      if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
-        erase_simulator(device_type)
-        if Snapshot.config[:localize_simulator]
-          localize_simulator(device_type, language, locale)
+        if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
+          erase_simulator(device_type)
+          if Snapshot.config[:localize_simulator]
+            localize_simulator(device_type, language, locale)
+          end
+        elsif Snapshot.config[:reinstall_app]
+          # no need to reinstall if device has been erased
+          uninstall_app(device_type)
         end
-      elsif Snapshot.config[:reinstall_app]
-        # no need to reinstall if device has been erased
-        uninstall_app(device_type)
       end
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
@@ -290,6 +292,7 @@ module Snapshot
 
     # rubocop:disable Style/Next
     def verify_helper_is_current
+      return if Snapshot.config[:skip_helper_version_check]
       current_version = version_of_bundled_helper
       UI.verbose "Checking that helper files contain #{current_version}"
 
@@ -298,7 +301,7 @@ module Snapshot
         content = File.read(path)
 
         unless content.include?(current_version)
-          UI.error "Your '#{path}' is outdated, please run `snapshot update`"
+          UI.error "Your '#{path}' is outdated, please run `fastlane snapshot update`"
           UI.error "to update your Helper file"
           UI.user_error!("Please update your Snapshot Helper file")
         end

@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -40,6 +41,7 @@ produce
 Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -61,7 +63,7 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 - **Associate** apps with App Groups on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Installation
 
@@ -79,7 +81,7 @@ To get a list of all available parameters:
 
 ```
   Commands:
-    associate_group  Associate with a group, which is create if needed or simply located otherwise
+    associate_group  Associate with a group, which is created if needed or simply located otherwise
     create           Creates a new app on iTunes Connect and the Apple Developer Portal
     disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
     enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
@@ -218,7 +220,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

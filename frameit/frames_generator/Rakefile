@@ -56,7 +56,7 @@ task :generate_device_frames do
   puts "Done writing all the things to './output', please upload both the 'latest' and the time stamp '#{current_time}' folder to GitHub".green
   puts "To do so, clone https://github.com/fastlane/frameit-frames, make sure to check out the `gh-pages` branch".green
   puts "and overwrite the 'latest' folder, and copy the time stamp folder into the root.".green
-  puts "Push the changes, and run `frameit update_frames` to ensure everything worked as expected".green
+  puts "Push the changes, and run `fastlane frameit update_frames` to ensure everything worked as expected".green
 end
 
 def confirm
@@ -72,4 +72,4 @@ def convert_image_resource(path)
   image.write(path)
 end
 
-task :default => [:generate_device_frames]
+task default: [:generate_device_frames]

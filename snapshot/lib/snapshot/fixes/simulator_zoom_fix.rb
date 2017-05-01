@@ -13,7 +13,7 @@ module Snapshot
           simulator_name = simulator.name.tr("\s", "-")
           key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 
-          Helper.backticks("defaults write '#{config_path}' '#{key}' '1.0'", print: $verbose)
+          Helper.backticks("defaults write '#{config_path}' '#{key}' '1.0'", print: FastlaneCore::Globals.verbose?)
         end
       end
 

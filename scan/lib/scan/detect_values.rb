@@ -36,7 +36,22 @@ module Scan
 
       default_derived_data
 
+      coerce_to_array_of_strings(:only_testing)
+      coerce_to_array_of_strings(:skip_testing)
+
       return config
+    end
+
+    def self.coerce_to_array_of_strings(config_key)
+      config_value = Scan.config[config_key]
+
+      return if config_value.nil?
+
+      # splitting on comma allows us to support comma-separated lists of values
+      # from the command line, even though the ConfigItem is not defined as an
+      # Array type
+      config_value = config_value.split(',') unless config_value.kind_of?(Array)
+      Scan.config[config_key] = config_value.map(&:to_s)
     end
 
     def self.default_derived_data

@@ -46,7 +46,7 @@ module Fastlane
           UI.success('Successfully sent Slack notification')
         else
           UI.verbose(result)
-          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile.")
+          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL")
         end
       end
 
@@ -91,7 +91,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",
-                                       description: "Add additional information to this post. payload must be a hash containg any key with any value",
+                                       description: "Add additional information to this post. payload must be a hash containing any key with any value",
                                        default_value: {},
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :default_payloads,

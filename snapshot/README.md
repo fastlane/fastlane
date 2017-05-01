@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -60,6 +61,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -83,7 +85,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
 - _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 After _snapshot_ successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
 
@@ -280,7 +282,7 @@ to update your `SnapshotHelper.swift` files. In case you modified your `Snapshot
 
 ## Launch Arguments
 
-You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `NSProcessInfo.processInfo().arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `NSUserDefaults.standardUserDefaults()`.
+You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `ProcessInfo.processInfo.arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `UserDefaults.standard`.
 
 ```ruby
 launch_arguments([
@@ -289,14 +291,14 @@ launch_arguments([
 ```
 
 ```swift
-name.text = NSUserDefaults.standardUserDefaults().stringForKey("firstName")
+name.text = UserDefaults.standard.string(forKey: "firstName")
 // name.text = "Felix"
 ```
 
 _snapshot_ includes `-FASTLANE_SNAPSHOT YES`, which will set a temporary user default for the key `FASTLANE_SNAPSHOT`, you may use this to detect when the app is run by _snapshot_.
 
 ```swift
-if NSUserDefaults.standardUserDefaults().boolForKey("FASTLANE_SNAPSHOT") {
+if UserDefaults.standard.bool(forKey: "FASTLANE_SNAPSHOT") {
     // runtime check that we are in snapshot mode
 }
 ```
@@ -334,7 +336,7 @@ _snapshot_ finds all these entries using a regex. The number of _snapshot_ outpu
 
 If you find a better way to do any of this, please submit an issue on GitHub or even a pull request :+1:
 
-Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152).
+Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has been resolved with Xcode 8.3, so it's now possible to actually take screenshots from the simulator. We'll keep using the old approach for now, since many of you still want to use older versions of Xcode.
 
 # Tips
 
@@ -360,7 +362,7 @@ Also, feel free to duplicate radar [23062925](https://openradar.appspot.com/rada
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Frame the screenshots
 

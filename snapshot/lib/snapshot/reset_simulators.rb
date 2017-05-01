@@ -6,7 +6,7 @@ module Snapshot
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       sure = true if FastlaneCore::Env.truthy?("SNAPSHOT_FORCE_DELETE") || force
-      sure = agree("Are you sure? All your simulators will be DELETED and new ones will be created! (y/n)".red, true) unless sure
+      sure = UI.confirm("Are you sure? All your simulators will be DELETED and new ones will be created!") unless sure
       UI.user_error!("User cancelled action") unless sure
 
       devices.each do |device|
@@ -58,7 +58,7 @@ module Snapshot
     end
 
     def self.devices
-      all_devices = Helper.backticks('xcrun simctl list devices', print: $verbose)
+      all_devices = Helper.backticks('xcrun simctl list devices', print: FastlaneCore::Globals.verbose?)
       # == Devices ==
       # -- iOS 9.0 --
       #   iPhone 4s (32246EBC-33B0-47F9-B7BB-5C23C550DF29) (Shutdown)
@@ -85,7 +85,7 @@ module Snapshot
 
       if phones.any? && watches.any?
         puts "Creating device pair of #{phones.last} and #{watches.last}"
-        Helper.backticks("xcrun simctl pair #{watches.last} #{phones.last}", print: $verbose)
+        Helper.backticks("xcrun simctl pair #{watches.last} #{phones.last}", print: FastlaneCore::Globals.verbose?)
       end
     end
 

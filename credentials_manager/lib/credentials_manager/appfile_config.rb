@@ -44,7 +44,7 @@ module CredentialsManager
           eval(content)
           # rubocop:enable Security/Eval
 
-          print_debug_information(path: full_path) if $verbose
+          print_debug_information(path: full_path) if FastlaneCore::Globals.verbose?
         end
       end
 
@@ -168,7 +168,7 @@ module CredentialsManager
     # platform_name  - Symbol representing a platform name.
     # block - Block to execute to override configuration values.
     #
-    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
+    # Discussion If received platform name does not match the platform name available as environment variable, no changes will
     #             be applied.
     def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s

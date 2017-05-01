@@ -20,6 +20,10 @@ module Gym
           # If that location changes, search it using xcrun --sdk iphoneos -f PackageApplication
           package_application_path = "#{Xcode.xcode_path}/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication"
 
+          unless File.exist?(package_application_path)
+            ErrorHandler.raise_legacy_build_api_error("")
+          end
+
           UI.crash!("Unable to patch the `PackageApplication` script bundled in Xcode. This is not supported.") unless expected_md5_hashes.include?(Digest::MD5.file(package_application_path).hexdigest)
 
           # Duplicate PackageApplication script to PackageApplication4Gym
@@ -29,11 +33,11 @@ module Gym
           Dir[File.join(Gym::ROOT, "lib/assets/package_application_patches/*.diff")].each do |patch|
             UI.verbose "Applying Package Application patch: #{File.basename(patch)}"
             command = ["patch '#{@patched_package_application_path}' < '#{patch}'"]
-            Runner.new.print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if $verbose
+            Runner.new.print_command(command, "Applying Package Application patch: #{File.basename(patch)}") if FastlaneCore::Globals.verbose?
 
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: false,
-                                            print_command: $verbose,
+                                            print_command: FastlaneCore::Globals.verbose?,
                                                     error: proc do |output|
                                                       ErrorHandler.handle_package_error(output)
                                                     end)

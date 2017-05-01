@@ -7,7 +7,7 @@ module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
     # This web service is fully open source: https://github.com/fastlane/refresher
-    UPDATE_URL = "https://fastlane-refresher.herokuapp.com/"
+    UPDATE_URL = "https://refresher.fastlane.tools/"
 
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
@@ -59,7 +59,7 @@ module FastlaneCore
       else
         puts "# An update for #{gem_name} is available. You are on #{current_version}.".green
       end
-      puts "# It is recommended to use the latest version.".green
+      puts "# You should use the latest version.".green
       puts "# Please update using `#{self.update_command(gem_name: gem_name)}`.".green
 
       puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
@@ -79,10 +79,12 @@ module FastlaneCore
     def self.update_command(gem_name: "fastlane")
       if Helper.bundler?
         "bundle update #{gem_name.downcase}"
-      elsif Helper.contained_fastlane?
+      elsif Helper.contained_fastlane? || Helper.homebrew?
         "fastlane update_fastlane"
+      elsif Helper.mac_app?
+        "the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version."
       else
-        "sudo gem update #{gem_name.downcase}"
+        "sudo gem install #{gem_name.downcase}"
       end
     end
 

@@ -58,10 +58,14 @@ module Fastlane
       rescue => ex
         Dir.chdir(path_to_use) do
           # Provide error block exception without colour code
-          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
-
-          error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
-          error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
+          begin
+            error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
+            error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
+          rescue => error_block_exception
+            UI.error("An error occurred while executing the `error` block:")
+            UI.error(error_block_exception.to_s)
+            raise ex # raise the original error message
+          end
         end
 
         raise ex
@@ -97,6 +101,17 @@ module Fastlane
       nil
     end
 
+    # Pass a action alias symbol (e.g. :enable_automatic_code_signing)
+    # and this method will return a reference to the action class
+    # if it exists. In case the action with this alias can't be found
+    # this method will return nil.
+    def class_reference_from_action_alias(method_sym)
+      alias_found = find_alias(method_sym.to_s)
+      return nil unless alias_found
+
+      class_reference_from_action_name(alias_found.to_sym)
+    end
+
     # lookup if an alias exists
     def find_alias(action_name)
       Actions.alias_actions.each do |key, v|
@@ -115,14 +130,12 @@ module Fastlane
       # First, check if there is a predefined method in the actions folder
       class_ref = class_reference_from_action_name(method_sym)
       unless class_ref
-        alias_found = find_alias(method_sym.to_s)
-        if alias_found
+        class_ref = class_reference_from_action_alias(method_sym)
+        # notify action that it has been used by alias
+        if class_ref.respond_to?(:alias_used)
           orig_action = method_sym.to_s
-          class_ref = class_reference_from_action_name(alias_found.to_sym)
-          # notify action that it has been used by alias
-          if class_ref.respond_to?(:alias_used)
-            class_ref.alias_used(orig_action, arguments.first)
-          end
+          arguments = [{}] if arguments.empty?
+          class_ref.alias_used(orig_action, arguments.first)
         end
       end
 
@@ -242,6 +255,8 @@ module Fastlane
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(method_sym)
         raise e
+      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
@@ -258,12 +273,11 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
-          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-
+        # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        if platform
           unless class_ref.is_supported?(platform)
-            UI.user_error!("Action '#{name}' doesn't support required operating system '#{platform}'.")
+            UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
         end
       end

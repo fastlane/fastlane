@@ -719,7 +719,7 @@ describe Fastlane do
         )
       end
 
-      it "should support ommiting output when specifying multiple reports " do
+      it "should support omitting output when specifying multiple reports " do
         ENV["XCODE_BUILD_PATH"] = "./build"
 
         result = Fastlane::FastFile.new.parse("lane :test do

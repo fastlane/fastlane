@@ -35,14 +35,6 @@ module Spaceship
         'buildSdk' => :build_sdk,
         'fileName' => :file_name
       )
-
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
     end
   end
 end

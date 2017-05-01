@@ -97,20 +97,38 @@ module Sigh
 
       return results if Sigh.config[:skip_certificate_verification]
 
-      return results.find_all do |a|
-        # Also make sure we have the certificate installed on the local machine
+      UI.message "Verifying certificates..."
+      return results.find_all do |current_profile|
         installed = false
-        a.certificates.each do |cert|
+
+        # Attempts to download all certificates from this profile
+        # for checking if they are installed.
+        # `cert.download_raw` can fail if the user is a
+        # "member" and not an a "admin"
+        raw_certs = current_profile.certificates.map do |cert|
+          begin
+            raw_cert = cert.download_raw
+          rescue => error
+            UI.important("Cannot download cert #{cert.id} - #{error.message}")
+            raw_cert = nil
+          end
+          { downloaded: raw_cert, cert: cert }
+        end
+
+        # Makes sure we have the certificate installed on the local machine
+        raw_certs.each do |current_cert|
+          # Skip certificates that failed to download
+          next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(cert.download_raw)
+          file.write(current_cert[:downloaded])
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
+            UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && a.certificate_valid?
+        installed && current_profile.certificate_valid?
       end
     end
 
@@ -127,18 +145,18 @@ module Sigh
         end
       end
 
-      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name} for #{Sigh.config[:platform]} platform'"
+      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform"
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
                               certificate: cert,
                                       mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvos' : nil)
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
       profile
     end
 
     def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
-      when 'ios'
+      when 'ios', 'tvos'
         if profile_type == Spaceship.provisioning_profile.Development
           certificates = Spaceship.certificate.development.all
         elsif profile_type == Spaceship.provisioning_profile.InHouse
@@ -216,8 +234,13 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
-      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
+      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+
+      if Sigh.config[:platform].to_s == 'tvos'
+        profile_name += "_tvos"
+      end
+
+      profile_name += '.mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
@@ -242,7 +265,7 @@ module Sigh
       UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
       UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
       UI.message ""
-      UI.message "produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
       UI.message ""
       UI.message "You will be asked for any missing information, like the full name of your app"
       UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
