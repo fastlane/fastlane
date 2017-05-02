@@ -89,7 +89,7 @@ module Gym
           end
         end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
-        
+
         pipe
       end
 
