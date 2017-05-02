@@ -41,6 +41,7 @@ module Gym
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
+        options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
@@ -64,6 +65,7 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
+        pipe << "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if Gym.config[:analyze_build_time]
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
