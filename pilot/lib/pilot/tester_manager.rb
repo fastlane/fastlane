@@ -10,15 +10,19 @@ module Pilot
       app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
       UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)") unless app
 
-      tester = find_or_create_tester(email: config[:email], first_name: config[:first_name], last_name: config[:last_name])
+      tester = find_or_create_tester(email: config[:email], first_name: config[:first_name], last_name: config[:last_name], app: app)
 
       begin
         groups = Spaceship::TestFlight::Group.add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
         if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
           UI.success("Successfully added tester to app #{app.name}")
         else
-          group_names = groups.map(&:name).join(", ")
-          UI.success("Successfully added tester to app #{app.name} in group(s) #{group_names}")
+          if config[:groups]
+            group_names = groups.map(&:name).join(", ")
+            UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
+          else
+            UI.success("Successfully added tester to the default tester group in app: #{app.name}")
+          end
         end
       rescue => ex
         UI.error("Could not add #{tester.email} to app: #{app.name}")
@@ -91,21 +95,35 @@ module Pilot
       nil
     end
 
-    def find_or_create_tester(email: nil, first_name: nil, last_name: nil)
-      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+    def find_or_create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
+      current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
+      tester = nil
+
+      if current_user.roles.include?("admin")
+        tester = Spaceship::Tunes::Tester::Internal.find(email)
+        tester ||= Spaceship::Tunes::Tester::External.find(email)
+      elsif current_user.roles.include?("appmanager")
+        raise "Account #{current_user.email_address} is only an 'App Manager' and therefore you must also define what app this tester (#{email}) should be added to" unless app
+        tester = Spaceship::Tunes::Tester::Internal.find_by_app(app.apple_id, email)
+        tester ||= Spaceship::Tunes::Tester::External.find_by_app(app.apple_id, email)
+      else
+        raise "Account #{current_user.email} doesn't have a role that is allowed to administer app testers, current roles: #{current_user.roles}"
+      end
 
       if tester
-        UI.success("Existing tester #{tester.email}")
-      else
-        tester = Spaceship::Tunes::Tester::External.create!(email: config[:email],
-                                                            first_name: config[:first_name],
-                                                            last_name: config[:last_name])
-        UI.success("Successfully added tester: #{tester.email} to your account")
+        UI.success("Existing tester #{email}")
+      elsif current_user.roles.include?("admin")
+        tester = Spaceship::Tunes::Tester::External.create!(email: email, first_name: first_name, last_name: last_name)
+        UI.success("Successfully added tester: #{email} to your account")
+      elsif current_user.roles.include?("appmanager")
+        Spaceship::TestFlight::Base.client.create_app_level_tester(app_id: app.apple_id, first_name: first_name, last_name: last_name, email: email)
+        tester = Spaceship::Tunes::Tester::External.find_by_app(app.apple_id, email)
+        UI.success("Successfully added tester: #{email} to your app #{app.name}")
       end
+
       return tester
     rescue => ex
-      UI.error("Could not create tester #{config[:email]}")
+      UI.error("Could not create tester #{email}")
       raise ex
     end
 

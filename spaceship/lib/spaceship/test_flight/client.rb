@@ -112,15 +112,21 @@ module Spaceship::TestFlight
     ##
 
     def post_tester(app_id: nil, tester: nil)
-      assert_required_params(__method__, binding)
+      return create_app_level_tester(app_id: app_id,
+                                 first_name: tester.first_name,
+                                  last_name: tester.last_name,
+                                      email: tester.email)
+    end
 
+    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
+      assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url
         req.body = {
-          "email" => tester.email,
-          "firstName" => tester.first_name,
-          "lastName" => tester.last_name
+          "email" => email,
+          "firstName" => first_name,
+          "lastName" => last_name
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
