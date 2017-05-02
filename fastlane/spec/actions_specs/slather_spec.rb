@@ -60,6 +60,7 @@ describe Fastlane do
       end
 
       it "works with bundle" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
             use_bundle_exec: true,
@@ -114,10 +115,11 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             slather
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "does not require project if .slather.yml is found" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         File.write('./.slather.yml', '')
 
         result = Fastlane::FastFile.new.parse("lane :test do

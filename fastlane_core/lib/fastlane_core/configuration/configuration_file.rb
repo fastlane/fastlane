@@ -8,6 +8,7 @@ module FastlaneCore
     # @param path [String] The path to the configuration file to use
     def initialize(config, path, block_for_missing)
       self.config = config
+
       @block_for_missing = block_for_missing
       content = File.read(path)
 
@@ -20,9 +21,9 @@ module FastlaneCore
       end
 
       begin
-        # rubocop:disable Lint/Eval
+        # rubocop:disable Security/Eval
         eval(content) # this is okay in this case
-        # rubocop:enable Lint/Eval
+        # rubocop:enable Security/Eval
 
         print_resulting_config_values(path) # only on success
       rescue SyntaxError => ex
@@ -46,7 +47,8 @@ module FastlaneCore
       end.compact
 
       puts ""
-      puts Terminal::Table.new(rows: rows, title: "Detected Values from '#{path}'")
+      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values from '#{path}'")
       puts ""
     end
 
@@ -66,6 +68,18 @@ module FastlaneCore
 
         return if value.nil?
         self.modified_values[method_sym] = value
+
+        # to support frozen strings (e.g. ENV variables) too
+        # we have to dupe the value
+        # in < Ruby 2.4.0 `.dup` is not support by boolean values
+        # and there is no good way to check if a class actually
+        # responds to `dup`, so we have to rescue the exception
+        begin
+          value = value.dup
+        rescue TypeError
+          # Nothing specific to do here, if we can't dupe, we just
+          # deal with it (boolean values can't be from env variables anyway)
+        end
         self.config[method_sym] = value
       else
         # We can't set this value, maybe the tool using this configuration system has its own
@@ -76,6 +90,49 @@ module FastlaneCore
         else
           self.config[method_sym] = '' # important, since this will raise a good exception for free
         end
+      end
+    end
+
+    # Override configuration for a specific lane. If received lane name does not
+    # match the lane name available as environment variable, no changes will
+    # be applied.
+    #
+    # @param lane_name Symbol representing a lane name.
+    # @yield Block to run for overriding configuration values.
+    #
+    def for_lane(lane_name)
+      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
+      end
+    end
+
+    # Override configuration for a specific platform. If received platform name
+    # does not match the platform name available as environment variable, no
+    # changes will be applied.
+    #
+    # @param platform_name Symbol representing a platform name.
+    # @yield Block to run for overriding configuration values.
+    #
+    def for_platform(platform_name)
+      if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
+        with_a_clean_config_merged_when_complete do
+          yield
+        end
+      end
+    end
+
+    # Allows a configuration block (for_lane, for_platform) to get a clean
+    # configuration for applying values, so that values can be overridden
+    # (once) again. Those values are then merged into the surrounding
+    # configuration as the block completes
+    def with_a_clean_config_merged_when_complete
+      self.config.push_values!
+      begin
+        yield
+      ensure
+        self.config.pop_values!
       end
     end
   end

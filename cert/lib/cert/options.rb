@@ -60,7 +60,17 @@ module Cert
                                      env_name: "CERT_KEYCHAIN_PASSWORD",
                                      sensitive: true,
                                      description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     env_name: "CERT_PLATFORM",
+                                     description: "Set the provisioning profile's platform (ios, macos)",
+                                     is_string: false,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       pt = %w(macos ios)
+                                       UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
+                                     end)
       ]
     end
   end

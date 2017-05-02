@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Crashlytics Integration" do
       before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ENV.delete "CRASHLYTICS_API_TOKEN"
         ENV.delete "CRASHLYTICS_BUILD_SECRET"
         ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
@@ -294,7 +295,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error
+            end.to raise_error(%r{Couldn't find crashlytics at path .*fastlane/wadus})
           end
 
           it "raises an error if no api token was given" do

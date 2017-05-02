@@ -17,6 +17,15 @@ describe FastlaneCore do
       end
     end
 
+    describe '#json_file?' do
+      it "should return false on invalid json file" do
+        expect(FastlaneCore::Helper.json_file?("./fastlane_core/spec/fixtures/json_file/broken")).to be false
+      end
+      it "should return true on valid json file" do
+        expect(FastlaneCore::Helper.json_file?("./fastlane_core/spec/fixtures/json_file/valid")).to be true
+      end
+    end
+
     describe "#is_ci?" do
       it "returns false when not building in a known CI environment" do
         stub_const('ENV', {})
@@ -49,7 +58,36 @@ describe FastlaneCore do
       end
     end
 
-    # Mac OS only (to work on Linux)
+    describe "#keychain_path" do
+      it "finds file in current directory" do
+        allow(File).to receive(:exist?).and_return(false)
+
+        found = File.expand_path("test.keychain")
+        allow(File).to receive(:exist?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path("test.keychain")).to eq File.expand_path(found)
+      end
+
+      it "finds file in current directory with -db" do
+        allow(File).to receive(:exist?).and_return(false)
+
+        found = File.expand_path("test-db")
+        allow(File).to receive(:exist?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path("test.keychain")).to eq File.expand_path(found)
+      end
+
+      it "finds file in current directory with spaces and \"" do
+        allow(File).to receive(:exist?).and_return(false)
+
+        found = File.expand_path('\\"\\ test\\ \\".keychain')
+        allow(File).to receive(:exist?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path('\\"\\ test\\ \\".keychain')).to eq File.expand_path(found)
+      end
+    end
+
+    # macOS only (to work on Linux)
     if FastlaneCore::Helper.is_mac?
       describe "Xcode" do
         # Those tests also work when using a beta version of Xcode

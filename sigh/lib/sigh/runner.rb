@@ -24,14 +24,10 @@ module Sigh
         profile = profiles.first
 
         if Sigh.config[:force]
-          if profile_type == Spaceship.provisioning_profile::AppStore or profile_type == Spaceship.provisioning_profile::InHouse
-            UI.important "Updating the provisioning profile"
-          else
-            UI.important "Updating the profile to include all devices"
-            profile.devices = Spaceship.device.all_for_profile_type(profile.type)
-          end
-
-          profile = profile.update! # assign it, as it's a new profile
+          # Recreating the profile ensures it has all of the requested properties (cert, name, etc.)
+          UI.important "Recreating the profile"
+          profile.delete!
+          profile = create_profile!
         end
       else
         UI.important "No existing profiles found, that match the certificates you have installed locally! Creating a new provisioning profile for you"
@@ -65,9 +61,9 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier])
+      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
       results = results.find_all do |current_profile|
-        if current_profile.valid?
+        if current_profile.valid? || Sigh.config[:force]
           true
         else
           UI.message("Provisioning Profile '#{current_profile.name}' is not valid, skipping this one...")
@@ -101,20 +97,38 @@ module Sigh
 
       return results if Sigh.config[:skip_certificate_verification]
 
-      return results.find_all do |a|
-        # Also make sure we have the certificate installed on the local machine
+      UI.message "Verifying certificates..."
+      return results.find_all do |current_profile|
         installed = false
-        a.certificates.each do |cert|
+
+        # Attempts to download all certificates from this profile
+        # for checking if they are installed.
+        # `cert.download_raw` can fail if the user is a
+        # "member" and not an a "admin"
+        raw_certs = current_profile.certificates.map do |cert|
+          begin
+            raw_cert = cert.download_raw
+          rescue => error
+            UI.important("Cannot download cert #{cert.id} - #{error.message}")
+            raw_cert = nil
+          end
+          { downloaded: raw_cert, cert: cert }
+        end
+
+        # Makes sure we have the certificate installed on the local machine
+        raw_certs.each do |current_cert|
+          # Skip certificates that failed to download
+          next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(cert.download_raw)
+          file.write(current_cert[:downloaded])
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
+            UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && a.certificate_valid?
+        installed && current_profile.certificate_valid?
       end
     end
 
@@ -131,22 +145,44 @@ module Sigh
         end
       end
 
-      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}'"
+      UI.important "Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform"
       profile = profile_type.create!(name: name,
                                 bundle_id: bundle_id,
-                              certificate: cert)
+                              certificate: cert,
+                                      mac: Sigh.config[:platform].to_s == 'macos',
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
       profile
+    end
+
+    def certificates_for_profile_and_platform
+      case Sigh.config[:platform].to_s
+      when 'ios', 'tvos'
+        if profile_type == Spaceship.provisioning_profile.Development
+          certificates = Spaceship.certificate.development.all
+        elsif profile_type == Spaceship.provisioning_profile.InHouse
+          certificates = Spaceship.certificate.in_house.all
+        else
+          certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+        end
+
+      when 'macos'
+        if profile_type == Spaceship.provisioning_profile.Development
+          certificates = Spaceship.certificate.mac_development.all
+        elsif profile_type == Spaceship.provisioning_profile.AppStore
+          certificates = Spaceship.certificate.mac_app_distribution.all
+        elsif profile_type == Spaceship.provisioning_profile.Direct
+          certificates = Spaceship.certificate.developer_id_application.all
+        else
+          certificates = Spaceship.certificate.mac_app_distribution.all
+        end
+      end
+
+      certificates
     end
 
     # Certificate to use based on the current distribution mode
     def certificate_to_use
-      if profile_type == Spaceship.provisioning_profile.Development
-        certificates = Spaceship.certificate.development.all
-      elsif profile_type == Spaceship.provisioning_profile.InHouse
-        certificates = Spaceship.certificate.in_house.all
-      else
-        certificates = Spaceship.certificate.production.all # Ad hoc or App Store
-      end
+      certificates = certificates_for_profile_and_platform
 
       # Filter them
       certificates = certificates.find_all do |c|
@@ -172,7 +208,7 @@ module Sigh
       end
 
       if certificates.count > 1 and !Sigh.config[:development]
-        UI.important "Found more than one code signing identity. Choosing the first one. Check out `sigh --help` to see all available options."
+        UI.important "Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options."
         UI.important "Available Code Signing Identities for current filters:"
         certificates.each do |c|
           str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
@@ -198,8 +234,13 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}.mobileprovision" # default name
-      profile_name += '.mobileprovision' unless profile_name.include? 'mobileprovision'
+      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+
+      if Sigh.config[:platform].to_s == 'tvos'
+        profile_name += "_tvos"
+      end
+
+      profile_name += '.mobileprovision'
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
@@ -213,7 +254,7 @@ module Sigh
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      return if Spaceship::App.find(Sigh.config[:app_identifier])
+      return if Spaceship::App.find(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
       print_produce_command(Sigh.config)
       UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
     end
@@ -224,7 +265,7 @@ module Sigh
       UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
       UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
       UI.message ""
-      UI.message "produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
       UI.message ""
       UI.message "You will be asked for any missing information, like the full name of your app"
       UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"

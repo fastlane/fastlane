@@ -1,6 +1,7 @@
 require 'json'
 require 'fastlane/version'
 
+require 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
 require 'fastlane_core/core_ext/string'
 
@@ -28,6 +29,8 @@ require 'fastlane_core/ui/ui'
 require 'fastlane_core/tool_collector'
 require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/keychain_importer'
+require 'fastlane_core/swag'
+require 'fastlane_core/build_watcher'
 
 # Third Party code
 require 'colored'
@@ -41,6 +44,8 @@ module FastlaneCore
 
   # A directory that's being used to user-wide fastlane configs
   # This directory is also used for the bundled fastlane
+  # Since we don't want to access FastlaneCore from spaceship
+  # this method is duplicated in spaceship/client.rb
   def self.fastlane_user_dir
     path = File.expand_path(File.join("~", ".fastlane"))
     FileUtils.mkdir_p(path) unless File.directory?(path)

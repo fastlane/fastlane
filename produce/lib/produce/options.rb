@@ -65,6 +65,22 @@ module Produce
                                      description: "Skip the creation of the app on iTunes Connect",
                                      is_string: false,
                                      default_value: false),
+
+        FastlaneCore::ConfigItem.new(key: :enabled_features,
+                                     short_option: "-P",
+                                     env_name: "PRODUCE_ENABLED_FEATURES",
+                                     description: "Array with Spaceship App Features",
+                                     is_string: false,
+                                     default_value: {},
+                                     verify_block: proc do |value|
+                                                     allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
+                                                                     :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
+                                                     UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
+                                                     value.each do |key, v|
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                     end
+                                                   end),
+
         FastlaneCore::ConfigItem.new(key: :skip_devcenter,
                                      short_option: "-d",
                                      env_name: "PRODUCE_SKIP_DEVCENTER",

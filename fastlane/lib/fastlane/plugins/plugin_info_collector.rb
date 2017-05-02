@@ -95,7 +95,7 @@ module Fastlane
     #
 
     def detect_author
-      git_name = Helper.backticks('git config --get user.name', print: $verbose).strip
+      git_name = Helper.backticks('git config --get user.name', print: FastlaneCore::Globals.verbose?).strip
       return git_name.empty? ? nil : git_name
     end
 
@@ -121,7 +121,7 @@ module Fastlane
     #
 
     def detect_email
-      git_email = Helper.backticks('git config --get user.email', print: $verbose).strip
+      git_email = Helper.backticks('git config --get user.email', print: FastlaneCore::Globals.verbose?).strip
       return git_email.empty? ? nil : git_email
     end
 

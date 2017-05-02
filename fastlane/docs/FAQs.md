@@ -90,6 +90,9 @@ lane :deploy_all do
 end
 ```
 
+And you can combine multiple envs in one go
+Ex: `fastlane build --env app1,env1,env2` will use `.env.app1` `.env.env1` and `.env.env2`
+
 More on the `.env` file can be found [here](https://github.com/bkeepers/dotenv).
 
 ### Disable colored output
@@ -102,5 +105,5 @@ export FASTLANE_DISABLE_COLORS=1
 
 ### "User interaction is not allowed" when using `fastlane` via SSH
 
-This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](http://stackoverflow.com/a/22637896/445598).
+This error can occur when you run `fastlane` via SSH. To fix it check out [this reply on StackOverflow](https://stackoverflow.com/a/22637896/445598).
 

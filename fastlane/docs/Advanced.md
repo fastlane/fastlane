@@ -174,19 +174,33 @@ If you just want to try an action without adding them to your `Fastfile` yet, yo
 fastlane run notification message:"My Text" title:"The Title"
 ```
 
-To get the avaiable options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
+To get the available options for any action run `fastlane action [action_name]`. You might not be able to set some kind of parameters using this method.
 
-## Shell values
+## Shell interaction
+
+### Return value
+
 You can get value from shell commands:
 ```ruby
 output = sh("pod update")
 ```
 
+### Working directory
+
+`sh` action uses a different working directory than other _fastlane_ actions. As working directory, most _fastlane_ actions use the current directory as of the time when the `fastlane` command has been called. However, `sh` action uses `./fastlane/` subdirectory of the current directory as its working directory. Furthermore, shell environment variable PWD does not reflect the working directory, while retrieved within `sh` action.
+For further details refer to the related issue fastlane/fastlane#6982
+
+If you need to call a script present in the current directory, you can use the following notion:
+```
+sh("#{ENV['PWD']}/script.sh")
+```
+
+
 ## Priorities of parameters and options
 
 The order in which `fastlane` tools take their values from
 
-1. CLI parameter (e.g. `gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
+1. CLI parameter (e.g. `fastlane gym --scheme Example`) or Fastfile (e.g. `gym(scheme: 'Example')`)
 1. Environment variable (e.g. `GYM_SCHEME`)
 1. Tool specific config file (e.g. `Gymfile` containing `scheme 'Example'`)
 1. Default value (which might be taken from the `Appfile`, e.g. `app_identifier` from the `Appfile`)
@@ -346,6 +360,89 @@ fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
+## Control configuration by lane and by platform
+
+In general, configuration files take only the first value given for a particular configuration item. That means that for an `Appfile` like the following:
+
+```ruby
+app_identifier "com.used.id"
+app_identifier "com.ignored.id"
+```
+
+the `app_identfier` will be `"com.used.id"` and the second value will be ignored. The `for_lane` and `for_platform` configuration blocks provide a limited exception to this rule.
+
+All configuration files (Appfile, Matchfile, Screengrabfile, etc.) can use `for_lane` and `for_platform` blocks to control (and override) configuration values for those circumstances.
+
+`for_lane` blocks will be called when the name of lane invoked on the command line matches the one specified by the block. So, given a `Screengrabfile` like:
+
+```ruby
+locales ['en-US', 'fr-FR', 'ja-JP']
+
+for_lane :screenshots_english_only do
+  locales ['en-US']
+end
+
+for_lane :screenshots_french_only do
+  locales ['fr-FR']
+end
+```
+
+`locales` will have the values `['en-US', 'fr-FR', 'ja-JP']` by default, but will only have one value when running the `fastlane screenshots_english_only` or `fastlane screenshots_french_only`.
+
+`for_platform` gives you similar control based on the platform for which you have invoked _fastlane_. So, for an `Appfile` configured like:
+
+```ruby
+app_identifier "com.default.id"
+
+for_lane :enterprise do
+  app_identifier "com.forlane.enterprise"
+end
+
+for_platform :mac do
+  app_identifier "com.forplatform.mac"
+
+  for_lane :release do
+    app_identifier "com.forplatform.mac.forlane.release"
+  end
+end
+```
+
+you can expect the `app_identifier` to equal `"com.forplatform.mac.forlane.release"` when invoking `fastlane mac release`.
+
 ## Gitignore
 
 The documentation was moved to [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md).
+
+## Directory behavior
+
+_fastlane_ was designed in a way that you can run _fastlane_ from both the root directory of the project, and from the `fastlane` sub-folder.
+
+Take this example `Fastfile` on the path `fastlane/Fastfile`
+```ruby
+sh "pwd" # => "[root]/fastlane"
+puts Dir.pwd # => "[root]/fastlane"
+
+lane :something do
+  sh "pwd" # => "[root]/fastlane"
+  puts Dir.pwd # => "[root]/fastlane"
+
+  my_action
+end
+```
+
+The implementation of `my_action` looks like this:
+```ruby
+def run(params)
+  puts Dir.pwd # => "[root]"
+end
+```
+
+Notice how every action and every plugin's code runs in the root of the project, while all user code from the `Fastfile` runs inside the `fastlane` directory. This is important to consider when migrating existing code from your `Fastfile` into your own action or plugin. To change the directory manually you can use standard Ruby blocks:
+
+```ruby
+Dir.chdir("..") do
+  # code here runs in the parent directory
+end
+```
+
+This behavior isn't great, and has been like this since the very early days of _fastlane_. As much as we'd like to change it, there is no good way to do so, without breaking thousands of production setups, so we decided to keep it as is for now.

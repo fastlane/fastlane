@@ -9,7 +9,7 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      UI.user_error "Couldn't find file at path '#{path}'" unless File.exist? path
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist? path
       @color = color
       @path = path
       @size = FastImage.size(path)
@@ -60,7 +60,7 @@ module Frameit
     end
 
     def mac?
-      return device_name == 'Mac'
+      return device_name == 'MacBook'
     end
 
     # The name of the orientation of a screenshot. Used to find the correct template

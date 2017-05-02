@@ -19,10 +19,7 @@ describe Gym do
     it "supports additional parameters" do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
-      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
-      xcargs = xcargs_hash.map do |k, v|
-        "#{k.to_s.shellescape}=#{v.shellescape}"
-      end.join ' '
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3", xcargs: xcargs, scheme: 'Example' }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -46,10 +43,7 @@ describe Gym do
     it "disables xcpretty formatting" do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
-      xcargs_hash = { DEBUG: "1", BUNDLE_NAME: "Example App" }
-      xcargs = xcargs_hash.map do |k, v|
-        "#{k.to_s.shellescape}=#{v.shellescape}"
-      end.join ' '
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
       options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example', disable_xcpretty: true }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -65,6 +59,30 @@ describe Gym do
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
                              "| tee #{log_path.shellescape}"
+                           ])
+    end
+
+    it "enables unicode" do
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example', xcpretty_utf: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+                             "set -o pipefail &&",
+                             "xcodebuild",
+                             "-scheme Example",
+                             "-project ./gym/examples/standard/Example.xcodeproj",
+                             "-sdk '9.0'",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             :archive,
+                             "| tee #{log_path.shellescape}",
+                             "| xcpretty",
+                             "--utf"
                            ])
     end
 
@@ -171,6 +189,30 @@ describe Gym do
                                "-resultBundlePath './ExampleProductName.result'",
                                :archive,
                                "| tee #{log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+      end
+    end
+
+    describe "Analyze Build Time Example" do
+      it "uses the correct build command with the example project" do
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: true, scheme: 'Example' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\"",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
                                "| xcpretty"
                              ])
       end

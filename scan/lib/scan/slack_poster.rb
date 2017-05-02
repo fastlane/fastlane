@@ -3,7 +3,7 @@ module Scan
     def run(results)
       return if Scan.config[:skip_slack]
       return if Scan.config[:slack_only_on_failure] && results[:failures] == 0
-      return if Scan.config[:slack_url].nil?
+      return if Scan.config[:slack_url].to_s.empty?
 
       require 'slack-notifier'
       notifier = Slack::Notifier.new(Scan.config[:slack_url])
@@ -51,7 +51,10 @@ module Scan
 
       if result.code.to_i == 200
         UI.success('Successfully sent Slack notification')
+      elsif result.code.to_i == 404
+        UI.error("The Slack URL you provided could not be reached (404)")
       else
+        UI.error("The Slack notification could not be sent:")
         UI.error(result.to_s)
       end
     end

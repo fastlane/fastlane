@@ -129,6 +129,21 @@ describe Fastlane do
 
         expect(result).to eq("git tag -am #{message} \'#{tag}\' #{commit}")
       end
+
+      it "allows you to sign the tag using the default e-mail address's key." do
+        tag = '2.0.0'
+        message = "message"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            tag: '#{tag}',
+            message: '#{message}',
+            sign: true
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am #{message} -s \'#{tag}\'")
+      end
     end
   end
 end

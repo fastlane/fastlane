@@ -10,14 +10,14 @@ Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master
 
 **Adding Credentials**
 ```
-fastlane-credentials add --username felix@krausefx.com
+fastlane fastlane-credentials add --username felix@krausefx.com
 Password: *********
 Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
 ```
-fastlane-credentials remove --username felix@krausefx.com
+fastlane fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
@@ -33,12 +33,14 @@ You can easily delete the stored password by opening the "Keychain Access" app, 
 
 ## Using environment variables
 
+Pass the user credentials via the following environment variables:
+
 ```
 FASTLANE_USER
 FASTLANE_PASSWORD
 ```
 
-If you don't want to have your password stored in the Keychain use `FASTLANE_DONT_STORE_PASSWORD`.
+If you don't want to have your password stored in the Keychain set the `FASTLANE_DONT_STORE_PASSWORD` environment variable to `"1"`.
 
 ## Implementing a custom solution
 

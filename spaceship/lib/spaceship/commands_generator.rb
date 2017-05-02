@@ -24,7 +24,7 @@ module Spaceship
       global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
 
       command :playground do |c|
-        c.syntax = 'spaceship playground'
+        c.syntax = 'fastlane spaceship playground'
         c.description = 'Run an interactive shell that connects you to Apple web services'
 
         c.action do |args, options|
@@ -33,7 +33,7 @@ module Spaceship
       end
 
       command :spaceauth do |c|
-        c.syntax = 'spaceship spaceauth'
+        c.syntax = 'fastlane spaceship spaceauth'
         c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
 
         c.action do |args, options|

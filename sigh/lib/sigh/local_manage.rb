@@ -82,11 +82,11 @@ module Sigh
       UI.message "#{profiles_soon.count} are valid but will expire within 30 days".yellow
       UI.message "#{profiles_valid.count} are valid".green
 
-      UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
+      UI.message "You can remove all expired profiles using `fastlane sigh manage -e`" if profiles_expired.count > 0
     end
 
     def self.profile_info(profile)
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         "#{profile['Name']} - #{File.basename profile['Path']}"
       else
         profile['Name']
@@ -108,7 +108,7 @@ module Sigh
         if Helper.ci?
           UI.user_error! "On a CI server, cleanup cannot be used without the --force option"
         else
-          delete = agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
+          delete = UI.confirm("Delete these provisioning profiles #{profiles.length}?")
         end
       end
 

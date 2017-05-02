@@ -26,7 +26,7 @@ module Fastlane
         end
 
         if params[:select_reqex]
-          UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
+          UI.important("'select_reqex' parameter is deprecated. Please use 'select_regex' instead.")
           select_regex = params[:select_reqex]
         end
 
@@ -43,7 +43,7 @@ module Fastlane
           file_ruby = file.gsub('\ ', ' ')
           File.exist?(file_ruby) and
             (!select_regex or file_ruby =~ select_regex) and
-            (!exclude_regex or !(file_ruby =~ exclude_regex))
+            (!exclude_regex or file_ruby !~ exclude_regex)
         end
 
         command_prefix = [

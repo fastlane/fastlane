@@ -22,8 +22,8 @@ import tools.fastlane.screengrab.file.Chmod;
 public class FileWritingScreenshotCallback implements ScreenshotCallback {
     private static final String TAG = "Screengrab";
 
-    private static final String NAME_SEPARATOR = "_";
-    private static final String EXTENSION = ".png";
+    protected static final String NAME_SEPARATOR = "_";
+    protected static final String EXTENSION = ".png";
     private static final int FULL_QUALITY = 100;
     private static final String SCREENGRAB_DIR_NAME = "screengrab";
 
@@ -37,8 +37,7 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     public void screenshotCaptured(String screenshotName, Bitmap screenshot) {
         try {
             File screenshotDirectory = getFilesDirectory(appContext, Locale.getDefault());
-            String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;
-            File screenshotFile = new File(screenshotDirectory, screenshotFileName);
+            File screenshotFile = getScreenshotFile(screenshotDirectory, screenshotName);
 
             OutputStream fos = null;
             try {
@@ -52,10 +51,15 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
                 }
             }
 
-            Log.d(TAG, "Captured screenshot \"" + screenshotFileName + "\"");
+            Log.d(TAG, "Captured screenshot \"" + screenshotFile.getName() + "\"");
         } catch (Exception e) {
             throw new RuntimeException("Unable to capture screenshot.", e);
         }
+    }
+
+    protected File getScreenshotFile(File screenshotDirectory, String screenshotName) {
+        String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;
+        return new File(screenshotDirectory, screenshotFileName);
     }
 
     private static File getFilesDirectory(Context context, Locale locale) throws IOException {
@@ -66,7 +70,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             directory = initializeDirectory(externalDir);
         }
 
-        if (directory == null) {
+        // We can only try this fall-back before Android N, since N makes Context.MODE_WORLD_READABLE
+        // result in a SecurityException
+        if (directory == null && Build.VERSION.SDK_INT < 24) {
             File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
             directory = initializeDirectory(internalDir);
         }
@@ -86,7 +92,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             if (dir.isDirectory() && dir.canWrite()) {
                 return dir;
             }
-        } catch (IOException ignored) {}
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to initialize directory: " + dir.getAbsolutePath(), e);
+        }
 
         return null;
     }

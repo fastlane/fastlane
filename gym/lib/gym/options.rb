@@ -9,6 +9,24 @@ module Gym
       @options = plain_options
     end
 
+    def self.legacy_api_note!
+      UI.important "Unfortunately the legacy build API was removed with Xcode 8.3."
+      UI.important "Please make sure to remove use_legacy_build_api from your ./fastlane/Fastfile"
+      UI.important "and update the gym call to include the export method like this:"
+      UI.important "== App Store Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "app-store")'
+      UI.important "==  Ad Hoc Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "ad-hoc")'
+      UI.important "== Development Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "development")'
+      UI.important "== In-House Enterprise Builds =="
+      UI.error '     gym(scheme: "MyScheme", export_method: "enterprise")'
+      UI.important "If you run into a code signing error, please check out our troubleshooting guide for more information on how to solve the most common issues"
+      UI.error "    https://docs.fastlane.tools/codesigning/troubleshooting/ 🚀"
+      UI.important ""
+      UI.user_error! "legacy_build_api removed!"
+    end
+
     def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -82,6 +100,11 @@ module Gym
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_ipa,
+                                     env_name: "GYM_SKIP_PACKAGE_IPA",
+                                     description: "Should we skip packaging the ipa?",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -103,6 +126,9 @@ module Gym
                                      verify_block: proc do |value|
                                        if value
                                          UI.important "Don't use this option any more, as it's deprecated by Apple"
+                                       end
+                                       if Gym::Xcode.legacy_api_deprecated?
+                                         Gym::Options.legacy_api_note!
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_method,
@@ -131,7 +157,8 @@ module Gym
                                      conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
-                                     end),
+                                     end,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
                                      description: "Export ipa from previously build xarchive. Uses archive_path as source",
@@ -196,7 +223,8 @@ module Gym
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
                                      description: "Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
-                                     optional: true),
+                                     optional: true,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :xcconfig,
                                      short_option: "-y",
                                      env_name: "GYM_XCCONFIG",
@@ -248,7 +276,17 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in culprits.txt file",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
+                                     env_name: "XCPRETTY_UTF",
+                                     description: "Have xcpretty use unicode encoding when reporting builds",
+                                     optional: true,
+                                     is_string: false)
       ]
     end
   end

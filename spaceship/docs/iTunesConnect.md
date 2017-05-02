@@ -283,7 +283,8 @@ app.external_testers            # => Array of all external testers for this appl
 # Creating new external testers
 Spaceship::Tunes::Tester::External.create!(email: "github@krausefx.com",
                                       first_name: "Felix",
-                                       last_name: "Krause")
+                                       last_name: "Krause",
+                                          groups: ["spaceship"])
 
 # Add all external testers to an application
 app.add_all_testers!

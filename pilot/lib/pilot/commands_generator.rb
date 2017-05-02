@@ -8,8 +8,6 @@ module Pilot
   class CommandsGenerator
     include Commander::Methods
 
-    FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
-
     def self.start
       new.run
     end
@@ -31,11 +29,13 @@ module Pilot
         begin
           mgr.public_send(action, config)
         rescue => ex
-          failures.push(address)
-          UI.message("[#{address}]: #{ex}")
+          # no need to show the email address in the message if only one specified
+          message = (args.count > 1) ? "[#{address}]: #{ex}" : ex
+          failures << message
+          UI.error(message)
         end
       end
-      UI.user_error!("Some operations failed: #{failures}") unless failures.empty?
+      UI.user_error!("Some operations failed: #{failures.join(', ')}") unless failures.empty?
     end
 
     def run
@@ -47,11 +47,14 @@ module Pilot
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/pilot"
       program :help_formatter, :compact
 
-      global_option("--verbose") { $verbose = true }
+      global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 
       command :upload do |c|
-        c.syntax = "pilot upload"
+        c.syntax = "fastlane pilot upload"
         c.description = "Uploads a new binary to Apple TestFlight"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.upload(config)
@@ -59,18 +62,23 @@ module Pilot
       end
 
       command :distribute do |c|
-        c.syntax = "pilot distribute"
+        c.syntax = "fastlane pilot distribute"
         c.description = "Distribute a previously uploaded binary to Apple TestFlight"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-          config[:distribute_external] = true
           Pilot::BuildManager.new.distribute(config)
         end
       end
 
       command :builds do |c|
-        c.syntax = "pilot builds"
+        c.syntax = "fastlane pilot builds"
         c.description = "Lists all builds for given application"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::BuildManager.new.list(config)
@@ -78,16 +86,22 @@ module Pilot
       end
 
       command :add do |c|
-        c.syntax = "pilot add"
+        c.syntax = "fastlane pilot add"
         c.description = "Adds new external tester(s) to a specific app (if given). This will also add an existing tester to an app."
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           handle_multiple('add_tester', args, options)
         end
       end
 
       command :list do |c|
-        c.syntax = "pilot list"
+        c.syntax = "fastlane pilot list"
         c.description = "Lists all registered testers, both internal and external"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterManager.new.list_testers(config)
@@ -95,24 +109,33 @@ module Pilot
       end
 
       command :find do |c|
-        c.syntax = "pilot find"
+        c.syntax = "fastlane pilot find"
         c.description = "Find tester(s) (internal or external) by their email address"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           handle_multiple('find_tester', args, options)
         end
       end
 
       command :remove do |c|
-        c.syntax = "pilot remove"
+        c.syntax = "fastlane pilot remove"
         c.description = "Remove external tester(s) by their email address"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           handle_multiple('remove_tester', args, options)
         end
       end
 
       command :export do |c|
-        c.syntax = "pilot export"
+        c.syntax = "fastlane pilot export"
         c.description = "Exports all external testers to a CSV file"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterExporter.new.export_testers(config)
@@ -120,8 +143,11 @@ module Pilot
       end
 
       command :import do |c|
-        c.syntax = "pilot import"
+        c.syntax = "fastlane pilot import"
         c.description = "Create external testers from a CSV file"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
         c.action do |args, options|
           config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
           Pilot::TesterImporter.new.import_testers(config)

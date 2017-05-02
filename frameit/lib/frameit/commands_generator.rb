@@ -21,14 +21,15 @@ module Frameit
       program :help, 'GitHub', 'https://github.com/fastlane/frameit'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-      FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       default_command :run
 
       command :run do |c|
-        c.syntax = 'frameit black'
+        c.syntax = 'fastlane frameit black'
         c.description = "Adds a black frame around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)
@@ -37,8 +38,10 @@ module Frameit
       end
 
       command :silver do |c|
-        c.syntax = 'frameit silver'
+        c.syntax = 'fastlane frameit silver'
         c.description = "Adds a silver frame around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)
@@ -47,8 +50,10 @@ module Frameit
       end
 
       command :gold do |c|
-        c.syntax = 'frameit gold'
+        c.syntax = 'fastlane frameit gold'
         c.description = "Adds a gold frame around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)
@@ -57,8 +62,10 @@ module Frameit
       end
 
       command :rose_gold do |c|
-        c.syntax = 'frameit rose_gold'
+        c.syntax = 'fastlane frameit rose_gold'
         c.description = "Adds a rose gold frame around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
 
         c.action do |args, options|
           load_config(options)
@@ -67,7 +74,7 @@ module Frameit
       end
 
       command :setup do |c|
-        c.syntax = 'frameit setup'
+        c.syntax = 'fastlane frameit setup'
         c.description = "Downloads and sets up the latest device frames"
 
         c.action do |args, options|
@@ -76,7 +83,7 @@ module Frameit
       end
 
       command :download_frames do |c|
-        c.syntax = 'frameit download_frames'
+        c.syntax = 'fastlane frameit download_frames'
         c.description = "Downloads and sets up the latest device frames"
 
         c.action do |args, options|

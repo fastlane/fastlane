@@ -38,6 +38,12 @@ describe Spaceship::Application do
           expect(a.apple_id).to eq('898536088')
         end
 
+        it "returns the application if available ignoring case" do
+          a = Spaceship::Application.find('net.sunAPPs.107')
+          expect(a.class).to eq(Spaceship::Application)
+          expect(a.apple_id).to eq('898536088')
+        end
+
         it "returns nil if not available" do
           a = Spaceship::Application.find('netnot.available')
           expect(a).to eq(nil)
@@ -62,7 +68,6 @@ describe Spaceship::Application do
     describe "#create!" do
       it "works with valid data and defaults to English" do
         Spaceship::Tunes::Application.create!(name: "My name",
-                                              version: "1.0",
                                               sku: "SKU123",
                                               bundle_id: "net.sunapps.123")
       end
@@ -71,7 +76,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_broken_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         end.to raise_error "You must choose a primary language. You must choose a primary language."
@@ -81,7 +85,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_broken_create_wildcard
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
         end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
@@ -92,7 +95,6 @@ describe Spaceship::Application do
       it "works with valid data and defaults to English" do
         TunesStubbing.itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My Name",
-                                              version: "1.0",
                                               sku: "SKU123",
                                               bundle_id: "net.sunapps.123",
                                               company_name: "SunApps GmbH")
@@ -102,7 +104,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_applications_broken_first_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
@@ -269,6 +270,30 @@ describe Spaceship::Application do
         expect(promocodes.version.number_of_codes).to eq(7)
         expect(promocodes.version.maximum_number_of_codes).to eq(100)
         expect(promocodes.version.contract_file_name).to eq('promoCodes/ios/spqr5/PromoCodeHolderTermsDisplay_en_us.html')
+      end
+    end
+
+    describe "#availability" do
+      let(:app) { Spaceship::Application.all.first }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        availability = app.availability
+        expect(availability.inspect).to include("Tunes::Availability")
+      end
+    end
+
+    describe "#update_availability" do
+      let(:app) { Spaceship::Application.all.first }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        TunesStubbing.itc_stub_app_uninclude_future_territories
+
+        availability = app.availability
+        availability.include_future_territories = false
+        availability = app.update_availability!(availability)
+        expect(availability.inspect).to include("Tunes::Availability")
       end
     end
   end

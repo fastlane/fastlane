@@ -13,12 +13,12 @@ module Fastlane
           UI.success('Git status is clean, all good! 💪')
           Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START] = true
         else
-          UI.user_error!("Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.")
+          UI.user_error!("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
         end
       end
 
       def self.description
-        "Raises an exception if there are uncommited git changes"
+        "Raises an exception if there are uncommitted git changes"
       end
 
       def self.details

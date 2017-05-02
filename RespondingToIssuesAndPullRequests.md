@@ -1,14 +1,14 @@
-# How to respond to Issues and PRs 
+# How to respond to Issues and PRs
 
 ## How we treat each other  
 
-When replying to issues and PRs, make sure you always follow our [Code of Conduct](CODE_OF_CONDUCT.md) and our [vision for fastlane](VISION.md). Make sure to read these thoroughly and understand them before you interact with any other users! In general, be nice to each other, and treat **everyone** with the same respect and dignity. 
+When replying to issues and PRs, make sure you always follow our [Code of Conduct](CODE_OF_CONDUCT.md) and our [vision for fastlane](VISION.md). Make sure to read these thoroughly and understand them before you interact with any other users! In general, be nice to each other, and treat **everyone** with the same respect and dignity.
 
-Also, whenever you submit a comment, don’t ask users for their personal information or account credentials. 
+Also, whenever you submit a comment, don’t ask users for their personal information or account credentials.
 
 ## How we use GitHub Labels
 
-Issues and PRs may get marked with labels to help the fastlane team communicate with each other and with the community as a whole. Usually most issues and PRs will get two different labels, one for the tool it affects (e.g. `fastlane`, `fastlane_core`, `supply`, ...) and one that represents some general information about the state or nature of the issue/PR. 
+Issues and PRs may get marked with labels to help the fastlane team communicate with each other and with the community as a whole. Usually most issues and PRs will get two different labels, one for the tool it affects (e.g. `fastlane`, `fastlane_core`, `supply`, ...) and one that represents some general information about the state or nature of the issue/PR.
 
 If you identify an issue that seems interesting but not time-critical, and is simple for new contributors to dive into, we recommend adding the “you can do this” label. PRs labeled “you can do this” should have very clear descriptions of the problem and solution. Remember that someone who is new to fastlane will need some coaching to be successful!
 
@@ -27,14 +27,14 @@ If you identify an issue that seems interesting but not time-critical, and is si
 
 ### Tool Labels
 
-Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`. 
+Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`.
 
-## How to review Pull Requests 
+## How to review Pull Requests
 
 ### Recommended setup for testing the code
 
 - Clone the _fastlane_ repository by running  `git clone git@github.com:fastlane/fastlane.git` in your terminal
-- For each PR you want to review, make sure to add the user’s fork as a remote 
+- For each PR you want to review, make sure to add the user’s fork as a remote
   - `git remote add <GITHUB_USERNAME> git@github.com:<GITHUB_USERNAME>/fastlane.git`
 - Then, check out the branch for the user’s PR
   - Fetch all their branches `git fetch <GITHUB_USERNAME>`
@@ -43,8 +43,9 @@ Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`.
     - Create a new branch to merge the others into `git checkout -b my_new_branch`
     - Merge the branch from one PR `git pull --rebase <GITHUB_USERNAME> <THEIR_PR_BRANCH>`
     - Repeat the last step for each of the related PRs that the user submitted.
-- After checking out a user’s code, you should always make sure that the tests are still working. 
+- After checking out a user’s code, you should always make sure that the tests are still working.
   - Run `bundle install` to make sure all dependencies are installed
+  - Use `bundle exec fastlane test` from the root directory to run all validation steps (tests, rubocop, etc)
   - Use `bundle exec rspec` from the root directory to run all tests
   - Use `bundle exec rspec [tool_name]` to run all tests for a specific tool
   - Use `bundle exec rubocop -a` to run the linter and autocorrect many of the issues it found
@@ -58,11 +59,11 @@ git checkout pr-1234
 
 ### Using your _fastlane_ clone in a project
 
-First of all, since we are testing code that is considered bleeding edge and might not be stable yet, make sure to **never test with an account that is provided by your employer and/or real, live apps!** Things might break irrevocably! For that reason, we recommend setting up an entirely new account and project for testing _fastlane_ PRs. 
+First of all, since we are testing code that is considered bleeding edge and might not be stable yet, make sure to **never test with an account that is provided by your employer and/or real, live apps!** Things might break irrevocably! For that reason, we recommend setting up an entirely new account and project for testing _fastlane_ PRs.
 
 Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local fastlane clone and drop it into your project's root folder.
 
-Make sure to change the `local_fastlane_path` variable to point to your fastlane clone, e.g. `~/fastlane`, then you can run
+Make sure to replace `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` with the path to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
 ```
 bundle update
 ```
@@ -74,7 +75,7 @@ bundle show fastlane
 
 which should print out the path to your local development environment.
 
-Afterwards, execute _fastlane_ or one of the tools using `bundle exec <tool>`, e.g. `bundle exec fastlane` or `bundle exec deliver`. 
+Afterwards, execute _fastlane_ or one of the tools using `bundle exec <tool>`, e.g. `bundle exec fastlane` or `bundle exec deliver`.
 
 ### Reviewing the Code
 

@@ -63,7 +63,7 @@ module Cert
           revoke_count += 1
         rescue => e
           UI.error "An error occurred while revoking #{certificate.id} #{certificate.name}"
-          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if $verbose
+          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if FastlaneCore::Globals.verbose?
         end
       end
 
@@ -109,7 +109,7 @@ module Cert
           UI.error "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
         end
 
-        File.delete(path) # as apparantly this certificate is pretty useless without a private key
+        File.delete(path) # as apparently this certificate is pretty useless without a private key
       end
 
       UI.important "Couldn't find an existing certificate... creating a new one"
@@ -123,9 +123,17 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      cert_type = Spaceship.certificate.production
-      cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-      cert_type = Spaceship.certificate.development if Cert.config[:development]
+      case Cert.config[:platform].to_s
+      when 'ios', 'tvos'
+        cert_type = Spaceship.certificate.production
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+        cert_type = Spaceship.certificate.development if Cert.config[:development]
+
+      when 'macos'
+        cert_type = Spaceship.certificate.mac_app_distribution
+        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+
+      end
 
       cert_type
     end
@@ -138,11 +146,12 @@ module Cert
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
+        type_name = (Cert.config[:development] ? "Development" : "Distribution")
         if ex.to_s.include?("You already have a current")
-          type_name = (Cert.config[:development] ? "Development" : "Distribution")
           UI.user_error!("Could not create another #{type_name} certificate, reached the maximum number of available #{type_name} certificates.", show_github_issues: true)
+        elsif ex.to_s.include?("You are not allowed to perform this operation.") && type_name == "Distribution"
+          UI.user_error!("You do not have permission to create this certificate. Only Team Admins can create Distribution certificates\n 🔍 See https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html for more information.")
         end
-
         raise ex
       end
 

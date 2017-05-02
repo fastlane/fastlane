@@ -52,12 +52,6 @@ module Spaceship
       })
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param mac [Bool] Fetches Mac devices if true
         # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Array) Returns all devices registered for this account
@@ -97,13 +91,15 @@ module Spaceship
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
         def all_ios_profile_devices
-          all.select { |device| device.device_type != "tvOS" }
+          all.reject { |device| device.device_type == "tvOS" }
         end
 
-        # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
+        # @return (Array) Returns all devices matching the provided profile_type
         def all_for_profile_type(profile_type)
           if profile_type.include? "tvOS"
             Spaceship::Device.all_apple_tvs
+          elsif profile_type.include? "Mac"
+            Spaceship::Device.all_macs
           else
             Spaceship::Device.all_ios_profile_devices
           end

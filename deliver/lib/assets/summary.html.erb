@@ -107,12 +107,25 @@
               margin-left: 10px;
               margin-right: 10px;
           }
+          .app-icons {
+            overflow: hidden;
+          }
           .app-icons img {
             width: 150px;
           }
           .app-icons .app-icon {
               float: left;
               margin-right: 20px;
+          }
+
+          .app-review-information {
+            margin-left: 15px;
+            margin-right: 15px;
+            margin-top: 22px;
+          }
+
+          .app-review-information-key {
+            font-weight: 700;
           }
         </style>
     </head>
@@ -228,5 +241,20 @@
         
         <hr />
       <% end # end data %>
+      <% if @options[:app_review_information] %>
+        <div class="app-review-information">
+          <div class="cat-headline">Review Information</div>
+          <dl class="app-review-information">
+            <% @options[:app_review_information].each do |key, value| %>
+                <dt class="app-review-information-key">
+                  <%= key.to_s.capitalize.gsub("_", " ") %>
+                </dt>
+                <dd class="app-review-information-text">
+                  <%= (value || '').gsub("\n", "<br />") %>
+                </dd>
+            <% end %>
+          </dl>
+        </div>
+    <% end %>
     </body>
 </html>

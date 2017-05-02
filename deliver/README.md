@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ deliver
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/deliver/LICENSE)
-[![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](http://rubygems.org/gems/deliver)
+[![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](https://rubygems.org/gems/deliver)
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
@@ -40,6 +41,7 @@ deliver
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -63,7 +65,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 To upload builds to TestFlight check out [pilot](https://github.com/fastlane/fastlane/tree/master/pilot).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Installation
 
@@ -86,8 +88,6 @@ The guide will create all the necessary files for you, using the existing app me
 - Enjoy a good drink, while the computer does all the work for you
 
 From now on, you can run `fastlane deliver` to deploy a new update, or just upload new app metadata and screenshots.
-
-Already using `deliver` and just updated to 1.0? Check out the [Migration Guide](https://github.com/fastlane/fastlane/blob/master/deliver/MigrationGuide.md).
 
 # Usage
 
@@ -123,6 +123,12 @@ Download existing screenshots from iTunes Connect
 
 ```
 fastlane deliver download_screenshots
+```
+
+Download existing metadata from iTunes Connect
+
+```
+fastlane deliver download_metadata
 ```
 
 To get a list of available options run
@@ -175,7 +181,7 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Available language codes
 ```

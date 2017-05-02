@@ -2,31 +2,35 @@ module Match
   class Utils
     def self.import(item_path, keychain, password: "")
       keychain_path = FastlaneCore::Helper.keychain_path(keychain)
-      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: $verbose)
+      FastlaneCore::KeychainImporter.import_file(item_path, keychain_path, keychain_password: password, output: FastlaneCore::Globals.verbose?)
     end
 
     # Fill in an environment variable, ready to be used in _xcodebuild_
     def self.fill_environment(key, value)
-      UI.important "Setting environment variable '#{key}' to '#{value}'" if $verbose
+      UI.important "Setting environment variable '#{key}' to '#{value}'" if FastlaneCore::Globals.verbose?
       ENV[key] = value
     end
 
-    def self.environment_variable_name(app_identifier: nil, type: nil)
-      base_environment_variable_name(app_identifier: app_identifier, type: type).join("_")
+    def self.environment_variable_name(app_identifier: nil, type: nil, platform: :ios)
+      base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform).join("_")
     end
 
-    def self.environment_variable_name_team_id(app_identifier: nil, type: nil)
-      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["team-id"]).join("_")
+    def self.environment_variable_name_team_id(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["team-id"]).join("_")
     end
 
-    def self.environment_variable_name_profile_name(app_identifier: nil, type: nil)
-      (base_environment_variable_name(app_identifier: app_identifier, type: type) + ["profile-name"]).join("_")
+    def self.environment_variable_name_profile_name(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-name"]).join("_")
+    end
+
+    def self.environment_variable_name_profile_path(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-path"]).join("_")
     end
 
     def self.get_cert_info(cer_certificate_path)
       command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
       command << " &" # start in separate process
-      output = Helper.backticks(command, print: $verbose)
+      output = Helper.backticks(command, print: FastlaneCore::Globals.verbose?)
 
       # openssl output:
       # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}\n
@@ -52,8 +56,12 @@ module Match
       return {}
     end
 
-    def self.base_environment_variable_name(app_identifier: nil, type: nil)
-      ["sigh", app_identifier, type]
+    def self.base_environment_variable_name(app_identifier: nil, type: nil, platform: :ios)
+      if platform.to_s == :ios.to_s
+        ["sigh", app_identifier, type] # We keep the ios profiles without the platform for backwards compatibility
+      else
+        ["sigh", app_identifier, type, platform.to_s]
+      end
     end
   end
 end

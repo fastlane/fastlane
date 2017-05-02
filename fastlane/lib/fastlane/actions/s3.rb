@@ -1,15 +1,18 @@
 require 'fastlane/erb_template_helper'
 require 'ostruct'
 require 'uri'
+require 'cgi'
 
 module Fastlane
   module Actions
     module SharedValues
-      S3_IPA_OUTPUT_PATH = :S3_IPA_OUTPUT_PATH
-      S3_DSYM_OUTPUT_PATH = :S3_DSYM_OUTPUT_PATH
-      S3_PLIST_OUTPUT_PATH = :S3_PLIST_OUTPUT_PATH
-      S3_HTML_OUTPUT_PATH = :S3_HTML_OUTPUT_PATH
-      S3_VERSION_OUTPUT_PATH = :S3_VERSION_OUTPUT_PATH
+      # Using ||= because these MAY be defined by the the
+      # preferred aws_s3 plugin
+      S3_IPA_OUTPUT_PATH ||= :S3_IPA_OUTPUT_PATH
+      S3_DSYM_OUTPUT_PATH ||= :S3_DSYM_OUTPUT_PATH
+      S3_PLIST_OUTPUT_PATH ||= :S3_PLIST_OUTPUT_PATH
+      S3_HTML_OUTPUT_PATH ||= :S3_HTML_OUTPUT_PATH
+      S3_VERSION_OUTPUT_PATH ||= :S3_VERSION_OUTPUT_PATH
     end
 
     S3_ARGS_MAP = {
@@ -111,13 +114,13 @@ module Fastlane
         build_num = info['CFBundleVersion']
         bundle_id = info['CFBundleIdentifier']
         bundle_version = info['CFBundleShortVersionString']
-        title = info['CFBundleName']
+        title = CGI.escapeHTML(info['CFBundleName'])
         device_family = info['UIDeviceFamily']
         full_version = "#{bundle_version}.#{build_num}"
 
         # Creating plist and html names
         s3_domain = AWS::Core::Endpoints.hostname(s3_region, 's3') || 's3.amazonaws.com'
-        plist_file_name ||= "#{url_part}#{title.delete(' ')}.plist"
+        plist_file_name ||= "#{url_part}#{URI.escape(title)}.plist"
         plist_url = URI::HTTPS.build(host: s3_domain, path: "/#{s3_bucket}/#{plist_file_name}").to_s
 
         html_file_name ||= "index.html"
@@ -381,7 +384,7 @@ module Fastlane
                                        default_value: ENV['AWS_REGION']),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",
-                                       description: "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  ",
+                                       description: "S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  ",
                                        optional: true,
                                        default_value: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'),
           FastlaneCore::ConfigItem.new(key: :source,
@@ -433,7 +436,12 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `aws_s3` plugin instead.\n" \
+          "Install using `fastlane add_plugin aws_s3`."
       end
     end
   end

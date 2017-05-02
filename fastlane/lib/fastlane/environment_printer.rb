@@ -34,10 +34,10 @@ module Fastlane
       env_tail = "</details>"
       final_output = ""
 
-      if $captured_output
+      if FastlaneCore::Globals.captured_output?
         final_output << "### Captured Output\n\n"
         final_output << "Command Used: `#{ARGV.join(' ')}`\n"
-        final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{$captured_output}\n\n```\n\n</details>\n\n"
+        final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{FastlaneCore::Globals.captured_output}\n\n```\n\n</details>\n\n"
       end
 
       final_output << env_header + env_output + env_tail
@@ -68,7 +68,7 @@ module Fastlane
           if Gem::Version.new(installed_version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
@@ -112,7 +112,7 @@ module Fastlane
           if Gem::Version.new(current_gem.version) == Gem::Version.new(latest_version)
             update_status = "✅ Up-To-Date"
           else
-            update_status = "🚫 Update availaible"
+            update_status = "🚫 Update available"
           end
         rescue
           update_status = "💥 Check failed"
@@ -217,12 +217,19 @@ module Fastlane
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => anonymized_path(RbConfig::CONFIG['libdir']),
         "OpenSSL Version" => OpenSSL::OPENSSL_VERSION,
-        "Is contained" => Helper.contained_fastlane?.to_s
+        "Is contained" => Helper.contained_fastlane?.to_s,
+        "Is homebrew" => Helper.homebrew?.to_s,
+        "Is installed via Fabric.app" => Helper.mac_app?.to_s
       }
 
       if Helper.mac?
         table_content["Xcode Path"] = anonymized_path(Helper.xcode_path)
-        table_content["Xcode Version"] = Helper.xcode_version
+        begin
+          table_content["Xcode Version"] = Helper.xcode_version
+        rescue => ex
+          UI.error(ex)
+          UI.error("Could not get Xcode Version")
+        end
       end
 
       table = ["| Key | Value |"]

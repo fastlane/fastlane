@@ -1,0 +1,4 @@
+# don't run unmaintained test on any dependencies in Gemfile
+# We need to add this file to exclude unmaintained errors due to the dependency to the "colored" gem
+tests:
+  unmaintained: skip

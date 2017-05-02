@@ -6,7 +6,7 @@ describe Frameit do
       # directory.
       before(:all) do
         @old_env_home = ENV['HOME']
-        ENV['HOME'] = '/thisdirectorydoesnotexist'
+        ENV['HOME'] = '/tmp/thisdirectorydoesnotexist'
       end
 
       after(:all) do

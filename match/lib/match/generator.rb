@@ -20,7 +20,7 @@ module Match
         cert_path = Cert::Runner.new.launch
       rescue => ex
         if ex.to_s.include?("You already have a current")
-          UI.user_error!("Could not create a new certificate as you reached the maximum number of certificates for this account. You can use the `match nuke` command to revoke your existing certificates. More information https://github.com/fastlane/fastlane/tree/master/match")
+          UI.user_error!("Could not create a new certificate as you reached the maximum number of certificates for this account. You can use the `fastlane match nuke` command to revoke your existing certificates. More information https://github.com/fastlane/fastlane/tree/master/match")
         else
           raise ex
         end
@@ -39,7 +39,13 @@ module Match
 
       prov_type = Match.profile_type_sym(params[:type])
 
-      profile_name = ["match", profile_type_name(prov_type), app_identifier].join(" ")
+      names = ["match", profile_type_name(prov_type), app_identifier]
+
+      if params[:platform].to_s != :ios.to_s # For ios we do not include the platform for backwards compatibility
+        names << params[:platform]
+      end
+
+      profile_name = names.join(" ")
 
       values = {
         app_identifier: app_identifier,
@@ -52,6 +58,7 @@ module Match
         team_id: params[:team_id]
       }
 
+      values[:platform] = params[:platform]
       values[:adhoc] = true if prov_type == :adhoc
       values[:development] = true if prov_type == :development
 
@@ -68,7 +75,7 @@ module Match
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore
       return "InHouse" if type == :enterprise
-      return "Unkown"
+      return "Unknown"
     end
   end
 end

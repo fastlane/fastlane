@@ -9,7 +9,7 @@ describe Fastlane do
               subtitle: 'hi'
             )
           end").runner.execute(:test)
-        end.to raise_exception
+        end.to raise_exception(FastlaneCore::Interface::FastlaneError, "No value found for 'message'")
       end
 
       it "works with message argument alone" do

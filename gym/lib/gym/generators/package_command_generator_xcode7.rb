@@ -1,5 +1,6 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
@@ -164,7 +165,7 @@ module Gym
         UI.command_output("-----------------------------------------")
         UI.command_output(JSON.pretty_generate(hash))
         UI.command_output("-----------------------------------------")
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
           UI.command_output(to_plist(hash))

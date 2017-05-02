@@ -15,7 +15,8 @@ module Fastlane
 
       def self.details
         [
-          "Allows running an arbitrary shell command"
+          "Allows running an arbitrary shell command.",
+          "Be aware of a specific behavior of 'sh' action with regard to the working directory. For details refer to Advanced.md"
         ].join("\n")
       end
 
@@ -31,10 +32,10 @@ module Fastlane
                                          is_string: false,
                                          default_value: true),
           FastlaneCore::ConfigItem.new(key: :error_callback,
-                                         description: 'A callback invoked with the command ouptut if there is a non-zero exit status',
+                                         description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
-                                         is_string: true,
-                                         default_value: 'nil')
+                                         is_string: false,
+                                         default_value: nil)
         ]
       end
 

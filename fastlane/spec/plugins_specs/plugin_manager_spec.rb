@@ -133,6 +133,7 @@ describe Fastlane do
       end
 
       it "runs the action as expected if the plugin is available" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         # We don't need to set this, since this method shouldn't even be called when the plugin is available
         # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
 
@@ -197,7 +198,19 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             my_custom_plugin
           end").runner.execute(:test)
-        end.to raise_exception("Could not find action or lane 'my_custom_plugin'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
+        end.to raise_exception("Could not find action, lane or variable 'my_custom_plugin'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
+      end
+
+      it "shows an appropriate error message when a plugin is really broken" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        ex = ScriptError.new
+        pm = Fastlane::PluginManager.new
+        plugin_name = "broken"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true).and_raise(ex)
+        expect(UI).to receive(:error).with("Error loading plugin '#{plugin_name}': #{ex}")
+        pm.load_plugins
+        expect(pm.plugin_references[plugin_name]).not_to be_nil
       end
     end
   end

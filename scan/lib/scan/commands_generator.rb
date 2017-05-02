@@ -7,8 +7,6 @@ module Scan
   class CommandsGenerator
     include Commander::Methods
 
-    FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options)
-
     def self.start
       new.run
     end
@@ -28,11 +26,14 @@ module Scan
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/scan"
       program :help_formatter, :compact
 
-      global_option("--verbose") { $verbose = true }
+      global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 
       command :tests do |c|
-        c.syntax = "scan"
+        c.syntax = "fastlane scan"
         c.description = Scan::DESCRIPTION
+
+        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options, command: c)
+
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Scan::Options.available_options,
                                                       convert_options(options))
@@ -41,7 +42,7 @@ module Scan
       end
 
       command :init do |c|
-        c.syntax = "scan init"
+        c.syntax = "fastlane scan init"
         c.description = "Creates a new Scanfile for you"
         c.action do |_args, options|
           containing = (Helper.fastlane_enabled? ? 'fastlane' : '.')

@@ -5,7 +5,7 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
+      UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
@@ -43,9 +43,7 @@ module Supply
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
       # but it has to be between 0.05 and 0.5 to pass the validity check. So we are passing the default value 0.1
       client.update_track(Supply.config[:track], 0.1, nil)
-      version_codes.each do |apk_version_code|
-        client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], apk_version_code)
-      end
+      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], version_codes)
     end
 
     def upload_changelogs(language)
@@ -113,6 +111,13 @@ module Supply
 
       apk_paths.each do |apk_path|
         apk_version_codes.push(upload_binary_data(apk_path))
+      end
+
+      mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
+      mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
+        if mapping_path
+          client.upload_mapping(mapping_path, version_code)
+        end
       end
 
       update_track(apk_version_codes)

@@ -1,6 +1,7 @@
 module Fastlane
   module Actions
     class CarthageAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         validate(params)
 
@@ -26,17 +27,19 @@ module Fastlane
         cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
+        cmd << "--cache-builds" if params[:cache_builds]
 
         Actions.sh(cmd.join(' '))
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.validate(params)
         command_name = params[:command]
         if command_name != "archive" && params[:frameworks].count > 0
-          UI.user_error!("Frameworks option is avaialble only for 'archive' command.")
+          UI.user_error!("Frameworks option is available only for 'archive' command.")
         end
         if command_name != "archive" && params[:output]
-          UI.user_error!("Output option is avaialble only for 'archive' command.")
+          UI.user_error!("Output option is available only for 'archive' command.")
         end
       end
 
@@ -127,6 +130,11 @@ module Fastlane
                                            UI.user_error!("Please pass a valid platform. Use one of the following: #{available_platforms.join(', ')}") unless available_platforms.map(&:downcase).include?(platform.downcase)
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :cache_builds,
+                                       env_name: "FL_CARTHAGE_CACHE_BUILDS",
+                                       description: "By default Carthage will rebuild a dependency regardless of whether it's the same resolved version as before. Passing the --cache-builds will cause carthage to avoid rebuilding a dependency if it can",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :frameworks,
                                        description: "Framework name or names to archive, could be applied only along with the archive command",
                                        default_value: [],
@@ -175,6 +183,7 @@ module Fastlane
             verbose: false,                                 # Print xcodebuild output inline
             platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
             configuration: "Release",                       # Build configuration to use when building
+            cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
           )'
         ]

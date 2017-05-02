@@ -1,6 +1,6 @@
 module Fastlane
   class MarkdownDocsGenerator
-    ENHANCER_URL = "https://fastlane-enhancer.herokuapp.com"
+    ENHANCER_URL = "https://enhancer.fastlane.tools"
 
     attr_accessor :categories
 
@@ -82,11 +82,19 @@ module Fastlane
       require 'faraday'
       require 'json'
 
+      # Only Fabric team members have access to the enhancer instance
+      # This can be used to check doc changes for everyone else
+      if FastlaneCore::Env.truthy?('USE_ENHANCE_TEST_DATA')
+        return [{ "action" => "puts", "launches" => 123, "errors" => 0, "ratio" => 0.0, "crashes" => 0 },
+                { "action" => "fastlane_version", "launches" => 123, "errors" => 43, "ratio" => 0.34, "crashes" => 0 },
+                { "action" => "default_platform", "launches" => 123, "errors" => 33, "ratio" => 0.27, "crashes" => 31 }]
+      end
+
       unless @launches
         conn = Faraday.new(ENHANCER_URL)
         conn.basic_auth(ENV["ENHANCER_USER"], ENV["ENHANCER_PASSWORD"])
         begin
-          @launches = JSON.parse(conn.get('/index.json').body)
+          @launches = JSON.parse(conn.get('/index.json?minimum_launches=0').body)
         rescue
           UI.user_error!("Couldn't fetch usage data, make sure to have ENHANCER_USER and ENHANCER_PASSWORD")
         end

@@ -40,11 +40,11 @@ module CredentialsManager
                  'you should turn off smart quotes in your editor of choice.'.red
           end
 
-          # rubocop:disable Lint/Eval
+          # rubocop:disable Security/Eval
           eval(content)
-          # rubocop:enable Lint/Eval
+          # rubocop:enable Security/Eval
 
-          print_debug_information(path: full_path) if $verbose
+          print_debug_information(path: full_path) if FastlaneCore::Globals.verbose?
         end
       end
 
@@ -73,7 +73,7 @@ module CredentialsManager
     end
 
     def fallback_to_default_values
-      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"]
+      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"] || ENV["DELIVER_USERNAME"]
     end
 
     def data
@@ -122,6 +122,10 @@ module CredentialsManager
       setter(:json_key_file, *args, &block)
     end
 
+    def json_key_data_raw(*args, &block)
+      setter(:json_key_data_raw, *args, &block)
+    end
+
     def issuer(*args, &block)
       puts "Appfile: DEPRECATED issuer: use json_key_file instead".red
       setter(:issuer, *args, &block)
@@ -164,7 +168,7 @@ module CredentialsManager
     # platform_name  - Symbol representing a platform name.
     # block - Block to execute to override configuration values.
     #
-    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
+    # Discussion If received platform name does not match the platform name available as environment variable, no changes will
     #             be applied.
     def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s

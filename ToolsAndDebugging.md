@@ -1,10 +1,10 @@
 # Tooling and Debugging
 
-For detailed instructions on how to get started with contributing to _fastlane_, first check out [HowToContribute.md](HowToContribute.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
+For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr]. This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
 ## Debug using [pry](http://pryrepl.org/)
 
-Before you’re able to use [pry](http://pryrepl.org/), make sure to have completed the [HowToContribute.md](HowToContribute.md) setup part, as this will install all required development dependencies.
+Before you’re able to use [pry](http://pryrepl.org/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
 
 To add a breakpoint anywhere in the _fastlane_ codebase, add the following 2 lines wherever you want to jump in
 
@@ -13,16 +13,16 @@ require 'pry'
 binding.pry
 ```
 
-As debugging with pry requires the development dependencies, make sure to execute _fastlane_ using `bundle exec` after running `bundle install` in the project- or _fastlane_ directory. 
+As debugging with pry requires the development dependencies, make sure to execute _fastlane_ using `bundle exec` after running `bundle install` in the project- or _fastlane_ directory.
 
 ```
 bundle exec fastlane beta --verbose
 ```
 
-If you need the breakpoint when running tests, make sure to have the `DEBUG` mode enabled, as the default test runner will remove all output from stdout, and therefore not showing the output of `pry`:
+If you need the breakpoint when running tests, make sure to have the `DEBUG` environment variable set, as the default test runner will remove all output from stdout, and therefore not showing the output of `pry`:
 
 ```
-DEBUG=1 bundle exec rspec
+DEBUG= bundle exec rspec
 ```
 
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
@@ -36,7 +36,7 @@ After introducing some changes to the _fastlane_ source code, you probably want 
 
 Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local fastlane clone and drop it into your project's root folder.
 
-Make sure to change the `local_fastlane_path` variable to point to your fastlane clone, e.g. `~/fastlane`, then you can run
+Make sure to replace `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` with the path to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
 ```
 bundle update
 ```
@@ -100,22 +100,22 @@ If it is a server issue, it’s best to [file a radar](https://bugreport.apple.c
 
 <img src=".assets/ToolingCharlesEnableSSL.png" align="right" width="180" />
 
-This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes.  If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/). 
+This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes.  If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
 
 First, download and install the latest version of [Charles Proxy](https://www.charlesproxy.com/). After the first launch, you’ll have to install its [Root Certificate](https://www.charlesproxy.com/documentation/using-charles/ssl-certificates/).
 
 > In Charles go to the Help menu and choose "SSL Proxying > Install Charles Root Certificate". Keychain Access will open, and prompt you about the certificate. Click the "Always Trust" button. You will then be prompted for your Administrator password to update the system trust settings.
 
-You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [iTunes Connect](https://itunesconnect.apple.com). 
+You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [iTunes Connect](https://itunesconnect.apple.com).
 
-If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in. 
+If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in.
 After doing so, refresh the iTunes Connect page. You should be able to see all web requests with their responses.
 
 We’re not using the built-in network tracker of your browser, since we also need a proxy for our local _fastlane_ install, which will be covered in the next section of this document.
 
 <img src=".assets/ToolingCharlesRequest.png" />
 
-### Compare the API requests 
+### Compare the API requests
 
 They key is to do the same action you want to test on both the website, and in _spaceship_, so you can see how the requests are different.
 
@@ -136,7 +136,7 @@ task :debug do
   Spaceship::Tunes.login("apple@fastlane.tools") # use your own test account
   # or
   Spaceship::Portal.login("apple@fastlane.tools") # use your own test account
-  
+
   # then add code to test whatever part of _spaceship_ needs to be tested
   # e.g.
   apps = Spaceship::Tunes::Application.all
@@ -150,3 +150,6 @@ To run the newly created script, `cd` into the _spaceship_ directory and run
 ```
 FASTLANE_DEBUG=1 fastlane debug
 ```
+
+<!--Links-->
+[first-pr]: YourFirstPR.md

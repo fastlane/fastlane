@@ -21,6 +21,14 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "alias does not crash with no param" do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        expect(UI).to receive(:important).with("modified")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          somealias
+        end").runner.execute(:test)
+      end
+
       it "alias can override option" do
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         expect(UI).to receive(:important).with("modified")
@@ -56,14 +64,26 @@ describe Fastlane do
 
     describe "Call another action from an action" do
       it "allows the user to call it using `other_action.rocket`" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromAction')
+        Fastlane::Actions.executed_actions.clear
 
         response = {
           rocket: "🚀",
-          pwd: File.join(Dir.pwd, "fastlane")
+          pwd: Dir.pwd
         }
         expect(ff.runner.execute(:something, :ios)).to eq(response)
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from'])
+      end
+
+      it "shows only actions called from Fastfile" do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromActionWithOtherAction')
+        Fastlane::Actions.executed_actions.clear
+
+        ff.runner.execute(:something, :ios)
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from', 'example'])
       end
 
       it "shows an appropriate error message when trying to directly call an action" do
@@ -71,7 +91,7 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromActionInvalid')
         expect do
           ff.runner.execute(:something, :ios)
-        end.to raise_error("To call another action from an action use `OtherAction.rocket` instead")
+        end.to raise_error("To call another action from an action use `other_action.rocket` instead")
       end
     end
   end

@@ -2,7 +2,6 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
-  # rubocop:disable Metrics/ModuleLength
   module Helper
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
@@ -28,6 +27,18 @@ module FastlaneCore
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # checks if given file is a valid json file
+    # base taken from: http://stackoverflow.com/a/26235831/1945875
+    def self.json_file?(filename)
+      return false unless File.exist?(filename)
+      begin
+        JSON.parse(File.read(filename))
+        return true
+      rescue JSON::ParserError
+        return false
+      end
     end
 
     # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
@@ -71,7 +82,7 @@ module FastlaneCore
     end
 
     def self.windows?
-      # taken from: http://stackoverflow.com/a/171011/1945875
+      # taken from: https://stackoverflow.com/a/171011/1945875
       (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
     end
 
@@ -107,11 +118,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
@@ -136,7 +142,7 @@ module FastlaneCore
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
         UI.error(ex)
-        UI.error("Error detecting currently used Xcode installation")
+        UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have Xcode installed and set it using `sudo xcode-select -s [path]`")
       end
       @xcode_version
     end
@@ -167,7 +173,7 @@ module FastlaneCore
     end
 
     def self.keychain_path(name)
-      # Existing code expects that a keychain name will be expanded into a default path to Libary/Keychains
+      # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
       #
@@ -188,18 +194,25 @@ module FastlaneCore
         name
       ].map { |path| File.expand_path(path) }
 
-      # Transforms ["thing"] to ["thing", "thing-db", "thing.keychain", "thing.keychain-db"]
+      # Transforms ["thing"] to ["thing-db", "thing.keychain-db", "thing", "thing.keychain"]
       keychain_paths = []
       possible_locations.each do |location|
-        keychain_paths << location
         keychain_paths << "#{location}-db"
-        keychain_paths << "#{location}.keychain"
         keychain_paths << "#{location}.keychain-db"
+        keychain_paths << location
+        keychain_paths << "#{location}.keychain"
       end
 
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
+    end
+
+    # @return true if XCode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable
@@ -219,7 +232,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
+      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
     end
 
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
@@ -236,5 +249,4 @@ module FastlaneCore
       end
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end

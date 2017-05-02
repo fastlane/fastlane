@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ pem
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pem/LICENSE)
-[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
+[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](https://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
 
@@ -41,11 +42,10 @@ Tired of manually creating and maintaining your push notification profiles for y
 
 `pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
 
-To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/fastlane/tree/master/sigh).
-
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -61,7 +61,6 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
-
 
 Check out this gif:
 
@@ -87,7 +86,7 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```pem``` will never revoke your existing certificates.
+Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
@@ -117,13 +116,29 @@ To get a list of available options run:
 ### Note about empty `p12` passwords and Keychain Access.app
 
 `pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password.
-While the file is valid, Mac OSX's Keychain Access will not allow you to open the file without specifying a passphrase.
+While the file is valid, the Mac's Keychain Access will not allow you to open the file without specifying a passphrase.
 
 Instead, you may verify the file is valid using OpenSSL:
 
     openssl pkcs12 -info -in my.p12
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to `pem` and back to `p12`:
+
+    % openssl pkcs12 -in my.p12 -out my.pem
+    Enter Import Password:
+      <hit enter: the p12 has no password>
+    MAC verified OK
+    Enter PEM pass phrase:
+      <enter a temporary password to encrypt the pem file>
+      
+    % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
+    Enter pass phrase for temp.pem:
+      <enter the temporary password to decrypt the pem file>
+
+    Enter Export Password:
+      <enter a password for encrypting the new p12 file>
+
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Environment Variables
 
@@ -154,7 +169,7 @@ Run `fastlane pem --help` to get a list of available environment variables.
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

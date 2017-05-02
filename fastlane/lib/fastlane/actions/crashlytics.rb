@@ -35,7 +35,7 @@ module Fastlane
                  .gsub(params[:build_secret], '[[BUILD_SECRET]]')
         end
 
-        UI.verbose sanitizer.call(command.join(' ')) if $verbose
+        UI.verbose sanitizer.call(command.join(' ')) if FastlaneCore::Globals.verbose?
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
@@ -51,7 +51,7 @@ module Fastlane
 
         return command if Helper.test?
 
-        UI.verbose sanitizer.call(result) if $verbose
+        UI.verbose sanitizer.call(result) if FastlaneCore::Globals.verbose?
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
         UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
@@ -65,7 +65,7 @@ module Fastlane
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
         if platform == :ios or platform.nil?
-          ipa_path_default = Dir["*.ipa"].last
+          ipa_path_default = Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last
         end
 
         if platform == :android

@@ -33,7 +33,7 @@ module Fastlane
 
       def self.example_code
         [
-          'clipboard(value: "https://github.com/fastlane/fastlane/tree/master/fastlane")',
+          'clipboard(value: "https://docs.fastlane.tools/")',
           'clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] || "")'
         ]
       end

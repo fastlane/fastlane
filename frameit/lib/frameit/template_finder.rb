@@ -19,12 +19,12 @@ module Frameit
           # Unfortunately not every device type is available in rose gold or gold
           # This is why we can't have nice things #yatusabes
           # fallback to a white iPhone, which looks similar
-          UI.important("Unfortunatey device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to silver...")
+          UI.important("Unfortunately device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to silver...")
           screenshot.color = Frameit::Color::SILVER
           return self.get_template(screenshot)
         else
           UI.error("Couldn't find template for screenshot type '#{filename}'")
-          UI.error("Please run `frameit download_frames` to download the latest frames")
+          UI.error("Please run `fastlane frameit download_frames` to download the latest frames")
         end
         return filename if Helper.test?
         return nil

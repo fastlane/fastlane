@@ -79,6 +79,45 @@ describe FastlaneCore do
         end
       end
 
+      describe ':shell_string flags' do
+        let(:config_items) do
+          [
+            FastlaneCore::ConfigItem.new(key: :shell_string_1,
+                                short_option: '-s',
+                                 description: 'Shell String 1',
+                                        type: :shell_string)
+          ]
+        end
+
+        it 'raises MissingArgument for short flags with missing values' do
+          stub_commander_runner_args(['-s'])
+
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+        end
+
+        it 'raises MissingArgument for long flags with missing values' do
+          stub_commander_runner_args(['--shell_string_1'])
+
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+        end
+
+        it 'captures the provided value for short flags' do
+          stub_commander_runner_args(['-s', 'foo bar=baz qux'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:shell_string_1]).to eq('foo bar=baz qux')
+        end
+
+        it 'captures the provided value for long flags' do
+          stub_commander_runner_args(['--shell_string_1', 'foo bar=baz qux'])
+
+          program = TestCommanderProgram.run(config_items)
+
+          expect(program.options[:shell_string_1]).to eq('foo bar=baz qux')
+        end
+      end
+
       describe 'Integer flags' do
         let(:config_items) do
           [

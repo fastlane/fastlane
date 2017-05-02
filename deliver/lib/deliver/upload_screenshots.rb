@@ -3,6 +3,7 @@ module Deliver
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
+      return if options[:edit_live]
 
       app = options[:app]
 

@@ -1,6 +1,8 @@
 #!/bin/bash --login
+# shellcheck disable=SC2155
+# shellcheck disable=SC1090
 
-# Originally from, http://stackoverflow.com/questions/33041109
+# Originally from, https://stackoverflow.com/questions/33041109
 # Modified to work in RVM and non RVM environments
 #
 # Xcode 7 (incl. 7.0.1) seems to have a dependency on the system ruby.
@@ -21,6 +23,7 @@
 # -----
 
 which rvm > /dev/null
+# shellcheck disable=SC2181
 if [[ $? -eq 0 ]]; then
   echo "RVM detected, forcing to use system ruby"
   # This allows you to use rvm in a script. Otherwise you get a BS

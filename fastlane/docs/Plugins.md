@@ -33,7 +33,7 @@ In general, we might not accept actions that
 
 ### Find a plugin
 
-Head over the [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) for a list of plugins you can use.
+Head over to the [Plugins List](https://docs.fastlane.tools/actions/#plugins) for a list of plugins you can use.
 
 List all available plugins using
 
@@ -64,7 +64,7 @@ This will:
 #### Plugin Source
 
 Your `fastlane/Pluginfile` contains the list of all `fastlane` plugins your project uses. The `Pluginfile` is a [Gemfile](http://bundler.io/gemfile.html) that gets imported from your main `Gemfile`.
-You specificy all dependencies, including the required version numbers:
+You specify all dependencies, including the required version numbers:
 
 ```ruby
 # Fetched from RubyGems.org

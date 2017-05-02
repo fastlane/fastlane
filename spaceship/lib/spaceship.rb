@@ -1,3 +1,4 @@
+require 'spaceship/globals'
 require 'spaceship/base'
 require 'spaceship/client'
 require 'spaceship/launcher'
@@ -9,6 +10,7 @@ require 'spaceship/portal/spaceship'
 # iTunes Connect
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
+require 'spaceship/test_flight'
 
 # To support legacy code
 module Spaceship
@@ -20,12 +22,15 @@ module Spaceship
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
   AppGroup = Spaceship::Portal::AppGroup
+  WebsitePush = Spaceship::Portal::WebsitePush
   AppService = Spaceship::Portal::AppService
 
   # iTunes Connect
   AppVersion = Spaceship::Tunes::AppVersion
   AppSubmission = Spaceship::Tunes::AppSubmission
   Application = Spaceship::Tunes::Application
+  Members = Spaceship::Tunes::Members
+  Persons = Spaceship::Portal::Persons
 
   DESCRIPTION = "Ruby library to access the Apple Dev Center and iTunes Connect".freeze
 end

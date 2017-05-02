@@ -27,7 +27,7 @@ module Fastlane
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, please call `fastlane_require #{gem_name}` before to ensure the gem is installed")
+        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
       end
 
       parse(content, @path)
@@ -50,9 +50,9 @@ module Fastlane
           # is this always clear and safe to declare any local variables we want, because the eval function uses the instance scope
           # instead of local.
 
-          # rubocop:disable Lint/Eval
+          # rubocop:disable Security/Eval
           eval(data, parsing_binding, relative_path) # using eval is ok for this case
-          # rubocop:enable Lint/Eval
+          # rubocop:enable Security/Eval
         rescue SyntaxError => ex
           line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
           UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
@@ -136,14 +136,14 @@ module Fastlane
       @runner.set_after_each(@current_platform, block)
     end
 
-    # Is executed if an error occured during fastlane execution
+    # Is executed if an error occurred during fastlane execution
     def error(&block)
       @runner.set_error(@current_platform, block)
     end
 
     # Is used to look if the method is implemented as an action
     def method_missing(method_sym, *arguments, &_block)
-      self.runner.trigger_action_by_name(method_sym, nil, *arguments)
+      self.runner.trigger_action_by_name(method_sym, nil, false, *arguments)
     end
 
     #####################################################
@@ -171,9 +171,10 @@ module Fastlane
     end
 
     # Execute shell command
-    def sh(command)
-      Actions.execute_action(command) do
-        Actions.sh_no_action(command)
+    def sh(command, log: true, error_callback: nil)
+      command_header = log ? command : "shell command"
+      Actions.execute_action(command_header) do
+        Actions.sh_no_action(command, log: log, error_callback: error_callback)
       end
     end
 
@@ -205,12 +206,12 @@ module Fastlane
 
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
 
-      collector.did_launch_action(:import)
-      parse(File.read(path), path)
-
-      # Check if we can also import local actions which are in the same directory as the Fastfile
+      # First check if there are local actions to import in the same directory as the Fastfile
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+
+      collector.did_launch_action(:import)
+      parse(File.read(path), path)
     end
 
     # @param url [String] The git URL to clone the repository from
@@ -227,35 +228,30 @@ module Fastlane
         # Checkout the repo
         repo_name = url.split("/").last
 
-        tmp_path = Dir.mktmpdir("fl_clone")
-        clone_folder = File.join(tmp_path, repo_name)
+        Dir.mktmpdir("fl_clone") do |tmp_path|
+          clone_folder = File.join(tmp_path, repo_name)
 
-        branch_option = ""
-        branch_option = "--branch #{branch}" if branch != 'HEAD'
+          branch_option = ""
+          branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-        clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
+          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
 
-        UI.message "Cloning remote git repo..."
-        Actions.sh(clone_command)
+          UI.message "Cloning remote git repo..."
+          Actions.sh(clone_command)
 
-        Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
 
-        # We also want to check out all the local actions of this fastlane setup
-        containing = path.split(File::SEPARATOR)[0..-2]
-        containing = "." if containing.count == 0
-        actions_folder = File.join(containing, "actions")
-        begin
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
-        rescue
-          # We don't care about a failure here, as local actions are optional
-        end
+          # We also want to check out all the local actions of this fastlane setup
+          containing = path.split(File::SEPARATOR)[0..-2]
+          containing = "." if containing.count == 0
+          actions_folder = File.join(containing, "actions")
+          begin
+            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+          rescue
+            # We don't care about a failure here, as local actions are optional
+          end
 
-        import(File.join(clone_folder, path))
-
-        if Dir.exist?(clone_folder)
-          # We want to re-clone if the folder already exists
-          UI.message "Clearing the git repo..."
-          Actions.sh("rm -rf '#{tmp_path}'")
+          import(File.join(clone_folder, path))
         end
       end
     end

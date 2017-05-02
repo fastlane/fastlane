@@ -3,7 +3,6 @@ module Fastlane
     class BadgeAction < Action
       def self.run(params)
         Actions.verify_gem!('badge')
-        check_imagemagick!
         require 'badge'
         options = {
           dark: params[:dark],
@@ -125,7 +124,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :shield_no_resize,
                                        env_name: "FL_BADGE_SHIELD_NO_RESIZE",
-                                       description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrinked to not exceed the icon graphic",
+                                       description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrunk to not exceed the icon graphic",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
@@ -141,20 +140,6 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :android].include?(platform)
       end
-
-      def self.check_imagemagick!
-        return if `which convert`.include?('convert')
-
-        UI.error("You have to install ImageMagick to use `badge`")
-        UI.error("")
-        UI.error("Install it using:")
-        UI.command("brew update && brew install imagemagick")
-        UI.error("")
-        UI.error("If you don't have homebrew, visit http://brew.sh")
-
-        UI.user_error!("Install ImageMagick and start your lane again!")
-      end
-      private_class_method :check_imagemagick!
     end
   end
 end

@@ -33,7 +33,7 @@ module Sigh
       display_name = "-d #{display_name.shellescape}" if display_name
       short_version = "--short-version #{short_version}" if short_version
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
-      verbose = "-v" if $verbose
+      verbose = "-v" if FastlaneCore::Globals.verbose?
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
       specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
@@ -51,8 +51,8 @@ module Sigh
         use_app_entitlements_flag,
         verbose,
         bundle_id,
-        ipa.shellescape,
-        specific_keychain
+        specific_keychain,
+        ipa.shellescape # Output path must always be last argument
       ].join(' ')
 
       puts command.magenta

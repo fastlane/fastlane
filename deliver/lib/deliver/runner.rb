@@ -36,7 +36,7 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file...")
 
-      changed = options[:app].ensure_version!(app_version, platform: options[:pkg] ? 'osx' : 'ios')
+      changed = options[:app].ensure_version!(app_version, platform: options[:platform])
 
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
@@ -72,11 +72,11 @@ module Deliver
     def prepare_app_icons(options = {})
       return unless options[:metadata_path]
 
-      default_app_icon_path = File.join(options[:metadata_path], "app_icon.png")
-      options[:app_icon] ||= default_app_icon_path if File.exist?(default_app_icon_path)
+      default_app_icon_path = Dir[File.join(options[:metadata_path], "app_icon.{png,jpg}")].first
+      options[:app_icon] ||= default_app_icon_path if default_app_icon_path && File.exist?(default_app_icon_path)
 
-      default_watch_icon_path = File.join(options[:metadata_path], "watch_icon.png")
-      options[:app_icon] ||= default_watch_icon_path if File.exist?(default_watch_icon_path)
+      default_watch_icon_path = Dir[File.join(options[:metadata_path], "watch_icon.{png,jpg}")].first
+      options[:apple_watch_app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
     end
 
     # Upload the binary to iTunes Connect
@@ -86,13 +86,15 @@ module Deliver
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           ipa_path: options[:ipa],
-          package_path: "/tmp"
+          package_path: "/tmp",
+          platform: options[:platform]
         )
       elsif options[:pkg]
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           pkg_path: options[:pkg],
-          package_path: "/tmp"
+          package_path: "/tmp",
+          platform: options[:platform]
         )
       end
 

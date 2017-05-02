@@ -20,13 +20,13 @@ module PEM
       program :help, 'GitHub', 'https://github.com/fastlane/PEM'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-
-      FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :renew do |c|
-        c.syntax = 'pem renew'
+        c.syntax = 'fastlane pem renew'
         c.description = 'Renews the certificate (in case it expired) and shows the path to the generated pem file'
+
+        FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options, command: c)
 
         c.action do |args, options|
           PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options.__hash__)

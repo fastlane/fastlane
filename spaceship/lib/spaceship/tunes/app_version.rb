@@ -45,6 +45,11 @@ module Spaceship
       # @return (Bool) Should the app automatically be released once it's approved?
       attr_accessor :release_on_approval
 
+      # @return (Fixnum) Milliseconds for releasing in GMT (e.g. 1480435200000 = Tue, 29 Nov 2016 16:00:00 GMT).
+      #   Use nil to unset. Setting this will supercede the release_on_approval field, so this field must be nil
+      #   for release_on_approval to be used.
+      attr_accessor :auto_release_date
+
       # @return (Bool)
       attr_accessor :can_beta_test
 
@@ -135,6 +140,7 @@ module Spaceship
         'largeAppIcon.value.originalFileName' => :app_icon_original_name,
         'largeAppIcon.value.url' => :app_icon_url,
         'releaseOnApproval.value' => :release_on_approval,
+        'autoReleaseDate.value' => :auto_release_date,
         'status' => :raw_status,
         'preReleaseBuild.buildVersion' => :build_version,
         'supportsAppleWatch' => :supports_apple_watch,
@@ -497,8 +503,8 @@ module Spaceship
         {
           keywords: :keywords,
           description: :description,
-          supportURL: :support_url,
-          marketingURL: :marketing_url,
+          supportUrl: :support_url,
+          marketingUrl: :marketing_url,
           releaseNotes: :release_notes
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
@@ -578,6 +584,7 @@ module Spaceship
         lang_details = languages[0]
         display_families = lang_details["displayFamilies"]["value"]
         device_details = display_families.find { |display_family| display_family['name'] == device }
+        raise "Couldn't find device family for #{device}" if device_details.nil?
         raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
         return device_details[data_field]
       rescue => ex

@@ -35,13 +35,25 @@ module Commander
 
       begin
         collector.did_launch_action(@program[:name])
-        run_active_command
+        # PILOT_MAINTENANCE Temporaroy `begin/rescue` block for pilot mainenance mode
+        begin
+          run_active_command
+        rescue => e
+          raise e unless @program[:name] == 'pilot'
+          raise_pilot_maintenance_mode_exception!(e)
+        end
       rescue InvalidCommandError => e
-        abort "#{e}. Use --help for more information"
-      rescue Interrupt => ex
+        # calling `abort` makes it likely that tests stop without failing, so
+        # we'll disable that during tests.
+        if FastlaneCore::Helper.test?
+          raise e
+        else
+          abort "#{e}. Use --help for more information"
+        end
+      rescue Interrupt => e
         # We catch it so that the stack trace is hidden by default when using ctrl + c
-        if $verbose
-          raise ex
+        if FastlaneCore::Globals.verbose?
+          raise e
         else
           puts "\nCancelled... use --verbose to show the stack trace"
         end
@@ -49,11 +61,26 @@ module Commander
         OptionParser::InvalidOption,
         OptionParser::InvalidArgument,
         OptionParser::MissingArgument => e
-        abort e.to_s
+        # calling `abort` makes it likely that tests stop without failing, so
+        # we'll disable that during tests.
+        if FastlaneCore::Helper.test?
+          raise e
+        else
+          abort e.to_s
+        end
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
         display_user_error!(e, e.message)
+      rescue Errno::ENOENT => e
+        # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
+        puts ""
+        FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
+        FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
+        puts ""
+        raise e
+      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        display_user_error!(e, e.to_s)
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
@@ -67,6 +94,31 @@ module Commander
         handle_unknown_error!(e)
       ensure
         collector.did_finish
+      end
+    end
+
+    # PILOT_MAINTENANCE Remove after pilot migration is done
+    def raise_pilot_maintenance_mode_exception!(e)
+      FastlaneCore::UI.important("-------------")
+      FastlaneCore::UI.important("pilot crashed")
+      FastlaneCore::UI.important("-------------")
+      FastlaneCore::UI.error("Unfortunately the TestFlight update from 11th April 2017 changed")
+      FastlaneCore::UI.error("the way Testers, Groups, and Builds are managed on iTunesConnect.")
+      FastlaneCore::UI.error("We have already fixed a number of features including submitting")
+      FastlaneCore::UI.error("builds for testing, adding and removing testers from groups, and")
+      FastlaneCore::UI.error("waiting for builds to process.")
+      FastlaneCore::UI.error("")
+      FastlaneCore::UI.error("Please open an issue on https://github.com/fastlane/fastlane/issues")
+      FastlaneCore::UI.error("if you believe this failure is the result of a bug in _pilot_ and we")
+      FastlaneCore::UI.error("will be happy to look into this further.")
+      FastlaneCore::UI.error("")
+      FastlaneCore::UI.error("Please stay tuned for more updates from _fastlane_ as we fix more issues!")
+      FastlaneCore::UI.error("")
+      if FastlaneCore::Globals.verbose?
+        raise e # on verbose mode, we want to show the original stack trace
+      else
+        FastlaneCore::UI.error("Original error message:")
+        FastlaneCore::UI.user_error!(e.message)
       end
     end
 
@@ -140,16 +192,17 @@ module Commander
       # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
       # method. If so, we'll present any returned error info in the manner of a user_error!
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
+      should_show_github_issues = e.respond_to?(:show_github_issues) ? e.show_github_issues : true
 
       if error_info
         error_info = error_info.join("\n\t") if error_info.kind_of?(Array)
 
-        show_github_issues(error_info)
+        show_github_issues(error_info) if should_show_github_issues
 
         display_user_error!(e, error_info)
       else
         # Pass the error instead of a message so that the inspector can do extra work to simplify the query
-        show_github_issues(e)
+        show_github_issues(e) if should_show_github_issues
 
         # From https://stackoverflow.com/a/4789702/445598
         # We do this to make the actual error message red and therefore more visible
@@ -158,10 +211,12 @@ module Commander
     end
 
     def display_user_error!(e, message)
-      if $verbose # with stack trace
+      if FastlaneCore::Globals.verbose?
+        # with stack trace
         reraise_formatted!(e, message)
       else
-        abort "\n[!] #{message}".red # without stack trace
+        # without stack trace
+        abort "\n[!] #{message}".red
       end
     end
 
@@ -176,7 +231,7 @@ module Commander
       require 'gh_inspector'
       require 'fastlane_core/ui/github_issue_inspector_reporter'
 
-      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: $verbose)
+      inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: FastlaneCore::Globals.verbose?)
       delegate = Fastlane::InspectorReporter.new
       if message_or_error.kind_of?(String)
         inspector.search_query(message_or_error, delegate)
@@ -184,7 +239,7 @@ module Commander
         inspector.search_exception(message_or_error, delegate)
       end
     rescue => ex
-      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if $verbose
+      FastlaneCore::UI.error("Error finding relevant GitHub issues: #{ex}") if FastlaneCore::Globals.verbose?
     end
   end
 end

@@ -9,10 +9,11 @@ describe Fastlane do
 
       it "raises an exception if it's an old version" do
         expect do
+          expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION)
           Fastlane::FastFile.new.parse("lane :test do
             fastlane_version '9999'
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(/The Fastfile requires a fastlane version of >= 9999./)
       end
 
       it "raises an exception if it's an old version in a non-bundler environement" do

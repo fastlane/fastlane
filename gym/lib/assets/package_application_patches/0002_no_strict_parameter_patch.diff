@@ -9,7 +9,7 @@ will be fixed). To workaround the problem, please save a copy and modify
 PackageApplication to pass “—no-strict” to codesign, you can locate PackageApplication
 by running the following:- xcrun -sdk iphoneos -f PackageApplication
 
-See http://stackoverflow.com/questions/26008449/xcodebuild-codesign-vvvv-saysresource-envelope-is-obsolete
+See https://stackoverflow.com/questions/26008449/xcodebuild-codesign-vvvv-saysresource-envelope-is-obsolete
 
 ---
  PackageApplication4Gym | 4 ++--

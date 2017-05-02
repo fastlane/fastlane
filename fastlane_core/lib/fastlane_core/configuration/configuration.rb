@@ -44,6 +44,9 @@ module FastlaneCore
       self.available_options = available_options || []
       self.values = values || {}
 
+      # used for pushing and popping values to provide nesting configuration contexts
+      @values_stack = []
+
       # if we are in captured output mode - keep a array of sensitive option values
       # those will be later - replaced by ####
       if $capture_output
@@ -153,7 +156,7 @@ module FastlaneCore
     # Take a look at how `gym` uses this method
     #
     # @param config_file_name [String] The name of the configuration file to use (optional)
-    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
+    # @param block_for_missing [Block] A ruby block that is called when there is an unknown method
     #   in the configuration file
     def load_configuration_file(config_file_name = nil, block_for_missing = nil)
       return unless config_file_name
@@ -262,6 +265,25 @@ module FastlaneCore
     # Direct access to the values, without iterating through all items
     def _values
       @values
+    end
+
+    # Clears away any current configuration values by pushing them onto a stack.
+    # Values set after calling push_values! will be merged with the previous
+    # values after calling pop_values!
+    #
+    # see: pop_values!
+    def push_values!
+      @values_stack.push(@values)
+      @values = {}
+    end
+
+    # Restores a previous set of configuration values by merging any current
+    # values on top of them
+    #
+    # see: push_values!
+    def pop_values!
+      return if @values_stack.empty?
+      @values = @values_stack.pop.merge(@values)
     end
 
     def all_keys

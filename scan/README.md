@@ -20,6 +20,7 @@
   <b>scan</b> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ scan
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/scan/LICENSE)
-[![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](http://rubygems.org/gems/scan)
+[![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](https://rubygems.org/gems/scan)
 
 ###### The easiest way to run tests of your iOS and Mac app
 
@@ -40,6 +41,7 @@ scan
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#whats-scan">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -101,8 +103,8 @@ scan
 
 `scan` uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
 
-              |  scan Features
---------------------------|------------------------------------------------------------
+|          |  scan Features  |
+|----------|-----------------|
 :checkered_flag: | Beautiful inline build output while running the tests
 :mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
 :bar_chart: | Support for HTML, JSON and JUnit reports
@@ -205,7 +207,7 @@ For more information visit the [fastlane GitHub page](https://github.com/fastlan
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

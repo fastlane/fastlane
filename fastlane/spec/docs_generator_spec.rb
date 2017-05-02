@@ -19,7 +19,6 @@ describe Fastlane do
       expect(output).to include('Upload something to Google')
       expect(output).to include('fastlane mac beta')
       expect(output).to include('https://fastlane.tools')
-      expect(output).to include('https://github.com/')
     end
 
     it "generates new markdown docs but skips empty platforms" do

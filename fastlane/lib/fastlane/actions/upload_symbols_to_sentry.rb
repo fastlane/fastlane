@@ -104,7 +104,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :project_slug,
                                        env_name: "SENTRY_PROJECT_SLUG",
-                                       description: "Prgoject slug for Sentry",
+                                       description: "Project slug for Sentry",
                                        verify_block: proc do |value|
                                          UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value and !value.empty?
                                        end),
@@ -152,7 +152,13 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use the `sentry` plugin instead.\n" \
+          "Install using `fastlane add_plugin sentry`.\n" \
+          "Replace `upload_symbols_to_sentry` with `sentry_upload_dsym`"
       end
     end
   end

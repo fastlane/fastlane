@@ -45,7 +45,8 @@ describe Match::Generator do
         cert_id: 'fake_cert_id',
         provisioning_name: 'match Development app_identifier',
         ignore_profiles_with_different_name: true,
-        team_id: 'team_id'
+        team_id: 'team_id',
+        platform: :ios
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -58,10 +59,11 @@ describe Match::Generator do
 
       params = {
         app_identifier: 'app_identifier',
-        prov_type: :development,
+        type: :development,
         workspace: 'workspace',
         username: 'username',
-        team_id: 'team_id'
+        team_id: 'team_id',
+        platform: :ios
       }
       Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier])
     end

@@ -2,32 +2,37 @@ module FastlaneCore
   # Shell is the terminal output of things
   # For documentation for each of the methods open `interface.rb`
   class Shell < Interface
+    require 'tty-screen'
+
     def log
       return @log if @log
 
       $stdout.sync = true
 
-      if Helper.is_test?
+      if Helper.is_test? && !ENV.key?('DEBUG')
+        $stdout.puts "Logging disabled while running tests. Force them by setting the DEBUG environment variable"
         @log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @log ||= Logger.new($stdout)
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        if $verbose
-          string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
-        elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
-          string = ""
-        else
-          string = "[#{datetime.strftime('%H:%M:%S')}]: "
-        end
-
-        string += "#{msg}\n"
-
-        string
+        "#{format_string(datetime, severity)}#{msg}\n"
       end
 
+      require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
+
       @log
+    end
+
+    def format_string(datetime = Time.now, severity = "")
+      if FastlaneCore::Globals.verbose?
+        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
+      elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
+        return ""
+      else
+        return "[#{datetime.strftime('%H:%M:%S')}]: "
+      end
     end
 
     #####################################################
@@ -51,7 +56,7 @@ module FastlaneCore
     end
 
     def deprecated(message)
-      log.error(message.to_s.bold.blue)
+      log.error(message.to_s.deprecated)
     end
 
     def command(message)
@@ -67,13 +72,19 @@ module FastlaneCore
     end
 
     def verbose(message)
-      log.debug(message.to_s) if $verbose
+      log.debug(message.to_s) if FastlaneCore::Globals.verbose?
     end
 
     def header(message)
-      i = message.length + 8
+      format = format_string
+      if message.length + 8 < TTY::Screen.width - format.length
+        message = "--- #{message} ---"
+        i = message.length
+      else
+        i = TTY::Screen.width - format.length
+      end
       success("-" * i)
-      success("--- " + message + " ---")
+      success(message)
       success("-" * i)
     end
 
@@ -90,12 +101,12 @@ module FastlaneCore
 
     def input(message)
       verify_interactive!(message)
-      ask(message.to_s.yellow).to_s.strip
+      ask("#{format_string}#{message.to_s.yellow}").to_s.strip
     end
 
     def confirm(message)
       verify_interactive!(message)
-      agree("#{message} (y/n)".yellow, true)
+      agree("#{format_string}#{message.to_s.yellow} (y/n)", true)
     end
 
     def select(message, options)
@@ -108,7 +119,7 @@ module FastlaneCore
     def password(message)
       verify_interactive!(message)
 
-      ask(message.yellow) { |q| q.echo = "*" }
+      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = "*" }
     end
 
     private

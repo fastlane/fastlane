@@ -50,14 +50,27 @@ ensure
 end
 
 def with_verbose(verbose)
-  orig_verbose = $verbose
-  $verbose = verbose
+  orig_verbose = FastlaneCore::Globals.verbose?
+  FastlaneCore::Globals.verbose = verbose
   yield if block_given?
 ensure
-  $verbose = orig_verbose
+  FastlaneCore::Globals.verbose = orig_verbose
 end
 
 def stub_commander_runner_args(args)
   runner = Commander::Runner.new(args)
   allow(Commander::Runner).to receive(:instance).and_return(runner)
+end
+
+def capture_stds
+  require "stringio"
+  orig_stdout = $stdout
+  orig_stderr = $stderr
+  $stdout = StringIO.new
+  $stderr = StringIO.new
+  yield if block_given?
+  [$stdout.string, $stderr.string]
+ensure
+  $stdout = orig_stdout
+  $stderr = orig_stderr
 end

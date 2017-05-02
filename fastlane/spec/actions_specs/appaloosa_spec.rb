@@ -3,6 +3,9 @@ describe Fastlane do
     APPALOOSA_SERVER = Fastlane::Actions::AppaloosaAction::APPALOOSA_SERVER
 
     describe 'Appaloosa Integration' do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
       let(:appaloosa_lane) do
         "lane :test do appaloosa(
           {

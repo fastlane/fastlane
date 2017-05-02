@@ -7,6 +7,7 @@ module FaradayMiddleware
     end
 
     define_parser do |body|
+      body = body.force_encoding("UTF-8")
       Plist.parse_xml(body)
     end
   end

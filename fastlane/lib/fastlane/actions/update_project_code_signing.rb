@@ -26,10 +26,6 @@ module Fastlane
         "Updated code signing settings from 'Automatic' to a specific profile"
       end
 
-      def self.details
-        "Don't use this action, check out https://docs.fastlane.tools/codesigning/getting-started/ for more details"
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
@@ -63,6 +59,12 @@ module Fastlane
 
       def self.category
         :deprecated
+      end
+
+      def self.deprecated_notes
+        "You shouldn't use update_project_code_signing.\n" \
+          "Have you considered using the recommended way to do code signing?\n" \
+          "https://docs.fastlane.tools/codesigning/getting-started/"
       end
     end
   end

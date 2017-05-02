@@ -48,12 +48,6 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          return self.new(attrs)
-        end
-
         # @return (Array) Returns all apps available for this account
         def all
           client.applications.map { |application| self.factory(application) }
@@ -63,7 +57,7 @@ module Spaceship
         #   as either the App ID or the bundle identifier
         def find(identifier, mac: false)
           all.find do |app|
-            (app.apple_id == identifier.to_s || app.bundle_id == identifier) &&
+            ((app.apple_id && app.apple_id.casecmp(identifier.to_s) == 0) || (app.bundle_id && app.bundle_id.casecmp(identifier.to_s) == 0)) &&
               app.version_sets.any? { |v| (mac ? ["osx"] : ["ios", "appletvos"]).include?(v.platform) }
           end
         end
@@ -73,8 +67,8 @@ module Spaceship
         #   This can't be longer than 255 characters.
         # @param primary_language (String): If localized app information isn't available in an
         #   App Store territory, the information from your primary language will be used instead.
-        # @param version (String): The version number is shown on the App Store and should
-        #   match the one you used in Xcode.
+        # @param version *DEPRECATED: Use `ensure_version!` method instead*
+        #   (String): The version number is shown on the App Store and should match the one you used in Xcode.
         # @param sku (String): A unique ID for your app that is not visible on the App Store.
         # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
         #   can't be changed after you submit your first build.
@@ -84,9 +78,9 @@ module Spaceship
         #  should it be an ios or an osx app
 
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+          UI.deprecated("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
           client.create_application!(name: name,
                          primary_language: primary_language,
-                                  version: version,
                                       sku: sku,
                                 bundle_id: bundle_id,
                                 bundle_id_suffix: bundle_id_suffix,
@@ -239,6 +233,26 @@ module Spaceship
         client.price_tier(self.apple_id)
       end
 
+      # set the availability. This method doesn't require `save` to be called
+      def update_availability!(availability)
+        client.update_availability!(self.apple_id, availability)
+      end
+
+      # The current availability.
+      def availability
+        client.availability(self.apple_id)
+      end
+
+      #####################################################
+      # @!group in_app_purchases
+      #####################################################
+      # Get base In-App-Purchases object
+      def in_app_purchases
+        attrs = {}
+        attrs[:application] = self
+        Tunes::IAP.factory(attrs)
+      end
+
       #####################################################
       # @!group Builds
       #####################################################
@@ -356,58 +370,8 @@ module Spaceship
       # @!group Testers
       #####################################################
 
-      # Add all testers (internal and external) to the current app list
-      def add_all_testers!
-        Tunes::Tester.external.add_all_to_app!(self.apple_id)
-        Tunes::Tester.internal.add_all_to_app!(self.apple_id)
-      end
-
-      # @return (Array) Returns all external testers available for this app
-      def external_testers
-        Tunes::Tester.external.all_by_app(self.apple_id)
-      end
-
-      # @return (Array) Returns all internal testers available for this app
-      def internal_testers
-        Tunes::Tester.internal.all_by_app(self.apple_id)
-      end
-
-      # @return (Spaceship::Tunes::Tester.external) Returns the external tester matching the parameter
-      #   as either the Tester id or email
-      # @param identifier (String) (required): Value used to filter the tester
-      def find_external_tester(identifier)
-        Tunes::Tester.external.find_by_app(self.apple_id, identifier)
-      end
-
-      # @return (Spaceship::Tunes::Tester.internal) Returns the internal tester matching the parameter
-      #   as either the Tester id or email
-      # @param identifier (String) (required): Value used to filter the tester
-      def find_internal_tester(identifier)
-        Tunes::Tester.internal.find_by_app(self.apple_id, identifier)
-      end
-
-      # Add external tester to the current app list, if it doesn't exist will be created
-      # @param email (String) (required): The email of the tester
-      # @param first_name (String) (optional): The first name of the tester (Ignored if user already exist)
-      # @param last_name (String) (optional): The last name of the tester (Ignored if user already exist)
-      def add_external_tester!(email: nil, first_name: nil, last_name: nil)
-        raise "Tester is already on #{self.name} betatesters" if find_external_tester(email)
-
-        tester = Tunes::Tester.external.find(email) || Tunes::Tester.external.create!(email: email,
-                                                                                 first_name: first_name,
-                                                                                  last_name: last_name)
-        tester.add_to_app!(self.apple_id)
-      end
-
-      # Remove external tester from the current app list that matching the parameter
-      #   as either the Tester id or email
-      # @param identifier (String) (required): Value used to filter the tester
-      def remove_external_tester!(identifier)
-        tester = find_external_tester(identifier)
-
-        raise "Tester is not on #{self.name} betatesters" unless tester
-
-        tester.remove_from_app!(self.apple_id)
+      def default_external_group
+        TestFlight::Group.default_external_group(app_id: self.apple_id)
       end
 
       #####################################################

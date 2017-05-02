@@ -1,5 +1,10 @@
 skip_docs
 
+desc "Runs the unit tests and other verifications for the fastlane repo"
+lane :test do |options|
+  validate_repo
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   ensure_git_branch(branch: "master")
@@ -51,17 +56,16 @@ lane :bump do |options|
   sh "git checkout master"
 end
 
-desc "Display a changelog for fastlane since its last release."
-lane :show_changelog do
-  old_version = current_version
-
-  print_release_changelog(old_version: old_version)
-end
-
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
+  slack_train_start(distance: 2,
+                       train: "🚀",
+           reverse_direction: true,
+                        rail: "✨")
+
   update_fastlane
+  slack_train
 
   # Git verification
   #
@@ -69,10 +73,10 @@ lane :release do
   ensure_git_branch(branch: 'master')
   git_pull
 
-  # Verifying RubyGems version
-  #
   validate_repo
 
+  # Verifying RubyGems version
+  #
   require "../fastlane/lib/fastlane/version.rb"
   version = Fastlane::VERSION
   old_version = current_version
@@ -89,10 +93,10 @@ lane :release do
   #
   github_release = get_github_release(url: "fastlane/fastlane", version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    print_release_changelog(old_version: old_version)
+    show_changelog(old_version: old_version)
 
     title = prompt(text: 'Title: ')
-    description = prompt(text: "Please enter a changelog: ",
+    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't affect the end-user): ",
                          multi_line_end_keyword: "END")
 
     github_release = set_github_release(
@@ -116,24 +120,30 @@ lane :release do
   # After publishing
   #
   if ENV['SLACK_URL']
+    release_notes = github_release['body']
+    # markup - turn github references into links
+    release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
+    slack_message = "Successfully released [fastlane #{version}](#{release_url}) :rocket:"
     slack(
       channel: "releases",
       default_payloads: [],
-      message: "Successfully released [fastlane #{version}](#{release_url}) :rocket:",
+      message: slack_message,
       payload: {
-        "New" => github_release['body']
+        "New" => release_notes
       }
     )
+    slack(channel: "action", default_payloads: [], message: slack_message)
   end
 
   clubmate
   donate_food
 
   puts "You can now tweet:".green
-  tag_url = "https://github.com/fastlane/fastlane/releases/tag/fastlane/#{version}"
-  puts "[fastlane] #{github_release['name']} #{tag_url}"
+  releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
+  puts "[fastlane] #{github_release['name']} #{releases_url}"
 
   update_docs
+  slack_train
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
@@ -147,6 +157,15 @@ lane :verify_docs do
   end
 end
 
+desc "Generates the actions.md that will get used on https://docs.fastlane.tools"
+desc "This will NOT also automatically submit a pull request to fastlane/docs"
+desc "This SHOULD only be used for testing changes to the docs"
+lane :test_generate_docs do
+  ENV['USE_ENHANCE_TEST_DATA'] = "true"
+  generate_markdown_docs
+  ENV.delete("USE_ENHANCE_TEST_DATA")
+end
+
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
@@ -156,9 +175,7 @@ lane :update_docs do
   end
 
   clone_docs do
-    require 'fastlane/documentation/markdown_docs_generator'
-    actions_md_path = File.expand_path("docs/actions.md")
-    Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+    actions_md_path = generate_markdown_docs
 
     Bundler.with_clean_env do
       sh "bundle update"
@@ -189,9 +206,17 @@ lane :update_docs do
   end
 end
 
+def generate_markdown_docs
+  require 'fastlane/documentation/markdown_docs_generator'
+  actions_md_path = File.expand_path("docs/actions.md")
+  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
+
+  return actions_md_path
+end
+
 def clone_docs
   require 'tmpdir'
-  git_url = "https://github.com/fastlane/docs"
+  git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
 
   Dir.mktmpdir("fl_clone") do |tmp_dir|
     Dir.chdir(tmp_dir) do
@@ -207,16 +232,17 @@ error do |lane, exception|
   if ENV['SLACK_URL']
     slack(channel: "testing", message: exception.to_s, success: false)
   end
+  slack_train_crash
 end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do
   # Verifying that no debug code is in the code base
   #
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "**/*/playground.rb") # debugging code
-  ensure_no_debug_code(text: "# TODO", extension: ".rb") # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb") # rspec focus
-  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb") # Merge conflict
+  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
+  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
 
   rubocop
 
@@ -237,13 +263,19 @@ private_lane :validate_repo do
 
   Dir.chdir("..") do
     # Install the bundle and the actual gem
-    sh "bundle install"
+    sh "bundle check || bundle install"
     sh "rake install"
 
     # Run the tests
     #
     sh "bundle exec rake test_all"
+
+    # Verify shell code style
+    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
+
+  test_generate_docs
+  ensure_code_samples
 
   # Verify docs are still working
   verify_docs
@@ -260,14 +292,15 @@ private_lane :no_binary do
   ['fastlane_core', 'spaceship', 'credentials_manager']
 end
 
-desc "Print out the changelog since the last tagged release"
-private_lane :print_release_changelog do |options|
-  tool_name = options[:tool] || "fastlane"
-  old_version = options[:old_version]
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
+  old_version = options[:old_version] || current_version
 
-  changes = Actions.sh("git log --pretty='* %s' #{tool_name}/#{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
-  changes.gsub!("[#{tool_name}] ", "") # some commits are pre-fixed with the tool name in [ ]
+  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
   changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
+
+  github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
+  sh "open #{github_diff_url}"
 
   puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
   changes # return the text without the modified colors
@@ -277,6 +310,13 @@ desc "Add a git tag in the fastlane repo for this release"
 private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
+end
+
+# Run the code samples, yo
+private_lane :ensure_code_samples do
+  UI.message "<U+1F557>  Verifying all code samples work with the latest fastlane release"
+  test_sample_code(path: File.expand_path("docs/Actions.md"))
+  UI.success "<U+2705>  All fastlane code samples work as expected"
 end
 
 lane :donate_food do

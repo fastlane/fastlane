@@ -8,7 +8,7 @@ module Fastlane
     def inspector_started_query(query, inspector)
       puts ""
       puts "Looking for related GitHub issues on #{inspector.repo_owner}/#{inspector.repo_name}..."
-      puts "Search query: #{query}" if $verbose
+      puts "Search query: #{query}" if FastlaneCore::Globals.verbose?
       puts ""
     end
 
@@ -18,7 +18,10 @@ module Fastlane
 
       if report.issues.count > NUMBER_OF_ISSUES_INLINE
         puts "and #{report.total_results - NUMBER_OF_ISSUES_INLINE} more at: #{report.url}"
+        puts ""
       end
+
+      print_open_link_hint
     end
 
     # Called once the report has been recieved, but when there are no issues found.
@@ -42,9 +45,14 @@ module Fastlane
       status = (resolved ? issue.state.green : issue.state.red)
 
       puts "➡️  #{issue.title.yellow}"
-      puts "   #{issue.html_url} [#{status}] #{issue.comments} 💬"
-      puts "   #{Time.parse(issue.updated_at).to_pretty}"
+      puts "    #{issue.html_url} [#{status}] #{issue.comments} 💬"
+      puts "    #{Time.parse(issue.updated_at).to_pretty}"
       puts ""
+    end
+
+    def print_open_link_hint(newline = false)
+      puts "" if newline
+      puts "🔗  You can ⌘ + double-click on links to open them directly in your browser." if Helper.mac?
     end
   end
 end

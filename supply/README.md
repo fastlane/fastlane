@@ -20,6 +20,7 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,7 +32,7 @@ supply
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/supply/LICENSE)
-[![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
+[![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](https://rubygems.org/gems/supply)
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
@@ -41,6 +42,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -62,7 +64,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Upload the app icon, promo graphics and screenshots for multiple languages
 - Have a local copy of the metadata in your git repository
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Installation
 
@@ -141,7 +143,7 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 
 After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
 
-Here you can supply images with the following file names (extension can be png, jpg or jpeg):
+Inside of a given locale directory is a folder called `images`. Here you can supply images with the following file names (extension can be png, jpg or jpeg):
 
 - `featureGraphic`
 - `icon`
@@ -199,7 +201,7 @@ This can be done using the `--track_promote_to` parameter.  The `--track_promote
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
