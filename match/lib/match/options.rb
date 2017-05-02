@@ -58,7 +58,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :disable_encryption,
                                      env_name: "MATCH_DISABLE_ENCRYPTION",
                                      short_option: "-d",
-                                     description: "Disable encryption, certificates including keys and profiles won't be encrypted! be sure that your git repo is safe!",
+                                     description: "Disable encryption, certificates including keys and profiles won't be encrypted! Be sure that your git repo is safe!",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :team_id,

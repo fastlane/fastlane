@@ -1,6 +1,8 @@
 module Match
   class GitHelper
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, disable_encryption: false)
+      # rubocop:enable Metrics/PerceivedComplexity
       return @dir if @dir
 
       @dir = Dir.mktmpdir
@@ -19,6 +21,29 @@ module Match
         UI.error("Run the following command manually to make sure you're properly authenticated:")
         UI.command(command)
         UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
+      end
+
+      # if there is a encryption state marker file
+      if File.exist?(File.join(@dir, "match_crypted.txt"))
+        # repo is crypted but user requested to run match in disabled_encryption mode
+        # files cannot be read.
+        if GitHelper.crypted?(@dir) && disable_encryption == true
+          remote_is_crypted!
+        end
+
+        # repo is not crypted, but match is run with enabled encryption
+        if !GitHelper.crypted?(@dir) && disable_encryption == false
+          UI.error("Encryption enabled, but remote repository is currently decrypted.")
+          UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
+          UI.user_error!("remote_decrypted")
+        end
+      else
+        # existing repo has `match_version.txt` - but no encryption state marker but unencrypted request
+        if File.exist?(File.join(@dir, "match_version.txt")) && disable_encryption
+          UI.error("You requested to disable encryption on a repo that is not up-to-date")
+          UI.error("Please run match atleast once with the current version")
+          remote_is_crypted!
+        end
       end
 
       add_user_config(git_full_name, git_user_email)
@@ -43,6 +68,12 @@ module Match
       return @dir
     end
 
+    def self.remote_is_crypted!
+      UI.error("Encryption disabled, but remote repository is currently crypted.")
+      UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
+      UI.user_error!("remote_encrypted")
+    end
+
     def self.generate_commit_message(params)
       # 'Automatic commit via fastlane'
       [
@@ -52,6 +83,19 @@ module Match
         "and platform",
         params[:platform]
       ].join(" ")
+    end
+
+    def self.crypted?(workspace)
+      path = File.join(workspace, "match_crypted.txt")
+      # if file does not exist -> return true (default match behaviour)
+      return true unless File.exist?(path)
+      is_crypted = File.read(path).chomp
+      # if "true" it is crypted
+      if is_crypted.to_s == "true"
+        return true
+      else
+        return false
+      end
     end
 
     def self.match_version(workspace)
@@ -67,6 +111,8 @@ module Match
 
         Encrypt.new.encrypt_repo(path: path, git_url: git_url, disable_encryption: disable_encryption)
         File.write("match_version.txt", Fastlane::VERSION) # unencrypted
+        # store the state of encryption
+        File.write("match_crypted.txt", (!disable_encryption).to_s)
 
         commands = []
         commands << "git add -A"

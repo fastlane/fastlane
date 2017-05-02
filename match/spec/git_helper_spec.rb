@@ -35,6 +35,31 @@ describe Match do
         expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
       end
 
+      it "fails if remote is crypted and no-encryption requested" do
+        path = Dir.mktmpdir
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        shallow_clone = true
+        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}' --depth 1 --no-single-branch"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
+
+        expect(File).to receive(:exist?).with(File.join(path, "match_crypted.txt")).and_return(true)
+        expect(Match::GitHelper).to receive(:crypted?).and_return(true)
+
+        expect do
+          result = Match::GitHelper.clone(git_url, shallow_clone, disable_encryption: true)
+        end.to raise_error("remote_encrypted")
+      end
+
       it "clones the repo" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
