@@ -56,7 +56,8 @@ module Pilot
         app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
         app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
         begin
-          app_test_info.save_for_app(app_id: build.app_id)
+          app_test_info.save_for_app!(app_id: build.app_id)
+          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
         rescue => ex
           UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
         end
@@ -65,10 +66,10 @@ module Pilot
       if should_update_build_information(options)
         begin
           build.update_build_information!(whats_new: options[:changelog])
+          UI.success "Successfully set the changelog for build"
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
-        UI.success "Successfully set the changelog for build"
       end
 
       return if config[:skip_submission]
