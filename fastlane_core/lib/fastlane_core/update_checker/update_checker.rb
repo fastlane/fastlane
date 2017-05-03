@@ -192,7 +192,7 @@ module FastlaneCore
     end
 
     def self.send_launch_analytic_events_for(gem_name)
-      return if ENV["FASTLANE_OPT_OUT_USAGE"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
       ci = Helper.is_ci?.to_s
       project_hash = p_hash(ARGV, gem_name)
@@ -261,7 +261,7 @@ module FastlaneCore
     end
 
     def self.send_completion_events_for(gem_name)
-      return if ENV["FASTLANE_OPT_OUT_USAGE"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
       ci = Helper.is_ci?.to_s
       install_method = if Helper.rubygems?
@@ -287,7 +287,6 @@ module FastlaneCore
       analytic_event_body = { analytics: analytics }.to_json
 
       url = ENV["ANALYTIC_INGESTER_URL"] || "https://ana-ing.fabric.io/public"
-
       Excon.post(url,
                 :body => analytic_event_body,
                 :headers => { "Content-Type" => 'application/json' })
