@@ -250,7 +250,7 @@ module Fastlane
                                        default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
-                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download",
+                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
