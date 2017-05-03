@@ -36,7 +36,7 @@ module Spaceship::TestFlight
 
     def testers_for_app(app_id: nil)
       assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers"
+      url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
       response = request(:get, url)
       handle_response(response)
     end
