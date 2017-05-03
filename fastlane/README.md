@@ -186,7 +186,7 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 
 ## Statistics
 
-`fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer).
+`fastlane` tracks the number of errors for each action to detect integration issues.
 
 You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
 
