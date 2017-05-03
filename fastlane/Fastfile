@@ -5,10 +5,6 @@ lane :test do |options|
   validate_repo
 end
 
-lane :andrea_test do |options|
-  puts "testing"
-end
-
 desc "Increment the version number of this gem"
 lane :bump do |options|
   ensure_git_branch(branch: "master")
