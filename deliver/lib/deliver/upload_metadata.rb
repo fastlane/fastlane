@@ -116,7 +116,7 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Dir.glob(File.join(options[:metadata_path], "*")).each do |lng_folder|
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
         next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
 
         language = File.basename(lng_folder)
