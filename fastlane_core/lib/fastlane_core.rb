@@ -31,6 +31,8 @@ require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/keychain_importer'
 require 'fastlane_core/swag'
 require 'fastlane_core/build_watcher'
+require 'fastlane_core/crash_reporter/crash_reporter'
+require 'fastlane_core/crash_reporter/backtrace_sanitizer'
 
 # Third Party code
 require 'colored'

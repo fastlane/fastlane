@@ -5,6 +5,10 @@ lane :test do |options|
   validate_repo
 end
 
+lane :yolo do
+  ensure_git_branch('master')
+end
+
 desc "Increment the version number of this gem"
 lane :bump do |options|
   ensure_git_branch(branch: "master")
