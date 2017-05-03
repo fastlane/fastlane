@@ -20,7 +20,7 @@ module Spaceship::TestFlight
     end
 
     # saves the changes to the App Test Info object to TestFlight
-    def save_for_app(app_id: nil)
+    def save_for_app!(app_id: nil)
       client.put_app_test_info(app_id: app_id, app_test_info: self)
     end
   end

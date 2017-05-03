@@ -86,7 +86,7 @@ describe Spaceship::TestFlight::AppTestInfo do
 
     it 'updates app test info on the server' do
       expect(app_test_info.client).to receive(:put_app_test_info).with(same_app_test_info(app_test_info))
-      app_test_info.save_for_app(app_id: 'app-id')
+      app_test_info.save_for_app!(app_id: 'app-id')
     end
   end
 end
