@@ -34,20 +34,6 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def testers_for_app(app_id: nil)
-      assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers"
-      response = request(:get, url)
-      handle_response(response)
-    end
-
-    def delete_tester_from_app(app_id: nil, tester_id: nil)
-      assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
-      response = request(:delete, url)
-      handle_response(response)
-    end
-
     ##
     # @!group Builds API
     ##
@@ -110,6 +96,20 @@ module Spaceship::TestFlight
     ##
     # @!group Testers API
     ##
+
+    def testers_for_app(app_id: nil)
+      assert_required_params(__method__, binding)
+      url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
+      response = request(:get, url)
+      handle_response(response)
+    end
+
+    def delete_tester_from_app(app_id: nil, tester_id: nil)
+      assert_required_params(__method__, binding)
+      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
+      response = request(:delete, url)
+      handle_response(response)
+    end
 
     def post_tester(app_id: nil, tester: nil)
       assert_required_params(__method__, binding)
