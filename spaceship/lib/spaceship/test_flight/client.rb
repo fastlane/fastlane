@@ -156,15 +156,22 @@ module Spaceship::TestFlight
     end
 
     ##
-    # @!group TestInfo
+    # @!group AppTestInfo
     ##
 
-    def put_testinfo(app_id: nil, testinfo: nil)
+    def get_app_test_info(app_id: nil)
+      assert_required_params(__method__, binding)
+
+      response = request(:get, "providers/#{team_id}/apps/#{app_id}/testInfo")
+      handle_response(response)
+    end
+
+    def put_app_test_info(app_id: nil, app_test_info: nil)
       assert_required_params(__method__, binding)
 
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/testInfo"
-        req.body = testinfo.to_json
+        req.body = app_test_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_response(response)
