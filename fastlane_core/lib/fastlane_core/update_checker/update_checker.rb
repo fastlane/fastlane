@@ -36,8 +36,8 @@ module FastlaneCore
       @results ||= {}
     end
 
-    def self.start_time
-      @start_time
+    class << self
+      attr_reader :start_time
     end
 
     def self.update_available?(gem_name, current_version)
@@ -223,7 +223,7 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name:'project',
+          name: 'project',
           detail: p_hash
         },
         action: {
@@ -249,7 +249,7 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name:'tool',
+          name: 'tool',
           detail: tool || 'unknown'
         },
         action: {
@@ -292,8 +292,8 @@ module FastlaneCore
 
       url = ENV["ANALYTIC_INGESTER_URL"] || "https://ana-ing.fabric.io/public"
       Excon.post(url,
-                :body => analytic_event_body,
-                :headers => { "Content-Type" => 'application/json' })
+                 body: analytic_event_body,
+                 headers: { "Content-Type" => 'application/json' })
     end
 
     def self.event_for_completion(tool, ci, duration, timestamp_seconds)
@@ -303,7 +303,7 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name:'tool',
+          name: 'tool',
           detail: tool || 'unknown'
         },
         action: {
@@ -329,7 +329,7 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name:'tool',
+          name: 'tool',
           detail: tool || 'unknown'
         },
         action: {

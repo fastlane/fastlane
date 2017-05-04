@@ -115,9 +115,9 @@ describe FastlaneCore do
       it "has no p_hash event when no project defined" do
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(1)
-          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched'}.size).to eq(1)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched' }.size).to eq(1)
         end
-        
+
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
 
@@ -126,9 +126,9 @@ describe FastlaneCore do
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(1)
-          expect(analytics.find_all { |a| a[:primary_target][:detail] == 'true' && a[:action][:name] == 'launched'}.size).to eq(1)
+          expect(analytics.find_all { |a| a[:primary_target][:detail] == 'true' && a[:action][:name] == 'launched' }.size).to eq(1)
         end
-        
+
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
 
@@ -138,10 +138,10 @@ describe FastlaneCore do
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(2)
-          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched'}.size).to eq(1)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched' }.size).to eq(1)
           expect(analytics.find_all { |a| a[:actor][:name] == 'project' && a[:action][:name] == 'update_checked' && a[:actor][:detail] == p_hashed_id }.size).to eq(1)
         end
-        
+
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
 
@@ -152,7 +152,7 @@ describe FastlaneCore do
               expect(analytics.size).to eq(2)
               expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
             end
-          
+
             FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
           end
         end
@@ -163,7 +163,7 @@ describe FastlaneCore do
               expect(analytics.size).to eq(2)
               expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
             end
-          
+
             FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
           end
         end
@@ -191,7 +191,7 @@ describe FastlaneCore do
           expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'completed_with_duration' && a[:primary_target][:detail] }.size).to eq(1)
           expect(analytics.find_all { |a| a[:action][:name] == 'completed_with_install_method' && a[:primary_target][:detail] == 'gem' && a[:secondary_target][:detail] == 'false' }.size).to eq(1)
         end
-        
+
         FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
       end
     end

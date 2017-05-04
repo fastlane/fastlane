@@ -1,6 +1,6 @@
 describe FastlaneCore::ToolCollector do
   before(:all) { ENV.delete("FASTLANE_OPT_OUT_USAGE") }
-  
+
   let(:collector) { FastlaneCore::ToolCollector.new }
 
   it "keeps track of what tools get invoked" do
@@ -49,14 +49,14 @@ describe FastlaneCore::ToolCollector do
 
     analytic_event_body = collector.create_analytic_event_body
     analytics = JSON.parse(analytic_event_body)['analytics']
-    
+
     expect(analytics.size).to eq(4)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan'}.size).to eq(2)
-    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym'}.size).to eq(2)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'scan'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym'}.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym' }.size).to eq(1)
   end
 
   it "posts the collected data with an error when finished" do
@@ -66,14 +66,14 @@ describe FastlaneCore::ToolCollector do
 
     analytic_event_body = collector.create_analytic_event_body
     analytics = JSON.parse(analytic_event_body)['analytics']
-    
+
     expect(analytics.size).to eq(4)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan'}.size).to eq(2)
-    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym'}.size).to eq(2)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'scan'}.size).to eq(1)
-    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym'}.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym' }.size).to eq(1)
   end
 
   it "posts the web onboarding data with a success when finished" do
@@ -82,12 +82,12 @@ describe FastlaneCore::ToolCollector do
 
       analytic_event_body = collector.create_analytic_event_body
       analytics = JSON.parse(analytic_event_body)['analytics']
-      
+
       expect(analytics.size).to eq(3)
-      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane'}.size).to eq(1)
-      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane'}.size).to eq(2)
-      expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'fastlane'}.size).to eq(1)
-      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['actor']['detail'] == 'fastfile_id' && a['primary_target']['detail'] == 'success'}.size).to eq(1)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['actor']['detail'] == 'fastfile_id' && a['primary_target']['detail'] == 'success' }.size).to eq(1)
     end
   end
 
@@ -98,11 +98,11 @@ describe FastlaneCore::ToolCollector do
 
       analytic_event_body = collector.create_analytic_event_body
       analytics = JSON.parse(analytic_event_body)['analytics']
-      
+
       expect(analytics.size).to eq(3)
-      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane'}.size).to eq(1)
-      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane'}.size).to eq(2)
-      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'fastfile_id'}.size).to eq(1)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'fastfile_id' }.size).to eq(1)
     end
   end
 
@@ -113,11 +113,11 @@ describe FastlaneCore::ToolCollector do
 
       analytic_event_body = collector.create_analytic_event_body
       analytics = JSON.parse(analytic_event_body)['analytics']
-      
+
       expect(analytics.size).to eq(3)
-      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane'}.size).to eq(1)
-      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane'}.size).to eq(2)
-      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'fastfile_id'}.size).to eq(1)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'fastfile_id' }.size).to eq(1)
     end
   end
 end
