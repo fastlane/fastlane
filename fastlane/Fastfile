@@ -209,7 +209,6 @@ lane :update_docs do
 end
 
 def send_mac_app_ci_reminder
-  # require 'pry'; binding.pry
   if ENV['FABRIC_SLACK_URL']
     slack(
       slack_url: ENV['FABRIC_SLACK_URL'],
