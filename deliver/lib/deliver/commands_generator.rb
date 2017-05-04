@@ -50,8 +50,7 @@ module Deliver
         c.action do |args, options|
           options = FastlaneCore::Configuration.create(deliverfile_options, options.__hash__)
           loaded = options.load_configuration_file("Deliverfile")
-          loaded = true if options[:description] || options[:ipa] || options[:pkg] # do we have *anything* here?
-          loaded = true if File.exist?(File.join(FastlaneCore::FastlaneFolder.path || ".", "metadata"))
+          loaded = true if options[:description] || options[:ipa] || options[:pkg] || File.exist?(File.join(FastlaneCore::FastlaneFolder.path || ".", "metadata")) # do we have *anything* here?
           unless loaded
             if UI.confirm("No deliver configuration found in the current directory. Do you want to setup deliver?")
               require 'deliver/setup'
