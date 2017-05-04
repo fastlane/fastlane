@@ -139,6 +139,12 @@ In addition to `fastlane`'s commands, you also have access to these `fastlane` t
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 
+## Statistics
+
+`fastlane` tracks the number of errors for each action to detect integration issues.
+
+You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
+
 ## Need Help?
 
 Please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup.
