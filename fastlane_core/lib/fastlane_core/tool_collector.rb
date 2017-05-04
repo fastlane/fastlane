@@ -60,31 +60,12 @@ module FastlaneCore
       end
 
       require 'excon'
-      timestamp_seconds = Time.now.to_i
       url = ENV["ANALYTIC_INGESTER_URL"] || "https://ana-ing.fabric.io/public"
-      analytics = []
       
-      fastfile_id = ENV["GENERATED_FASTFILE_ID"]
-      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
-      # generate as part of an automated process.
-      if fastfile_id && launches.size == 1 && launches['fastlane']
-        completion_status = crash ? 'crash' : ( error ? 'error' : 'success' )
-        analytics << event_for_web_onboarding(fastfile_id, completion_status, timestamp_seconds)
-      end
-
-      launches.each do |action, count|
-        action_version = versions[action] || 'unknown'
-        action_completion_status = action == crash ? 'crash' : ( action == error ? 'error' : 'success' )
-
-        analytics << event_for_completion(action, action_completion_status, action_version, timestamp_seconds)
-        analytics << event_for_count(action, count, action_version, timestamp_seconds)
-      end
-
-      analytic_event_body = { analytics: analytics }.to_json
-
-      if Helper.is_test? # don't send test data
-        return url
-      else
+      analytic_event_body = create_analytic_event_body
+      
+      # Never generate web requests during tests
+      unless Helper.test?
         fork do
           begin 
             Excon.post(url,
@@ -94,10 +75,35 @@ module FastlaneCore
             # we don't want to show a stack trace if something goes wrong
           end
         end
-        return true
       end
+
+      return true
     rescue
       # We don't care about connection errors
+    end
+
+    def create_analytic_event_body
+      analytics = []
+      timestamp_seconds = Time.now.to_i
+
+      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
+      fastfile_id = ENV["GENERATED_FASTFILE_ID"]
+
+      if fastfile_id && launches.size == 1 && launches['fastlane']
+        completion_status = crash ? 'crash' : ( error ? 'error' : 'success' )
+        analytics << event_for_web_onboarding(fastfile_id, completion_status, timestamp_seconds)
+      end
+
+      launches.each do |action, count|
+        action_version = versions[action] || 'unknown'
+        action_completion_status = crash && error == action ? 'crash' : ( action == error ? 'error' : 'success' )
+
+        analytics << event_for_completion(action, action_completion_status, action_version, timestamp_seconds)
+        analytics << event_for_count(action, count, action_version, timestamp_seconds)
+      end
+
+      { analytics: analytics }.to_json
     end
 
     def show_message
