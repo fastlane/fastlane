@@ -97,26 +97,32 @@ module Pilot
 
     def find_or_create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
       current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
-      tester = nil
-
-      if current_user.roles.include?("admin")
+      if current_user.admin?
         tester = Spaceship::Tunes::Tester::Internal.find(email)
         tester ||= Spaceship::Tunes::Tester::External.find(email)
-      elsif current_user.roles.include?("appmanager")
-        raise "Account #{current_user.email_address} is only an 'App Manager' and therefore you must also define what app this tester (#{email}) should be added to" unless app
+      elsif current_user.app_manager?
+        unless app
+          UI.user_error!("Account #{current_user.email_address} is only an 'App Manager' and therefore you must also define what app this tester (#{email}) should be added to")
+        end
         tester = Spaceship::Tunes::Tester::Internal.find_by_app(app.apple_id, email)
         tester ||= Spaceship::Tunes::Tester::External.find_by_app(app.apple_id, email)
       else
-        raise "Account #{current_user.email} doesn't have a role that is allowed to administer app testers, current roles: #{current_user.roles}"
+        UI.user_error!("Account #{current_user.email} doesn't have a role that is allowed to administer app testers, current roles: #{current_user.roles}")
+        tester = nil
       end
 
       if tester
         UI.success("Existing tester #{email}")
-      elsif current_user.roles.include?("admin")
-        tester = Spaceship::Tunes::Tester::External.create!(email: email, first_name: first_name, last_name: last_name)
+      elsif current_user.admin?
+        tester = Spaceship::Tunes::Tester::External.create!(email: email,
+                                                       first_name: first_name,
+                                                        last_name: last_name)
         UI.success("Successfully added tester: #{email} to your account")
-      elsif current_user.roles.include?("appmanager")
-        Spaceship::TestFlight::Base.client.create_app_level_tester(app_id: app.apple_id, first_name: first_name, last_name: last_name, email: email)
+      elsif current_user.app_manager?
+        Spaceship::TestFlight::Tester.create_app_level_tester(app_id: app.apple_id,
+                                                          first_name: first_name,
+                                                           last_name: last_name,
+                                                               email: email)
         tester = Spaceship::Tunes::Tester::External.find_by_app(app.apple_id, email)
         UI.success("Successfully added tester: #{email} to your app #{app.name}")
       end
