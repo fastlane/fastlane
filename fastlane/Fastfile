@@ -244,7 +244,7 @@ private_lane :send_mac_app_ci_reminder do
       channel: 'deployment-tools',
       default_payloads: [],
       message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
-      )
+    )
   end
 end
 
