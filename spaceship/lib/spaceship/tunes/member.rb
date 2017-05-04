@@ -24,6 +24,14 @@ module Spaceship
         return parsed_roles
       end
 
+      def admin?
+        roles.include?("admin")
+      end
+
+      def app_manager?
+        roles.include?("appmanager")
+      end
+
       def preferred_currency
         currency_base = raw_data["preferredCurrency"]["value"]
         return {
