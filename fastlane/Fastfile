@@ -208,17 +208,6 @@ lane :update_docs do
   end
 end
 
-def send_mac_app_ci_reminder
-  if ENV['FABRIC_SLACK_URL']
-    slack(
-      slack_url: ENV['FABRIC_SLACK_URL'],
-      channel: 'deployment-tools',
-      default_payloads: [],
-      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
-      )
-  end
-end
-
 def generate_markdown_docs
   require 'fastlane/documentation/markdown_docs_generator'
   actions_md_path = File.expand_path("docs/actions.md")
@@ -246,6 +235,17 @@ error do |lane, exception|
     slack(channel: "testing", message: exception.to_s, success: false)
   end
   slack_train_crash
+end
+
+private_lane :send_mac_app_ci_reminder do
+  if ENV['FABRIC_SLACK_URL']
+    slack(
+      slack_url: ENV['FABRIC_SLACK_URL'],
+      channel: 'deployment-tools',
+      default_payloads: [],
+      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
+      )
+  end
 end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
