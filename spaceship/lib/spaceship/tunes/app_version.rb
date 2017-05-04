@@ -595,14 +595,15 @@ module Spaceship
         # Enable Scaling for all screen sizes that don't have at least one screenshot
         # We automatically disable scaling once we upload at least one screenshot
         language_details = raw_data_details.each do |current_language|
-          language_details = current_language["displayFamilies"]["value"]
-          language_details.each do |device_language_details|
+          language_details = (current_language["displayFamilies"] || {})["value"]
+          (language_details || []).each do |device_language_details|
+            next if device_language_details["screenshots"].nil?
             next if device_language_details["screenshots"]["value"].count > 0
 
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
-            device_language_details["scaled"]["value"] = true
-            device_language_details["messagesScaled"]["value"] = true
+            device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
+            device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
             # we unset `scaled` or `messagesScaled` as soon as we upload a
             # screenshot for this device/language combination
           end
