@@ -105,6 +105,13 @@ describe FastlaneCore do
         allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
       end
 
+      it "sends no events when opted out" do
+        with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
+          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
+        end
+      end
+
       it "has no p_hash event when no project defined" do
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(1)
@@ -132,7 +139,7 @@ describe FastlaneCore do
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(2)
           expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched'}.size).to eq(1)
-          expect(analytics.find_all { |a| a[:actor][:name] == 'project' && a[:action][:name] == 'update_checked' && a[:actor][:detail] == p_hashed_id}.size).to eq(1)
+          expect(analytics.find_all { |a| a[:actor][:name] == 'project' && a[:action][:name] == 'update_checked' && a[:actor][:detail] == p_hashed_id }.size).to eq(1)
         end
         
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
@@ -143,7 +150,7 @@ describe FastlaneCore do
           FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
             expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
               expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios}.size).to eq(1)
+              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
             end
           
             FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
@@ -154,12 +161,38 @@ describe FastlaneCore do
           FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
             expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
               expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android}.size).to eq(1)
+              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
             end
           
             FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
           end
         end
+      end
+    end
+
+    describe "#send_completion_events_for" do
+      before do
+        ENV.delete("FASTLANE_OPT_OUT_USAGE")
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+      end
+
+      it "sends no events when opted out" do
+        with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
+          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
+        end
+      end
+
+      it "contains duration event and a install method event" do
+        allow(FastlaneCore::UpdateChecker).to receive(:start_time).and_return(Time.now)
+        allow(FastlaneCore::Helper).to receive(:rubygems?).and_return(true)
+        expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+          expect(analytics.size).to eq(2)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'completed_with_duration' && a[:primary_target][:detail] }.size).to eq(1)
+          expect(analytics.find_all { |a| a[:action][:name] == 'completed_with_install_method' && a[:primary_target][:detail] == 'gem' && a[:secondary_target][:detail] == 'false' }.size).to eq(1)
+        end
+        
+        FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
       end
     end
   end

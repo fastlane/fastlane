@@ -36,6 +36,10 @@ module FastlaneCore
       @results ||= {}
     end
 
+    def self.start_time
+      @start_time
+    end
+
     def self.update_available?(gem_name, current_version)
       latest = server_results[gem_name]
       return (latest and Gem::Version.new(latest) > Gem::Version.new(current_version))
@@ -277,7 +281,7 @@ module FastlaneCore
                        else
                          'unknown'
                        end
-      duration = (Time.now - @start_time).to_i
+      duration = (Time.now - start_time).to_i
       timestamp_seconds = Time.now.to_i
 
       send_completion_events(gem_name, ci, install_method, duration, timestamp_seconds)
