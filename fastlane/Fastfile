@@ -142,7 +142,7 @@ lane :release do
   releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
   puts "[fastlane] #{github_release['name']} #{releases_url}"
 
-  print_mac_app_ci_reminder
+  send_mac_app_ci_reminder
 
   update_docs
   slack_train
@@ -208,10 +208,16 @@ lane :update_docs do
   end
 end
 
-def print_mac_app_ci_reminder
-  UI.header "IMPORTANT"
-  UI.important "Please run the Fabric Mac App Package CI job!"
-  UI.header "IMPORTANT"
+def send_mac_app_ci_reminder
+  # require 'pry'; binding.pry
+  if ENV['FABRIC_SLACK_URL']
+    slack(
+      slack_url: ENV['FABRIC_SLACK_URL'],
+      channel: 'deployment-tools',
+      default_payloads: [],
+      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
+      )
+  end
 end
 
 def generate_markdown_docs
