@@ -142,6 +142,8 @@ lane :release do
   releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
   puts "[fastlane] #{github_release['name']} #{releases_url}"
 
+  print_mac_app_ci_reminder
+
   update_docs
   slack_train
 end
@@ -204,6 +206,12 @@ lane :update_docs do
       end
     end
   end
+end
+
+def print_mac_app_ci_reminder
+  UI.header "IMPORTANT"
+  UI.important "Please run the Fabric Mac App Package CI job!"
+  UI.header "IMPORTANT"
 end
 
 def generate_markdown_docs
