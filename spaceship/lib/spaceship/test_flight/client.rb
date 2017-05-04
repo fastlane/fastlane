@@ -110,14 +110,6 @@ module Spaceship::TestFlight
     ##
     # @!group Testers API
     ##
-
-    def post_tester(app_id: nil, tester: nil)
-      return create_app_level_tester(app_id: app_id,
-                                 first_name: tester.first_name,
-                                  last_name: tester.last_name,
-                                      email: tester.email)
-    end
-
     def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
