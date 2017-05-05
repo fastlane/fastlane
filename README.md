@@ -152,7 +152,7 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
 
 We have recently changed the destination service to which these metrics are reported, as well as the format of the data, but the data that is collected has not changed.
 
-You can easily opt-out of metrics collection by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
+You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
 
 ## Need Help?
 

@@ -126,7 +126,7 @@ module FastlaneCore
       UI.message(launches)
       UI.message(@error) if @error
       UI.message("This information is used to fix failing tools and improve those that are most often used.")
-      UI.message("You can disable this by setting the environment variable: FASTLANE_OPT_OUT_USAGE=1")
+      UI.message("You can disable this by adding `opt_out_usage` at the top of your Fastfile")
     end
 
     def launches
