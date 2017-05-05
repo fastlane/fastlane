@@ -62,7 +62,7 @@ module FastlaneCore
       end
 
       require 'excon'
-      url = ENV["ANALYTIC_INGESTER_URL"] || "https://ana-ing.fabric.io/public"
+      url = ENV["FASTLANE_METRICS_URL"] || "https://fastlane-metrics.fabric.io/public"
 
       analytic_event_body = create_analytic_event_body
 

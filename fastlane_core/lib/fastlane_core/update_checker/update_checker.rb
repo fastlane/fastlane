@@ -287,7 +287,7 @@ module FastlaneCore
     def self.send_events(analytics)
       analytic_event_body = { analytics: analytics }.to_json
 
-      url = ENV["ANALYTIC_INGESTER_URL"] || "https://ana-ing.fabric.io/public"
+      url = ENV["FASTLANE_METRICS_URL"] || "https://fastlane-metrics.fabric.io/public"
       Excon.post(url,
                  body: analytic_event_body,
                  headers: { "Content-Type" => 'application/json' })
