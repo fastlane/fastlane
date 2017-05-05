@@ -11,7 +11,7 @@ rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Felix Krause", "Michael Furtak", "Andrea Falcone", "David Ohayon", "Mark Pirri", "Hemal Shah", "Manuel Wallner"]
+  spec.authors       = ["Felix Krause", "Michael Furtak", "Andrea Falcone", "David Ohayon", "Mark Pirri", "Hemal Shah", "Manuel Wallner", "Joshua Liebowitz"]
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
   spec.description   = Fastlane::DESCRIPTION
@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'terminal-notifier', '>= 1.6.2', '< 2.0.0' # macOS notifications
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
   spec.add_dependency 'plist', '>= 3.1.0', '< 4.0.0' # Needed for set_build_number_repository and get_info_plist_value actions
+  spec.add_dependency 'CFPropertyList', '>= 2.3', '< 3.0.0' # Needed to be able to read binary plist format
   spec.add_dependency 'addressable', '>= 2.3', '< 3.0.0' # Support for URI templates
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'word_wrap', '~> 1.0.0' # to add line breaks for tables with long strings
@@ -70,6 +71,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'pry-byebug'
+  spec.add_development_dependency 'pry-rescue'
+  spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
@@ -77,4 +80,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '~> 1.6.7'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
+  spec.add_development_dependency 'sinatra', '~> 1.4.8'
 end

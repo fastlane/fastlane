@@ -41,6 +41,7 @@ module Gym
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
+        options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
@@ -64,6 +65,7 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
+        pipe << "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if Gym.config[:analyze_build_time]
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
@@ -103,10 +105,6 @@ module Gym
       def build_path
         unless Gym.cache[:build_path]
           Gym.cache[:build_path] = Gym.config[:build_path]
-          unless Gym.cache[:build_path]
-            day = Time.now.strftime("%F") # e.g. 2015-08-07
-            Gym.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-          end
           FileUtils.mkdir_p Gym.cache[:build_path]
         end
         Gym.cache[:build_path]

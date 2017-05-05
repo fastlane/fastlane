@@ -10,6 +10,7 @@ require 'spaceship/portal/spaceship'
 # iTunes Connect
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
+require 'spaceship/test_flight'
 
 # To support legacy code
 module Spaceship

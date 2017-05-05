@@ -100,6 +100,11 @@ module Gym
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_ipa,
+                                     env_name: "GYM_SKIP_PACKAGE_IPA",
+                                     description: "Should we skip packaging the ipa?",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -272,6 +277,11 @@ module Gym
                                      verify_block: proc do |value|
                                        UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in culprits.txt file",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",

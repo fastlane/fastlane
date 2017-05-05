@@ -118,11 +118,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
@@ -211,6 +206,13 @@ module FastlaneCore
       keychain_path = keychain_paths.find { |path| File.exist?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
+    end
+
+    # @return true if XCode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable

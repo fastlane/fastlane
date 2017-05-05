@@ -59,7 +59,13 @@ end
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
+  slack_train_start(distance: 2,
+                       train: "🚀",
+           reverse_direction: true,
+                        rail: "✨")
+
   update_fastlane
+  slack_train
 
   # Git verification
   #
@@ -67,10 +73,10 @@ lane :release do
   ensure_git_branch(branch: 'master')
   git_pull
 
-  # Verifying RubyGems version
-  #
   validate_repo
 
+  # Verifying RubyGems version
+  #
   require "../fastlane/lib/fastlane/version.rb"
   version = Fastlane::VERSION
   old_version = current_version
@@ -136,7 +142,10 @@ lane :release do
   releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
   puts "[fastlane] #{github_release['name']} #{releases_url}"
 
+  send_mac_app_ci_reminder
+
   update_docs
+  slack_train
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
@@ -224,6 +233,18 @@ end
 error do |lane, exception|
   if ENV['SLACK_URL']
     slack(channel: "testing", message: exception.to_s, success: false)
+  end
+  slack_train_crash
+end
+
+private_lane :send_mac_app_ci_reminder do
+  if ENV['FABRIC_SLACK_URL']
+    slack(
+      slack_url: ENV['FABRIC_SLACK_URL'],
+      channel: 'deployment-tools',
+      default_payloads: [],
+      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
+    )
   end
 end
 

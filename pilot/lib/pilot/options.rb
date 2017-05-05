@@ -32,7 +32,7 @@ module Pilot
                                      optional: true,
                                      env_name: "PILOT_IPA",
                                      description: "Path to the ipa file to upload",
-                                     default_value: Dir["*.ipa"].first,
+                                     default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
@@ -65,9 +65,10 @@ module Pilot
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :update_build_info_on_upload,
+                                     deprecated: true,
                                      short_option: "-x",
                                      env_name: "PILOT_UPDATE_BUILD_INFO_ON_UPLOAD",
-                                     description: "Update build info immediately after validation. This will set the changelog even if PILOT_SKIP_SUBMISSION is set, but will have no effect if PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING is set",
+                                     description: "Update build info immediately after validation. This is deprecated and will be removed in a future release. iTunesConnect no longer supports setting build info until after build processing has completed, which is when build info is updated by default",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :apple_id,

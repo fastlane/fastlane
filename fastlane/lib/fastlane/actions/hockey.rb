@@ -88,6 +88,11 @@ module Fastlane
         app_id = options.delete(:public_identifier)
 
         ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        dsym = options.delete(:dsym)
+
+        if dsym
+          dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym and File.exist?(dsym)
+        end
 
         response = connection.get do |req|
           req.url("/api/2/apps/#{app_id}/app_versions/new")
@@ -104,6 +109,10 @@ module Fastlane
         end
 
         options[:ipa] = ipaio
+
+        if dsym
+          options[:dsym] = dsym_io
+        end
 
         connection.put do |req|
           req.url("/api/2/apps/#{app_id}/app_versions/#{app_version_id}")
@@ -241,7 +250,7 @@ module Fastlane
                                        default_value: "1"),
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
-                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download",
+                                       description: "Download status: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",

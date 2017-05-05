@@ -45,8 +45,8 @@ module Fastlane
       status = (resolved ? issue.state.green : issue.state.red)
 
       puts "➡️  #{issue.title.yellow}"
-      puts "   #{issue.html_url} [#{status}] #{issue.comments} 💬"
-      puts "   #{Time.parse(issue.updated_at).to_pretty}"
+      puts "    #{issue.html_url} [#{status}] #{issue.comments} 💬"
+      puts "    #{Time.parse(issue.updated_at).to_pretty}"
       puts ""
     end
 
