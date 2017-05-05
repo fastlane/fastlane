@@ -376,7 +376,10 @@ module FastlaneCore
     def load_password_for_transporter
       # 3 different sources for the password
       #   1) ENV variable for application specific password
-      return ENV[TWO_FACTOR_ENV_VARIABLE] if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
+      if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
+        UI.message("Fetching password for transporter from environment variable named `#{TWO_FACTOR_ENV_VARIABLE}`")
+        return ENV[TWO_FACTOR_ENV_VARIABLE]
+      end
       #   2) TWO_STEP_HOST_PREFIX from keychain
       account_manager = CredentialsManager::AccountManager.new(user: @user,
                                                              prefix: TWO_STEP_HOST_PREFIX,
