@@ -49,6 +49,7 @@ module Fastlane
     def show_analytics
       UI.message("fastlane will collect the number of errors for each action to detect integration issues")
       UI.message("No sensitive/private information will be uploaded")
+      UI.message("Learn more at https://github.com/fastlane/fastlane#metrics")
     end
   end
 end

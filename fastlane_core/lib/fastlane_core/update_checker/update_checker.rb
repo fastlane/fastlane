@@ -6,9 +6,6 @@ require 'fastlane_core/update_checker/changelog'
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
-    # This web service is fully open source: https://github.com/fastlane/refresher
-    UPDATE_URL = "https://refresher.fastlane.tools/"
-
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
       return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
@@ -169,7 +166,7 @@ module FastlaneCore
     end
 
     # To not count the same projects multiple time for the number of launches
-    # More information: https://github.com/fastlane/refresher
+    # Learn more at https://github.com/fastlane/fastlane#metrics
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def self.p_hash(args, gem_name)
