@@ -51,9 +51,25 @@ module Pilot
         UI.user_error!("No build to distribute!")
       end
 
-      if should_update_build_information(options)
-        build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-        UI.success "Successfully set the changelog and/or description for build"
+      if should_update_app_test_information?(options)
+        app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
+        app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
+        app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
+        begin
+          app_test_info.save_for_app!(app_id: build.app_id)
+          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
+        rescue => ex
+          UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
+        end
+      end
+
+      if should_update_build_information?(options)
+        begin
+          build.update_build_information!(whats_new: options[:changelog])
+          UI.success "Successfully set the changelog for build"
+        rescue => ex
+          UI.user_error!("Could not set changelog: #{ex}")
+        end
       end
 
       return if config[:skip_submission]
@@ -104,8 +120,12 @@ module Pilot
       return row
     end
 
-    def should_update_build_information(options)
-      options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+    def should_update_build_information?(options)
+      options[:changelog].to_s.length > 0
+    end
+
+    def should_update_app_test_information?(options)
+      options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
     end
 
     def distribute_build(uploaded_build, options)
