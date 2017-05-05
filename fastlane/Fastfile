@@ -257,6 +257,10 @@ private_lane :validate_repo do
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
 
+  # spaceship and credentials_manager don't have access to fastlane_core
+  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+
   rubocop
 
   # Verifying the --help command
