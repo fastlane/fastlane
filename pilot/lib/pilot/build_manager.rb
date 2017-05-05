@@ -121,7 +121,7 @@ module Pilot
     end
 
     def should_update_build_information(options)
-      options[:changelog].to_s.length
+      options[:changelog].to_s.length > 0
     end
 
     def should_update_app_test_information(options)
