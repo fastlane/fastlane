@@ -139,11 +139,20 @@ In addition to `fastlane`'s commands, you also have access to these `fastlane` t
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 
-## Statistics
+## Metrics
 
-`fastlane` tracks the number of errors for each action to detect integration issues.
+_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
 
-You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
+* The number of successes, errors, and crashes for _fastlane_ and each action run in a Fastfile
+* The running time of _fastlane_
+* The method by which _fastlane_ was installed
+* Whether _fastlane_ is being run on CI
+* The platform (e.g. iOS, Android) for which _fastlane_ is run
+* A hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
+
+We have recently changed the destination service to which these metrics are reported, as well as the format of the data, but the data that is collected has not changed.
+
+You can easily opt-out of metrics collection by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
 
 ## Need Help?
 
