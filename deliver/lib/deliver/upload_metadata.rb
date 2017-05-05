@@ -233,6 +233,7 @@ module Deliver
         UI.error(ex.to_s)
         UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
       end
+      UI.message("Setting the app's age rating...")
       v.update_rating(json)
     end
   end
