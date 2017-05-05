@@ -84,7 +84,7 @@ module Spaceship::TestFlight
       if groups.nil?
         default_external_group = app.default_external_group
         if default_external_group.nil?
-          UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
+          raise "The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option."
         end
         test_flight_groups = [default_external_group]
       else
@@ -92,7 +92,7 @@ module Spaceship::TestFlight
           groups.include?(group.name)
         end
 
-        UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
+        raise "There are no groups available matching the names passed to the `:groups` option." if test_flight_groups.empty?
       end
 
       test_flight_groups.each(&block)
