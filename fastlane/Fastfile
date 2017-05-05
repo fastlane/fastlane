@@ -249,7 +249,7 @@ private_lane :send_mac_app_ci_reminder do
 end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
-lane :validate_repo do
+private_lane :validate_repo do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
