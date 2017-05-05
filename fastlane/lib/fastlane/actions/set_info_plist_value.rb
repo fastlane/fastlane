@@ -10,7 +10,11 @@ module Fastlane
         begin
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
-          plist[params[:key]] = params[:value]
+          if params[:subkey]
+            plist[params[:key]][params[:subkey]] = params[:value]
+          else
+            plist[params[:key]] = params[:value]
+          end
           new_plist = Plist::Emit.dump(plist)
           File.write(path, new_plist)
 
@@ -31,6 +35,10 @@ module Fastlane
                                        env_name: "FL_SET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of key in plist",
                                        optional: false),
+          FastlaneCore::ConfigItem.new(key: :subkey,
+                                       env_name: "FL_SET_INFO_PLIST_SUBPARAM_NAME",
+                                       description: "Name of subkey in plist",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
@@ -47,7 +55,7 @@ module Fastlane
       end
 
       def self.authors
-        ["kohtenko"]
+        ["kohtenko", "uwehollatz"]
       end
 
       def self.is_supported?(platform)
@@ -56,7 +64,8 @@ module Fastlane
 
       def self.example_code
         [
-          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")'
+          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")',
+          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true)'
         ]
       end
 
