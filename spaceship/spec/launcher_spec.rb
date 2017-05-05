@@ -67,9 +67,9 @@ describe Spaceship do
         clean_launcher.login(username, password)
         csr = PortalStubbing.adp_read_fixture_file('certificateSigningRequest.certSigningRequest')
 
-        expect {
+        expect do
           clean_launcher.certificate.development_push.create!(csr: csr, bundle_id: bundle_id)
-        }.to_not raise_error
+        end.to_not raise_error
       end
     end
   end
