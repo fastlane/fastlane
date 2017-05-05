@@ -59,6 +59,18 @@ describe Spaceship do
         clean_launcher.login(username, password)
         expect(clean_launcher.provisioning_profile.all.count).to eq(6)
       end
+
+      it "shouldn't fail if trying to create new apns_certificate before app is invoked" do
+        bundle_id = 'net.sunapps.151'
+
+        clean_launcher = Spaceship::Launcher.new
+        clean_launcher.login(username, password)
+        csr = PortalStubbing.adp_read_fixture_file('certificateSigningRequest.certSigningRequest')
+
+        expect {
+          clean_launcher.certificate.development_push.create!(csr: csr, bundle_id: bundle_id)
+        }.to_not raise_error
+      end
     end
   end
 end
