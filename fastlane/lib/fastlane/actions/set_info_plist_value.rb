@@ -11,7 +11,12 @@ module Fastlane
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
           if params[:subkey]
-            plist[params[:key]][params[:subkey]] = params[:value]
+          	if !plist[params[:key]]
+          		UI.message "Key doesn't exist, going to create new one ..."
+          		plist[params[:key]] = {params[:subkey] => params[:value]}
+          	else
+            	plist[params[:key]][params[:subkey]] = params[:value]
+            end
           else
             plist[params[:key]] = params[:value]
           end
