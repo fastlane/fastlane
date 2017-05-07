@@ -74,6 +74,11 @@ module Supply
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
       self.android_publisher.authorization = auth_client
+      if Supply.config[:root_url]
+        # Google's client expects the root_url string to end with "/".
+        Supply.config[:root_url] << '/' unless Supply.config[:root_url].end_with?('/')
+        self.android_publisher.root_url = Supply.config[:root_url]
+      end
     end
 
     #####################################################
