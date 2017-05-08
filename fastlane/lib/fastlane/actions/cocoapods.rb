@@ -15,7 +15,9 @@ module Fastlane
         end
 
         cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
-        cmd << ['pod install']
+        cmd << ['pod']
+        cmd << ["_#{params[:pod_version]}_"] if params[:pod_version]
+        cmd << ['install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
@@ -53,6 +55,11 @@ module Fastlane
                                        description: "Execute command without logging output",
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :pod_version,
+                                       env_name: "FL_COCOAPODS_VERSION",
+                                       description: "Use a specific pod version",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_COCOAPODS_VERBOSE",
                                        description: "Show more debugging information",
