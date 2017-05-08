@@ -83,7 +83,7 @@ This does the following:
 
 - Create a new signing request
 - Create a new push certification
-- Downloads the certificate
+- Downloads the certificate *(Note: pem [cannot](https://github.com/fastlane/fastlane/issues/7158#issuecomment-262745836 "cannot") download already generated push profiles)*
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
 Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
