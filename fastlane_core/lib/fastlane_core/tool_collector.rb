@@ -1,6 +1,6 @@
 module FastlaneCore
   class ToolCollector
-    HOST_URL = ENV['FASTLANE_ENHANCER_URL'] || "https://enhancer.fastlane.tools"
+    # Learn more at https://github.com/fastlane/fastlane#metrics
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -61,41 +61,72 @@ module FastlaneCore
         show_message
       end
 
-      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
-      # generate as part of an automated process.
       require 'excon'
-      url = HOST_URL + '/did_launch?'
-      url += URI.encode_www_form(
-        versions: versions.to_json,
-        steps: launches.to_json,
-        error: @error || "",
-        crash: @crash ? @error : "",
-        fastfile_id: ENV["GENERATED_FASTFILE_ID"] || ""
-      )
+      url = ENV["FASTLANE_METRICS_URL"] || "https://fastlane-metrics.fabric.io/public"
 
-      if Helper.is_test? # don't send test data
-        return url
-      else
+      analytic_event_body = create_analytic_event_body
+
+      # Never generate web requests during tests
+      unless Helper.test?
         fork do
           begin
-            Excon.post(url)
+            Excon.post(url,
+                       body: analytic_event_body,
+                       headers: { "Content-Type" => 'application/json' })
           rescue
             # we don't want to show a stack trace if something goes wrong
           end
         end
-        return true
       end
+
+      return true
     rescue
       # We don't care about connection errors
     end
 
+    def create_analytic_event_body
+      analytics = []
+      timestamp_seconds = Time.now.to_i
+
+      # `fastfile_id` helps us track success/failure metrics for Fastfiles we
+      # generate as part of an automated process.
+      fastfile_id = ENV["GENERATED_FASTFILE_ID"]
+
+      if fastfile_id && launches.size == 1 && launches['fastlane']
+        if crash
+          completion_status = 'crash'
+        elsif error
+          completion_status = 'error'
+        else
+          completion_status = 'success'
+        end
+        analytics << event_for_web_onboarding(fastfile_id, completion_status, timestamp_seconds)
+      end
+
+      launches.each do |action, count|
+        action_version = versions[action] || 'unknown'
+        if crash && error == action
+          action_completion_status = 'crash'
+        elsif action == error
+          action_completion_status = 'error'
+        else
+          action_completion_status = 'success'
+        end
+        analytics << event_for_completion(action, action_completion_status, action_version, timestamp_seconds)
+        analytics << event_for_count(action, count, action_version, timestamp_seconds)
+      end
+
+      { analytics: analytics }.to_json
+    end
+
     def show_message
-      UI.message("Sending Crash/Success information. More information on: https://github.com/fastlane/enhancer")
+      UI.message("Sending Crash/Success information")
+      UI.message("Learn more at https://github.com/fastlane/fastlane#metrics")
       UI.message("No personal/sensitive data is sent. Only sharing the following:")
       UI.message(launches)
       UI.message(@error) if @error
       UI.message("This information is used to fix failing tools and improve those that are most often used.")
-      UI.message("You can disable this by setting the environment variable: FASTLANE_OPT_OUT_USAGE=1")
+      UI.message("You can disable this by adding `opt_out_usage` at the top of your Fastfile")
     end
 
     def launches
@@ -121,7 +152,7 @@ module FastlaneCore
     end
 
     # Returns nil if we shouldn't track this action
-    # Returns a (maybe modified) name that should be sent to the enhancer web service
+    # Returns a (maybe modified) name that should be sent to the analytic ingester
     # Modificiation is used to prefix the action name with the name of the plugin
     def name_to_track(name)
       return nil unless is_official?(name)
@@ -181,6 +212,80 @@ module FastlaneCore
       end
 
       return nil
+    end
+
+    def event_for_web_onboarding(fastfile_id, completion_status, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-enhancer',
+          product: 'fastlane_web_onboarding'
+        },
+        actor: {
+          name: 'customer',
+          detail: fastfile_id
+        },
+        action: {
+          name: 'fastfile_executed'
+        },
+        primary_target: {
+          name: 'fastlane_completion_status',
+          detail: completion_status
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def event_for_completion(action, completion_status, version, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-enhancer',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'action',
+          detail: action
+        },
+        action: {
+          name: 'execution_completed'
+        },
+        primary_target: {
+          name: 'completion_status',
+          detail: completion_status
+        },
+        secondary_target: {
+          name: 'version',
+          detail: version
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def event_for_count(action, count, version, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-enhancer',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'action',
+          detail: action
+        },
+        action: {
+          name: 'execution_counted'
+        },
+        primary_target: {
+          name: 'count',
+          detail: count.to_s || "1"
+        },
+        secondary_target: {
+          name: 'version',
+          detail: version
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
     end
   end
 end
