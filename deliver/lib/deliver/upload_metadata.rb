@@ -112,6 +112,7 @@ module Deliver
 
       v.release_on_approval = options[:automatic_release]
 
+      set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
 
@@ -218,6 +219,17 @@ module Deliver
         options[key] ||= File.read(path)
       end
 
+      # Load trade representative contact information
+      options[:trade_representative_contact_information] ||= {}
+      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.values.each do |option_name|
+        path = File.join(options[:metadata_path], TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, "#{option_name}.txt")
+        next unless File.exist?(path)
+        next if options[:trade_representative_contact_information][option_name].to_s.length > 0
+
+        UI.message("Loading '#{path}'...")
+        options[:trade_representative_contact_information][option_name] ||= File.read(path)
+      end
+
       # Load review information
       options[:app_review_information] ||= {}
       REVIEW_INFORMATION_VALUES.values.each do |option_name|
@@ -231,6 +243,16 @@ module Deliver
     end
 
     private
+
+    def set_trade_representative_contact_information(v, options)
+      return unless options[:trade_representative_contact_information]
+      info = options[:trade_representative_contact_information]
+      UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
+
+      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
+        v.send("#{key}=", info[option_name].chomp) if info[option_name].chomp
+      end
+    end
 
     def set_review_information(v, options)
       return unless options[:app_review_information]
