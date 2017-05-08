@@ -153,8 +153,8 @@ module FastlaneCore
     # Use this method to exit the program because of a test failure
     # that's caused by the source code of the user. Example for this
     # is that scan will fail when the tests fail.
-    # By using this method we'll get more accurate results on the
-    # fastlane failures on enhancer
+    # By using this method we'll have more accurate results about
+    # fastlane failures
     def test_failure!(error_message)
       raise FastlaneTestFailure.new, error_message
     end
