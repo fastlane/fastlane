@@ -14,6 +14,7 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
   allow(profile).to receive(:download).and_return("FileContent")
   allow(profile).to receive(:is_adhoc?).and_return(false)
   allow(profile).to receive(:name).and_return("profile name")
+  allow(profile).to receive(:uuid).and_return("uuid")
   if expect_delete
     expect(profile).to receive(:delete!)
   else

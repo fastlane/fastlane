@@ -234,7 +234,7 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important "Downloading provisioning profile..."
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+      profile_name ||= "#{profile_type.pretty_type}_#{profile.uuid}_#{Sigh.config[:app_identifier]}"
 
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"

@@ -11,7 +11,7 @@ describe Sigh do
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
       val = Sigh::Manager.start
-      expect(val).to eq(File.expand_path("./AppStore_com.krausefx.app.mobileprovision"))
+      expect(val).to eq(File.expand_path("./AppStore_uuid_com.krausefx.app.mobileprovision"))
       File.delete(val)
     end
 
@@ -21,7 +21,7 @@ describe Sigh do
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
       val = Sigh::Manager.start
-      expect(val).to eq(File.expand_path("./AppStore_com.krausefx.app.mobileprovision"))
+      expect(val).to eq(File.expand_path("./AppStore_uuid_com.krausefx.app.mobileprovision"))
       File.delete(val)
     end
 
@@ -31,7 +31,7 @@ describe Sigh do
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
       val = Sigh::Manager.start
-      expect(val).to eq(File.expand_path("./AppStore_com.krausefx.app.mobileprovision"))
+      expect(val).to eq(File.expand_path("./AppStore_uuid_com.krausefx.app.mobileprovision"))
       File.delete(val)
     end
   end
