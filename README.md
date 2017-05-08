@@ -12,7 +12,7 @@ fastlane
 
 #### ✨ Check out [docs.fastlane.tools](https://docs.fastlane.tools) on how to get started with fastlane ✨
 
-`fastlane` is a tool for iOS, Mac, and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
+`fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
 Use a lane to define your process:
 
@@ -34,7 +34,7 @@ Then to deploy a new 'beta' version of your app just run
 
 |          |  fastlane  |
 |----------|------------|
-:sparkles: | Connect iOS, Mac, and Android build tools into one workflow (both _fastlane_ tools and third party tools)
+:sparkles: | Connect iOS and Android build tools into one workflow (both _fastlane_ tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds, or testing
 :ship: | Deploy from any computer, including a CI server
 :wrench: | Extend and customise functionality
