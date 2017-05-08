@@ -150,5 +150,25 @@ describe FastlaneCore::BuildWatcher do
       expect(UI).to receive(:crash!).with("Could not find a build for app: some-app-id on platform: ios").and_call_original
       expect { FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios) }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
     end
+
+    it 'sleeps 10 seconds by default' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build])
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([], [ready_build])
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(10)
+
+      allow(UI).to receive(:message)
+      allow(UI).to receive(:success)
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
+    end
+
+    it 'sleeps for the amount of time specified in poll_interval' do
+      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([processing_build])
+      expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([], [ready_build])
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(123)
+
+      allow(UI).to receive(:message)
+      allow(UI).to receive(:success)
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 123)
+    end
   end
 end
