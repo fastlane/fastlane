@@ -63,7 +63,8 @@ module Snapshot
       end
 
       def pipe(device_type, language, locale)
-        ["| tee #{xcodebuild_log_path(device_type: device_type, language: language, locale: locale).shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+        log_path = xcodebuild_log_path(device_type: device_type, language: language, locale: locale)
+        ["| tee #{log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
       def find_device(device_name, os_version = Snapshot.config[:ios_version])
@@ -110,9 +111,13 @@ module Snapshot
 
       def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
         name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
-        name_components << device_type if device_type
-        name_components << language if language
-        name_components << locale if locale
+
+        if Snapshot.config[:namespace_log_files]
+          name_components << device_type if device_type
+          name_components << language if language
+          name_components << locale if locale
+        end
+
         file_name = "#{name_components.join('-')}.log"
 
         containing = File.expand_path(Snapshot.config[:buildlog_path])
