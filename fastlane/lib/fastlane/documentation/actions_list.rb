@@ -95,7 +95,7 @@ module Fastlane
 
         corrections << action_names.select { |name| name.include? filter }
 
-        puts "Did you mean: #{corrections.flatten.uniq.join(', ')} ?".green unless corrections.flatten.empty?
+        puts "Did you mean: #{corrections.flatten.uniq.join(', ')}?".green unless corrections.flatten.empty?
       end
     end
 
