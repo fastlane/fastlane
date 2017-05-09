@@ -11,9 +11,9 @@ module Fastlane
         require 'json'
 
         http_method = (params[:http_method] || 'GET').to_s.upcase
-        url = self.parse_url(params[:server_url], params[:path], params[:url])
-        headers = self.parse_headers(params[:api_token], params[:headers])
-        request_body = self.parse_body(params[:body], params[:raw_body])
+        url = parse_url(params[:server_url], params[:path], params[:url])
+        headers = parse_headers(params[:api_token], params[:headers])
+        request_body = parse_body(params[:body], params[:raw_body])
         handled_errors = params[:errors] || {}
 
         response = call_endpoint(
@@ -66,6 +66,7 @@ module Fastlane
         headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
         headers.merge(overrides || {})
       end
+      private_class_method :parse_headers
 
       def self.parse_url(server_url, path, url)
         return_url = path ? File.join(server_url, path) : url
@@ -73,6 +74,7 @@ module Fastlane
         UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless return_url
         return_url
       end
+      private_class_method :parse_url
 
       def self.parse_body(body, raw_body)
         body ||= {}
@@ -86,12 +88,14 @@ module Fastlane
           body
         end
       end
+      private_class_method :parse_body
 
       def self.parse_json(value)
         JSON.parse(value)
       rescue JSON::ParserError
         nil
       end
+      private_class_method :parse_json
 
       def self.call_endpoint(url, http_method, headers, body, params = {})
         require 'excon'
@@ -115,6 +119,7 @@ module Fastlane
           debug_response: opts[:debug]
         )
       end
+      private_class_method :call_endpoint
 
       #####################################################
       # @!group Documentation
