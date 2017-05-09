@@ -21,6 +21,7 @@ module Pilot
         if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
           UI.success("Successfully added tester to app #{app.name}")
         else
+          # tester was added to the group(s) in the above add_tester_to_groups() call, now we need to let the user know which group(s)
           if config[:groups]
             group_names = groups.map(&:name).join(", ")
             UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
