@@ -58,9 +58,9 @@ describe Pilot::TesterManager do
     end
 
     let(:current_user) do
-      Spaceship::Tunes::Member.new({ "firstname": "Josh",
-                           "lastname": "Liebowitz",
-                           "email_address": "taquitos+nospam@gmail.com" })
+      Spaceship::Tunes::Member.new({ "firstname" => "Josh",
+                           "lastname" => "Liebowitz",
+                           "email_address" => "taquitos+nospam@gmail.com" })
     end
 
     let(:fake_tester) do
