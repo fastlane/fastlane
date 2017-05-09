@@ -39,6 +39,7 @@ describe Deliver do
           allow(version).to receive_message_chain('watch_app_icon.asset_token').and_return(nil)
           stub_const('Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES', [])
           stub_const('Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES', [])
+          stub_const('Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES', {})
         end
 
         it 'generates review information' do
