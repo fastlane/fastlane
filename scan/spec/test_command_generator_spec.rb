@@ -18,8 +18,8 @@ describe Scan do
     iPad Retina (07773A11-417D-4D4C-BC25-1C3444D50836) (Shutdown)
     iPad Air (2ABEAF08-E480-4617-894F-6BAB587E7963) (Shutdown)
     iPad Air 2 (DA6C7D10-564B-4563-884D-834EF4F10FB9) (Shutdown)
-    iPad Pro (9.7 inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
-    iPad Pro (12.9 inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
+    iPad Pro (9.7-inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
+    iPad Pro (12.9-inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
 -- iOS 9.3 --
     iPhone 4s (238767C4-AF29-4485-878C-7011B98DCB87) (Shutdown)
     iPhone 5 (B8E05CCB-B97A-41FC-A8A8-2771711690B5) (Shutdown)
