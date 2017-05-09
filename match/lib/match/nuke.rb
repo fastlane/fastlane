@@ -11,7 +11,13 @@ module Match
       self.params = params
       self.type = type
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
+      params[:workspace] = GitHelper.clone(params[:git_url],
+                                           params[:shallow_clone],
+                                           skip_docs: params[:skip_docs],
+                                           branch: params[:git_branch],
+                                           git_full_name: params[:git_full_name],
+                                           git_user_email: params[:git_user_email],
+                                           clone_branch_directly: params[:clone_branch_directly])
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
