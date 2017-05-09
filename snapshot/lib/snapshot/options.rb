@@ -181,7 +181,7 @@ module Snapshot
                                      env_name: "SNAPSHOT_NAMESPACE_LOG_FILES",
                                      description: "Separate the log files per device and per language",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false)
       ]
     end
   end
