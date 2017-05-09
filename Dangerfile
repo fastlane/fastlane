@@ -23,3 +23,7 @@ if File.exist?(file_path)
 else
   puts "Couldn't find any test artifacts in path #{file_path}"
 end
+
+if files_modified.grep(/.gemspec/)
+  warn ".gemspec file was modified"
+end
