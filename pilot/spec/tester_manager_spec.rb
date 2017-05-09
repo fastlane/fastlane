@@ -3,6 +3,97 @@ require 'ostruct'
 
 describe Pilot::TesterManager do
   describe "Manages adding/removing/displaying testers" do
+    let(:tester_manager) { Pilot::TesterManager.new }
+
+    let(:global_testers) do
+      [
+        OpenStruct.new(
+          first_name: 'First',
+          last_name: 'Last',
+          email: 'my@email.addr',
+          groups: ['testers'],
+          devices: ["d"],
+          full_version: '1.0 (21)',
+          pretty_install_date: '2016-01-01',
+          something_else: 'blah'
+        ),
+        OpenStruct.new(
+          first_name: 'Fabricio',
+          last_name: 'Devtoolio',
+          email: 'fabric-devtools@gmail.com',
+          groups: ['testers'],
+          devices: ["d", "d2"],
+          full_version: '1.1 (22)',
+          pretty_install_date: '2016-02-02',
+          something_else: 'blah'
+        )
+      ]
+    end
+
+    let(:app_context_testers) do
+      [
+        OpenStruct.new(
+          first_name: 'First',
+          last_name: 'Last',
+          email: 'my@email.addr',
+          something_else: 'blah'
+        ),
+        OpenStruct.new(
+          first_name: 'Fabricio',
+          last_name: 'Devtoolio',
+          email: 'fabric-devtools@gmail.com',
+          something_else: 'blah'
+        )
+      ]
+    end
+
+    let(:custom_tester_group) do
+      OpenStruct.new(
+        id: "CustomID",
+        name: "Test Group",
+        is_internal_group: false,
+        app_id: "com.whatever",
+        is_default_external_group: false
+      )
+    end
+
+    let(:current_user) do
+      Spaceship::Tunes::Member.new({ "firstname": "Josh",
+                           "lastname": "Liebowitz",
+                           "email_address": "taquitos+nospam@gmail.com" })
+    end
+
+    let(:fake_tester) do
+      OpenStruct.new(
+        first_name: 'fake',
+        last_name: 'tester',
+        email: 'fabric-devtools@gmail.com+fake@gmail.com'
+      )
+    end
+
+    let(:default_add_tester_options) do
+      FastlaneCore::Configuration.create(Pilot::Options.available_options, {
+        apple_id: 'com.whatever',
+        email: fake_tester.email,
+        first_name: fake_tester.first_name,
+        last_name: fake_tester.last_name
+      })
+    end
+
+    let(:default_add_tester_options_with_group) do
+      FastlaneCore::Configuration.create(Pilot::Options.available_options, {
+        apple_id: 'com.whatever',
+        email: fake_tester.email,
+        first_name: fake_tester.first_name,
+        last_name: fake_tester.last_name,
+        groups: ["Test Group"]
+      })
+    end
+
+    let(:fake_app) { "fake_app_object" }
+
+    let(:fake_client) { "fake client" }
+
     before(:each) do
       allow(fake_app).to receive(:apple_id).and_return("com.whatever")
       allow(fake_app).to receive(:name).and_return("My Fake App")
@@ -157,97 +248,5 @@ describe Pilot::TesterManager do
         tester_manager.add_tester(default_add_tester_options_with_group)
       end
     end
-
-    # Data and mocks
-    let(:tester_manager) { Pilot::TesterManager.new }
-
-    let(:global_testers) do
-      [
-        OpenStruct.new(
-          first_name: 'First',
-          last_name: 'Last',
-          email: 'my@email.addr',
-          groups: ['testers'],
-          devices: ["d"],
-          full_version: '1.0 (21)',
-          pretty_install_date: '2016-01-01',
-          something_else: 'blah'
-        ),
-        OpenStruct.new(
-          first_name: 'Fabricio',
-          last_name: 'Devtoolio',
-          email: 'fabric-devtools@gmail.com',
-          groups: ['testers'],
-          devices: ["d", "d2"],
-          full_version: '1.1 (22)',
-          pretty_install_date: '2016-02-02',
-          something_else: 'blah'
-        )
-      ]
-    end
-
-    let(:app_context_testers) do
-      [
-        OpenStruct.new(
-          first_name: 'First',
-          last_name: 'Last',
-          email: 'my@email.addr',
-          something_else: 'blah'
-        ),
-        OpenStruct.new(
-          first_name: 'Fabricio',
-          last_name: 'Devtoolio',
-          email: 'fabric-devtools@gmail.com',
-          something_else: 'blah'
-        )
-      ]
-    end
-
-    let(:custom_tester_group) do
-      OpenStruct.new(
-        id: "CustomID",
-        name: "Test Group",
-        is_internal_group: false,
-        app_id: "com.whatever",
-        is_default_external_group: false
-      )
-    end
-
-    let(:current_user) do
-      Spaceship::Tunes::Member.new({ "firstname": "Josh",
-                           "lastname": "Liebowitz",
-                           "email_address": "taquitos+nospam@gmail.com" })
-    end
-
-    let(:fake_tester) do
-      OpenStruct.new(
-        first_name: 'fake',
-        last_name: 'tester',
-        email: 'fabric-devtools@gmail.com+fake@gmail.com'
-      )
-    end
-
-    let(:default_add_tester_options) do
-      FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-        apple_id: 'com.whatever',
-        email: fake_tester.email,
-        first_name: fake_tester.first_name,
-        last_name: fake_tester.last_name
-      })
-    end
-
-    let(:default_add_tester_options_with_group) do
-      FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-        apple_id: 'com.whatever',
-        email: fake_tester.email,
-        first_name: fake_tester.first_name,
-        last_name: fake_tester.last_name,
-        groups: ["Test Group"]
-      })
-    end
-
-    let(:fake_app) { "fake_app_object" }
-
-    let(:fake_client) { "fake client" }
   end
 end
