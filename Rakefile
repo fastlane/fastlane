@@ -26,6 +26,11 @@ task :push do
   sh "bundle exec fastlane release"
 end
 
+desc 'Prompt build on TeamCity'
+task :tc_bundle do
+  puts 'Bundle!'
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
