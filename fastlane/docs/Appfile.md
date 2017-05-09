@@ -65,3 +65,42 @@ If you want to access those values from within your `Fastfile` use
 identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
 ```
+
+### Multiple users configuration
+
+#### Using environment vairables
+
+In big teams you can override `apple_id` variable with `FASTLANE_USER` environment variable. 
+Doing this will allow different developers to specify their own apple ids, and won't affect others
+In case if `FASTLANE_USER` enviroment variable won't be setup - then email from the `Appfile` will be used
+
+```ruby
+# Appfile
+# This is the apple id that will be used in case if FASTLANE_USER is undefined
+apple_id "default@email.com"
+```
+
+```bash
+# ~/.bashrc of some user
+export FASTLANE_USER="some_user@gmail.com"
+
+# ~/.bashrc of some another user
+export FASTLANE_USER="another_user@gmail.com"
+```
+
+#### Using file check and .gitignore
+
+As an another option, you can use use file checking and .gitignore combination:
+```ruby
+# Appfile
+if File.exist?("apple_id.txt")
+  apple_id File.read("apple_id.txt").strip
+else
+  apple_id "default@email.com"
+end
+```
+
+```sh
+# .gitignore
+apple_id.txt
+```
