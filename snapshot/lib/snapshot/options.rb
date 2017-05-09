@@ -176,7 +176,12 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :test_target_name,
                                      env_name: "SNAPSHOT_TEST_TARGET_NAME",
                                      description: "The name of the target you want to test (if you desire to override the Target Application from Xcode)",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :namespace_log_files,
+                                     env_name: "SNAPSHOT_NAMESPACE_LOG_FILES",
+                                     description: "Separate the log files per device and per language",
+                                     optional: true,
+                                     is_string: false)
       ]
     end
   end
