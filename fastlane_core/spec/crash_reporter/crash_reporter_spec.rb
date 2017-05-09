@@ -29,18 +29,68 @@ describe FastlaneCore::CrashReporter do
       allow(Time).to receive(:now).and_return(Time.new(0))
     end
 
-    it 'posts a report to Stackdriver' do
-      setup_sanitizer_expectation
-      stub_stackdriver_request
-      FastlaneCore::CrashReporter.report_crash(exception: exception)
+    context 'post reports to Stackdriver' do
+      before do
+        silence_ui_output
+        supress_file_writing
+      end
+
+      it 'posts a report to Stackdriver' do
+        setup_sanitizer_expectation
+        stub_stackdriver_request
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
+
+      it 'posts a report of specified type to Stackdriver' do
+        setup_sanitizer_expectation(type: :crash)
+        stub_stackdriver_request(type: :crash)
+        FastlaneCore::CrashReporter.report_crash(type: :crash, exception: exception)
+      end
     end
 
-    it 'posts a report of specified type to Stackdriver' do
-      setup_sanitizer_expectation(type: :crash)
-      stub_stackdriver_request(type: :crash)
-      FastlaneCore::CrashReporter.report_crash(type: :crash, exception: exception)
+    context 'write report to file' do
+      before do
+        silence_ui_output
+        supress_stackdriver_reporting
+      end
+
+      it 'writes a file with the json payload' do
+        file = double('File')
+        expect(File).to receive(:open).with("#{FastlaneCore.fastlane_user_dir}/last_crash.json", 'w').and_yield(file)
+        expect(file).to receive(:write).with(expected_body.to_json)
+
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
+    end
+
+    context 'message user about crash reporting' do
+      before do
+        supress_file_writing
+        supress_stackdriver_reporting
+      end
+
+      it 'prints information about crash reporting' do
+        expect(UI).to receive(:important).with("We logged a crash report to #{FastlaneCore::CrashReporter.crash_report_path}")
+        expect(UI).to receive(:important).with("We sent a crash report to help us make _fastlane_ better!")
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
     end
   end
+end
+
+def silence_ui_output
+  allow(UI).to receive(:important)
+end
+
+def supress_file_writing
+  file = double('File')
+  allow(File).to receive(:open).and_yield(file)
+  allow(file).to receive(:write)
+end
+
+def supress_stackdriver_reporting
+  setup_sanitizer_expectation
+  stub_stackdriver_request
 end
 
 def setup_sanitizer_expectation(type: :unknown)
