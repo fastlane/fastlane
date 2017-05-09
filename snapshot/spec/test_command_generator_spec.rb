@@ -40,7 +40,8 @@ describe Snapshot do
           output_simulator_logs: true,
           devices: ['iPhone 6 (10.1)', 'iPhone 6s'],
           project: './snapshot/example/Example.xcodeproj',
-          scheme: 'ExampleUITests'
+          scheme: 'ExampleUITests',
+          namespace_log_files: true
         })
       end
 
@@ -98,7 +99,7 @@ describe Snapshot do
     end
 
     describe "Valid iOS Configuration" do
-      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
 
       def configure(options)
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
@@ -187,7 +188,7 @@ describe Snapshot do
     end
 
     describe "Valid macOS Configuration" do
-      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS" } }
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS", namespace_log_files: true } }
 
       it "uses default parameters on macOS" do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
@@ -211,7 +212,7 @@ describe Snapshot do
     end
 
     describe "Unique logs" do
-      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
 
       it 'uses correct name and language' do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
@@ -232,6 +233,18 @@ describe Snapshot do
       it 'can work without parameters' do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path
+        expect(log_path).to eq(
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s
+        )
+      end
+    end
+
+    describe "Unique logs disabled" do
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
+
+      it 'uses correct file name' do
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: nil)
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s
         )
