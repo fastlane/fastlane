@@ -1,6 +1,19 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false)
+    def self.clone(git_url,
+                   shallow_clone,
+                   manual_password: nil,
+                   skip_docs: false,
+                   branch: "master",
+                   git_full_name: nil,
+                   git_user_email: nil,
+                   clone_branch_directly: false)
+      # Note: if you modify the parameters above, don't forget to also update the method call in
+      # - runner.rb
+      # - nuke.rb
+      # - change_password.rb
+      # - commands_generator.rb
+      #
       return @dir if @dir
 
       @dir = Dir.mktmpdir

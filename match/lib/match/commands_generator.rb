@@ -96,7 +96,10 @@ module Match
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
-          decrypted_repo = Match::GitHelper.clone(params[:git_url], params[:shallow_clone], branch: params[:git_branch])
+          decrypted_repo = Match::GitHelper.clone(params[:git_url],
+                                                  params[:shallow_clone],
+                                                  branch: params[:git_branch],
+                                                  clone_branch_directly: params[:clone_branch_directly])
           UI.success "Repo is at: '#{decrypted_repo}'"
         end
       end
