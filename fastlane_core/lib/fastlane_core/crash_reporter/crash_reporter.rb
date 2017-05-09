@@ -33,8 +33,8 @@ module FastlaneCore
       end
     end
 
-    def report_payload(message: nil, backtrace: nil)
-      json = {
+    def self.report_payload(message: nil, backtrace: nil)
+      {
         'eventTime': Time.now.to_datetime.rfc3339,
         'serviceContext': {
           'service': 'fastlane',
