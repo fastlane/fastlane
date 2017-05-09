@@ -172,7 +172,9 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 `fastlane` is designed to make your life easier by bringing together all `fastlane` tools
 
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
+- [`supply`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to Google Play. Select tracks for builds and promote builds to production.
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
+- [`screengrab`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your Android app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
