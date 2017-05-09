@@ -2,15 +2,19 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "github_api" do
       let(:response_body) { File.read("./fastlane/spec/fixtures/requests/github_create_file_response.json") }
+      let(:user_agent) { 'fastlane-github_api' }
+      let(:headers) do
+        {
+          'Authorization' => 'Basic MTIzNDU2Nzg5',
+          'Host' => 'api.github.com:443',
+          'User-Agent' => user_agent
+        }
+      end
 
       context 'successful' do
         before do
           stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md").
-            with(headers: {
-                    'Authorization' => 'Basic MTIzNDU2Nzg5',
-                    'Host' => 'api.github.com:443',
-                    'User-Agent' => 'fastlane-github_api'
-                  }).
+            with(headers: headers).
             to_return(status: 200, body: response_body, headers: {})
         end
 
@@ -95,7 +99,7 @@ describe Fastlane do
             {
               'Authorization' => 'Basic MTIzNDU2Nzg5',
               'Host' => 'uploads.github.com:443',
-              'User-Agent' => 'fastlane-github_api'
+              'User-Agent' => user_agent
             }
           end
 
@@ -130,7 +134,7 @@ describe Fastlane do
               {
                 'Authorization' => 'custom',
                 'Host' => 'uploads.github.com:443',
-                'User-Agent' => 'fastlane-github_api',
+                'User-Agent' => 'fastlane-custom-user-agent',
                 'Content-Type' => 'text/plain'
               }
             end
@@ -143,7 +147,8 @@ describe Fastlane do
                     http_method: 'POST',
                     headers: {
                       'Content-Type' => 'text/plain',
-                      'Authorization' => 'custom'
+                      'Authorization' => 'custom',
+                      'User-Agent' => 'fastlane-custom-user-agent'
                     },
                     url: 'https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md',
                     raw_body: 'test raw content of file'
