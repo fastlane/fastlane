@@ -108,7 +108,7 @@ describe Snapshot do
         it "uses the default parameters" do
           configure options
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6", language: "en", locale: nil)
           id = command.join('').match(/id=(.+?),/)[1]
           ios = command.join('').match(/OS=(\d+.\d+)/)[1]
           expect(command).to eq(
@@ -122,7 +122,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone\\ 6-en.log")} | xcpretty "
             ]
           )
         end
@@ -130,7 +130,7 @@ describe Snapshot do
         it "allows to supply custom xcargs" do
           configure options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots")
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6", language: "en", locale: nil)
           id = command.join('').match(/id=(.+?),/)[1]
           ios = command.join('').match(/OS=(\d+.\d+)/)[1]
           expect(command).to eq(
@@ -145,7 +145,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests.log')} | xcpretty "
+              "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests-iPhone\\ 6-en.log')} | xcpretty "
             ]
           )
         end
@@ -153,7 +153,7 @@ describe Snapshot do
         it "uses the default parameters on tvOS too" do
           configure options.merge(devices: ["Apple TV 1080p"])
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-          command = Snapshot::TestCommandGenerator.generate(device_type: "Apple TV 1080p")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "Apple TV 1080p", language: "en", locale: nil)
           id = command.join('').match(/id=(.+?),/)[1]
           os = command.join('').match(/OS=(\d+.\d+)/)[1]
           expect(command).to eq(
@@ -167,7 +167,7 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log")} | xcpretty "
+              "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-Apple\\ TV\\ 1080p-en.log")} | xcpretty "
             ]
           )
         end
@@ -180,7 +180,7 @@ describe Snapshot do
 
         it 'uses the fixed derivedDataPath if given' do
           expect(Dir).not_to receive(:mktmpdir)
-          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6")
+          command = Snapshot::TestCommandGenerator.generate(device_type: "iPhone 6", language: "en", locale: nil)
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
       end
@@ -192,7 +192,7 @@ describe Snapshot do
       it "uses default parameters on macOS" do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
         expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
-        command = Snapshot::TestCommandGenerator.generate(device_type: "Mac")
+        command = Snapshot::TestCommandGenerator.generate(device_type: "Mac", language: "en", locale: nil)
         expect(command).to eq(
           [
             "set -o pipefail &&",
@@ -204,8 +204,36 @@ describe Snapshot do
             "FASTLANE_SNAPSHOT=YES",
             :build,
             :test,
-            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS.log")} | xcpretty "
+            "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS-Mac-en.log")} | xcpretty "
           ]
+        )
+      end
+    end
+
+    describe "Unique logs" do
+      let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
+
+      it 'uses correct name and language' do
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: nil)
+        expect(log_path).to eq(
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log").to_s
+        )
+      end
+
+      it 'uses includes locale if specified' do
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: "pt_BR")
+        expect(log_path).to eq(
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log").to_s
+        )
+      end
+
+      it 'can work without parameters' do
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        log_path = Snapshot::TestCommandGenerator.xcodebuild_log_path
+        expect(log_path).to eq(
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s
         )
       end
     end
