@@ -10,7 +10,8 @@ describe FastlaneCore::CrashReporter do
         backtrace: [
           'path/to/fastlane/line/that/crashed',
           'path/to/fastlane/line/that/called/the/crash'
-        ]
+        ],
+        message: 'message goes here'
       )
     end
 
@@ -63,6 +64,25 @@ describe FastlaneCore::CrashReporter do
       end
     end
 
+    context 'reporting exception message' do
+      before do
+        silence_ui_output
+        supress_file_writing
+      end
+
+      it 'omits exception message for user_error' do
+        setup_sanitizer_expectation(type: :user_error)
+        stub_stackdriver_request(type: :user_error)
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
+
+      it 'includes exception message for other crash types' do
+        setup_sanitizer_expectation
+        stub_stackdriver_request
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
+    end
+
     context 'message user about crash reporting' do
       before do
         supress_file_writing
@@ -103,7 +123,7 @@ def setup_sanitizer_expectation(type: :unknown)
 end
 
 def stub_stackdriver_request(type: :unknown)
-  expected_body[:message] = "#{FastlaneCore::CrashReporter.types[type]}: #{exception.backtrace.join("\n")}"
+  expected_body[:message] = "#{FastlaneCore::CrashReporter.types[type]} #{exception.message}: #{exception.backtrace.join("\n")}"
   stub_request(:post, STACKDRIVER_URL).with do |request|
     request.body == expected_body.to_json
   end

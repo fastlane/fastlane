@@ -26,7 +26,8 @@ module FastlaneCore
     def self.report_crash(type: :unknown, exception: nil)
       return unless enabled?
       backtrace = BacktraceSanitizer.sanitize(type: type, backtrace: exception.backtrace)
-      payload = report_payload(message: "#{types[type]}", backtrace: backtrace)
+      message = report_message(type: type, exception: exception)
+      payload = report_payload(message: message, backtrace: backtrace)
       send_report(payload: payload)
       UI.important("We sent a crash report to help us make _fastlane_ better!")
       save_file(payload: payload)
@@ -34,6 +35,11 @@ module FastlaneCore
     end
 
     private
+
+    def self.report_message(type: :unknown, exception: nil)
+      message = type == :user_error ? '' : " #{exception.message}"
+      "#{types[type]}#{message}"
+    end
 
     def self.save_file(payload: "{}")
       File.open(crash_report_path, 'w') do |f|
