@@ -12,9 +12,10 @@ module FastlaneCore
         !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
       end
 
-      def report_crash(type: :unknown, exception: nil)
+      def report_crash(type: :unknown, exception: nil, action: nil)
+        require 'pry'; binding.pry
         return unless enabled?
-        payload = CrashReportGenerator.generate(type: type, exception: exception)
+        payload = CrashReportGenerator.generate(type: type, exception: exception, action: nil)
         send_report(payload: payload)
         save_file(payload: payload)
         show_message unless did_show_message?

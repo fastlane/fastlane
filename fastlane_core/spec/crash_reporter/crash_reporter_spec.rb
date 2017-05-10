@@ -81,7 +81,8 @@ end
 def setup_crash_report_generator_expectation(type: :unknown)
   expect(FastlaneCore::CrashReportGenerator).to receive(:generate).with(
     type: type,
-    exception: exception
+    exception: exception,
+    action: nil
   ).and_return(stub_body.to_json)
 end
 
