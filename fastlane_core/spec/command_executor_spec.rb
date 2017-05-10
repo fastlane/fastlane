@@ -28,6 +28,11 @@ describe FastlaneCore do
         # have crashed the test
         expect(result).to eq('a_filename')
       end
+
+      it 'does some basic command' do
+        result = FastlaneCore::CommandExecutor.execute(command: "echo foobar")
+        expect(result).to eq('foobar')
+      end
     end
 
     describe "which" do
