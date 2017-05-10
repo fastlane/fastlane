@@ -203,7 +203,7 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
                                      short_option: "-e",
                                      env_name: "GYM_PROVISIONING_PROFILE_PATH",
-                                     description: "The path to the provisioning profile (optional)",
+                                     description: "Deprecated: The path to the provisioning profile",
                                      optional: true,
                                      deprecated: 'Use target specific provisioning profiles instead',
                                      verify_block: proc do |value|
