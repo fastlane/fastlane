@@ -5,15 +5,6 @@ lane :test do |options|
   validate_repo
 end
 
-lane :yolo do
-  require 'dotenv';  Dotenv.load
-  require 'faraday'
-  connection = Faraday.new(url: "https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=#{ENV['STACKDRIVER_API_KEY']}")
-  response = connection.post
-  require 'pry'; binding.pry
-  puts ''
-end
-
 desc "Increment the version number of this gem"
 lane :bump do |options|
   ensure_git_branch(branch: "master")

@@ -13,12 +13,12 @@ describe FastlaneCore::CrashReportGenerator do
 
     let(:expected_body) do
       {
-        'eventTime': '0000-01-01T00:00:00-05:00',
-        'serviceContext': {
-          'service': 'fastlane',
-          'version': '2.29.0'
+        'eventTime' => '0000-01-01T00:00:00-05:00',
+        'serviceContext' => {
+          'service' => 'fastlane',
+          'version' => '2.29.0'
           },
-        'message': ""
+        'message' => ""
       }
     end
 
@@ -51,7 +51,7 @@ def setup_sanitizer_expectation(type: :unknown)
   expect(FastlaneCore::BacktraceSanitizer).to receive(:sanitize).with(
     type: type,
     backtrace: exception.backtrace
-    ) do |args|
+  ) do |args|
     args[:backtrace]
   end
 end

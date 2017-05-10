@@ -86,11 +86,11 @@ def setup_crash_report_generator_expectation(type: :unknown)
   expect(FastlaneCore::CrashReportGenerator).to receive(:generate).with(
     type: type,
     exception: exception
-    ).and_return(stub_body.to_json)
+  ).and_return(stub_body.to_json)
 end
 
 def stub_stackdriver_request(type: :unknown)
-  stub_request(:post, /https:\/\/clouderrorreporting.googleapis.com\/v1beta1\/projects\/fastlane-166414\/events:report\?key=.*/).with do |request|
+  stub_request(:post, %r{https:\/\/clouderrorreporting.googleapis.com\/v1beta1\/projects\/fastlane-166414\/events:report\?key=.*}).with do |request|
     request.body == stub_body.to_json
   end
 end
