@@ -1,5 +1,6 @@
 module Match
   class GitHelper
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.clone(git_url,
                    shallow_clone,
                    manual_password: nil,
@@ -7,7 +8,7 @@ module Match
                    branch: "master",
                    git_full_name: nil,
                    git_user_email: nil,
-                   clone_branch_directly: false
+                   clone_branch_directly: false,
                    disable_encryption: false)
       # Note: if you modify the parameters above, don't forget to also update the method call in
       # - runner.rb
@@ -88,6 +89,7 @@ module Match
 
       return @dir
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def self.remote_is_crypted!
       UI.error("Encryption disabled, but remote repository is currently crypted.")

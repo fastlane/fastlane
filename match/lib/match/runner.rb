@@ -14,7 +14,7 @@ module Match
                                            branch: params[:git_branch],
                                            git_full_name: params[:git_full_name],
                                            git_user_email: params[:git_user_email],
-                                           clone_branch_directly: params[:clone_branch_directly]
+                                           clone_branch_directly: params[:clone_branch_directly],
                                            disable_encryption: params[:disable_encryption])
 
       unless params[:readonly]
