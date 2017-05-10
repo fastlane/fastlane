@@ -313,9 +313,9 @@ module Spaceship
 
       # Private methods
       def setup
-        # Properly parse the AppStatus
         status = raw_data['status']
         @app_status = Tunes::AppStatus.get_from_string(status)
+
         setup_large_app_icon
         setup_watch_app_icon
         setup_transit_app_file if supports_app_transit?
@@ -503,8 +503,8 @@ module Spaceship
         {
           keywords: :keywords,
           description: :description,
-          supportURL: :support_url,
-          marketingURL: :marketing_url,
+          supportUrl: :support_url,
+          marketingUrl: :marketing_url,
           releaseNotes: :release_notes
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
@@ -592,8 +592,24 @@ module Spaceship
       end
 
       def setup_screenshots
-        @screenshots = {}
+        # Enable Scaling for all screen sizes that don't have at least one screenshot
+        # We automatically disable scaling once we upload at least one screenshot
+        language_details = raw_data_details.each do |current_language|
+          language_details = (current_language["displayFamilies"] || {})["value"]
+          (language_details || []).each do |device_language_details|
+            next if device_language_details["screenshots"].nil?
+            next if device_language_details["screenshots"]["value"].count > 0
 
+            # The current row includes screenshots for all device types
+            # so we need to enable scaling for both iOS and watchOS apps
+            device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
+            device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
+            # we unset `scaled` or `messagesScaled` as soon as we upload a
+            # screenshot for this device/language combination
+          end
+        end
+
+        @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
           @screenshots[row['language']] = setup_screenshots_for(row) + setup_messages_screenshots_for(row)

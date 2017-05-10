@@ -265,7 +265,7 @@ module Spaceship
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
-      UI.deprecated("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
+      puts "The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead" if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
       primary_language ||= "English"
@@ -324,8 +324,19 @@ module Spaceship
     end
 
     def get_reviews(app_id, platform, storefront, versionId = '')
-      r = request(:get, "ra/apps/#{app_id}/reviews?platform=#{platform}&storefront=#{storefront}&versionId=#{versionId}")
-      parse_response(r, 'data')['reviews']
+      index = 0
+      per_page = 100 # apple default
+      all_reviews = []
+      loop do
+        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        all_reviews.concat(parse_response(r, 'data')['reviews'])
+        if all_reviews.count < parse_response(r, 'data')['reviewCount']
+          index += per_page
+        else
+          break
+        end
+      end
+      all_reviews
     end
 
     #####################################################

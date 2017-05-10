@@ -42,23 +42,82 @@ describe FastlaneCore::ToolCollector do
     end
   end
 
-  it "posts the collected data when finished" do
+  it "posts the collected data with a crash when finished" do
     collector.did_launch_action(:gym)
     collector.did_launch_action(:scan)
     collector.did_crash(:scan)
-    url = collector.did_finish
 
-    form = Hash[URI.decode_www_form(url.split("?")[1])]
-    form["steps"] = JSON.parse form["steps"]
-    form["versions"] = JSON.parse form["versions"]
+    analytic_event_body = collector.create_analytic_event_body
+    analytics = JSON.parse(analytic_event_body)['analytics']
 
-    expect(form["steps"]["gym"]).to eq(1)
-    expect(form["steps"]["scan"]).to eq(1)
+    expect(analytics.size).to eq(4)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+  end
 
-    expect(form["versions"]["gym"]).to eq(Fastlane::VERSION)
-    expect(form["versions"]["scan"]).to eq(Fastlane::VERSION)
+  it "posts the collected data with an error when finished" do
+    collector.did_launch_action(:gym)
+    collector.did_launch_action(:scan)
+    collector.did_raise_error(:scan)
 
-    expect(form["error"]).to eq("scan")
-    expect(form["crash"]).to eq("scan")
+    analytic_event_body = collector.create_analytic_event_body
+    analytics = JSON.parse(analytic_event_body)['analytics']
+
+    expect(analytics.size).to eq(4)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'scan' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'gym' }.size).to eq(2)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'scan' }.size).to eq(1)
+    expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'gym' }.size).to eq(1)
+  end
+
+  it "posts the web onboarding data with a success when finished" do
+    with_env_values('GENERATED_FASTFILE_ID' => 'fastfile_id') do
+      collector.did_launch_action(:fastlane)
+
+      analytic_event_body = collector.create_analytic_event_body
+      analytics = JSON.parse(analytic_event_body)['analytics']
+
+      expect(analytics.size).to eq(3)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == 'success' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['actor']['detail'] == 'fastfile_id' && a['primary_target']['detail'] == 'success' }.size).to eq(1)
+    end
+  end
+
+  it "posts the web onboarding data with an crash when finished" do
+    with_env_values('GENERATED_FASTFILE_ID' => 'fastfile_id') do
+      collector.did_launch_action(:fastlane)
+      collector.did_crash(:gym)
+
+      analytic_event_body = collector.create_analytic_event_body
+      analytics = JSON.parse(analytic_event_body)['analytics']
+
+      expect(analytics.size).to eq(3)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'crash' && a['actor']['detail'] == 'fastfile_id' }.size).to eq(1)
+    end
+  end
+
+  it "posts the web onboarding data with an error when finished" do
+    with_env_values('GENERATED_FASTFILE_ID' => 'fastfile_id') do
+      collector.did_launch_action(:fastlane)
+      collector.did_raise_error(:gym)
+
+      analytic_event_body = collector.create_analytic_event_body
+      analytics = JSON.parse(analytic_event_body)['analytics']
+
+      expect(analytics.size).to eq(3)
+      expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
+      expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
+      expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'fastfile_id' }.size).to eq(1)
+    end
   end
 end

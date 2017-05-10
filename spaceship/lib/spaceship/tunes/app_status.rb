@@ -33,7 +33,7 @@ module Spaceship
       PROCESSING_FOR_APP_STORE = "Processing for App Store"
       # WAITING_FOR_EXPORT_COMPLIANCE = "Waiting For Export Compliance"
       METADATA_REJECTED = "Metadata Rejected"
-      # REMOVED_FROM_SALE = "Removed From Sale"
+      REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
 
       # Get the app status matching based on a string (given by iTunes Connect)
@@ -46,8 +46,10 @@ module Spaceship
           'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
           'waitingForReview' => WAITING_FOR_REVIEW,
           'inReview' => IN_REVIEW,
+          'rejected' => REJECTED,
           'pendingDeveloperRelease' => PENDING_DEVELOPER_RELEASE,
-          'metadataRejected' => METADATA_REJECTED
+          'metadataRejected' => METADATA_REJECTED,
+          'removedFromSale' => REMOVED_FROM_SALE
         }
 
         mapping.each do |k, v|

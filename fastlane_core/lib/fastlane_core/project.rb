@@ -279,9 +279,14 @@ module FastlaneCore
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command.
       #
-      # The 'clean' portion of this command is a workaround for an xcodebuild bug with Core Data projects.
+      # The 'clean' portion of this command was a workaround for an xcodebuild bug with Core Data projects.
+      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
-      command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      if FastlaneCore::Helper.xcode_at_least?('8.3')
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      else
+        command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+      end
       command += " 2> /dev/null" if xcodebuild_suppress_stderr
       command
     end
@@ -291,9 +296,16 @@ module FastlaneCore
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
     def build_settings(key: nil, optional: true)
       unless @build_settings
+        if is_workspace
+          if schemes.count == 0
+            UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
+          end
+          options[:scheme] ||= schemes.first
+        end
+
         command = build_xcodebuild_showbuildsettings_command
 
-        # xcode might hang here and retrying fixes the problem, see fastlane#4059
+        # Xcode might hang here and retrying fixes the problem, see fastlane#4059
         begin
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
@@ -327,7 +339,7 @@ module FastlaneCore
 
     # Returns the build settings and sets the default scheme to the options hash
     def default_build_settings(key: nil, optional: true)
-      options[:scheme] = schemes.first if is_workspace
+      options[:scheme] ||= schemes.first if is_workspace
       build_settings(key: key, optional: optional)
     end
 
