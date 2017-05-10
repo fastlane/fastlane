@@ -46,8 +46,12 @@ module Spaceship::TestFlight
     # is not enough to add the tester to a group. If this isn't done the next request would fail.
     # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
     def add_tester!(tester)
-      # This post request makes the account-level tester available to the app
-      tester_data = client.post_tester(app_id: self.app_id, tester: tester)
+      # This post request creates an account-level tester and then makes it available to the app, or just makes
+      # it available to the app if it already exists
+      tester_data = client.create_app_level_tester(app_id: self.app_id,
+                                               first_name: tester.first_name,
+                                                last_name: tester.last_name,
+                                                    email: tester.email)
       # This put request adds the tester to the group
       client.put_tester_to_group(group_id: self.id, tester_id: tester_data['id'], app_id: self.app_id)
     end
