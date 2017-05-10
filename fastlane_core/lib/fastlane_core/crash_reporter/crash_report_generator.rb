@@ -35,7 +35,7 @@ module FastlaneCore
 
       def crash_report_payload(message: '')
         {
-          'eventTime' => Time.now.to_datetime.rfc3339,
+          'eventTime' => Time.now.utc.to_datetime.rfc3339,
           'serviceContext' => {
             'service' => 'fastlane',
             'version' => Fastlane::VERSION

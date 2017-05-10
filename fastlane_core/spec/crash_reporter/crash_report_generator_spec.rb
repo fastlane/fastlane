@@ -1,3 +1,5 @@
+require 'timecop'
+
 describe FastlaneCore::CrashReportGenerator do
   context 'generate crash report' do
     let(:exception) do
@@ -13,7 +15,7 @@ describe FastlaneCore::CrashReportGenerator do
 
     let(:expected_body) do
       {
-        'eventTime' => '0000-01-01T00:00:00-05:00',
+        'eventTime' => '0000-01-01T00:00:00+00:00',
         'serviceContext' => {
           'service' => 'fastlane',
           'version' => '2.29.0'
@@ -23,7 +25,7 @@ describe FastlaneCore::CrashReportGenerator do
     end
 
     before do
-      allow(Time).to receive(:now).and_return(Time.new('0000-01-01T00:00:00-05:00'))
+      Timecop.freeze(Time.utc(0))
     end
 
     it 'omits a message for type user_error' do
@@ -43,6 +45,10 @@ describe FastlaneCore::CrashReportGenerator do
       setup_expected_body(message_text: ": #{exception.message}\n")
       report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: exception))
       expect(report['message']).to include(exception.backtrace.join("\n"))
+    end
+
+    after do
+      Timecop.return
     end
   end
 end
