@@ -83,6 +83,10 @@ module Fastlane
         # little user hint
         UI.user_error!("No file changes picked up. Make sure you run the `increment_build_number` action first.") if git_dirty_files.empty?
 
+        if params[:settings]
+          expected_changed_files << 'Settings.bundle/Root.plist'
+        end
+
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)).subset? Set.new(expected_changed_files.map(&:downcase)))
         unless changed_files_as_expected
