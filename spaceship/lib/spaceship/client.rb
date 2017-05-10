@@ -541,6 +541,9 @@ module Spaceship
         store_csrf_tokens(response)
         content
       end
+    rescue => ex
+      UpdateChecker.ensure_spaceship_version # to show an update message on error if necessary
+      raise ex
     end
 
     def detect_most_common_errors_and_raise_exceptions(body)
