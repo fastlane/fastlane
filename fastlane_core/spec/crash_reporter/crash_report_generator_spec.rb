@@ -57,5 +57,5 @@ def setup_sanitizer_expectation(type: :unknown)
 end
 
 def setup_expected_body(type: :unknown, message_text: "")
-  expected_body[:message] = "#{FastlaneCore::CrashReportGenerator.types[type]}#{message_text}#{exception.backtrace.join("\n")}"
+  expected_body['message'] = "#{FastlaneCore::CrashReportGenerator.types[type]}#{message_text}#{exception.backtrace.join("\n")}"
 end
