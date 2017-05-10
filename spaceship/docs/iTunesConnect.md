@@ -138,6 +138,24 @@ attr_accessor :watch_app_icon_original_name
 attr_accessor :version_id
 
 ####
+# Trade Representative Contact Information
+####
+
+attr_accessor :trade_representative_trade_name
+attr_accessor :trade_representative_first_name
+attr_accessor :trade_representative_last_name
+attr_accessor :trade_representative_address_line_1
+attr_accessor :trade_representative_address_line_2
+attr_accessor :trade_representative_address_line_3
+attr_accessor :trade_representative_city_name
+attr_accessor :trade_representative_state
+attr_accessor :trade_representative_country
+attr_accessor :trade_representative_postal_code
+attr_accessor :trade_representative_phone_number
+attr_accessor :trade_representative_email
+attr_accessor :trade_representative_is_displayed_on_app_store
+
+####
 # App Review Information
 ####
 
