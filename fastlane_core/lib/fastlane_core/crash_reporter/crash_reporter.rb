@@ -29,7 +29,7 @@ module FastlaneCore
     end
 
     def self.send_report(payload: "{}")
-      connection = Faraday.new(url: "https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=#{ENV['STACKDRIVER_API_KEY']}")
+      connection = Faraday.new(url: "https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=AIzaSyAMACPfuI-wi4grJWEZjcPvhfV2Rhmddwo")
       connection.post do |request|
         request.headers['Content-Type'] = 'application/json'
         request.body = payload

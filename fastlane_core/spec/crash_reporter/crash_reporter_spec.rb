@@ -1,6 +1,4 @@
 describe FastlaneCore::CrashReporter do
-  STACKDRIVER_URL = 'https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=stackdriver_api_key'
-  ENV['STACKDRIVER_API_KEY'] = "stackdriver_api_key"
   context 'crash reporting' do
     let(:exception) do
       double(
@@ -15,7 +13,7 @@ describe FastlaneCore::CrashReporter do
 
     let(:stub_body) do
       {
-        'key': 'value'
+        'key' => 'value'
       }
     end
 
@@ -84,7 +82,7 @@ def setup_crash_report_generator_expectation(type: :unknown)
 end
 
 def stub_stackdriver_request(type: :unknown)
-  stub_request(:post, STACKDRIVER_URL).with do |request|
+  stub_request(:post, /https:\/\/clouderrorreporting.googleapis.com\/v1beta1\/projects\/fastlane-166414\/events:report\?key=.*/).with do |request|
     request.body == stub_body.to_json
   end
 end

@@ -6,6 +6,7 @@ module Fastlane
     # Raises an exception and stop the lane execution if the repo is not on a specific branch
     class EnsureGitBranchAction < Action
       def self.run(params)
+        UI.user_error!("thing one thing two")
         branch = params[:branch]
         branch_expr = /#{branch}/
         if Actions.git_branch =~ branch_expr
