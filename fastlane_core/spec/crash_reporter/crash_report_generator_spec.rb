@@ -23,7 +23,7 @@ describe FastlaneCore::CrashReportGenerator do
     end
 
     before do
-      allow(Time).to receive(:now).and_return(Time.new(0))
+      allow(Time).to receive(:now).and_return(Time.new('0000-01-01T00:00:00-05:00'))
     end
 
     it 'omits a message for type user_error' do
