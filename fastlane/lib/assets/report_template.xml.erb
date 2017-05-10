@@ -7,7 +7,7 @@
       <% name = [index.to_s.rjust(log, "0"), step[:name]].join(": ") %>
       <testcase classname="fastlane.lanes" name=<%= name.encode(:xml => :attr) %> time="<%= step[:time] %>">
         <% if step[:error] %>
-          <failure message=<%= step[:error].encode(:xml => :attr).gsub("\n", "&#10;") %> />
+          <failure message="<%= step[:error].encode(:xml => :attr).gsub("\n", "&#10;") %>" />
         <% end %>
       </testcase>
     <% end %>
