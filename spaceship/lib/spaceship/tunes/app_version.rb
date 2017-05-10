@@ -72,6 +72,48 @@ module Spaceship
       attr_accessor :transit_app_file
 
       ####
+      # Trade Representative Contact Information
+      ####
+      # @return (String) Trade Representative Contact Information Trade Name. This attribute isn't editable
+      attr_accessor :trade_representative_trade_name
+
+      # @return (String) Trade Representative Contact Information First Name
+      attr_accessor :trade_representative_first_name
+
+      # @return (String) Trade Representative Contact Information Last Name
+      attr_accessor :trade_representative_last_name
+
+      # @return (String) Trade Representative Contact Information Address Line 1
+      attr_accessor :trade_representative_address_line_1
+
+      # @return (String) Trade Representative Contact Information Address Line 2
+      attr_accessor :trade_representative_address_line_2
+
+      # @return (String) Trade Representative Contact Information Address Line 3
+      attr_accessor :trade_representative_address_line_3
+
+      # @return (String) Trade Representative Contact Information City Name
+      attr_accessor :trade_representative_city_name
+
+      # @return (String) Trade Representative Contact Information State
+      attr_accessor :trade_representative_state
+
+      # @return (String) Trade Representative Contact Information Country
+      attr_accessor :trade_representative_country
+
+      # @return (String) Trade Representative Contact Information Postal Code
+      attr_accessor :trade_representative_postal_code
+
+      # @return (String) Trade Representative Contact Information Phone Number
+      attr_accessor :trade_representative_phone_number
+
+      # @return (String) Trade Representative Contact Information Email Address
+      attr_accessor :trade_representative_email
+
+      # @return (Boolean) Display Trade Representative Contact Information on the Korean App Store or not
+      attr_accessor :trade_representative_is_displayed_on_app_store
+
+      ####
       # App Review Information
       ####
       # @return (String) App Review Information First Name
@@ -149,6 +191,22 @@ module Spaceship
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
+
+        # Trade Representative Contact Information
+
+        'appStoreInfo.tradeName.value' => :trade_representative_trade_name,
+        'appStoreInfo.firstName.value' => :trade_representative_first_name,
+        'appStoreInfo.lastName.value' => :trade_representative_last_name,
+        'appStoreInfo.addressLine1.value' => :trade_representative_address_line_1,
+        'appStoreInfo.addressLine2.value' => :trade_representative_address_line_2,
+        'appStoreInfo.addressLine3.value' => :trade_representative_address_line_3,
+        'appStoreInfo.cityName.value' => :trade_representative_city_name,
+        'appStoreInfo.state.value' => :trade_representative_state,
+        'appStoreInfo.country.value' => :trade_representative_country,
+        'appStoreInfo.postalCode.value' => :trade_representative_postal_code,
+        'appStoreInfo.phoneNumber.value' => :trade_representative_phone_number,
+        'appStoreInfo.emailAddress.value' => :trade_representative_email,
+        'appStoreInfo.shouldDisplayInStore.value' => :trade_representative_is_displayed_on_app_store,
 
         # App Review Information
         'appReviewInfo.firstName.value' => :review_first_name,

@@ -118,13 +118,13 @@
               margin-right: 20px;
           }
 
-          .app-review-information {
+          .app-minor-information {
             margin-left: 15px;
             margin-right: 15px;
             margin-top: 22px;
           }
 
-          .app-review-information-key {
+          .app-minor-information-key {
             font-weight: 700;
           }
         </style>
@@ -241,20 +241,37 @@
         
         <hr />
       <% end # end data %>
-      <% if @options[:app_review_information] %>
-        <div class="app-review-information">
-          <div class="cat-headline">Review Information</div>
-          <dl class="app-review-information">
-            <% @options[:app_review_information].each do |key, value| %>
-                <dt class="app-review-information-key">
+      <% if @options[:trade_representative_contact_information] %>
+        <div class="app-minor-information">
+          <div class="cat-headline">Trade Representative Contact Information</div>
+          <dl class="app-minor-information">
+            <% @options[:trade_representative_contact_information].each do |key, value| %>
+                <dt class="app-minor-information-key">
                   <%= key.to_s.capitalize.gsub("_", " ") %>
                 </dt>
-                <dd class="app-review-information-text">
+                <dd class="app-minor-information-text">
                   <%= (value || '').gsub("\n", "<br />") %>
                 </dd>
             <% end %>
           </dl>
         </div>
-    <% end %>
+        <hr />
+      <% end %>
+
+      <% if @options[:app_review_information] %>
+        <div class="app-minor-information">
+          <div class="cat-headline">Review Information</div>
+          <dl class="app-minor-information">
+            <% @options[:app_review_information].each do |key, value| %>
+                <dt class="app-minor-information-key">
+                  <%= key.to_s.capitalize.gsub("_", " ") %>
+                </dt>
+                <dd class="app-minor-information-text">
+                  <%= (value || '').gsub("\n", "<br />") %>
+                </dd>
+            <% end %>
+          </dl>
+        </div>
+      <% end %>
     </body>
 </html>
