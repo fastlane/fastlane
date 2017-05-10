@@ -350,9 +350,12 @@ module Fastlane
       references = Fastlane.const_get(module_name).all_classes.collect do |path|
         next unless File.dirname(path).end_with?("/actions") # we only want to match actions
 
-        File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
+        File.readlines(path)
+          .map { |line| line.sub!(/class (.*) < Action/, '\1') }
+          .compact
+          .map { |line| line.strip.gsub('Action', '').fastlane_underscore }
       end
-      references.compact!
+      references.compact!.flatten(1)
 
       # Check if this overwrites a built-in action and
       # show a warning if that's the case
