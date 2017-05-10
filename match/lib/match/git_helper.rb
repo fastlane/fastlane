@@ -49,12 +49,12 @@ module Match
       if File.exist?(File.join(@dir, "match_crypted.txt"))
         # repo is crypted but user requested to run match in disabled_encryption mode
         # files cannot be read.
-        if GitHelper.crypted?(@dir) && disable_encryption == true
-          remote_is_crypted!
+        if GitHelper.encrypted?(@dir) && disable_encryption
+          remote_is_encrypted!
         end
 
         # repo is not crypted, but match is run with enabled encryption
-        if !GitHelper.crypted?(@dir) && disable_encryption == false
+        if !GitHelper.encrypted?(@dir) && !disable_encryption
           UI.error("Encryption enabled, but remote repository is currently decrypted.")
           UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
           UI.user_error!("remote_decrypted")
@@ -64,7 +64,7 @@ module Match
         if File.exist?(File.join(@dir, "match_version.txt")) && disable_encryption
           UI.error("You requested to disable encryption on a repo that is not up-to-date")
           UI.error("Please run match atleast once with the current version")
-          remote_is_crypted!
+          remote_is_encrypted!
         end
       end
 
@@ -91,7 +91,7 @@ module Match
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
-    def self.remote_is_crypted!
+    def self.remote_is_encrypted!
       UI.error("Encryption disabled, but remote repository is currently crypted.")
       UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
       UI.user_error!("remote_encrypted")
@@ -108,7 +108,7 @@ module Match
       ].join(" ")
     end
 
-    def self.crypted?(workspace)
+    def self.encrypted?(workspace)
       path = File.join(workspace, "match_crypted.txt")
       # if file does not exist -> return true (default match behaviour)
       return true unless File.exist?(path)

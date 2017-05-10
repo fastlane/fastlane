@@ -53,7 +53,7 @@ describe Match do
           and_return(nil)
 
         expect(File).to receive(:exist?).with(File.join(path, "match_crypted.txt")).and_return(true)
-        expect(Match::GitHelper).to receive(:crypted?).and_return(true)
+        expect(Match::GitHelper).to receive(:encrypted?).and_return(true)
 
         expect do
           result = Match::GitHelper.clone(git_url, shallow_clone, disable_encryption: true)
