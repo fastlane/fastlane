@@ -1,15 +1,6 @@
 describe FastlaneCore::CrashReporter do
   context 'crash reporting' do
-    let(:exception) do
-      double(
-        'Exception',
-        backtrace: [
-          'path/to/fastlane/line/that/crashed',
-          'path/to/fastlane/line/that/called/the/crash'
-        ],
-        message: 'message goes here'
-      )
-    end
+    let(:exception) { double('Exception') }
 
     let(:stub_body) do
       {
@@ -17,16 +8,11 @@ describe FastlaneCore::CrashReporter do
       }
     end
 
-    # let(:generator) { double('CrashReportGenerator', generate: { 'key': 'value' }) }
-
-    before do
-      allow(Time).to receive(:now).and_return(Time.new(0))
-    end
-
     context 'post reports to Stackdriver' do
       before do
         silence_ui_output
-        supress_file_writing
+        supress_crash_report_file_writing
+        supress_opt_out_crash_reporting_file_writing
       end
 
       it 'posts a report to Stackdriver without specified type' do
@@ -42,11 +28,29 @@ describe FastlaneCore::CrashReporter do
       end
     end
 
+    context 'opted out of crash reporting' do
+      before do
+        silence_ui_output
+        supress_opt_out_crash_reporting_file_writing
+        supress_crash_report_file_writing
+      end
+
+      it 'does not post a report to Stackdriver if opted out' do
+        ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = '1'
+        assert_not_requested(stub_stackdriver_request)
+      end
+
+      after do
+        ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = nil
+      end
+    end
+
     context 'write report to file' do
       before do
         silence_ui_output
         supress_stackdriver_reporting
         setup_crash_report_generator_expectation
+        supress_opt_out_crash_reporting_file_writing
       end
 
       it 'writes a file with the json payload' do
@@ -61,10 +65,14 @@ describe FastlaneCore::CrashReporter do
 end
 
 def silence_ui_output
-  allow(UI).to receive(:important)
+  allow(UI).to receive(:message)
 end
 
-def supress_file_writing
+def supress_opt_out_crash_reporting_file_writing
+  allow(File).to receive(:write)
+end
+
+def supress_crash_report_file_writing
   file = double('File')
   allow(File).to receive(:open).and_yield(file)
   allow(file).to receive(:write)

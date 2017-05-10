@@ -8,19 +8,38 @@ module FastlaneCore
     end
 
     def self.enabled?
-      true
+      !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
     end
 
     def self.report_crash(type: :unknown, exception: nil)
       return unless enabled?
       payload = CrashReportGenerator.generate(type: type, exception: exception)
       send_report(payload: payload)
-      UI.important("We sent a crash report to help us make _fastlane_ better!")
       save_file(payload: payload)
-      UI.important("We logged a crash report to #{crash_report_path}")
+      show_message unless did_show_message?
     end
 
     private
+
+    def self.show_message
+      UI.message("Sending crash report...")
+      UI.message("The stacktrace is sanitized so no personal inormation is sent.")
+      UI.message("To see what we are sending, look here: #{crash_report_path}")
+      UI.message("Learn more at https://github.com/fastlane/fastlane#crash_reporting")
+      UI.message("You can disable crash reporting by adding `opt_out_crash_reporting` at the top of your Fastfile")
+    end
+
+    def self.did_show_message?
+      file_name = ".did_show_opt_out_crash_info"
+
+      path = File.join(FastlaneCore.fastlane_user_dir, file_name)
+      did_show = File.exist?(path)
+
+      return did_show if did_show
+
+      File.write(path, '1')
+      false
+    end
 
     def self.save_file(payload: "{}")
       File.open(crash_report_path, 'w') do |f|
