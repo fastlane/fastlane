@@ -39,7 +39,7 @@ module Fastlane
         flags << params[:flags] unless params[:flags].nil?
 
         # Run the actual gradle task
-        gradle = Helper::GradleHelper.new(gradle_path: gradle_path)
+        gradle = Helper::GradleHelper.new(gradle_path: gradle_path.shellescape)
 
         # If these were set as properties, then we expose them back out as they might be useful to others
         Actions.lane_context[SharedValues::GRADLE_BUILD_TYPE] = build_type if build_type
