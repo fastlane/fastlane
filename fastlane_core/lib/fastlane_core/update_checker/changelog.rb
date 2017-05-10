@@ -26,6 +26,11 @@ module FastlaneCore
       end
 
       def releases(gem_name)
+        # We have to follow redirects, since some repos were moved
+        # away into a separate org
+        # Taken from https://github.com/excon/excon/issues/115#issuecomment-40647211
+        Excon.defaults[:middlewares] << Excon::Middleware::RedirectFollower
+
         url = "https://api.github.com/repos/fastlane/#{gem_name}/releases"
         # We have to follow redirects, since some repos were moved away into a separate org
         server_response = Excon.get(url,
