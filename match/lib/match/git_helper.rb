@@ -92,7 +92,7 @@ module Match
     # rubocop:enable Metrics/PerceivedComplexity
 
     def self.remote_is_encrypted!
-      UI.error("Encryption disabled, but remote repository is currently crypted.")
+      UI.error("Encryption disabled, but remote repository is currently encrypted.")
       UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
       UI.user_error!("remote_encrypted")
     end
