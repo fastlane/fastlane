@@ -27,9 +27,15 @@ describe FastlaneCore::CrashReporter do
       end
 
       it 'posts a report to Stackdriver with specified type' do
-        stub_stackdriver_request(type: :crash)
+        stub_stackdriver_request
         setup_crash_report_generator_expectation(type: :crash)
         FastlaneCore::CrashReporter.report_crash(type: :crash, exception: exception)
+      end
+
+      it 'posts a report to Stackdriver with specified service' do
+        stub_stackdriver_request
+        setup_crash_report_generator_expectation(action: 'test_action')
+        FastlaneCore::CrashReporter.report_crash(action: 'test_action', exception: exception)
       end
 
       it 'only posts one report' do
@@ -89,15 +95,15 @@ def supress_stackdriver_reporting
   stub_stackdriver_request
 end
 
-def setup_crash_report_generator_expectation(type: :unknown)
+def setup_crash_report_generator_expectation(type: :unknown, action: nil)
   expect(FastlaneCore::CrashReportGenerator).to receive(:generate).with(
     type: type,
     exception: exception,
-    action: nil
+    action: action
   ).and_return(stub_body.to_json)
 end
 
-def stub_stackdriver_request(type: :unknown)
+def stub_stackdriver_request
   stub_request(:post, %r{https:\/\/clouderrorreporting.googleapis.com\/v1beta1\/projects\/fastlane-166414\/events:report\?key=.*}).with do |request|
     request.body == stub_body.to_json
   end
