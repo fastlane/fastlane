@@ -1,5 +1,3 @@
-require 'timecop'
-
 describe FastlaneCore::CrashReportGenerator do
   context 'generate crash report' do
     let(:exception) do
@@ -25,7 +23,7 @@ describe FastlaneCore::CrashReportGenerator do
     end
 
     before do
-      Timecop.freeze(Time.utc(0))
+      allow(Time).to receive(:now).and_return(Time.utc(0))
     end
 
     it 'omits a message for type user_error' do
@@ -45,10 +43,6 @@ describe FastlaneCore::CrashReportGenerator do
       setup_expected_body(message_text: ": #{exception.message}\n")
       report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: exception))
       expect(report['message']).to include(exception.backtrace.join("\n"))
-    end
-
-    after do
-      Timecop.return
     end
   end
 end
