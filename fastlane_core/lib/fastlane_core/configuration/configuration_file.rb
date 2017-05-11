@@ -4,10 +4,14 @@ module FastlaneCore
     # A reference to the actual configuration
     attr_accessor :config
 
+    # Path to the config file represented by the current object
+    attr_accessor :configfile_path
+
     # @param config [FastlaneCore::Configuration] is stored to save the resulting values
     # @param path [String] The path to the configuration file to use
     def initialize(config, path, block_for_missing)
       self.config = config
+      self.configfile_path = path
 
       @block_for_missing = block_for_missing
       content = File.read(path)
@@ -25,20 +29,20 @@ module FastlaneCore
         eval(content) # this is okay in this case
         # rubocop:enable Security/Eval
 
-        print_resulting_config_values(path) # only on success
+        print_resulting_config_values # only on success
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
       end
     end
 
-    def print_resulting_config_values(path)
+    def print_resulting_config_values
       require 'terminal-table'
-      UI.success("Successfully loaded '#{File.expand_path(path)}' 📄")
+      UI.success("Successfully loaded '#{File.expand_path(self.configfile_path)}' 📄")
 
       # Show message when self.modified_values is empty
       if self.modified_values.empty?
-        UI.important("No values defined in '#{path}'")
+        UI.important("No values defined in '#{self.configfile_path}'")
         return
       end
 
@@ -48,7 +52,7 @@ module FastlaneCore
 
       puts ""
       puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values from '#{path}'")
+                              title: "Detected Values from '#{self.configfile_path}'")
       puts ""
     end
 
@@ -66,7 +70,24 @@ module FastlaneCore
         value = arguments.first
         value = yield if value.nil? && block_given?
 
-        return if value.nil?
+        if value.nil?
+          unless block_given?
+            # The config file has something like this:
+            #
+            #   clean
+            #
+            # without specifying a value for the method call
+            # or a block. This is most likely a user error
+            # So we tell the user that they can provide a value
+            warning = ["In the config file '#{self.configfile_path}'"]
+            warning << "you have the line #{method_sym}, but didn't provide"
+            warning << "any value. Make sure to append a value rght after the"
+            warning << "option name. Make sure to check the docs for more information"
+            UI.important(warning.join(" "))
+          end
+          return
+        end
+
         self.modified_values[method_sym] = value
 
         # to support frozen strings (e.g. ENV variables) too
