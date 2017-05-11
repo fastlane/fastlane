@@ -57,6 +57,16 @@ describe FastlaneCore do
         expect(config[:app_identifier]).to eq("detlef.app.super")
       end
 
+      it "prints a warning if no value is provided" do
+        important_message = "In the config file './fastlane_core/spec/fixtures/ConfigFileEmptyValue' you have the line apple_id, but didn't provide any value. Make sure to append a value rght after the option name. Make sure to check the docs for more information"
+        expect(FastlaneCore::UI).to receive(:important).with(important_message)
+        expect(FastlaneCore::UI).to receive(:important).with("No values defined in './fastlane_core/spec/fixtures/ConfigFileEmptyValue'")
+
+        config = FastlaneCore::Configuration.create(options, { app_identifier: "detlef.app.super" })
+        config.load_configuration_file('ConfigFileEmptyValue')
+        expect(config[:app_identifier]).to eq("detlef.app.super") # original value
+      end
+
       it "supports modifying of frozen strings too" do
         # Test that a value can be modified (this isn't the case by default if it's set via ENV)
         app_identifier = "com.krausefx.yolo"
