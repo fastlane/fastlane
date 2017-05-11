@@ -23,12 +23,13 @@ module FastlaneCore
 
       def crash_report_message(type: :unknown, exception: nil)
         return if exception.nil?
-        backtrace = FastlaneCore::BacktraceSanitizer.sanitize(type: type, backtrace: exception.backtrace).join("\n")
+        backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(type: type, backtrace: exception.backtrace).join("\n")
         message = types[type]
+        sanitized_exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)
         if type == :user_error
           message += ': '
         else
-          message += ": #{exception.message}"
+          message += ": #{sanitized_exception_message}"
         end
         message = message[0..100]
         message += "\n" unless type == :user_error

@@ -55,11 +55,16 @@ describe FastlaneCore::CrashReportGenerator do
 end
 
 def setup_sanitizer_expectation(type: :unknown)
-  expect(FastlaneCore::BacktraceSanitizer).to receive(:sanitize).with(
+  expect(FastlaneCore::CrashReportSanitizer).to receive(:sanitize_backtrace).with(
     type: type,
     backtrace: exception.backtrace
   ) do |args|
     args[:backtrace]
+  end
+  expect(FastlaneCore::CrashReportSanitizer).to receive(:sanitize_string).with(
+    string: exception.message
+  ) do |args|
+    args[:string]
   end
 end
 
