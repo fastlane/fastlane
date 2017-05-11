@@ -1,5 +1,10 @@
 describe FastlaneCore::CrashReporter do
   context 'crash reporting' do
+    before do
+      ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = nil
+      FastlaneCore::CrashReporter.reset_crash_reporter_for_testing
+    end
+
     let(:exception) { double('Exception') }
 
     let(:stub_body) do
@@ -26,6 +31,16 @@ describe FastlaneCore::CrashReporter do
         setup_crash_report_generator_expectation(type: :crash)
         FastlaneCore::CrashReporter.report_crash(type: :crash, exception: exception)
       end
+
+      it 'only posts one report' do
+        stub_stackdriver_request
+        setup_crash_report_generator_expectation
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+
+        # The expectation we set up above is only for one invocation of the
+        # report generator, so if this calls it again, it will fail
+        FastlaneCore::CrashReporter.report_crash(exception: exception)
+      end
     end
 
     context 'opted out of crash reporting' do
@@ -38,10 +53,6 @@ describe FastlaneCore::CrashReporter do
       it 'does not post a report to Stackdriver if opted out' do
         ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = '1'
         assert_not_requested(stub_stackdriver_request)
-      end
-
-      after do
-        ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = nil
       end
     end
 

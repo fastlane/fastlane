@@ -4,21 +4,27 @@ require 'json'
 module FastlaneCore
   class CrashReporter
     class << self
+      @@did_report_crash = false
+
       def crash_report_path
         File.join(FastlaneCore.fastlane_user_dir, 'latest_crash.json')
       end
 
       def enabled?
-        !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
+        !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING") && !@@did_report_crash
       end
 
       def report_crash(type: :unknown, exception: nil, action: nil)
-        require 'pry'; binding.pry
         return unless enabled?
-        payload = CrashReportGenerator.generate(type: type, exception: exception, action: nil)
+        payload = CrashReportGenerator.generate(type: type, exception: exception, action: action)
         send_report(payload: payload)
         save_file(payload: payload)
         show_message unless did_show_message?
+        @@did_report_crash = true
+      end
+
+      def reset_crash_reporter_for_testing
+        @@did_report_crash = false
       end
 
       private
