@@ -1,9 +1,5 @@
 skip_docs
 
-lane :yolo do
-  ensure_git_branch(branch: 'master')
-end
-
 desc "Runs the unit tests and other verifications for the fastlane repo"
 lane :test do |options|
   validate_repo
