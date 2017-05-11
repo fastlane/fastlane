@@ -1,5 +1,4 @@
 describe FastlaneCore::CrashReporter do
-
   context 'crash reporting' do
     before do
       ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = nil
