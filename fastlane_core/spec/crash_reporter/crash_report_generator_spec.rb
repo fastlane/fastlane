@@ -16,7 +16,7 @@ describe FastlaneCore::CrashReportGenerator do
         'eventTime' => '0000-01-01T00:00:00+00:00',
         'serviceContext' => {
           'service' => 'fastlane',
-          'version' => '2.29.0'
+          'version' => Fastlane::VERSION
           },
         'message' => ""
       }
