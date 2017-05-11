@@ -4,9 +4,8 @@ require "fastlane/cli_tools_distributor"
 describe Fastlane do
   describe Fastlane::EnvironmentPrinter do
     before do
-      stub_request(:post, %r{https:\/\/refresher.fastlane.tools\/.*}).
-        with(headers: { 'Host' => 'refresher.fastlane.tools:443' }).
-        to_return(status: 200, body: '{"version": "0.16.2",  "status": "ok"}', headers: {})
+      stub_request(:get, %r{https:\/\/rubygems.org\/api\/v1\/gems\/.*}).
+        to_return(status: 200, body: '{"version": "0.16.2"}', headers: {})
     end
 
     let(:env) { Fastlane::EnvironmentPrinter.get }
