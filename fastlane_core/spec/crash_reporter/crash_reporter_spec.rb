@@ -1,8 +1,15 @@
 describe FastlaneCore::CrashReporter do
+
   context 'crash reporting' do
     before do
       ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = nil
       FastlaneCore::CrashReporter.reset_crash_reporter_for_testing
+      FastlaneCore::CrashReporter.enable_for_testing
+    end
+
+    after do
+      ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = '1'
+      FastlaneCore::CrashReporter.disable_for_testing
     end
 
     let(:exception) { double('Exception') }
