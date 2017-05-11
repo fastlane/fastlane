@@ -112,7 +112,11 @@ module FastlaneCore
     end
 
     def self.fetch_latest(gem_name)
-      JSON.parse(Excon.get("https://rubygems.org/api/v1/gems/#{gem_name}.json").body)["version"]
+      JSON.parse(Excon.get(generate_fetch_url(gem_name)).body)["version"]
+    end
+
+    def self.generate_fetch_url(gem_name)
+      "https://rubygems.org/api/v1/gems/#{gem_name}.json"
     end
 
     # (optional) Returns the app identifier for the current tool
