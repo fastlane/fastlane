@@ -95,7 +95,7 @@ module Commander
           handle_unknown_error!(e)
         end
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        type = e.kind_of?(FastlaneCore::Interface::FastlaneCrash) ? :crash : :unknown
+        type = e.kind_of?(FastlaneCore::Interface::FastlaneCrash) ? :crash : :exception
         FastlaneCore::CrashReporter.report_crash(type: type, exception: e)
         collector.did_crash(@program[:name])
         handle_unknown_error!(e)

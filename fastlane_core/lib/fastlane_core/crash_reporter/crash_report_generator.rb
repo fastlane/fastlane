@@ -5,6 +5,7 @@ module FastlaneCore
         {
           user_error: '[USER_ERROR]',
           crash: '[FASTLANE_CRASH]',
+          exception: '[EXCEPTION]',
           connection_failure: '[CONNECTION_FAILURE]',
           system: '[SYSTEM_ERROR]',
           option_parser: '[OPTION_PARSER]',
