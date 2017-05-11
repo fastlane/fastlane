@@ -11,11 +11,12 @@ module FastlaneCore
       end
 
       def enabled?
-        !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING") && !@did_report_crash
+        !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
       end
 
       def report_crash(type: :unknown, exception: nil, action: nil)
         return unless enabled?
+        return if @did_report_crash
         payload = CrashReportGenerator.generate(type: type, exception: exception, action: action)
         send_report(payload: payload)
         save_file(payload: payload)
