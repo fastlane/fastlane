@@ -14,14 +14,15 @@ module FastlaneCore
         }
       end
 
-      def generate(type: :unknown, exception: nil)
+      def generate(type: :unknown, exception: nil, action: nil)
         message = crash_report_message(type: type, exception: exception)
-        crash_report_payload(message: message)
+        crash_report_payload(message: message, action: action)
       end
 
       private
 
       def crash_report_message(type: :unknown, exception: nil)
+        return if exception.nil?
         backtrace = FastlaneCore::BacktraceSanitizer.sanitize(type: type, backtrace: exception.backtrace).join("\n")
         message = types[type]
         if type == :user_error
@@ -34,11 +35,11 @@ module FastlaneCore
         message + backtrace
       end
 
-      def crash_report_payload(message: '')
+      def crash_report_payload(message: '', action: nil)
         {
           'eventTime' => Time.now.utc.to_datetime.rfc3339,
           'serviceContext' => {
-            'service' => 'fastlane',
+            'service' => action || 'fastlane',
             'version' => Fastlane::VERSION
           },
           'message' => message

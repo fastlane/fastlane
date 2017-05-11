@@ -26,6 +26,13 @@ describe FastlaneCore::CrashReportGenerator do
       allow(Time).to receive(:now).and_return(Time.utc(0))
     end
 
+    it 'sets service to the action that crashed' do
+      setup_sanitizer_expectation
+      setup_expected_body(message_text: ": #{exception.message}\n")
+      report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: exception, action: 'test_action'))
+      expect(report['serviceContext']['service']).to eq('test_action')
+    end
+
     it 'omits a message for type user_error' do
       setup_sanitizer_expectation(type: :user_error)
       setup_expected_body(type: :user_error, message_text: ": ")
