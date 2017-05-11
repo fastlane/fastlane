@@ -62,16 +62,16 @@ module Fastlane
         table << "|--------|---------|\n"
         plugin_manager.available_plugins.each do |plugin|
           begin
-          installed_version = Fastlane::ActionCollector.determine_version(plugin)
-          latest_version = FastlaneCore::UpdateChecker.fetch_latest(plugin)
-          if Gem::Version.new(installed_version) == Gem::Version.new(latest_version)
-            update_status = "✅ Up-To-Date"
-          else
-            update_status = "🚫 Update available"
+            installed_version = Fastlane::ActionCollector.determine_version(plugin)
+            latest_version = FastlaneCore::UpdateChecker.fetch_latest(plugin)
+            if Gem::Version.new(installed_version) == Gem::Version.new(latest_version)
+              update_status = "✅ Up-To-Date"
+            else
+              update_status = "🚫 Update available"
+            end
+          rescue
+            update_status = "💥 Check failed"
           end
-        rescue
-          update_status = "💥 Check failed"
-        end
           table << "| #{plugin} | #{installed_version} | #{update_status} |\n"
         end
 
