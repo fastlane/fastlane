@@ -21,6 +21,10 @@ describe Fastlane::CLIToolsDistributor do
   end
 
   describe "update checking" do
+    before do
+      allow(FastlaneCore::CrashReporter).to receive(:report_crash)
+    end
+
     it "checks for updates when running a lane" do
       FastlaneSpec::Env.with_ARGV(["sigh"])
       require 'fastlane/commands_generator'

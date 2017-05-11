@@ -39,6 +39,7 @@ describe Commander::Runner do
     before(:each) do
       allow(Commander::Runner).to receive(:instance).and_return(Commander::Runner.new)
       expect(FastlaneCore::ToolCollector).to receive(:new).and_return(mock_tool_collector)
+      allow(FastlaneCore::CrashReporter).to receive(:report_crash)
     end
 
     it "calls the tool collector lifecycle methods for a successful run" do
