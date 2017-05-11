@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME).freeze
+      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME).freeze
     end
 
     class GitBranchAction < Action
@@ -15,7 +15,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns the name of the current git branch, possibly as controled by CI ENV vars"
+        "Returns the name of the current git branch, possibly as managed by CI ENV vars"
       end
 
       def self.details

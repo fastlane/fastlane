@@ -1,14 +1,36 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil)
+    def self.clone(git_url,
+                   shallow_clone,
+                   manual_password: nil,
+                   skip_docs: false,
+                   branch: "master",
+                   git_full_name: nil,
+                   git_user_email: nil,
+                   clone_branch_directly: false)
+      # Note: if you modify the parameters above, don't forget to also update the method call in
+      # - runner.rb
+      # - nuke.rb
+      # - change_password.rb
+      # - commands_generator.rb
+      #
       return @dir if @dir
 
       @dir = Dir.mktmpdir
 
       command = "git clone '#{git_url}' '#{@dir}'"
-      command << " --depth 1 --no-single-branch" if shallow_clone
+      if shallow_clone
+        command << " --depth 1 --no-single-branch"
+      elsif clone_branch_directly
+        command += " -b #{branch.shellescape} --single-branch"
+      end
 
       UI.message "Cloning remote git repo..."
+
+      if branch && !clone_branch_directly
+        UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
+      end
+
       begin
         # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
         FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
@@ -154,29 +176,6 @@ module Match
                                                 print_all: FastlaneCore::Globals.verbose?,
                                                 print_command: FastlaneCore::Globals.verbose?)
         end
-      end
-    end
-
-    # Checks push permission to git repo
-    def self.repo_pushable?(path, branch = "master")
-      Dir.chdir(path) do
-        command = "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape} --dry-run"
-        FastlaneCore::CommandExecutor.execute(command: command,
-                                              print_all: FastlaneCore::Globals.verbose?,
-                                              print_command: FastlaneCore::Globals.verbose?)
-      end
-      return true
-    rescue => ex
-      UI.error("No permission to push...")
-      UI.error(ex)
-      return false
-    end
-
-    def self.check_push_repo_permission(path, branch = "master")
-      unless repo_pushable?(path, branch)
-        UI.error("You do not have push permission to git repository provided")
-        UI.error("_match_ needs to create a new certificate or provisioning profile, however without push access to the git repo, the generated certificate can't be stored properly, resulting in an unused certificate")
-        UI.user_error!("Please grant push access for the current git user to the git repo, so that _match_ can update and create certificates for you")
       end
     end
   end

@@ -46,7 +46,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2/?platformString=ios").
         to_return(status: 200, body: itc_read_fixture_file('create_application_prefill_request.json'), headers: { 'Content-Type' => 'application/json' })
 
-      # Actual sucess request
+      # Actual success request
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2").
         to_return(status: 200, body: itc_read_fixture_file('create_application_success.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -76,7 +76,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews/summary?platform=ios&versionId=").
         to_return(status: 200, body: itc_read_fixture_file('ratings_summary.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews?platform=ios&storefront=US&versionId=").
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&storefront=US&versionId=").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -318,9 +318,15 @@ class TunesStubbing
                  headers: { "Content-Type" => "application/json" })
       # iap edit family
       stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
-        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        with(body: itc_read_fixture_file("iap_family_edit_versions.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
                     headers: { "Content-Type" => "application/json" })
+
+      # iap edit family
+      stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
+        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                headers: { "Content-Type" => "application/json" })
 
       # iap family detail
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20372345").

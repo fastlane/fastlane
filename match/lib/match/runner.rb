@@ -8,7 +8,13 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch], git_full_name: params[:git_full_name], git_user_email: params[:git_user_email])
+      params[:workspace] = GitHelper.clone(params[:git_url],
+                                           params[:shallow_clone],
+                                           skip_docs: params[:skip_docs],
+                                           branch: params[:git_branch],
+                                           git_full_name: params[:git_full_name],
+                                           git_user_email: params[:git_user_email],
+                                           clone_branch_directly: params[:clone_branch_directly])
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username])
@@ -56,7 +62,7 @@ module Match
 
       UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
-      UI.error("An error occured while verifying your certificates and profiles with the Apple Developer Portal.")
+      UI.error("An error occurred while verifying your certificates and profiles with the Apple Developer Portal.")
       UI.error("If you already have your certificates stored in git, you can run `fastlane match` in readonly mode")
       UI.error("to just install the certificates and profiles without accessing the Dev Portal.")
       UI.error("To do so, just pass `readonly: true` to your match call.")
@@ -74,7 +80,6 @@ module Match
       if certs.count == 0 or keys.count == 0
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
         cert_path = Generator.generate_certificate(params, cert_type)
         self.changes_to_commit = true
       else
@@ -128,8 +133,6 @@ module Match
           UI.error "If you are certain that a profile should exist, double-check the recent changes to your match repository"
           UI.user_error! "No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information."
         end
-
-        GitHelper.check_push_repo_permission(params[:workspace], params[:git_branch])
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,

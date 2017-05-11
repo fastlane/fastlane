@@ -71,7 +71,7 @@ module Snapshot
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
-    # @return true/false depending on if the tests succeded
+    # @return true/false depending on if the tests succeeded
     def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
       return launch(language, locale, device, launch_arguments)
     rescue => ex
@@ -124,7 +124,7 @@ module Snapshot
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         headings: ["Device"] + results.values.first.keys,
         title: "snapshot results"
       }
@@ -133,7 +133,7 @@ module Snapshot
       puts ""
     end
 
-    # Returns true if it succeded
+    # Returns true if it succeeded
     def launch(language, locale, device_type, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
@@ -171,7 +171,7 @@ module Snapshot
 
       open_simulator_for_device(device_type)
 
-      command = TestCommandGenerator.generate(device_type: device_type)
+      command = TestCommandGenerator.generate(device_type: device_type, language: language, locale: locale)
 
       if locale
         UI.header("#{device_type} - #{language} (#{locale})")
@@ -208,7 +208,7 @@ module Snapshot
                                                 end
                                               end)
 
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path)
+      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
 
       dir_name = locale || language
 
@@ -292,6 +292,7 @@ module Snapshot
 
     # rubocop:disable Style/Next
     def verify_helper_is_current
+      return if Snapshot.config[:skip_helper_version_check]
       current_version = version_of_bundled_helper
       UI.verbose "Checking that helper files contain #{current_version}"
 

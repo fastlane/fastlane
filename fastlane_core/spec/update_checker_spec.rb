@@ -3,6 +3,13 @@ require 'fastlane_core/update_checker/update_checker'
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
     let (:name) { 'fastlane' }
+    def android_hash_of(value)
+      hash_of("android_project_#{value}")
+    end
+
+    def hash_of(value)
+      Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt")
+    end
 
     describe "#update_available?" do
       it "no update is available" do
@@ -72,12 +79,8 @@ describe FastlaneCore do
     describe "#p_hash?" do
       let (:package_name) { 'com.test.app' }
 
-      def android_hash_of(value)
-        hash_of("android_project_#{value}")
-      end
-
-      def hash_of(value)
-        Digest::SHA256.hexdigest("p#{value}fastlan3_SAlt")
+      before do
+        ENV.delete("FASTLANE_OPT_OUT_USAGE")
       end
 
       it "chooses the correct param for package name for supply" do
@@ -96,33 +99,100 @@ describe FastlaneCore do
       end
     end
 
-    describe "#generate_fetch_url" do
+    describe "#send_launch_analytic_events_for" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
-        expect(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
       end
 
-      it "generated the correct URL with no parameters, no platform value and no p_hash" do
-        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://refresher.fastlane.tools/fastlane")
+      it "sends no events when opted out" do
+        with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
+          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
+        end
       end
 
-      it "uses the bundle identifier and hashes the value if available" do
+      it "has no p_hash event when no project defined" do
+        expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+          expect(analytics.size).to eq(1)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched' }.size).to eq(1)
+        end
+
+        FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
+      end
+
+      it "identifies CI correctly" do
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+
+        expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+          expect(analytics.size).to eq(1)
+          expect(analytics.find_all { |a| a[:primary_target][:detail] == 'true' && a[:action][:name] == 'launched' }.size).to eq(1)
+        end
+
+        FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
+      end
+
+      it "contains p_hash event and uses the bundle identifier and hashes the value if available" do
         ENV["PILOT_APP_IDENTIFIER"] = "com.krausefx.app"
-        expect(FastlaneCore::UpdateChecker.generate_fetch_url("fastlane")).to eq("https://refresher.fastlane.tools/fastlane?p_hash=50925b8f18defc356dad507b1729bc185f9582513537346424b0be09b1f12b2f&platform=ios")
+        p_hashed_id = hash_of(ENV["PILOT_APP_IDENTIFIER"])
+
+        expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+          expect(analytics.size).to eq(2)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'launched' }.size).to eq(1)
+          expect(analytics.find_all { |a| a[:actor][:name] == 'project' && a[:action][:name] == 'update_checked' && a[:actor][:detail] == p_hashed_id }.size).to eq(1)
+        end
+
+        FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
 
       describe "#platform" do
         it "ios" do
           FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
-            expect(FastlaneCore::UpdateChecker.generate_fetch_url("sigh")).to eq("https://refresher.fastlane.tools/sigh?p_hash=52629c9a0eebe49c58db83c94c090bd790a101ff2a70ab9514f6a6427644375a&platform=ios")
+            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+              expect(analytics.size).to eq(2)
+              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
+            end
+
+            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
           end
         end
 
         it "android" do
           FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
-            expect(FastlaneCore::UpdateChecker.generate_fetch_url("supply")).to eq("https://refresher.fastlane.tools/supply?p_hash=6a8b842e4a75d2a2bc4bdf584406a68eab8cabcc7b7a396c283b390fff30b59b&platform=android")
+            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+              expect(analytics.size).to eq(2)
+              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
+            end
+
+            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
           end
         end
+      end
+    end
+
+    describe "#send_completion_events_for" do
+      before do
+        ENV.delete("FASTLANE_OPT_OUT_USAGE")
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+      end
+
+      it "sends no events when opted out" do
+        with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
+          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
+        end
+      end
+
+      it "contains duration event and a install method event" do
+        allow(FastlaneCore::UpdateChecker).to receive(:start_time).and_return(Time.now)
+        allow(FastlaneCore::Helper).to receive(:rubygems?).and_return(true)
+        expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
+          expect(analytics.size).to eq(2)
+          expect(analytics.find_all { |a| a[:actor][:detail] == 'fastlane' && a[:action][:name] == 'completed_with_duration' && a[:primary_target][:detail] }.size).to eq(1)
+          expect(analytics.find_all { |a| a[:action][:name] == 'completed_with_install_method' && a[:primary_target][:detail] == 'gem' && a[:secondary_target][:detail] == 'false' }.size).to eq(1)
+        end
+
+        FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
       end
     end
   end

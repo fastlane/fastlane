@@ -77,11 +77,12 @@ module Screengrab
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
       devices.reject! do |device|
         [
-          'server is out of date',   # The adb server is out of date and must be restarted
-          'unauthorized',            # The device has not yet accepted ADB control
-          'offline',                 # The device is offline, skip it
-          '* daemon',                # Messages printed when the daemon is starting up
-          'List of devices attached' # Header of table for data we want
+          'server is out of date',    # The adb server is out of date and must be restarted
+          'unauthorized',             # The device has not yet accepted ADB control
+          'offline',                  # The device is offline, skip it
+          '* daemon',                 # Messages printed when the daemon is starting up
+          'List of devices attached', # Header of table for data we want
+          "doesn't match this client" # Message printed when there is an ADB client/server version mismatch
         ].any? { |status| device.include? status }
       end
 
@@ -249,10 +250,12 @@ module Screengrab
                                     print_all: true,
                                     print_command: true)
 
-      if @config[:exit_on_test_failure]
-        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
-      else
-        UI.error("Tests failed") if test_output.include?("FAILURES!!!")
+      if test_output.include?("FAILURES!!!")
+        if @config[:exit_on_test_failure]
+          UI.test_failure!("Tests failed for locale #{locale} on device #{device_serial}")
+        else
+          UI.error("Tests failed")
+        end
       end
     end
 

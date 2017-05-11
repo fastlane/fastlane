@@ -21,7 +21,7 @@ module Deliver
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
 
-    # This method takes care of creating a new 'deliver' folder, containg the app metadata
+    # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
@@ -62,6 +62,17 @@ module Deliver
         end
         content << "\n"
         resulting_path = File.join(path, "#{key}.txt")
+        File.write(resulting_path, content)
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Trade Representative Contact Information
+      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
+        content = v.send(key).to_s
+        content << "\n"
+        base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
+        FileUtils.mkdir_p(base_dir)
+        resulting_path = File.join(base_dir, "#{option_name}.txt")
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end

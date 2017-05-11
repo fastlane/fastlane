@@ -40,7 +40,7 @@ module Supply
     # Initializes the android_publisher and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     # @param path_to_key: The path to your p12 file (@deprecated)
-    # @param issuer: Email addresss for oauth (@deprecated)
+    # @param issuer: Email address for oauth (@deprecated)
     def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
       scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
@@ -74,6 +74,11 @@ module Supply
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
       self.android_publisher.authorization = auth_client
+      if Supply.config[:root_url]
+        # Google's client expects the root_url string to end with "/".
+        Supply.config[:root_url] << '/' unless Supply.config[:root_url].end_with?('/')
+        self.android_publisher.root_url = Supply.config[:root_url]
+      end
     end
 
     #####################################################

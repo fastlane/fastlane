@@ -306,7 +306,7 @@ module FastlaneCore
     # @param dir [String] the path in which the package file should be stored
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transfering
+    #   when transferring
     def download(app_id, dir = nil)
       dir ||= "/tmp"
 
@@ -340,7 +340,7 @@ module FastlaneCore
     # @param dir [String] the path in which the package file is located
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transfering
+    #   when transferring
     def upload(app_id, dir)
       actual_dir = File.join(dir, "#{app_id}.itmsp")
 
@@ -376,7 +376,10 @@ module FastlaneCore
     def load_password_for_transporter
       # 3 different sources for the password
       #   1) ENV variable for application specific password
-      return ENV[TWO_FACTOR_ENV_VARIABLE] if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
+      if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
+        UI.message("Fetching password for transporter from environment variable named `#{TWO_FACTOR_ENV_VARIABLE}`")
+        return ENV[TWO_FACTOR_ENV_VARIABLE]
+      end
       #   2) TWO_STEP_HOST_PREFIX from keychain
       account_manager = CredentialsManager::AccountManager.new(user: @user,
                                                              prefix: TWO_STEP_HOST_PREFIX,

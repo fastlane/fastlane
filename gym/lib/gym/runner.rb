@@ -16,6 +16,8 @@ module Gym
 
       if Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
+        return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
+
         package_app
         fix_package
         compress_and_move_dsym
@@ -59,7 +61,7 @@ module Gym
       puts Terminal::Table.new(
         title: title.green,
         headings: ["Option", "Value"],
-        rows: rows.delete_if { |c| c.to_s.empty? }
+        rows: FastlaneCore::PrintTable.transform_output(rows.delete_if { |c| c.to_s.empty? })
       )
     end
 

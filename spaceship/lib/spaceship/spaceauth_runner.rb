@@ -22,7 +22,7 @@ module Spaceship
         puts "This could be an issue with iTunes Connect,".yellow
         puts "Please try unsetting the FASTLANE_SESSION environment variable".yellow
         puts "and re-run `fastlane spaceauth`".yellow
-        UI.crash!("Problem connecting to iTunes Connect")
+        raise "Problem connecting to iTunes Connect"
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie

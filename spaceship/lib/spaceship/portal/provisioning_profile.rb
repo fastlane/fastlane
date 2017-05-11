@@ -200,7 +200,7 @@ module Spaceship
 
         # Create a new provisioning profile
         # @param name (String): The name of the provisioning profile on the Dev Portal
-        # @param bundle_id (String): The app identifier, this paramter is required
+        # @param bundle_id (String): The app identifier, this parameter is required
         # @param certificate (Certificate): The certificate that should be used with this
         #   provisioning profile. You can also pass an array of certificates to this method. This will
         #   only work for development profiles

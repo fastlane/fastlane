@@ -83,9 +83,9 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 2.  To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
-- Then, before running `screengrab` you'll need a debug and test apk
+- Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
-- Once complete run `screengrab` in your app project directory to generate screenshots
+- Once complete run `fastlane screengrab` in your app project directory to generate screenshots
     - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
 - Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran `screengrab`
 
@@ -132,7 +132,7 @@ fastlane screengrab --help
 
 # Tips
 
-# UI Tests
+## UI Tests
 
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
@@ -168,6 +168,10 @@ When using JUnit 3 you'll need to add a bit more code:
 - Use `Screengrab.screenshot("name_of_screenshot_here");` to capture screenshots at the appropriate points in your tests
 
 If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup.
+
+## Clean Status Bar
+
+You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 

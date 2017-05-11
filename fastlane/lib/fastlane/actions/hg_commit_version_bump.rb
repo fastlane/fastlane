@@ -84,7 +84,7 @@ module Fastlane
         changed_files_as_expected = dirty_set.subset? expected_set
         unless changed_files_as_expected
           unless params[:force]
-            str = ["Found unexpected uncommited changes in the working directory. Expected these files to have changed:",
+            str = ["Found unexpected uncommitted changes in the working directory. Expected these files to have changed:",
                    "#{expected_changed_files.join("\n")}.",
                    "But found these actual changes: \n#{hg_dirty_files.join("\n")}.",
                    "Make sure you have cleaned up the build artifacts and are only left with the changed version files at this",

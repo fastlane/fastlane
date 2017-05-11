@@ -16,6 +16,10 @@ module Gym
         is_pre = v.split('.')[0].to_i < 7
         is_pre
       end
+
+      def legacy_api_deprecated?
+        FastlaneCore::Helper.xcode_at_least?('8.3')
+      end
     end
   end
 end

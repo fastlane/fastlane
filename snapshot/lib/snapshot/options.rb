@@ -80,6 +80,11 @@ module Snapshot
                                      description: "Don't open the HTML summary after running _snapshot_",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :skip_helper_version_check,
+                                     env_name: 'SNAPSHOT_SKIP_SKIP_HELPER_VERSION_CHECK',
+                                     description: "Do not check for most recent SnapshotHelper code",
+                                     default_value: false,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :clear_previous_screenshots,
                                      env_name: 'SNAPSHOT_CLEAR_PREVIOUS_SCREENSHOTS',
                                      description: "Enabling this option will automatically clear previously generated screenshots before running snapshot",
@@ -171,7 +176,12 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :test_target_name,
                                      env_name: "SNAPSHOT_TEST_TARGET_NAME",
                                      description: "The name of the target you want to test (if you desire to override the Target Application from Xcode)",
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :namespace_log_files,
+                                     env_name: "SNAPSHOT_NAMESPACE_LOG_FILES",
+                                     description: "Separate the log files per device and per language",
+                                     optional: true,
+                                     is_string: false)
       ]
     end
   end

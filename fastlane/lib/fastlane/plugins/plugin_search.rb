@@ -24,11 +24,10 @@ module Fastlane
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: (search_query ? "fastlane plugins '#{search_query}'" : "Available fastlane plugins").green,
         headings: ["Name", "Description", "Downloads"]
       }
-      params[:rows] = rows
 
       puts ""
       puts Terminal::Table.new(params)
