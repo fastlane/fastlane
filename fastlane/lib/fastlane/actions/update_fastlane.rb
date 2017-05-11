@@ -58,7 +58,7 @@ module Fastlane
         update_needed.each do |tool_info|
           tool = tool_info[0]
           gem_version = tool_info[1]
-          local_version = Gem::Version.new(highest_versions[tool].version)          
+          local_version = Gem::Version.new(highest_versions[tool].version)
           latest_official_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
 
           if options[:nightly]
@@ -140,7 +140,7 @@ module Fastlane
                                        env_name: "FL_TOOLS_TO_UPDATE",
                                        description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh)",
                                        deprecated: true,
-                                       optional: true),
+                                       optional: true)
         ]
       end
 
