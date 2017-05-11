@@ -68,7 +68,8 @@ module Fastlane
           end
 
           # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
-          updater.update_gem(tool, Gem::Requirement.new(gem_version))
+          requirement_version = options[:nightly] ? gem_version : local_version.approximate_recommendation
+          updater.update_gem(tool, Gem::Requirement.new(requirement_version))
 
           UI.success("Finished updating #{tool}")
         end
