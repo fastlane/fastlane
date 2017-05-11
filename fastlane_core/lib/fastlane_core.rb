@@ -33,7 +33,7 @@ require 'fastlane_core/swag'
 require 'fastlane_core/build_watcher'
 require 'fastlane_core/crash_reporter/crash_reporter'
 require 'fastlane_core/crash_reporter/crash_report_generator'
-require 'fastlane_core/crash_reporter/backtrace_sanitizer'
+require 'fastlane_core/crash_reporter/crash_report_sanitizer'
 
 # Third Party code
 require 'colored'
