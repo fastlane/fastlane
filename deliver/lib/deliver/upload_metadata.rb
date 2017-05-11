@@ -250,7 +250,7 @@ module Deliver
       UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-        v.send("#{key}=", info[option_name].chomp) if info[option_name].chomp
+        v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
     end
 
