@@ -58,9 +58,8 @@ module Fastlane
         update_needed.each do |tool_info|
           tool = tool_info[0]
           gem_version = tool_info[1]
-          local_version = Gem::Version.new(highest_versions[tool].version)
-          update_url = FastlaneCore::UpdateChecker.generate_fetch_url(tool)
-          latest_official_version = FastlaneCore::UpdateChecker.fetch_latest(update_url)
+          local_version = Gem::Version.new(highest_versions[tool].version)          
+          latest_official_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
 
           if options[:nightly]
             UI.message("Updating #{tool} from #{local_version.to_s.yellow} to nightly build #{gem_version.to_s.yellow}... (last official release #{latest_official_version.to_s.yellow}) 🚀")
