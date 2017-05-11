@@ -54,9 +54,7 @@ describe FastlaneCore::CrashReporter do
       end
 
       it 'writes a file with the json payload' do
-        file = double('File')
-        expect(File).to receive(:open).with("#{FastlaneCore.fastlane_user_dir}/last_crash.json", 'w').and_yield(file)
-        expect(file).to receive(:write).with(stub_body.to_json)
+        expect(File).to receive(:write).with(FastlaneCore::CrashReporter.crash_report_path, stub_body.to_json)
 
         FastlaneCore::CrashReporter.report_crash(exception: exception)
       end
@@ -73,9 +71,7 @@ def supress_opt_out_crash_reporting_file_writing
 end
 
 def supress_crash_report_file_writing
-  file = double('File')
-  allow(File).to receive(:open).and_yield(file)
-  allow(file).to receive(:write)
+  allow(File).to receive(:write).with(FastlaneCore::CrashReporter.crash_report_path, stub_body.to_json)
 end
 
 def supress_stackdriver_reporting

@@ -5,7 +5,7 @@ module FastlaneCore
   class CrashReporter
     class << self
       def crash_report_path
-        "#{FastlaneCore.fastlane_user_dir}/last_crash.json"
+        File.join(FastlaneCore.fastlane_user_dir, 'latest_crash.json')
       end
 
       def enabled?
@@ -43,9 +43,7 @@ module FastlaneCore
       end
 
       def save_file(payload: "{}")
-        File.open(crash_report_path, 'w') do |f|
-          f.write(payload)
-        end
+        File.write(crash_report_path, payload)
       end
 
       def send_report(payload: "{}")
