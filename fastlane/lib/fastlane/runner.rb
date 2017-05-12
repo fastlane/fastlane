@@ -252,11 +252,13 @@ module Fastlane
             class_ref.run(arguments)
           end
         end
+      rescue \
+        FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
+        FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(type: :user_error, exception: e, action: method_sym)
         collector.did_raise_error(method_sym)
-        raise e
-      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else

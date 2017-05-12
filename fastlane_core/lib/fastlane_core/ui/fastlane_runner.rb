@@ -70,6 +70,10 @@ module Commander
           FastlaneCore::CrashReporter.report_crash(type: :option_parser, exception: e, action: @program[:name])
           abort e.to_s
         end
+      rescue \
+        FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
+        FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+        display_user_error!(e, e.to_s)
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
@@ -83,8 +87,6 @@ module Commander
         puts ""
         FastlaneCore::CrashReporter.report_crash(type: :system, exception: e, action: @program[:name])
         raise e
-      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
-        display_user_error!(e, e.to_s)
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
