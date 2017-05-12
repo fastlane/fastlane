@@ -1,3 +1,5 @@
+require 'babosa'
+require 'cgi'
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
@@ -7,7 +9,6 @@ require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
-require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
