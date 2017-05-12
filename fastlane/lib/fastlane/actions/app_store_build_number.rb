@@ -39,7 +39,7 @@ module Fastlane
 
           begin
             train = app.build_trains[version_number]
-            build_nr = train.builds.map(&:build_version).map(&:to_i).sort.last
+            build_nr = train.builds.map(&:build_version).map { |s| Gem::Version.new(s) }.sort.last.to_s
           rescue
             UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
