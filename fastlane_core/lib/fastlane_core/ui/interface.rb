@@ -126,6 +126,10 @@ module FastlaneCore
       end
     end
 
+    # raised from build_failure!
+    class FastlaneBuildFailure < FastlaneError
+    end
+
     # raised from test_failure!
     class FastlaneTestFailure < StandardError
     end
@@ -148,6 +152,16 @@ module FastlaneCore
     # and want to show a nice error message to the user
     def user_error!(error_message, options = {})
       raise FastlaneError.new(options), error_message.to_s
+    end
+
+    # Use this method to exit the program because of a build failure
+    # that's caused by the source code of the user. Example for this
+    # is that gym will fail when the code doesn't compile or because
+    # settings for the project are incorrect.
+    # By using this method we'll have more accurate results about
+    # fastlane failures
+    def build_failure!(error_message, options = {})
+      raise FastlaneBuildFailure.new(options), error_message.to_s
     end
 
     # Use this method to exit the program because of a test failure
