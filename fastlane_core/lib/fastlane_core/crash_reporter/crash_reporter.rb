@@ -67,7 +67,11 @@ module FastlaneCore
       end
 
       def save_file(payload: "{}")
-        File.write(crash_report_path, payload)
+        begin
+          File.write(crash_report_path, payload)
+        rescue
+          UI.message("Fastlane failed to write the crash report to #{crash_report_path}.")
+        end
       end
 
       def send_report(payload: "{}")
