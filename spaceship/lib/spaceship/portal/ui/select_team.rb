@@ -31,6 +31,21 @@ module Spaceship
       #     {...}
       #   ]
 
+      def self.ci?
+        # Check for Jenkins, Travis CI, ... environment variables
+        ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+          return true if ENV.key?(current)
+        end
+        return false
+      end
+
+      def self.interactive?
+        interactive = true
+        interactive = false if $stdout.isatty == false
+        interactive = false if ci?
+        return interactive
+      end
+
       def select_team
         teams = client.teams
 
@@ -63,6 +78,16 @@ module Spaceship
         end
 
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
+
+        unless self.class.interactive?
+          puts "Multiple teams found on the Developer Portal, Your Terminal is running in non-interactive mode! Cannot continue from here."
+          puts "Please check that you set FASTLANE_TEAM_ID or FASTLANE_TEAM_NAME to the right value."
+          puts "Available Teams:"
+          teams.each_with_index do |team, i|
+            puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
+          end
+          raise "multiple_teams_no_interactive_shell"
+        end
 
         # User Selection
         loop do
