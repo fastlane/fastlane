@@ -30,9 +30,16 @@ describe Spaceship::Tunes::Tester do
       expect(t.devices).to eq([{ "model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil }])
     end
 
+    it "Tester without tester id" do
+      t = Spaceship::Tunes::Tester::External.find("nil@krausefx.com")
+      expect(t.tester_id).to eq(nil)
+      expect(t.first_name).to eq("Detlef")
+      expect(t.last_name).to eq("Müller")
+    end
+
     it "External Testers" do
       testers = Spaceship::Tunes::Tester::External.all
-      expect(testers.count).to eq(2)
+      expect(testers.count).to eq(3)
       t = testers[0]
       expect(t.class).to eq(Spaceship::Tunes::Tester::External)
 
