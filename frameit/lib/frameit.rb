@@ -11,6 +11,9 @@ require 'frameit/strings_parser'
 require 'frameit/mac_editor'
 require 'frameit/dependency_checker'
 require 'frameit/options'
+# arabic resharper
+require 'bidi'
+require 'frameit/resharper'
 
 require 'fastlane_core'
 

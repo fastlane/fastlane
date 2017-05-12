@@ -536,7 +536,7 @@ function resign {
         log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
         PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
     fi
-
+    
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ];
