@@ -89,6 +89,7 @@ module Supply
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      optional: true,
                                      verify_block: proc do |value|
+                                       true if ENV["SUPPLY_TRACK_PROMOTE_TO"]
                                        UI.user_error! "Could not find apk file at path '#{value}'" unless File.exist?(value)
                                        UI.user_error! "apk file is not an apk" unless value.end_with?('.apk')
                                      end),
