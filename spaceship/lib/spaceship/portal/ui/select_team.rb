@@ -32,18 +32,17 @@ module Spaceship
       #   ]
 
       def self.ci?
-        # Check for Jenkins, Travis CI, ... environment variables
-        ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
-          return true if ENV.key?(current)
+        if Object.const_defined?("FastlaneCore")
+          return FastlaneCore::Helper.ci?
         end
         return false
       end
 
       def self.interactive?
-        interactive = true
-        interactive = false if $stdout.isatty == false
-        interactive = false if ci?
-        return interactive
+        if Object.const_defined?("FastlaneCore")
+          return FastlaneCore::Helper.interactive?
+        end
+        return true
       end
 
       def select_team
