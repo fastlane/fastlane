@@ -32,14 +32,14 @@ module Spaceship
       #   ]
 
       def self.ci?
-        if Object.const_defined?("FastlaneCore")
+        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.ci?
         end
         return false
       end
 
       def self.interactive?
-        if Object.const_defined?("FastlaneCore")
+        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.interactive?
         end
         return true
@@ -85,7 +85,7 @@ module Spaceship
           teams.each_with_index do |team, i|
             puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
           end
-          raise "multiple_teams_no_interactive_shell"
+          raise "Multiple Teams found; unable to choose, terminal not ineractive!"
         end
 
         # User Selection
