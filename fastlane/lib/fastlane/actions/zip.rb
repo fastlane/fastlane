@@ -9,7 +9,9 @@ module Fastlane
         absolute_output_path = File.expand_path(params[:output_path])
 
         # Appends ".zip" if path does not end in ".zip"
-        absolute_output_path = absolute_output_path.gsub(/(?<!.zip)$/, ".zip")
+        unless absolute_output_path.end_with?(".zip")
+          absolute_output_path += ".zip"
+        end
 
         absolute_output_dir = File.expand_path("..", absolute_output_path)
         FileUtils.mkdir_p(absolute_output_dir)
