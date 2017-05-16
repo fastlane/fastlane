@@ -2,7 +2,7 @@ skip_docs
 
 desc "Runs the unit tests and other verifications for the fastlane repo"
 lane :test do |options|
-  snapshot(project: '.')
+  validate_repo
 end
 
 desc "Increment the version number of this gem"
