@@ -5,23 +5,18 @@ module FastlaneCore
         {
           user_error: '[USER_ERROR]',
           crash: '[FASTLANE_CRASH]',
-          exception: '[EXCEPTION]',
-          connection_failure: '[CONNECTION_FAILURE]',
-          system: '[SYSTEM_ERROR]',
-          option_parser: '[OPTION_PARSER]',
-          invalid_command: '[INVALID_COMMAND]',
-          unknown: '[UNKNOWN]'
+          exception: '[EXCEPTION]'
         }
       end
 
-      def generate(type: :unknown, exception: nil, action: nil)
+      def generate(type: :exception, exception: nil, action: nil)
         message = crash_report_message(type: type, exception: exception)
         crash_report_payload(message: message, action: action)
       end
 
       private
 
-      def crash_report_message(type: :unknown, exception: nil)
+      def crash_report_message(type: :exception, exception: nil)
         return if exception.nil?
         backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(type: type, backtrace: exception.backtrace).join("\n")
         message = types[type]
