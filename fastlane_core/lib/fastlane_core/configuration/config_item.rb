@@ -102,14 +102,12 @@ module FastlaneCore
       @allow_shell_conversion = (type == :shell_string)
     end
 
-    # This will raise an exception if the value is not valid
     def verify!(value)
-      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid?(value)
-      true
+      valid?(value)
     end
 
     # Make sure, the value is valid (based on the verify block)
-    # Returns false if that's not the case
+    # Raises an exception if the value is invalid
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value
