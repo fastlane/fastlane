@@ -1,7 +1,7 @@
 module FastlaneCore
   class CrashReportSanitizer
     class << self
-      def sanitize_backtrace(backtrace: nil, type: :unknown)
+      def sanitize_backtrace(backtrace: nil, type: :exception)
         if type == :user_error || type == :crash
           # If the crash is from `UI` we only want to include the stack trace
           # up to the point where the crash was initiated.

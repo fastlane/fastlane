@@ -54,7 +54,7 @@ describe FastlaneCore::CrashReportGenerator do
   end
 end
 
-def setup_sanitizer_expectation(type: :unknown)
+def setup_sanitizer_expectation(type: :exception)
   expect(FastlaneCore::CrashReportSanitizer).to receive(:sanitize_backtrace).with(
     type: type,
     backtrace: exception.backtrace
@@ -68,6 +68,6 @@ def setup_sanitizer_expectation(type: :unknown)
   end
 end
 
-def setup_expected_body(type: :unknown, message_text: "")
+def setup_expected_body(type: :exception, message_text: "")
   expected_body['message'] = "#{FastlaneCore::CrashReportGenerator.types[type]}#{message_text}#{exception.backtrace.join("\n")}"
 end

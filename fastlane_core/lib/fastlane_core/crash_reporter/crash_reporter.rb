@@ -16,7 +16,7 @@ module FastlaneCore
         !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
       end
 
-      def report_crash(type: :unknown, exception: nil, action: nil)
+      def report_crash(exception: nil, action: nil)
         return unless enabled?
         return if @did_report_crash
 
@@ -25,7 +25,7 @@ module FastlaneCore
         # we want to test it
         return if Helper.test? && !@explitly_enabled_for_testing
 
-        payload = CrashReportGenerator.generate(type: type, exception: exception, action: action)
+        payload = CrashReportGenerator.generate(type: type(exception), exception: exception, action: action)
         send_report(payload: payload)
         save_file(payload: payload)
         show_message unless did_show_message?
@@ -45,6 +45,18 @@ module FastlaneCore
       end
 
       private
+
+      def type(exception)
+        return :exception if exception.nil? || exception.backtrace.nil? || exception.backtrace[0].nil?
+        first_frame = exception.backtrace[0]
+        if first_frame.include?('user_error!') && first_frame.include?('interface.rb')
+          :user_error
+        elsif first_frame.include?('crash!') && first_frame.include?('interface.rb')
+          :crash
+        else
+          :exception
+        end
+      end
 
       def show_message
         UI.message("Sending crash report...")
