@@ -103,7 +103,7 @@ module FastlaneCore
     end
 
     def verify!(value)
-      true if valid?(value)
+      valid?(value)
     end
 
     # Make sure, the value is valid (based on the verify block)
