@@ -37,5 +37,9 @@ module Spaceship::TestFlight
     def remove_from_app!(app_id: nil)
       client.delete_tester_from_app(app_id: app_id, tester_id: self.tester_id)
     end
+
+    def resend_invite(app_id: nil)
+      client.resend_invite_to_external_tester(app_id: app_id, tester_id: self.tester_id)
+    end
   end
 end
