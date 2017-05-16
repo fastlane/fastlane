@@ -9,7 +9,8 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        app = Spaceship::Application.find(params[:app_identifier])
+        app = Spaceship::Application.find(params[:app_identifier]) || Spaceship::Application.find(params[:app_identifier], mac: true)
+        UI.user_error!("Couldn't find app with identifier #{params[:app_identifier]}") if app.nil?
 
         version_number = params[:version]
         unless version_number
@@ -62,7 +63,7 @@ module Fastlane
         UI.message("Uploading changes to iTunes Connect...")
         v.save!
 
-        UI.success("👼 Successfully pushed the new changelog to #{v.url}")
+        UI.success("👼  Successfully pushed the new changelog to #{v.url}")
       end
 
       def self.default_changelog_path
