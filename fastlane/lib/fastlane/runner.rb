@@ -257,7 +257,8 @@ module Fastlane
         FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        FastlaneCore::CrashReporter.report_crash(type: :user_error, exception: e, action: method_sym)
+        type = e.backtrace[0].include?('user_error!') ? :user_error : :exception
+        FastlaneCore::CrashReporter.report_crash(type: type, exception: e, action: method_sym)
         collector.did_raise_error(method_sym)
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException

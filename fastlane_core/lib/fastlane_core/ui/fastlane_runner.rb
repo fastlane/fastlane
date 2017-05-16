@@ -77,7 +77,8 @@ module Commander
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
-        FastlaneCore::CrashReporter.report_crash(type: :user_error, exception: e, action: @program[:name])
+        type = e.backtrace[0].include?('user_error!') ? :user_error : :crash
+        FastlaneCore::CrashReporter.report_crash(type: type, exception: e, action: @program[:name])
         display_user_error!(e, e.message)
       rescue Errno::ENOENT => e
         # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
