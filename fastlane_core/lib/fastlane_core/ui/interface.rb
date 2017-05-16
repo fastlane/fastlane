@@ -111,18 +111,38 @@ module FastlaneCore
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
+    class FastlaneException < StandardError
+        def clean_backtrace(string: nil)
+            return nil if backtrace.nil?
+            return backtrace if backtrace[0].nil?
+            first_frame = backtrace[0]
+            if first_frame.include?(string) || first_frame.include?('interface.rb')
+              backtrace.drop(2)
+            else
+              backtrace
+            end
+        end
+    end
+
     # raised from crash!
-    class FastlaneCrash < StandardError
+    class FastlaneCrash < FastlaneException
+        def cleaned_backtrace
+            clean_backtrace(string: 'crash!')
+        end
     end
 
     # raised from user_error!
-    class FastlaneError < StandardError
+    class FastlaneError < FastlaneException
       attr_reader :show_github_issues
       attr_reader :error_info
 
       def initialize(show_github_issues: false, error_info: nil)
         @show_github_issues = show_github_issues
         @error_info = error_info
+      end
+
+      def cleaned_backtrace
+        clean_backtrace(string: 'crash!')
       end
     end
 

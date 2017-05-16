@@ -2,17 +2,7 @@ module FastlaneCore
   class CrashReportSanitizer
     class << self
       def sanitize_backtrace(backtrace: nil, type: :exception)
-        if type == :user_error || type == :crash
-          # If the crash is from `UI` we only want to include the stack trace
-          # up to the point where the crash was initiated.
-          # The two stack frames we are dropping are `method_missing` and
-          # the call to `crash!` or `user_error!`.
-          stack = backtrace.drop(2)
-        else
-          stack = backtrace
-        end
-
-        stack.map do |frame|
+        backtrace.map do |frame|
           sanitize_string(string: frame)
         end
       end
