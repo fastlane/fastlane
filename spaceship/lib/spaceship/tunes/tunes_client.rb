@@ -514,9 +514,11 @@ module Spaceship
     # }, {
     # ...
     def pricing_tiers
-      r = request(:get, 'ra/apps/pricing/matrix')
-      data = parse_response(r, 'data')['pricingTiers']
-      data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
+      @pricing_tiers ||= begin
+        r = request(:get, 'ra/apps/pricing/matrix')
+        data = parse_response(r, 'data')['pricingTiers']
+        data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
+      end
     end
 
     #####################################################
@@ -1011,16 +1013,29 @@ module Spaceship
       handle_itc_response(r)
     end
 
-    # loads the full In-App-Purchases
+    # Loads the full In-App-Purchases
     def load_iap(app_id: nil, purchase_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
     end
 
-    # loads the full In-App-Purchases-Family
+    # Loads the full In-App-Purchases-Family
     def load_iap_family(app_id: nil, family_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")
       parse_response(r, 'data')
+    end
+
+    # Loads the full In-App-Purchases-Pricing-Matrix
+    #   note: the matrix is the same for any app_id
+    #
+    # @param params (Hash)
+    # @option params (String) :app_id
+    def subscription_pricing_tiers(app_id:)
+      @subscription_pricing_tiers ||= begin
+        r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix/recurring")
+        data = parse_response(r, "data")["pricingTiers"]
+        data.map { |tier| Spaceship::Tunes::IAPSubscriptionPricingTier.factory(tier) }
+      end
     end
 
     # updates an In-App-Purchases-Family
