@@ -77,7 +77,7 @@ module Commander
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
-        type = e.backtrace[0].include?('user_error!') ? :user_error : :crash
+        type = e.backtrace[0].include?('user_error!') ? :user_error : :exception
         FastlaneCore::CrashReporter.report_crash(type: type, exception: e, action: @program[:name])
         display_user_error!(e, e.message)
       rescue Errno::ENOENT => e
