@@ -71,8 +71,7 @@ describe Spaceship::TestFlight::Tester do
   end
 
   context 'invites' do
-
-    let(:tester) { Spaceship::TestFlight::Tester.new('id' => 'tester-id')}
+    let(:tester) { Spaceship::TestFlight::Tester.new('id' => 'tester-id') }
 
     context '.resend_invite' do
       it 'suceeds' do
