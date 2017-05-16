@@ -87,7 +87,7 @@ describe Deliver do
         it 'generates trade representative contact information' do
           setup.generate_metadata_files(version, tempdir)
           base_dir = File.join(tempdir, 'trade_representative_contact_information')
-          %w(trade_name first_name last_name adderss_line1 adderss_line2 adderss_line3 city_name state country postal_code phone_number email_address is_displayed_on_app_store).each do |filename|
+          %w(trade_name first_name last_name address_line1 city_name state country postal_code phone_number email_address is_displayed_on_app_store).each do |filename|
             expect(File.exist?(File.join(base_dir, "#{filename}.txt"))).to be_truthy
           end
         end
