@@ -45,6 +45,12 @@ describe FastlaneCore::CrashReportGenerator do
       expect(FastlaneCore::CrashReportGenerator.generate(exception: exception)).to eq(expected_body.to_json)
     end
 
+    it 'includes exception class name for exceptions' do
+      setup_sanitizer_expectation(type: :exception)
+      setup_expected_body(type: :exception, message_text: ": #{exception.class.name}: #{exception.message}\n")
+      expect(FastlaneCore::CrashReportGenerator.generate(type: :exception, exception: exception)).to eq(expected_body.to_json)
+    end
+
     it 'includes stack frames in message' do
       setup_sanitizer_expectation
       setup_expected_body(message_text: ": #{exception.message}\n")

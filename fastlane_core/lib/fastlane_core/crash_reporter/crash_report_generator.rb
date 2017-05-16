@@ -28,6 +28,8 @@ module FastlaneCore
         sanitized_exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)
         if type == :user_error
           message += ': '
+        elsif type == :exception
+          message += ": #{exception.class.name}: #{sanitized_exception_message}"
         else
           message += ": #{sanitized_exception_message}"
         end
