@@ -34,6 +34,10 @@ require 'fastlane_core/build_watcher'
 require 'fastlane_core/crash_reporter/crash_reporter'
 require 'fastlane_core/crash_reporter/crash_report_generator'
 require 'fastlane_core/crash_reporter/crash_report_sanitizer'
+require 'fastlane_core/ui/errors/fastlane_exception'
+require 'fastlane_core/ui/errors/fastlane_error'
+require 'fastlane_core/ui/errors/fastlane_crash'
+require 'fastlane_core/ui/errors/fastlane_shell_error'
 
 # Third Party code
 require 'colored'
