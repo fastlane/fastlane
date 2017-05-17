@@ -11,7 +11,7 @@ describe FastlaneCore::CrashReporter do
       FastlaneCore::CrashReporter.disable_for_testing
     end
 
-    let(:exception) { double('Exception') }
+    let(:exception) { double('Exception', backtrace: []) }
 
     let(:stub_body) do
       {
@@ -26,27 +26,9 @@ describe FastlaneCore::CrashReporter do
         supress_opt_out_crash_reporting_file_writing
       end
 
-      it 'posts a report to Stackdriver without specified type' do
-        stub_stackdriver_request
-        setup_crash_report_generator_expectation
-        FastlaneCore::CrashReporter.report_crash(exception: exception)
-      end
-
-      it 'posts a report to Stackdriver with specified type' do
-        stub_stackdriver_request
-        setup_crash_report_generator_expectation(type: :crash)
-        FastlaneCore::CrashReporter.report_crash(type: :crash, exception: exception)
-      end
-
-      it 'posts a report to Stackdriver with specified service' do
-        stub_stackdriver_request
-        setup_crash_report_generator_expectation(action: 'test_action')
-        FastlaneCore::CrashReporter.report_crash(action: 'test_action', exception: exception)
-      end
-
       it 'only posts one report' do
         stub_stackdriver_request
-        setup_crash_report_generator_expectation
+        setup_crash_report_generator_expectation(exception: exception)
         FastlaneCore::CrashReporter.report_crash(exception: exception)
 
         # The expectation we set up above is only for one invocation of the
@@ -72,7 +54,7 @@ describe FastlaneCore::CrashReporter do
       before do
         silence_ui_output
         supress_stackdriver_reporting
-        setup_crash_report_generator_expectation
+        setup_crash_report_generator_expectation(exception: exception)
         supress_opt_out_crash_reporting_file_writing
       end
 
@@ -101,9 +83,8 @@ def supress_stackdriver_reporting
   stub_stackdriver_request
 end
 
-def setup_crash_report_generator_expectation(type: :unknown, action: nil)
+def setup_crash_report_generator_expectation(action: nil, exception: nil)
   expect(FastlaneCore::CrashReportGenerator).to receive(:generate).with(
-    type: type,
     exception: exception,
     action: action
   ).and_return(stub_body.to_json)

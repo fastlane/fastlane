@@ -111,18 +111,74 @@ module FastlaneCore
     # @!group Errors: Different kinds of exceptions
     #####################################################
 
+    class FastlaneException < StandardError
+      def prefix
+        '[FASTLANE_EXCEPTION]'
+      end
+
+      def caused_by_calling_ui_method?(method_name: nil)
+        return false if backtrace.nil? || backtrace[0].nil? || method_name.nil?
+        first_frame = backtrace[0]
+        if first_frame.include?(method_name) && first_frame.include?('interface.rb')
+          true
+        else
+          false
+        end
+      end
+
+      def trim_backtrace(method_name: nil)
+        if caused_by_calling_ui_method?(method_name: method_name)
+          backtrace.drop(2)
+        else
+          backtrace
+        end
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?
+      end
+
+      def crash_report_message
+        return '' if could_contain_pii?
+        exception.message
+      end
+    end
+
     # raised from crash!
-    class FastlaneCrash < StandardError
+    class FastlaneCrash < FastlaneException
+      def prefix
+        '[FASTLANE_CRASH]'
+      end
+
+      def trimmed_backtrace
+        trim_backtrace(method_name: 'crash!')
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?(method_name: 'crash!')
+      end
     end
 
     # raised from user_error!
-    class FastlaneError < StandardError
+    class FastlaneError < FastlaneException
       attr_reader :show_github_issues
       attr_reader :error_info
 
       def initialize(show_github_issues: false, error_info: nil)
         @show_github_issues = show_github_issues
         @error_info = error_info
+      end
+
+      def prefix
+        '[USER_ERROR]'
+      end
+
+      def trimmed_backtrace
+        trim_backtrace(method_name: 'user_error!')
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?(method_name: 'user_error!')
       end
     end
 
