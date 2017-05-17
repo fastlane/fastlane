@@ -36,7 +36,7 @@ describe Spaceship::Tunes::IAPDetail do
           { tier: 1, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }
         end
 
-        before { expect(detailed).to receive(:pricing_intervals).and_return([interval]) }
+        before { expect(detailed).to receive(:pricing_intervals).at_least(:once).and_return([interval]) }
 
         it "returns all pricing infos of the specified tier" do
           expect(subject).to all(be_an(Spaceship::Tunes::PricingInfo))
@@ -58,7 +58,7 @@ describe Spaceship::Tunes::IAPDetail do
           ]
         end
 
-        before { allow(detailed).to receive(:pricing_intervals).and_return(intervals) }
+        before { allow(detailed).to receive(:pricing_intervals).at_least(:once).and_return(intervals) }
 
         it "returns pricing infos for each country" do
           expect(subject).to all(be_an(Spaceship::Tunes::IAPSubscriptionPricingInfo))

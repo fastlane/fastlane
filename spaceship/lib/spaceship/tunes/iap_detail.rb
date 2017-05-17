@@ -223,39 +223,35 @@ module Spaceship
       # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multple subscription pricing tiers
       #   if the iap uses territorial pricing
       def pricing_info
-        intervals = pricing_intervals
-        return world_wide_pricing(intervals) if world_wide_pricing?(intervals)
-        territorial_pricing(intervals)
+        return world_wide_pricing_info if world_wide_pricing?
+        territorial_pricing_info
       end
 
       private
 
       # Checks wheather an iap uses world wide or territorial pricing.
       #
-      # @param intervals ([Hash]) The array of pricing intervals defined for the iap
       # @return (true, false)
-      def world_wide_pricing?(intervals)
-        intervals.first[:country] == "WW"
+      def world_wide_pricing?
+        pricing_intervals.first[:country] == "WW"
       end
 
       # Maps a single pricing interval to pricing infos.
       #
-      # @param intervals ([Hash]) The array of pricing intervals defined for the iap
       # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same tier
-      def world_wide_pricing(intervals)
+      def world_wide_pricing_info
         client
           .pricing_tiers
-          .find { |p| p.tier_stem == intervals.first[:tier].to_s }
+          .find { |p| p.tier_stem == pricing_intervals.first[:tier].to_s }
           .pricing_info
       end
 
       # Maps pricing intervals to their respective subscription pricing infos.
       #
-      # @param intervals ([Hash]) The array of pricing intervals defined for the iap
       # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of subscription pricing infos
-      def territorial_pricing(intervals)
+      def territorial_pricing_info
         pricing_matrix = client.subscription_pricing_tiers(app_id: application.apple_id)
-        intervals.map do |interval|
+        pricing_intervals.map do |interval|
           pricing_matrix
             .find { |p| p.tier_stem == interval[:tier].to_s }
             .pricing_info
