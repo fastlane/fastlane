@@ -32,11 +32,10 @@ module FastlaneCore
         exception.message
       end
     end
-  end
+    class FastlaneBuildFailure < FastlaneException
+    end
 
-  class FastlaneBuildFailure < Interface::FastlaneException
-  end
-
-  class FastlaneTestFailure < Interface::FastlaneException
+    class FastlaneTestFailure < FastlaneException
+    end
   end
 end
