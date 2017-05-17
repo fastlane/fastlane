@@ -140,7 +140,7 @@ module FastlaneCore
 
       def crash_report_message
         return '' if could_contain_pii?
-        "#{exception.message[0..100]}\n"
+        exception.message
       end
     end
 
