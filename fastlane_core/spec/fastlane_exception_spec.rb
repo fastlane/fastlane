@@ -74,14 +74,14 @@ describe FastlaneCore::Interface::FastlaneException do
     it 'trims backtrace containing sh_helper.rb' do
       mock_backtrace = ["path/to/sh_helper.rb:55", "path/to/sh_helper.rb:10", "path/to/another/file.rb:1337"]
       exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
-      expect(exception).to receive(:backtrace).at_least(1).and_return(mock_backtrace)
+      expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
       expect(exception.trimmed_backtrace).to eq(mock_backtrace.drop(2))
     end
 
     it 'does not trim backtrace not containing sh_helper.rb' do
       mock_backtrace = ["path/to/file.rb:1337", "path/to/file.rb:2001"]
       exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
-      expect(exception).to receive(:backtrace).at_least(1).and_return(mock_backtrace)
+      expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
       expect(exception.trimmed_backtrace).to eq(mock_backtrace)
     end
   end
