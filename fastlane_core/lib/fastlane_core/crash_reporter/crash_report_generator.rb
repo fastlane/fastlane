@@ -16,11 +16,13 @@ module FastlaneCore
         message += ': '
 
         if exception.respond_to?(:crash_report_message)
-          message += FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.crash_report_message)
+          exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.crash_report_message)
         else
-          message += "#{exception.class.name}: #{FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)[0..100]}\n"
+          exception_message = "#{exception.class.name}: #{FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)}"
         end
 
+        message += exception_message[0..100]
+        message += "\n" unless exception.respond_to?(:could_contain_pii?) && exception.could_contain_pii?
         message + backtrace
       end
 
