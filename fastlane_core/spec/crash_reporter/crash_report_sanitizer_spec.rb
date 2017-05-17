@@ -27,28 +27,6 @@ describe FastlaneCore::CrashReportSanitizer do
     end
   end
 
-  context 'stack frame dropping' do
-    it 'drops the first two frames from crashes' do
-      expect(FastlaneCore::CrashReportSanitizer.sanitize_backtrace(
-               type: :crash,
-               backtrace: ['frame0', 'frame1', 'frame2']
-      )).to eq(['frame2'])
-    end
-
-    it 'drops the first two frames from user errors' do
-      expect(FastlaneCore::CrashReportSanitizer.sanitize_backtrace(
-               type: :user_error,
-               backtrace: ['frame0', 'frame1', 'frame2']
-      )).to eq(['frame2'])
-    end
-
-    it 'drops no frames from other errors' do
-      expect(FastlaneCore::CrashReportSanitizer.sanitize_backtrace(
-               backtrace: ['frame0', 'frame1', 'frame2']
-      )).to eq(['frame0', 'frame1', 'frame2'])
-    end
-  end
-
   context 'message sanitization' do
     let(:fastlane_spec) { double('Gem::Specification') }
 
