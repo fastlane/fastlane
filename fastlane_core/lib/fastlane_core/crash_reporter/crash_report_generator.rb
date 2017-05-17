@@ -2,13 +2,13 @@ module FastlaneCore
   class CrashReportGenerator
     class << self
       def generate(exception: nil, action: nil)
-        message = crash_report_message(exception: exception)
+        message = format_crash_report_message(exception: exception)
         crash_report_payload(message: message, action: action)
       end
 
       private
 
-      def crash_report_message(exception: nil)
+      def format_crash_report_message(exception: nil)
         return if exception.nil?
         stack = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
         backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: stack).join("\n")
