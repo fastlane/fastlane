@@ -144,7 +144,6 @@ module FastlaneCore
       end
     end
 
-
     # raised from crash!
     class FastlaneCrash < FastlaneException
       def prefix

@@ -263,7 +263,6 @@ module Fastlane
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
-        type = e.kind_of?(FastlaneCore::Interface::FastlaneCrash) ? :crash : :exception
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)
         collector.did_crash(method_sym)
         raise e
