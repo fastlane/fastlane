@@ -26,34 +26,6 @@ describe FastlaneCore::CrashReporter do
         supress_opt_out_crash_reporting_file_writing
       end
 
-# These tests might be able to be removed?
-      it 'posts a report to Stackdriver without specified type' do
-        stub_stackdriver_request
-        setup_crash_report_generator_expectation(exception: exception)
-        FastlaneCore::CrashReporter.report_crash(exception: exception)
-      end
-
-      it 'posts a report to Stackdriver with crash type' do
-        stub_stackdriver_request
-        crash_exception = double('Exception', backtrace: ["/fastlane/fastlane_core/lib/fastlane_core/ui/interface.rb:142:in `crash!'"])
-        setup_crash_report_generator_expectation(exception: crash_exception)
-        FastlaneCore::CrashReporter.report_crash(exception: crash_exception)
-      end
-
-      it 'posts a report to Stackdriver with user_error type' do
-        stub_stackdriver_request
-        user_error_exception = double('Exception', backtrace: ["/fastlane/fastlane_core/lib/fastlane_core/ui/interface.rb:152:in `user_error!'"])
-        setup_crash_report_generator_expectation(exception: user_error_exception)
-        FastlaneCore::CrashReporter.report_crash(exception: user_error_exception)
-      end
-
-      it 'posts a report to Stackdriver with specified service' do
-        stub_stackdriver_request
-        setup_crash_report_generator_expectation(action: 'test_action', exception: exception)
-        FastlaneCore::CrashReporter.report_crash(action: 'test_action', exception: exception)
-      end
-# ^^^^^^^^^^
-
       it 'only posts one report' do
         stub_stackdriver_request
         setup_crash_report_generator_expectation(exception: exception)
