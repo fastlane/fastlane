@@ -112,23 +112,43 @@ module FastlaneCore
     #####################################################
 
     class FastlaneException < StandardError
-        def clean_backtrace(string: nil)
-            return nil if backtrace.nil?
-            return backtrace if backtrace[0].nil?
-            first_frame = backtrace[0]
-            if first_frame.include?(string) || first_frame.include?('interface.rb')
-              backtrace.drop(2)
-            else
-              backtrace
-            end
+      def prefix
+        '[FASTLANE_EXCEPTION]'
+      end
+
+      def caused_by_calling_ui_method?(method_name: nil)
+        return false if backtrace.nil? || backtrace[0].nil? || method_name.nil?
+        first_frame = backtrace[0]
+        if first_frame.include?(method_name) || first_frame.include?('interface.rb')
+          true
+        else
+          false
         end
+      end
+
+      def trim_backtrace(method_name: nil)
+        if caused_by_calling_ui_method?(method_name: method_name)
+          backtrace.drop(2)
+        else
+          backtrace
+        end
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?
+      end
     end
+
 
     # raised from crash!
     class FastlaneCrash < FastlaneException
-        def cleaned_backtrace
-            clean_backtrace(string: 'crash!')
-        end
+      def prefix
+        '[FASTLANE_CRASH]'
+      end
+
+      def trimmed_backtrace
+        trim_backtrace(method_name: 'crash!')
+      end
     end
 
     # raised from user_error!
@@ -141,8 +161,12 @@ module FastlaneCore
         @error_info = error_info
       end
 
-      def cleaned_backtrace
-        clean_backtrace(string: 'crash!')
+      def prefix
+        '[USER_ERROR]'
+      end
+
+      def trimmed_backtrace
+        trim_backtrace(method_name: 'crash!')
       end
     end
 
