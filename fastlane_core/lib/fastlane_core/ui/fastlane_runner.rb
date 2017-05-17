@@ -42,7 +42,7 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(type: :invalid_command, exception: e, action: @program[:name])
+          FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
           abort "#{e}. Use --help for more information"
         end
       rescue Interrupt => e
@@ -61,7 +61,7 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(type: :option_parser, exception: e, action: @program[:name])
+          FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
           abort e.to_s
         end
       rescue \
@@ -71,7 +71,7 @@ module Commander
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])
         show_github_issues(e.message) if e.show_github_issues
-        FastlaneCore::CrashReporter.report_crash(type: :user_error, exception: e, action: @program[:name])
+        FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
         display_user_error!(e, e.message)
       rescue Errno::ENOENT => e
         # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
@@ -79,7 +79,7 @@ module Commander
         FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
         FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
         puts ""
-        FastlaneCore::CrashReporter.report_crash(type: :system, exception: e, action: @program[:name])
+        FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
         raise e
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
@@ -87,12 +87,11 @@ module Commander
         if e.message.include? 'Connection reset by peer - SSL_connect'
           handle_tls_error!(e)
         else
-          FastlaneCore::CrashReporter.report_crash(type: :connection_failure, exception: e, action: @program[:name])
+          FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
           handle_unknown_error!(e)
         end
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        type = e.kind_of?(FastlaneCore::Interface::FastlaneCrash) ? :crash : :exception
-        FastlaneCore::CrashReporter.report_crash(type: type, exception: e, action: @program[:name])
+        FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
         collector.did_crash(@program[:name])
         handle_unknown_error!(e)
       ensure

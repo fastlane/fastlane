@@ -1,38 +1,29 @@
 module FastlaneCore
   class CrashReportGenerator
     class << self
-      def types
-        {
-          user_error: '[USER_ERROR]',
-          crash: '[FASTLANE_CRASH]',
-          exception: '[EXCEPTION]',
-          connection_failure: '[CONNECTION_FAILURE]',
-          system: '[SYSTEM_ERROR]',
-          option_parser: '[OPTION_PARSER]',
-          invalid_command: '[INVALID_COMMAND]',
-          unknown: '[UNKNOWN]'
-        }
-      end
-
-      def generate(type: :unknown, exception: nil, action: nil)
-        message = crash_report_message(type: type, exception: exception)
+      def generate(exception: nil, action: nil)
+        message = format_crash_report_message(exception: exception)
         crash_report_payload(message: message, action: action)
       end
 
       private
 
-      def crash_report_message(type: :unknown, exception: nil)
+      def format_crash_report_message(exception: nil)
         return if exception.nil?
-        backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(type: type, backtrace: exception.backtrace).join("\n")
-        message = types[type]
-        sanitized_exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)
-        if type == :user_error
-          message += ': '
+        backtrace = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
+        backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: backtrace).join("\n")
+        message = exception.respond_to?(:prefix) ? exception.prefix : '[EXCEPTION]'
+        message += ': '
+
+        if exception.respond_to?(:crash_report_message)
+          exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.crash_report_message)
         else
-          message += ": #{sanitized_exception_message}"
+          exception_message = "#{exception.class.name}: #{FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)}"
         end
+
+        message += exception_message
         message = message[0..100]
-        message += "\n" unless type == :user_error
+        message += "\n" unless exception.respond_to?(:could_contain_pii?) && exception.could_contain_pii?
         message + backtrace
       end
 
