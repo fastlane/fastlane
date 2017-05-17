@@ -263,7 +263,7 @@ describe Pilot::TesterManager do
         allow(Spaceship::Application).to receive(:find).and_return(nil)
         allow(tester_manager).to receive(:find_app).and_return(nil)
 
-        expect(Spaceship::Tunes::Tester::External).to receive(:find).and_return(fake_tester) # before creating, no testers
+        expect(Spaceship::Tunes::Tester::External).to receive(:find).and_return(fake_tester)
         expect(Spaceship::TestFlight::Group).to_not receive(:remove_tester_from_groups!)
         expect(FastlaneCore::UI).to receive(:success).with('Successfully removed tester fabric-devtools@gmail.com+fake@gmail.com from Users and Roles')
 
