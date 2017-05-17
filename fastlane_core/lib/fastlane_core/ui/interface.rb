@@ -119,7 +119,7 @@ module FastlaneCore
       def caused_by_calling_ui_method?(method_name: nil)
         return false if backtrace.nil? || backtrace[0].nil? || method_name.nil?
         first_frame = backtrace[0]
-        if first_frame.include?(method_name) || first_frame.include?('interface.rb')
+        if first_frame.include?(method_name) && first_frame.include?('interface.rb')
           true
         else
           false
@@ -137,6 +137,11 @@ module FastlaneCore
       def could_contain_pii?
         caused_by_calling_ui_method?
       end
+
+      def crash_report_message
+        return '' if could_contain_pii?
+        "#{exception.message[0..100]}\n"
+      end
     end
 
 
@@ -148,6 +153,10 @@ module FastlaneCore
 
       def trimmed_backtrace
         trim_backtrace(method_name: 'crash!')
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?(method_name: 'crash!')
       end
     end
 
@@ -166,7 +175,11 @@ module FastlaneCore
       end
 
       def trimmed_backtrace
-        trim_backtrace(method_name: 'crash!')
+        trim_backtrace(method_name: 'user_error!')
+      end
+
+      def could_contain_pii?
+        caused_by_calling_ui_method?(method_name: 'user_error!')
       end
     end
 

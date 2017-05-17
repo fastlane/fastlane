@@ -10,18 +10,17 @@ module FastlaneCore
 
       def crash_report_message(exception: nil)
         return if exception.nil?
-        stack = exception.respond_to?(:cleaned_backtrace) ? exception.cleaned_backtrace : exception.backtrace
+        stack = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
         backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: stack).join("\n")
         message = exception.respond_to?(:prefix) ? exception.prefix : '[EXCEPTION]'
+        message += ': '
 
-        if exception.respond_to?(:could_contain_pii?) && exception.could_contain_pii?
-          message += ': '
+        if exception.respond_to?(:crash_report_message)
+          message += FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.crash_report_message)
         else
-          sanitized_exception_message = FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)
-          message += ": #{sanitized_exception_message}"
+          message += "#{exception.class.name}: #{FastlaneCore::CrashReportSanitizer.sanitize_string(string: exception.message)[0..100]}\n"
         end
-        message = message[0..100]
-        message += "\n" unless exception.respond_to?(:could_contain_pii?) && exception.could_contain_pii?
+
         message + backtrace
       end
 
