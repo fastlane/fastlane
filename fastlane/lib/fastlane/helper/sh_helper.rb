@@ -52,7 +52,7 @@ module Fastlane
           message += "\n#{result}" if print_command_output
 
           error_callback.call(result) if error_callback
-          UI.user_error!(message)
+          UI.shell_error!(message)
         end
       end
 
