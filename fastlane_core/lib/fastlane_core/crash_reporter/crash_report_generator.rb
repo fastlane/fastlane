@@ -1,22 +1,14 @@
 module FastlaneCore
   class CrashReportGenerator
     class << self
-      def types
-        {
-          user_error: '[USER_ERROR]',
-          crash: '[FASTLANE_CRASH]',
-          exception: '[EXCEPTION]'
-        }
-      end
-
-      def generate(type: :exception, exception: nil, action: nil)
-        message = crash_report_message(type: type, exception: exception)
+      def generate(exception: nil, action: nil)
+        message = crash_report_message(exception: exception)
         crash_report_payload(message: message, action: action)
       end
 
       private
 
-      def crash_report_message(type: :exception, exception: nil)
+      def crash_report_message(exception: nil)
         return if exception.nil?
         stack = exception.respond_to?(:cleaned_backtrace) ? exception.cleaned_backtrace : exception.backtrace
         backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: stack).join("\n")
