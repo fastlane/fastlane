@@ -260,6 +260,8 @@ describe Pilot::TesterManager do
     describe "when external tester is removed without providing app" do
       it "removes the tester without error" do
         allow(current_user).to receive(:roles).and_return(["admin"])
+        allow(Spaceship::Application).to receive(:find).and_return(nil)
+
         expect(Spaceship::Tunes::Tester::External).to receive(:find).and_return(fake_tester) # before creating, no testers
         expect(Spaceship::TestFlight::Group).to_not receive(:remove_tester_from_groups!)
         expect(FastlaneCore::UI).to receive(:success).with('Successfully removed tester fabric-devtools@gmail.com+fake@gmail.com from Users and Roles')
