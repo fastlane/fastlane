@@ -118,9 +118,8 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        parsed_intervals = []
-        raw_data["pricingIntervals"].each do |interval|
-          parsed_intervals << {
+        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
+          {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
             end_date: interval["value"]["priceTierEndDate"],
@@ -128,7 +127,6 @@ module Spaceship
             country: interval["value"]["country"]
           }
         end
-        return parsed_intervals
       end
 
       # @return (String) Human Readable type of the purchase
