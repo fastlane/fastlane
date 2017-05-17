@@ -182,6 +182,25 @@ module FastlaneCore
       end
     end
 
+    class FastlaneShellError < FastlaneException
+      def prefix
+        '[SHELL_ERROR]'
+      end
+
+      def trimmed_backtrace
+        trace = trim_backtrace(method_name: 'shell_error!')
+
+        # we also want to trim off the shell invocation itself, which means
+        # removing any lines from the backtrace that contain functions
+        # in `sh_helper.rb`
+        trace.drop_while { |frame| frame.include?('sh_helper.rb') }
+      end
+
+      def could_contain_pii?
+        true
+      end
+    end
+
     # raised from build_failure!
     class FastlaneBuildFailure < FastlaneError
     end
@@ -208,6 +227,18 @@ module FastlaneCore
     # and want to show a nice error message to the user
     def user_error!(error_message, options = {})
       raise FastlaneError.new(options), error_message.to_s
+    end
+
+    # Use this method to exit the program because of a shell command
+    # failure -- the command returned a non-zero response. This does
+    # not specify the nature of the error. The error might be from a
+    # programming error, a user error, or an expected  error because
+    # the user of the Fastfile doesn't have their environment set up
+    # properly. Because of this, when these errors occur, it means
+    # that the caller of the shell command did not adequate error
+    # handling and the caller error handling should be improved.
+    def shell_error!(error_message, options = {})
+      raise FastlaneShellError.new(options), error_message.to_s
     end
 
     # Use this method to exit the program because of a build failure

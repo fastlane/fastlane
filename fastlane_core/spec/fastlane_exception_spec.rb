@@ -64,4 +64,25 @@ describe FastlaneCore::Interface::FastlaneException do
       end
     end
   end
+
+  context 'shell error stack trimming' do
+    # testing the shell error stack trimming behavior is complicated, because
+    # the code explicitly only removes frames in sh_helper.rb, but we cannot
+    # actually have those frames in a backtrace in a unit test
+    # so, we will stub the backtrace on the object under test to return a
+    # hard code backtrace, and be sure that is trimmed properly
+    it 'trims backtrace containing sh_helper.rb' do
+      mock_backtrace = ["path/to/sh_helper.rb:55", "path/to/sh_helper.rb:10", "path/to/another/file.rb:1337"]
+      exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
+      allow(exception).to receive(:backtrace).and_return(mock_backtrace)
+      expect(exception.trimmed_backtrace).to eq(mock_backtrace.drop(2))
+    end
+
+    it 'does not trim backtrace not containing sh_helper.rb' do
+      mock_backtrace = ["path/to/file.rb:1337", "path/to/file.rb:2001"]
+      exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
+      allow(exception).to receive(:backtrace).and_return(mock_backtrace)
+      expect(exception.trimmed_backtrace).to eq(mock_backtrace)
+    end
+  end
 end
