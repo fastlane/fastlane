@@ -236,7 +236,7 @@ module Spaceship
       #
       # @return (true, false)
       def world_wide_pricing?
-        pricing_intervals.first&.[](:country) == "WW"
+        pricing_intervals.fetch(0, {})[:country] == "WW"
       end
 
       # Maps a single pricing interval to pricing infos.
