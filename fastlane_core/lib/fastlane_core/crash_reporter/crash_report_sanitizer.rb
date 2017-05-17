@@ -1,7 +1,7 @@
 module FastlaneCore
   class CrashReportSanitizer
     class << self
-      def sanitize_backtrace(backtrace: nil, type: :exception)
+      def sanitize_backtrace(backtrace: nil)
         backtrace.map do |frame|
           sanitize_string(string: frame)
         end
