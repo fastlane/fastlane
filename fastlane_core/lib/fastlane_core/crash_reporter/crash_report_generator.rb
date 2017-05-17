@@ -10,8 +10,8 @@ module FastlaneCore
 
       def format_crash_report_message(exception: nil)
         return if exception.nil?
-        stack = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
-        backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: stack).join("\n")
+        backtrace = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
+        backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: backtrace).join("\n")
         message = exception.respond_to?(:prefix) ? exception.prefix : '[EXCEPTION]'
         message += ': '
 
