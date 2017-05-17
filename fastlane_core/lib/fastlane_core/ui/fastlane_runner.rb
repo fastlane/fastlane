@@ -35,13 +35,7 @@ module Commander
 
       begin
         collector.did_launch_action(@program[:name])
-        # PILOT_MAINTENANCE Temporaroy `begin/rescue` block for pilot mainenance mode
-        begin
-          run_active_command
-        rescue => e
-          raise e unless @program[:name] == 'pilot'
-          raise_pilot_maintenance_mode_exception!(e)
-        end
+        run_active_command
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
@@ -103,31 +97,6 @@ module Commander
         handle_unknown_error!(e)
       ensure
         collector.did_finish
-      end
-    end
-
-    # PILOT_MAINTENANCE Remove after pilot migration is done
-    def raise_pilot_maintenance_mode_exception!(e)
-      FastlaneCore::UI.important("-------------")
-      FastlaneCore::UI.important("pilot crashed")
-      FastlaneCore::UI.important("-------------")
-      FastlaneCore::UI.error("Unfortunately the TestFlight update from 11th April 2017 changed")
-      FastlaneCore::UI.error("the way Testers, Groups, and Builds are managed on iTunesConnect.")
-      FastlaneCore::UI.error("We have already fixed a number of features including submitting")
-      FastlaneCore::UI.error("builds for testing, adding and removing testers from groups, and")
-      FastlaneCore::UI.error("waiting for builds to process.")
-      FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Please open an issue on https://github.com/fastlane/fastlane/issues")
-      FastlaneCore::UI.error("if you believe this failure is the result of a bug in _pilot_ and we")
-      FastlaneCore::UI.error("will be happy to look into this further.")
-      FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Please stay tuned for more updates from _fastlane_ as we fix more issues!")
-      FastlaneCore::UI.error("")
-      if FastlaneCore::Globals.verbose?
-        raise e # on verbose mode, we want to show the original stack trace
-      else
-        FastlaneCore::UI.error("Original error message:")
-        FastlaneCore::UI.user_error!(e.message)
       end
     end
 
