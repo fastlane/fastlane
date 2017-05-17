@@ -188,16 +188,16 @@ module FastlaneCore
       end
 
       def trimmed_backtrace
-        trace = trim_backtrace(method_name: 'shell_error!')
+        backtrace = trim_backtrace(method_name: 'shell_error!')
 
         # we also want to trim off the shell invocation itself, which means
         # removing any lines from the backtrace that contain functions
         # in `sh_helper.rb`
-        trace.drop_while { |frame| frame.include?('sh_helper.rb') }
+        backtrace.drop_while { |frame| frame.include?('sh_helper.rb') }
       end
 
       def could_contain_pii?
-        true
+        caused_by_calling_ui_method?(method_name: 'shell_error!')
       end
     end
 
