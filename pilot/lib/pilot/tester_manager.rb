@@ -57,7 +57,8 @@ module Pilot
       app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
       unless app
         tester.delete!
-        UI.success("Successfully removed tester #{tester.email}")
+        UI.success("Successfully removed tester #{tester.email} from Users and Roles")
+        return
       end
 
       begin
