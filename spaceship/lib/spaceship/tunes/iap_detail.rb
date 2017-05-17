@@ -218,11 +218,14 @@ module Spaceship
 
       # Retrieves the actual prices for an iap.
       #
+      # @return ([]) An empty array
+      #   if the iap is not yet cleared for sale
       # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same pricing tier
       #   if the iap uses world wide pricing
       # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multple subscription pricing tiers
       #   if the iap uses territorial pricing
       def pricing_info
+        return [] unless cleared_for_sale
         return world_wide_pricing_info if world_wide_pricing?
         territorial_pricing_info
       end
@@ -233,7 +236,7 @@ module Spaceship
       #
       # @return (true, false)
       def world_wide_pricing?
-        pricing_intervals.first[:country] == "WW"
+        pricing_intervals.first&.[](:country) == "WW"
       end
 
       # Maps a single pricing interval to pricing infos.

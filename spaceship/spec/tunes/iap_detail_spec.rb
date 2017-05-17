@@ -30,6 +30,14 @@ describe Spaceship::Tunes::IAPDetail do
     describe "pricing_info" do
       subject { detailed.pricing_info }
 
+      context "when iap is not cleared for sale yet" do
+        before { allow(detailed).to receive(:cleared_for_sale).and_return(false) }
+
+        it "retuns an empty array" do
+          expect(subject).to eq([])
+        end
+      end
+
       context "when iap is a non-subscription product" do
         let(:pricing_tiers) { client.pricing_tiers }
         let(:interval) do
