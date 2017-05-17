@@ -111,6 +111,13 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def resend_invite_to_external_tester(app_id: nil, tester_id: nil)
+      assert_required_params(__method__, binding)
+      url = "/testflight/v1/invites/#{app_id}/resend?testerId=#{tester_id}"
+      response = request(:post, url)
+      handle_response(response)
+    end
+
     def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
       assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
