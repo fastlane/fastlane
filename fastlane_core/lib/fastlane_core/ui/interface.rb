@@ -124,6 +124,18 @@ module FastlaneCore
         @show_github_issues = show_github_issues
         @error_info = error_info
       end
+
+      def type
+        return :unknown if backtrace[0].nil?
+        first_frame = backtrace[0]
+        if first_frame.include?('user_error!') && first_frame.include?('interface.rb')
+          :user_error
+        elsif first_frame.include?('crash!') && first_frame.include?('interface.rb')
+          :crash
+        else
+          :exception
+        end
+      end
     end
 
     # raised from build_failure!
