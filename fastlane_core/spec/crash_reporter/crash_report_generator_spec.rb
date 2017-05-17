@@ -1,6 +1,6 @@
 describe FastlaneCore::CrashReportGenerator do
   context 'generate crash report' do
-    let(:exception) do
+    let(:mock_exception) do
       double(
         'Exception',
         backtrace: [
@@ -28,46 +28,52 @@ describe FastlaneCore::CrashReportGenerator do
 
     it 'sets service to the action that crashed' do
       setup_sanitizer_expectation
-      setup_expected_body(message_text: ": #{exception.message}\n")
-      report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: exception, action: 'test_action'))
+      report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: mock_exception, action: 'test_action'))
       expect(report['serviceContext']['service']).to eq('test_action')
     end
 
     it 'omits a message for type user_error' do
-      setup_sanitizer_expectation(type: :user_error)
-      setup_expected_body(type: :user_error, message_text: ": ")
-      expect(FastlaneCore::CrashReportGenerator.generate(type: :user_error, exception: exception)).to eq(expected_body.to_json)
+      begin
+        UI.user_error!('Some User Error')
+      rescue => e
+        setup_sanitizer_expectation(exception: e)
+        setup_expected_body(message_text: "[USER_ERROR]: ", exception: e)
+        expect(FastlaneCore::CrashReportGenerator.generate(exception: e)).to eq(expected_body.to_json)
+      end
     end
 
     it 'includes a message for other types' do
-      setup_sanitizer_expectation
-      setup_expected_body(message_text: ": #{exception.message}\n")
-      expect(FastlaneCore::CrashReportGenerator.generate(exception: exception)).to eq(expected_body.to_json)
+      setup_sanitizer_expectation(exception: mock_exception)
+      setup_expected_body(message_text: "[EXCEPTION]: #{mock_exception.class.name}: #{mock_exception.message}\n", exception: mock_exception)
+      expect(FastlaneCore::CrashReportGenerator.generate(exception: mock_exception)).to eq(expected_body.to_json)
     end
 
     it 'includes stack frames in message' do
-      setup_sanitizer_expectation
-      setup_expected_body(message_text: ": #{exception.message}\n")
-      report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: exception))
-      expect(report['message']).to include(exception.backtrace.join("\n"))
+      setup_sanitizer_expectation(exception: mock_exception)
+      setup_expected_body(message_text: "[EXCEPTION]: #{mock_exception.message}\n", exception: mock_exception)
+      report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: mock_exception))
+      expect(report['message']).to include(mock_exception.backtrace.join("\n"))
     end
   end
 end
 
-def setup_sanitizer_expectation(type: :exception)
+def setup_sanitizer_expectation(exception: nil)
+  exception ||= mock_exception
+  stack = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
+  message = exception.respond_to?(:crash_report_message) ? exception.crash_report_message : exception.message
   expect(FastlaneCore::CrashReportSanitizer).to receive(:sanitize_backtrace).with(
-    type: type,
-    backtrace: exception.backtrace
+    backtrace: stack
   ) do |args|
     args[:backtrace]
   end
   expect(FastlaneCore::CrashReportSanitizer).to receive(:sanitize_string).with(
-    string: exception.message
+    string: message
   ) do |args|
     args[:string]
   end
 end
 
-def setup_expected_body(type: :exception, message_text: "")
-  expected_body['message'] = "#{FastlaneCore::CrashReportGenerator.types[type]}#{message_text}#{exception.backtrace.join("\n")}"
+def setup_expected_body(message_text: "", exception: nil)
+  stack = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
+  expected_body['message'] = "#{message_text}#{stack.join("\n")}"
 end
