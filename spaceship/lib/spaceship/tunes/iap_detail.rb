@@ -253,7 +253,7 @@ module Spaceship
       #
       # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of subscription pricing infos
       def territorial_pricing_info
-        pricing_matrix = client.subscription_pricing_tiers(app_id: application.apple_id)
+        pricing_matrix = client.subscription_pricing_tiers(application.apple_id)
         pricing_intervals.map do |interval|
           pricing_matrix
             .find { |p| p.tier_stem == interval[:tier].to_s }

@@ -58,7 +58,7 @@ describe Spaceship::Tunes::IAPDetail do
       end
 
       context "when iap is a subscription product with territorial pricing" do
-        let(:pricing_tiers) { client.subscription_pricing_tiers(app_id: app.apple_id) }
+        let(:pricing_tiers) { client.subscription_pricing_tiers(app.apple_id) }
         let(:intervals) do
           [
             { tier: 22, begin_date: nil, end_date: nil, grandfathered: {}, country: "QA" },

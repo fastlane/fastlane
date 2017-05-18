@@ -3,7 +3,7 @@ describe Spaceship::Tunes::IAPSubscriptionPricingTier do
 
   let(:client)        { Spaceship::AppVersion.client }
   let(:app)           { Spaceship::Application.all.first }
-  let(:pricing_tiers) { client.subscription_pricing_tiers(app_id: app.apple_id) }
+  let(:pricing_tiers) { client.subscription_pricing_tiers(app.apple_id) }
 
   describe "In-App-Purchase Subscription Pricing Tier" do
     subject { pricing_tiers }

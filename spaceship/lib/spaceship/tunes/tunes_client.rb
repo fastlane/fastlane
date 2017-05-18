@@ -1028,9 +1028,9 @@ module Spaceship
     # Loads the full In-App-Purchases-Pricing-Matrix
     #   note: the matrix is the same for any app_id
     #
-    # @param params (Hash)
-    # @option params (String) :app_id
-    def subscription_pricing_tiers(app_id:)
+    # @param app_id (String) The Apple ID of any app
+    # @return ([Spaceship::Tunes::IAPSubscriptionPricingTier]) An array of pricing tiers
+    def subscription_pricing_tiers(app_id)
       @subscription_pricing_tiers ||= begin
         r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix/recurring")
         data = parse_response(r, "data")["pricingTiers"]
