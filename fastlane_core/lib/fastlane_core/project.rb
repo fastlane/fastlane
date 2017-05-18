@@ -314,7 +314,7 @@ module FastlaneCore
             UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
           end
         rescue Timeout::Error
-          raise FastlaneCore::Interface::FastlaneDependencyError.new, "xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
+          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
             " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
             " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ".red
         end
