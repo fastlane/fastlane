@@ -38,6 +38,7 @@ require 'fastlane_core/ui/errors/fastlane_exception'
 require 'fastlane_core/ui/errors/fastlane_error'
 require 'fastlane_core/ui/errors/fastlane_crash'
 require 'fastlane_core/ui/errors/fastlane_shell_error'
+require 'fastlane_core/ui/errors/fastlane_not_counted_error'
 
 # Third Party code
 require 'colored'
