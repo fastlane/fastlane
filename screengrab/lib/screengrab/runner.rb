@@ -69,6 +69,8 @@ module Screengrab
 
       open_screenshots_summary(device_type_dir_name)
 
+      ReportsGenerator.new.generate
+
       UI.success "Captured #{number_of_screenshots} screenshots! 📷✨"
     end
 

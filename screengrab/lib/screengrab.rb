@@ -4,6 +4,7 @@ require 'fileutils'
 require 'fastlane_core'
 
 require 'screengrab/runner'
+require 'screengrab/reports_generator'
 require 'screengrab/detect_values'
 require 'screengrab/dependency_checker'
 require 'screengrab/options'
