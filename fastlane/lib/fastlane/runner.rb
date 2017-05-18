@@ -254,9 +254,7 @@ module Fastlane
         end
       rescue Interrupt => e
         raise e # reraise the interruption to avoid logging this as a crash
-      rescue \
-        FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
-        FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+      rescue FastlaneCore::Interface::FastlaneNotCountedFailure => e # these are exceptions that we dont count as crashes
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)

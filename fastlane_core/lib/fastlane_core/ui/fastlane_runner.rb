@@ -64,9 +64,7 @@ module Commander
           FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
           abort e.to_s
         end
-      rescue \
-        FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
-        FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+      rescue FastlaneCore::Interface::FastlaneNotCountedFailure => e # test_failure!
         display_user_error!(e, e.to_s)
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         collector.did_raise_error(@program[:name])

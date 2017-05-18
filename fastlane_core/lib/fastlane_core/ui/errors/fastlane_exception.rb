@@ -32,10 +32,5 @@ module FastlaneCore
         exception.message
       end
     end
-    class FastlaneBuildFailure < FastlaneException
-    end
-
-    class FastlaneTestFailure < FastlaneException
-    end
   end
 end
