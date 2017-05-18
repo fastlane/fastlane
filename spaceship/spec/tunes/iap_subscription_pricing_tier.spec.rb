@@ -41,7 +41,6 @@ describe Spaceship::Tunes::IAPSubscriptionPricingTier do
 
     it "correctly parses the pricing info" do
       expect(subject.pricing_info.first).to have_attributes(
-        country:            nil,
         country_code:       "IN",
         currency_symbol:    "R",
         wholesale_price:    6.09,

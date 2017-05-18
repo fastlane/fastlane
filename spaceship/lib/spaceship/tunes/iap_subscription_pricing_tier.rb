@@ -33,9 +33,6 @@ module Spaceship
     end
 
     class IAPSubscriptionPricingInfo < TunesBase
-      # @return (String) name of the country, e.g. "United States"
-      attr_accessor :country
-
       # @return (String) country code, e.g. "US"
       attr_accessor :country_code
 
@@ -64,7 +61,6 @@ module Spaceship
       attr_accessor :f_wholesale_price2
 
       attr_mapping(
-        "country" => :country,
         "countryCode" => :country_code,
         "currencySymbol" => :currency_symbol,
         "currencyCode" => :currency_code,
