@@ -69,4 +69,15 @@ describe Spaceship::TestFlight::Tester do
       end
     end
   end
+
+  context 'invites' do
+    let(:tester) { Spaceship::TestFlight::Tester.new('id' => 'tester-id') }
+
+    context '.resend_invite' do
+      it 'suceeds' do
+        expect(mock_client).to receive(:resend_invite_to_external_tester).with(app_id: 'app-id', tester_id: 'tester-id')
+        tester.resend_invite(app_id: 'app-id')
+      end
+    end
+  end
 end

@@ -107,33 +107,6 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    #####################################################
-    # @!group Errors: Different kinds of exceptions
-    #####################################################
-
-    # raised from crash!
-    class FastlaneCrash < StandardError
-    end
-
-    # raised from user_error!
-    class FastlaneError < StandardError
-      attr_reader :show_github_issues
-      attr_reader :error_info
-
-      def initialize(show_github_issues: false, error_info: nil)
-        @show_github_issues = show_github_issues
-        @error_info = error_info
-      end
-    end
-
-    # raised from build_failure!
-    class FastlaneBuildFailure < FastlaneError
-    end
-
-    # raised from test_failure!
-    class FastlaneTestFailure < StandardError
-    end
-
     # Pass an exception to this method to exit the program
     #   using the given exception
     # Use this method instead of user_error! if this error is
@@ -152,6 +125,18 @@ module FastlaneCore
     # and want to show a nice error message to the user
     def user_error!(error_message, options = {})
       raise FastlaneError.new(options), error_message.to_s
+    end
+
+    # Use this method to exit the program because of a shell command
+    # failure -- the command returned a non-zero response. This does
+    # not specify the nature of the error. The error might be from a
+    # programming error, a user error, or an expected  error because
+    # the user of the Fastfile doesn't have their environment set up
+    # properly. Because of this, when these errors occur, it means
+    # that the caller of the shell command did not adequate error
+    # handling and the caller error handling should be improved.
+    def shell_error!(error_message, options = {})
+      raise FastlaneShellError.new(options), error_message.to_s
     end
 
     # Use this method to exit the program because of a build failure

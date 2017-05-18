@@ -16,7 +16,7 @@ module FastlaneCore
         !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_CRASH_REPORTING")
       end
 
-      def report_crash(type: :unknown, exception: nil, action: nil)
+      def report_crash(exception: nil, action: nil)
         return unless enabled?
         return if @did_report_crash
 
@@ -25,7 +25,7 @@ module FastlaneCore
         # we want to test it
         return if Helper.test? && !@explitly_enabled_for_testing
 
-        payload = CrashReportGenerator.generate(type: type, exception: exception, action: action)
+        payload = CrashReportGenerator.generate(exception: exception, action: action)
         send_report(payload: payload)
         save_file(payload: payload)
         show_message unless did_show_message?
