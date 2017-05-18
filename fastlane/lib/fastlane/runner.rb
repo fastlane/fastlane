@@ -252,7 +252,7 @@ module Fastlane
             class_ref.run(arguments)
           end
         end
-      rescue Interrupt => e
+      rescue Interrupt
         UI.error('fastlane was interrupted. We hope you give it another try!')
       rescue \
         FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
