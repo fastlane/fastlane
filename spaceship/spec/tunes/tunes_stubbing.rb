@@ -362,6 +362,11 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
         to_return(status: 200, body: itc_read_fixture_file("iap_list.json"),
                 headers: { "Content-Type" => "application/json" })
+
+      # subscription pricing tiers
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/pricing/matrix/recurring").
+        to_return(status: 200, body: itc_read_fixture_file("iap_pricing_tiers.json"),
+                  headers: { "Content-Type" => "application/json" })
     end
 
     def itc_stub_reject_version_success
