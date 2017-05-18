@@ -253,7 +253,7 @@ module Fastlane
           end
         end
       rescue Interrupt => e
-        raise e
+        raise e # reraise the interruption to avoid logging this as a crash
       rescue \
         FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
         FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
