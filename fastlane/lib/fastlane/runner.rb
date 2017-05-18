@@ -253,7 +253,6 @@ module Fastlane
           end
         end
       rescue Interrupt => e
-        UI.error('fastlane was interrupted. We hope you give it another try!')
         raise e
       rescue \
         FastlaneCore::Interface::FastlaneBuildFailure,    # build_failure!
