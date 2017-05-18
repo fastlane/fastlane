@@ -1,11 +1,11 @@
 module FastlaneCore
   class Interface
-    class FastlaneNotCountedFailure < FastlaneException; end
+    class FastlaneCommonException < FastlaneException; end
 
-    class FastlaneBuildFailure < FastlaneNotCountedFailure; end
+    class FastlaneBuildFailure < FastlaneCommonException; end
 
-    class FastlaneTestFailure < FastlaneNotCountedFailure; end
+    class FastlaneTestFailure < FastlaneCommonException; end
 
-    class FastlaneDependencyError < FastlaneNotCountedFailure; end
+    class FastlaneDependencyError < FastlaneCommonException; end
   end
 end
