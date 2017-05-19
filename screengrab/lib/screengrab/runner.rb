@@ -292,7 +292,7 @@ module Screengrab
       # success based on whether there are more screenshots there than when we started.
       if starting_screenshot_count == ending_screenshot_count
         UI.error "Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run."
-        UI.user_error! "No screenshots were detected 📷❌"
+        UI.abort_with_message! "No screenshots were detected 📷❌"
       end
 
       ending_screenshot_count - starting_screenshot_count
