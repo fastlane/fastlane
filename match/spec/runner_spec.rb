@@ -51,11 +51,16 @@ describe Match do
         git_url: git_url
       }
 
+      keychain = "login.keychain"
+
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
+      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
+
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = "./match/spec/fixtures/existing"
       cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
       key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
-      keychain = "login.keychain"
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
