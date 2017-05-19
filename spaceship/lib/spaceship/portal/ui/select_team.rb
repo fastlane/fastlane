@@ -39,8 +39,8 @@ module Spaceship
       end
 
       def self.interactive?
-        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
-          return FastlaneCore::Helper.interactive?
+        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("UI")
+          return FastlaneCore::UI.interactive?
         end
         return true
       end
