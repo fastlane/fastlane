@@ -15,9 +15,20 @@ module FastlaneCore
         end
       end
 
+      def includes_method_missing?
+        return false if backtrace.nil? || backtrace[1].nil?
+        second_frame = backtrace[1]
+        second_frame.include?('method_missing') && second_frame.include?('ui.rb')
+      end
+
       def trim_backtrace(method_name: nil)
         if caused_by_calling_ui_method?(method_name: method_name)
-          backtrace.drop(2)
+          if includes_method_missing?
+            drop_count = 2
+          else
+            drop_count = 1
+          end
+          backtrace.drop(drop_count)
         else
           backtrace
         end
