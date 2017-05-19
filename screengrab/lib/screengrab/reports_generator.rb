@@ -1,5 +1,4 @@
 require 'erb'
-require 'fastimage'
 
 module Screengrab
   class ReportsGenerator
@@ -14,7 +13,6 @@ module Screengrab
         language = File.basename(language_folder)
         Dir[File.join(language_folder, 'images', '*', '*.png')].sort.each do |screenshot|
           device_type_folder = File.basename(File.dirname(screenshot))
-          p device_type_folder
           @data[language] ||= {}
           @data[language][device_type_folder] ||= []
           resulting_path = File.join('.', language, 'images', device_type_folder, File.basename(screenshot))
