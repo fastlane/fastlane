@@ -1,5 +1,13 @@
 describe Match do
   describe Match::Runner do
+    let(:keychain) { 'login.keychain' }
+
+    before do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
+      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
+    end
+
     it "creates a new profile and certificate if it doesn't exist yet" do
       git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
@@ -50,12 +58,6 @@ describe Match do
         type: "appstore",
         git_url: git_url
       }
-
-      keychain = "login.keychain"
-
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
-      allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = "./match/spec/fixtures/existing"
