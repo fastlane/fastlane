@@ -107,6 +107,10 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
+    #####################################################
+    # @!group Abort helper methods
+    #####################################################
+
     # Pass an exception to this method to exit the program
     #   using the given exception
     # Use this method instead of user_error! if this error is
@@ -156,6 +160,18 @@ module FastlaneCore
     # fastlane failures
     def test_failure!(error_message)
       raise FastlaneTestFailure.new, error_message
+    end
+
+    # Use this method to exit the program because of terminal state
+    # that is neither the fault of fastlane, nor a problem with the
+    # user's input. Using this method instead of user_error! will
+    # avoid tracking this outcome as a fastlane failure.
+    #
+    #   e.g. tests ran successfully, but no screenshots were found
+    #
+    # This will show the message, but hide the full stack trace.
+    def abort_with_message!(message)
+      raise FastlaneCommonException.new, message
     end
 
     #####################################################
