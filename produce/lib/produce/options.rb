@@ -69,7 +69,7 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :enabled_features,
                                      short_option: "-P",
                                      env_name: "PRODUCE_ENABLED_FEATURES",
-                                     description: "Array with Spaceship App Features",
+                                     description: "Array with Spaceship App Features (e.g. app_group,apple_pay, associated_domains, data_protection, game_center, health_kit, home_kit, wireless_accessory, icloud, in_app_purchase, inter_app_audio, passbook, push_notification, siri_kit, vpn_configuration)",
                                      is_string: false,
                                      default_value: {},
                                      verify_block: proc do |value|
