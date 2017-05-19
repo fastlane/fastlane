@@ -43,6 +43,20 @@ describe FastlaneCore::Interface::FastlaneException do
         expect(e.trimmed_backtrace.count).to eq(e.backtrace.count)
       end
     end
+
+    it 'does not trim two frames if method_missing not included' do
+      mock_backtrace = ["/path/to/interface.rb:1234:in `user_error!'", "path/to/caller.rb:10: in `hello!'", "path/to/another/file.rb:1337"]
+      exception = FastlaneCore::Interface::FastlaneError.new
+      expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
+      expect(exception.trimmed_backtrace.count).to eq(exception.backtrace.count - 1)
+    end
+
+    it 'does trim two frames if method_messing included' do
+      mock_backtrace = ["/path/to/interface.rb:1234:in `user_error!'", "path/to/ui.rb:10: in `method_missing'", "path/to/caller:10: in `hello!'", "path/to/another/file.rb:1337"]
+      exception = FastlaneCore::Interface::FastlaneError.new
+      expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
+      expect(exception.trimmed_backtrace.count).to eq(exception.backtrace.count - 2)
+    end
   end
 
   context 'crash report message' do
