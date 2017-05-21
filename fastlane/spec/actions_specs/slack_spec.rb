@@ -100,16 +100,16 @@ describe Fastlane do
           message: message,
           success: false,
           channel: channel,
-          default_payloads: "lane,test_result",
+          default_payloads: "lane,test_result"
         })
 
         notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
-      
+
         fields = attachments[:fields]
 
         expect(fields[0][:title]).to eq('Lane')
         expect(fields[0][:value]).to eq(lane_name)
-        
+
         expect(fields[1][:title]).to eq('Result')
         expect(fields[1][:value]).to eq('Error')
       end
