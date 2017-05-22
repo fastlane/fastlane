@@ -67,7 +67,7 @@ module Screengrab
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
-      open_screenshots_summary(device_type_dir_name)
+      ReportsGenerator.new.generate
 
       UI.success "Captured #{number_of_screenshots} screenshots! 📷✨"
     end
@@ -341,16 +341,6 @@ module Screengrab
     rescue
       # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
       # We can safely ignore that and treat it as if it returned 'No such file'
-    end
-
-    def open_screenshots_summary(device_type_dir_name)
-      unless @config[:skip_open_summary]
-        UI.message "Opening screenshots summary"
-        # MCF: this isn't OK on any platform except Mac
-        run_adb_command("open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
-                        print_all: false,
-                        print_command: true)
-      end
     end
 
     def run_adb_command(command, print_all: false, print_command: false)
