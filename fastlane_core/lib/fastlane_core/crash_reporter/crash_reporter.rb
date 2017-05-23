@@ -62,7 +62,14 @@ module FastlaneCore
 
         return did_show if did_show
 
-        File.write(path, '1')
+        begin
+          File.write(path, '1')
+        rescue
+          if FastlaneCore::Globals.verbose?
+            UI.error("Cannot write out file indicating that crash report announcement has been displayed.")
+            UI.error("The following message will be displayed on the next crash as well:")
+          end
+        end
         false
       end
 
