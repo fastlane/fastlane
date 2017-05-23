@@ -403,8 +403,11 @@ module Spaceship
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
-      # get woinst, wois, and itctx cookie values
+      # get `woinst` and `wois` cookie values
       request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
+
+      # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+      request(:get, "https://olympus.itunes.apple.com/v1/session")
 
       case response.status
       when 403
