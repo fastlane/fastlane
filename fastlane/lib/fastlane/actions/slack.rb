@@ -98,7 +98,7 @@ module Fastlane
                                        env_name: "FL_SLACK_DEFAULT_PAYLOADS",
                                        description: "Remove some of the default payloads. More information about the available payloads on GitHub",
                                        optional: true,
-                                       is_string: false),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :attachment_properties,
                                        env_name: "FL_SLACK_ATTACHMENT_PROPERTIES",
                                        description: "Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments",
