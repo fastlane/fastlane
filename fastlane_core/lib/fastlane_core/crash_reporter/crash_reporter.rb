@@ -62,7 +62,11 @@ module FastlaneCore
 
         return did_show if did_show
 
-        File.write(path, '1')
+        begin
+          File.write(path, '1')
+        rescue
+          # don't show the user a message, since there is no functionality lost when this happens
+        end
         false
       end
 
