@@ -20,6 +20,8 @@ class TunesStubbing
         to_return(status: 200, body: "")
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
+      stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
+        to_return(status: 200, body: "") # we don't actually care about the body
 
       # Actual login
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
