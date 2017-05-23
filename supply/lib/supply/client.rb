@@ -263,15 +263,17 @@ module Supply
     def track_version_codes(track)
       ensure_active_edit!
 
-      result = call_google_api do
-        android_publisher.get_track(
+      begin
+        result = android_publisher.get_track(
           current_package_name,
           current_edit.id,
           track
         )
+        return result.version_codes
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
+        raise
       end
-
-      return result.version_codes
     end
 
     def update_apk_listing_for_language(apk_listing)
