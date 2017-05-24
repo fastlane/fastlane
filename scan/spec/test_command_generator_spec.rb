@@ -218,6 +218,7 @@ describe Scan do
             devices: ["iPhone 6s", "iPad Air"],
             project: './scan/examples/standard/app.xcodeproj'
           })
+          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
@@ -226,6 +227,10 @@ describe Scan do
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
             with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+
+          mock_test_result_parser = Object.new
+          allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
+          allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
           mock_slack_poster = Object.new
           allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
