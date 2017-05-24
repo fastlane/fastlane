@@ -443,7 +443,7 @@ module Spaceship
         end
 
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{itc_service_key}"
+          req.url "https://idmsa.apple.com/appleauth/auth/signin"
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -454,23 +454,22 @@ module Spaceship
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
-      # get `woinst` and `wois` cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
-
-      # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
-      request(:get, "https://olympus.itunes.apple.com/v1/session")
+      # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
+        fetch_olympus_session
         return response
+      when 409
+        # 2 factor is enabled for this account, first handle that
+        # and then get the olympus session
+        handle_two_step(response)
+        fetch_olympus_session
+        return true
       else
-        location = response["Location"]
-        if location && URI.parse(location).path == "/auth" # redirect to 2 step auth page
-          handle_two_step(response)
-          return true
-        elsif (response.body || "").include?('invalid="true"')
+        if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif (response['Set-Cookie'] || "").include?("itctx")
@@ -480,6 +479,11 @@ module Spaceship
           raise TunesClient::ITunesConnectError.new, info.join("\n")
         end
       end
+    end
+
+    # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+    def fetch_olympus_session
+      request(:get, "https://olympus.itunes.apple.com/v1/session")
     end
 
     def itc_service_key
