@@ -48,10 +48,10 @@ module Fastlane
 
         options_to_client = lambda do |options|
           options.map do |option|
-            case option
-            when :shake, :anonymous
+            case option.to_s
+            when "shake", "anonymous"
               option.to_s
-            when :video_only_wifi
+            when "video_only_wifi"
               'video-only-wifi'
             else
               UI.user_error!("Unknown option: #{option}")
