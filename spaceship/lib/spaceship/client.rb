@@ -401,7 +401,7 @@ module Spaceship
         if keychain_entry.invalid_credentials
           login(user)
         else
-          puts "Please run this tool again to apply the new password"
+          raise ex
         end
       end
     end
