@@ -32,7 +32,6 @@ deliver
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/deliver/LICENSE)
-[![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](https://rubygems.org/gems/deliver)
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
