@@ -43,59 +43,6 @@ module Spaceship
       "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
-    # @return (Array) A list of all available teams
-    def teams
-      user_details_data['associatedAccounts'].sort_by do |team|
-        [
-          team['contentProvider']['name'],
-          team['contentProvider']['contentProviderId']
-        ]
-      end
-    end
-
-    # @return (String) The currently selected Team ID
-    def team_id
-      return @current_team_id if @current_team_id
-
-      if teams.count > 1
-        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
-      end
-      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
-    end
-
-    # Set a new team ID which will be used from now on
-    def team_id=(team_id)
-      # First, we verify the team actually exists, because otherwise iTC would return the
-      # following confusing error message
-      #
-      #     invalid content provider id
-      #
-      available_teams = teams.collect do |team|
-        (team["contentProvider"] || {})["contentProviderId"]
-      end
-
-      result = available_teams.find do |available_team_id|
-        team_id.to_s == available_team_id.to_s
-      end
-
-      unless result
-        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
-      end
-
-      response = request(:post) do |req|
-        req.url "ra/v1/session/webSession"
-        req.body = {
-          contentProviderId: team_id,
-          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      handle_itc_response(response.body)
-
-      @current_team_id = team_id
-    end
-
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
     def select_team
@@ -146,13 +93,6 @@ module Spaceship
           self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
           break
         end
-      end
-    end
-
-    # @return (Hash) Fetches all information of the currently used team
-    def team_information
-      teams.find do |t|
-        t['teamId'] == team_id
       end
     end
 
@@ -677,56 +617,6 @@ module Spaceship
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/apps/version/ref')
       data = parse_response(r, 'data')
       Spaceship::Tunes::AppVersionRef.factory(data)
-    end
-
-    # Fetch the general information of the user, is used by various methods across spaceship
-    # Sample return value
-    # => {"associatedAccounts"=>
-    #   [{"contentProvider"=>{"contentProviderId"=>11142800, "name"=>"Felix Krause", "contentProviderTypes"=>["Purple Software"]}, "roles"=>["Developer"], "lastLogin"=>1468784113000}],
-    #  "sessionToken"=>{"dsId"=>"8501011116", "contentProviderId"=>18111111, "expirationDate"=>nil, "ipAddress"=>nil},
-    #  "permittedActivities"=>
-    #   {"EDIT"=>
-    #     ["UserManagementSelf",
-    #      "GameCenterTestData",
-    #      "AppAddonCreation"],
-    #    "REPORT"=>
-    #     ["UserManagementSelf",
-    #      "AppAddonCreation"],
-    #    "VIEW"=>
-    #     ["TestFlightAppExternalTesterManagement",
-    #      ...
-    #      "HelpGeneral",
-    #      "HelpApplicationLoader"]},
-    #  "preferredCurrencyCode"=>"EUR",
-    #  "preferredCountryCode"=>nil,
-    #  "countryOfOrigin"=>"AT",
-    #  "isLocaleNameReversed"=>false,
-    #  "feldsparToken"=>nil,
-    #  "feldsparChannelName"=>nil,
-    #  "hasPendingFeldsparBindingRequest"=>false,
-    #  "isLegalUser"=>false,
-    #  "userId"=>"1771111155",
-    #  "firstname"=>"Detlef",
-    #  "lastname"=>"Mueller",
-    #  "isEmailInvalid"=>false,
-    #  "hasContractInfo"=>false,
-    #  "canEditITCUsersAndRoles"=>false,
-    #  "canViewITCUsersAndRoles"=>true,
-    #  "canEditIAPUsersAndRoles"=>false,
-    #  "transporterEnabled"=>false,
-    #  "contentProviderFeatures"=>["APP_SILOING", "PROMO_CODE_REDESIGN", ...],
-    #  "contentProviderType"=>"Purple Software",
-    #  "displayName"=>"Detlef",
-    #  "contentProviderId"=>"18742800",
-    #  "userFeatures"=>[],
-    #  "visibility"=>true,
-    #  "DYCVisibility"=>false,
-    #  "contentProvider"=>"Felix Krause",
-    #  "userName"=>"detlef@krausefx.com"}
-    def user_details_data
-      return @_cached_user_details if @_cached_user_details
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
-      @_cached_user_details = parse_response(r, 'data')
     end
 
     # Fetches the User Detail information from ITC. This gets called often and almost never changes
