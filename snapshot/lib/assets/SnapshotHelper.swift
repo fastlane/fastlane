@@ -6,6 +6,13 @@
 //  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
+// -----------------------------------------------------
+// IMPORTANT: When modifying this file, make sure to 
+//            increment the version number at the very
+//            bottom of the file to notify users about
+//            the new SnapshotHelper.swift
+// -----------------------------------------------------
+
 import Foundation
 import XCTest
 
@@ -145,7 +152,7 @@ open class Snapshot: NSObject {
                 print("Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?")
                 return nil
             }
-            homeDir = homeDirUrl
+            homeDir = URL(fileURLWithPath: homeDirUrl.path)
         #endif
         return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
@@ -163,4 +170,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.3]
+// SnapshotHelperVersion [1.4]

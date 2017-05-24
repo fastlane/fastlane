@@ -18,8 +18,8 @@ describe Scan do
     iPad Retina (07773A11-417D-4D4C-BC25-1C3444D50836) (Shutdown)
     iPad Air (2ABEAF08-E480-4617-894F-6BAB587E7963) (Shutdown)
     iPad Air 2 (DA6C7D10-564B-4563-884D-834EF4F10FB9) (Shutdown)
-    iPad Pro (9.7 inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
-    iPad Pro (12.9 inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
+    iPad Pro (9.7-inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
+    iPad Pro (12.9-inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
 -- iOS 9.3 --
     iPhone 4s (238767C4-AF29-4485-878C-7011B98DCB87) (Shutdown)
     iPhone 5 (B8E05CCB-B97A-41FC-A8A8-2771711690B5) (Shutdown)
@@ -218,28 +218,19 @@ describe Scan do
             devices: ["iPhone 6s", "iPad Air"],
             project: './scan/examples/standard/app.xcodeproj'
           })
-          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPhone 6s_iOS_10.0.logarchive/)
-          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPad Air_iOS_10.0.logarchive/)
+          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl getenv 021A465B-A294-4D9E-AD07-6BDC8E186343 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
-          expect(FastlaneCore::CommandExecutor).
-            to receive(:execute).
-            with(command: "xcrun simctl getenv 2ABEAF08-E480-4617-894F-6BAB587E7963 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
-
-          expect(FastlaneCore::CommandExecutor).
-            to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+          mock_test_result_parser = Object.new
+          allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
+          allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
           mock_slack_poster = Object.new
           allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)

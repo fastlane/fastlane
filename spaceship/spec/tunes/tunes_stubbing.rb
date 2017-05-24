@@ -20,6 +20,8 @@ class TunesStubbing
         to_return(status: 200, body: "")
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
+      stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
+        to_return(status: 200, body: "") # we don't actually care about the body
 
       # Actual login
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
@@ -76,7 +78,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews/summary?platform=ios&versionId=").
         to_return(status: 200, body: itc_read_fixture_file('ratings_summary.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews?platform=ios&storefront=US&versionId=").
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&storefront=US&versionId=").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -318,9 +320,15 @@ class TunesStubbing
                  headers: { "Content-Type" => "application/json" })
       # iap edit family
       stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
-        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        with(body: itc_read_fixture_file("iap_family_edit_versions.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
                     headers: { "Content-Type" => "application/json" })
+
+      # iap edit family
+      stub_request(:put, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
+        with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                headers: { "Content-Type" => "application/json" })
 
       # iap family detail
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20372345").
@@ -356,6 +364,11 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
         to_return(status: 200, body: itc_read_fixture_file("iap_list.json"),
                 headers: { "Content-Type" => "application/json" })
+
+      # subscription pricing tiers
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/pricing/matrix/recurring").
+        to_return(status: 200, body: itc_read_fixture_file("iap_pricing_tiers.json"),
+                  headers: { "Content-Type" => "application/json" })
     end
 
     def itc_stub_reject_version_success

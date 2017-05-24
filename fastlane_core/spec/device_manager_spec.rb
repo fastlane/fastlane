@@ -85,13 +85,13 @@ describe FastlaneCore do
           is_simulator: true
         )
         expect(devices[-2]).to have_attributes(
-          name: "iPad Pro (9.7 inch)", os_type: "iOS", os_version: "10.0",
+          name: "iPad Pro (9.7-inch)", os_type: "iOS", os_version: "10.0",
           udid: "C03658EC-1362-4D8D-A40A-45B1D7D5405E",
           state: "Shutdown",
           is_simulator: true
         )
         expect(devices[-1]).to have_attributes(
-          name: "iPad Pro (12.9 inch)", os_type: "iOS", os_version: "10.0",
+          name: "iPad Pro (12.9-inch)", os_type: "iOS", os_version: "10.0",
           udid: "CEF11EB3-79DF-43CB-896A-0F33916C8BDE",
           state: "Shutdown",
           is_simulator: true

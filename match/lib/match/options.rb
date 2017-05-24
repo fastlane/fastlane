@@ -106,6 +106,11 @@ module Match
                                      description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :clone_branch_directly,
+                                     env_name: "MATCH_CLONE_BRANCH_DIRECTLY",
+                                     description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      description: nil,
                                      verify_block: proc do |value|

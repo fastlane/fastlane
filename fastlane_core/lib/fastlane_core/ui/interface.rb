@@ -108,27 +108,8 @@ module FastlaneCore
     end
 
     #####################################################
-    # @!group Errors: Different kinds of exceptions
+    # @!group Abort helper methods
     #####################################################
-
-    # raised from crash!
-    class FastlaneCrash < StandardError
-    end
-
-    # raised from user_error!
-    class FastlaneError < StandardError
-      attr_reader :show_github_issues
-      attr_reader :error_info
-
-      def initialize(show_github_issues: false, error_info: nil)
-        @show_github_issues = show_github_issues
-        @error_info = error_info
-      end
-    end
-
-    # raised from test_failure!
-    class FastlaneTestFailure < StandardError
-    end
 
     # Pass an exception to this method to exit the program
     #   using the given exception
@@ -150,13 +131,47 @@ module FastlaneCore
       raise FastlaneError.new(options), error_message.to_s
     end
 
+    # Use this method to exit the program because of a shell command
+    # failure -- the command returned a non-zero response. This does
+    # not specify the nature of the error. The error might be from a
+    # programming error, a user error, or an expected  error because
+    # the user of the Fastfile doesn't have their environment set up
+    # properly. Because of this, when these errors occur, it means
+    # that the caller of the shell command did not adequate error
+    # handling and the caller error handling should be improved.
+    def shell_error!(error_message, options = {})
+      raise FastlaneShellError.new(options), error_message.to_s
+    end
+
+    # Use this method to exit the program because of a build failure
+    # that's caused by the source code of the user. Example for this
+    # is that gym will fail when the code doesn't compile or because
+    # settings for the project are incorrect.
+    # By using this method we'll have more accurate results about
+    # fastlane failures
+    def build_failure!(error_message, options = {})
+      raise FastlaneBuildFailure.new(options), error_message.to_s
+    end
+
     # Use this method to exit the program because of a test failure
     # that's caused by the source code of the user. Example for this
     # is that scan will fail when the tests fail.
-    # By using this method we'll get more accurate results on the
-    # fastlane failures on enhancer
+    # By using this method we'll have more accurate results about
+    # fastlane failures
     def test_failure!(error_message)
       raise FastlaneTestFailure.new, error_message
+    end
+
+    # Use this method to exit the program because of terminal state
+    # that is neither the fault of fastlane, nor a problem with the
+    # user's input. Using this method instead of user_error! will
+    # avoid tracking this outcome as a fastlane failure.
+    #
+    #   e.g. tests ran successfully, but no screenshots were found
+    #
+    # This will show the message, but hide the full stack trace.
+    def abort_with_message!(message)
+      raise FastlaneCommonException.new, message
     end
 
     #####################################################

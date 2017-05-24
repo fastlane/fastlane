@@ -19,6 +19,7 @@ if ENV["SPACESHIP_DEBUG"]
 end
 
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
@@ -123,17 +124,84 @@ module Spaceship
     end
 
     def self.hostname
-      raise "You must implemented self.hostname"
+      raise "You must implement self.hostname"
     end
 
-    def initialize
+    # @return (Array) A list of all available teams
+    def teams
+      user_details_data['associatedAccounts'].sort_by do |team|
+        [
+          team['contentProvider']['name'],
+          team['contentProvider']['contentProviderId']
+        ]
+      end
+    end
+
+    def user_details_data
+      return @_cached_user_details if @_cached_user_details
+      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
+      @_cached_user_details = parse_response(r, 'data')
+    end
+
+    # @return (String) The currently selected Team ID
+    def team_id
+      return @current_team_id if @current_team_id
+
+      if teams.count > 1
+        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+      end
+      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+    end
+
+    # Set a new team ID which will be used from now on
+    def team_id=(team_id)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider id
+      #
+      available_teams = teams.collect do |team|
+        (team["contentProvider"] || {})["contentProviderId"]
+      end
+
+      result = available_teams.find do |available_team_id|
+        team_id.to_s == available_team_id.to_s
+      end
+
+      unless result
+        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+      end
+
+      response = request(:post) do |req|
+        req.url "ra/v1/session/webSession"
+        req.body = {
+          contentProviderId: team_id,
+          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      handle_itc_response(response.body)
+
+      @current_team_id = team_id
+    end
+
+    # Instantiates a client but with a cookie derived from another client.
+    #
+    # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
+    def self.client_with_authorization_from(another_client)
+      self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+    end
+
+    def initialize(cookie: nil, current_team_id: nil)
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
         }
       }
-      @cookie = HTTP::CookieJar.new
+      @current_team_id = current_team_id
+      @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response :json, content_type: /\bjson$/
         c.response :xml, content_type: /\bxml$/
@@ -335,8 +403,11 @@ module Spaceship
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
-      # get woinst, wois, and itctx cookie values
+      # get `woinst` and `wois` cookie values
       request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
+
+      # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+      request(:get, "https://olympus.itunes.apple.com/v1/session")
 
       case response.status
       when 403
@@ -569,6 +640,7 @@ module Spaceship
       return params, headers
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
 
 require 'spaceship/two_step_client'

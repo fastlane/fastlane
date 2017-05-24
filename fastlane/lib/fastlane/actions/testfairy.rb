@@ -48,7 +48,7 @@ module Fastlane
 
         options_to_client = lambda do |options|
           options.map do |option|
-            case option
+            case option.to_sym
             when :shake, :anonymous
               option.to_s
             when :video_only_wifi

@@ -12,7 +12,7 @@ fastlane
 
 #### ✨ Check out [docs.fastlane.tools](https://docs.fastlane.tools) on how to get started with fastlane ✨
 
-`fastlane` is a tool for iOS, Mac, and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
+`fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
 Use a lane to define your process:
 
@@ -34,7 +34,7 @@ Then to deploy a new 'beta' version of your app just run
 
 |          |  fastlane  |
 |----------|------------|
-:sparkles: | Connect iOS, Mac, and Android build tools into one workflow (both _fastlane_ tools and third party tools)
+:sparkles: | Connect iOS and Android build tools into one workflow (both _fastlane_ tools and third party tools)
 :monorail: | Define different `deployment lanes` for App Store deployment, beta builds, or testing
 :ship: | Deploy from any computer, including a CI server
 :wrench: | Extend and customise functionality
@@ -48,7 +48,7 @@ Then to deploy a new 'beta' version of your app just run
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
 :hatching_chick: | Over 170 built-in integrations available
-:computer: | Support for iOS, macOS, and Android apps
+:computer: | Support for iOS and Android apps
 :octocat: | Full Git and Mercurial support
 
 <hr />
@@ -138,6 +138,27 @@ In addition to `fastlane`'s commands, you also have access to these `fastlane` t
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
+
+## Metrics
+
+_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
+
+* The number of successes, errors, and crashes for _fastlane_ and each action run in a Fastfile
+* The running time of _fastlane_
+* The method by which _fastlane_ was installed
+* Whether _fastlane_ is being run on CI
+* The platform (e.g. iOS, Android) for which _fastlane_ is run
+* A hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
+
+We have recently changed the destination service to which these metrics are reported, as well as the format of the data, but the data that is collected has not changed.
+
+You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
+
+## Crash Reporting
+
+In order to continuously improve stability, _fastlane_ will record crash reports with sanitized stacktraces. Sanitization removes personal information from the stacktrace and error message (including home directories, _fastlane_ path, gem paths, environment variables, and parameters).
+
+You can easily opt-out of crash reporting by adding `opt_out_crash_reporting` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_CRASH_REPORTING`. Just like metrics mentioned above, participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
 
 ## Need Help?
 

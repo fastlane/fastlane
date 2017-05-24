@@ -91,7 +91,7 @@ fastlane release
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
 :hatching_chick: | Over 170 built-in integrations available
-:computer: | Support for iOS, macOS and Android apps
+:computer: | Support for iOS and Android apps
 :octocat: | Full git and mercurial support
 
 
@@ -138,7 +138,11 @@ The setup assistant will create all the necessary files for you, using the exist
 - Follow the setup assistant, which will set up ```fastlane``` for you
 - Further customise the ```Fastfile``` with [actions](https://docs.fastlane.tools/actions).
 
-For more details, please follow the [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) or [documentation](https://github.com/fastlane/fastlane/tree/master/fastlane/docs).
+For more details, follow our new Getting Started guides:
+
+- [Getting Started fastlane guide for iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
+- [Getting Started fastlane guide for Android](https://docs.fastlane.tools/getting-started/android/setup/)
+
 
 There are also 2 Japanese fastlane guides available: [qiita](http://qiita.com/gin0606/items/a8573b582752de0c15e1) and [mercari](http://tech.mercari.com/entry/2015/07/13/143000)
 
@@ -179,12 +183,6 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
-
-## Statistics
-
-`fastlane` tracks the number of errors for each action to detect integration issues. The data will be sent to [fastlane-enhancer](https://github.com/fastlane/enhancer).
-
-You can easily opt-out by adding `opt_out_usage` to your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. To also disable update checks, set the `FASTLANE_SKIP_UPDATE_CHECK` variable.
 
 ## Credentials
 A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/fastlane/tree/master/credentials_manager).

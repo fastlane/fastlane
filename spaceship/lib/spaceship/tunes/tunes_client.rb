@@ -265,7 +265,7 @@ module Spaceship
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
     def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
-      UI.deprecated("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
+      puts "The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead" if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
       primary_language ||= "English"
@@ -324,8 +324,19 @@ module Spaceship
     end
 
     def get_reviews(app_id, platform, storefront, versionId = '')
-      r = request(:get, "ra/apps/#{app_id}/reviews?platform=#{platform}&storefront=#{storefront}&versionId=#{versionId}")
-      parse_response(r, 'data')['reviews']
+      index = 0
+      per_page = 100 # apple default
+      all_reviews = []
+      loop do
+        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        all_reviews.concat(parse_response(r, 'data')['reviews'])
+        if all_reviews.count < parse_response(r, 'data')['reviewCount']
+          index += per_page
+        else
+          break
+        end
+      end
+      all_reviews
     end
 
     #####################################################
@@ -503,9 +514,11 @@ module Spaceship
     # }, {
     # ...
     def pricing_tiers
-      r = request(:get, 'ra/apps/pricing/matrix')
-      data = parse_response(r, 'data')['pricingTiers']
-      data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
+      @pricing_tiers ||= begin
+        r = request(:get, 'ra/apps/pricing/matrix')
+        data = parse_response(r, 'data')['pricingTiers']
+        data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
+      end
     end
 
     #####################################################
@@ -1000,16 +1013,29 @@ module Spaceship
       handle_itc_response(r)
     end
 
-    # loads the full In-App-Purchases
+    # Loads the full In-App-Purchases
     def load_iap(app_id: nil, purchase_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
     end
 
-    # loads the full In-App-Purchases-Family
+    # Loads the full In-App-Purchases-Family
     def load_iap_family(app_id: nil, family_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")
       parse_response(r, 'data')
+    end
+
+    # Loads the full In-App-Purchases-Pricing-Matrix
+    #   note: the matrix is the same for any app_id
+    #
+    # @param app_id (String) The Apple ID of any app
+    # @return ([Spaceship::Tunes::IAPSubscriptionPricingTier]) An array of pricing tiers
+    def subscription_pricing_tiers(app_id)
+      @subscription_pricing_tiers ||= begin
+        r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix/recurring")
+        data = parse_response(r, "data")["pricingTiers"]
+        data.map { |tier| Spaceship::Tunes::IAPSubscriptionPricingTier.factory(tier) }
+      end
     end
 
     # updates an In-App-Purchases-Family

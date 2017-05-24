@@ -75,8 +75,6 @@ module Scan
       end
 
       def pipe
-        # During building we just show the output in the terminal
-        # Check out the ReportCollector class for more xcpretty things
         pipe = ["| tee '#{xcodebuild_log_path}'"]
 
         if Scan.config[:output_style] == 'raw'
@@ -103,7 +101,13 @@ module Scan
           formatter << "--test"
         end
 
-        return pipe << ["| xcpretty #{formatter.join(' ')}"]
+        reporter_options_generator = XCPrettyReporterOptionsGenerator.new(Scan.config[:open_report],
+                                                                          Scan.config[:output_types],
+                                                                          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
+                                                                          Scan.config[:output_directory],
+                                                                          Scan.config[:use_clang_report_name])
+        reporter_options = reporter_options_generator.generate_reporter_options
+        return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
       end
 
       # Store the raw file

@@ -18,9 +18,7 @@ module Gym
       end
 
       def legacy_api_deprecated?
-        UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-        v = xcode_version
-        Gem::Version.new(v) >= Gem::Version.new('8.3.0')
+        FastlaneCore::Helper.xcode_at_least?('8.3')
       end
     end
   end

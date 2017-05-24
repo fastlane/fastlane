@@ -1,6 +1,6 @@
 Style/PercentLiteralDelimiters:
   Enabled: false
-  
+
 # kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
@@ -16,6 +16,12 @@ Style/SafeNavigation:
 Performance/RegexpMatch:
   Enabled: false
 
+# This suggests use of `tr` instead of `gsub`. While this might be more performant,
+# these methods are not at all interchangable, and behave very differently. This can
+# lead to people making the substitution without considering the differences.
+Performance/StringReplacement:
+  Enabled: false
+
 # .length == 0 is also good, we don't always want .zero?
 Style/NumericPredicate:
   Enabled: false
@@ -23,7 +29,7 @@ Style/NumericPredicate:
 # this would cause errors with long lanes
 Metrics/BlockLength:
   Enabled: false
-  
+
 # this is a bit buggy
 Metrics/ModuleLength:
   Enabled: false
@@ -36,23 +42,23 @@ Style/VariableNumber:
 Style/MethodMissing:
   Enabled: false
 
-# 
+#
 #   File.chmod(0777, f)
-# 
+#
 # is easier to read than
-# 
+#
 #   File.chmod(0o777, f)
-# 
+#
 Style/NumericLiteralPrefix:
   Enabled: false
 
-# 
+#
 # command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
-# 
+#
 # is easier to read than
-# 
+#
 # command = !clean_expired.nil? || !clean_pattern.nil? ? CLEANUP : LIST
-# 
+#
 Style/TernaryParentheses:
   Enabled: false
 

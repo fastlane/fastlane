@@ -1,14 +1,36 @@
 module Match
   class GitHelper
-    def self.clone(git_url, shallow_clone, manual_password: nil, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil)
+    def self.clone(git_url,
+                   shallow_clone,
+                   manual_password: nil,
+                   skip_docs: false,
+                   branch: "master",
+                   git_full_name: nil,
+                   git_user_email: nil,
+                   clone_branch_directly: false)
+      # Note: if you modify the parameters above, don't forget to also update the method call in
+      # - runner.rb
+      # - nuke.rb
+      # - change_password.rb
+      # - commands_generator.rb
+      #
       return @dir if @dir
 
       @dir = Dir.mktmpdir
 
       command = "git clone '#{git_url}' '#{@dir}'"
-      command << " --depth 1 --no-single-branch" if shallow_clone
+      if shallow_clone
+        command << " --depth 1 --no-single-branch"
+      elsif clone_branch_directly
+        command += " -b #{branch.shellescape} --single-branch"
+      end
 
       UI.message "Cloning remote git repo..."
+
+      if branch && !clone_branch_directly
+        UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
+      end
+
       begin
         # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
         FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",

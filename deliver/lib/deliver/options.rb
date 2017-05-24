@@ -37,7 +37,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_IPA_PATH",
                                      description: "Path to your ipa file",
-                                     default_value: Dir["*.ipa"].first,
+                                     default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
@@ -51,7 +51,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_PKG_PATH",
                                      description: "Path to your pkg file",
-                                     default_value: Dir["*.pkg"].first,
+                                     default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
@@ -228,6 +228,10 @@ module Deliver
                                      description: "Metadata: The english name of the secondary second sub category(e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
+                                     description: "Metadata: A hash containing the trade representative contact information",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
