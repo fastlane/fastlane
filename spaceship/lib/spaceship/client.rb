@@ -447,6 +447,7 @@ module Spaceship
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
