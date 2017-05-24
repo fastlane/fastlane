@@ -22,14 +22,16 @@ class TunesStubbing
         to_return(status: 200, body: "")
       stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
         to_return(status: 200, body: "") # we don't actually care about the body
+      stub_request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com").
+        to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
 
       # Actual login
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
         to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
 
       # Failed login attempts
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=1234567890").
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
     end

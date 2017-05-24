@@ -401,7 +401,7 @@ module Spaceship
         if keychain_entry.invalid_credentials
           login(user)
         else
-          puts "Please run this tool again to apply the new password"
+          raise ex
         end
       end
     end
@@ -443,10 +443,11 @@ module Spaceship
         end
 
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{itc_service_key}"
+          req.url "https://idmsa.apple.com/appleauth/auth/signin"
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
@@ -454,23 +455,22 @@ module Spaceship
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
-      # get `woinst` and `wois` cookie values
-      request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa")
-
-      # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
-      request(:get, "https://olympus.itunes.apple.com/v1/session")
+      # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
+        fetch_olympus_session
         return response
+      when 409
+        # 2 factor is enabled for this account, first handle that
+        # and then get the olympus session
+        handle_two_step(response)
+        fetch_olympus_session
+        return true
       else
-        location = response["Location"]
-        if location && URI.parse(location).path == "/auth" # redirect to 2 step auth page
-          handle_two_step(response)
-          return true
-        elsif (response.body || "").include?('invalid="true"')
+        if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif (response['Set-Cookie'] || "").include?("itctx")
@@ -482,6 +482,11 @@ module Spaceship
       end
     end
 
+    # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+    def fetch_olympus_session
+      request(:get, "https://olympus.itunes.apple.com/v1/session")
+    end
+
     def itc_service_key
       return @service_key if @service_key
 
@@ -489,16 +494,10 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
-      # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
-      # the content be served only as plain-text, which seems to work around their problem, while not affecting
-      # other clients.
-      #
-      # https://github.com/fastlane/fastlane/issues/4610
-      headers = { 'Accept-Encoding' => 'identity' }
-      # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
-      @service_key = js.body.match(/itcServiceKey = '(.*)'/)[1]
+      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      @service_key = response.body["authServiceKey"].to_s
+
+      raise "Service key is empty" if @service_key.length == 0
 
       # Cache the key locally
       File.write(itc_service_key_path, @service_key)
