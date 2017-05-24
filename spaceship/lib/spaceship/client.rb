@@ -137,6 +137,50 @@ module Spaceship
       end
     end
 
+    # Fetch the general information of the user, is used by various methods across spaceship
+    # Sample return value
+    # => {"associatedAccounts"=>
+    #   [{"contentProvider"=>{"contentProviderId"=>11142800, "name"=>"Felix Krause", "contentProviderTypes"=>["Purple Software"]}, "roles"=>["Developer"], "lastLogin"=>1468784113000}],
+    #  "sessionToken"=>{"dsId"=>"8501011116", "contentProviderId"=>18111111, "expirationDate"=>nil, "ipAddress"=>nil},
+    #  "permittedActivities"=>
+    #   {"EDIT"=>
+    #     ["UserManagementSelf",
+    #      "GameCenterTestData",
+    #      "AppAddonCreation"],
+    #    "REPORT"=>
+    #     ["UserManagementSelf",
+    #      "AppAddonCreation"],
+    #    "VIEW"=>
+    #     ["TestFlightAppExternalTesterManagement",
+    #      ...
+    #      "HelpGeneral",
+    #      "HelpApplicationLoader"]},
+    #  "preferredCurrencyCode"=>"EUR",
+    #  "preferredCountryCode"=>nil,
+    #  "countryOfOrigin"=>"AT",
+    #  "isLocaleNameReversed"=>false,
+    #  "feldsparToken"=>nil,
+    #  "feldsparChannelName"=>nil,
+    #  "hasPendingFeldsparBindingRequest"=>false,
+    #  "isLegalUser"=>false,
+    #  "userId"=>"1771111155",
+    #  "firstname"=>"Detlef",
+    #  "lastname"=>"Mueller",
+    #  "isEmailInvalid"=>false,
+    #  "hasContractInfo"=>false,
+    #  "canEditITCUsersAndRoles"=>false,
+    #  "canViewITCUsersAndRoles"=>true,
+    #  "canEditIAPUsersAndRoles"=>false,
+    #  "transporterEnabled"=>false,
+    #  "contentProviderFeatures"=>["APP_SILOING", "PROMO_CODE_REDESIGN", ...],
+    #  "contentProviderType"=>"Purple Software",
+    #  "displayName"=>"Detlef",
+    #  "contentProviderId"=>"18742800",
+    #  "userFeatures"=>[],
+    #  "visibility"=>true,
+    #  "DYCVisibility"=>false,
+    #  "contentProvider"=>"Felix Krause",
+    #  "userName"=>"detlef@krausefx.com"}
     def user_details_data
       return @_cached_user_details if @_cached_user_details
       r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
@@ -184,6 +228,13 @@ module Spaceship
       handle_itc_response(response.body)
 
       @current_team_id = team_id
+    end
+
+    # @return (Hash) Fetches all information of the currently used team
+    def team_information
+      teams.find do |t|
+        t['teamId'] == team_id
+      end
     end
 
     # Instantiates a client but with a cookie derived from another client.
