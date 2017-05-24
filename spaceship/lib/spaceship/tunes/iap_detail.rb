@@ -118,9 +118,8 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        parsed_intervals = []
-        raw_data["pricingIntervals"].each do |interval|
-          parsed_intervals << {
+        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
+          {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
             end_date: interval["value"]["priceTierEndDate"],
@@ -128,7 +127,6 @@ module Spaceship
             country: interval["value"]["country"]
           }
         end
-        return parsed_intervals
       end
 
       # @return (String) Human Readable type of the purchase
@@ -216,6 +214,52 @@ module Spaceship
       # Deletes In-App-Purchase
       def delete!
         client.delete_iap!(app_id: application.apple_id, purchase_id: self.purchase_id)
+      end
+
+      # Retrieves the actual prices for an iap.
+      #
+      # @return ([]) An empty array
+      #   if the iap is not yet cleared for sale
+      # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same pricing tier
+      #   if the iap uses world wide pricing
+      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multple subscription pricing tiers
+      #   if the iap uses territorial pricing
+      def pricing_info
+        return [] unless cleared_for_sale
+        return world_wide_pricing_info if world_wide_pricing?
+        territorial_pricing_info
+      end
+
+      private
+
+      # Checks wheather an iap uses world wide or territorial pricing.
+      #
+      # @return (true, false)
+      def world_wide_pricing?
+        pricing_intervals.fetch(0, {})[:country] == "WW"
+      end
+
+      # Maps a single pricing interval to pricing infos.
+      #
+      # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same tier
+      def world_wide_pricing_info
+        client
+          .pricing_tiers
+          .find { |p| p.tier_stem == pricing_intervals.first[:tier].to_s }
+          .pricing_info
+      end
+
+      # Maps pricing intervals to their respective subscription pricing infos.
+      #
+      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of subscription pricing infos
+      def territorial_pricing_info
+        pricing_matrix = client.subscription_pricing_tiers(application.apple_id)
+        pricing_intervals.map do |interval|
+          pricing_matrix
+            .find { |p| p.tier_stem == interval[:tier].to_s }
+            .pricing_info
+            .find { |i| i.country_code == interval[:country] }
+        end
       end
     end
   end

@@ -6,6 +6,7 @@ require 'spaceship/tunes/iap_family_list'
 require 'spaceship/tunes/iap_families'
 require 'spaceship/tunes/iap_family_details'
 require 'spaceship/tunes/iap_families'
+require 'spaceship/tunes/iap_subscription_pricing_tier'
 
 module Spaceship
   module Tunes

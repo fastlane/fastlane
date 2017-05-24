@@ -20,9 +20,9 @@ module Deliver
         trade_representative_trade_name: :trade_name,
         trade_representative_first_name: :first_name,
         trade_representative_last_name: :last_name,
-        trade_representative_address_line_1: :adderss_line1,
-        trade_representative_address_line_2: :adderss_line2,
-        trade_representative_address_line_3: :adderss_line3,
+        trade_representative_address_line_1: :address_line1,
+        trade_representative_address_line_2: :address_line2,
+        trade_representative_address_line_3: :address_line3,
         trade_representative_city_name: :city_name,
         trade_representative_state: :state,
         trade_representative_country: :country,
@@ -250,7 +250,7 @@ module Deliver
       UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-        v.send("#{key}=", info[option_name].chomp) if info[option_name].chomp
+        v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
     end
 

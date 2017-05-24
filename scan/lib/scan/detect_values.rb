@@ -153,7 +153,7 @@ module Scan
       end
 
       default = lambda do
-        UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+        UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
 
         result = Array(
           simulators
@@ -163,7 +163,7 @@ module Scan
             .last || simulators.first
         )
 
-        UI.error("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
+        UI.message("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
 
         result
       end

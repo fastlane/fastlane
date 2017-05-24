@@ -55,7 +55,7 @@ module Gym
         print_xcode_path_instructions
         print_xcode_version
         raise_legacy_build_api_error(output) if Gym.config[:use_legacy_build_api]
-        UI.user_error!("Error building the application - see the log above", error_info: output)
+        UI.build_failure!("Error building the application - see the log above", error_info: output)
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -86,7 +86,7 @@ module Gym
           print "provisioning profile and code signing identity."
         end
         print_full_log_path
-        UI.user_error!("Error packaging up the application", error_info: output)
+        UI.build_failure!("Error packaging up the application", error_info: output)
       end
 
       def handle_empty_archive
@@ -96,7 +96,7 @@ module Gym
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
         print "Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/"
         print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
-        UI.user_error!("Archive invalid")
+        UI.build_failure!("Archive invalid")
       end
 
       def find_standard_output_path(output)
@@ -110,7 +110,7 @@ module Gym
         UI.error("and was removed with Xcode 8.3")
         UI.error("Please update your Fastfile to include the export_method too")
         UI.error("more information about how to migrate away: https://github.com/fastlane/fastlane/releases/tag/2.24.0")
-        UI.user_error!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
+        UI.build_failure!("Build failed. Please remove the `use_legacy_build_api` option in your Fastfile and try again", error_info: output)
       end
 
       private
