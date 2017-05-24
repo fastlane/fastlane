@@ -60,6 +60,8 @@
 # 4. extracts the entitlements from the provisioning profile
 # 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
+# new features May 2017
+# 1. enables the -b option to be used more than once and updates nested applications and app extentions bundle id
 
 # Logging functions
 
@@ -142,7 +144,9 @@ fi
 ORIGINAL_FILE="$1"
 CERTIFICATE="$2"
 ENTITLEMENTS=
-BUNDLE_IDENTIFIER=""
+#BUNDLE_IDENTIFIER=""
+RAW_BUNDLE_IDENTIFIERS=()
+BUNDLE_IDENTIFIERS_BY_TARGET=()
 DISPLAY_NAME=""
 KEYCHAIN=""
 VERSION_NUMBER=""
@@ -178,7 +182,8 @@ while [ "$1" != "" ]; do
             ;;
         -b | --bundle-id )
             shift
-            BUNDLE_IDENTIFIER="$1"
+            RAW_BUNDLE_IDENTIFIERS+=("$1")
+            #BUNDLE_IDENTIFIER="$1"
             ;;
         -k | --keychain )
             shift
@@ -226,6 +231,15 @@ then
 fi
 
 # Log the options
+for indentifier in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
+    if [[ "$indentifier" =~ .+=.+ ]]; then
+        log "Specified bundle identifier: '${indentifier#*=}' for target produce name: '${indentifier%%=*}'"
+    else
+        log "Specified bundle identifier: '$indentifier'"
+    fi
+done
+
+# Log the options
 for provision in "${RAW_PROVISIONS[@]}"; do
     if [[ "$provision" =~ .+=.+ ]]; then
         log "Specified provisioning profile: '${provision#*=}' for bundle identifier: '${provision%%=*}'"
@@ -238,7 +252,7 @@ log "Original file: '$ORIGINAL_FILE'"
 log "Certificate: '$CERTIFICATE'"
 [[ -n "${DISPLAY_NAME}" ]] && log "Specified display name: '$DISPLAY_NAME'"
 [[ -n "${ENTITLEMENTS}" ]] && log "Specified signing entitlements: '$ENTITLEMENTS'"
-[[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
+#[[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
 [[ -n "${KEYCHAIN}" ]] && log "Specified keychain to use: '$KEYCHAIN'"
 [[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
 [[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
@@ -337,6 +351,17 @@ function provision_for_bundle_id {
     done
 }
 
+# Find the bundle identifier for a given target product name
+function bundle_id_for_target {
+
+    for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
+        if [[ "$1" == "$2" ]]; then
+            echo "${ARG#*=}"
+            break
+        fi
+    done
+}
+
 # Find the bundle identifier contained inside a provisioning profile
 function bundle_id_for_provison {
 
@@ -388,7 +413,7 @@ done
 # Resign the given application
 function resign {
 
-    local APP_PATH="$1"
+    local APP_PATH="$1" 
     local NESTED="$2"
     local BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER"
     local NEW_PROVISION="$NEW_PROVISION"
@@ -398,6 +423,8 @@ function resign {
     if [[ "$NESTED" == NESTED ]]; then
         # Ignore bundle identifier for nested applications
         BUNDLE_IDENTIFIER=""
+        # MLR TODO: nope look it up!
+        # MLR NOTE: APP_PATH == target product name?
     fi
 
     # Make sure that the Info.plist file is where we expect it
