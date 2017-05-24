@@ -46,22 +46,7 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      # First, generate a JUnit report to get the number of tests
-      require 'tempfile'
-      output_file = Tempfile.new("junit_report")
-
-      report_collector = ReportCollector.new(Scan.config[:open_report],
-                                             Scan.config[:output_types],
-                                             Scan.config[:output_directory],
-                                             Scan.config[:use_clang_report_name],
-                                             Scan.config[:custom_report_file_name])
-
-      cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                               types: 'junit',
-                                               output_file_name: output_file.path).values.last
-      system(cmd)
-
-      result = TestResultParser.new.parse_result(output_file.read)
+      result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
 
       if result[:failures] > 0
@@ -81,8 +66,6 @@ module Scan
 
       copy_simulator_logs
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
-
       if result[:failures] > 0
         UI.test_failure!("Tests have failed")
       end
@@ -90,6 +73,15 @@ module Scan
       unless tests_exit_status == 0
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
+
+      if !Helper.is_ci? && Scan.cache[:open_html_report_path]
+        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+      end
+    end
+
+    def test_results
+      return "" unless Scan.cache[:temp_junit_report]
+      File.read(Scan.cache[:temp_junit_report])
     end
 
     def copy_simulator_logs
