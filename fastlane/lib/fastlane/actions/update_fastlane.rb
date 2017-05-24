@@ -93,12 +93,12 @@ module Fastlane
 
       def self.show_information_about_nightly_builds
         UI.message("")
-        UI.message("Please help us test early releases of fastlane by opting into nightly builds")
+        UI.message("Please help us test early releases of fastlane by opting into nightly builds 🌃")
         UI.message("Just replace your `update_fastlane` call with")
         UI.message("")
         UI.command_output("update_fastlane(nightly: true)")
         UI.message("")
-        UI.message("Nightly builds are reviewed and tested just like the public releases")
+        UI.message("Nightly builds are reviewed and tested just like the public releases 🚂")
         UI.message("")
       end
 
