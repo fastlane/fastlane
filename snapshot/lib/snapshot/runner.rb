@@ -47,6 +47,7 @@ module Snapshot
             results[device] ||= {}
 
             current_run = device_index * Snapshot.config[:languages].count + language_index + 1
+            Snapshot.cache[:current_run] = current_run
             number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
 
