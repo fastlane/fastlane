@@ -24,12 +24,18 @@ module FastlaneCore
         # a crash report), unless we have explictly turned on the crash reporter because
         # we want to test it
         return if Helper.test? && !@explitly_enabled_for_testing
-
-        payload = CrashReportGenerator.generate(exception: exception, action: action)
-        send_report(payload: payload)
-        save_file(payload: payload)
-        show_message unless did_show_message?
-        @did_report_crash = true
+        begin
+          payload = CrashReportGenerator.generate(exception: exception, action: action)
+          send_report(payload: payload)
+          save_file(payload: payload)
+          show_message unless did_show_message?
+          @did_report_crash = true
+        rescue
+          if FastlaneCore::Globals.verbose?
+            UI.error("Unable to send the crash report.")
+            UI.error("Please open an issue on GitHub if you need help!")
+          end
+        end
       end
 
       def reset_crash_reporter_for_testing
