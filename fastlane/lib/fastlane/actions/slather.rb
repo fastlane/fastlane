@@ -53,20 +53,18 @@ module Fastlane
         File.file?('.slather.yml')
       end
 
-      def self.slather_version(params)
-        command = []
-        command.push("bundle exec") if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
-        command.push("slather version")
-        Gem::Version.create(`#{command.join(' ')}`.split(' ')[1])
+      def self.slather_version
+        require 'slather'
+        Slather::VERSION
       end
 
-      def self.configuration_available?(params)
-        Gem::Version.create('2.4.1') <= slather_version(params)
+      def self.configuration_available?
+        Gem::Version.new('2.4.1') <= Gem::Version.new(slather_version)
       end
 
       def self.validate_params!(params)
         if params[:configuration]
-          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?(params)
+          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?
         end
 
         if params[:proj] || has_config_file

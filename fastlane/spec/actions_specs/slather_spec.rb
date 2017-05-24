@@ -192,21 +192,21 @@ describe Fastlane do
         context "when slather version is 2.4.0" do
           let(:version) { '2.4.0' }
           it "configuration option is not available" do
-            expect(action.configuration_available?(param)).to be_falsey
+            expect(action.configuration_available?).to be_falsey
           end
         end
 
         context "when slather version is 2.4.1" do
           let(:version) { '2.4.1' }
           it "configuration option is available" do
-            expect(action.configuration_available?(param)).to be_truthy
+            expect(action.configuration_available?).to be_truthy
           end
         end
 
         context "when slather version is 2.4.2" do
           let(:version) { '2.4.2' }
           it "configuration option is available" do
-            expect(action.configuration_available?(param)).to be_truthy
+            expect(action.configuration_available?).to be_truthy
           end
         end
       end
