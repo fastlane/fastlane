@@ -438,16 +438,10 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      # Some customers in Asia have had trouble with the CDNs there that cache and serve this content, leading
-      # to "buffer error (Zlib::BufError)" from deep in the Ruby HTTP stack. Setting this header requests that
-      # the content be served only as plain-text, which seems to work around their problem, while not affecting
-      # other clients.
-      #
-      # https://github.com/fastlane/fastlane/issues/4610
-      headers = { 'Accept-Encoding' => 'identity' }
-      # We need a service key from a JS file to properly auth
-      js = request(:get, "https://itunesconnect.apple.com/itc/static-resources/controllers/login_cntrl.js", nil, headers)
-      @service_key = js.body.match(/itcServiceKey = '(.*)'/)[1]
+      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      @service_key = response.body["authServiceKey"].to_s
+
+      raise "Service key is empty" if @service_key.length == 0
 
       # Cache the key locally
       File.write(itc_service_key_path, @service_key)
