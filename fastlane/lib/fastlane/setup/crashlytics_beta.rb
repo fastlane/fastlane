@@ -55,7 +55,7 @@ module Fastlane
 
 # rubocop:disable Style/IndentationConsistency
 %{  #
-  # Learn more here: https://docs.fastlane.tools/getting-started/ios/beta-deployment/ 
+  # Learn more here: https://docs.fastlane.tools/getting-started/ios/beta-deployment/
   #             and: https://docs.fastlane.tools/getting-started/android/beta-deployment/
   #
   lane :beta do |values|
