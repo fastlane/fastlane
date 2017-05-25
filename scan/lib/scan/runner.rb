@@ -5,6 +5,10 @@ require 'terminal-table'
 
 module Scan
   class Runner
+    def initialize
+      @test_command_generator = TestCommandGenerator.new
+    end
+
     def run
       handle_results(test_app)
     end
@@ -16,7 +20,7 @@ module Scan
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first) if Scan.devices
-      command = TestCommandGenerator.generate
+      command = @test_command_generator.generate
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -87,7 +91,7 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
       output_file = Tempfile.new("junit_report")
-      cmd = "cat #{TestCommandGenerator.xcodebuild_log_path} | xcpretty --report junit --output #{output_file.path} &> /dev/null"
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path} | xcpretty --report junit --output #{output_file.path} &> /dev/null"
       system(cmd)
       output_file.read
     end

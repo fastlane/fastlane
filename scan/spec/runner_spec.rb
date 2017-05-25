@@ -7,7 +7,10 @@ describe Scan do
         mock_slack_poster = Object.new
         allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
         allow(mock_slack_poster).to receive(:run)
-        allow(Scan::TestCommandGenerator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
+
+        mock_test_command_generator = Object.new
+        allow(Scan::TestCommandGenerator).to receive(:new).and_return(mock_test_command_generator)
+        allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
 
         mock_test_result_parser = Object.new
         allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
