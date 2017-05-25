@@ -239,8 +239,8 @@ module Fastlane
           title: "Lane Context".yellow,
           rows: FastlaneCore::PrintTable.transform_output(rows)
         })
-      rescue => e
-        os = Helper.linux? : 'linux' ? 'mac'
+      rescue
+        os = Helper.linux? ? 'linux' : 'mac'
         UI.crash!("Something went wrong trying to print the lane context on #{os}")
       end
     end
