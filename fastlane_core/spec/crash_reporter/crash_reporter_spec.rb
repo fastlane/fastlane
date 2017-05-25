@@ -37,6 +37,16 @@ describe FastlaneCore::CrashReporter do
       end
     end
 
+    context 'plugin crashes' do
+      let(:plugin_exception) { double('Plugin_Exception', backtrace: ['[gem_home]/gems/fastlane-plugin-appicon-0.6.0/lib/fastlane/plugin/appicon/actions/android_appicon_action.rb:23:in `run']) }
+
+      it 'does not post crash report if the crash came from a plugin' do
+        expect(FastlaneCore::CrashReportGenerator).to_not receive(:generate)
+        expect(FastlaneCore::CrashReporter.crash_came_from_plugin?(exception: plugin_exception)).to eq(true)
+        FastlaneCore::CrashReporter.report_crash(exception: plugin_exception)
+      end
+    end
+
     context 'opted out of crash reporting' do
       before do
         silence_ui_output
