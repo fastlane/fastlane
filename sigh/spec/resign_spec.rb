@@ -75,6 +75,5 @@ describe Sigh do
       bundle_id_options = @resign.create_bundle_id_options(bundle_id)
       expect(bundle_id_options).to eq("-b at.fastlane")
     end
-
   end
 end

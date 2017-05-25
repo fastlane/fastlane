@@ -156,6 +156,7 @@ module Sigh
           new_app_id = app_name.shellescape
           "-b #{new_app_id}"
         else
+          ""
         end
       end.join(' ')
     end

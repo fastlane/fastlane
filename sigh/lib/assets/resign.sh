@@ -240,7 +240,7 @@ fi
 # Log the options
 for indentifier in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
     if [[ "$indentifier" =~ .+=.+ ]]; then
-        log "Specified bundle identifier: '${indentifier#*=}' for target produce name: '${indentifier%%=*}'"
+        log "Specified bundle identifier: '${indentifier#*=}' for target product name: '${indentifier%%=*}'"
     else
         log "Specified bundle identifier: '$indentifier'"
     fi
@@ -410,7 +410,7 @@ done
 function bundle_id_for_target {
 
    for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
-        echo "ARG: ${ARG%%=*} ${ARG#*=}" >&2
+        #echo "ARG: ${ARG%%=*} ${ARG#*=}" >&2
         if [[ "${ARG#*=}" == "$1" ]]; then
             echo "${ARG%%=*}"
             break
@@ -455,18 +455,17 @@ done
 function resign {
 
     local APP_PATH="$1" 
-    local APP_NAME=$(basename "$APP_PATH" .appex)
+    local APP_NAME=$(basename "$APP_PATH")
+    APP_NAME="${APP_NAME%.*}"
     local NESTED="$2"
-    local BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER"
+    local BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
     local NEW_PROVISION="$NEW_PROVISION"
     local APP_IDENTIFIER_PREFIX=""
     local TEAM_IDENTIFIER=""
 
-    if [[ "$NESTED" == NESTED ]]; then
-        BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
-        warning "BUNDLE_IDENTIFIER == $BUNDLE_IDENTIFIER for APP_NAME=$APP_NAME"
+    if [[ "$BUNDLE_IDENTIFIER" == "" && "$NESTED" != NESTED ]]; then
+        BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER" 
     fi
-    return 
 
     # Make sure that the Info.plist file is where we expect it
     if [ ! -e "$APP_PATH/Info.plist" ];
@@ -635,10 +634,17 @@ function resign {
     for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
         REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
+        # MLR TODO: this --^ is still pointing to the old bundle_id!
+        # need to update the $APP_PATH/Info.plist before this point.
+        # or somehow look up the old to new bundle_id here.
         if [ -n "$REF_BUNDLE_ID" ];
         then
+            log "*** REF_BUNDLE_ID $REF_BUNDLE_ID"
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
+            log "*** PROVISIONS_BY_ID $PROVISIONS_BY_ID"
+            # MLR TODO: this doesnt work. Need to map the old REF_BUNDLE_ID here to the new one somehow!
             REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
+            log "*** REF_PROVISION $REF_PROVISION"
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
@@ -646,6 +652,8 @@ function resign {
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
+                # MLR TODO: this is give a empty string for WKCompanionAppBundleIdentifier NEW_REF_BUNDLE_ID
+                #    for watchapp
                 PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
             fi
         fi
