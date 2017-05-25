@@ -124,6 +124,8 @@ module Deliver
       rescue Spaceship::ITunesConnectError => e
         if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
           UI.user_error!(e.message)
+        else
+          raise e
         end
       end
     end
