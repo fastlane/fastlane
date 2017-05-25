@@ -38,7 +38,7 @@ module FastlaneCore
     # [Boolean] Set if the variable is to be converted to a shell-escaped String when provided as a Hash or Array
     # Allows items expected to be strings used in shell arguments to be alternatively provided as a Hash or Array for better readability and auto-escaped for us.
     attr_accessor :allow_shell_conversion
-    
+
     # [Boolean] Set if the variable can be used from shell
     attr_accessor :display_in_shell
 
@@ -88,7 +88,7 @@ module FastlaneCore
       optional = false if optional.nil?
 
       sensitive = false if sensitive.nil?
-      
+
       display_in_shell = true if display_in_shell.nil?
 
       @key = key

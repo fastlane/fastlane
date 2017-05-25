@@ -1,7 +1,7 @@
 require 'spaceship'
 
 module Produce
-  class DeveloperCenter    
+  class DeveloperCenter
     SERVICE_ON = "on"
     SERVICE_OFF = "off"
     SERVICE_COMPLETE = "complete"
@@ -9,7 +9,7 @@ module Produce
     SERVICE_UNTIL_FIRST_LAUNCH = "untilfirstauth"
     SERVICE_LEGACY = "legacy"
     SERVICE_CLOUDKIT = "cloudkit"
-    
+
     ALLOWED_SERVICES = {
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
@@ -29,9 +29,9 @@ module Produce
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
-      vpn_configuration: [SERVICE_ON, SERVICE_OFF],
+      vpn_configuration: [SERVICE_ON, SERVICE_OFF]
     }
-    
+
     def run
       login
       create_new_app
@@ -73,10 +73,10 @@ module Produce
     def enable_services
       app_service = Spaceship.app_service
       enabled_clean_options = {}
-      
+
       # "enable_services" was deprecated in favor of "enable_services"
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enable_services]
-      
+
       config_enabled_services.each do |k, v|
         if k.to_sym == :data_protection
           case v
