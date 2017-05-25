@@ -233,11 +233,13 @@ module Fastlane
         [key, content.to_s]
       end
 
-      require 'terminal-table'
-      puts Terminal::Table.new({
-        title: "Lane Context".yellow,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      })
+      unless Helper.linux?
+        require 'terminal-table'
+        puts Terminal::Table.new({
+          title: "Lane Context".yellow,
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        })
+      end
     end
   end
 end
