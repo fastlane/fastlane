@@ -90,6 +90,21 @@ describe Scan do
         expect(@scan.test_results).to_not be_nil
         expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
       end
+
+      describe "when output_style is raw" do
+        it "still proceeds successfully and generates a temp junit report" do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            include_simulator_logs: false,
+            output_style: "raw"
+          })
+          
+          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
+          expect(@scan.test_results).to_not be_nil
+          expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+        end
+      end
     end
   end
 end
