@@ -45,7 +45,7 @@ module Scan
         type = raw_type.strip
         output_path = File.join(File.expand_path(@output_directory), determine_output_file_name(type))
         reporter << "--report #{type}"
-        reporter << "--output #{output_path}"
+        reporter << "--output '#{output_path}'"
 
         if type == "html" && @open_report
           Scan.cache[:open_html_report_path] = output_path
