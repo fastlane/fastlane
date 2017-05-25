@@ -99,7 +99,7 @@ describe Scan do
             include_simulator_logs: false,
             output_style: "raw"
           })
-          
+
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
           expect(@scan.test_results).to_not be_nil
           expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
