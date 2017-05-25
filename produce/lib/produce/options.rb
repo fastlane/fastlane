@@ -66,17 +66,32 @@ module Produce
                                      is_string: false,
                                      default_value: false),
 
+        # Deprecating this in favor of a rename from "enabled_features" to "enable_services"
         FastlaneCore::ConfigItem.new(key: :enabled_features,
+                                     deprecated: true,
                                      display_in_shell: false,
                                      env_name: "PRODUCE_ENABLED_FEATURES",
-                                     description: "Array with Spaceship App Features (e.g. #{Produce::DeveloperCenter::ALLOWED_FEATURES.join(", ")})",
+                                     description: "Array with Spaceship App Features (e.g. #{Produce::DeveloperCenter::ALLOWED_SERVICES.join(", ")})",
                                      is_string: false,
                                      default_value: {},
                                      verify_block: proc do |value|
-                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_FEATURES
+                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES
                                                      UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
                                                      value.each do |key, v|
                                                        UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                     end
+                                                   end),
+        FastlaneCore::ConfigItem.new(key: :enable_services,
+                                     display_in_shell: false,
+                                     env_name: "PRODUCE_ENABLE_SERVICES",
+                                     description: "Array with Spaceship App Services (e.g. #{Produce::DeveloperCenter::ALLOWED_SERVICES.join(", ")})",
+                                     is_string: false,
+                                     default_value: {},
+                                     verify_block: proc do |value|
+                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES
+                                                     UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
+                                                     value.each do |key, v|
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
                                                      end
                                                    end),
 

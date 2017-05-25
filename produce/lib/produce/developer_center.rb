@@ -2,7 +2,7 @@ require 'spaceship'
 
 module Produce
   class DeveloperCenter
-    ALLOWED_FEATURES =[:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit,
+    ALLOWED_SERVICES = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit,
                        :home_kit, :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, 
                        :push_notification, :siri_kit, :vpn_configuration]
     
@@ -23,7 +23,7 @@ module Produce
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name,
-                                         enabled_features: enabled_features,
+                                         enable_services: enable_services,
                                          mac: Produce.config[:platform] == "osx")
 
         if app.name != Produce.config[:app_name]
@@ -44,11 +44,14 @@ module Produce
       return true
     end
 
-    def enabled_features
+    def enable_services
       app_service = Spaceship.app_service
       enabled_clean_options = {}
       
-      Produce.config[:enabled_features].each do |k, v|
+      # "enable_services" was deprecated in favor of "enable_services"
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enable_services]
+      
+      config_enabled_services.each do |k, v|
         if k.to_sym == :data_protection
           case v
           when "complete"

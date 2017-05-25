@@ -45,7 +45,7 @@ describe Spaceship::Portal::App do
       expect(app.is_wildcard).to eq(false)
 
       expect(app.features).to include("push" => true)
-      expect(app.enabled_features).to include("push")
+      expect(app.enable_services).to include("push")
       expect(app.dev_push_enabled).to eq(false)
       expect(app.prod_push_enabled).to eq(true)
       expect(app.app_groups_count).to eq(0)
@@ -88,7 +88,7 @@ describe Spaceship::Portal::App do
 
   describe '#create' do
     it 'creates an app id with an explicit bundle_id' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: {}) {
+      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enable_services: {}) {
         { 'isWildCard' => true }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App')
@@ -96,15 +96,15 @@ describe Spaceship::Portal::App do
     end
 
     it 'creates an app id with an explicit bundle_id and no push notifications' do
-      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enabled_features: { push_notification: "off" }) {
+      expect(client).to receive(:create_app!).with(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', mac: false, enable_services: { push_notification: "off" }) {
         { 'enabledFeatures' => ["inAppPurchase"] }
       }
-      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enabled_features: { push_notification: "off" })
-      expect(app.enabled_features).not_to include("push")
+      app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enable_services: { push_notification: "off" })
+      expect(app.enable_services).not_to include("push")
     end
 
     it 'creates an app id with a wildcard bundle_id' do
-      expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', mac: false, enabled_features: {}) {
+      expect(client).to receive(:create_app!).with(:wildcard, 'Development App', 'tools.fastlane.spaceship.*', mac: false, enable_services: {}) {
         { 'isWildCard' => false }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.*', name: 'Development App')
