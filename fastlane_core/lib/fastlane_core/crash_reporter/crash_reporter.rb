@@ -19,7 +19,6 @@ module FastlaneCore
       def report_crash(exception: nil, action: nil)
         return unless enabled?
         return if @did_report_crash
-        return if crash_came_from_plugin?(exception: exception)
         # Do not run the crash reporter while tests are happening (it might try to send
         # a crash report), unless we have explictly turned on the crash reporter because
         # we want to test it
@@ -36,12 +35,6 @@ module FastlaneCore
             UI.error("Please open an issue on GitHub if you need help!")
           end
         end
-      end
-
-      def crash_came_from_plugin?(exception: nil)
-        return false if exception.nil?
-        plugin_frame = exception.backtrace.find { |frame| frame.include?('fastlane-plugin-') }
-        plugin_frame.nil? ? false : true
       end
 
       def reset_crash_reporter_for_testing

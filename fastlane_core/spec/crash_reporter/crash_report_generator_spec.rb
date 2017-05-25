@@ -54,6 +54,18 @@ describe FastlaneCore::CrashReportGenerator do
       report = JSON.parse(FastlaneCore::CrashReportGenerator.generate(exception: mock_exception))
       expect(report['message']).to include(mock_exception.backtrace.join("\n"))
     end
+
+    let(:plugin_exception) do
+      double(
+        'Exception',
+        backtrace: ['[gem_home]/gems/fastlane-plugin-appicon-0.6.0/lib/fastlane/plugin/appicon/actions/android_appicon_action.rb:23:in `run'],
+        message: 'plugin exception message'
+      )
+    end
+    it 'has a PLUGIN_CRASH prefix' do
+      setup_expected_body(message_text: "[PLUGIN_CRASH]: #{plugin_exception.class.name}: #{plugin_exception.message}\n", exception: plugin_exception)
+      expect(FastlaneCore::CrashReportGenerator.generate(exception: plugin_exception)).to eq(expected_body.to_json)
+    end
   end
 end
 
