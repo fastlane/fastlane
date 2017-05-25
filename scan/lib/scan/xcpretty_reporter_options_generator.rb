@@ -58,7 +58,7 @@ module Scan
       @temp_junit_report = Tempfile.new("junit_report")
       Scan.cache[:temp_junit_report] = @temp_junit_report.path
       reporter << "--report junit"
-      reporter << "--output #{Scan.cache[:temp_junit_report]}"
+      reporter << "--output '#{Scan.cache[:temp_junit_report]}'"
       return reporter
     end
 
