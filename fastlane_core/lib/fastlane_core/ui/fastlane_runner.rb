@@ -62,7 +62,20 @@ module Commander
           raise e
         else
           FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
-          abort e.to_s
+          if self.active_command.name == "help" && @default_command == :help # need to access directly via @
+            # This is a special case, for example for pilot
+            # when the user runs `fastlane pilot -u user@google.com`
+            # This would be confusing, as the user probably wanted to use `pilot list`
+            # or some other command. Because `-u` isn't available for the `pilot --help`
+            # command it would show this very confusing error message otherwise
+            abort "Please ensure to use one of the available commands (#{self.commands.keys.join(', ')})".red
+          else
+            # This would print something like
+            #
+            #   invalid option: -u
+            #
+            abort e.to_s
+          end
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
         display_user_error!(e, e.to_s)
