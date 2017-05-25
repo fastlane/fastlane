@@ -55,7 +55,7 @@ module Fastlane
 
 # rubocop:disable Style/IndentationConsistency
 %{  #
-  # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
+  # Learn more here: https://github.com/fastlane/examples 🚀
   #
   lane :beta do |values|
     # Fabric generated this lane for deployment to Crashlytics Beta
