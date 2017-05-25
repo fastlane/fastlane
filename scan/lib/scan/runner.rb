@@ -80,8 +80,16 @@ module Scan
     end
 
     def test_results
-      return "" unless Scan.cache[:temp_junit_report]
-      File.read(Scan.cache[:temp_junit_report])
+      temp_junit_report = Scan.cache[:temp_junit_report]
+      return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
+
+      # Something went wrong with the temp junit report for the test success/failures count.
+      # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
+      UI.message("Generating test results. This may take a while for large projects.")
+      output_file = Tempfile.new("junit_report")
+      cmd = "cat #{TestCommandGenerator.xcodebuild_log_path} | xcpretty --report junit --output #{output_file.path} &> /dev/null"
+      system(cmd)
+      output_file.read
     end
 
     def copy_simulator_logs
