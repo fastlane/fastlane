@@ -67,14 +67,13 @@ module Produce
                                      default_value: false),
 
         FastlaneCore::ConfigItem.new(key: :enabled_features,
-                                     short_option: "-P",
+                                     allow_shell: false,
                                      env_name: "PRODUCE_ENABLED_FEATURES",
-                                     description: "Array with Spaceship App Features (e.g. app_group,apple_pay, associated_domains, data_protection, game_center, health_kit, home_kit, wireless_accessory, icloud, in_app_purchase, inter_app_audio, passbook, push_notification, siri_kit, vpn_configuration)",
+                                     description: "Array with Spaceship App Features (e.g. #{Produce::DeveloperCenter::ALLOWED_FEATURES.join(", ")})",
                                      is_string: false,
                                      default_value: {},
                                      verify_block: proc do |value|
-                                                     allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
-                                                                     :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
+                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_FEATURES
                                                      UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
                                                      value.each do |key, v|
                                                        UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym

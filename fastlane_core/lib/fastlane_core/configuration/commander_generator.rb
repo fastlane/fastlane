@@ -13,6 +13,7 @@ module FastlaneCore
       used_switches = []
       options.each do |option|
         next if option.description.to_s.empty? # "private" options
+        next unless option.allow_shell
 
         short_switch = option.short_option
         key = option.key

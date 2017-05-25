@@ -2,6 +2,10 @@ require 'spaceship'
 
 module Produce
   class DeveloperCenter
+    ALLOWED_FEATURES =[:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit,
+                       :home_kit, :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, 
+                       :push_notification, :siri_kit, :vpn_configuration]
+    
     def run
       login
       create_new_app
@@ -43,6 +47,7 @@ module Produce
     def enabled_features
       app_service = Spaceship.app_service
       enabled_clean_options = {}
+      
       Produce.config[:enabled_features].each do |k, v|
         if k.to_sym == :data_protection
           case v
