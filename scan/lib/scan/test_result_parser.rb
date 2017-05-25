@@ -14,7 +14,10 @@ module Scan
         }
       else
         UI.error("Couldn't parse the number of tests from the output")
-        return {}
+        return {
+          tests: 0,
+          failures: 0
+        }
       end
     end
   end
