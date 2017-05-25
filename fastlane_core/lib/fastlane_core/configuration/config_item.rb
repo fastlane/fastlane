@@ -98,6 +98,10 @@ module FastlaneCore
         # deprecated options are marked deprecated in their description
         description = "[DEPRECATED!] #{deprecated} - #{description}"
       end
+      
+      optional = false if optional.nil?
+      sensitive = false if sensitive.nil?
+      display_in_shell = true if display_in_shell.nil?
 
       @key = key
       @env_name = env_name
@@ -108,13 +112,13 @@ module FastlaneCore
       @is_string = is_string
       @data_type = type
       @data_type = String if type == :shell_string
-      @optional = false if optional.nil?
+      @optional = optional
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
       @deprecated = deprecated
-      @sensitive = false if sensitive.nil?
+      @sensitive = sensitive
       @allow_shell_conversion = (type == :shell_string)
-      @display_in_shell = true if display_in_shell.nil?
+      @display_in_shell = display_in_shell
     end
 
     def verify!(value)
