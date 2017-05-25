@@ -45,7 +45,7 @@ module Scan
         type = raw_type.strip
         output_path = File.join(File.expand_path(@output_directory), determine_output_file_name(type))
         reporter << "--report #{type}"
-        reporter << "--output #{output_path}"
+        reporter << "--output '#{output_path}'"
 
         if type == "html" && @open_report
           Scan.cache[:open_html_report_path] = output_path
@@ -55,9 +55,10 @@ module Scan
       # adds another junit reporter in case the user does not specify one
       # this will be used to generate a results table and then discarded
       require 'tempfile'
-      Scan.cache[:temp_junit_report] = Tempfile.new("junit_report").path
+      @temp_junit_report = Tempfile.new("junit_report")
+      Scan.cache[:temp_junit_report] = @temp_junit_report.path
       reporter << "--report junit"
-      reporter << "--output #{Scan.cache[:temp_junit_report]}"
+      reporter << "--output '#{Scan.cache[:temp_junit_report]}'"
       return reporter
     end
 
