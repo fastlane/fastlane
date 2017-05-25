@@ -59,7 +59,20 @@ module FastlaneCore
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, display_in_shell: nil)
+    def initialize(key: nil,
+                   env_name: nil,
+                   description: nil,
+                   short_option: nil,
+                   default_value: nil,
+                   verify_block: nil,
+                   is_string: true,
+                   type: nil,
+                   optional: nil,
+                   conflicting_options: nil,
+                   conflict_block: nil,
+                   deprecated: nil,
+                   sensitive: nil,
+                   display_in_shell: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -85,11 +98,6 @@ module FastlaneCore
         # deprecated options are marked deprecated in their description
         description = "[DEPRECATED!] #{deprecated} - #{description}"
       end
-      optional = false if optional.nil?
-
-      sensitive = false if sensitive.nil?
-
-      display_in_shell = true if display_in_shell.nil?
 
       @key = key
       @env_name = env_name
@@ -100,13 +108,13 @@ module FastlaneCore
       @is_string = is_string
       @data_type = type
       @data_type = String if type == :shell_string
-      @optional = optional
+      @optional = false if optional.nil?
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
       @deprecated = deprecated
-      @sensitive = sensitive
+      @sensitive = false if sensitive.nil?
       @allow_shell_conversion = (type == :shell_string)
-      @display_in_shell = display_in_shell
+      @display_in_shell = true if display_in_shell.nil?
     end
 
     def verify!(value)
