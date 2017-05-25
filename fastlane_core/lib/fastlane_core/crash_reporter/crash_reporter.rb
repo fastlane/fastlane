@@ -19,6 +19,7 @@ module FastlaneCore
       def report_crash(exception: nil, action: nil)
         return unless enabled?
         return if @did_report_crash
+
         # Do not run the crash reporter while tests are happening (it might try to send
         # a crash report), unless we have explictly turned on the crash reporter because
         # we want to test it
