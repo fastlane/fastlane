@@ -406,13 +406,26 @@ for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
 done
 
+# Find the bundle identifier for a given target product name
+function bundle_id_for_target {
+
+   for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
+        echo "ARG: ${ARG%%=*} ${ARG#*=}" >&2
+        if [[ "${ARG#*=}" == "$1" ]]; then
+            echo "${ARG%%=*}"
+            break
+        fi  
+    done
+
+}
+
 # Add given target name and bundle identifier to the search list
 function add_target_name_for_bundle_id {
 
     local TARGET="$1"
     local BUNDLE_ID="$2"
 
-    local CURRENT_BUNDLE_ID=$(bundle_id_for_target_name "$TARGET" STRICT)
+    local CURRENT_BUNDLE_ID=$(bundle_id_for_target "$TARGET")
 
     if [[ "$CURRENT_BUNDLE_ID" != "" && "$CURRENT_BUNDLE_ID" != "$BUNDLE_ID" ]]; then
         error "Conflicting bundle ids '$BUNDLE_ID' and '$CURRENT_BUNDLE_ID' for target name '$TARGET'."
@@ -426,32 +439,23 @@ function add_bundle_id {
 
     if [[ "$1" =~ .+=.+ ]]; then
         TARGET_NAME="${1#*=}"
-        add_target_name_for_bundle_id "$TARGET_NAME" "${1%%=*}"
+        local BUNDLE_ID="${1%%=*}"
+        add_target_name_for_bundle_id "$TARGET_NAME" "$BUNDLE_ID"
     elif [[ "$DEFAULT_BUNDLE_IDENTIFIER" == "" ]]; then
         DEFAULT_BUNDLE_IDENTIFIER="$1"
     fi
 }
 
-# Load bundle identifiers from provisioning profiles
+# Load bundle identifiers
 for ARG in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
     add_bundle_id "$ARG"
 done
-
-# Find the bundle identifier for a given target product name
-function bundle_id_for_target {
-
-    for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
-        if [[ "$1" == "$2" ]]; then
-            echo "${ARG#*=}"
-            break
-        fi
-    done
-}
 
 # Resign the given application
 function resign {
 
     local APP_PATH="$1" 
+    local APP_NAME=$(basename "$APP_PATH" .appex)
     local NESTED="$2"
     local BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER"
     local NEW_PROVISION="$NEW_PROVISION"
@@ -459,13 +463,10 @@ function resign {
     local TEAM_IDENTIFIER=""
 
     if [[ "$NESTED" == NESTED ]]; then
-        # Ignore bundle identifier for nested applications
-        BUNDLE_IDENTIFIER=""
-        # MLR TODO: nope look it up!
-        # MLR NOTE: APP_PATH == target product name?
-        warning "MLR Was here APP_PATH == $APP_PATH"
-        local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
+        BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
+        warning "BUNDLE_IDENTIFIER == $BUNDLE_IDENTIFIER for APP_NAME=$APP_NAME"
     fi
+    return 
 
     # Make sure that the Info.plist file is where we expect it
     if [ ! -e "$APP_PATH/Info.plist" ];
@@ -856,11 +857,11 @@ function resign {
 while IFS= read -d '' -r app;
 do
     log "Resigning nested application: '$app'"
-    # MLR TODO: put back: resign "$app" NESTED
+    resign "$app" NESTED
 done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
 
 # Resign the application
-# MLR TODO: put back: resign "$TEMP_DIR/Payload/$APP_NAME"
+resign "$TEMP_DIR/Payload/$APP_NAME"
 
 # Repackage quietly
 log "Repackaging as $NEW_FILE"
