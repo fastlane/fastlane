@@ -96,7 +96,7 @@ module Scan
       reporter_options = reporter_options_generator.generate_reporter_options
       cmd = "cat #{@test_command_generator.xcodebuild_log_path} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
       system(cmd)
-      return File.read(Scan.cache[:temp_junit_report])
+      File.read(Scan.cache[:temp_junit_report])
     end
 
     def copy_simulator_logs

@@ -65,5 +65,31 @@ describe Scan do
         end
       end
     end
+
+    describe "test_results" do
+      before(:each) do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj',
+          include_simulator_logs: false
+        })
+
+        mock_slack_poster = Object.new
+        allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
+        allow(mock_slack_poster).to receive(:run)
+
+        mock_test_command_generator = Object.new
+        allow(Scan::TestCommandGenerator).to receive(:new).and_return(mock_test_command_generator)
+        allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
+
+        @scan = Scan::Runner.new
+      end
+
+      it "still proceeds successfully if the temp junit report was deleted" do
+        Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
+        expect(@scan.test_results).to_not be_nil
+        expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+      end
+    end
   end
 end
