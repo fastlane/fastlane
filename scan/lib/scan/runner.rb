@@ -91,9 +91,12 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
       output_file = Tempfile.new("junit_report")
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path} | xcpretty --report junit --output #{output_file.path} &> /dev/null"
+
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options = reporter_options_generator.generate_reporter_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
       system(cmd)
-      output_file.read
+      return File.read(Scan.cache[:temp_junit_report])
     end
 
     def copy_simulator_logs
