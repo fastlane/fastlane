@@ -19,6 +19,7 @@ module Fastlane
         begin
           Badge::Runner.new.run(params[:path], options)
         rescue => e
+          # We want to catch this error and raise our own so that we are not counting this as a crash in our metrics
           UI.user_error!("Something went wrong while running badge: #{e}")
         end
       end

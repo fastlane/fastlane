@@ -42,7 +42,7 @@ module FastlaneCore
       def crash_came_from_custom_action?(exception: nil)
         return false if exception.nil?
         custom_frame = exception.backtrace.find { |frame| frame.start_with?('actions/') }
-        custom_frame.nil? ? false : true
+        !custom_frame.nil?
       end
 
       def reset_crash_reporter_for_testing

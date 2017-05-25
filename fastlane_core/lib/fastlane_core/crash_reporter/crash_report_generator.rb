@@ -38,7 +38,7 @@ module FastlaneCore
       def crash_came_from_plugin?(exception: nil)
         return false if exception.nil?
         plugin_frame = exception.backtrace.find { |frame| frame.include?('fastlane-plugin-') }
-        plugin_frame.nil? ? false : true
+        !plugin_frame.nil?
       end
 
       def crash_report_payload(message: '', action: nil)
