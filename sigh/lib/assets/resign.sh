@@ -61,7 +61,7 @@
 # 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
 # new features May 2017
-# 1. enables the -b option to be used more than once and updates nested applications and app extentions bundle id
+# 1. enables the -b option to be used more than once and updates nested applications and app extentions bundle ids
 
 # Logging functions
 
@@ -127,8 +127,15 @@ usage() {
     echo -e "\t    --bundle-version bundleVersion\tSpecify new bundle version (CFBundleVersion) number." >&2
     echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
+
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
-    echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
+    echo -e "\t\t\t\t\t\tAlternatively you may provide multiple bundle identifiers if the application contains" >&2
+    echo -e "\t\t\t\t\t\tnested applications or app extensions, which need their own bundle identifier." >&2
+    echo -e "\t\t\t\t\t\tYou can do so by providing -b option multiple times specifying" >&2
+    echo -e "\t\t\t\t\t\tthe app name and new bundle identifier for that app name joined with '='." >&2
+    echo -e "\t\t\t\t\t\t\t-b My App=com.main-app" >&2
+    echo -e "\t\t\t\t\t\t\t-b My Nested App=com.nested-app" >&2
+
     echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisionin profile." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-e, --entitlements' option." >&2
     echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
@@ -144,7 +151,7 @@ fi
 ORIGINAL_FILE="$1"
 CERTIFICATE="$2"
 ENTITLEMENTS=
-#BUNDLE_IDENTIFIER=""
+DEFAULT_BUNDLE_IDENTIFIER=""
 RAW_BUNDLE_IDENTIFIERS=()
 BUNDLE_IDENTIFIERS_BY_TARGET=()
 DISPLAY_NAME=""
@@ -351,17 +358,6 @@ function provision_for_bundle_id {
     done
 }
 
-# Find the bundle identifier for a given target product name
-function bundle_id_for_target {
-
-    for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
-        if [[ "$1" == "$2" ]]; then
-            echo "${ARG#*=}"
-            break
-        fi
-    done
-}
-
 # Find the bundle identifier contained inside a provisioning profile
 function bundle_id_for_provison {
 
@@ -410,12 +406,54 @@ for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
 done
 
+# Add given target name and bundle identifier to the search list
+function add_target_name_for_bundle_id {
+
+    local TARGET="$1"
+    local BUNDLE_ID="$2"
+
+    local CURRENT_BUNDLE_ID=$(bundle_id_for_target_name "$TARGET" STRICT)
+
+    if [[ "$CURRENT_BUNDLE_ID" != "" && "$CURRENT_BUNDLE_ID" != "$BUNDLE_ID" ]]; then
+        error "Conflicting bundle ids '$BUNDLE_ID' and '$CURRENT_BUNDLE_ID' for target name '$TARGET'."
+    fi
+
+    BUNDLE_IDENTIFIERS_BY_TARGET+=("$TARGET=$BUNDLE_ID")
+}
+
+# Add given target name to the search list
+function add_bundle_id {
+
+    if [[ "$1" =~ .+=.+ ]]; then
+        TARGET_NAME="${1#*=}"
+        add_target_name_for_bundle_id "$TARGET_NAME" "${1%%=*}"
+    elif [[ "$DEFAULT_BUNDLE_IDENTIFIER" == "" ]]; then
+        DEFAULT_BUNDLE_IDENTIFIER="$1"
+    fi
+}
+
+# Load bundle identifiers from provisioning profiles
+for ARG in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
+    add_bundle_id "$ARG"
+done
+
+# Find the bundle identifier for a given target product name
+function bundle_id_for_target {
+
+    for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
+        if [[ "$1" == "$2" ]]; then
+            echo "${ARG#*=}"
+            break
+        fi
+    done
+}
+
 # Resign the given application
 function resign {
 
     local APP_PATH="$1" 
     local NESTED="$2"
-    local BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER"
+    local BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER"
     local NEW_PROVISION="$NEW_PROVISION"
     local APP_IDENTIFIER_PREFIX=""
     local TEAM_IDENTIFIER=""
@@ -425,6 +463,8 @@ function resign {
         BUNDLE_IDENTIFIER=""
         # MLR TODO: nope look it up!
         # MLR NOTE: APP_PATH == target product name?
+        warning "MLR Was here APP_PATH == $APP_PATH"
+        local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
     fi
 
     # Make sure that the Info.plist file is where we expect it
@@ -816,11 +856,11 @@ function resign {
 while IFS= read -d '' -r app;
 do
     log "Resigning nested application: '$app'"
-    resign "$app" NESTED
+    # MLR TODO: put back: resign "$app" NESTED
 done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
 
 # Resign the application
-resign "$TEMP_DIR/Payload/$APP_NAME"
+# MLR TODO: put back: resign "$TEMP_DIR/Payload/$APP_NAME"
 
 # Repackage quietly
 log "Repackaging as $NEW_FILE"

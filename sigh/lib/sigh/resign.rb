@@ -24,6 +24,10 @@ module Sigh
         provisioning_profiles = [provisioning_profiles]
       end
 
+      unless new_bundle_id.kind_of?(Enumerable)
+        new_bundle_id = [new_bundle_id]
+      end
+
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements.shellescape}" if entitlements
@@ -34,7 +38,7 @@ module Sigh
       short_version = "--short-version #{short_version}" if short_version
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
       verbose = "-v" if FastlaneCore::Globals.verbose?
-      bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
+      bundle_id = create_bundle_id_options(new_bundle_id)
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
       specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
 
@@ -133,6 +137,26 @@ module Sigh
           app_id = File.expand_path(app_id)
         end
         "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
+      end.join(' ')
+    end
+
+    def create_bundle_id_options(bundle_ids)
+      # bundle_ids is passed either a hash (to be able to update extensions/nested apps):
+      # (in that case the underlying resign.sh expects values given as "-b "App Name"=at.fastlane -b "App Ext Name"=at.fastlane.today")
+      #   {
+      #     "App Name" => "at.fastlane",
+      #     "App Ext Name" => "at.fastlane.today"
+      #   }
+      # or an array
+      # (resign.sh also takes "-b t.fastlane" as a param)
+      bundle_ids.map do |app_name, new_app_id|
+        if new_app_id
+          "-b #{[app_name, new_app_id].compact.map(&:shellescape).join('=')}"
+        elsif app_name
+          new_app_id = app_name.shellescape
+          "-b #{new_app_id}"
+        else
+        end
       end.join(' ')
     end
 
