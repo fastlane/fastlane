@@ -319,14 +319,23 @@ module Fastlane
     end
 
     def set_before_all(platform, block)
+      unless before_all_blocks[platform].nil?
+        UI.error("You defined multiple `before_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       before_all_blocks[platform] = block
     end
 
     def set_after_all(platform, block)
+      unless after_all_blocks[platform].nil?
+        UI.error("You defined multiple `after_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       after_all_blocks[platform] = block
     end
 
     def set_error(platform, block)
+      unless error_blocks[platform].nil?
+        UI.error("You defined multiple `error` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       error_blocks[platform] = block
     end
 
