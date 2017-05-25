@@ -98,7 +98,7 @@ module FastlaneCore
         # deprecated options are marked deprecated in their description
         description = "[DEPRECATED!] #{deprecated} - #{description}"
       end
-      
+
       optional = false if optional.nil?
       sensitive = false if sensitive.nil?
       display_in_shell = true if display_in_shell.nil?
