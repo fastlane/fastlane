@@ -67,7 +67,7 @@ module Produce
                                      default_value: false),
 
         FastlaneCore::ConfigItem.new(key: :enabled_features,
-                                     allow_shell: false,
+                                     display_in_shell: false,
                                      env_name: "PRODUCE_ENABLED_FEATURES",
                                      description: "Array with Spaceship App Features (e.g. #{Produce::DeveloperCenter::ALLOWED_FEATURES.join(", ")})",
                                      is_string: false,

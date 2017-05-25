@@ -40,7 +40,7 @@ module FastlaneCore
     attr_accessor :allow_shell_conversion
     
     # [Boolean] Set if the variable can be used from shell
-    attr_accessor :allow_shell
+    attr_accessor :display_in_shell
 
     # Creates a new option
     # @param key (Symbol) the key which is used as command parameters or key in the fastlane tools
@@ -58,8 +58,8 @@ module FastlaneCore
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
-    # @param allow_shell (Boolean) Set if the variable can be used from shell
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, allow_shell: nil)
+    # @param display_in_shell (Boolean) Set if the variable can be used from shell
+    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil, display_in_shell: nil)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -89,7 +89,7 @@ module FastlaneCore
 
       sensitive = false if sensitive.nil?
       
-      allow_shell = true if allow_shell.nil?
+      display_in_shell = true if display_in_shell.nil?
 
       @key = key
       @env_name = env_name
@@ -106,7 +106,7 @@ module FastlaneCore
       @deprecated = deprecated
       @sensitive = sensitive
       @allow_shell_conversion = (type == :shell_string)
-      @allow_shell = allow_shell
+      @display_in_shell = display_in_shell
     end
 
     def verify!(value)
