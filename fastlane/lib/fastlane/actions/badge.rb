@@ -16,7 +16,11 @@ module Fastlane
           shield_gravity: params[:shield_gravity],
           shield_no_resize: params[:shield_no_resize]
         }
-        Badge::Runner.new.run(params[:path], options)
+        begin
+          Badge::Runner.new.run(params[:path], options)
+        rescue => e
+          UI.user_error!("Something went wrong while running badge: #{e}")
+        end
       end
 
       #####################################################
