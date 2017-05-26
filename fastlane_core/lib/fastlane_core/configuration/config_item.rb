@@ -72,7 +72,7 @@ module FastlaneCore
                    conflict_block: nil,
                    deprecated: nil,
                    sensitive: nil,
-                   display_in_shell: nil)
+                   display_in_shell: true)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -101,7 +101,6 @@ module FastlaneCore
 
       optional = false if optional.nil?
       sensitive = false if sensitive.nil?
-      display_in_shell = true if display_in_shell.nil?
 
       @key = key
       @env_name = env_name
