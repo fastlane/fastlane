@@ -112,8 +112,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :bundle_id,
                                        env_name: "FL_RESIGN_BUNDLE_ID",
                                        description: "Set new bundle ID during resign (CFBundleIdentifier)",
-                                       is_string: true,
-                                       optional: true),
+                                       is_string: false,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         files = case value
+                                                 when Hash then value.values
+                                                 when Enumerable then value
+                                                 else [value]
+                                                 end
+                                               end),
           FastlaneCore::ConfigItem.new(key: :use_app_entitlements,
                                        env_name: "FL_USE_APP_ENTITLEMENTS",
                                        description: "Extract app bundle codesigning entitlements\nand combine with entitlements from new provisionin profile",
