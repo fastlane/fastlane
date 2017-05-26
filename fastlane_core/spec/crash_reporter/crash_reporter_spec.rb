@@ -11,7 +11,7 @@ describe FastlaneCore::CrashReporter do
       FastlaneCore::CrashReporter.disable_for_testing
     end
 
-    let(:exception) { double('Exception', backtrace: []) }
+    let(:exception) { double('Exception', backtrace: [], fastlane_crash_came_from_custom_action?: false) }
 
     let(:stub_body) do
       {
@@ -38,11 +38,11 @@ describe FastlaneCore::CrashReporter do
     end
 
     context 'custom action crashes' do
-      let(:custom_action_exception) { double('Custom_Action_Exception', backtrace: ['actions/git_lab:58:in `include?']) }
-
-      it 'does not post crash report if the crash came from a plugin' do
+      it 'does not post crash report if the crash came from a custom action' do
+        custom_action_exception = FastlaneCore::Interface::FastlaneError.new
+        custom_action_exception.set_backtrace(['actions/git_lab:58:in `include?'])
         expect(FastlaneCore::CrashReportGenerator).to_not receive(:generate)
-        expect(FastlaneCore::CrashReporter.crash_came_from_custom_action?(exception: custom_action_exception)).to eq(true)
+        expect(custom_action_exception.fastlane_crash_came_from_custom_action?).to eq(true)
         FastlaneCore::CrashReporter.report_crash(exception: custom_action_exception)
       end
     end

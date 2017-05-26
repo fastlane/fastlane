@@ -13,7 +13,7 @@ module FastlaneCore
         backtrace = exception.respond_to?(:trimmed_backtrace) ? exception.trimmed_backtrace : exception.backtrace
         backtrace = FastlaneCore::CrashReportSanitizer.sanitize_backtrace(backtrace: backtrace).join("\n")
 
-        if crash_came_from_plugin?(exception: exception)
+        if exception.fastlane_crash_came_from_plugin?
           message = '[PLUGIN_CRASH]'
         elsif exception.respond_to?(:prefix)
           message = exception.prefix
@@ -33,12 +33,6 @@ module FastlaneCore
         message = message[0..100]
         message += "\n" unless exception.respond_to?(:could_contain_pii?) && exception.could_contain_pii?
         message + backtrace
-      end
-
-      def crash_came_from_plugin?(exception: nil)
-        return false if exception.nil?
-        plugin_frame = exception.backtrace.find { |frame| frame.include?('fastlane-plugin-') }
-        !plugin_frame.nil?
       end
 
       def crash_report_payload(message: '', action: nil)
