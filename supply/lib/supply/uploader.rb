@@ -185,7 +185,8 @@ module Supply
             end
             version_codes = keep_version_codes + version_codes
             client.update_track(track, 1.0, keep_version_codes)
-            UI.message("Superseded track '#{track}', kept '#{keep_version_codes}'")
+            removed_version_codes = track_version_codes - keep_version_codes
+            UI.message("Superseded track '#{track}', removed '#{removed_version_codes}'")
           end
         end
       end
