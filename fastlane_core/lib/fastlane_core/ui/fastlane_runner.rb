@@ -15,6 +15,9 @@ module Commander
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
+
+    attr_accessor :collector
+
     def run!
       require_program :version, :description
       trap('INT') { abort program(:int_message) } if program(:int_message)
@@ -31,10 +34,8 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
-      @collector = FastlaneCore::ToolCollector.new
-
       begin
-        @collector.did_launch_action(@program[:name])
+        collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
@@ -90,8 +91,12 @@ module Commander
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
       ensure
-        @collector.did_finish
+        collector.did_finish
       end
+    end
+
+    def collector
+      @collector ||= FastlaneCore::ToolCollector.new
     end
 
     def rescue_file_error(e)
@@ -115,12 +120,12 @@ module Commander
 
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
-      @collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
+      collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      @collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
+      collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
       display_user_error!(e, e.message)
