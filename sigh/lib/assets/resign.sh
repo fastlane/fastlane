@@ -476,7 +476,6 @@ function add_new_bundle_id_for_old_bundle_id {
     fi
 
     NEW_BUNDLE_IDENTIFIERS_BY_OLD+=("$OLD_BUNDLE_ID=$NEW_BUNDLE_ID")
-    log "NEW_BUNDLE_IDENTIFIERS_BY_OLD ${NEW_BUNDLE_IDENTIFIERS_BY_OLD[@]}"
 }
 
 # Build list of old to new bundle ids 
@@ -485,6 +484,7 @@ function build_old_new_bundle_id {
     local APP_PATH="$1"
     local APP_NAME=$(basename "$APP_PATH")
     APP_NAME="${APP_NAME%.*}"
+    local NESTED="$2"
     local BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
 
     if [[ "$BUNDLE_IDENTIFIER" == "" && "$NESTED" != NESTED ]]; then
@@ -688,7 +688,6 @@ function resign {
         then
             # Found a reference bundle id, now get map to the new bundle id
             NEW_REF_BUNDLE_ID=$(new_bundle_id_for_old_bundle_id $OLD_REF_BUNDLE_ID)
-            log "OLD_REF_BUNDLE_ID=$OLD_REF_BUNDLE_ID, NEW_REF_BUNDLE_ID=$NEW_REF_BUNDLE_ID"
             # Change if not the same and if doesn't contain wildcard
             # shellcheck disable=SC2049
             if [[ "$OLD_REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]] && [[ "$NEW_REF_BUNDLE_ID" != "" ]];
@@ -905,7 +904,7 @@ function resign {
 build_old_new_bundle_id "$TEMP_DIR/Payload/$APP_NAME"
 while IFS= read -d '' -r app;
 do
-    build_old_new_bundle_id "$app"
+    build_old_new_bundle_id "$app" NESTED
 done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
 
 # Sign nested applications and app extensions
