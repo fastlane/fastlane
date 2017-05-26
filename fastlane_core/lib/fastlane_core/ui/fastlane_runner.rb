@@ -115,16 +115,12 @@ module Commander
 
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
-      unless e.fastlane_crash_came_from_custom_action? || e.fastlane_crash_came_from_plugin?
-        @collector.did_crash(@program[:name])
-      end
+      @collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      unless e.fastlane_crash_came_from_custom_action? || e.fastlane_crash_came_from_plugin?
-        @collector.did_raise_error(@program[:name])
-      end
+      @collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
       display_user_error!(e, e.message)
