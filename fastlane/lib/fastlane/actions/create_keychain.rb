@@ -8,13 +8,17 @@ module Fastlane
 
     class CreateKeychainAction < Action
       def self.run(params)
+        if params[:password].nil?
+          UI.user_error!("You have to pass a non-nil value to :password")
+        end
+
         escaped_password = params[:password].shellescape
 
         if params[:name]
           escaped_name = params[:name].shellescape
           keychain_path = "~/Library/Keychains/#{escaped_name}"
         else
-          keychain_path = params[:path].shellescape
+          keychain_path = params[:path] && params[:path].shellescape
         end
 
         if keychain_path.nil?
