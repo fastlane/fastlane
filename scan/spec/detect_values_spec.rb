@@ -13,6 +13,28 @@ describe Scan do
       end
     end
 
+    describe "validation" do
+      it "advises of problems with multiple output_types and a custom_report_file_name" do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          # use default output types
+          custom_report_file_name: 'report.xml'
+        }
+        expect(FastlaneCore::UI).to receive(:user_error!).with("Using a :custom_report_file_name with multiple :output_types (html,junit) will lead to unexpected results. Use :output_files instead.")
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "does not advise of a problem with one output_type and a custom_report_file_name" do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          output_types: 'junit',
+          custom_report_file_name: 'report.xml'
+        }
+        expect(FastlaneCore::UI).not_to receive(:user_error!)
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+    end
+
     describe "value coercion" do
       it "coerces only_testing to be an array" do
         options = {
