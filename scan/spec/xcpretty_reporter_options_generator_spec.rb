@@ -229,7 +229,7 @@ describe Scan do
           options = {
             project: "./scan/examples/standard/app.xcodeproj",
             output_types: "junit,html",
-            custom_report_file_name: "junit.xml",
+            output_files: "junit.xml",
             output_directory: "/test_output"
           }
 
