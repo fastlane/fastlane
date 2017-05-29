@@ -213,7 +213,7 @@ module Spaceship
       end
 
       unless result
-        raise ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+        raise TunesClient::ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
       end
 
       response = request(:post) do |req|
