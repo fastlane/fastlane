@@ -28,6 +28,13 @@ module Deliver
       return available_options
     end
 
+    def self.force_overwrite_metadata?(options, path)
+      res = options[:force]
+      res ||= ENV["DELIVER_FORCE_OVERWRITE"] # for backward compatibility
+      res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?") if UI.interactive?
+      res
+    end
+
     # rubocop:disable Metrics/PerceivedComplexity
     def run
       program :name, 'deliver'
@@ -146,8 +153,7 @@ module Deliver
           Deliver::Runner.new(options) # to login...
           containing = FastlaneCore::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           path = options[:metadata_path] || File.join(containing, 'metadata')
-          res = ENV["DELIVER_FORCE_OVERWRITE"]
-          res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?")
+          res = Deliver::CommandsGenerator.force_overwrite_metadata?(options, path)
           return 0 unless res
 
           require 'deliver/setup'
