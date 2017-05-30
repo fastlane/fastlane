@@ -26,7 +26,7 @@ module Supply
                                      description: "The percentage of the user fraction when uploading to the rollout track",
                                      default_value: '0.1',
                                      verify_block: proc do |value|
-                                       min = 0.05
+                                       min = 0.01
                                        max = 0.5
                                        UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
                                      end),
