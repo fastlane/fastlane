@@ -144,7 +144,7 @@ module Spaceship
       latinized
     end
 
-    def create_app!(type, name, bundle_id, mac: false, enabled_features: {})
+    def create_app!(type, name, bundle_id, mac: false, enable_services: {})
       # We moved the ensure_csrf to the top of this method
       # as we got some users with issues around creating new apps
       # https://github.com/fastlane/fastlane/issues/5813
@@ -171,7 +171,7 @@ module Spaceship
         teamId: team_id
       }
       params.merge!(ident_params)
-      enabled_features.each do |k, v|
+      enable_services.each do |k, v|
         params[v.service_id.to_sym] = v.value
       end
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
