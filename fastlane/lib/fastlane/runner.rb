@@ -258,13 +258,13 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)
-        collector.did_raise_error(method_sym)
+        collector.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)
-        collector.did_crash(method_sym)
+        collector.did_crash(method_sym) if e.fastlane_should_report_metrics?
         raise e
       end
     end

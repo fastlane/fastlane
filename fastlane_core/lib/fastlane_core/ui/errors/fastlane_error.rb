@@ -34,4 +34,12 @@ class Exception
     plugin_frame = backtrace.find { |frame| frame.include?('fastlane-plugin-') }
     !plugin_frame.nil?
   end
+
+  def fastlane_should_report_metrics?
+    if fastlane_crash_came_from_plugin? || fastlane_crash_came_from_custom_action?
+      false
+    else
+      true
+    end
+  end
 end
