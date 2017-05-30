@@ -35,7 +35,12 @@ module Fastlane
                                          description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
                                          is_string: false,
-                                         default_value: nil)
+                                         default_value: nil),
+          FastlaneCore::ConfigItem.new(key: :raise_shell_error,
+                                       description: 'Boolean value that indicates whether raising shell errors or not',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: true)
         ]
       end
 

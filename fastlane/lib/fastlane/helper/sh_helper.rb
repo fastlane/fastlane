@@ -6,19 +6,26 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
-    def self.sh(command, log: true, error_callback: nil)
-      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh(command, log: true, error_callback: nil, raise_shell_error: true)
+      sh_control_output(command,
+                        print_command: log,
+                        print_command_output: log,
+                        error_callback: error_callback,
+                        raise_shell_error: raise_shell_error)
     end
 
-    def self.sh_no_action(command, log: true, error_callback: nil)
-      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh_no_action(command, log: true, error_callback: nil, raise_shell_error: true)
+      sh_control_output(command, print_command: log,
+                        print_command_output: log,
+                        error_callback: error_callback,
+                        raise_shell_error: raise_shell_error)
     end
 
     # @param command [String] The command to be executed
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
-    def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil, raise_shell_error: true)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -52,7 +59,7 @@ module Fastlane
           message += "\n#{result}" if print_command_output
 
           error_callback.call(result) if error_callback
-          UI.shell_error!(message)
+          UI.shell_error!(message) if raise_shell_error
         end
       end
 
