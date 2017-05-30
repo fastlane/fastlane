@@ -33,8 +33,8 @@ module Spaceship
       # @return (Hash) Feature details
       attr_accessor :features
 
-      # @return (Array) List of enabled features
-      attr_accessor :enabled_features
+      # @return (Array) List of enabled services
+      attr_accessor :enable_services
 
       # @return (Bool) Development Push Enabled?
       attr_accessor :dev_push_enabled
@@ -62,7 +62,7 @@ module Spaceship
         'identifier' => :bundle_id,
         'isWildCard' => :is_wildcard,
         'features' => :features,
-        'enabledFeatures' => :enabled_features,
+        'enabledFeatures' => :enable_services,
         'isDevPushEnabled' => :dev_push_enabled,
         'isProdPushEnabled' => :prod_push_enabled,
         'associatedApplicationGroupsCount' => :app_groups_count,
@@ -92,14 +92,14 @@ module Spaceship
         # @param name [String] the name of the App
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
-        def create!(bundle_id: nil, name: nil, mac: false, enabled_features: {})
+        def create!(bundle_id: nil, name: nil, mac: false, enable_services: {})
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac, enabled_features: enabled_features)
+          new_app = client.create_app!(type, name, bundle_id, mac: mac, enable_services: enable_services)
           self.new(new_app)
         end
 
