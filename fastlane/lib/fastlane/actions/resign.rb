@@ -115,12 +115,12 @@ module Fastlane
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         files = case value
-                                                 when Hash then value.values
-                                                 when Enumerable then value
-                                                 else [value]
-                                                 end
-                                               end),
+                                         case value
+                                         when Hash then value.values
+                                         when Enumerable then value
+                                         else [value]
+                                         end
+                                       end),
           FastlaneCore::ConfigItem.new(key: :use_app_entitlements,
                                        env_name: "FL_USE_APP_ENTITLEMENTS",
                                        description: "Extract app bundle codesigning entitlements\nand combine with entitlements from new provisionin profile",
