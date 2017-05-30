@@ -31,7 +31,6 @@
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/spaceship/LICENSE)
-[![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](https://rubygems.org/gems/spaceship)
 
 `spaceship` exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
 

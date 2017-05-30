@@ -92,6 +92,7 @@ module Fastlane
           UI.important "to launch fastlane faster, please use"
           UI.message ""
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
+          UI.message ""
         else
           # fastlane is slow and there is no Gemfile
           # Let's tell the user how to use `gem cleanup` and how to

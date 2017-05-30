@@ -258,13 +258,13 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)
-        collector.did_raise_error(method_sym)
+        collector.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e, action: method_sym)
-        collector.did_crash(method_sym)
+        collector.did_crash(method_sym) if e.fastlane_should_report_metrics?
         raise e
       end
     end
@@ -319,14 +319,23 @@ module Fastlane
     end
 
     def set_before_all(platform, block)
+      unless before_all_blocks[platform].nil?
+        UI.error("You defined multiple `before_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       before_all_blocks[platform] = block
     end
 
     def set_after_all(platform, block)
+      unless after_all_blocks[platform].nil?
+        UI.error("You defined multiple `after_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       after_all_blocks[platform] = block
     end
 
     def set_error(platform, block)
+      unless error_blocks[platform].nil?
+        UI.error("You defined multiple `error` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       error_blocks[platform] = block
     end
 
