@@ -111,13 +111,19 @@ module Fastlane
         rows << [index, name, current[:time].to_i]
       end
 
-      puts ""
-      puts Terminal::Table.new(
-        title: "fastlane summary".green,
-        headings: ["Step", "Action", "Time (in s)"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
-      puts ""
+      begin
+        require 'terminal-table'
+        puts ""
+        puts Terminal::Table.new(
+          title: "fastlane summary".green,
+          headings: ["Step", "Action", "Time (in s)"],
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        )
+        puts ""
+      rescue
+        os = Helper.linux? ? 'linux' : 'mac'
+        UI.crash!("Something went wrong trying to print the lane context on #{os}")
+      end
     end
 
     # Lane chooser if user didn't provide a lane
