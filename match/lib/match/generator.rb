@@ -67,6 +67,7 @@ module Match
       values[:platform] = :macos if params[:platform].to_s == 'osx'
       values[:adhoc] = true if prov_type == :adhoc
       values[:development] = true if prov_type == :development
+      values[:distribution_type] = params[:distribution_type]
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 

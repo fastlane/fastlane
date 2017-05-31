@@ -170,6 +170,7 @@ module Sigh
           cert_type = Spaceship.certificate.mac_development
         elsif profile_type == Spaceship.provisioning_profile.AppStore
           cert_type = Spaceship.certificate.mac_app_distribution
+          cert_type = Spaceship.certificate.mac_installer_distribution if Sigh.config[:distribution_type].to_s == 'installer'
         elsif profile_type == Spaceship.provisioning_profile.Direct
           cert_type = Spaceship.certificate.developer_id_application
         else
