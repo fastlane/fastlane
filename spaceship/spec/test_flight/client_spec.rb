@@ -47,10 +47,17 @@ describe Spaceship::TestFlight::Client do
     end
 
     it 'raises an exception on a HTTP error' do
-      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      response = double('Response', body: '<html>Server Error</html>', status: 400)
       expect do
         subject.handle_response(response)
       end.to raise_error(Spaceship::Client::UnexpectedResponse)
+    end
+
+    it 'raises an InternalServerError exception on a HTTP 500 error' do
+      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      expect do
+        subject.handle_response(response)
+      end.to raise_error(Spaceship::Client::InternalServerError)
     end
   end
 
