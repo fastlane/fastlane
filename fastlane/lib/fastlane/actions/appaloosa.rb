@@ -24,7 +24,8 @@ module Fastlane
         uri = URI("#{APPALOOSA_SERVER}/upload_services/presign_form")
         params = { file: file_name, store_id: store_id, group_ids: group_ids }
         uri.query = URI.encode_www_form(params)
-        http = Net::HTTP.new(uri.host)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
         presign_form_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         json_res = JSON.parse(presign_form_response.body)
         return if error_detected json_res['errors']
@@ -45,7 +46,8 @@ module Fastlane
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/upload_services/url_for_download")
         params = { store_id: store_id, api_key: api_key, key: path }
         uri.query = URI.encode_www_form(params)
-        http = Net::HTTP.new(uri.host)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
         url_for_download_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         if invalid_response?(url_for_download_response)
           UI.user_error!("ERROR: A problem occurred with your API token and your store id. Please try again.")
