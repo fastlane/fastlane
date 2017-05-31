@@ -1,4 +1,5 @@
 require 'spaceship'
+require 'review/rule_processor'
 
 module Review
   class Runner
@@ -11,15 +12,30 @@ module Review
                                              title: "Summary for review #{Fastlane::VERSION}")
 
       UI.message "Starting login with user '#{Review.config[:username]}'"
-      Spaceship.login(Review.config[:username], nil)
-      Spaceship.select_team
+      Spaceship::Tunes.login(Review.config[:username])
+      Spaceship::Tunes.select_team
       UI.message "Successfully logged in"
+
       ensure_app_exists!
+
+      check_for_rule_violations(app_version: latest_app_version)
+    end
+
+    def check_for_rule_violations(app_version: nil)
+      Review::RuleProcessor.process_app_version(app_version: app_version)
+    end
+
+    def app
+      Spaceship::Tunes::Application.find(Review.config[:app_identifier])
+    end
+
+    def latest_app_version
+      app.latest_version
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      return if Spaceship::App.find(Review.config[:app_identifier], mac: Review.config[:platform].to_s == 'macos')
+      return if app
     end
   end
 end

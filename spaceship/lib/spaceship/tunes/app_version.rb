@@ -1,9 +1,11 @@
+require "spaceship/annotations"
 module Spaceship
   module Tunes
     # Represents an editable version of an iTunes Connect Application
     # This can either be the live or the edit version retrieved via the app
     # rubocop:disable Metrics/ClassLength
     class AppVersion < TunesBase
+      annotate!
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
       attr_accessor :application
@@ -159,6 +161,7 @@ module Spaceship
       attr_reader :description
 
       # @return (Hash) The changelog
+      _keeper_rule_data friendly_name: "Release notes"
       attr_reader :release_notes
 
       # @return (Hash) A hash representing the support url in all languages
@@ -389,6 +392,7 @@ module Spaceship
       end
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
+      _keeper_rule_data friendly_name: "App URL"
       def url
         url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{application.apple_id}/ios/versioninfo/"
         url += "deliverable" if self.is_live?

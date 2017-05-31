@@ -4,7 +4,7 @@ require 'credentials_manager'
 module Review
   class Options
     def self.available_options
-      user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
@@ -21,7 +21,7 @@ module Review
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "REVIEW_TEAM_ID",
-                                     description: "The ID of your Developer Portal team if you're in multiple teams",
+                                     description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
@@ -30,7 +30,7 @@ module Review
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "REVIEW_TEAM_NAME",
-                                     description: "The name of your Developer Portal team if you're in multiple teams",
+                                     description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
