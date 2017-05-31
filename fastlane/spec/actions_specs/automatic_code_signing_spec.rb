@@ -85,7 +85,7 @@ describe Fastlane do
     end
 
     it "raises exception on old projects" do
-      expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please use xcode to upgrade to atlease 0800")
+      expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
       result = Fastlane::FastFile.new.parse("lane :test do
         disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic-code-signing-old.xcodeproj')
       end").runner.execute(:test)
