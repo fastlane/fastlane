@@ -76,8 +76,9 @@ module Match
     def fetch_certificates(params: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
+      certs_dir = Match.certs_dir(params, cert_type)
+      certs = Dir[File.join(certs_dir, "*.cer")]
+      keys = Dir[File.join(certs_dir, "*.p12")]
 
       if certs.count == 0 or keys.count == 0
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
@@ -117,7 +118,7 @@ module Match
         names.push(params[:platform])
       end
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
+      base_dir = Match.profiles_dir(params, prov_type)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles

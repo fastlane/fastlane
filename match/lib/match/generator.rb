@@ -3,7 +3,7 @@ module Match
   class Generator
     def self.generate_certificate(params, cert_type)
       require 'cert'
-      output_path = File.join(params[:workspace], "certs", cert_type.to_s)
+      output_path = Match.certs_dir(params, cert_type)
 
       platform = params[:platform]
       platform = :macos if params[:platform].to_s == 'osx'
@@ -53,7 +53,7 @@ module Match
 
       values = {
         app_identifier: app_identifier,
-        output_path: File.join(params[:workspace], "profiles", prov_type.to_s),
+        output_path: Match.profiles_dir(params, prov_type),
         username: params[:username],
         force: true,
         cert_id: certificate_id,

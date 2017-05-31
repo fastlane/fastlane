@@ -34,4 +34,13 @@ module Match
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)
     raise "Unknown cert type: '#{type}'"
   end
+
+  def self.certs_dir(params, cert_type)
+    File.join(params[:workspace], "certs", cert_type.to_s)
+  end
+
+  def self.profiles_dir(params, prov_type)
+    File.join(params[:workspace], "profiles", prov_type.to_s)
+  end
+
 end
