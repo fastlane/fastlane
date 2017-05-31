@@ -171,10 +171,11 @@ module Fastlane
         case response.status
         when 200...300
           url = response.body['public_url']
-
+          version_url = url + "/app_versions/" + response.body['version']
           Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
 
+          UI.message("Version Download URL: #{version_url}") if version_url
           UI.message("Public Download URL: #{url}") if url
           UI.success('Build successfully uploaded to HockeyApp!')
         else
