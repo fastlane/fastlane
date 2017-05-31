@@ -24,6 +24,10 @@ module Match
     return %w(appstore adhoc development enterprise)
   end
 
+  def self.distribution_types
+    return %w(installer app)
+  end
+
   def self.profile_type_sym(type)
     return type.to_sym
   end
