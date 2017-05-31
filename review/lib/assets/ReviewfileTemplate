@@ -1,0 +1,23 @@
+# For more information about this configuration visit
+# https://github.com/fastlane/fastlane/tree/master/review#reviewfile
+
+# In general, you can use the options available
+# fastlane review --help
+
+# Remove the # in front of the line to enable the option
+
+# You have three possible values for each rule options
+# :disabled
+# indicates that your metadata will not be checked by this rule
+
+# :warn
+# when triggered, this rule will only warn you of a potential problem
+
+# :fail
+# when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after review finishes
+
+# Examples:
+# spell_checking :disabled
+# trademarks :warning
+# private_api :fail
+
