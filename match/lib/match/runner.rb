@@ -77,6 +77,7 @@ module Match
       cert_type = Match.cert_type_sym(params[:type])
 
       certs_dir = Match.certs_dir(params, cert_type)
+      UI.verbose("Searching for certificates under #{certs_dir}")
       certs = Dir[File.join(certs_dir, "*.cer")]
       keys = Dir[File.join(certs_dir, "*.p12")]
 
