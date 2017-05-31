@@ -36,16 +36,18 @@ module Match
         end
       end
 
-      # Certificate
-      cert_id = fetch_certificate(params: params)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
+      # Certificates
+      cert_ids = fetch_certificates(params: params)
+      cert_ids.each do |cert_id|
+        spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
-      # Provisioning Profiles
-      app_identifiers.each do |app_identifier|
-        loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier)
+        # Provisioning Profiles
+        app_identifiers.each do |app_identifier|
+          loop do
+            break if fetch_provisioning_profile(params: params,
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier)
+          end
         end
       end
 
@@ -71,7 +73,7 @@ module Match
       GitHelper.clear_changes
     end
 
-    def fetch_certificate(params: nil)
+    def fetch_certificates(params: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
       certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
@@ -80,28 +82,30 @@ module Match
       if certs.count == 0 or keys.count == 0
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type)
+        cert_paths = [Generator.generate_certificate(params, cert_type)]
         self.changes_to_commit = true
       else
-        cert_path = certs.last
-        UI.message "Installing certificate..."
+        certs.each do |cert_path|
+          UI.message "Installing certificate..."
 
-        if FastlaneCore::CertChecker.installed?(cert_path)
-          UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
-        else
-          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          if FastlaneCore::CertChecker.installed?(cert_path)
+            UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
+          else
+            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          end
+
+          # Import the private key
+          # there seems to be no good way to check if it's already installed - so just install it
+          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+
+          # Get and print info of certificate
+          info = Utils.get_cert_info(cert_path)
+          TablePrinter.print_certificate_info(cert_info: info)
         end
-
-        # Import the private key
-        # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
-
-        # Get and print info of certificate
-        info = Utils.get_cert_info(cert_path)
-        TablePrinter.print_certificate_info(cert_info: info)
+        cert_paths = certs
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      return cert_paths.map { |cp| File.basename(cp).gsub(".cer", "") } # Certificate ID
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
