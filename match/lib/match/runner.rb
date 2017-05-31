@@ -32,13 +32,13 @@ module Match
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, platform: params[:platform])
         end
       end
 
       # Certificate
       cert_id = fetch_certificate(params: params)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
+      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
       # Provisioning Profiles
       app_identifiers.each do |app_identifier|
@@ -145,7 +145,7 @@ module Match
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         self.changes_to_commit = true
