@@ -38,6 +38,10 @@ module Fastlane
       def self.authors
         ["Shashikant86"]
       end
+      
+      def self.category
+        :building
+      end
 
       def self.example_code
         ['check_swift_version(version: "Apple Swift version 3.0.2")']
