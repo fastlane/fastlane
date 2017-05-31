@@ -36,11 +36,19 @@ module Match
   end
 
   def self.certs_dir(params, cert_type)
-    File.join(params[:workspace], "certs", cert_type.to_s)
+    File.join(params[:workspace], platform_dir(params), "certs", cert_type.to_s)
   end
 
   def self.profiles_dir(params, prov_type)
-    File.join(params[:workspace], "profiles", prov_type.to_s)
+    File.join(params[:workspace], platform_dir(params), "profiles", prov_type.to_s)
   end
 
+  # return the platform prefix under which to store the data
+  def self.platform_dir(params)
+    platform = ''
+    platform = 'osx' if params[:platform].to_s == 'osx'
+    platform
+  end
+
+  private_class_method :platform_dir
 end
