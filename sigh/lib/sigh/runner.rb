@@ -260,12 +260,13 @@ module Sigh
     end
 
     def print_produce_command(config)
+      platform_option = "--platform osx" if Sigh.config[:platform].to_s == 'macos'
       UI.message ""
       UI.message "==========================================".yellow
       UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
       UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
       UI.message ""
-      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc #{platform_option}".yellow
       UI.message ""
       UI.message "You will be asked for any missing information, like the full name of your app"
       UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"
