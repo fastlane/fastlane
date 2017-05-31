@@ -1,5 +1,6 @@
 require 'fastlane_core'
 require 'review/runner'
+require 'review/manager'
 require 'review/options'
 
 module Review
@@ -12,7 +13,7 @@ module Review
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV["REVIEW_TEAM_ID"]
-  ENV['DELIVER_USER'] ||= ENV["REVIEW_USERNAME"]
   ENV['APP_IDENTIFIER'] ||= ENV["REVIEW_APP_IDENTIFIER"]
+
+  DESCRIPTION = 'Check your app for common App Store review problems before you submit'
 end

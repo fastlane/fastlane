@@ -7,17 +7,17 @@
 # Remove the # in front of the line to enable the option
 
 # You have three possible values for each rule options
-# :disabled
+# :skip
 # indicates that your metadata will not be checked by this rule
 
 # :warn
-# when triggered, this rule will only warn you of a potential problem
+# when triggered, this rule will warn you of a potential problem
 
 # :fail
-# when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after review finishes
+# when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after fastlane review finishes
 
 # Examples:
-# spell_checking :disabled
+# spell_checking :skip
 # trademarks :warning
 # private_api :fail
 
