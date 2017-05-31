@@ -9,6 +9,8 @@ module FastlaneCore
       ids = installed_identies
       finger_print = sha1_fingerprint(path)
 
+      UI.verbose("#{ids} contain? #{finger_print}")
+
       return ids.include? finger_print
     end
 
