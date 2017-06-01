@@ -254,9 +254,9 @@ module Deliver
         end
       end
       
-      # Replace :default symbol with "default" string
+      # Reject "default" language from getting enabled
       enabled_languages = enabled_languages.reject! do |lang|
-        lang == :default || lang == "default"
+        lang == "default"
       end.uniq
 
       # Reject "default" language from getting enabled
