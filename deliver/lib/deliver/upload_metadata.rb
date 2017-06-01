@@ -96,7 +96,7 @@ module Deliver
           UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
           next
         end
-
+        
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
@@ -135,21 +135,57 @@ module Deliver
         end
       end
     end
+    
+    # Normalizes languages keys from symbols to strings
+    def normalize_language_key(options)
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        current.keys.each do |key|
+          current[key.to_s] = current.delete(key)
+        end
+      end
+      
+      options
+    end
 
     # rubocop:enable Metrics/PerceivedComplexity
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
+<<<<<<< HEAD
       # Normalizes languages keys from symbols to strings
       normalize_language_keys(options)
+=======
+      # Build a complete list of the required languages
+      enabled_languages = options[:languages] || []
+
+      # Get all languages used in existing settings
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      # Check folder list (an empty folder signifies a language is required)
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
+        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
+>>>>>>> Works with language config and works when symbols given in as a language
 
       # Build a complete list of the required languages
       enabled_languages = detect_languages(options)
       
+<<<<<<< HEAD
       # Replace :default symbol with "default" string
       # enabled_languages.map do |lang|
       #   lang == :default ? "default" : lang
       # end
+=======
+      enabled_languages.uniq!
+>>>>>>> Works with language config and works when symbols given in as a language
 
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
@@ -219,9 +255,9 @@ module Deliver
       end
       
       # Replace :default symbol with "default" string
-      enabled_languages.reject! do |lang|
+      enabled_languages = enabled_languages.reject! do |lang|
         lang == :default || lang == "default"
-      end
+      end.uniq
 
       # Reject "default" language from getting enabled
       # because "default" is not an iTC language

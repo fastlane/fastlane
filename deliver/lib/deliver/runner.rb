@@ -94,6 +94,8 @@ module Deliver
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
       upload_metadata.load_from_filesystem(options)
+      
+      upload_metadata.normalize_language_key(options)
 
       # Assign "default" values to all languages
       upload_metadata.assign_defaults(options)
