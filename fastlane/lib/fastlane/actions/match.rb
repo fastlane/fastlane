@@ -5,9 +5,19 @@ module Fastlane
         require 'match'
 
         params.load_configuration_file("Matchfile")
+
+        params[:platform] = match_platform if params[:platform].nil?
+
         Match::Runner.new.run(params)
 
         define_profile_type(params)
+      end
+
+      def self.match_platform
+        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME].to_s == "mac"
+          UI.verbose("Taking platform from lane_context")
+          return 'osx'
+        end
       end
 
       def self.define_profile_type(values)
