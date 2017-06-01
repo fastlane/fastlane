@@ -142,8 +142,8 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
-        current.keys.each do |key|
-          current[key.to_s] = current.delete(key)
+        current.keys.each do |language|
+          current[language.to_s] = current.delete(language)
         end
       end
 
