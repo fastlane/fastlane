@@ -309,7 +309,17 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :marketing_url,
                                      description: "Metadata: Localised marketing url",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :languages,
+                                     description: "Metadata: List of languages to activate",
+                                     type: Array,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       value.each do |language|
+                                         is_valid_language = FastlaneCore::Languages::ALL_LANGUAGES.include?(language)
+                                         UI.user_error!(":languages was given an invalid lanuage - #{language}") unless is_valid_language
+                                       end
+                                     end)
       ]
     end
   end
