@@ -99,7 +99,7 @@ module Match
 
           # Import the private key
           # there seems to be no good way to check if it's already installed - so just install it
-          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+          Utils.import(cert_path.gsub(".cer", ".p12"), params[:keychain_name], password: params[:keychain_password])
 
           # Get and print info of certificate
           info = Utils.get_cert_info(cert_path)
