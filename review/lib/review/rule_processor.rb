@@ -1,14 +1,17 @@
 require 'spaceship'
 
 module Review
-  class DataPointToCheck
+  # each data point we want to check has some text value we we'll be inspecting
+  # along with the text, we'll hold on to the property name, and what that name maps to in plain english
+  # so that we can print out nice, friendly messages.
+  class ItemToCheck
     attr_accessor :text
-    attr_accessor :property_name
+    attr_accessor :item_name
     attr_accessor :friendly_name
 
-    def initialize(text, property_name, friendly_name)
+    def initialize(text, item_name, friendly_name)
       @text = text
-      @property_name = property_name
+      @item_name = item_name
       @friendly_name = friendly_name
     end
   end
@@ -20,7 +23,7 @@ module Review
         text = app_version.public_send(attribute_name)
         friendly_name = app_version.class.annotations(attribute_name)[:keeper_rule_data][:friendly_name]
         property_name = attribute_name
-        DataPointToCheck.new(text, property_name, friendly_name)
+        ItemToCheck.new(text, property_name, friendly_name)
       end
 
       # this is just proof of concept

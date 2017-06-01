@@ -36,6 +36,7 @@ module Review
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
       return if app
+      UI.user_error!("Could not find App with App Identifier '#{Review.config[:app_identifier]}'")
     end
   end
 end
