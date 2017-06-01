@@ -158,7 +158,7 @@ module Supply
       if Supply.config[:track].eql? "rollout"
         client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
       else
-        check_superseded_tracks(apk_version_codes)
+        check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
         client.update_track(Supply.config[:track], 1.0, apk_version_codes)
       end
     end
@@ -167,6 +167,7 @@ module Supply
     #  - Lesser than the greatest of any later (i.e. production) track
     #  - Or lesser than the currently being uploaded if it's in an earlier (i.e. alpha) track
     def check_superseded_tracks(apk_version_codes)
+      UI.message("Checking superseded tracks...")
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
