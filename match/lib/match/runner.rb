@@ -82,33 +82,54 @@ module Match
       certs = Dir[File.join(certs_dir, "*.cer")]
       keys = Dir[File.join(certs_dir, "*.p12")]
 
-      if certs.count == 0 or keys.count == 0
-        UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
-        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_paths = [Generator.generate_certificate(params, cert_type)]
-        self.changes_to_commit = true
+      cert_ids = certs.map { |cp| File.basename(cp).gsub(".cer", "") }
+
+      # check if the certificates we have locally match the ones we are looking for
+      if cert_ids.count == 0
+        missing = true
       else
-        certs.each do |cert_path|
-          UI.message "Installing certificate..."
-
-          if FastlaneCore::CertChecker.installed?(cert_path)
-            UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
-          else
-            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
-          end
-
-          # Import the private key
-          # there seems to be no good way to check if it's already installed - so just install it
-          Utils.import(cert_path.gsub(".cer", ".p12"), params[:keychain_name], password: params[:keychain_password])
-
-          # Get and print info of certificate
-          info = Utils.get_cert_info(cert_path)
-          TablePrinter.print_certificate_info(cert_info: info)
-        end
-        cert_paths = certs
+        portal_certs_ids = CertFinder.find_certificate_ids(params, cert_type)
+        UI.verbose("Found #{portal_certs_ids} portal certificates")
+        matching_certs = cert_ids & portal_certs_ids
+        # we should find at most one
+        UI.important("More than one matching cert found: #{matching_certs}") if matching_certs.count > 1
+        missing = matching_certs.count == 0
+      end
+      if !missing
+        # missing the key is also a problem
+        missing = Dir[File.join(certs_dir, "#{matching_certs[0]}.p12")].count == 0
+        UI.important("Missing key for certificate id #{matching_certs[0]}") if missing
       end
 
-      return cert_paths.map { |cp| File.basename(cp).gsub(".cer", "") } # Certificate ID
+      if missing
+        UI.important "Couldn't find a valid code signing identity in the git repo for #{[cert_type, params[:distribution_type]].join(' ')}... creating one for you now"
+        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        generated_cert = Generator.generate_certificate(params, cert_type)
+        self.changes_to_commit = true
+      end
+
+      # generated_cert was installed. We install all the other certificates
+      certs.each do |cert_path|
+        UI.message "Installing certificate..."
+
+        if FastlaneCore::CertChecker.installed?(cert_path)
+          UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
+        else
+          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+        end
+
+        # Import the private key
+        # there seems to be no good way to check if it's already installed - so just install it
+        Utils.import(cert_path.gsub(".cer", ".p12"), params[:keychain_name], password: params[:keychain_password])
+
+        # Get and print info of certificate
+        info = Utils.get_cert_info(cert_path)
+        TablePrinter.print_certificate_info(cert_info: info)
+      end
+
+      certs << generated_cert if generated_cert
+
+      return certs.map { |cp| File.basename(cp).gsub(".cer", "") } # Certificate ID
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
