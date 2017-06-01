@@ -116,6 +116,11 @@ module Fastlane
       self.current_platform = nil
     end
 
+    # Define environment variables
+    def env(name, value)
+      @runner.add_env(self.current_platform, name, value)
+    end
+
     # Is executed before each test run
     def before_all(&block)
       @runner.set_before_all(@current_platform, block)

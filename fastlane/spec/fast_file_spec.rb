@@ -33,6 +33,49 @@ describe Fastlane do
       end
     end
 
+    describe "#env" do
+      before do
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileEnv')
+      end
+
+      after do
+        ENV["FASTLANE_TEST_ENV_GLOBAL"] = nil
+        ENV["FASTLANE_TEST_ENV_PLATFORM"] = nil
+      end
+
+      it "Set environment variable" do
+        expect(ENV["FASTLANE_TEST_ENV_GLOBAL"]).to be_nil
+        @ff.runner.execute('echo')
+        expect(ENV["FASTLANE_TEST_ENV_GLOBAL"]).to eq("foobar")
+      end
+
+      context "with platform" do
+        context "with ios" do
+          it "Set environment variable on specific platforms" do
+            expect(ENV["FASTLANE_TEST_ENV_PLATFORM"]).to be_nil
+            @ff.runner.execute('echo', 'ios')
+            expect(ENV["FASTLANE_TEST_ENV_PLATFORM"]).to eq("ios")
+          end
+        end
+
+        context "with android" do
+          it "Set environment variable on specific platforms" do
+            expect(ENV["FASTLANE_TEST_ENV_PLATFORM"]).to be_nil
+            @ff.runner.execute('echo', 'android')
+            expect(ENV["FASTLANE_TEST_ENV_PLATFORM"]).to eq("android")
+          end
+        end
+
+        context "with environment variable in lane" do
+          it "Do not set environment variable" do
+            expect(ENV["FASTLANE_INNER_ENV"]).to be_nil
+            @ff.runner.execute('inner_env', 'ios')
+            expect(ENV["FASTLANE_INNER_ENV"]).to be_nil
+          end
+        end
+      end
+    end
+
     describe "#lane_name" do
       before do
         @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
