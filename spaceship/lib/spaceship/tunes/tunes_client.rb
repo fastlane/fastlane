@@ -258,8 +258,13 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_rating_summary(app_id, platform, versionId = '')
-      r = request(:get, "ra/apps/#{app_id}/reviews/summary?platform=#{platform}&versionId=#{versionId}")
+    def get_rating_summary(app_id, platform, versionId = '', storefront = '')
+      # if storefront or versionId == '' api fails
+      rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
+      rating_url << "storefront=#{storefront}" if storefront != ''
+      rating_url << "versionId=#{versionId}" if versionId != ''
+
+      r = request(:get, rating_url)
       parse_response(r, 'data')
     end
 

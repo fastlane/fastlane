@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ClassLength
 class TunesStubbing
   class << self
     def itc_read_fixture_file(filename)
@@ -77,8 +78,11 @@ class TunesStubbing
     end
 
     def itc_stub_ratings
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/reviews/summary?platform=ios&versionId=").
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews/summary").
         to_return(status: 200, body: itc_read_fixture_file('ratings_summary.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews/summary?storefront=US").
+        to_return(status: 200, body: itc_read_fixture_file('ratings_summary_US.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&storefront=US&versionId=").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
