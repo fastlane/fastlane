@@ -240,6 +240,9 @@ module Sigh
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"
       end
+      if Sigh.config[:platform].to_s == 'macos'
+        profile_name += "_osx"
+      end
 
       profile_name += '.mobileprovision'
 
