@@ -47,7 +47,9 @@ module FastlaneCore
     end
 
     def self.list_available_identities
-      `security find-identity -v -p codesigning`
+      # we could only search the policies we need depending on the cert CN name for example
+      # right now, we go for all
+      `security find-identity -v -p codesigning -p macappstore`
     end
 
     def self.wwdr_certificate_installed?
