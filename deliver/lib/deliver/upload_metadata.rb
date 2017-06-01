@@ -96,7 +96,7 @@ module Deliver
           UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
           next
         end
-
+        
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
@@ -135,13 +135,27 @@ module Deliver
         end
       end
     end
+    
+    # Normalizes languages keys from symbols to strings
+    def normalize_language_key(options)
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        current.keys.each do |key|
+          current[key.to_s] = current.delete(key)
+        end
+      end
+      
+      options
+    end
 
     # rubocop:enable Metrics/PerceivedComplexity
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
       # Build a complete list of the required languages
-      enabled_languages = []
+      enabled_languages = options[:languages] || []
 
       # Get all languages used in existing settings
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
@@ -160,10 +174,7 @@ module Deliver
         enabled_languages << language unless enabled_languages.include?(language)
       end
       
-      # Replace :default symbol with "default" string
-      enabled_languages.map do |lang|
-        lang == :default ? "default" : lang
-      end
+      enabled_languages.uniq!
 
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
@@ -195,7 +206,7 @@ module Deliver
       v = options[:app].edit_version
       UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
-      enabled_languages = []
+      enabled_languages = options[:languages] || []
       LOCALISED_VERSION_VALUES.each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
@@ -206,9 +217,9 @@ module Deliver
       end
       
       # Replace :default symbol with "default" string
-      enabled_languages.reject! do |lang|
+      enabled_languages = enabled_languages.reject! do |lang|
         lang == :default || lang == "default"
-      end
+      end.uniq
 
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
