@@ -96,7 +96,7 @@ module Deliver
           UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
           next
         end
-        
+
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
@@ -135,7 +135,7 @@ module Deliver
         end
       end
     end
-    
+
     # Normalizes languages keys from symbols to strings
     def normalize_language_key(options)
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
@@ -146,7 +146,7 @@ module Deliver
           current[key.to_s] = current.delete(key)
         end
       end
-      
+
       options
     end
 
@@ -173,7 +173,7 @@ module Deliver
         language = File.basename(lng_folder)
         enabled_languages << language unless enabled_languages.include?(language)
       end
-      
+
       enabled_languages.uniq!
 
       return unless enabled_languages.include?("default")
@@ -215,7 +215,7 @@ module Deliver
           enabled_languages << language unless enabled_languages.include?(language)
         end
       end
-      
+
       # Reject "default" language from getting enabled
       enabled_languages = enabled_languages.reject! do |lang|
         lang == "default"

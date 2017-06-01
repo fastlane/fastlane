@@ -6,7 +6,7 @@ module Deliver
 
     def initialize(options, skip_auto_detection = {})
       self.options = options
-      
+
       login
       Deliver::DetectValues.new.run!(self.options, skip_auto_detection)
       FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Fastlane::VERSION} Summary")
@@ -90,10 +90,10 @@ module Deliver
       # First, collect all the things for the HTML Report
       screenshots = UploadScreenshots.new.collect_screenshots(options)
       UploadMetadata.new.load_from_filesystem(options)
-      
+
       # Normalizes languages keys from symbols to strings
       UploadMetadata.new.normalize_language_key(options)
-      
+
       # Assign "default" values to all languages
       UploadMetadata.new.assign_defaults(options)
 
