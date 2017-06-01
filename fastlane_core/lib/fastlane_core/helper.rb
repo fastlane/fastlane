@@ -24,6 +24,11 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # @return true if it is enabled to execute external commands
+    def self.sh_enabled?
+      !self.test?
+    end
+
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
