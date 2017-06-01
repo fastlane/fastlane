@@ -30,7 +30,7 @@ module Spaceship
       # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
       # @example
       #   "https://is1-ssl.mzstatic.com/image/thumb/Purple7/v4/cd/a3/e2/cda3e2ac-4034-c6af-ee0c-3e4d9a0bafaa/pr_source.png/340x340bb-80.png"
-      # aexample
+      # @example
       #   nil
       attr_accessor :app_icon_preview_url
 
@@ -130,9 +130,9 @@ module Spaceship
       end
 
       def ratings(version_id: '', storefront: '')
-        attrs = client.get_rating_summary(apple_id, platform, version_id, storefront)
+        attrs = client.get_ratings(apple_id, platform, version_id, storefront)
         attrs[:application] = self
-        Tunes::AppRatings.factory(attrs)
+        Tunes::AppRatings.new(attrs)
       end
 
       def platforms
