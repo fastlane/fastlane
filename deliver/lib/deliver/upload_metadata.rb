@@ -145,6 +145,11 @@ module Deliver
 
       # Build a complete list of the required languages
       enabled_languages = detect_languages(options)
+      
+      # Replace :default symbol with "default" string
+      # enabled_languages.map do |lang|
+      #   lang == :default ? "default" : lang
+      # end
 
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
@@ -211,6 +216,11 @@ module Deliver
           language = language.to_s
           enabled_languages << language unless enabled_languages.include?(language)
         end
+      end
+      
+      # Replace :default symbol with "default" string
+      enabled_languages.reject! do |lang|
+        lang == :default || lang == "default"
       end
 
       # Reject "default" language from getting enabled
