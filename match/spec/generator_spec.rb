@@ -5,6 +5,8 @@ describe Match::Generator do
 
       config = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: true,
+        distribution_type: nil,
+        platform: nil,
         output_path: 'workspace/certs/development',
         force: true,
         username: 'username',
@@ -39,6 +41,7 @@ describe Match::Generator do
       config = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
         app_identifier: 'app_identifier',
         development: true,
+        distribution_type: nil,
         output_path: 'workspace/profiles/development',
         username: 'username',
         force: true,
