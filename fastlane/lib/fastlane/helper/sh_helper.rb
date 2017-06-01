@@ -29,9 +29,7 @@ module Fastlane
       UI.command(command) if print_command
 
       result = ''
-      if Helper.test?
-        result << command # only for the tests
-      else
+      if Helper.sh_enabled?
         exit_status = nil
         IO.popen(command, err: [:child, :out]) do |io|
           io.sync = true
@@ -58,6 +56,8 @@ module Fastlane
             UI.shell_error!(message)
           end
         end
+      else
+        result << command # only for the tests
       end
 
       result
