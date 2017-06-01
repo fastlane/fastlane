@@ -41,6 +41,7 @@ module Match
       cert_ids.each do |cert_id|
         spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
+        next if params[:distribution_type].to_s == 'installer' # no provisioning profiles for those
         # Provisioning Profiles
         app_identifiers.each do |app_identifier|
           loop do
