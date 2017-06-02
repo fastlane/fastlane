@@ -172,7 +172,6 @@ describe Deliver::UploadMetadata do
 
   describe "#languages" do
     let(:options) { { metadata_path: tmpdir } }
-
     def create_metadata(path, text)
       File.open(File.join(path), 'w') do |f|
         f.write(text)
