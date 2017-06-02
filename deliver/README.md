@@ -195,7 +195,11 @@ no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms,
 
 Deliver has a special `default` language code which allows you to provide values that are not localised, and which will be used as defaults when you don’t provide a specific localised value.
 
-You can use this either in json within your deliverfile, or as a folder in your metadata file.
+In order to use `default`, you will need tell `deliver` which languages your app all uses. You can do this in either of two ways:
+1. Create the folders named with the language in the metadata folder
+2. Add the following to your deliverfile `languages(['en-US','de-DE'])` 
+
+You can use this either in json within your deliverfile, or as a folder in your metadata folder.
 
 Imagine that you have localised data for the following language codes:  ```en-US, de-DE, el, it```
 
