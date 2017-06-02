@@ -284,7 +284,7 @@ module Deliver
                                          keywords = keywords.join(", ") if keywords.kind_of?(Array)
                                          value[language] = keywords
 
-                                         UI.user_error!(":keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
+                                         UI.user_error!("keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :promotional_text,
@@ -314,10 +314,11 @@ module Deliver
                                      description: "Metadata: List of languages to activate",
                                      type: Array,
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       value.each do |language|
-                                         is_valid_language = FastlaneCore::Languages::ALL_LANGUAGES.include?(language)
-                                         UI.user_error!(":languages was given an invalid lanuage - #{language}") unless is_valid_language
+                                     verify_block: proc do |languages|
+                                       diff = languages - FastlaneCore::Languages::ALL_LANGUAGES
+                                       
+                                       unless diff.empty?
+                                         UI.user_error!("the following languages are not valid: #{diff.join(',')}")
                                        end
                                      end)
       ]

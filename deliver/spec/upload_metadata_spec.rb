@@ -171,9 +171,6 @@ describe Deliver::UploadMetadata do
   end
 
   describe "#languages" do
-    # LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url]
-    # LOCALISED_APP_VALUES = [:name, :privacy_url]
-
     let(:options) { { metadata_path: tmpdir } }
 
     def create_metadata(path, text)

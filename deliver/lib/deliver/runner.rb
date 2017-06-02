@@ -87,15 +87,15 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to iTunes Connect
     def upload_metadata
+      upload_metadata = UploadMetadata.new
+      upload_screenshots = UploadScreenshots.new
+      
       # First, collect all the things for the HTML Report
       screenshots = UploadScreenshots.new.collect_screenshots(options)
-      UploadMetadata.new.load_from_filesystem(options)
-
-      # Normalizes languages keys from symbols to strings
-      UploadMetadata.new.normalize_language_key(options)
+      upload_metadata.load_from_filesystem(options)
 
       # Assign "default" values to all languages
-      UploadMetadata.new.assign_defaults(options)
+      upload_metadata.assign_defaults(options)
 
       # Handle app icon / watch icon
       prepare_app_icons(options)
@@ -104,7 +104,7 @@ module Deliver
       validate_html(screenshots)
 
       # Commit
-      UploadMetadata.new.upload(options)
+      upload_metadata.upload(options)
       UploadScreenshots.new.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
