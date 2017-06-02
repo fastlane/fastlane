@@ -197,10 +197,10 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
 
-        language = File.basename(lng_folder)
+        language = File.basename(lang_folder)
         enabled_languages << language unless enabled_languages.include?(language)
       end
 
@@ -257,9 +257,9 @@ module Deliver
       end
 
       # Reject "default" language from getting enabled
-      enabled_languages = enabled_languages.reject! do |lang|
+      enabled_languages.reject! do |lang|
         lang == "default"
-      end.uniq
+      end.uniq!
 
       # Reject "default" language from getting enabled
       # because "default" is not an iTC language
@@ -327,6 +327,20 @@ module Deliver
     end
 
     private
+    
+    # Normalizes languages keys from symbols to strings
+    def normalize_language_key(options)
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        current.keys.each do |language|
+          current[language.to_s] = current.delete(language)
+        end
+      end
+
+      options
+    end
 
     # Normalizes languages keys from symbols to strings
     def normalize_language_keys(options)

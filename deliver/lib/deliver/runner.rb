@@ -109,6 +109,7 @@ module Deliver
       # Commit
       upload_metadata.upload(options)
       upload_screenshots.upload(options, screenshots)
+
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
     end
