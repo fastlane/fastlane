@@ -21,6 +21,7 @@ require 'fastlane/documentation/docs_generator'
 require 'fastlane/other_action'
 require 'fastlane/plugins/plugins'
 require 'fastlane/fastlane_require'
+require 'fastlane/fastfile_parser'
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
