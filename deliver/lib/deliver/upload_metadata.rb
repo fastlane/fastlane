@@ -327,7 +327,7 @@ module Deliver
     end
 
     private
-    
+
     # Normalizes languages keys from symbols to strings
     def normalize_language_key(options)
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
