@@ -91,7 +91,7 @@ module Deliver
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
-      screenshots = UploadScreenshots.new.collect_screenshots(options)
+      screenshots = upload_screenshots.collect_screenshots(options)
       upload_metadata.load_from_filesystem(options)
 
       # Assign "default" values to all languages
@@ -105,7 +105,7 @@ module Deliver
 
       # Commit
       upload_metadata.upload(options)
-      UploadScreenshots.new.upload(options, screenshots)
+      upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
     end
