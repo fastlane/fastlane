@@ -249,12 +249,30 @@ describe Deliver::UploadMetadata do
       end
     end
     
-    context "with localized version values" do
-      
-    end
-    
-    context "with localized app values" do
-      
+    context "with localized version values for release notes" do
+      it "default value set for unspecified languages" do
+        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+        options[:release_notes] = {
+          'default': 'something',
+          'en-US': 'something else',
+          'es-MX': 'something else else'
+        }
+        
+        create_filesystem_language('en-US')
+        create_filesystem_language('de-DE')
+        create_filesystem_language('el')
+        
+        uploader.load_from_filesystem(options)
+        uploader.assign_defaults(options)
+        
+        expect(options[:release_notes]["en-US"]).to eql('something else')
+        expect(options[:release_notes]["es-MX"]).to eql('something else else')
+        expect(options[:release_notes]["en-AU"]).to eql('something')
+        expect(options[:release_notes]["en-CA"]).to eql('something')
+        expect(options[:release_notes]["en-GB"]).to eql('something')
+        expect(options[:release_notes]["de-DE"]).to eql('something')
+        expect(options[:release_notes]["el"]).to eql('something')
+      end
     end
   end
 end
