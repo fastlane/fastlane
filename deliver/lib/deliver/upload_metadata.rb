@@ -154,7 +154,6 @@ module Deliver
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
-      # Normalizes languages keys from symbols to strings
       normalize_language_keys(options)
 
       # Build a complete list of the required languages
@@ -183,7 +182,7 @@ module Deliver
         current.delete("default")
       end
     end
-    
+
     def detect_languages(options)
       # Build a complete list of the required languages
       enabled_languages = options[:languages] || []
@@ -206,7 +205,7 @@ module Deliver
       end
 
       enabled_languages
-        .map { |s| s.to_s }
+        .map(&:to_s)
         .uniq
     end
 
