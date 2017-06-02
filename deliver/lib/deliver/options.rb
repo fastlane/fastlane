@@ -316,7 +316,7 @@ module Deliver
                                      optional: true,
                                      verify_block: proc do |languages|
                                        diff = languages - FastlaneCore::Languages::ALL_LANGUAGES
-                                       
+
                                        unless diff.empty?
                                          UI.user_error!("the following languages are not valid: #{diff.join(',')}")
                                        end

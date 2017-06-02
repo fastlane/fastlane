@@ -89,7 +89,7 @@ module Deliver
     def upload_metadata
       upload_metadata = UploadMetadata.new
       upload_screenshots = UploadScreenshots.new
-      
+
       # First, collect all the things for the HTML Report
       screenshots = UploadScreenshots.new.collect_screenshots(options)
       upload_metadata.load_from_filesystem(options)
