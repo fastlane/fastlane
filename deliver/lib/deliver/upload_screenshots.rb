@@ -32,11 +32,7 @@ module Deliver
         lng_text = "language"
         lng_text += "s" if enabled_languages.count != 1
         UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        begin
-          v.save!
-        rescue ITunesConnectError
-          UI.user_error!("Unable to activate languages: #{langs}. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
-        end
+        v.save!
         # This refreshes the app version from iTC after enabling a localization
         v = app.edit_version
       end
@@ -100,7 +96,12 @@ module Deliver
         UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
 
         language_dir_name = File.basename(lng_folder)
-        language = available_languages[language_dir_name.downcase] || language_dir_name
+
+        if available_languages[language_dir_name.downcase].nil?
+          UI.user_error!("#{language_dir_name} is not an available language. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
+        end
+
+        language = available_languages[language_dir_name.downcase]
 
         files.each do |file_path|
           is_framed = file_path.downcase.include?("_framed.")
