@@ -282,6 +282,19 @@ module Spaceship
         nil
       end
 
+      def activate_languages(languages)
+        create_languages(enabled_languages)
+        lng_text = "language"
+        lng_text += "s" if enabled_languages.count != 1
+        langs = enabled_languages.join(', ')
+        UI.message("Activating #{lng_text} #{langs}...")
+        save!
+      rescue ITunesConnectError
+        UI.user_error!("Unable to activate languages: #{langs}. Please verify that your language codes have the appropriate cases. See http://data.okfn.org/data/core/language-codes#resource-ietf-language-tags for a list of available codes.")
+      rescue => e
+        raise e
+      end
+
       def current_build_number
         if self.is_live?
           build_version

@@ -184,11 +184,7 @@ module Deliver
       end
 
       if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
-        lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        v.save!
+        v.activate_languages(enabled_languages)
       end
       true
     end
