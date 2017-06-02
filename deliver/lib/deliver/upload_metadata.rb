@@ -55,6 +55,8 @@ module Deliver
     # Directory name it contains review information
     REVIEW_INFORMATION_DIR = "review_information"
 
+    ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
+
     # rubocop:disable Metrics/PerceivedComplexity
 
     # Make sure to call `load_from_filesystem` before calling upload
@@ -142,6 +144,22 @@ module Deliver
     def assign_defaults(options)
       # Normalizes languages keys from symbols to strings
       normalize_language_keys(options)
+
+      # Build a complete list of the required languages
+      enabled_languages = []
+
+      # Get all languages used in existing settings
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      # Check folder list (an empty folder signifies a language is required)
+      Loader.language_folders(options[:metadata_path], options[:skip_unsupported_languages]).each do |lng_folder|
+        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
 
       # Build a complete list of the required languages
       enabled_languages = detect_languages(options)
