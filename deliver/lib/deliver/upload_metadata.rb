@@ -155,26 +155,7 @@ module Deliver
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
       # Build a complete list of the required languages
-      enabled_languages = options[:languages] || []
-
-      # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-
-      # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lng_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
-      end
-
-      enabled_languages.uniq!
+      enabled_languages = detect_languages(options)
 
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
@@ -194,6 +175,32 @@ module Deliver
         end
         current.delete("default")
       end
+    end
+    
+    def detect_languages(options)
+      # Build a complete list of the required languages
+      enabled_languages = options[:languages] || []
+
+      # Get all languages used in existing settings
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      # Check folder list (an empty folder signifies a language is required)
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
+        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
+
+        language = File.basename(lng_folder)
+        enabled_languages << language unless enabled_languages.include?(language)
+      end
+
+      enabled_languages
+        .map { |s| s.to_s }
+        .uniq
     end
 
     # Makes sure all languages we need are actually created
