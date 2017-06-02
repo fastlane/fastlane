@@ -199,6 +199,7 @@ In order to use `default`, you will need to tell `deliver` which languages your 
 1. Create the folders named with the language in the metadata folder (i.e. fastlane/metadata/en-US or fastlane/metadata/de-DE)
 2. Add the following to your `Deliverfile` `languages(['en-US','de-DE'])` 
 
+
 You can use this either in json within your `Deliverfile` and/or as folders in your metadata folder. `deliver` will take the union of both language sets from the `Deliverfile` and from the metadata folder and create on single set of languages which will be enabled.
 
 Imagine that you have localised data for the following language codes:  ```en-US, de-DE, el, it```
