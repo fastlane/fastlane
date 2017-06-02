@@ -523,6 +523,12 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def available_languages
+      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
+      response = parse_response(r, 'data')
+      response.flat_map { |region| region["storeFronts"] }.flat_map { |storefront| storefront["supportedLocaleCodes"] }.uniq
+    end
+
     #####################################################
     # @!group App Icons
     #####################################################
