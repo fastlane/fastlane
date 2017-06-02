@@ -172,6 +172,7 @@ describe Deliver::UploadMetadata do
 
   describe "#languages" do
     let(:options) { { metadata_path: tmpdir } }
+
     def create_metadata(path, text)
       File.open(File.join(path), 'w') do |f|
         f.write(text)
@@ -249,15 +250,15 @@ describe Deliver::UploadMetadata do
       it "default value set for unspecified languages" do
         options[:languages] = ['en-AU', 'en-CA', 'en-GB']
         options[:release_notes] = {
-          'default': 'something',
-          'en-US': 'something else',
-          'es-MX': 'something else else'
+          'default' => 'something',
+          'en-US' => 'something else',
+          'es-MX' => 'something else else'
         }
-        
+
         create_filesystem_language('en-US')
         create_filesystem_language('de-DE')
         create_filesystem_language('el')
-        
+
         uploader.load_from_filesystem(options)
         uploader.assign_defaults(options)
 
