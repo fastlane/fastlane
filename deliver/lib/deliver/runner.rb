@@ -25,7 +25,7 @@ module Deliver
         upload_binary
       end
 
-      UI.success("Finished the upload to iTunes Connect")
+      UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
       submit_for_review if options[:submit_for_review]
     end
