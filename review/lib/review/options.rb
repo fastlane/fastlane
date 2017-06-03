@@ -1,8 +1,13 @@
 require 'fastlane_core'
 require 'credentials_manager'
+require 'review/rules'
 
 module Review
   class Options
+    def self.rules
+      Rules.all_rules
+    end
+
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
