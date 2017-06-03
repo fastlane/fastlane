@@ -81,7 +81,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
-- Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to Q&A or the marketing team
+- Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to QA or the marketing team
 - _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
