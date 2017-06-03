@@ -32,7 +32,7 @@ module Review
 
         c.action do |_args, options|
           Review.config = FastlaneCore::Configuration.create(Review::Options.available_options, options.__hash__)
-          Review::Manager.start
+          Review::Runner.new.run
         end
       end
 
