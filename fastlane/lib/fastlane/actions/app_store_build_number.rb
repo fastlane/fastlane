@@ -30,6 +30,10 @@ module Fastlane
           @build_numbers.join(".")
         end
 
+        def to_f
+          @build_numbers.first(2).join(".").to_f
+        end
+
         def to_i
           @build_numbers.first
         end
@@ -45,7 +49,7 @@ module Fastlane
         end
 
         def +(other)
-          return build_numbers.first + other
+          return self.to_i + othser
         end
       end
 
