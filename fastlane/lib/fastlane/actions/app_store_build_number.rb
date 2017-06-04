@@ -49,7 +49,7 @@ module Fastlane
         end
 
         def +(other)
-          return self.to_i + othser
+          return self.to_i + other
         end
       end
 
