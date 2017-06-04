@@ -12,7 +12,7 @@ module Fastlane
 
         public
 
-        VERSION_PATTERN = /^(\.?[0-9]+)+$/
+        VERSION_PATTERN = /^([0-9])+(\.[0-9]+)*$/
 
         def self.correct?(version)
           version.to_s.match(VERSION_PATTERN)
