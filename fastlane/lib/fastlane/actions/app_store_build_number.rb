@@ -15,7 +15,7 @@ module Fastlane
         VERSION_PATTERN = /^(\.?[0-9]+)+$/
 
         def self.correct?(version)
-          (version.to_s !~ VERSION_PATTERN).nil?
+          version.to_s.match(VERSION_PATTERN)
         end
 
         def initialize(version)
