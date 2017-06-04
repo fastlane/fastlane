@@ -5,6 +5,50 @@ module Fastlane
     end
 
     class AppStoreBuildNumberAction < Action
+      class BuildNumber
+        protected
+
+        attr_reader :build_numbers
+
+        public
+
+        VERSION_PATTERN = /^(\.?[0-9]+)+$/
+
+        def self.correct?(version)
+          (version.to_s !~ VERSION_PATTERN).nil?
+        end
+
+        def initialize(version)
+          unless self.class.correct?(version)
+            raise ArgumentError, "Malformed version number string #{version}"
+          end
+
+          @build_numbers = version.split(".").map { |s| Integer(s) }
+        end
+
+        def to_s
+          @build_numbers.join(".")
+        end
+
+        def to_i
+          @build_numbers.first
+        end
+
+        def ==(other)
+          self.to_s == other.to_s
+        end
+
+        def <=>(other)
+          return unless other.instance_of?(BuildNumber)
+
+          @build_numbers <=> other.build_numbers
+        end
+
+        def +(other)
+          return build_numbers.first + other
+        end
+      end
+
       def self.run(params)
         require 'spaceship'
 
@@ -39,7 +83,7 @@ module Fastlane
 
           begin
             train = app.build_trains[version_number]
-            build_nr = train.builds.map(&:build_version).map { |s| Gem::Version.new(s) }.sort.last.to_s
+            build_nr = train.builds.map(&:build_version).map { |s| BuildNumber.new(s) }.sort.last
           rescue
             UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
