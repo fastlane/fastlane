@@ -168,6 +168,7 @@ module Snapshot
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
+      authorize_location(device_type) if Snapshot.config[:authorize_location]
 
       open_simulator_for_device(device_type)
 
@@ -270,6 +271,30 @@ module Snapshot
         UI.message "Adding '#{path}'"
         Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
       end
+    end
+
+    def authorize_location(device_type)
+      UI.verbose "Authorizing location permission for #{device_type}..."
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      Snapshot.config[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
+
+      plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Caches/locationd"
+      FileUtils.mkpath(plist_path)
+      plist_file = File.join(plist_path, "clients.plist")
+      Helper.backticks("plutil -convert xml1 #{plist_file}") if File.file?(plist_file)
+      plist = Plist.parse_xml(plist_file) || {}
+
+      plist[Snapshot.config[:app_identifier]] = {
+        "SupportedAuthorizationMask" => 3,
+        "Authorization" => 4,
+        "Authorized" => true,
+        "Whitelisted" => false,
+        "Executable" => "",
+        "Registered" => "",
+        "BundleId" => Snapshot.config[:app_identifier]
+      }
+
+      File.write(plist_file, Plist::Emit.dump(plist))
     end
 
     def clear_previous_screenshots

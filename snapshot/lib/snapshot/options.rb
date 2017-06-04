@@ -109,7 +109,7 @@ module Snapshot
                                      env_name: 'SNAPSHOT_APP_IDENTIFIER',
                                      short_option: "-a",
                                      optional: true,
-                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
+                                     description: "The bundle identifier of the app to uninstall or authorize (only needed when enabling reinstall_app or authorize_location)",
                                      default_value: ENV["SNAPSHOT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :add_photos,
                                      env_name: 'SNAPSHOT_PHOTOS',
@@ -123,6 +123,12 @@ module Snapshot
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :authorize_location,
+                                     env_name: 'SNAPSHOT_AUTHORIZE_LOCATION',
+                                     short_option: "-z",
+                                     description: "Enabling this option will automatically authorize location permission on the simulator for the application",
+                                     default_value: false,
+                                     is_string: false),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
