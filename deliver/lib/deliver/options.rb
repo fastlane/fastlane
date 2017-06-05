@@ -259,6 +259,13 @@ module Deliver
                                          UI.user_error!(":keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :promotional_text,
+                                     description: "Metadata: An array of localised promotional texts",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       UI.user_error!(":keywords must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :release_notes,
                                      description: "Metadata: Localised release notes for this version",
                                      optional: true,
