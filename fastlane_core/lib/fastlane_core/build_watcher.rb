@@ -41,9 +41,9 @@ module FastlaneCore
         # As this method is very often used to wait for a build, and then do something
         # with it, we have to be sure that the build actually is ready
         if build.nil?
-          UI.message("Build doesn't show up in the build list any more, waiting for it to appear again")
+          UI.message("Build doesn't show up in the build list any more, waiting for it to appear again (#{build.train_version} - #{build.build_version})")
         elsif build.active?
-          UI.success("Build #{build.train_version} - #{build.build_version} is already being tested")
+          UI.success("Build is already being tested (#{build.train_version} - #{build.build_version})")
         elsif build.ready_to_submit? || build.export_compliance_missing?
           UI.success("Successfully finished processing the build #{build.train_version} - #{build.build_version}")
         else

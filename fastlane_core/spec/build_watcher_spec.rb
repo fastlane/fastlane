@@ -68,7 +68,7 @@ describe FastlaneCore::BuildWatcher do
       expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(active_build)
       expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([active_build])
 
-      expect(UI).to receive(:success).with("Build #{active_build.train_version} - #{active_build.build_version} is already being tested")
+      expect(UI).to receive(:success).with("Build is already being tested (#{active_build.train_version} - #{active_build.build_version})")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
 
       expect(found_build).to eq(active_build)
@@ -113,7 +113,7 @@ describe FastlaneCore::BuildWatcher do
       expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([], [ready_build])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
 
-      expect(UI).to receive(:message).with("Build doesn't show up in the build list any more, waiting for it to appear again")
+      expect(UI).to receive(:message).with("Build doesn't show up in the build list any more, waiting for it to appear again (#{ready_build.train_version} - #{ready_build.build_version})")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
 
