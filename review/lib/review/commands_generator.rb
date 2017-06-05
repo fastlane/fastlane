@@ -1,7 +1,6 @@
 require "commander"
 require "fastlane_core"
 require "fastlane/version"
-require "review/manager"
 
 HighLine.track_eof = false
 

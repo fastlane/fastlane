@@ -1,6 +1,5 @@
 require 'fastlane_core'
 require 'review/runner'
-require 'review/manager'
 require 'review/options'
 
 module Review
