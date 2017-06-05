@@ -7,6 +7,14 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "works as expected with options" do
+        allow(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", '0.1')
+        stub_const('Fastlane::VERSION', '0.1')
+        Fastlane::FastFile.new.parse("lane :test do
+          fastlane_version '0.1', lock: true
+        end").runner.execute(:test)
+      end
+
       it "raises an exception if it's an old version" do
         expect do
           expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION)
@@ -14,6 +22,15 @@ describe Fastlane do
             fastlane_version '9999'
           end").runner.execute(:test)
         end.to raise_error(/The Fastfile requires a fastlane version of >= 9999./)
+      end
+
+      it "raises an exception if it's not an exact version" do
+        expect do
+          expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION)
+          Fastlane::FastFile.new.parse("lane :test do
+            fastlane_version '9999', lock: true
+          end").runner.execute(:test)
+        end.to raise_error(/The Fastfile requires a fastlane version of 9999./)
       end
 
       it "raises an exception if it's an old version in a non-bundler environement" do
@@ -45,7 +62,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             fastlane_version
           end").runner.execute(:test)
-        end.to raise_error("Please pass minimum fastlane version as parameter to fastlane_version")
+        end.to raise_error("Please pass minimum/required fastlane version as parameter to fastlane_version")
       end
     end
   end
