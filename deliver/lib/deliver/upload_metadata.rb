@@ -2,7 +2,7 @@ module Deliver
   # upload description, rating, etc.
   class UploadMetadata
     # All the localised values attached to the version
-    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url]
+    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url, :promotional_text]
 
     # Everything attached to the version but not being localised
     NON_LOCALISED_VERSION_VALUES = [:copyright]

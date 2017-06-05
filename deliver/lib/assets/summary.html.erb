@@ -195,6 +195,13 @@
               <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
           </div>
         <% end %>
+
+        <% if @options[:promotional_text] %>
+          <div class="app-changelog">
+              <div class="cat-headline">Changelog</div>
+              <%= (@options[:promotional_text][language] || '').gsub("\n", "<br />") %>
+          </div>
+        <% end %>
         
         <div class="app-screenshots">
           <div class="cat-headline">Screenshots</div>
