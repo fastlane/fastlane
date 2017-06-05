@@ -34,9 +34,9 @@ module FastlaneCore
             if line.include?("inch)")
               # For Xcode 8, where sometimes we have the # of inches in ()
               # iPad Pro (12.9 inch) (CEF11EB3-79DF-43CB-896A-0F33916C8BDE) (Shutdown)
-              match = line.match(/\s+([^\(]+ \(.*inch\)) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+              match = line.match(/\s+(.+ \(.*inch\)) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
             else
-              match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
+              match = line.match(/\s+(.+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
             end
 
             if match && !match[4] && (os_type == requested_os_type || requested_os_type == "")
