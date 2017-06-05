@@ -811,7 +811,9 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          trailer_data = display_family.fetch("trailer", {}).fetch("value")
+          trailer_raw = display_family["trailer"]
+          next if trailer_raw.nil?
+          trailer_data = trailer_raw["value"]
           next if trailer_data.nil?
           data = {
             device_type: display_family['name'],
