@@ -1,11 +1,18 @@
 require 'fastlane_core'
 require 'credentials_manager'
-require 'review/rules'
+Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
 
 module Review
   class Options
     def self.rules
-      Rules.all_rules
+      [
+        AppleThingsRule,
+        PlaceholderWordsRule,
+        UnreachableURLRule,
+        OtherPlatformsRule,
+        FutureFunctionalityRule,
+        TestWordsRule
+      ].map(&:new)
     end
 
     def self.available_options
