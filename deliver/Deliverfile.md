@@ -179,6 +179,17 @@ keywords(
 )
 ```
 
+##### promotional_text
+
+Localised promotional text
+
+```ruby
+promotional_text(
+  "en-US" => "Hey, you should totally buy our app, it's the best",
+  "de-DE" => "App kaufen bitte"
+)
+```
+
 ##### app_icon
 A path to a new app icon, which must be exactly 1024x1024px
 ```ruby
