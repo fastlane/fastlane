@@ -6,7 +6,7 @@ module FastlaneCore
     class << self
       @did_report_crash = false
 
-      @explitly_enabled_for_testing = false
+      @explicitly_enabled_for_testing = false
 
       def crash_report_path
         File.join(FastlaneCore.fastlane_user_dir, 'latest_crash.json')
@@ -22,9 +22,9 @@ module FastlaneCore
         return if exception.fastlane_crash_came_from_custom_action?
 
         # Do not run the crash reporter while tests are happening (it might try to send
-        # a crash report), unless we have explictly turned on the crash reporter because
+        # a crash report), unless we have explicitly turned on the crash reporter because
         # we want to test it
-        return if Helper.test? && !@explitly_enabled_for_testing
+        return if Helper.test? && !@explicitly_enabled_for_testing
         begin
           payload = CrashReportGenerator.generate(exception: exception, action: action)
           send_report(payload: payload)
@@ -44,11 +44,11 @@ module FastlaneCore
       end
 
       def enable_for_testing
-        @explitly_enabled_for_testing = true
+        @explicitly_enabled_for_testing = true
       end
 
       def disable_for_testing
-        @explitly_enabled_for_testing = false
+        @explicitly_enabled_for_testing = false
       end
 
       private
