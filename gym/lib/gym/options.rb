@@ -277,7 +277,14 @@ module Gym
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :new_build_system,
+                                     short_option: "-N",
+                                     env_name: "GYM_NEW_BUILD_SYSTEM",
+                                     is_string: false,
+                                     description: "Use new Build System currently in preview on Xcode>=9",
+                                     optional: true)
+
       ]
     end
   end
