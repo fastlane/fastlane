@@ -40,6 +40,31 @@ describe Gym do
                            ])
     end
 
+    it "supports new build system -> best build system" do
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3", xcargs: xcargs, scheme: 'Example', new_build_system: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+                             "set -o pipefail &&",
+                             "xcodebuild",
+                             "-scheme Example",
+                             "-project ./gym/examples/standard/Example.xcodeproj",
+                             "-sdk '9.0'",
+                             "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-UseNewBuildSystem=YES",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             :archive,
+                             "| tee #{log_path.shellescape}",
+                             "| xcpretty"
+                           ])
+    end
+
     it "disables xcpretty formatting" do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
