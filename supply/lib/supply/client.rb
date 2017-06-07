@@ -68,8 +68,9 @@ module Supply
 
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
       Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
-      Google::Apis::RequestOptions.default.timeout_sec = 300
-      Google::Apis::RequestOptions.default.open_timeout_sec = 300
+      Google::Apis::ClientOptions.default.read_timeout_sec = 300
+      Google::Apis::ClientOptions.default.open_timeout_sec = 300
+      Google::Apis::ClientOptions.default.send_timeout_sec = 300
       Google::Apis::RequestOptions.default.retries = 5
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
@@ -262,15 +263,17 @@ module Supply
     def track_version_codes(track)
       ensure_active_edit!
 
-      result = call_google_api do
-        android_publisher.get_track(
+      begin
+        result = android_publisher.get_track(
           current_package_name,
           current_edit.id,
           track
         )
+        return result.version_codes
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
+        raise
       end
-
-      return result.version_codes
     end
 
     def update_apk_listing_for_language(apk_listing)
