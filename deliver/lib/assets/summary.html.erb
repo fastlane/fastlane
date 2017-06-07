@@ -13,6 +13,14 @@
               margin-right: 25px;
           }
 
+          .app-subtitle {
+              font-size: 26px;
+              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
+              font-weight: 300;
+              margin-left: 25px;
+              margin-right: 25px;
+          }
+
           .app-urls {
               margin-left: 25px;
               font-size: 14px;
@@ -154,6 +162,12 @@
         <% else %>
           <div class="app-name">
             <%= language %>
+          </div>
+        <% end %>
+
+        <% if @options[:subtitle] %>
+          <div class="app-subtitle">
+            Subtitle:  <%= @options[:subtitle][language] %>
           </div>
         <% end %>
 
