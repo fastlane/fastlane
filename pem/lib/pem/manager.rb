@@ -55,6 +55,7 @@ module PEM
         end
 
         x509_certificate = cert.download
+        # since voip push certificate can only be for production, we use production name here
         certificate_type = (PEM.config[:development] ? 'development' : 'production')
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
@@ -84,6 +85,8 @@ module PEM
       def certificate
         if PEM.config[:development]
           Spaceship.certificate.development_push
+        elsif PEM.config[:voip]
+          Spaceship.certificate.voip_push
         else
           Spaceship.certificate.production_push
         end
