@@ -94,5 +94,53 @@ describe Fastlane do
         end.to raise_error("To call another action from an action use `other_action.rocket` instead")
       end
     end
+
+    describe "shell_out_should_use_bundle_exec?" do
+      it "should be false when using contained version" do
+        expect(FastlaneCore::Helper).to receive(:contained_fastlane?).and_return(true)
+        expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(false)
+      end
+
+      it "should return true if a Gemfile was provided by the parent process" do
+        with_env_values('BUNDLE_GEMFILE' => 'someGemfile') do
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(true)
+        end
+      end
+
+      it "should return true if file named 'Gemfile' is found in the current directory" do
+        with_env_values('BUNDLE_GEMFILE' => nil) do
+          allow(Pathname).to receive(:pwd).and_return("./fastlane/spec/fixtures/gemfiles/a")
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(true)
+        end
+      end
+
+      it "should return true if file named 'gems.rb' is found in the current directory" do
+        with_env_values('BUNDLE_GEMFILE' => nil) do
+          allow(Pathname).to receive(:pwd).and_return("./fastlane/spec/fixtures/gemfiles/b")
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(true)
+        end
+      end
+
+      it "should return true if file named 'Gemfile' is found in some ancestor directory" do
+        with_env_values('BUNDLE_GEMFILE' => nil) do
+          allow(Pathname).to receive(:pwd).and_return("./fastlane/spec/fixtures/gemfiles/a/aa")
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(true)
+        end
+      end
+
+      it "should return true if file named 'gems.rb' is found in some ancestor directory" do
+        with_env_values('BUNDLE_GEMFILE' => nil) do
+          allow(Pathname).to receive(:pwd).and_return("./fastlane/spec/fixtures/gemfiles/b/bb")
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(true)
+        end
+      end
+
+      it "should return false if no Gemfile can be found" do
+        with_env_values('BUNDLE_GEMFILE' => nil) do
+          allow(File).to receive(:file?).and_return(false)
+          expect(Fastlane::Action.shell_out_should_use_bundle_exec?).to eq(false)
+        end
+      end
+    end
   end
 end

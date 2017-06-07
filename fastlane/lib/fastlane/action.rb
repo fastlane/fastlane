@@ -118,9 +118,25 @@ module Fastlane
       UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
     end
 
-    # When shelling out from the actoin, should we use `bundle exec`?
+    # When shelling out from the action, should we use `bundle exec`?
     def self.shell_out_should_use_bundle_exec?
-      return File.exist?('Gemfile') && !Helper.contained_fastlane?
+      unless Helper.contained_fastlane?
+        given = ENV["BUNDLE_GEMFILE"] # provided by bundler when using 'bundle exec fastlane'
+        return true if given && !given.empty?
+
+        previous = nil
+        current  = File.expand_path(Pathname.pwd).untaint
+        until !File.directory?(current) || current == previous
+          ["Gemfile", "gems.rb"].each do |filename|
+            return true if File.file?(File.join(current, filename))
+          end
+
+          previous = current
+          current = File.expand_path("..", current)
+        end
+      end
+
+      return false
     end
 
     # Return a new instance of the OtherAction action
