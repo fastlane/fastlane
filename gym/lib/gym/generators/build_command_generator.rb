@@ -40,7 +40,6 @@ module Gym
         options << "-archivePath #{archive_path.shellescape}"
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-        options << "-UseNewBuildSystem=YES" if config[:new_build_system]
         options << config[:xcargs] if config[:xcargs]
         options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
