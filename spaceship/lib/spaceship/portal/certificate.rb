@@ -148,7 +148,7 @@ module Spaceship
         "9RQEK7MSXA" => InHouse,
         "LA30L5BJEU" => Certificate,
         "BKLRAVXMGM" => DevelopmentPush,
-        "UPV3DW712I" => ProductionPush,
+        ["UPV3DW712I", "3BQKVH9I2X"] => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
@@ -161,7 +161,6 @@ module Spaceship
         "DZQUP8189Y",
         "FGQUP4785Z",
         "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
         "FUOY7LWJET"
       ]
 
