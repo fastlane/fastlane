@@ -111,12 +111,54 @@ module Gym
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
 
+    def check_prov_entitlement(path)
+      profile = `cat "#{path}/embedded.mobileprovision" | security cms -D`
+      UI.user_error!("Unable to extract profile") unless $? == 0
+
+      plist = Plist.parse_xml(profile)
+      prov_entitlements = plist["Entitlements"]
+      archived_entitlements = `cat "#{path}/archived-expanded-entitlements.xcent"`
+      # if we have no entitlements ignore check
+      if $? == 0
+
+        archived_plist = Plist.parse_xml(archived_entitlements)
+        archived_plist.each do |key, value|
+          unless prov_entitlements.key?(key)
+            UI.user_error!("Provisioning Profile is missing #{key} as set in entitlements")
+          end
+        end
+      end
+      UI.success "Prov match Entl. (#{File.basename(path)}): #{archived_plist.keys.join(',')}"
+    end
+
+    # check prov against entitlement
+    def check_prov_against_entitlement
+      # check if entitlements match provisioning keys.
+      app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
+      # check main app
+      check_prov_entitlement app_path
+
+      # check appex -> e.g today, watch-app
+      Dir[File.join(app_path, "*", "*.appex")].each do |appex|
+        check_prov_entitlement  appex
+      end
+      Dir[File.join(app_path, "*", "*", "*.appex")].each do |appex|
+        check_prov_entitlement  appex
+      end
+      # check embeded apps -> eg. watch-ext
+      Dir[File.join(app_path, "*", "*.app")].each do |app|
+        check_prov_entitlement  app
+      end
+      true
+    end
+
     # Makes sure the archive is there and valid
     def verify_archive
       # from https://github.com/fastlane/gym/issues/115
       if (Dir[BuildCommandGenerator.archive_path + "/*"]).count == 0
         ErrorHandler.handle_empty_archive
       end
+      check_prov_against_entitlement
     end
 
     def package_app
