@@ -1,6 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe Fastlane::Actions::AppStoreBuildNumberAction::BuildNumber do
+      it "Should works adding by int" do
+        build_number = Fastlane::Actions::AppStoreBuildNumberAction::BuildNumber.new("3.9.1")
+
+        result = build_number + 1
+
+        expect(result).to eq(4)
+      end
+
       it "Should sorted fine in mixed types" do
         build_number1 = Fastlane::Actions::AppStoreBuildNumberAction::BuildNumber.new("3")
         build_number2 = Fastlane::Actions::AppStoreBuildNumberAction::BuildNumber.new("3.9")
