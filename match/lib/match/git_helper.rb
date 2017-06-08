@@ -24,6 +24,7 @@ module Match
       elsif clone_branch_directly
         command += " -b #{branch.shellescape} --single-branch"
       end
+      command << " --verbose" if FastlaneCore::Globals.verbose?
 
       UI.message "Cloning remote git repo..."
 
@@ -33,9 +34,7 @@ module Match
 
       begin
         # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-        FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
-                                            print_all: FastlaneCore::Globals.verbose?,
-                                        print_command: FastlaneCore::Globals.verbose?)
+        Kernel.`("GIT_TERMINAL_PROMPT=0 #{command}")
       rescue
         UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
         UI.error("Run the following command manually to make sure you're properly authenticated:")
