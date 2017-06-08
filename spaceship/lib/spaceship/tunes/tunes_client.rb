@@ -690,7 +690,8 @@ module Spaceship
       data.delete("dailySubmissionCountByPlatform")
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
+        req.url "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
+        #req.url "ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
