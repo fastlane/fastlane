@@ -341,16 +341,13 @@ Spaceship::Tunes::SandboxTester.delete_all!
 ratings = app.ratings # => Spaceship::Tunes::AppRatings
 
 # Get the number of 5 star ratings
-five_star_count = ratings.rating_summary.five_star_rating_count
+five_star_count = ratings.five_star_rating_count
 
 # Find the average rating across all stores
-average_rating = ratings.rating_summary.average_rating
-
-# List store fronts the app is available in
-ratings.store_fronts # => Hash of country code to Spaceship::Tunes::AppRatingSummary
+average_rating = ratings.average_rating
 
 # Find the average rating for a given store front
-average_rating = ratings.store_fronts["US"].average_rating
+average_rating = app.ratings(storefront: "US").average_rating
 
 # Get reviews for a given store front
 reviews = ratings.reviews("US") # => Array of hashes representing review data
