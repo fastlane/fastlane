@@ -90,9 +90,9 @@ module Snapshot
 
     def config_launch_arguments
       launch_arguments = Array(Snapshot.config[:launch_arguments])
-      # if more than 1 set of arguments, use a tuple with an index
+      # use a tuple with an index, nil denoting only 1 set of arguments
       if launch_arguments.count == 1
-        [launch_arguments]
+        [[nil, launch_arguments.first]]
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
       end
