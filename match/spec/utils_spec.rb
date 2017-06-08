@@ -1,11 +1,15 @@
 describe Match do
   describe Match::Utils do
+    before(:each) do
+      allow(FastlaneCore::Helper).to receive(:backticks).with('security -h | grep set-key-partition-list', print: false).and_return('    set-key-partition-list               Set the partition list of a key.')
+    end
+
     describe 'import' do
       it 'finds a normal keychain name relative to ~/Library/Keychains' do
         expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{Dir.home}/Library/Keychains/login.keychain &> /dev/null"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k '' #{Dir.home}/Library/Keychains/login.keychain &> /dev/null"
 
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
@@ -21,7 +25,7 @@ describe Match do
         expected_command = "security import item.path -k '/my/special.keychain' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" /my/special.keychain &> /dev/null"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k '' /my/special.keychain &> /dev/null"
 
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with('/my/special.keychain').and_return(true)
@@ -45,7 +49,7 @@ describe Match do
         expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain-db' -P '' -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k \"\" #{Dir.home}/Library/Keychains/login.keychain-db &> /dev/null"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k '' #{Dir.home}/Library/Keychains/login.keychain-db &> /dev/null"
 
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
