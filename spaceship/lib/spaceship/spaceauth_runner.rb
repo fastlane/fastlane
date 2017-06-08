@@ -16,13 +16,13 @@ module Spaceship
         Spaceship::Tunes.login(@username)
         puts "Successfully logged in to iTunes Connect".green
         puts ""
-      rescue
+      rescue => e
         puts "Could not login to iTunes Connect".red
         puts "Please check your credentials and try again.".yellow
         puts "This could be an issue with iTunes Connect,".yellow
         puts "Please try unsetting the FASTLANE_SESSION environment variable".yellow
         puts "and re-run `fastlane spaceauth`".yellow
-        raise "Problem connecting to iTunes Connect"
+        FastlaneCore::UI.user_error! "Problem connecting to iTunes Connect\n#{e.backtrace.join("\n")}"
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
