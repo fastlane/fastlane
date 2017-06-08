@@ -60,6 +60,8 @@
 # 4. extracts the entitlements from the provisioning profile
 # 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
+# new features May 2017
+# 1. enables the -b option to be used more than once and updates nested applications and app extentions bundle ids
 
 # Logging functions
 
@@ -125,8 +127,15 @@ usage() {
     echo -e "\t    --bundle-version bundleVersion\tSpecify new bundle version (CFBundleVersion) number." >&2
     echo -e "\t\t\t\t\t\t\tWill apply for all nested apps and extensions." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
+
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
-    echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
+    echo -e "\t\t\t\t\t\tAlternatively you may provide multiple bundle identifiers if the application contains" >&2
+    echo -e "\t\t\t\t\t\tnested applications or app extensions, which need their own bundle identifier." >&2
+    echo -e "\t\t\t\t\t\tYou can do so by providing -b option multiple times specifying" >&2
+    echo -e "\t\t\t\t\t\tthe app name and new bundle identifier for that app name joined with '='." >&2
+    echo -e "\t\t\t\t\t\t\t-b My App=com.main-app" >&2
+    echo -e "\t\t\t\t\t\t\t-b My Nested App=com.nested-app" >&2
+
     echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisionin profile." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-e, --entitlements' option." >&2
     echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
@@ -142,7 +151,10 @@ fi
 ORIGINAL_FILE="$1"
 CERTIFICATE="$2"
 ENTITLEMENTS=
-BUNDLE_IDENTIFIER=""
+DEFAULT_BUNDLE_IDENTIFIER=""
+RAW_BUNDLE_IDENTIFIERS=()
+BUNDLE_IDENTIFIERS_BY_TARGET=()
+NEW_BUNDLE_IDENTIFIERS_BY_OLD=()
 DISPLAY_NAME=""
 KEYCHAIN=""
 VERSION_NUMBER=""
@@ -178,7 +190,8 @@ while [ "$1" != "" ]; do
             ;;
         -b | --bundle-id )
             shift
-            BUNDLE_IDENTIFIER="$1"
+            RAW_BUNDLE_IDENTIFIERS+=("$1")
+            #BUNDLE_IDENTIFIER="$1"
             ;;
         -k | --keychain )
             shift
@@ -226,6 +239,15 @@ then
 fi
 
 # Log the options
+for indentifier in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
+    if [[ "$indentifier" =~ .+=.+ ]]; then
+        log "Specified bundle identifier: '${indentifier#*=}' for target product name: '${indentifier%%=*}'"
+    else
+        log "Specified bundle identifier: '$indentifier'"
+    fi
+done
+
+# Log the options
 for provision in "${RAW_PROVISIONS[@]}"; do
     if [[ "$provision" =~ .+=.+ ]]; then
         log "Specified provisioning profile: '${provision#*=}' for bundle identifier: '${provision%%=*}'"
@@ -238,7 +260,7 @@ log "Original file: '$ORIGINAL_FILE'"
 log "Certificate: '$CERTIFICATE'"
 [[ -n "${DISPLAY_NAME}" ]] && log "Specified display name: '$DISPLAY_NAME'"
 [[ -n "${ENTITLEMENTS}" ]] && log "Specified signing entitlements: '$ENTITLEMENTS'"
-[[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
+#[[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
 [[ -n "${KEYCHAIN}" ]] && log "Specified keychain to use: '$KEYCHAIN'"
 [[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
 [[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
@@ -385,19 +407,114 @@ for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
 done
 
+# Find the bundle identifier for a given target product name
+function bundle_id_for_target {
+
+   for ARG in "${BUNDLE_IDENTIFIERS_BY_TARGET[@]}"; do
+        #echo "ARG: ${ARG%%=*} ${ARG#*=}" >&2
+        if [[ "${ARG#*=}" == "$1" ]]; then
+            echo "${ARG%%=*}"
+            break
+        fi  
+    done
+
+}
+
+# Add given target name and bundle identifier to the search list
+function add_target_name_for_bundle_id {
+
+    local TARGET="$1"
+    local BUNDLE_ID="$2"
+
+    local CURRENT_BUNDLE_ID=$(bundle_id_for_target "$TARGET")
+
+    if [[ "$CURRENT_BUNDLE_ID" != "" && "$CURRENT_BUNDLE_ID" != "$BUNDLE_ID" ]]; then
+        error "Conflicting bundle ids '$BUNDLE_ID' and '$CURRENT_BUNDLE_ID' for target name '$TARGET'."
+    fi
+
+    BUNDLE_IDENTIFIERS_BY_TARGET+=("$TARGET=$BUNDLE_ID")
+}
+
+# Add given target name to the search list
+function add_bundle_id {
+
+    if [[ "$1" =~ .+=.+ ]]; then
+        TARGET_NAME="${1#*=}"
+        local BUNDLE_ID="${1%%=*}"
+        add_target_name_for_bundle_id "$TARGET_NAME" "$BUNDLE_ID"
+    elif [[ "$DEFAULT_BUNDLE_IDENTIFIER" == "" ]]; then
+        DEFAULT_BUNDLE_IDENTIFIER="$1"
+    fi
+}
+
+# Load bundle identifiers
+for ARG in "${RAW_BUNDLE_IDENTIFIERS[@]}"; do
+    add_bundle_id "$ARG"
+done
+
+# Find the new bundle identifier for an old bundle id
+function new_bundle_id_for_old_bundle_id {
+
+   for ARG in "${NEW_BUNDLE_IDENTIFIERS_BY_OLD[@]}"; do
+        if [[ "${ARG%%=*}" == "$1" ]]; then
+            echo "${ARG#*=}"
+            break
+        fi  
+   done
+}
+
+# Add given old to new bundle identifier to the search list
+function add_new_bundle_id_for_old_bundle_id {
+
+    local OLD_BUNDLE_ID="$1"
+    local NEW_BUNDLE_ID="$2"
+
+    local CURRENT_NEW_BUNDLE_ID=$(new_bundle_id_for_old_bundle_id "$OLD_BUNDLE_ID")
+
+    if [[ "$CURRENT_NEW_BUNDLE_ID" != "" && "$CURRENT_NEW_BUNDLE_ID" != "$NEW_BUNDLE_ID" ]]; then
+        error "Conflicting new bundle ids '$NEW_BUNDLE_ID' and '$CURRENT_NEW_BUNDLE_ID'"
+    fi
+
+    NEW_BUNDLE_IDENTIFIERS_BY_OLD+=("$OLD_BUNDLE_ID=$NEW_BUNDLE_ID")
+}
+
+# Build list of old to new bundle ids 
+function build_old_new_bundle_id {
+
+    local APP_PATH="$1"
+    local APP_NAME=$(basename "$APP_PATH")
+    APP_NAME="${APP_NAME%.*}"
+    local NESTED="$2"
+    local BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
+
+    if [[ "$BUNDLE_IDENTIFIER" == "" && "$NESTED" != NESTED ]]; then
+        BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER"
+    fi
+
+    # Make sure that the Info.plist file is where we expect it
+    if [ ! -e "$APP_PATH/Info.plist" ];
+    then
+        error "Expected file does not exist: '$APP_PATH/Info.plist'"
+    fi
+
+    local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
+    add_new_bundle_id_for_old_bundle_id $CURRENT_BUNDLE_IDENTIFIER $BUNDLE_IDENTIFIER
+}
+
 # Resign the given application
 function resign {
 
-    local APP_PATH="$1"
+    local APP_PATH="$1" 
+    local APP_NAME=$(basename "$APP_PATH")
+    APP_NAME="${APP_NAME%.*}"
     local NESTED="$2"
-    local BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER"
+    local BUNDLE_IDENTIFIER=$(bundle_id_for_target "$APP_NAME")
     local NEW_PROVISION="$NEW_PROVISION"
     local APP_IDENTIFIER_PREFIX=""
     local TEAM_IDENTIFIER=""
 
-    if [[ "$NESTED" == NESTED ]]; then
-        # Ignore bundle identifier for nested applications
-        BUNDLE_IDENTIFIER=""
+    if [[ "$BUNDLE_IDENTIFIER" == "" && "$NESTED" != NESTED ]]; then
+        BUNDLE_IDENTIFIER="$DEFAULT_BUNDLE_IDENTIFIER" 
     fi
 
     # Make sure that the Info.plist file is where we expect it
@@ -566,18 +683,16 @@ function resign {
     log "Fixing nested app and extension references"
     for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
-        REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
-        if [ -n "$REF_BUNDLE_ID" ];
+        OLD_REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
+        if [ -n "$OLD_REF_BUNDLE_ID" ];
         then
-            # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
-            REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
-            # Map to the new bundle id
-            NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
+            # Found a reference bundle id, now get map to the new bundle id
+            NEW_REF_BUNDLE_ID=$(new_bundle_id_for_old_bundle_id $OLD_REF_BUNDLE_ID)
             # Change if not the same and if doesn't contain wildcard
             # shellcheck disable=SC2049
-            if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
+            if [[ "$OLD_REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]] && [[ "$NEW_REF_BUNDLE_ID" != "" ]];
             then
-                log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
+                log "Updating nested app or extension reference for ${key} key from ${OLD_REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
                 PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
             fi
         fi
@@ -784,6 +899,13 @@ function resign {
     rm -f "$TEMP_DIR/old-embedded.mobileprovision"
     rm -f "$TEMP_DIR/oldInfo.plist"
 }
+
+# Build Old to New Bundle Id map
+build_old_new_bundle_id "$TEMP_DIR/Payload/$APP_NAME"
+while IFS= read -d '' -r app;
+do
+    build_old_new_bundle_id "$app" NESTED
+done < <(find "$TEMP_DIR/Payload/$APP_NAME" -d -mindepth 1 \( -name "*.app" -or -name "*.appex" \) -print0)
 
 # Sign nested applications and app extensions
 while IFS= read -d '' -r app;

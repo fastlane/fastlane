@@ -60,5 +60,20 @@ describe Sigh do
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_1_SHA1)
       expect(actualresult).to eq(IDENTITY_1_SHA1)
     end
+
+    it "Create bundle_id options from hash" do
+      bundle_id_hash = {
+        "My App Name" => "at.fastlane",
+        "My App Ext Name" => "at.fastlane.today"
+      }
+      bundle_id_options = @resign.create_bundle_id_options(bundle_id_hash)
+      expect(bundle_id_options).to eq("-b My\\ App\\ Name=at.fastlane -b My\\ App\\ Ext\\ Name=at.fastlane.today")
+    end
+
+    it "Create bundle_id option from array" do
+      bundle_id = ["at.fastlane"]
+      bundle_id_options = @resign.create_bundle_id_options(bundle_id)
+      expect(bundle_id_options).to eq("-b at.fastlane")
+    end
   end
 end
