@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'cryptex'
+require 'commander'
+require 'credentials_manager/appfile_config'
+require 'cryptex/options'
+
+HighLine.track_eof = false
+
+class CryptexApplication
+  include Commander::Methods
+
+  def run
+    program :version, Cryptex::VERSION
+    program :description, 'CLI for \'cryptex\' -  Manage Crypted Git Repo'
+    program :help, 'Author', 'Helmut Januschka <helmut@januschka.com>'
+    program :help, 'Website', 'https://fastlane.tools'
+    program :help, 'GitHub', 'https://github.com/fastlane/cryptex'
+    program :help_formatter, :compact
+
+    global_option('--verbose') { $verbose = true }
+
+    FastlaneCore::CommanderGenerator.new.generate(Cryptex::Options.available_options)
+
+    command :init do |c|
+      c.syntax = 'cryptex init'
+      c.description = 'Create new crypted git repo'
+
+      c.action do |args, options|
+        Cryptex.config = FastlaneCore::Configuration.create(Cryptex::Options.available_options, options.__hash__)
+        Cryptex::Runner.new.launch
+      end
+    end
+
+#    command :revoke_expired do |c|
+#      c.syntax = 'cert revoke_expired'
+#      c.description = 'Revoke expired iOS code signing certificates'
+#      c.action do |args, options|
+#        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+#        Cert::Runner.new.revoke_expired_certs!
+#      end
+#    end
+
+    default_command :init
+
+    run!
+  end
+end
+
+begin
+  FastlaneCore::UpdateChecker.start_looking_for_update('cryptex')
+  CryptexApplication.new.run
+ensure
+  FastlaneCore::UpdateChecker.show_update_status('cryptex', Cryptex::VERSION)
+end
