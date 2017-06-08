@@ -28,11 +28,7 @@ module Deliver
 
       enabled_languages = screenshots_per_language.keys
       if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
-        lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        v.save!
+        v.activate_languages(enabled_languages)
         # This refreshes the app version from iTC after enabling a localization
         v = app.edit_version
       end
