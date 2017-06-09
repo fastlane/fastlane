@@ -260,8 +260,6 @@ module Fastlane
           elsif param.kind_of? Array
             # commit_version_bump include: %w{package.json custom.cfg}
             param
-          else
-            nil
           end
         end
 
@@ -277,7 +275,7 @@ module Fastlane
 
           root_pathname = Pathname.new repo_root
           Actions.lane_context[SharedValues::MODIFIED_FILES].map do |path|
-            next path unless path =~ /^\//
+            next path unless path =~ %r{^/}
             Pathname.new(path).relative_path_from(root_pathname).to_s
           end.uniq
         end
