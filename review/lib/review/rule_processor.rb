@@ -16,10 +16,10 @@ module Review
   end
 
   class RuleProcessor
-    def self.process_app_version(app_version: nil, rules: nil)
+    def self.process_app_and_version(app: nil, app_version: nil, rules: nil)
       items_to_check = []
-      items_to_check += generate_text_items_to_check(app_version: app_version)
-      items_to_check += generate_url_items_to_check(app_version: app_version)
+      items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
+      items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
 
       return process_rules(items_to_check: items_to_check, rules: rules)
     end
@@ -48,7 +48,7 @@ module Review
       return processor_result
     end
 
-    def self.generate_url_items_to_check(app_version: nil)
+    def self.generate_url_items_to_check(app: nil, app_version: nil)
       items = []
       items += collect_urls_from_hash(hash: app_version.support_url,
                                  item_name: :support_url,
@@ -56,6 +56,10 @@ module Review
       items += collect_urls_from_hash(hash: app_version.marketing_url,
                                  item_name: :marketing_url,
                      friendly_name_postfix: "marketing URL")
+
+      items += collect_urls_from_hash(hash: app.details.privacy_url,
+                                 item_name: :privacy_url,
+                     friendly_name_postfix: "privacy URL")
       return items
     end
 
@@ -67,7 +71,7 @@ module Review
       return items
     end
 
-    def self.generate_text_items_to_check(app_version: nil)
+    def self.generate_text_items_to_check(app: nil, app_version: nil)
       items = []
       items << TextItemToCheck.new(app_version.copyright, :copyright, "copyright")
       items << TextItemToCheck.new(app_version.review_first_name, :review_first_name, "review first name")
@@ -88,6 +92,13 @@ module Review
       items += collect_text_items_from_language_item(hash: app_version.release_notes,
                                                 item_name: :release_notes,
                                     friendly_name_postfix: "release notes")
+
+      items += collect_text_items_from_language_item(hash: app.details.name,
+                                                item_name: :app_name,
+                                    friendly_name_postfix: "app name")
+      # items += collect_text_items_from_language_item(hash: app.details.subtitle,
+      #                                           item_name: :app_subtitle,
+      #                               friendly_name_postfix: "app name subtitle")
       return items
     end
 

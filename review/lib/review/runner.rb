@@ -21,7 +21,7 @@ module Review
 
       ensure_app_exists!
 
-      processor_result = check_for_rule_violations(app_version: latest_app_version)
+      processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
       build_console_output(processor_result: processor_result)
     end
 
@@ -36,8 +36,12 @@ module Review
       end
     end
 
-    def check_for_rule_violations(app_version: nil)
-      Review::RuleProcessor.process_app_version(app_version: app_version, rules: Review::Options.rules)
+    def check_for_rule_violations(app: nil, app_version: nil)
+      Review::RuleProcessor.process_app_and_version(
+        app: app,
+        app_version: app_version,
+        rules: Review::Options.rules
+      )
     end
 
     def build_results_table(results: nil)
