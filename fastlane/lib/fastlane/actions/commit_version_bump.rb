@@ -227,6 +227,12 @@ module Fastlane
           )',
           'commit_version_bump(
             settings: %w[About.plist Root.plist] # Include more than one plist from Settings.bundle
+          )',
+          'commit_version_bump(
+            include: %w[package.json custom.cfg] # include other updated files as part of the version bump
+          )',
+          'commit_version_bump(
+            ignore: /OtherProject/ # ignore files matching a regular expression
           )'
         ]
       end
