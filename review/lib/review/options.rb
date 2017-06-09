@@ -8,10 +8,11 @@ module Review
       [
         AppleThingsRule,
         PlaceholderWordsRule,
-        UnreachableURLRule,
         OtherPlatformsRule,
         FutureFunctionalityRule,
-        TestWordsRule
+        TestWordsRule,
+        CurseWordsRule,
+        UnreachableURLRule
       ].map(&:new)
     end
 
