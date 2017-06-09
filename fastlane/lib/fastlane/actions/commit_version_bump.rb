@@ -1,10 +1,27 @@
+require 'pathname'
+
 module Fastlane
   module Actions
+    module SharedValues
+      MODIFIED_FILES = :MODIFIED_FILES
+    end
+
+    class << self
+      # Add an array of paths relative to the repo root or absolute paths that have been modified by
+      # an action.
+      #
+      # :files: An array of paths relative to the repo root or absolute paths
+      def add_modified_files(files)
+        modified_files = lane_context[SharedValues::MODIFIED_FILES] || Set.new
+        modified_files += files
+        lane_context[SharedValues::MODIFIED_FILES] = modified_files
+      end
+    end
+
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
-        require 'pathname'
         require 'set'
         require 'shellwords'
 
@@ -66,6 +83,8 @@ module Fastlane
         # returns an array (empty if params[:include] is nil) or nil for invalid argument
         extra_files = include_list_from_param params[:include]
         UI.user_error! ":include must specify a string array or a comma-separated string" if extra_files.nil?
+
+        extra_files += modified_files_relative_to_repo_root repo_path
 
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = extra_files
@@ -251,6 +270,16 @@ module Fastlane
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
           File.join(settings_bundle.real_path, settings_file_name)
+        end
+
+        def modified_files_relative_to_repo_root(repo_root)
+          return [] if Actions.lane_context[SharedValues::MODIFIED_FILES].nil?
+
+          root_pathname = Pathname.new repo_root
+          Actions.lane_context[SharedValues::MODIFIED_FILES].map do |path|
+            next path unless path =~ /^\//
+            Pathname.new(path).relative_path_from(root_pathname).to_s
+          end.uniq
         end
       end
     end
