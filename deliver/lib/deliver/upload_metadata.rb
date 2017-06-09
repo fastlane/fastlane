@@ -8,7 +8,7 @@ module Deliver
     NON_LOCALISED_VERSION_VALUES = [:copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :privacy_url]
+    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,

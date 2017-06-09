@@ -160,6 +160,17 @@ description({
 ##### name
 The title/name of the app
 
+##### subtitle
+
+Localised subtitle of the app
+
+```ruby
+subtitle(
+  "en-US" => "Awesome English subtitle here",
+  "de-DE" => "Jetzt mit deutschen Untertiteln!"
+)
+```
+
 ##### description
 The description of the app
 

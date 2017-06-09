@@ -245,6 +245,13 @@ module Deliver
                                      description: "Metadata: The localised app name",
                                      optional: true,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :subtitle,
+                                     description: "Metadata: The localised app subtitle",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       UI.user_error!(":subtitle must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
