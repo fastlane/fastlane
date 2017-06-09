@@ -294,23 +294,11 @@ tester = Spaceship::Tunes::Tester::Internal.find("felix@krausefx.com")
 # Same for external testers
 tester = Spaceship::Tunes::Tester::External.find("guest@krausefx.com")
 
-# Find all testers that were already added to an application
-app.external_testers            # => Array of all external testers for this application
-
-
 # Creating new external testers
 Spaceship::Tunes::Tester::External.create!(email: "github@krausefx.com",
                                       first_name: "Felix",
                                        last_name: "Krause",
                                           groups: ["spaceship"])
-
-# Add all external testers to an application
-app.add_all_testers!
-
-# Only add selected testers to an application
-# This will add the existing tester (if available) or create a new one
-app.add_external_tester!(email: "github@krausefx.com", first_name: "Felix", last_name: "Krause")
-```
 
 Right now, `spaceship` can't modify or create internal testers.
 
