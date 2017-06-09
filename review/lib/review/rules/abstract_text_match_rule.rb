@@ -10,7 +10,9 @@ module Review
     # rule block that checks text for any instance of each string in self.lowercased_words_to_look_for
     def self.rule_block
       return lambda { |text|
-        text = text.to_s.downcase
+        text = text.to_s.strip.downcase
+        return Review::VALIDATION_STATES[:pass] if text.empty?
+
         matches = self.lowercased_words_to_look_for.each_with_object([]) do |word, found_words|
           if text.include?(word)
             found_words << word
@@ -19,7 +21,7 @@ module Review
 
         if matches.length > 0
           class_name = self.name.split('::').last ||= self.name
-          UI.error "#{class_name} found words \"#{matches}\" 😭"
+          UI.error "#{class_name} found words \"#{matches.join(', ')}\" 😭"
           return Review::VALIDATION_STATES[:fail]
         else
           return Review::VALIDATION_STATES[:pass]

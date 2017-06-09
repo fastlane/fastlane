@@ -32,7 +32,7 @@ module Review
       if processor_result.items_not_checked.length > 0
         items_not_checked_table = build_items_not_checked_table(items_not_checked: processor_result.items_not_checked)
         puts items_not_checked_table
-        FastlaneCore::UI.message "The above items were skipped because enough rules were disabled that the items weren't checked by any rules."
+        FastlaneCore::UI.message "The above items didn't have any rules. Maybe they were disabled intentionally 🤷‍"
       end
     end
 
@@ -77,9 +77,9 @@ module Review
     def rendered_failed_results_table(failed_results: nil)
       rows = []
       failed_results.each do |failed_result|
-        rows << [failed_result.rule.key, failed_result.item.friendly_name] 
+        rows << [failed_result.rule.key, failed_result.item.friendly_name]
       end
-      
+
       return Terminal::Table.new(
         title: "Failed rules".red,
         headings: ["Name", "App metadata field: (language code)"],
@@ -92,7 +92,7 @@ module Review
       rules_checked.each do |rule|
         rows << [rule.key, rule.description]
       end
-      
+
       return Terminal::Table.new(
         title: "Enabled rules".green,
         headings: ["Name", "Description"],
@@ -107,9 +107,9 @@ module Review
       skipped_rules.each do |rule|
         rows << [rule.key, rule.description]
       end
-      
+
       return Terminal::Table.new(
-        title: "Skipped Rules".yellow,
+        title: "Skipped rules".yellow,
         headings: ["Name", "Description"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       ).to_s
@@ -120,10 +120,10 @@ module Review
       items_not_checked.each do |item|
         rows << [item.item_name, item.friendly_name]
       end
-      
+
       return Terminal::Table.new(
-        title: "Not Analyzed".yellow,
-        headings: ["Name", "Friendly Name"],
+        title: "Not analyzed".yellow,
+        headings: ["Name", "Friendly name"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       ).to_s
     end
