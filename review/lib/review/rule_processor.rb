@@ -96,6 +96,11 @@ module Review
       items += collect_text_items_from_language_item(hash: app.details.name,
                                                 item_name: :app_name,
                                     friendly_name_postfix: "app name")
+
+      items += collect_text_items_from_language_item(hash: app.details.apple_tv_privacy_policy,
+                                                item_name: :app_subtitle,
+                                    friendly_name_postfix: "Apple tv privacy policy")
+
       # items += collect_text_items_from_language_item(hash: app.details.subtitle,
       #                                           item_name: :app_subtitle,
       #                               friendly_name_postfix: "app name subtitle")
