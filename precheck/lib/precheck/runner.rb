@@ -2,19 +2,21 @@ require 'fastlane'
 require 'fastlane_core'
 require 'spaceship'
 require 'terminal-table'
-require 'review/rule_processor'
+require 'precheck/rule_processor'
 
-module Review
+module Precheck
   class Runner
     attr_accessor :spaceship
 
     # Uses the spaceship to download app metadata and then run all rule checkers
     def run
-      FastlaneCore::PrintTable.print_values(config: Review.config,
+      Precheck.config.load_configuration_file("Precheckfile")
+
+      FastlaneCore::PrintTable.print_values(config: Precheck.config,
                                          hide_keys: [:output_path],
-                                             title: "Summary for review #{Fastlane::VERSION}")
-      UI.message "Starting login with user '#{Review.config[:username]}'"
-      Spaceship::Tunes.login(Review.config[:username])
+                                             title: "Summary for precheck #{Fastlane::VERSION}")
+      UI.message "Starting login with user '#{Precheck.config[:username]}'"
+      Spaceship::Tunes.login(Precheck.config[:username])
       Spaceship::Tunes.select_team
 
       UI.message "Successfully logged in"
@@ -22,60 +24,48 @@ module Review
       ensure_app_exists!
 
       processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
-      build_console_output(processor_result: processor_result)
+      print_items_not_checked(processor_result: processor_result)
+      summary_table = build_potential_problems_table(processor_result: processor_result)
+
+      puts summary_table
     end
 
-    def build_console_output(processor_result: nil)
-      results_table = build_results_table(results: processor_result.rule_check_results)
-      puts results_table
-
-      if processor_result.items_not_checked.length > 0
-        items_not_checked_table = build_items_not_checked_table(items_not_checked: processor_result.items_not_checked)
-        puts items_not_checked_table
-        FastlaneCore::UI.message "The above items didn't have any rules. Maybe they were disabled intentionally 🤷‍"
-      end
+    def print_items_not_checked(processor_result: nil)
+      names = processor_result.items_not_checked.map(&:friendly_name)
+      UI.message "😶  Metadata fields not checked by any rule: #{names.join(', ')}".yellow if names.length > 0
     end
 
-    def check_for_rule_violations(app: nil, app_version: nil)
-      Review::RuleProcessor.process_app_and_version(
-        app: app,
-        app_version: app_version,
-        rules: Review::Options.rules
-      )
-    end
+    def build_potential_problems_table(processor_result: nil)
+      error_results = processor_result.error_results
+      warning_results = processor_result.warning_results
 
-    def build_results_table(results: nil)
-      rules = results.flat_map(&:rule)
+      rows = []
 
-      # all rules that were run
-      rules.uniq!
-
-      failed_results = []
-
-      # store one copy of each skipped rule because we're only reporting it once, not every time we skipped
-      skipped_rules = Set.new
-
-      results.each do |result|
-        if result.status == VALIDATION_STATES[:fail]
-          failed_results << result
-        elsif result.status == VALIDATION_STATES[:skipped]
-          skipped_rules.add(result.rule)
+      warning_results.each do |rule, results|
+        results.each do |result|
+          rows << [result.item.friendly_name, result.rule_return.failure_data.yellow]
         end
       end
 
-      env_output = "\n"
-      env_output << rendered_rules_checked_table(rules_checked: rules)
-      env_output << "\n"
-
-      rendered_skipped_rules_table = rendered_skipped_rules_table(skipped_rules: skipped_rules)
-      unless rendered_skipped_rules_table.nil?
-        env_output << rendered_skipped_rules_table
-        env_output << "\n"
+      error_results.each do |rule, results|
+        results.each do |result|
+          rows << [result.item.friendly_name, result.rule_return.failure_data.red]
+        end
       end
 
-      env_output << rendered_failed_results_table(failed_results: failed_results)
-      env_output << "\n"
-      return env_output
+      return Terminal::Table.new(
+        title: "Potential problems".red,
+        headings: ["Field", "Failure reason"],
+        rows: FastlaneCore::PrintTable.transform_output(rows)
+      ).to_s
+    end
+
+    def check_for_rule_violations(app: nil, app_version: nil)
+      Precheck::RuleProcessor.process_app_and_version(
+        app: app,
+        app_version: app_version,
+        rules: Precheck::Options.rules
+      )
     end
 
     def rendered_failed_results_table(failed_results: nil)
@@ -133,7 +123,7 @@ module Review
     end
 
     def app
-      Spaceship::Tunes::Application.find(Review.config[:app_identifier])
+      Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
@@ -143,7 +133,7 @@ module Review
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
       return if app
-      UI.user_error!("Could not find App with App Identifier '#{Review.config[:app_identifier]}'")
+      UI.user_error!("Could not find App with App Identifier '#{Precheck.config[:app_identifier]}'")
     end
   end
 end

@@ -15,6 +15,6 @@ module Fastlane
     :match,
     :scan,
     :gym,
-    :review
+    :precheck
   ]
 end

@@ -1,7 +1,7 @@
-require 'review/rule'
-require 'review/rules/abstract_text_match_rule'
+require 'precheck/rule'
+require 'precheck/rules/abstract_text_match_rule'
 
-module Review
+module Precheck
   class TestWordsRule < AbstractTextMatchRule
     def self.key
       :test_words
@@ -11,8 +11,12 @@ module Review
       "RULE_TEST_WORDS"
     end
 
+    def self.friendly_name
+      "No words indicating test content"
+    end
+
     def self.description
-      "Don't use text indicating this release is a test and not an App Store ready build"
+      "using text indicating this release is a test"
     end
 
     def self.lowercased_words_to_look_for

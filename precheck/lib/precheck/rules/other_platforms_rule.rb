@@ -1,7 +1,7 @@
-require 'review/rule'
-require 'review/rules/abstract_text_match_rule'
+require 'precheck/rule'
+require 'precheck/rules/abstract_text_match_rule'
 
-module Review
+module Precheck
   class OtherPlatformsRule < AbstractTextMatchRule
     def self.key
       :other_platforms
@@ -11,8 +11,12 @@ module Review
       "RULE_OTHER_PLATFORMS"
     end
 
+    def self.friendly_name
+      "No mentioning  competitors"
+    end
+
     def self.description
-      "Don't mention other platforms, like Android or Blackberry"
+      "mentioning other platforms, like Android or Blackberry"
     end
 
     def self.lowercased_words_to_look_for

@@ -19,24 +19,24 @@
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
-  <b>review</b>
+  <b>precheck</b>
 </p>
 
 -------
 
 <p align="center">
-  <img src="assets/review.png" height="110">
+  <img src="assets/precheck.png" height="110">
 </p>
 
-Review
+Precheck
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
-###### Pass App Store review, the first time
+###### Pass App Store precheck, the first time
 
-Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. fastlane review takes a lot of the guess work out by scanning your app’s details in iTunes Connect for avoidable problems. fastlane review helps you get your app through review without rejections so you can ship faster 🚀
+Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. fastlane precheck takes a lot of the guess work out by scanning your app’s details in iTunes Connect for avoidable problems. fastlane precheck helps you get your app through precheck without rejections so you can ship faster 🚀
 
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
@@ -55,7 +55,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>review</code> is part of <a href="https://fastlane.tools">fastlane</a>: The best way to ensure your App Store review passes without a hitch </h5>
+<h5 align="center"><code>precheck</code> is part of <a href="https://fastlane.tools">fastlane</a>: The best way to ensure your App Store precheck passes without a hitch </h5>
 
 # Features
 
@@ -72,42 +72,42 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
     sudo gem install fastlane
 
 # Usage
-Run fastlane review to check the app metadata from iTunes Connect
+Run fastlane precheck to check the app metadata from iTunes Connect
 
-    fastlane review
+    fastlane precheck
 
 To get a list of available options run
     
-    fastlane review --help
+    fastlane precheck --help
     
 # Example
 
-Each rule can take extra configuration arguments from the fastlane review file.
+Each rule can take extra configuration arguments from the fastlane precheck file.
 Here are some examples a list of rules
  
 built-in rules:
 
-    spell_checking :skip # indicates that your metadata will not be checked by this rule
-    trademarks :warning  # when triggered, this rule will warn you of a potential problem
-    private_api :fail    # show error and prevent any further commands from running after fastlane review finishes
+    apple_things(level: :skip) # indicates that your metadata will not be checked by this rule
+    curse_words(level: :warn) # when triggered, this rule will warn you of a potential problem
+    unreachable_urls(level: :error) # show error and prevent any further commands from running after fastlane precheck finishes
  
 
 ### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
-`review` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver).
+`precheck` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver).
 
 Update your `Fastfile` to contain the following code:
 
 ```ruby
 lane :production do
   deliver
-  review
+  precheck
 end
 ```
 
 # How does it work?
 
-`review` will access the `iTunes Connect` to download your app's metadata. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
+`precheck` will access the `iTunes Connect` to download your app's metadata. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
 
 
 # Tips
@@ -133,11 +133,11 @@ end
 # Need help?
 Please submit an issue on GitHub and provide information about your setup
 
-# Want to improve review's rules?
+# Want to improve precheck's rules?
 Please submit an issue on GitHub and provide information about your App Store rejection! Make sure you scrub out any personally identifiable information since this will be public.
 
 # Code of Conduct
-Help us keep `review` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep `precheck` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

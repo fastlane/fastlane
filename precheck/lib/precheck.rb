@@ -1,8 +1,8 @@
 require 'fastlane_core'
-require 'review/runner'
-require 'review/options'
+require 'precheck/runner'
+require 'precheck/options'
 
-module Review
+module Precheck
   # Use this to just setup the configuration attribute and set it later somewhere else
   class << self
     attr_accessor :config
@@ -12,7 +12,7 @@ module Review
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 
-  ENV['APP_IDENTIFIER'] ||= ENV["REVIEW_APP_IDENTIFIER"]
+  ENV['APP_IDENTIFIER'] ||= ENV["PRECHECK_APP_IDENTIFIER"]
 
   DESCRIPTION = 'Check your app for common App Store review problems before you submit'
 end

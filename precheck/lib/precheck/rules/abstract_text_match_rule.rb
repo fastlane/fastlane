@@ -1,6 +1,6 @@
-require 'review/rule'
+require 'precheck/rule'
 
-module Review
+module Precheck
   # abstract class that defines a default way to check for the presence of a list of words within a block of text
   class AbstractTextMatchRule < TextRule
     def self.lowercased_words_to_look_for
@@ -11,7 +11,7 @@ module Review
     def self.rule_block
       return lambda { |text|
         text = text.to_s.strip.downcase
-        return Review::VALIDATION_STATES[:pass] if text.empty?
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:pass]) if text.empty?
 
         matches = self.lowercased_words_to_look_for.each_with_object([]) do |word, found_words|
           if text.include?(word)
@@ -20,11 +20,11 @@ module Review
         end
 
         if matches.length > 0
-          class_name = self.name.split('::').last ||= self.name
-          UI.error "#{class_name} found words \"#{matches.join(', ')}\" 😭"
-          return Review::VALIDATION_STATES[:fail]
+          friendly_matches = matches.join(', ')
+          UI.verbose "😭  #{self.name.split('::').last ||= self.name} found words \"#{friendly_matches}\""
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:fail], failure_data: "found: #{friendly_matches}")
         else
-          return Review::VALIDATION_STATES[:pass]
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:pass])
         end
       }
     end
