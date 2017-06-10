@@ -1,7 +1,7 @@
-require 'review/rule'
-require 'review/rules/abstract_text_match_rule'
+require 'precheck/rule'
+require 'precheck/rules/abstract_text_match_rule'
 
-module Review
+module Precheck
   class PlaceholderWordsRule < AbstractTextMatchRule
     def self.key
       :placeholder_text
@@ -11,8 +11,12 @@ module Review
       "RULE_PLACEHOLDER_TEXT_THINGS"
     end
 
+    def self.friendly_name
+      "No placeholder text"
+    end
+
     def self.description
-      "Don't use Placeholder text, or anything indicating this isn't an App Store ready build"
+      "using placeholder text (e.g.:\"lorem ipsum\", \"text here\", etc...)"
     end
 
     def self.lowercased_words_to_look_for

@@ -1,7 +1,7 @@
-require 'review/rule'
-require 'review/rules/abstract_text_match_rule'
+require 'precheck/rule'
+require 'precheck/rules/abstract_text_match_rule'
 
-module Review
+module Precheck
   class AppleThingsRule < AbstractTextMatchRule
     def self.key
       :apple_things
@@ -11,8 +11,12 @@ module Review
       "RULE_APPLE_THINGS"
     end
 
+    def self.friendly_name
+      "No negative  sentiment"
+    end
+
     def self.description
-      "Don't mention Apple in a negative way"
+      "mentioning  in a way that could be considered negative"
     end
 
     def self.lowercased_words_to_look_for

@@ -1,8 +1,8 @@
 require 'fastlane_core'
-require 'review/item_to_check'
-require 'review/rule_check_result'
+require 'precheck/item_to_check'
+require 'precheck/rule_check_result'
 
-module Review
+module Precheck
   VALIDATION_STATES = {
     pass: "pass",
     fail: "fail",
@@ -12,27 +12,39 @@ module Review
   # rules can cause warnings, errors, or be skipped all together
   # by default they are set to indicate a RULE_LEVELS[:error]
   RULE_LEVELS = {
-    warning: "warnings",
-    error: "error",
-    skip: "skip"
+    warn: :warn,
+    error: :error,
+    skip: :skip
   }
 
   # Abstract super class
   attr_accessor :rule_block
 
   class Rule < FastlaneCore::ConfigItem
+    # when a rule evaluates a single item, it has a validation state
+    # if it fails, it has some data like what text failed to pass, or maybe a bad url
+    # this class encapsulates that return value and state
+    # it is the return value from each evaluated @rule_block
+    class RuleReturn
+      attr_accessor :validation_state
+      attr_accessor :failure_data
+
+      def initialize(validation_state: nil, failure_data: nil)
+        @validation_state = validation_state
+        @failure_data = failure_data
+      end
+    end
+
     def initialize(short_option: nil,
                    verify_block: nil,
                    is_string: nil,
                    type: nil,
                    conflicting_options: nil,
                    conflict_block: nil,
-                   rule_level: RULE_LEVELS[:error],
                    deprecated: nil,
                    sensitive: nil,
                    display_in_shell: nil)
       @rule_block = self.class.rule_block
-      @rule_level = rule_level
 
       super(key: self.class.key,
             env_name: self.class.env_name,
@@ -70,8 +82,16 @@ module Review
       not_implemented(__method__)
     end
 
+    def self.friendly_name
+      not_implemented(__method__)
+    end
+
     def self.default_value
       CredentialsManager::AppfileConfig.try_fetch_value(self.key)
+    end
+
+    def friendly_name
+      return self.class.friendly_name
     end
 
     def inspect
@@ -79,9 +99,6 @@ module Review
     end
 
     def check_item(item)
-      skipped_result = return_skipped_result_if_skipped(item)
-      return skipped_result unless skipped_result.nil?
-
       # validate the item we have was properly matched to this rule: TextItem -> TextRule, URLItem -> URLRule
       return skip_item_not_meant_for_this_rule(item) unless handle_item?(item)
 
@@ -98,16 +115,6 @@ module Review
     # override this method and return true or false
     def handle_item?(item)
       not_implemented(__method__)
-    end
-
-    # by default all rules will cause a failure to be displayed on the command line
-    # if the rule is skipped, we just create a RuleCheckResult that represents a skipped result
-    def return_skipped_result_if_skipped(item)
-      if @rule_level == RULE_LEVELS[:skip]
-        return RuleCheckResult.new(item, VALIDATION_STATES[:skipped], self)
-      else
-        return nil
-      end
     end
 
     def perform_check(item: nil)

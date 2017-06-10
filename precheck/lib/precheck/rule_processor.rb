@@ -1,16 +1,23 @@
 require 'spaceship'
 require 'fastlane/markdown_table_formatter'
-require 'review/item_to_check'
+require 'precheck/item_to_check'
 
-module Review
+module Precheck
   # encapsulated the results of the rule processing, needed to return not just an array of the results of our
   # checks, but also an array of items we didn't check, just in-case we were expecting to check everything
   class RuleProcessResult
-    attr_accessor :rule_check_results
+    attr_accessor :error_results # { rule: [result, result, ...] }
+    attr_accessor :warning_results # { rule: [result, result, ...] }
+    attr_accessor :skipped_rules
     attr_accessor :items_not_checked
 
-    def initialize(results, items_not_checked)
-      @rule_check_results = results
+    def initialize(error_results: nil,
+                   warning_results: nil,
+                   skipped_rules: nil,
+                   items_not_checked: nil)
+      @error_results = error_results
+      @warning_results = warning_results
+      @skipped_rules = skipped_rules
       @items_not_checked = items_not_checked
     end
   end
@@ -25,27 +32,61 @@ module Review
     end
 
     def self.process_rules(items_to_check: nil, rules: nil)
-      results = [] # array of RuleCheckResult
-      items_not_checked = [] # array of items that weren't checked for whatever reason
+      items_not_checked = items_to_check.to_set # items we haven't checked by at least one rule
+      error_results = {} # rule to fields map
+      warning_results = {} # rule to fields map
+      skipped_rules = []
 
-      items_to_check.each do |item|
-        # each rule will determine if it can handle this item, if not, it will just pass nil back
-        item_handled_by_at_least_one_rule = false
-        rules.each do |rule|
-          # ensure the item is checked by at least one rule
-          result = rule.check_item(item)
-          unless result.nil?
-            results << result
-            item_handled_by_at_least_one_rule = true
-          end
+      rules.each do |rule|
+        rule_config = Precheck.config[rule.key]
+        rule_level = rule_config[:level].to_sym unless rule_config.nil?
+        rule_level ||= RULE_LEVELS[:error].to_sym
+
+        if rule_level == RULE_LEVELS[:skip]
+          skipped_rules << rule
+          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow
+          next
         end
-        items_not_checked << item unless item_handled_by_at_least_one_rule
+
+        # if the rule failed at least once, we won't print a success message
+        rule_failed_at_least_once = false
+
+        items_to_check.each do |item|
+          result = rule.check_item(item)
+
+          # each rule will determine if it can handle this item, if not, it will just pass nil back
+          next if result.nil?
+
+          # we've checked this item, remove it from list of items not checked
+          items_not_checked.delete(item)
+
+          # if we passed, then go to the next item, otherwise, recode the failure
+          next unless result.status == VALIDATION_STATES[:fail]
+          add_new_result_to_rule_hash(rule_hash: error_results, result: result) if rule_level == RULE_LEVELS[:error]
+          add_new_result_to_rule_hash(rule_hash: warning_results, result: result) if rule_level == RULE_LEVELS[:warn]
+          rule_failed_at_least_once = true
+        end
+
+        if rule_failed_at_least_once
+          UI.error "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
+        else
+          UI.message "✅  Passed: #{rule.class.friendly_name}"
+        end
       end
 
-      results.sort_by! { |result| [result.item.item_name, result.rule.key] }
+      return RuleProcessResult.new(
+        error_results: error_results,
+        warning_results: warning_results,
+        skipped_rules: skipped_rules,
+        items_not_checked: items_not_checked.to_a
+      )
+    end
 
-      processor_result = RuleProcessResult.new(results, items_not_checked)
-      return processor_result
+    # hash will be { rule: [result, result, result] }
+    def self.add_new_result_to_rule_hash(rule_hash: nil, result: nil)
+      result_array = rule_hash[result.rule] ||= []
+      result_array << result
+      rule_hash[result.rule] = result_array
     end
 
     def self.generate_url_items_to_check(app: nil, app_version: nil)
@@ -74,12 +115,12 @@ module Review
     def self.generate_text_items_to_check(app: nil, app_version: nil)
       items = []
       items << TextItemToCheck.new(app_version.copyright, :copyright, "copyright")
-      items << TextItemToCheck.new(app_version.review_first_name, :review_first_name, "review first name")
-      items << TextItemToCheck.new(app_version.review_last_name, :review_last_name, "review last name")
-      items << TextItemToCheck.new(app_version.review_phone_number, :review_phone_number, "review phone number")
-      items << TextItemToCheck.new(app_version.review_email, :review_email, "review email")
-      items << TextItemToCheck.new(app_version.review_demo_user, :review_demo_user, "review demo user")
-      items << TextItemToCheck.new(app_version.review_notes, :review_notes, "review notes")
+      items << TextItemToCheck.new(app_version.review_first_name, :review_first_name, "precheck first name")
+      items << TextItemToCheck.new(app_version.review_last_name, :review_last_name, "precheck last name")
+      items << TextItemToCheck.new(app_version.review_phone_number, :review_phone_number, "precheck phone number")
+      items << TextItemToCheck.new(app_version.review_email, :review_email, "precheck email")
+      items << TextItemToCheck.new(app_version.review_demo_user, :review_demo_user, "precheck demo user")
+      items << TextItemToCheck.new(app_version.review_notes, :review_notes, "precheck notes")
 
       items += collect_text_items_from_language_item(hash: app_version.keywords,
                                                 item_name: :keywords,
@@ -99,15 +140,15 @@ module Review
 
       items += collect_text_items_from_language_item(hash: app.details.apple_tv_privacy_policy,
                                                 item_name: :app_subtitle,
-                                    friendly_name_postfix: "Apple tv privacy policy")
+                                    friendly_name_postfix: " tv privacy policy")
 
-      # items += collect_text_items_from_language_item(hash: app.details.subtitle,
-      #                                           item_name: :app_subtitle,
-      #                               friendly_name_postfix: "app name subtitle")
+      items += collect_text_items_from_language_item(hash: app.details.subtitle,
+                                                item_name: :app_subtitle,
+                                    friendly_name_postfix: "app name subtitle")
       return items
     end
 
-    # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
+    #   # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
     def self.collect_text_items_from_language_item(hash: nil, item_name: nil, friendly_name_postfix: nil)
       items = []
       hash.each do |key, value|

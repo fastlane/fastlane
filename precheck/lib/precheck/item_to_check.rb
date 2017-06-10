@@ -1,4 +1,4 @@
-module Review
+module Precheck
   # each attribute on a app version is a single item.
   # for example: .name, .keywords, .description, will all have a single item to represent them
   # which includes their name and a more user-friendly name we can use to print out information

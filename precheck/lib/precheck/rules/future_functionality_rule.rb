@@ -1,7 +1,7 @@
-require 'review/rule'
-require 'review/rules/abstract_text_match_rule'
+require 'precheck/rule'
+require 'precheck/rules/abstract_text_match_rule'
 
-module Review
+module Precheck
   class FutureFunctionalityRule < AbstractTextMatchRule
     def self.key
       :future_functionality
@@ -11,8 +11,12 @@ module Review
       "RULE_FUTURE_FUNCTIONALITY"
     end
 
+    def self.friendly_name
+      "No future functionality promises"
+    end
+
     def self.description
-      "Don't mention features or content that is not currently available in your app"
+      "mentioning features or content that is not currently available in your app"
     end
 
     def self.lowercased_words_to_look_for

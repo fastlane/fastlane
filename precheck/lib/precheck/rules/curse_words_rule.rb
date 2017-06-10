@@ -1,7 +1,7 @@
 require 'digest'
-require 'review/rule'
+require 'precheck/rule'
 
-module Review
+module Precheck
   class CurseWordsRule < TextRule
     def self.key
       :curse_words
@@ -11,14 +11,18 @@ module Review
       "RULE_CURSE_WORDS"
     end
 
+    def self.friendly_name
+      "No curse words"
+    end
+
     def self.description
-      "Find words that might be considered objectionable"
+      "including words that might be considered objectionable"
     end
 
     # rule block that checks text for any instance of each string in self.lowercased_words_to_look_for
     def self.rule_block
       return lambda { |text|
-        return Review::VALIDATION_STATES[:pass] if text.to_s.strip.empty?
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:pass]) if text.to_s.strip.empty?
 
         all_metadata_words_list = text.to_s.downcase.split
         metadata_word_hashes = all_metadata_words_list.map { |word| Digest::SHA256.hexdigest(word) }
@@ -32,13 +36,13 @@ module Review
         end
 
         if found_words.length > 0
-          class_name = self.name.split('::').last ||= self.name
-          UI.error "#{class_name} found potential curse words 😬"
-          UI.error "Keep in mind, these words might be ok given the context they are used in"
-          UI.error "Matched: \"#{found_words.join(', ')}\""
-          return Review::VALIDATION_STATES[:fail]
+          friendly_found_words = found_words.join(', ')
+          UI.verbose "#{self.name.split('::').last ||= self.name} found potential curse words 😬"
+          UI.verbose "Keep in mind, these words might be ok given the context they are used in"
+          UI.verbose "Matched: \"#{friendly_found_words}\""
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:fail], failure_data: "found: #{friendly_found_words}")
         else
-          return Review::VALIDATION_STATES[:pass]
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:pass])
         end
       }
     end
