@@ -19,7 +19,7 @@ module Fastlane
         values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE]
 
         if Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
-          # Since Xcode 9 you need to provide the explicit provisioning profile per app target
+          # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
           # If the user is smart and uses match and gym together with fastlane, we can do all
           # the heavy lifting for them
           values[:export_options] ||= {}
