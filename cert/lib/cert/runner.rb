@@ -131,6 +131,7 @@ module Cert
 
       when 'macos'
         cert_type = Spaceship.certificate.mac_app_distribution
+        cert_type = Spaceship.certificate.mac_installer_distribution if Cert.config[:distribution_type].to_s == 'installer'
         cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
 
       end
@@ -176,6 +177,7 @@ module Cert
       ENV["CER_FILE_PATH"] = cert_path
 
       UI.success "Successfully generated #{certificate.id} which was imported to the local machine."
+      UI.verbose "Certificate stored under #{cert_path}"
 
       return cert_path
     end

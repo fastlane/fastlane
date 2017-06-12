@@ -32,20 +32,23 @@ module Match
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, platform: params[:platform])
         end
       end
 
-      # Certificate
-      cert_id = fetch_certificate(params: params)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
+      # Certificates
+      cert_ids = fetch_certificates(params: params)
+      cert_ids.each do |cert_id|
+        spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
-      # Provisioning Profiles
-      app_identifiers.each do |app_identifier|
-        loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier)
+        next if params[:distribution_type].to_s == 'installer' # no provisioning profiles for those
+        # Provisioning Profiles
+        app_identifiers.each do |app_identifier|
+          loop do
+            break if fetch_provisioning_profile(params: params,
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier)
+          end
         end
       end
 
@@ -71,19 +74,42 @@ module Match
       GitHelper.clear_changes
     end
 
-    def fetch_certificate(params: nil)
+    def fetch_certificates(params: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
+      certs_dir = Match.certs_dir(params, cert_type)
+      UI.verbose("Searching for certificates under #{certs_dir}")
+      certs = Dir[File.join(certs_dir, "*.cer")]
+      keys = Dir[File.join(certs_dir, "*.p12")]
 
-      if certs.count == 0 or keys.count == 0
-        UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
-        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type)
-        self.changes_to_commit = true
+      cert_ids = certs.map { |cp| File.basename(cp).gsub(".cer", "") }
+
+      # check if the certificates we have locally match the ones we are looking for
+      if cert_ids.count == 0
+        missing = true
       else
-        cert_path = certs.last
+        portal_certs_ids = CertFinder.find_certificate_ids(params, cert_type)
+        UI.verbose("Found #{portal_certs_ids} portal certificates")
+        matching_certs = cert_ids & portal_certs_ids
+        # we should find at most one
+        UI.important("More than one matching cert found: #{matching_certs}") if matching_certs.count > 1
+        missing = matching_certs.count == 0
+      end
+      if !missing
+        # missing the key is also a problem
+        missing = Dir[File.join(certs_dir, "#{matching_certs[0]}.p12")].count == 0
+        UI.important("Missing key for certificate id #{matching_certs[0]}") if missing
+      end
+
+      if missing
+        UI.important "Couldn't find a valid code signing identity in the git repo for #{[cert_type, params[:distribution_type]].join(' ')}... creating one for you now"
+        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        generated_cert = Generator.generate_certificate(params, cert_type)
+        self.changes_to_commit = true
+      end
+
+      # generated_cert was installed. We install all the other certificates
+      certs.each do |cert_path|
         UI.message "Installing certificate..."
 
         if FastlaneCore::CertChecker.installed?(cert_path)
@@ -94,14 +120,16 @@ module Match
 
         # Import the private key
         # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        Utils.import(cert_path.gsub(".cer", ".p12"), params[:keychain_name], password: params[:keychain_password])
 
         # Get and print info of certificate
         info = Utils.get_cert_info(cert_path)
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      certs << generated_cert if generated_cert
+
+      return certs.map { |cp| File.basename(cp).gsub(".cer", "") } # Certificate ID
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
@@ -113,7 +141,7 @@ module Match
         names.push(params[:platform])
       end
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
+      base_dir = Match.profiles_dir(params, prov_type)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
 
       # Install the provisioning profiles
@@ -145,7 +173,7 @@ module Match
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         self.changes_to_commit = true

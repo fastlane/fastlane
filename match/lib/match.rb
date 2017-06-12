@@ -4,6 +4,7 @@ require 'match/nuke'
 require 'match/utils'
 require 'match/table_printer'
 require 'match/git_helper'
+require 'match/cert_finder'
 require 'match/generator'
 require 'match/setup'
 require 'match/encrypt'
@@ -24,6 +25,10 @@ module Match
     return %w(appstore adhoc development enterprise)
   end
 
+  def self.distribution_types
+    return %w(installer app)
+  end
+
   def self.profile_type_sym(type)
     return type.to_sym
   end
@@ -34,4 +39,21 @@ module Match
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)
     raise "Unknown cert type: '#{type}'"
   end
+
+  def self.certs_dir(params, cert_type)
+    File.join(params[:workspace], platform_dir(params), "certs", cert_type.to_s)
+  end
+
+  def self.profiles_dir(params, prov_type)
+    File.join(params[:workspace], platform_dir(params), "profiles", prov_type.to_s)
+  end
+
+  # return the platform prefix under which to store the data
+  def self.platform_dir(params)
+    platform = ''
+    platform = 'osx' if params[:platform].to_s == 'osx'
+    platform
+  end
+
+  private_class_method :platform_dir
 end

@@ -158,26 +158,27 @@ module Sigh
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
         if profile_type == Spaceship.provisioning_profile.Development
-          certificates = Spaceship.certificate.development.all
+          cert_type = Spaceship.certificate.development
         elsif profile_type == Spaceship.provisioning_profile.InHouse
-          certificates = Spaceship.certificate.in_house.all
+          cert_type = Spaceship.certificate.in_house
         else
-          certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+          cert_type = Spaceship.certificate.production # Ad hoc or App Store
         end
 
       when 'macos'
         if profile_type == Spaceship.provisioning_profile.Development
-          certificates = Spaceship.certificate.mac_development.all
+          cert_type = Spaceship.certificate.mac_development
         elsif profile_type == Spaceship.provisioning_profile.AppStore
-          certificates = Spaceship.certificate.mac_app_distribution.all
+          cert_type = Spaceship.certificate.mac_app_distribution
+          cert_type = Spaceship.certificate.mac_installer_distribution if Sigh.config[:distribution_type].to_s == 'installer'
         elsif profile_type == Spaceship.provisioning_profile.Direct
-          certificates = Spaceship.certificate.developer_id_application.all
+          cert_type = Spaceship.certificate.developer_id_application
         else
-          certificates = Spaceship.certificate.mac_app_distribution.all
+          cert_type = Spaceship.certificate.mac_app_distribution
         end
       end
 
-      certificates
+      cert_type.all
     end
 
     # Certificate to use based on the current distribution mode
@@ -239,6 +240,9 @@ module Sigh
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"
       end
+      if Sigh.config[:platform].to_s == 'macos'
+        profile_name += "_osx"
+      end
 
       profile_name += '.mobileprovision'
 
@@ -260,12 +264,13 @@ module Sigh
     end
 
     def print_produce_command(config)
+      platform_option = "--platform osx" if Sigh.config[:platform].to_s == 'macos'
       UI.message ""
       UI.message "==========================================".yellow
       UI.message "Could not find App ID with bundle identifier '#{config[:app_identifier]}'"
       UI.message "You can easily generate a new App ID on the Developer Portal using 'produce':"
       UI.message ""
-      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow
+      UI.message "fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc #{platform_option}".yellow
       UI.message ""
       UI.message "You will be asked for any missing information, like the full name of your app"
       UI.message "If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above"

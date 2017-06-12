@@ -26,6 +26,10 @@ module Sigh
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't enable both :development and :adhoc")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :distribution_type,
+                                     env_name: "SIGH_DISTRIBUTION_TYPE",
+                                     description: "Create a distribution or app installer certificate",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",
                                      description: "By default, the certificate will be added on your local machine. Setting this flag will skip this action",

@@ -28,6 +28,17 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :distribution_type,
+                                     env_name: "MATCH_DISTRIBUTION_TYPE",
+                                     description: "Define the distribution type, can be #{Match.distribution_types.join(', ')}",
+                                     is_string: true,
+                                     short_option: "-z",
+                                     default_value: 'app',
+                                     verify_block: proc do |value|
+                                       unless Match.distribution_types.include?(value)
+                                         UI.user_error!("Unsupported environment #{value}, must be in #{Match.distribution_types.join(', ')}")
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
@@ -141,7 +152,7 @@ module Match
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(tvos ios)
+                                       pt = %w(tvos ios osx)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end)
       ]

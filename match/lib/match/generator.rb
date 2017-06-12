@@ -3,14 +3,19 @@ module Match
   class Generator
     def self.generate_certificate(params, cert_type)
       require 'cert'
-      output_path = File.join(params[:workspace], "certs", cert_type.to_s)
+      output_path = Match.certs_dir(params, cert_type)
+
+      platform = params[:platform]
+      platform = :macos if params[:platform].to_s == 'osx'
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
+        distribution_type: params[:distribution_type],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
         team_id: params[:team_id],
+        platform: platform,
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name])
       })
 
@@ -49,7 +54,7 @@ module Match
 
       values = {
         app_identifier: app_identifier,
-        output_path: File.join(params[:workspace], "profiles", prov_type.to_s),
+        output_path: Match.profiles_dir(params, prov_type),
         username: params[:username],
         force: true,
         cert_id: certificate_id,
@@ -59,8 +64,10 @@ module Match
       }
 
       values[:platform] = params[:platform]
+      values[:platform] = :macos if params[:platform].to_s == 'osx'
       values[:adhoc] = true if prov_type == :adhoc
       values[:development] = true if prov_type == :development
+      values[:distribution_type] = params[:distribution_type]
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 

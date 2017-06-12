@@ -20,25 +20,30 @@ module Match
       Spaceship.select_team
     end
 
-    def bundle_identifier_exists(username: nil, app_identifier: nil)
-      found = Spaceship.app.find(app_identifier)
+    def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
+      is_mac = platform.to_s == 'osx'
+      found = Spaceship.app.find(app_identifier, mac: is_mac)
       return if found
 
       require 'sigh'
+      produce_platform = platform.to_s
+      produce_platform = 'macos' if is_mac
       Sigh::Runner.new.print_produce_command({
         username: username,
-        app_identifier: app_identifier
+        app_identifier: app_identifier,
+        platform: produce_platform
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
-      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      available_apps = Spaceship.app.all(mac: is_mac).collect { |a| "#{a.bundle_id} (#{a.name})" }
       UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `fastlane match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificate_exists(username: nil, certificate_id: nil)
-      found = Spaceship.certificate.all.find do |cert|
+    def certificate_exists(username: nil, certificate_id: nil, platform: nil)
+      is_mac = platform.to_s == 'osx'
+      found = Spaceship.certificate.all(mac: is_mac).find do |cert|
         cert.id == certificate_id
       end
       return if found
@@ -50,8 +55,9 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
 
-    def profile_exists(username: nil, uuid: nil)
-      found = Spaceship.provisioning_profile.all.find do |profile|
+    def profile_exists(username: nil, uuid: nil, platform: nil)
+      is_mac = platform.to_s == 'osx'
+      found = Spaceship.provisioning_profile.all(mac: is_mac).find do |profile|
         profile.uuid == uuid
       end
 
