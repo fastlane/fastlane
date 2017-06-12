@@ -334,7 +334,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.deleteall_edit_images(
+        android_publisher.deleteall_edit_image(
           current_package_name,
           current_edit.id,
           language,
