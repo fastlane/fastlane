@@ -38,6 +38,9 @@ module Match
                                         print_command: FastlaneCore::Globals.verbose?)
       rescue
         UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
+        if branch && clone_branch_directly
+          UI.error("You passed '#{branch}' as branch in combination with the `clone_branch_directly` flag. Please remove `clone_branch_directly` flag on the first run for _match_ to create the branch.")
+        end
         UI.error("Run the following command manually to make sure you're properly authenticated:")
         UI.command(command)
         UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
