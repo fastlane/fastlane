@@ -172,13 +172,7 @@ module Supply
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :check_superseded_tracks,
-                                     env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
-                                     optional: true,
-                                     description: "Check the other tracks for superseded versions and disable them",
-                                     is_string: false,
-                                     default_value: false)
+                                     end)
 
       ]
     end
