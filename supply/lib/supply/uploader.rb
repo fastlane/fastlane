@@ -158,43 +158,7 @@ module Supply
       if Supply.config[:track].eql? "rollout"
         client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
       else
-        check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
         client.update_track(Supply.config[:track], 1.0, apk_version_codes)
-      end
-    end
-
-    # Remove any version codes that is:
-    #  - Lesser than the greatest of any later (i.e. production) track
-    #  - Or lesser than the currently being uploaded if it's in an earlier (i.e. alpha) track
-    def check_superseded_tracks(apk_version_codes)
-      UI.message("Checking superseded tracks...")
-      max_apk_version_code = apk_version_codes.max
-      max_tracks_version_code = nil
-
-      tracks = ["production", "beta", "alpha"]
-      config_track_index = tracks.index(Supply.config[:track])
-
-      tracks.each_index do |track_index|
-        next if track_index.eql? config_track_index
-        track = tracks[track_index]
-
-        track_version_codes = client.track_version_codes(track).sort
-        next if track_version_codes.empty?
-
-        if max_tracks_version_code.nil?
-          max_tracks_version_code = track_version_codes.max
-        else
-          removed_version_codes = track_version_codes.take_while do |v|
-            v < max_tracks_version_code || (v < max_apk_version_code && track_index > config_track_index)
-          end
-
-          unless removed_version_codes.empty?
-            keep_version_codes = track_version_codes - removed_version_codes
-            max_tracks_version_code = keep_version_codes[0] unless keep_version_codes.empty?
-            client.update_track(track, 1.0, keep_version_codes)
-            UI.message("Superseded track '#{track}', removed '#{removed_version_codes}'")
-          end
-        end
       end
     end
 
