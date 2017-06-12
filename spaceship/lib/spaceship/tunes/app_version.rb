@@ -174,7 +174,7 @@ module Spaceship
       attr_reader :trailers
 
       # @return (Hash) Represents the phased_release hash (read-only)
-      #   For now, please use the `set_phased_release` method and call `.save!`
+      #   For now, please use the `toggle_phased_release` method and call `.save!`
       #   as the API will probably change in the future
       attr_reader :phased_release
 
@@ -189,7 +189,7 @@ module Spaceship
       #        "dayPercentageMap"=>{"1"=>1, "2"=>2, "3"=>5, "4"=>10, "5"=>20, "6"=>50, "7"=>100},
       #        "isEnabled"=>true}
       #
-      def set_phased_release(enabled: false)
+      def toggle_phased_release(enabled: false)
         state = (enabled ? "INACTIVE" : "NOT_STARTED")
 
         self.phased_release["state"]["value"] = state
