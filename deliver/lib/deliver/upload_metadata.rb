@@ -118,8 +118,19 @@ module Deliver
 
       UI.message("Uploading metadata to iTunes Connect")
       v.save!
-      details.save!
-      UI.success("Successfully uploaded set of metadata to iTunes Connect")
+      begin
+        details.save!
+        UI.success("Successfully uploaded set of metadata to iTunes Connect")
+      rescue Spaceship::ITunesConnectError => e
+        # This makes sure that we log invalid app names as user errors
+        # If another string needs to be checked here we should
+        # figure out a more generic way to handle these cases.
+        if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
+          UI.user_error!(e.message)
+        else
+          raise e
+        end
+      end
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
