@@ -2,14 +2,14 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Delete keychain Integration" do
       before :each do
-        allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:file?).and_return(false)
       end
 
       it "works with keychain name found locally" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         keychain = File.expand_path('test.keychain')
-        allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain).and_return(true)
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -22,8 +22,8 @@ describe Fastlane do
 
       it "works with keychain name found in ~/Library/Keychains" do
         keychain = File.expand_path('~/Library/Keychains/test.keychain')
-        allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain).and_return(true)
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -36,8 +36,8 @@ describe Fastlane do
 
       it "works with keychain name found in ~/Library/Keychains with -db" do
         keychain = File.expand_path('~/Library/Keychains/test.keychain-db')
-        allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain).and_return(true)
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -50,7 +50,7 @@ describe Fastlane do
 
       it "works with keychain name that contain spaces and `\"`" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        allow(File).to receive(:exist?).with(File.expand_path('" test ".keychain')).and_return(true)
+        allow(File).to receive(:file?).with(File.expand_path('" test ".keychain')).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -63,7 +63,9 @@ describe Fastlane do
       end
 
       it "works with absolute keychain path" do
+        allow(File).to receive(:exist?).and_return(false)
         allow(File).to receive(:exist?).with('/projects/test.keychain').and_return(true)
+        allow(File).to receive(:file?).with('/projects/test.keychain').and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({

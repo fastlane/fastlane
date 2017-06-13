@@ -208,7 +208,7 @@ module FastlaneCore
         keychain_paths << "#{location}.keychain"
       end
 
-      keychain_path = keychain_paths.find { |path| File.exist?(path) }
+      keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
     end
