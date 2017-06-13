@@ -99,7 +99,7 @@ module Gym
       end
     end
 
-    def self.detect_provisioning_profile # TODO: remove this method
+    def self.detect_provisioning_profile
       if Gym.config[:provisioning_profile_path].nil?
         return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
 
