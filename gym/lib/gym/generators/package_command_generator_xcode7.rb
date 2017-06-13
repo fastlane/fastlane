@@ -44,7 +44,7 @@ module Gym
         Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
       end
 
-      # Wrap xcodebuild to work-around ipatool dependecy to system ruby
+      # Wrap xcodebuild to work-around ipatool dependency to system ruby
       def wrap_xcodebuild
         require 'fileutils'
         @wrapped_xcodebuild_path ||= File.join(Gym::ROOT, "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
