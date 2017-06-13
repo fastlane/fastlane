@@ -84,6 +84,8 @@ module Gym
         end
       end
 
+      return if provisioning_profile_mapping.count == 0
+
       Gym.config[:export_options] ||= {}
       Gym.config[:export_options][:provisioningProfiles] = provisioning_profile_mapping
       UI.message("Detected provisioning profile mapping: #{provisioning_profile_mapping}")
