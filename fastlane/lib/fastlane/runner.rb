@@ -1,13 +1,21 @@
 module Fastlane
   class Runner
     # Symbol for the current lane
-    attr_accessor :current_lane
+    attr_reader :current_lane
 
     # Symbol for the current platform
     attr_accessor :current_platform
 
     # @return [Hash] All the lanes available, first the platform, then the lane
     attr_accessor :lanes
+
+    # Update lane scope whenever current changes
+    def current_lane=(value)
+      @current_lane = value
+      ENV["FASTLANE_LANE_NAME"] = value.to_s
+      Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
+      @current_lane
+    end
 
     def full_lane_name
       [current_platform, current_lane].reject(&:nil?).join(' ')
