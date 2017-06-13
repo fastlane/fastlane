@@ -10,7 +10,7 @@ module Precheck
 
     # Uses the spaceship to download app metadata and then run all rule checkers
     def run
-      Precheck.config.load_configuration_file("Precheckfile")
+      Precheck.config.load_configuration_file(Precheck.precheckfile_name)
 
       FastlaneCore::PrintTable.print_values(config: Precheck.config,
                                          hide_keys: [:output_path],
@@ -28,6 +28,10 @@ module Precheck
       summary_table = build_potential_problems_table(processor_result: processor_result)
 
       puts summary_table
+
+      if processor_result.should_trigger_user_error?
+        UI.user_error!("precheck found one or more potential problems that must be addressed before continuing")
+      end
     end
 
     def print_items_not_checked(processor_result: nil)

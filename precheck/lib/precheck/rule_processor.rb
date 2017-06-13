@@ -20,6 +20,11 @@ module Precheck
       @skipped_rules = skipped_rules
       @items_not_checked = items_not_checked
     end
+
+    def should_trigger_user_error?
+      return true if error_results.length > 0
+      return false
+    end
   end
 
   class RuleProcessor
@@ -61,7 +66,7 @@ module Precheck
           items_not_checked.delete(item)
 
           # if we passed, then go to the next item, otherwise, recode the failure
-          next unless result.status == VALIDATION_STATES[:fail]
+          next unless result.status == VALIDATION_STATES[:failed]
           add_new_result_to_rule_hash(rule_hash: error_results, result: result) if rule_level == RULE_LEVELS[:error]
           add_new_result_to_rule_hash(rule_hash: warning_results, result: result) if rule_level == RULE_LEVELS[:warn]
           rule_failed_at_least_once = true

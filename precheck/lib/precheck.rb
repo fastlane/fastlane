@@ -6,6 +6,10 @@ module Precheck
   # Use this to just setup the configuration attribute and set it later somewhere else
   class << self
     attr_accessor :config
+
+    def precheckfile_name
+      "Precheckfile"
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

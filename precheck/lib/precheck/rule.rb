@@ -4,8 +4,8 @@ require 'precheck/rule_check_result'
 
 module Precheck
   VALIDATION_STATES = {
-    pass: "pass",
-    fail: "fail",
+    passed: "passed",
+    failed: "failed",
     skipped: "skipped"
   }
 

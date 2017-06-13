@@ -22,7 +22,7 @@ module Precheck
     # rule block that checks text for any instance of each string in self.lowercased_words_to_look_for
     def self.rule_block
       return lambda { |text|
-        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:pass]) if text.to_s.strip.empty?
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:passed]) if text.to_s.strip.empty?
 
         all_metadata_words_list = text.to_s.downcase.split
         metadata_word_hashes = all_metadata_words_list.map { |word| Digest::SHA256.hexdigest(word) }
@@ -40,9 +40,9 @@ module Precheck
           UI.verbose "#{self.name.split('::').last ||= self.name} found potential curse words 😬"
           UI.verbose "Keep in mind, these words might be ok given the context they are used in"
           UI.verbose "Matched: \"#{friendly_found_words}\""
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:fail], failure_data: "found: #{friendly_found_words}")
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "found: #{friendly_found_words}")
         else
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:pass])
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         end
       }
     end

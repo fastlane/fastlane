@@ -12,6 +12,7 @@ module Fastlane
       :beta,
       :push,
       :production,
+      :app_review,
       :source_control,
       :notifications,
       :deprecated,
