@@ -24,6 +24,18 @@ module Fastlane
           # the heavy lifting for them
           values[:export_options] ||= {}
           values[:export_options][:provisioningProfiles] = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+        elsif Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS]
+          # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
+          # If the user used sigh we can match the profiles from sigh
+          values[:export_options] ||= {}
+          values[:export_options][:provisioningProfiles] ||= {}
+          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS].each do |profile_path|
+            profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
+            profile_team_id = profile["TeamIdentifier"].first
+            next if profile_team_id != values[:export_team_id] && !values[:export_team_id].nil?
+            bundle_id = profile["Entitlements"]["application-identifier"].gsub "#{profile_team_id}.", ""
+            values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
+          end
         end
 
         absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
