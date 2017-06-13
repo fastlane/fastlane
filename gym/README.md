@@ -174,6 +174,20 @@ export_options(
 )
 ```
 
+Optional: To pass a mapping of bundle identifiers to provisioning profiles, use the following
+
+```ruby
+export_options(
+  method: "app-store",
+  provisioningProfiles: { 
+    "com.example.bundleid": "Provisioning Profile Name",
+    "com.example.bundleid2": "Provisioning Profile Name 2",
+  }
+)
+```
+
+**Note**: If you use [fastlane](https://fastlane.tools) with [match](https://fastlane.tools/match) you don't need to provide those values manually.
+
 For the list of available options run `xcodebuild -help`.
 
 ## Setup code signing

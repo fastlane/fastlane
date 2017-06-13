@@ -14,6 +14,7 @@ module Gym
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
       detect_provisioning_profile
+      detect_selected_provisioning_profiles
 
       # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
@@ -62,7 +63,43 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
-    def self.detect_provisioning_profile
+    # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
+    # each target of your app
+    def self.detect_selected_provisioning_profiles
+      return if Gym.config[:export_options] && Gym.config[:export_options][:provisioningProfiles]
+
+      require 'xcodeproj'
+
+      provisioning_profile_mapping = {}
+      project = Xcodeproj::Project.open(Gym.project.path)
+      project.targets.each do |target|
+        target.build_configuration_list.build_configurations.each do |build_configuration|
+          current = build_configuration.build_settings
+
+          bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
+          provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
+          next if provisioning_profile_specifier.to_s.length == 0
+
+          provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+        end
+      end
+
+      Gym.config[:export_options] ||= {}
+      Gym.config[:export_options][:provisioningProfiles] = provisioning_profile_mapping
+      UI.message("Detected provisioning profile mapping: #{provisioning_profile_mapping}")
+    rescue => ex
+      # We don't want to fail the build if the automatic detection doesn't work
+      # especially since the mapping is optional for pre Xcode 9 setups
+      if Helper.xcode_at_least?("9.0")
+        UI.error("Couldn't automatically detect the provisioning profile mapping")
+        UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+        UI.error("provisioning profile to use for each target of your app")
+        UI.error(ex)
+        UI.verbose(ex.backtrace.join("\n"))
+      end
+    end
+
+    def self.detect_provisioning_profile # TODO: remove this method
       if Gym.config[:provisioning_profile_path].nil?
         return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
 
