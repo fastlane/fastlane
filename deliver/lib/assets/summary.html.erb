@@ -13,6 +13,14 @@
               margin-right: 25px;
           }
 
+          .app-subtitle {
+              font-size: 26px;
+              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
+              font-weight: 300;
+              margin-left: 25px;
+              margin-right: 25px;
+          }
+
           .app-urls {
               margin-left: 25px;
               font-size: 14px;
@@ -157,6 +165,12 @@
           </div>
         <% end %>
 
+        <% if @options[:subtitle] %>
+          <div class="app-subtitle">
+            Subtitle:  <%= @options[:subtitle][language] %>
+          </div>
+        <% end %>
+
         <div class="app-urls">
           <% all_keys = [:support_url, :marketing_url] %>
           <% all_keys.each do |key| %>
@@ -198,7 +212,7 @@
 
         <% if @options[:promotional_text] %>
           <div class="app-changelog">
-              <div class="cat-headline">Changelog</div>
+              <div class="cat-headline">Promotional Text</div>
               <%= (@options[:promotional_text][language] || '').gsub("\n", "<br />") %>
           </div>
         <% end %>

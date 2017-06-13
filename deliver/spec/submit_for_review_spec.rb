@@ -24,7 +24,9 @@ describe Deliver::SubmitForReview do
     context 'no builds' do
       let(:fake_builds) { make_fake_builds(0) }
       it 'throws a UI error' do
-        expect { review_submitter.find_build(fake_builds) }.to raise_error FastlaneCore::Interface::FastlaneCrash
+        expect do
+          review_submitter.find_build(fake_builds)
+        end.to raise_error FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on iTunes Connect to submit"
       end
     end
 
