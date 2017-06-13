@@ -69,6 +69,14 @@ module Spaceship
         'isHidden' => :hidden,
         'pendingState' => :state
       })
+
+      def create!(text)
+        client.create_developer_response!(app_id: application.apple_id, platform: application.platform, review_id: review_id, response: text)
+      end
+
+      def update!(text)
+        client.update_developer_response!(app_id: application.apple_id, platform: application.platform, review_id: review_id, response_id: id, response: text)
+      end
     end
 
     class AppReview < TunesBase
