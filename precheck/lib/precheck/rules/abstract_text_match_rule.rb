@@ -11,7 +11,7 @@ module Precheck
     def self.rule_block
       return lambda { |text|
         text = text.to_s.strip.downcase
-        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:pass]) if text.empty?
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:passed]) if text.empty?
 
         matches = self.lowercased_words_to_look_for.each_with_object([]) do |word, found_words|
           if text.include?(word)
@@ -22,9 +22,9 @@ module Precheck
         if matches.length > 0
           friendly_matches = matches.join(', ')
           UI.verbose "😭  #{self.name.split('::').last ||= self.name} found words \"#{friendly_matches}\""
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:fail], failure_data: "found: #{friendly_matches}")
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "found: #{friendly_matches}")
         else
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:pass])
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         end
       }
     end

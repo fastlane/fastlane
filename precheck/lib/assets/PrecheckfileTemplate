@@ -17,7 +17,11 @@
 # when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after precheck finishes
 
 # Examples:
-# spell_checking :skip
-# trademarks :warning
-# private_api :fail
+# apple_things(level: :skip)
+# curse_words(level: :warn)
+# future_functionality(level: :error)
+# other_platforms(level: :error)
+# placeholder_text(level: :error)
+# test_words(level: :error)
+# unreachable_urls(level: :error)
 
