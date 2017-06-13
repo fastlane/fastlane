@@ -23,6 +23,7 @@ module Fastlane
         escaped_password = params[:password].shellescape
 
         # unlock given keychain and disable lock and timeout
+        UI.message("Unlocking keychain #{escaped_path}")
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
         commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
         commands
