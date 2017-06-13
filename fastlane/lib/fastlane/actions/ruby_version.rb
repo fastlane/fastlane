@@ -34,7 +34,7 @@ module Fastlane
       def self.example_code
         ['ruby_version "2.4.0"']
       end
-      
+
       def self.details
         [
           "Add this to your `Fastfile` to require a certain version of _ruby_.",
