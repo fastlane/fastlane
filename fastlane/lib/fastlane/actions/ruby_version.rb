@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.author
-        "sebastian.varela"
+        "sebastianvarela"
       end
 
       def self.description
