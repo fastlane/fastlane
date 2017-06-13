@@ -9,13 +9,6 @@ module Fastlane
       def self.run(values)
         require 'gym'
 
-        should_use_legacy_api = values[:use_legacy_build_api] || Gym::Xcode.pre_7?
-
-        if values[:provisioning_profile_path].to_s.length.zero? && should_use_legacy_api
-          sigh_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
-          values[:provisioning_profile_path] = File.expand_path(sigh_path) if sigh_path
-        end
-
         values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE]
 
         if Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
