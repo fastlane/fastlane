@@ -43,7 +43,7 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+          FastlaneCore::CrashReporter.report_crash(exception: e)
           abort "#{e}. Use --help for more information"
         end
       rescue Interrupt => e
@@ -62,7 +62,7 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+          FastlaneCore::CrashReporter.report_crash(exception: e)
           if self.active_command.name == "help" && @default_command == :help # need to access directly via @
             # This is a special case, for example for pilot
             # when the user runs `fastlane pilot -u user@google.com`
@@ -105,7 +105,7 @@ module Commander
       FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
       FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
       puts ""
-      FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+      FastlaneCore::CrashReporter.report_crash(exception: e)
       raise e
     end
 
@@ -113,13 +113,13 @@ module Commander
       if e.message.include? 'Connection reset by peer - SSL_connect'
         handle_tls_error!(e)
       else
-        FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+        FastlaneCore::CrashReporter.report_crash(exception: e)
         handle_unknown_error!(e)
       end
     end
 
     def rescue_unknown_error(e)
-      FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+      FastlaneCore::CrashReporter.report_crash(exception: e)
       collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
       handle_unknown_error!(e)
     end
@@ -127,7 +127,7 @@ module Commander
     def rescue_fastlane_error(e)
       collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
       show_github_issues(e.message) if e.show_github_issues
-      FastlaneCore::CrashReporter.report_crash(exception: e, action: @program[:name])
+      FastlaneCore::CrashReporter.report_crash(exception: e)
       display_user_error!(e, e.message)
     end
 
