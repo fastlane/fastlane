@@ -135,7 +135,7 @@ module Deliver
           options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options, skip_version: true) # to login...
-          containing = FastlaneCore::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = options[:screenshots_path] || File.join(containing, 'screenshots')
           Deliver::DownloadScreenshots.run(options, path)
         end
@@ -151,7 +151,7 @@ module Deliver
           options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options) # to login...
-          containing = FastlaneCore::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = options[:metadata_path] || File.join(containing, 'metadata')
           res = Deliver::CommandsGenerator.force_overwrite_metadata?(options, path)
           return 0 unless res

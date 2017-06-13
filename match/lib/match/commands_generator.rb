@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane_core'
 require 'fastlane/version'
 
 HighLine.track_eof = false
@@ -60,7 +61,7 @@ module Match
         c.syntax = 'fastlane match init'
         c.description = 'Create the Matchfile for you'
         c.action do |args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, "Matchfile")
 
           if File.exist?(path)
