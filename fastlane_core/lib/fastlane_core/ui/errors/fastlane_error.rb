@@ -31,7 +31,7 @@ class Exception
   end
 
   def fastlane_crash_came_from_plugin?
-    plugin_frame = backtrace && backtrace.find { |frame| frame.include?('fastlane-plugin-') }
+    plugin_frame = exception && exception.backtrace && exception.backtrace.find { |frame| frame.include?('fastlane-plugin-') }
     !plugin_frame.nil?
   end
 
