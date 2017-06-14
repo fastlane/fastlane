@@ -2,7 +2,7 @@ machine:
   environment:
     FL_BUILDLOG_PATH: ~/Library/Logs
   xcode:
-    version: "8.2"
+    version: "8.3.2"
 dependencies:
   pre:
     - brew install shellcheck
