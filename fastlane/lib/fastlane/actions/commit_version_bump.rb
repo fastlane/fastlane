@@ -225,7 +225,7 @@ module Fastlane
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          File.join settings_bundle.real_path, settings_file_name
+          File.join(settings_bundle.real_path, settings_file_name)
         end
       end
     end
