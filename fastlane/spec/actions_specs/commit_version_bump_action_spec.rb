@@ -63,7 +63,7 @@ describe Fastlane::Actions::CommitVersionBumpAction do
   describe 'modified_files_relative_to_repo_root' do
     it 'returns an empty array if modified_files is nil' do
       Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::MODIFIED_FILES] = nil
-      expect(action.modified_files_relative_to_repo_root("/path/to/repo/root")).to be_empty
+      expect(action.modified_files_relative_to_repo_root "/path/to/repo/root").to be_empty
     end
 
     it 'returns a list of relative paths given a list of possibly absolute paths' do
@@ -76,8 +76,8 @@ describe Fastlane::Actions::CommitVersionBumpAction do
     it 'removes duplicates' do
       Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::MODIFIED_FILES] =
         Set.new %w{relative/path /path/to/repo/root/relative/path}
-      relative_paths = action.modified_files_relative_to_repo_root "/path/to/repo/root"
-      expect(relative_paths).to eq ["relative/path"]
+        relative_paths = action.modified_files_relative_to_repo_root "/path/to/repo/root"
+        expect(relative_paths).to eq ["relative/path"]
     end
   end
 
