@@ -34,8 +34,6 @@ module Deliver
       res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?") if UI.interactive?
       res
     end
-
-    # rubocop:disable Metrics/PerceivedComplexity
     def run
       program :name, 'deliver'
       program :version, Fastlane::VERSION
