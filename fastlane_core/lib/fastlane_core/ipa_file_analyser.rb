@@ -19,6 +19,7 @@ module FastlaneCore
 
     # Fetches the app platform from the given ipa file.
     def self.fetch_app_platform(path)
+      path = File.expand_path(path)
       plist = self.fetch_info_plist_file(path)
       platform = "ios"
       platform = plist['DTPlatformName'] if plist

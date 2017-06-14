@@ -14,8 +14,9 @@ module Pilot
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
+      ipa_path = File.expand_path(config[:ipa])
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
-                                                                      ipa_path: config[:ipa],
+                                                                      ipa_path: ipa_path,
                                                                   package_path: dir,
                                                                       platform: platform)
 
