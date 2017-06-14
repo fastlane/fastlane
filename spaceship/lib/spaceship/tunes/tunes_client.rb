@@ -139,7 +139,7 @@ module Spaceship
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
 
-        raise "Running in non-interactive shell" if UI.interactive? == false
+        raise  "Running in non-interactive shell" unless UserInterface.interactive?
 
         selected = ($stdin.gets || '').strip.to_i - 1
         team_to_use = teams[selected] if selected >= 0
