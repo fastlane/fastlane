@@ -174,7 +174,7 @@ export_options(
 )
 ```
 
-Optional: To pass a mapping of bundle identifiers to provisioning profiles, use the following
+Optional: If _gym_ can't automatically detect the provisioning profiles to use, you can pass a mapping of bundle identifiers to provisioning profiles:
 
 ```ruby
 export_options(
