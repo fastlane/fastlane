@@ -45,6 +45,12 @@ module Fastlane
           # Store the new number in the shared hash
           build_number = `#{command_prefix} agvtool what-version`.split("\n").last.strip
 
+          # if agvtool not enabled and user specified build_number, which means only modify plist build number
+          if $?.exitstatus != 0 and params[:build_number]
+            UI.important("only modify plist build number to specifed '#{params[:build_number]}'")
+            build_number = params[:build_number]
+          end
+
           return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
       rescue => ex
@@ -60,7 +66,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
-                                       description: "Change to a specific version",
+                                       description: "Change to a specific version. If you did not set Versioning System in Xcode, it would only modify build number in .plist file",
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
