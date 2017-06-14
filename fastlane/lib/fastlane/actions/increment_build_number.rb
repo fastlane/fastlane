@@ -15,6 +15,8 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
+        agv_enabled = system('agvtool what-version')
+        raise "Apple Generic Versioning is not enabled." unless agv_enabled
 
         folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
@@ -47,9 +49,8 @@ module Fastlane
 
           return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
         end
-      rescue => ex
-        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
-        raise ex
+      rescue
+        UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
       end
 
       def self.description
