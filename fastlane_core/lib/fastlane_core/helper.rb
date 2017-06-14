@@ -240,6 +240,11 @@ module FastlaneCore
       @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
     end
 
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+    end
+
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
     # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
     #

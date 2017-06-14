@@ -9,7 +9,7 @@ module Scan
     end
 
     def self.available_options
-      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
 
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
