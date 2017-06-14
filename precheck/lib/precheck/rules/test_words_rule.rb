@@ -19,7 +19,7 @@ module Precheck
       "using text indicating this release is a test"
     end
 
-    def self.lowercased_words_to_look_for
+    def lowercased_words_to_look_for
       [
         "testing",
         "just a test",

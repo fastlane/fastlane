@@ -18,5 +18,5 @@ module Precheck
 
   ENV['APP_IDENTIFIER'] ||= ENV["PRECHECK_APP_IDENTIFIER"]
 
-  DESCRIPTION = 'Check your app for common App Store review problems before you submit'
+  DESCRIPTION = 'Check your app using a community driven set of App Store review rules to avoid being rejected'
 end

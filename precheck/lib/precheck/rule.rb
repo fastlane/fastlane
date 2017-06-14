@@ -44,7 +44,6 @@ module Precheck
                    deprecated: nil,
                    sensitive: nil,
                    display_in_shell: nil)
-      @rule_block = self.class.rule_block
 
       super(key: self.class.key,
             env_name: self.class.env_name,
@@ -78,10 +77,6 @@ module Precheck
       not_implemented(__method__)
     end
 
-    def self.rule_block
-      not_implemented(__method__)
-    end
-
     def self.friendly_name
       not_implemented(__method__)
     end
@@ -96,6 +91,20 @@ module Precheck
 
     def inspect
       "#{self.class}(description: #{@description}, key: #{@key})"
+    end
+
+    # some rules can be customized with extra data at runtime, see CustomTextRule as an example
+    def needs_customization?
+      return false
+    end
+
+    # some rules can be customized with extra data at runtime, see CustomTextRule as an example
+    def customize_with_data(data: nil)
+      not_implemented(__method__)
+    end
+
+    def rule_block
+      not_implemented(__method__)
     end
 
     def check_item(item)
@@ -118,7 +127,7 @@ module Precheck
     end
 
     def perform_check(item: nil)
-      check_result = @rule_block.call(item.item_data)
+      check_result = self.rule_block.call(item.item_data)
       return RuleCheckResult.new(item, check_result, self)
     end
   end

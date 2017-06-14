@@ -19,7 +19,7 @@ module Precheck
       "mentioning other platforms, like Android or Blackberry"
     end
 
-    def self.lowercased_words_to_look_for
+    def lowercased_words_to_look_for
       [
         "android",
         "windows phone",
@@ -27,7 +27,6 @@ module Precheck
         "windows 10 mobile",
         "sailfish os",
         "windows universal app",
-        "wua",
         "blackberry",
         "palm os",
         "symbian"

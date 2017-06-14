@@ -53,6 +53,16 @@ module Precheck
           next
         end
 
+        if rule.needs_customization?
+          if rule_config.nil? || rule_config[:data].nil?
+            UI.verbose("#{rule.key} excluded because no data was passed to it e.g.: #{rule.key}(data: <data here>)")
+            next
+          end
+
+          custom_data = rule_config[:data]
+          rule.customize_with_data(data: custom_data)
+        end
+
         # if the rule failed at least once, we won't print a success message
         rule_failed_at_least_once = false
 

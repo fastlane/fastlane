@@ -19,13 +19,14 @@ module Precheck
       "using placeholder text (e.g.:\"lorem ipsum\", \"text here\", etc...)"
     end
 
-    def self.lowercased_words_to_look_for
+    def lowercased_words_to_look_for
       [
         "hipster ipsum",
         "bacon ipsum",
         "lorem ipsum",
         "placeholder",
-        "text here"
+        "text here",
+        "todo"
       ].map(&:downcase)
     end
   end

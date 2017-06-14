@@ -131,13 +131,13 @@ module Precheck
     end
 
     def latest_app_version
-      app.latest_version
+      @latest_version ||= app.latest_version
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
       return if app
-      UI.user_error!("Could not find App with App Identifier '#{Precheck.config[:app_identifier]}'")
+      UI.user_error!("Could not find app with App Identifier '#{Precheck.config[:app_identifier]}'")
     end
   end
 end

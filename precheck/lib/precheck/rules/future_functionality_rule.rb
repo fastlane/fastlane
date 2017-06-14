@@ -19,7 +19,7 @@ module Precheck
       "mentioning features or content that is not currently available in your app"
     end
 
-    def self.lowercased_words_to_look_for
+    def lowercased_words_to_look_for
       [
         "coming soon",
         "coming shortly",

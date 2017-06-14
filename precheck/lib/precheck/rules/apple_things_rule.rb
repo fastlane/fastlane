@@ -19,7 +19,7 @@ module Precheck
       "mentioning  in a way that could be considered negative"
     end
 
-    def self.lowercased_words_to_look_for
+    def lowercased_words_to_look_for
       [
         "ios",
         "macos",

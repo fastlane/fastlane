@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.category
-        :app_review
+        :misc
       end
     end
   end

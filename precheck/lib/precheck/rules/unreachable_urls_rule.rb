@@ -18,12 +18,13 @@ module Precheck
       "unreachable URLs in app metadata"
     end
 
-    def self.rule_block
+    def rule_block
       return lambda { |url|
         url = url.to_s.strip
         return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "empty url") if url.empty?
 
         begin
+          # URL redirects 
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: url) unless Faraday.head(url).status == 200
         rescue
           UI.verbose "URL #{url} not reachable 😵"

@@ -12,6 +12,7 @@ module Precheck
         FutureFunctionalityRule,
         TestWordsRule,
         CurseWordsRule,
+        CustomTextRule,
         UnreachableURLRule
       ].map(&:new)
     end
@@ -38,7 +39,7 @@ module Precheck
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                       ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
@@ -47,7 +48,7 @@ module Precheck
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                       ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end)
       ] + rules
     end
