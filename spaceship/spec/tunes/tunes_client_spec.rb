@@ -34,7 +34,6 @@ describe Spaceship::TunesClient do
       expect(subject.class.hostname).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/')
     end
 
-    
     describe "#handle_itc_response" do
       it "raises an exception if something goes wrong" do
         data = JSON.parse(TunesStubbing.itc_read_fixture_file('update_app_version_failed.json'))['data']
