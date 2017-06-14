@@ -16,7 +16,7 @@ module Precheck
       program :name, 'precheck'
       program :version, Fastlane::VERSION
       program :description, Precheck::DESCRIPTION
-      program :help, "Author", "Joshua Liebowitz <taquitos@gmail.com>"
+      program :help, "Author", "Joshua Liebowitz <taquitos@gmail.com>, @taquitos"
       program :help, "Website", "https://fastlane.tools"
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/precheck"
       program :help_formatter, :compact
@@ -39,7 +39,7 @@ module Precheck
         c.syntax = "fastlane precheck init"
         c.description = "Creates a new Precheckfile for you"
         c.action do |_args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Precheck.precheckfile_name)
           UI.user_error! "Precheckfile already exists" if File.exist?(path)
           template = File.read("#{Precheck::ROOT}/lib/assets/PrecheckfileTemplate")

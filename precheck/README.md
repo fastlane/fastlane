@@ -36,7 +36,7 @@ Precheck
 
 ###### Pass App Store precheck, the first time
 
-Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. fastlane precheck takes a lot of the guess work out by scanning your app’s details in iTunes Connect for avoidable problems. fastlane precheck helps you get your app through precheck without rejections so you can ship faster 🚀
+Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. _fastlane precheck_ takes a lot of the guess work out by scanning your app’s details in iTunes Connect for avoidable problems. fastlane precheck helps you get your app through app review without rejections so you can ship faster 🚀
 
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
@@ -55,15 +55,19 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>precheck</code> is part of <a href="https://fastlane.tools">fastlane</a>: The best way to ensure your App Store precheck passes without a hitch </h5>
+<h5 align="center"><code>precheck</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 
-- Many scanning rules like improper trademark usage, or iOS bug 🐛 mentions, or even swear word checker 😮
-- You can use our pre-selected list of what we would use, or you can customize which rules to check for, so you have to run the rules you care most about.
+- Many scanning rules:
+ -  product bug 🐛 mentions
+ - swear word checker 🙅‍♂️
+ - mentioning other platforms 🤖
+ - url reachability checker 😵
+ - placeholder/test words/mentioning future features 📝
+ - customizable word list checking 🙈
+- You can use our pre-selected list of what we would use, or you can customize which rules to check for, so you run the rules you care most about.
 - Customizable: you can decide if you want to warn 📢 about potential problems and continue or have fastlane show an error 🙅 and stop after all scans are done.
-- Paranoid mode if you want to be sure you’re doing all you can to avoid a potential rejection. This is most helpful when you need to get a hotfix out and you don’t want to take any chances it could be rejected.
-
 
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
@@ -82,15 +86,16 @@ To get a list of available options run
     
 # Example
 
-Each rule can take extra configuration arguments from the fastlane precheck file.
-Here are some examples a list of rules
- 
-built-in rules:
+Since you might want to manually trigger _precheck_ but don't want to specify all the parameters every time, you can store your defaults in a so called `Precheckfile`.
 
-    apple_things(level: :skip) # indicates that your metadata will not be checked by this rule
-    curse_words(level: :warn) # when triggered, this rule will warn you of a potential problem
-    unreachable_urls(level: :error) # show error and prevent any further commands from running after fastlane precheck finishes
- 
+Run `fastlane precheck init` to create a new configuration file. Example:
+
+```ruby
+apple_things(level: :skip) # indicates that your metadata will not be checked by this rule
+curse_words(level: :warn) # when triggered, this rule will warn you of a potential problem
+unreachable_urls(level: :error) # show error and prevent any further commands from running after fastlane precheck finishes
+custom_text(data: ["fabric"], level: :warn) # pass in whatever words you want to check for
+``` 
 
 ### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
@@ -100,8 +105,10 @@ Update your `Fastfile` to contain the following code:
 
 ```ruby
 lane :production do
+  ...
   deliver
-  precheck
+  precheck # this has to be after deliver as the iTC data will be verified
+  ...
 end
 ```
 
@@ -137,7 +144,7 @@ Please submit an issue on GitHub and provide information about your setup
 Please submit an issue on GitHub and provide information about your App Store rejection! Make sure you scrub out any personally identifiable information since this will be public.
 
 # Code of Conduct
-Help us keep `precheck` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _precheck_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

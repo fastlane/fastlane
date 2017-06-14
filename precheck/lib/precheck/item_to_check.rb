@@ -39,7 +39,7 @@ module Precheck
     end
   end
 
-  # if the data point we want to check is a URK field (like 'marketing_url'), we'll use this object to encapsulate it
+  # if the data point we want to check is a URL field (like 'marketing_url'), we'll use this object to encapsulate it
   # this includes the url, the property name, and what that name maps to in plain english so that we can print out nice, friendly messages.
   class URLItemToCheck < ItemToCheck
     attr_accessor :url
