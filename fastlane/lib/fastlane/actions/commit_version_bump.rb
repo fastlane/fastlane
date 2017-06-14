@@ -63,12 +63,8 @@ module Fastlane
           end
         end
 
-        # returns an array (empty if params[:include] is nil) or nil for invalid argument
-        extra_files = include_list_from_param params[:include]
-        UI.user_error! ":include must specify a string array or a comma-separated string" if extra_files.nil?
-
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
-        expected_changed_files = extra_files
+        expected_changed_files = []
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
 
@@ -160,11 +156,6 @@ module Fastlane
                                        description: "A regular expression used to filter matched plist files to be modified",
                                        optional: true,
                                        default_value: nil,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :include,
-                                       description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
-                                       optional: true,
-                                       default_value: nil,
                                        is_string: false)
         ]
       end
@@ -210,31 +201,15 @@ module Fastlane
       class << self
         def settings_plists_from_param(param)
           if param.kind_of? String
-            # commit_version_bump settings: "About.plist"
-            [param]
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+            return [param]
           elsif param.kind_of? Array
-            # commit_version_bump settings: ["Root.plist", "About.plist"]
-            param
-          else
-            # commit_version_bump settings: true # Root.plist
-            ["Root.plist"]
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+            return param
           end
-        end
 
-        def include_list_from_param(param)
-          return [] if param.nil?
-
-          if param.kind_of? String
-            # commit_version_bump include: "package.json,custom.cfg"
-            # This can be useful for environment variables, but there's no env. var. for :ignore,
-            # so not adding for :include for now.
-            param.split(",")
-          elsif param.kind_of? Array
-            # commit_version_bump include: %w{package.json custom.cfg}
-            param
-          else
-            nil
-          end
+          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
+          ["Root.plist"]
         end
 
         def settings_bundle_file_path(project, settings_file_name)
