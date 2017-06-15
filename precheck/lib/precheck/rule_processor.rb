@@ -25,6 +25,14 @@ module Precheck
       return true if error_results.length > 0
       return false
     end
+
+    def has_errors_or_warnings?
+      return true if error_results.length > 0 || warning_results.length > 0
+    end
+
+    def items_not_checked?
+      return true if items_not_checked.length > 0
+    end
   end
 
   class RuleProcessor

@@ -24,8 +24,11 @@ module Precheck
         return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "empty url") if url.empty?
 
         begin
-          # URL redirects 
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: url) unless Faraday.head(url).status == 200
+          request = Faraday.new(url) do |connection|
+            connection.use FaradayMiddleware::FollowRedirects
+            connection.adapter :net_http
+          end
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: url) unless request.head.status == 200
         rescue
           UI.verbose "URL #{url} not reachable 😵"
           # I can only return :fail here, but I also want to return #{url}
