@@ -15,11 +15,16 @@ module Precheck
       FastlaneCore::PrintTable.print_values(config: Precheck.config,
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
-      UI.message "Starting login with user '#{Precheck.config[:username]}'"
-      Spaceship::Tunes.login(Precheck.config[:username])
-      Spaceship::Tunes.select_team
 
-      UI.message "Successfully logged in"
+      unless Spaceship::Tunes.client
+        UI.message "Starting login with user '#{Precheck.config[:username]}'"
+        Spaceship::Tunes.login(Precheck.config[:username])
+        Spaceship::Tunes.select_team
+
+        UI.message "Successfully logged in"
+      end
+
+      UI.message "Checking app for precheck rule violations"
 
       ensure_app_exists!
 
@@ -35,12 +40,15 @@ module Precheck
       end
 
       if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck found one or more potential problems that must be addressed before continuing")
+        UI.user_error!("precheck found one or more potential problems that must be addressed before submitting to review")
+        return false
       end
 
       if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
         UI.message "precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green
       end
+
+      return true
     end
 
     def print_items_not_checked(processor_result: nil)

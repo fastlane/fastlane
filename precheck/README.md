@@ -65,6 +65,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
  - mentioning other platforms 🤖
  - url reachability checker 😵
  - placeholder/test words/mentioning future features 📝
+ - Copyright date checking
  - customizable word list checking 🙈
 - You can use our pre-selected list of what we would use, or you can customize which rules to check for, so you run the rules you care most about.
 - Customizable: you can decide if you want to warn 📢 about potential problems and continue or have fastlane show an error 🙅 and stop after all scans are done.
@@ -99,17 +100,24 @@ custom_text(data: ["fabric"], level: :warn) # pass in whatever words you want to
 
 ### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
-`precheck` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver).
+_precheck_ is totally integrated with [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver) another [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) tool.
 
 Update your `Fastfile` to contain the following code:
 
 ```ruby
 lane :production do
   ...
-  deliver
-  precheck # this has to be after deliver as the iTC data will be verified
+  # by default deliver will call precheck and warn you of any problems
+  # if you want precheck to halt submitting to app review, you can pass precheck_default_rule_level: :error
+  deliver(precheck_default_rule_level: :error)
   ...
 end
+
+# or if you prefer, you can run precheck alone
+lane :check_metadata do
+  precheck
+end
+
 ```
 
 # How does it work?

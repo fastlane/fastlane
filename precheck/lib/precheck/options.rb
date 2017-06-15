@@ -50,7 +50,13 @@ module Precheck
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :default_rule_level,
+                                     short_option: "-r",
+                                     env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
+                                     description: "The default rule level unless otherwise configured",
+                                     is_string: false,
+                                     default_value: RULE_LEVELS[:error])
       ] + rules
     end
   end
