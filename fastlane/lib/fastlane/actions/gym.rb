@@ -23,7 +23,12 @@ module Fastlane
           # If the user is smart and uses match and gym together with fastlane, we can do all
           # the heavy lifting for them
           values[:export_options] ||= {}
-          values[:export_options][:provisioningProfiles] = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+          # It's not always a hash, because the user might have passed a string path to a ready plist file
+          # If that's the case, we won't set the provisioning profiles
+          # see https://github.com/fastlane/fastlane/issues/9490
+          if values[:export_options].kind_of?(Hash)
+            values[:export_options][:provisioningProfiles] = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+          end
         end
 
         absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
