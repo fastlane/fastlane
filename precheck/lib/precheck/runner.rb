@@ -24,13 +24,22 @@ module Precheck
       ensure_app_exists!
 
       processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
-      print_items_not_checked(processor_result: processor_result)
-      summary_table = build_potential_problems_table(processor_result: processor_result)
 
-      puts summary_table
+      if processor_result.items_not_checked?
+        print_items_not_checked(processor_result: processor_result)
+      end
+
+      if processor_result.has_errors_or_warnings?
+        summary_table = build_potential_problems_table(processor_result: processor_result)
+        puts summary_table
+      end
 
       if processor_result.should_trigger_user_error?
         UI.user_error!("precheck found one or more potential problems that must be addressed before continuing")
+      end
+
+      if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
+        UI.message "precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green
       end
     end
 
@@ -57,11 +66,15 @@ module Precheck
         end
       end
 
-      return Terminal::Table.new(
-        title: "Potential problems".red,
-        headings: ["Field", "Failure reason"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      ).to_s
+      if rows.length == 0
+        return nil
+      else
+        return Terminal::Table.new(
+          title: "Potential problems".red,
+          headings: ["Field", "Failure reason"],
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        ).to_s
+      end
     end
 
     def check_for_rule_violations(app: nil, app_version: nil)

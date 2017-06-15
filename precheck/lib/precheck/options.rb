@@ -13,6 +13,7 @@ module Precheck
         TestWordsRule,
         CurseWordsRule,
         CustomTextRule,
+        CopyrightDateRule,
         UnreachableURLRule
       ].map(&:new)
     end

@@ -103,6 +103,12 @@ module Precheck
       not_implemented(__method__)
     end
 
+    # some rules only support specific fields, by default, all fields are supported unless restricted by
+    # providing a list of symbols matching the item_name as defined as the ItemToCheck is generated
+    def supported_fields_symbol_set
+      return nil
+    end
+
     def rule_block
       not_implemented(__method__)
     end
@@ -110,6 +116,7 @@ module Precheck
     def check_item(item)
       # validate the item we have was properly matched to this rule: TextItem -> TextRule, URLItem -> URLRule
       return skip_item_not_meant_for_this_rule(item) unless handle_item?(item)
+      return skip_item_not_meant_for_this_rule(item) unless item_field_supported?(item_name: item.item_name)
 
       # do the actual checking now
       return perform_check(item: item)
@@ -124,6 +131,12 @@ module Precheck
     # override this method and return true or false
     def handle_item?(item)
       not_implemented(__method__)
+    end
+
+    def item_field_supported?(item_name: nil)
+      return true if supported_fields_symbol_set.nil?
+      return true if supported_fields_symbol_set.include?(item_name)
+      return false
     end
 
     def perform_check(item: nil)
