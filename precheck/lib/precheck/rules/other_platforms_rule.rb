@@ -22,6 +22,8 @@ module Precheck
     def lowercased_words_to_look_for
       [
         "android",
+        "google",
+        "compuserve",
         "windows phone",
         "tizen",
         "windows 10 mobile",

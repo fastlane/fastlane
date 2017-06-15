@@ -1,3 +1,5 @@
+require 'precheck'
+
 module Deliver
   class Runner
     attr_accessor :options
@@ -27,7 +29,26 @@ module Deliver
 
       UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
-      submit_for_review if options[:submit_for_review]
+      precheck_success = precheck_app
+
+      submit_for_review if options[:submit_for_review] && precheck_success
+    end
+
+    # Make sure we pass precheck before uploading
+    def precheck_app
+      return true unless options[:only_submit_on_precheck_success]
+
+      if options[:submit_for_review]
+        UI.message("Making sure we pass precheck 👮‍♀️ 👮 before we submit  🛫")
+      else
+        UI.message("Running precheck 👮‍♀️ 👮")
+      end
+
+      precheck_options = { default_rule_level: options[:precheck_default_rule_level] }
+      precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
+      Precheck.config = precheck_config
+
+      return Precheck::Runner.new.run
     end
 
     # Make sure the version on iTunes Connect matches the one in the ipa

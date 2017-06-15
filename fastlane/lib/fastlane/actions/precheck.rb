@@ -7,7 +7,7 @@ module Fastlane
       def self.run(config)
         require 'precheck'
         Precheck.config = config
-        Precheck::Runner.new.run
+        return Precheck::Runner.new.run
       end
 
       def self.description
@@ -21,6 +21,10 @@ module Fastlane
       def self.available_options
         require 'precheck/options'
         Precheck::Options.available_options
+      end
+
+      def self.return_value
+        return "true if precheck passes, else, false"
       end
 
       def self.authors
