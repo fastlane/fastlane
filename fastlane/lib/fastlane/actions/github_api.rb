@@ -83,7 +83,7 @@ module Fastlane
                                          optional: true,
                                          verify_block: proc do |value|
                                            UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
-            end),
+                                         end),
             FastlaneCore::ConfigItem.new(key: :api_token,
                                          env_name: "FL_GITHUB_API_TOKEN",
                                          description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
@@ -100,7 +100,7 @@ module Fastlane
                                            unless %w(GET POST PUT DELETE HEAD CONNECT).include?(value.to_s.upcase)
                                              UI.user_error!("Unrecognised HTTP method")
                                            end
-            end),
+                                         end),
             FastlaneCore::ConfigItem.new(key: :body,
                                          env_name: "FL_GITHUB_API_REQUEST_BODY",
                                          description: "The request body in JSON or hash format",
@@ -122,7 +122,7 @@ module Fastlane
                                          optional: true,
                                          verify_block: proc do |value|
                                            UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include? "//"
-            end),
+                                         end),
             FastlaneCore::ConfigItem.new(key: :error_handlers,
                                          description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
                                          is_string: false,

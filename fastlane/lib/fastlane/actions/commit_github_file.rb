@@ -126,11 +126,11 @@ module Fastlane
                                        description: "The commit message. Defaults to the file name",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :secure,
-                                     env_name: "FL_COMMIT_GITHUB_FILE_SECURE",
-                                     description: "Optionally disable secure requests (ssl_verify_peer)",
-                                     is_string: false,
-                                     default_value: true,
-                                     optional: true)
+                                       env_name: "FL_COMMIT_GITHUB_FILE_SECURE",
+                                       description: "Optionally disable secure requests (ssl_verify_peer)",
+                                       is_string: false,
+                                       default_value: true,
+                                       optional: true)
         ]
       end
 
