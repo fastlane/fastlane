@@ -240,7 +240,7 @@ module Fastlane
           Excon.defaults[:ssl_verify_peer] = secure
           middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
 
-          UI.message("#{http_method} : #{url}")
+          UI.verbose("#{http_method} : #{url}")
 
           connection = Excon.new(url)
           connection.request(
