@@ -12,7 +12,6 @@ module FastlaneCore
       FileUtils.rm_rf self.package_path if File.directory?(self.package_path)
       FileUtils.mkdir_p self.package_path
 
-      ipa_path = File.expand_path(ipa_path)
       ipa_path = copy_ipa(ipa_path)
       @data = {
         apple_id: app_id,

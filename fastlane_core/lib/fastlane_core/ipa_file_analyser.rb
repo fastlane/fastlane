@@ -5,7 +5,6 @@ module FastlaneCore
   class IpaFileAnalyser
     # Fetches the app identifier (e.g. com.facebook.Facebook) from the given ipa file.
     def self.fetch_app_identifier(path)
-      path = File.expand_path(path)
       plist = self.fetch_info_plist_file(path)
       return plist['CFBundleIdentifier'] if plist
       return nil
@@ -13,7 +12,6 @@ module FastlaneCore
 
     # Fetches the app version from the given ipa file.
     def self.fetch_app_version(path)
-      path = File.expand_path(path)
       plist = self.fetch_info_plist_file(path)
       return plist['CFBundleShortVersionString'] if plist
       return nil
@@ -21,7 +19,6 @@ module FastlaneCore
 
     # Fetches the app platform from the given ipa file.
     def self.fetch_app_platform(path)
-      path = File.expand_path(path)
       plist = self.fetch_info_plist_file(path)
       platform = "ios"
       platform = plist['DTPlatformName'] if plist
@@ -30,7 +27,6 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_file(path)
-      path = File.expand_path(path)
       UI.user_error!("Could not find file at path '#{path}'") unless File.exist?(path)
       Zip::File.open(path, "rb") do |zipfile|
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
