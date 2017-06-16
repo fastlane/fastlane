@@ -13,14 +13,14 @@ module Fastlane
         http_method = (params[:http_method] || 'GET').to_s.upcase
         url = parse_url(params[:server_url], params[:path], params[:url])
         headers = parse_headers(params[:api_token], params[:headers])
-        request_body = parse_body(params[:body], params[:raw_body])
+        payload = parse_body(params[:body], params[:raw_body])
         handled_errors = params[:errors] || {}
 
         response = call_endpoint(
           url,
           http_method,
           headers,
-          request_body,
+          payload,
           { secure: params[:secure], debug: params[:debug] }
         )
 

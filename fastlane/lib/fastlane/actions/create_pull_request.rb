@@ -8,19 +8,19 @@ module Fastlane
       def self.run(params)
         UI.message("Creating new pull request from '#{params[:head]}' to branch '#{params[:base]}' of '#{params[:repo]}'")
 
-        request_body = {
+        payload = {
           'title' => params[:title],
           'head' => params[:head],
           'base' => params[:base]
         }
-        request_body['body'] = params[:body] if params[:body]
+        payload['body'] = params[:body] if params[:body]
 
         GithubApiAction.run(
           server_url: params[:api_url],
           api_token: params[:api_token],
           http_method: 'POST',
           path: "repos/#{params[:repo]}/pulls",
-          body: request_body,
+          body: payload,
           errors: {
             '*' => proc do |result|
               UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")

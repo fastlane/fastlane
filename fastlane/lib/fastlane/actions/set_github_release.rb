@@ -16,21 +16,21 @@ module Fastlane
         server_url = params[:server_url]
         tag_name = params[:tag_name]
 
-        body = {
+        payload = {
           'tag_name' => params[:tag_name],
           'name' => params[:name],
           'body' => params[:description],
           'draft' => !!params[:is_draft],
           'prerelease' => !!params[:is_prerelease]
         }
-        body['target_commitish'] = params[:commitish] if params[:commitish]
+        payload['target_commitish'] = params[:commitish] if params[:commitish]
 
         GithubApiAction.run(
           server_url: server_url,
           api_token: api_token,
           http_method: 'POST',
           path: "repos/#{repo_name}/releases",
-          body: body,
+          body: payload,
           errors: {
             422 => proc do |result|
               UI.error(result[:body])

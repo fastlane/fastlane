@@ -22,7 +22,7 @@ module Fastlane
         api_file_path = "/#{api_file_path}" unless api_file_path.start_with? '/'
         api_file_path = api_file_path[0..-2] if api_file_path.end_with? '/'
 
-        commit_request_body = {
+        payload = {
           path: api_file_path,
           message: commit_message || "Updated : #{file_name}",
           content: Base64.encode64(File.open(expanded_file_path).read),
@@ -37,7 +37,7 @@ module Fastlane
           secure: params[:secure],
           http_method: "PUT",
           path: File.join("repos", params[:repository_name], "contents", api_file_path),
-          body: commit_request_body,
+          body: payload,
           errors: {
             422 => proc do |result|
               json = result[:json]
