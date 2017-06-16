@@ -16,7 +16,7 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
         agv_enabled = system('agvtool what-version')
-        raise "Apple Generic Versioning is not enabled." unless agv_enabled || Helper.test?
+        raise "Apple Generic Versioning is not enabled." unless Helper.test? || agv_enabled
 
         folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
