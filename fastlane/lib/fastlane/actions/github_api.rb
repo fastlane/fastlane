@@ -14,7 +14,7 @@ module Fastlane
         url = parse_url(params[:server_url], params[:path], params[:url])
         headers = parse_headers(params[:api_token], params[:headers])
         payload = parse_body(params[:body], params[:raw_body])
-        handled_errors = params[:errors] || {}
+        error_handlers = params[:error_handlers] || {}
 
         response = call_endpoint(
           url,
@@ -39,7 +39,7 @@ module Fastlane
           end
           yield(result) if block_given?
         else
-          handled_error = handled_errors[status_code] || handled_errors['*']
+          handled_error = error_handlers[status_code] || error_handlers['*']
           if handled_error
             handled_error.call(result)
           else
@@ -184,7 +184,7 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include? "//"
                                        end),
-          FastlaneCore::ConfigItem.new(key: :errors,
+          FastlaneCore::ConfigItem.new(key: :error_handlers,
                                        description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
                                        is_string: false,
                                        default_value: {},
@@ -239,7 +239,7 @@ module Fastlane
             api_token: ENV["GITHUB_TOKEN"],
             http_method: "GET",
             path: "/repos/:owner/:repo/readme",
-            errors: {
+            error_handlers: {
               404 => proc do |result|
                 UI.message("Something went wrong - I couldn\'t find it...")
               end,

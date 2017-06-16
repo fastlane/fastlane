@@ -10,7 +10,7 @@ module Fastlane
           GithubApiAction.run(
             url: File.join(base_api_url, 'releases/latest'),
             http_method: 'GET',
-            errors: {
+            error_handlers: {
               404 => proc do |result|
                 UI.error("No latest release found for the specified GitHub repository")
               end,

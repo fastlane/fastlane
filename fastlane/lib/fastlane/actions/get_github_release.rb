@@ -13,7 +13,7 @@ module Fastlane
           api_token: params[:api_token],
           http_method: 'GET',
           path: "repos/#{params[:url]}/releases",
-          errors: {
+          error_handlers: {
             404 => proc do |result|
               UI.error("Repository #{params[:url]} cannot be found, please double check its name and that you provided a valid API token (if it's a private repository).")
               return nil

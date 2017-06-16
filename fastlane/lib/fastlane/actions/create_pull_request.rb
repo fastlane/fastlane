@@ -21,7 +21,7 @@ module Fastlane
           http_method: 'POST',
           path: "repos/#{params[:repo]}/pulls",
           body: payload,
-          errors: {
+          error_handlers: {
             '*' => proc do |result|
               UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
               return nil

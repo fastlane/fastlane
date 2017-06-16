@@ -38,7 +38,7 @@ module Fastlane
           http_method: "PUT",
           path: File.join("repos", params[:repository_name], "contents", api_file_path),
           body: payload,
-          errors: {
+          error_handlers: {
             422 => proc do |result|
               json = result[:json]
               UI.error(json || result[:body])

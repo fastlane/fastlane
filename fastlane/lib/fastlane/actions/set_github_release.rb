@@ -31,7 +31,7 @@ module Fastlane
           http_method: 'POST',
           path: "repos/#{repo_name}/releases",
           body: payload,
-          errors: {
+          error_handlers: {
             422 => proc do |result|
               UI.error(result[:body])
               UI.error("Release on tag #{tag_name} already exists!")
@@ -73,7 +73,7 @@ module Fastlane
               api_token: api_token,
               http_method: 'GET',
               path: "repos/#{repo_name}/releases/#{release_id}",
-              errors: {
+              error_handlers: {
                 '*' => proc do |get_result|
                   UI.error("GitHub responded with #{get_result[:status]}:#{get_result[:body]}")
                   UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
@@ -129,7 +129,7 @@ module Fastlane
           headers: headers,
           url: expanded_url,
           raw_body: File.read(file),
-          errors: {
+          error_handlers: {
             '*' => proc do |result|
               UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
               UI.user_error!("Failed to upload asset #{file_name} to GitHub.")

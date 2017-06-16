@@ -215,7 +215,7 @@ describe Fastlane do
                     content: 'VGVzdCBDb250ZW50Cg==\n',
                     branch: 'test-branch'
                   },
-                  errors: {
+                  error_handlers: {
                     401 => proc {|result|
                       UI.user_error!(\"Custom error handled for 401 \#{result[:body]}\")
                     },
@@ -247,7 +247,7 @@ describe Fastlane do
                     content: 'VGVzdCBDb250ZW50Cg==\n',
                     branch: 'test-branch'
                   },
-                  errors: {
+                  error_handlers: {
                     '*' => proc do |result|
                       UI.user_error!(\"Custom error handled for all errors\")
                     end,
@@ -278,7 +278,7 @@ describe Fastlane do
                   content: 'VGVzdCBDb250ZW50Cg==\n',
                   branch: 'test-branch'
                 },
-                errors: {
+                error_handlers: {
                   401 => proc do |result|
                     UI.message(\"error handled\")
                   end
