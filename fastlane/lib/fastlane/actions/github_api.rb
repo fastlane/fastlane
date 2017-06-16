@@ -11,9 +11,9 @@ module Fastlane
         require 'json'
 
         http_method = (params[:http_method] || 'GET').to_s.upcase
-        url = parse_url(params[:server_url], params[:path], params[:url])
-        headers = parse_headers(params[:api_token], params[:headers])
-        payload = parse_body(params[:body], params[:raw_body])
+        url = construct_url(params[:server_url], params[:path], params[:url])
+        headers = construct_headers(params[:api_token], params[:headers])
+        payload = construct_body(params[:body], params[:raw_body])
         error_handlers = params[:error_handlers] || {}
         secure = params[:secure] || true
 
@@ -59,23 +59,23 @@ module Fastlane
         return result
       end
 
-      def self.parse_headers(api_token, overrides)
+      def self.construct_headers(api_token, overrides)
         require 'base64'
         headers = { 'User-Agent' => 'fastlane-github_api' }
         headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
         headers.merge(overrides || {})
       end
-      private_class_method :parse_headers
+      private_class_method :construct_headers
 
-      def self.parse_url(server_url, path, url)
+      def self.construct_url(server_url, path, url)
         return_url = path ? File.join(server_url, path) : url
 
         UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless return_url
         return_url
       end
-      private_class_method :parse_url
+      private_class_method :construct_url
 
-      def self.parse_body(body, raw_body)
+      def self.construct_body(body, raw_body)
         body ||= {}
 
         if raw_body
@@ -87,7 +87,7 @@ module Fastlane
           body
         end
       end
-      private_class_method :parse_body
+      private_class_method :construct_body
 
       def self.parse_json(value)
         JSON.parse(value)
