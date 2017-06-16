@@ -33,7 +33,6 @@ module Fastlane
         GithubApiAction.run({
           server_url: params[:server_url],
           api_token: params[:api_token],
-          debug: params[:debug],
           secure: params[:secure],
           http_method: "PUT",
           path: File.join("repos", params[:repository_name], "contents", api_file_path),
@@ -131,12 +130,7 @@ module Fastlane
                                      description: "Optionally disable secure requests (ssl_verify_peer)",
                                      is_string: false,
                                      default_value: true,
-                                     optional: true),
-          FastlaneCore::ConfigItem.new(key: :debug,
-                                       env_name: "FL_COMMIT_GITHUB_FILE_DEBUG",
-                                       description: "Debug option for output (true/false)",
-                                       default_value: false,
-                                       is_string: false)
+                                     optional: true)
         ]
       end
 

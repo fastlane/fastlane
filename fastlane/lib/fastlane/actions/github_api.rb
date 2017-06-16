@@ -15,13 +15,14 @@ module Fastlane
         headers = parse_headers(params[:api_token], params[:headers])
         payload = parse_body(params[:body], params[:raw_body])
         error_handlers = params[:error_handlers] || {}
+        secure = params[:secure] || true
 
         response = call_endpoint(
           url,
           http_method,
           headers,
           payload,
-          { secure: params[:secure], debug: params[:debug] }
+          secure
         )
 
         status_code = response[:status]
@@ -32,11 +33,9 @@ module Fastlane
         }
 
         if status_code.between?(200, 299)
-          if params[:debug]
-            UI.message("Response:")
-            UI.message(response.body)
-            UI.message("---")
-          end
+          UI.verbose("Response:")
+          UI.verbose(response.body)
+          UI.verbose("---")
           yield(result) if block_given?
         else
           handled_error = error_handlers[status_code] || error_handlers['*']
@@ -97,14 +96,10 @@ module Fastlane
       end
       private_class_method :parse_json
 
-      def self.call_endpoint(url, http_method, headers, body, params = {})
+      def self.call_endpoint(url, http_method, headers, body, secure)
         require 'excon'
-        opts = {
-          secure: true,
-          debug: false
-        }.merge(params)
 
-        Excon.defaults[:ssl_verify_peer] = opts[:secure]
+        Excon.defaults[:ssl_verify_peer] = secure
         middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
 
         UI.message("#{http_method} : #{url}")
@@ -115,8 +110,8 @@ module Fastlane
           headers: headers,
           middlewares: middlewares,
           body: body,
-          debug_request: opts[:debug],
-          debug_response: opts[:debug]
+          debug_request: FastlaneCore::Globals.verbose?,
+          debug_response: FastlaneCore::Globals.verbose?
         )
       end
       private_class_method :call_endpoint
@@ -199,12 +194,7 @@ module Fastlane
                                      description: "Optionally disable secure requests (ssl_verify_peer)",
                                      is_string: false,
                                      default_value: true,
-                                     optional: true),
-          FastlaneCore::ConfigItem.new(key: :debug,
-                                       env_name: "FL_GITHUB_API_DEBUG",
-                                       description: "Github API debug option for output (true/false)",
-                                       default_value: false,
-                                       is_string: false)
+                                     optional: true)
         ]
       end
 
