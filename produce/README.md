@@ -32,7 +32,6 @@ produce
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/produce/LICENSE)
-[![Gem](https://img.shields.io/gem/v/produce.svg?style=flat)](https://rubygems.org/gems/produce)
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
@@ -78,31 +77,37 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 To get a list of all available parameters:
 
     fastlane produce --help
-
+    
 ```
-  Commands:
-    associate_group  Associate with a group, which is created if needed or simply located otherwise
-    create           Creates a new app on iTunes Connect and the Apple Developer Portal
-    disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
-    enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
-    group            Ensure that a specific App Group exists
-    help             Display global or [command] help documentation
+  Commands: (* default)
+    associate_group    Associate with a group, which is created if needed or simply located otherwise
+    create           * Creates a new app on iTunes Connect and the Apple Developer Portal
+    disable_services   Disable specific Application Services for a specific app on the Apple Developer Portal
+    enable_services    Enable specific Application Services for a specific app on the Apple Developer Portal
+    group              Ensure that a specific App Group exists
+    help               Display global or [command] help documentation
 
   Global Options:
+    --verbose
+    -h, --help           Display help documentation
+    -v, --version        Display version information
+
+  Options for create:
     -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
     -a, --app_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
     -e, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*) (PRODUCE_APP_IDENTIFIER_SUFFIX)
     -q, --app_name STRING App Name (PRODUCE_APP_NAME)
     -z, --app_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
     -y, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
+    -j, --platform STRING The platform to use (optional) (PRODUCE_PLATFORM)
     -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
     -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
-    -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
-    -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
-    -b, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
-    -l, --team_name STRING The name of your team if you're in multiple teams (PRODUCE_TEAM_NAME)
-    -h, --help           Display help documentation
-    -v, --version        Display version information
+    -i, --skip_itc [VALUE] Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
+    -d, --skip_devcenter [VALUE] Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -b, --team_id STRING The ID of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_ID)
+    -l, --team_name STRING The name of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_NAME)
+    -k, --itc_team_id [VALUE] The ID of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_ID)
+    -p, --itc_team_name STRING The name of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_NAME)
 ```
 
 ## Enabling / Disabling Application Services
@@ -184,6 +189,26 @@ lane :release do
     app_version: '1.0',
     sku: '123',
     team_name: 'SunApps GmbH' # only necessary when in multiple teams
+    
+    # Optional
+    # App services can be enabled during app creation
+    enable_services: {
+      app_group: "on"               # Valid values: "on", "off"
+      apple_pay: "on"               # Valid values: "on", "off"
+      associated_domains: "on"      # Valid values: "on", "off"
+      data_protection: "complete"   # Valid values: "complete", "unlessopen", "untilfirstauth"
+      game_center: "on"             # Valid values: "on", "off"
+      health_kit: "on"              # Valid values: "on", "off"
+      home_kit: "on"                # Valid values: "on", "off"
+      wireless_accessory: "on"      # Valid values: "on", "off"
+      icloud: "cloudkit"            # Valid values: "legacy", "cloudkit"
+      in_app_purchase: "on"         # Valid values: "on", "off"
+      inter_app_audio: "on"         # Valid values: "on", "off"
+      passbook: "on"                # Valid values: "on", "off"
+      push_notification: "on"       # Valid values: "on", "off"
+      siri_kit: "on"                # Valid values: "on", "off"
+      vpn_configuration: "on"       # Valid values: "on", "off"
+    }
   )
 
   deliver

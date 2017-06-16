@@ -3,6 +3,7 @@ require 'credentials_manager'
 
 module Supply
   class Options
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
       valid_tracks = %w(production beta alpha rollout)
       @options ||= [
@@ -25,7 +26,7 @@ module Supply
                                      description: "The percentage of the user fraction when uploading to the rollout track",
                                      default_value: '0.1',
                                      verify_block: proc do |value|
-                                       min = 0.05
+                                       min = 0.01
                                        max = 0.5
                                        UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
                                      end),
@@ -164,9 +165,17 @@ module Supply
                                        value.each do |path|
                                          UI.user_error! "Could not find mapping file at path '#{path}'" unless File.exist?(path)
                                        end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :root_url,
+                                     env_name: "SUPPLY_ROOT_URL",
+                                     description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
                                      end)
 
       ]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

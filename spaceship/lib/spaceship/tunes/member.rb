@@ -16,12 +16,29 @@ module Spaceship
         'dsId' => :user_id
       )
 
+      ROLES = {
+        admin: 'admin',
+        app_manager: 'appmanager',
+        sales: 'sales',
+        developer: 'developer',
+        marketing: 'marketing',
+        reports: 'reports'
+      }
+
       def roles
         parsed_roles = []
         raw_data["roles"].each do |role|
           parsed_roles << role["value"]["name"]
         end
         return parsed_roles
+      end
+
+      def admin?
+        roles.include?(ROLES[:admin])
+      end
+
+      def app_manager?
+        roles.include?(ROLES[:app_manager])
       end
 
       def preferred_currency

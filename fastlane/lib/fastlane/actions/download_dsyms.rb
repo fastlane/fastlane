@@ -112,7 +112,7 @@ module Fastlane
                                        short_option: "-a",
                                        env_name: "DOWNLOAD_DSYMS_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
-                                       optional: true,
+                                       optional: false,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
@@ -166,7 +166,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :appletvos].include?(platform)
       end
 
       def self.example_code

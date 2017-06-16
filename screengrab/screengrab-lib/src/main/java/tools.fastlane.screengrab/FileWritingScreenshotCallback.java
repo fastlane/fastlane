@@ -104,7 +104,14 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     }
 
     private static String localeToDirName(Locale locale) {
-        return locale.getLanguage() + "-" + locale.getCountry() + "/images/screenshots";
+        StringBuilder sb = new StringBuilder(locale.getLanguage());
+        String localeCountry = locale.getCountry();
+
+        if (localeCountry != null && localeCountry.length() != 0) {
+            sb.append("-").append(localeCountry);
+        }
+
+        return sb.append("/images/screenshots").toString();
     }
 
     private static void createPathTo(File dir) throws IOException {

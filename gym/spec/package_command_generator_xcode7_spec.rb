@@ -110,6 +110,24 @@ describe Gym do
       expect(Gym.config[:export_team_id]).to be_nil
     end
 
+    it "defaults to the correct export type if :export_options parameter is provided" do
+      options = {
+        project: "./gym/examples/standard/Example.xcodeproj",
+        export_options: {
+          include_symbols: true
+        }
+      }
+
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+      content = Plist.parse_xml(config_path)
+      expect(content["include_symbols"]).to eq(true)
+      expect(content["method"]).to eq('app-store')
+    end
+
     it "reads user export plist and override some parameters" do
       options = {
         project: "./gym/examples/standard/Example.xcodeproj",

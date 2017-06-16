@@ -47,10 +47,10 @@ module Fastlane
 
         project = Xcodeproj::Project.open(folder)
         project.targets.each do |target|
-          if !target_filter || target.product_name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
-            UI.success("Updating target #{target.product_name}...")
+          if !target_filter || target.name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
+            UI.success("Updating target #{target.name}...")
           else
-            UI.important("Skipping target #{target.product_name} as it doesn't match the filter '#{target_filter}'")
+            UI.important("Skipping target #{target.name} as it doesn't match the filter '#{target_filter}'")
             next
           end
 

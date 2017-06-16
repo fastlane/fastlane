@@ -8,7 +8,13 @@ module Match
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch], git_full_name: params[:git_full_name], git_user_email: params[:git_user_email])
+      params[:workspace] = GitHelper.clone(params[:git_url],
+                                           params[:shallow_clone],
+                                           skip_docs: params[:skip_docs],
+                                           branch: params[:git_branch],
+                                           git_full_name: params[:git_full_name],
+                                           git_user_email: params[:git_user_email],
+                                           clone_branch_directly: params[:clone_branch_directly])
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username])

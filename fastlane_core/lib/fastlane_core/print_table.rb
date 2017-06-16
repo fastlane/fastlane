@@ -44,7 +44,7 @@ module FastlaneCore
         value = ""
         array.each do  |l|
           colored_line = l
-          colored_line = "#{colors.first[0]}#{l}#{colors.last[0]}" if colors.length > 0
+          colored_line = "#{colors.first}#{l}#{colors.last}" if colors.length > 0
           value << colored_line
           value << "\n"
         end
@@ -68,15 +68,10 @@ module FastlaneCore
           return value.middle_truncate(max_value_length)
         elsif transform == :newline
           # remove all fixed newlines as it may mess up the output
-          value.tr!("\n", " ") if value.kind_of?(String)
+          value.gsub!("\n", " ") if value.kind_of?(String)
           if value.length >= max_value_length
-            colors = value.scan(/(\e\[.*?m)/)
-            if colors && colors.length > 0
-              colors.each do |color|
-                value.delete!(color.first)
-                value.delete!(color.last)
-              end
-            end
+            colors = value.scan(/\e\[.*?m/)
+            colors.each { |color| value.gsub!(color, '') }
             lines = value.wordwrap(max_value_length)
             return  colorize_array(lines, colors)
           end

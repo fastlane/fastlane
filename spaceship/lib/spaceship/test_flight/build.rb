@@ -67,16 +67,17 @@ module Spaceship::TestFlight
     BUILD_STATES = {
       processing: 'testflight.build.state.processing',
       active: 'testflight.build.state.testing.active',
-      ready: 'testflight.build.state.submit.ready',
+      ready_to_submit: 'testflight.build.state.submit.ready',
+      ready_to_test: 'testflight.build.state.testing.ready',
       export_compliance_missing: 'testflight.build.state.export.compliance.missing'
     }
 
-    # Find a Build by `build_id`. Returns `nil` if can't find it.
+    # Find a Build by `build_id`.
     #
     # @return (Spaceship::TestFlight::Build)
     def self.find(app_id: nil, build_id: nil)
       attrs = client.get_build(app_id: app_id, build_id: build_id)
-      self.new(attrs) if attrs
+      self.new(attrs)
     end
 
     def self.all(app_id: nil, platform: nil)
@@ -84,8 +85,8 @@ module Spaceship::TestFlight
       trains.values.flatten
     end
 
-    def self.builds_for_train(app_id: nil, platform: nil, train_version: nil)
-      builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
+    def self.builds_for_train(app_id: nil, platform: nil, train_version: nil, retry_count: 0)
+      builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
       builds_data.map { |data| self.new(data) }
     end
 
@@ -104,13 +105,17 @@ module Spaceship::TestFlight
     #
     # Note: this will overwrite any non-saved changes to the object
     #
-    # @return (Spaceceship::Base::DataHash) the raw_data of the build.
+    # @return (Spaceship::Base::DataHash) the raw_data of the build.
     def reload
       self.raw_data = self.class.find(app_id: app_id, build_id: id).raw_data
     end
 
     def ready_to_submit?
-      external_state == BUILD_STATES[:ready]
+      external_state == BUILD_STATES[:ready_to_submit]
+    end
+
+    def ready_to_test?
+      external_state == BUILD_STATES[:ready_to_test]
     end
 
     def active?
@@ -119,6 +124,14 @@ module Spaceship::TestFlight
 
     def processing?
       external_state == BUILD_STATES[:processing]
+    end
+
+    def export_compliance_missing?
+      external_state == BUILD_STATES[:export_compliance_missing]
+    end
+
+    def processed?
+      active? || ready_to_submit? || export_compliance_missing?
     end
 
     # Getting builds from BuildTrains only gets a partial Build object
@@ -155,13 +168,14 @@ module Spaceship::TestFlight
     end
 
     def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
-      test_info.description = description
-      test_info.feedback_email = feedback_email
-      test_info.whats_new = whats_new
+      test_info.description = description if description
+      test_info.feedback_email = feedback_email if feedback_email
+      test_info.whats_new = whats_new if whats_new
       save!
     end
 
     def submit_for_testflight_review!
+      return if ready_to_test?
       client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
     end
 

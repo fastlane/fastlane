@@ -37,7 +37,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_IPA_PATH",
                                      description: "Path to your ipa file",
-                                     default_value: Dir["*.ipa"].first,
+                                     default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
@@ -51,7 +51,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_PKG_PATH",
                                      description: "Path to your pkg file",
-                                     default_value: Dir["*.pkg"].first,
+                                     default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
@@ -228,6 +228,10 @@ module Deliver
                                      description: "Metadata: The english name of the secondary second sub category(e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
+        FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
+                                     description: "Metadata: A hash containing the trade representative contact information",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
@@ -241,6 +245,13 @@ module Deliver
                                      description: "Metadata: The localised app name",
                                      optional: true,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :subtitle,
+                                     description: "Metadata: The localised app subtitle",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       UI.user_error!(":subtitle must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
@@ -254,6 +265,13 @@ module Deliver
 
                                          UI.user_error!(":keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
                                        end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :promotional_text,
+                                     description: "Metadata: An array of localised promotional texts",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       UI.user_error!(":keywords must be a Hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
         FastlaneCore::ConfigItem.new(key: :release_notes,
                                      description: "Metadata: Localised release notes for this version",

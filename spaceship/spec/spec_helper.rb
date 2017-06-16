@@ -4,7 +4,6 @@ require_relative 'client_stubbing'
 require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
-
 # Ensure that no ENV vars which interfere with testing are set
 #
 set_auth_vars = [
@@ -67,4 +66,16 @@ end
 
 def after_each_spaceship
   @cache_paths.each { |path| try_delete path }
+end
+
+RSpec.configure do |config|
+  def mock_client_response(method_name, with: anything)
+    mock_method = allow(mock_client).to receive(method_name)
+    mock_method = mock_method.with(with)
+    if block_given?
+      mock_method.and_return(JSON.parse(yield.to_json))
+    else
+      mock_method
+    end
+  end
 end

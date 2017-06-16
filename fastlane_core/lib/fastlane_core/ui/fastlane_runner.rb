@@ -15,6 +15,9 @@ module Commander
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
+
+    attr_accessor :collector
+
     def run!
       require_program :version, :description
       trap('INT') { abort program(:int_message) } if program(:int_message)
@@ -31,23 +34,16 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
-      collector = FastlaneCore::ToolCollector.new
-
       begin
         collector.did_launch_action(@program[:name])
-        # PILOT_MAINTENANCE Temporaroy `begin/rescue` block for pilot mainenance mode
-        begin
-          run_active_command
-        rescue => e
-          raise e unless @program[:name] == 'pilot'
-          raise_pilot_maintenance_mode_exception!(e)
-        end
+        run_active_command
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
         if FastlaneCore::Helper.test?
           raise e
         else
+          FastlaneCore::CrashReporter.report_crash(exception: e)
           abort "#{e}. Use --help for more information"
         end
       rescue Interrupt => e
@@ -66,56 +62,73 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          abort e.to_s
+          FastlaneCore::CrashReporter.report_crash(exception: e)
+          if self.active_command.name == "help" && @default_command == :help # need to access directly via @
+            # This is a special case, for example for pilot
+            # when the user runs `fastlane pilot -u user@google.com`
+            # This would be confusing, as the user probably wanted to use `pilot list`
+            # or some other command. Because `-u` isn't available for the `pilot --help`
+            # command it would show this very confusing error message otherwise
+            abort "Please ensure to use one of the available commands (#{self.commands.keys.join(', ')})".red
+          else
+            # This would print something like
+            #
+            #   invalid option: -u
+            #
+            abort e.to_s
+          end
         end
-      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        collector.did_raise_error(@program[:name])
-        show_github_issues(e.message) if e.show_github_issues
-        display_user_error!(e, e.message)
-      rescue Errno::ENOENT => e
-        # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
-        puts ""
-        FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
-        FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
-        puts ""
-        raise e
-      rescue FastlaneCore::Interface::FastlaneTestFailure => e # test_failure!
+      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
         display_user_error!(e, e.to_s)
+      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+        rescue_fastlane_error(e)
+      rescue Errno::ENOENT => e
+        rescue_file_error(e)
       rescue Faraday::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
-        if e.message.include? 'Connection reset by peer - SSL_connect'
-          handle_tls_error!(e)
-        else
-          handle_unknown_error!(e)
-        end
+        rescue_connection_failed_error(e)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        collector.did_crash(@program[:name])
-        handle_unknown_error!(e)
+        rescue_unknown_error(e)
       ensure
         collector.did_finish
       end
     end
 
-    # PILOT_MAINTENANCE Remove after pilot migration is done
-    def raise_pilot_maintenance_mode_exception!(e)
-      FastlaneCore::UI.important("-------------")
-      FastlaneCore::UI.important("pilot crashed")
-      FastlaneCore::UI.important("-------------")
-      FastlaneCore::UI.error("Unfortunately the TestFlight update from 11th April 2017 changed")
-      FastlaneCore::UI.error("the way Testers, Groups and Builds are managed on iTunes connect.")
-      FastlaneCore::UI.error("We're busy working on migrating _pilot_ to work with the new system")
-      FastlaneCore::UI.error("however it requires lots of changes and refactors from our side")
-      FastlaneCore::UI.error("to ensure that everything keeps working for you as it did before")
-      FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Please follow the WIP pull request on GitHub to stay up to date: https://github.com/fastlane/fastlane/pull/8871")
-      FastlaneCore::UI.error("")
-      FastlaneCore::UI.error("Original error message: #{e}")
-      if FastlaneCore::Globals.verbose?
-        raise e # on verbose mode, we want to show the original stack trace
+    def collector
+      @collector ||= FastlaneCore::ToolCollector.new
+    end
+
+    def rescue_file_error(e)
+      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
+      puts ""
+      FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
+      FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
+      puts ""
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+      raise e
+    end
+
+    def rescue_connection_failed_error(e)
+      if e.message.include? 'Connection reset by peer - SSL_connect'
+        handle_tls_error!(e)
       else
-        FastlaneCore::UI.user_error!("pilot doesn't work with the latest TestFlight yet, we're busy working on upgrading it!")
+        FastlaneCore::CrashReporter.report_crash(exception: e)
+        handle_unknown_error!(e)
       end
+    end
+
+    def rescue_unknown_error(e)
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+      collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
+      handle_unknown_error!(e)
+    end
+
+    def rescue_fastlane_error(e)
+      collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
+      show_github_issues(e.message) if e.show_github_issues
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+      display_user_error!(e, e.message)
     end
 
     def handle_tls_error!(e)

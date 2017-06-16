@@ -66,18 +66,32 @@ module Produce
                                      is_string: false,
                                      default_value: false),
 
+        # Deprecating this in favor of a rename from "enabled_features" to "enable_services"
         FastlaneCore::ConfigItem.new(key: :enabled_features,
-                                     short_option: "-P",
+                                     deprecated: "Please use `enable_services` instead",
+                                     display_in_shell: false,
                                      env_name: "PRODUCE_ENABLED_FEATURES",
-                                     description: "Array with Spaceship App Features",
+                                     description: "Array with Spaceship App Services",
                                      is_string: false,
                                      default_value: {},
                                      verify_block: proc do |value|
-                                                     allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :health_kit, :home_kit,
-                                                                     :wireless_accessory, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :siri_kit, :vpn_configuration]
+                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
                                                      UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
                                                      value.each do |key, v|
                                                        UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                     end
+                                                   end),
+        FastlaneCore::ConfigItem.new(key: :enable_services,
+                                     display_in_shell: false,
+                                     env_name: "PRODUCE_ENABLE_SERVICES",
+                                     description: "Array with Spaceship App Services (e.g. #{allowed_services_description})",
+                                     is_string: false,
+                                     default_value: {},
+                                     verify_block: proc do |value|
+                                                     allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
+                                                     UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
+                                                     value.each do |key, v|
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
                                                      end
                                                    end),
 
@@ -125,6 +139,12 @@ module Produce
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end)
       ]
+    end
+
+    def self.allowed_services_description
+      return Produce::DeveloperCenter::ALLOWED_SERVICES.map do |k, v|
+        "#{k}: (#{v.join('|')})"
+      end.join(", ")
     end
   end
 end

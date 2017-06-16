@@ -24,6 +24,11 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # @return true if it is enabled to execute external commands
+    def self.sh_enabled?
+      !self.test?
+    end
+
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
@@ -118,11 +123,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
@@ -208,9 +208,16 @@ module FastlaneCore
         keychain_paths << "#{location}.keychain"
       end
 
-      keychain_path = keychain_paths.find { |path| File.exist?(path) }
+      keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
+    end
+
+    # @return true if XCode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable
@@ -231,6 +238,11 @@ module FastlaneCore
     def self.fastlane_enabled?
       # This is called from the root context on the first start
       @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
+    end
+
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
     end
 
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead

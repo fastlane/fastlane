@@ -35,21 +35,40 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, poll_interval: config[:wait_processing_interval])
 
-      distribute(options, latest_build)
+      distribute(options, build: latest_build)
     end
 
-    def distribute(options, build)
+    def distribute(options, build: nil)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      unless config[:update_build_info_on_upload]
-        if should_update_build_information(options)
-          build.update_build_information!(whats_new: options[:changelog], description: options[:beta_app_description], feedback_email: options[:beta_app_feedback_email])
-          UI.success "Successfully set the changelog and/or description for build"
+      build ||= Spaceship::TestFlight::Build.latest(app_id: app.apple_id, platform: fetch_app_platform)
+      if build.nil?
+        UI.user_error!("No build to distribute!")
+      end
+
+      if should_update_app_test_information?(options)
+        app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
+        app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
+        app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
+        begin
+          app_test_info.save_for_app!(app_id: build.app_id)
+          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
+        rescue => ex
+          UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
+        end
+      end
+
+      if should_update_build_information?(options)
+        begin
+          build.update_build_information!(whats_new: options[:changelog])
+          UI.success "Successfully set the changelog for build"
+        rescue => ex
+          UI.user_error!("Could not set changelog: #{ex}")
         end
       end
 
@@ -101,8 +120,12 @@ module Pilot
       return row
     end
 
-    def should_update_build_information(options)
-      options[:changelog].to_s.length > 0 or options[:beta_app_description].to_s.length > 0 or options[:beta_app_feedback_email].to_s.length > 0
+    def should_update_build_information?(options)
+      options[:changelog].to_s.length > 0
+    end
+
+    def should_update_app_test_information?(options)
+      options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
     end
 
     def distribute_build(uploaded_build, options)
@@ -110,10 +133,10 @@ module Pilot
 
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build.export_compliance.encryption_updated = false
-      uploaded_build.beta_review_info.demo_account_required = false
-      uploaded_build.submit_for_testflight_review!
 
       if options[:distribute_external]
+        uploaded_build.beta_review_info.demo_account_required = false
+        uploaded_build.submit_for_testflight_review!
         external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
         uploaded_build.add_group!(external_group) unless external_group.nil?
 
@@ -121,14 +144,18 @@ module Pilot
           UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
         end
 
-      end
-
-      if options[:groups]
-        groups = Group.filter_groups(app_id: uploaded_build.app_id) do |group|
-          options[:groups].include?(group.name)
+        if options[:groups]
+          groups = Spaceship::TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
+            options[:groups].include?(group.name)
+          end
+          groups.each do |group|
+            uploaded_build.add_group!(group)
+          end
         end
-        groups.each do |group|
-          uploaded_build.add_group!(group)
+      else # distribute internally
+        # in case any changes to export_compliance are required
+        if uploaded_build.export_compliance_missing?
+          uploaded_build.save!
         end
       end
 

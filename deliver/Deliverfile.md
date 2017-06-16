@@ -71,6 +71,29 @@ Pass the price tier as number. This will be active from the current day.
 ```ruby
 price_tier 0
 ```
+##### trade_representative_contact_information
+Trade Representative Contact information for Korean App Store. Available options: `first_name`, `last_name`, `address_line1`, `address_line2`, `address_line3`, `city_name`, `state`, `country`, `postal_code`, `phone_number`, `email_address`, `is_displayed_on_app_store`.
+
+
+```ruby
+trade_representative_contact_information(
+  first_name: "Felix",
+  last_name: "Krause",
+  address_line1: "1 Infinite Loop",
+  address_line2: "",
+  address_line3: null,
+  city_name: "Cupertino",
+  state: "California",
+  country: "United States",
+  postal_code: "95014",
+  phone_number: "+43 123123123",
+  email_address: "github@krausefx.com",
+)
+```
+
+You can also provide these values by creating files in a `metadata/trade_representative_contact_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `address_line1.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
+
+`is_displayed_on_app_store` is the option on iTunes Connect described as: `Display Trade Representative Contact Information on the Korean App Store`
 
 ##### app_review_information
 Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. 
@@ -137,6 +160,17 @@ description({
 ##### name
 The title/name of the app
 
+##### subtitle
+
+Localised subtitle of the app
+
+```ruby
+subtitle(
+  "en-US" => "Awesome English subtitle here",
+  "de-DE" => "Jetzt mit deutschen Untertiteln!"
+)
+```
+
 ##### description
 The description of the app
 
@@ -156,6 +190,17 @@ keywords(
 )
 ```
 
+##### promotional_text
+
+Localised promotional text
+
+```ruby
+promotional_text(
+  "en-US" => "Hey, you should totally buy our app, it's the best",
+  "de-DE" => "App kaufen bitte"
+)
+```
+
 ##### app_icon
 A path to a new app icon, which must be exactly 1024x1024px
 ```ruby
@@ -167,6 +212,21 @@ A path to a new app icon for the  Watch, which must be exactly 1024x1024px
 ```ruby
 apple_watch_app_icon './AppleWatchAppIcon.png'
 ```
+
+##### platform
+
+The platform of your application (a.e. ios, osx). 
+
+This option is optional. The default value is "ios" and deliver should be able to figure out the platform from your binary.
+
+However, in the case if multiple binaries present, you can specify a platform which you want to deliver explicitly.
+
+The available options: 
+
+- 'ios'
+- 'appletvos'
+- 'osx'
+
 
 ### Non-Localised
 

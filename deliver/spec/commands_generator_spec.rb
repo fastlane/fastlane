@@ -195,12 +195,13 @@ describe Deliver::CommandsGenerator do
 
   describe ":download_metadata option handling" do
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['download_metadata', '--description', 'My description', '--app_identifier', 'abcd', '-m', 'metadata/path'])
+      stub_commander_runner_args(['download_metadata', '--description', 'My description', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
         description: 'My description',
         app_identifier: 'abcd',
-        metadata_path: 'metadata/path'
+        metadata_path: 'metadata/path',
+        force: true
       })
 
       fake_app = "fake_app"
@@ -219,9 +220,39 @@ describe Deliver::CommandsGenerator do
         expect(metadata_path).to eq('metadata/path')
       end
 
-      # ENV var is needed to prevent user prompting for confirmation
-      with_env_values('DELIVER_FORCE_OVERWRITE' => '1') do
-        Deliver::CommandsGenerator.start
+      Deliver::CommandsGenerator.start
+    end
+
+    describe "force overwriting metadata" do
+      it "forces overwriting metadata if force is set" do
+        options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
+          force: true
+        })
+        expect(Deliver::CommandsGenerator.force_overwrite_metadata?(options, "an/ignored/path")).to be_truthy
+      end
+
+      it "forces overwriting metadata if DELIVER_FORCE_OVERWRITE is set" do
+        with_env_values('DELIVER_FORCE_OVERWRITE' => '1') do
+          expect(Deliver::CommandsGenerator.force_overwrite_metadata?({}, "an/ignored/path")).to be_truthy
+        end
+      end
+
+      it "fails forcing overwriting metadata if DELIVER_FORCE_OVERWRITE isn't set, force isn't set and user answers no in interactive mode" do
+        options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
+          force: false
+        })
+        expect(UI).to receive(:interactive?).and_return(true)
+        expect(UI).to receive(:confirm).and_return(false)
+        expect(Deliver::CommandsGenerator.force_overwrite_metadata?(options, "an/ignored/path")).to be_falsy
+      end
+
+      it "forces overwriting metadata if DELIVER_FORCE_OVERWRITE isn't set, force isn't set and user answers yes in interactive mode" do
+        options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
+          force: false
+        })
+        expect(UI).to receive(:interactive?).and_return(true)
+        expect(UI).to receive(:confirm).and_return(true)
+        expect(Deliver::CommandsGenerator.force_overwrite_metadata?(options, "an/ignored/path")).to be_truthy
       end
     end
   end

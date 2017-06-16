@@ -70,6 +70,43 @@ module Spaceship
         return parsed_versions
       end
 
+      # transforms user-set versions to iTC ones
+      def versions=(value = {})
+        if value.kind_of?(Array)
+          # input that comes from iTC api
+          return
+        end
+        new_versions = []
+        value.each do |language, current_version|
+          new_versions << {
+            "value" =>   {
+              "name" =>  { "value" => current_version[:name] },
+              "description" =>  { "value" => current_version[:description] },
+              "localeCode" =>  language.to_s
+            }
+          }
+        end
+
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, contentHosting: raw_data['versions'].first['contentHosting'], "details" => { "value" => new_versions }, "id" => raw_data["versions"].first["id"] }])
+      end
+
+      # transforms user-set intervals to iTC ones
+      def pricing_intervals=(value = [])
+        new_intervals = []
+        value.each do |current_interval|
+          new_intervals << {
+            "value" =>   {
+              "tierStem" =>  current_interval[:tier],
+              "priceTierEndDate" =>  current_interval[:end_date],
+              "priceTierEffectiveDate" =>  current_interval[:begin_date],
+              "grandfathered" =>  current_interval[:grandfathered],
+              "country" => current_interval[:country]
+            }
+          }
+        end
+        raw_data.set(["pricingIntervals"], new_intervals)
+      end
+
       # @return (Array) pricing intervals
       # @example:
       #  [
@@ -81,9 +118,8 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        parsed_intervals = []
-        raw_data["pricingIntervals"].each do |interval|
-          parsed_intervals << {
+        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
+          {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
             end_date: interval["value"]["priceTierEndDate"],
@@ -91,7 +127,6 @@ module Spaceship
             country: interval["value"]["country"]
           }
         end
-        return parsed_intervals
       end
 
       # @return (String) Human Readable type of the purchase
@@ -110,26 +145,26 @@ module Spaceship
         versions_array = []
         versions.each do |language, value|
           versions_array << {
-                    value: {
-                      description: { value: value[:description] },
-                      name: { value: value[:name] },
-                      localeCode: language.to_s
+                    "value" =>  {
+                      "description" => { "value" => value[:description] },
+                      "name" => { "value" => value[:name] },
+                      "localeCode" => language.to_s
                     }
           }
         end
 
-        raw_data.set(["versions"], [{ reviewNotes: @review_notes, details: { value: versions_array } }])
+        raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, contentHosting: raw_data['versions'].first[:contentHosting], "details" => { "value" => versions_array }, id: raw_data["versions"].first["id"] }])
 
         # transform pricingDetails
         intervals_array = []
         pricing_intervals.each do |interval|
           intervals_array << {
-            value: {
-              tierStem: interval[:tier],
-              priceTierEffectiveDate: interval[:begin_date],
-              priceTierEndDate: interval[:end_date],
-              country: interval[:country] || "WW",
-              grandfathered: interval[:grandfathered]
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
             }
           }
         end
@@ -179,6 +214,52 @@ module Spaceship
       # Deletes In-App-Purchase
       def delete!
         client.delete_iap!(app_id: application.apple_id, purchase_id: self.purchase_id)
+      end
+
+      # Retrieves the actual prices for an iap.
+      #
+      # @return ([]) An empty array
+      #   if the iap is not yet cleared for sale
+      # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same pricing tier
+      #   if the iap uses world wide pricing
+      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multple subscription pricing tiers
+      #   if the iap uses territorial pricing
+      def pricing_info
+        return [] unless cleared_for_sale
+        return world_wide_pricing_info if world_wide_pricing?
+        territorial_pricing_info
+      end
+
+      private
+
+      # Checks wheather an iap uses world wide or territorial pricing.
+      #
+      # @return (true, false)
+      def world_wide_pricing?
+        pricing_intervals.fetch(0, {})[:country] == "WW"
+      end
+
+      # Maps a single pricing interval to pricing infos.
+      #
+      # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same tier
+      def world_wide_pricing_info
+        client
+          .pricing_tiers
+          .find { |p| p.tier_stem == pricing_intervals.first[:tier].to_s }
+          .pricing_info
+      end
+
+      # Maps pricing intervals to their respective subscription pricing infos.
+      #
+      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of subscription pricing infos
+      def territorial_pricing_info
+        pricing_matrix = client.subscription_pricing_tiers(application.apple_id)
+        pricing_intervals.map do |interval|
+          pricing_matrix
+            .find { |p| p.tier_stem == interval[:tier].to_s }
+            .pricing_info
+            .find { |i| i.country_code == interval[:country] }
+        end
       end
     end
   end

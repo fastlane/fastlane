@@ -259,24 +259,20 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_junit,
                                      env_name: "XCPRETTY_REPORT_JUNIT",
                                      description: "Have xcpretty create a JUnit-style XML report at the provided path",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_html,
                                      env_name: "XCPRETTY_REPORT_HTML",
                                      description: "Have xcpretty create a simple HTML report at the provided path",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_json,
                                      env_name: "XCPRETTY_REPORT_JSON",
                                      description: "Have xcpretty create a JSON compilation database at the provided path",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in culprits.txt file",
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",

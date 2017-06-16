@@ -193,5 +193,29 @@ describe Gym do
                              ])
       end
     end
+
+    describe "Analyze Build Time Example" do
+      it "uses the correct build command with the example project" do
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: true, scheme: 'Example' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\"",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "| xcpretty"
+                             ])
+      end
+    end
   end
 end

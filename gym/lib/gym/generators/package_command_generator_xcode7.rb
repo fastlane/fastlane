@@ -10,6 +10,8 @@ module Gym
   # Responsible for building the fully working xcodebuild command
   class PackageCommandGeneratorXcode7
     class << self
+      DEFAULT_EXPORT_METHOD = "app-store"
+
       def generate
         print_legacy_information
 
@@ -134,14 +136,14 @@ module Gym
           end
 
           # Saves configuration for later use
-          Gym.config[:export_method] ||= hash[:method]
+          Gym.config[:export_method] ||= hash[:method] || DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = hash[:uploadSymbols] if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = hash[:uploadBitcode] if Gym.config[:include_bitcode].nil?
           Gym.config[:export_team_id] ||= hash[:teamID]
         else
           hash = {}
           # Sets default values
-          Gym.config[:export_method] ||= "app-store"
+          Gym.config[:export_method] ||= DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = true if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = false if Gym.config[:include_bitcode].nil?
         end

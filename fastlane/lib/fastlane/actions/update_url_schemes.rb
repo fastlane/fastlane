@@ -9,7 +9,7 @@ module Fastlane
 
         hash = Plist.parse_xml(path)
         hash['CFBundleURLTypes'].first['CFBundleURLSchemes'] = url_schemes
-        File.write(path, hash.to_plist)
+        File.write(path, Plist::Emit.dump(hash))
       end
 
       def self.description
