@@ -70,8 +70,8 @@ module Fastlane
 
         def details
           "Calls any Github API endpoint. You must provide your GitHub Personal token (get one from https://github.com/settings/tokens/new).
-        Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.
-        Documentation: https://developer.github.com/v3"
+          Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.
+          Documentation: https://developer.github.com/v3"
         end
 
         def available_options
