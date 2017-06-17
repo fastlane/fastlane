@@ -8,7 +8,7 @@ module Fastlane
         plugins = fetch_plugins.sort_by { |v| v.data[:overall_score] }.reverse
 
 
-        result = "# Available Plugins\n"
+        result = "# Available Plugins\n\n\n"
         result += plugins.collect do |current_plugin|
           @plugin = current_plugin
           result = ERB.new(File.read(params[:template_path]), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
