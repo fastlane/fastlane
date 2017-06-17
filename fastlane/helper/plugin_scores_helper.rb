@@ -42,8 +42,8 @@ module Fastlane
             has_info: self.info.to_s.length > 5,
             downloads: self.downloads,
             has_github_page: has_github_page,
-            mit_license: includes_license?("MIT"),
-            gnu_license: includes_license?("GNU") || includes_license?("GPL"),
+            has_mit_license: includes_license?("MIT"),
+            has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
             major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0")
           }
 
@@ -79,9 +79,9 @@ module Fastlane
             FastlanePluginRating.new(key: :forks,
                              description: "More forks = more people seem to use/modify this project",
                                    value: self.data[:github_forks].to_i * 5),
-            FastlanePluginRating.new(key: :mit_license,
+            FastlanePluginRating.new(key: :has_mit_license,
                              description: "fastlane is MIT licensed, it's good to have plugins use MIT too",
-                                   value: (self.data[:mit_license] ? 20 : -50)),
+                                   value: (self.data[:has_mit_license] ? 20 : -50)),
             FastlanePluginRating.new(key: :readme_score,
                              description: "How well is the README of the document written",
                                    value: self.data[:readme_score].to_i / 2),
