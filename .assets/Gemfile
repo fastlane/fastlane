@@ -2,4 +2,4 @@
 
 source "https://rubygems.org"
 
-gemspec path: File.expand_path("/Users/colinmcd94/Projects/fastlane")
+gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")
