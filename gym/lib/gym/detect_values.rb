@@ -65,22 +65,56 @@ module Gym
 
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
+    # rubocop:disable Style/MultilineBlockChain
     def self.detect_selected_provisioning_profiles
       return if Gym.config[:export_options] && Gym.config[:export_options][:provisioningProfiles]
 
       require 'xcodeproj'
 
       provisioning_profile_mapping = {}
-      project = Xcodeproj::Project.open(Gym.project.path)
-      project.targets.each do |target|
-        target.build_configuration_list.build_configurations.each do |build_configuration|
-          current = build_configuration.build_settings
 
-          bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
-          provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
-          next if provisioning_profile_specifier.to_s.length == 0
+      # Find the xcodeproj file, as the information isn't included in the workspace file
+      if Gym.project.workspace?
+        # We have a reference to the workspace, let's find the xcodeproj file
+        # For some reason the `plist` gem can't parse the content file
+        # so we'll use a regex to find all group references
 
-          provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+        workspace_data_path = File.join(Gym.project.path, "contents.xcworkspacedata")
+        workspace_data = File.read(workspace_data_path)
+        project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
+          # It's a relative path from the workspace file
+          File.join(File.expand_path("..", Gym.project.path), current_match.first)
+        end.find_all do |current_match|
+          !current_match.end_with?("Pods/Pods.xcodeproj")
+        end
+      else
+        project_paths = [Gym.project.path]
+      end
+
+      # Because there might be multiple projects inside a workspace
+      # we iterate over all of them (except for CocoaPods)
+      project_paths.each do |project_path|
+        UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
+        begin
+          project = Xcodeproj::Project.open(project_path)
+          project.targets.each do |target|
+            target.build_configuration_list.build_configurations.each do |build_configuration|
+              current = build_configuration.build_settings
+
+              bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
+              provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
+              next if provisioning_profile_specifier.to_s.length == 0
+
+              provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+            end
+          end
+        rescue => ex
+          # We catch errors here, as we might run into an exception on one included project
+          # But maybe the next project actually contains the information we need
+          if Helper.xcode_at_least?("9.0")
+            UI.error(ex)
+            UI.verbose(ex.backtrace.join("\n"))
+          end
         end
       end
 
@@ -100,6 +134,7 @@ module Gym
         UI.verbose(ex.backtrace.join("\n"))
       end
     end
+    # rubocop:enable Style/MultilineBlockChain
 
     def self.detect_provisioning_profile
       if Gym.config[:provisioning_profile_path].nil?
