@@ -86,6 +86,17 @@ module Fastlane
       nil
     end
 
+    # Get the hash of the last commit
+    def self.last_git_commit_hash(short)
+      if short
+        s = last_git_commit_formatted_with('%h')
+      else
+        s = last_git_commit_formatted_with('%H')
+      end
+      return s if s.to_s.length > 0
+      return nil
+    end
+
     # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
       return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
