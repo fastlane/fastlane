@@ -48,7 +48,19 @@ module Deliver
       precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
       Precheck.config = precheck_config
 
-      return Precheck::Runner.new.run
+      precheck_success = true
+      begin
+        precheck_success = Precheck::Runner.new.run
+      rescue => ex
+        UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finished. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
+        UI.verbose(ex.inspect)
+        UI.verbose(ex.backtrace.join("\n"))
+
+        # always report this back, since this is a new tool, we don't want to crash, but we still want to see this
+        FastlaneCore::CrashReporter.report_crash(exception: ex)
+      end
+
+      return precheck_success
     end
 
     # Make sure the version on iTunes Connect matches the one in the ipa
