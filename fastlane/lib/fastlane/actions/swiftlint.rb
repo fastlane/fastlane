@@ -11,7 +11,7 @@ module Fastlane
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
-        command = params[:executable].nil? ? "swiftlint" : params[:executable]
+        command = params[:executable].nil? ? "swiftlint" : params[:executable].dup
         command << " #{params[:mode]}"
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
