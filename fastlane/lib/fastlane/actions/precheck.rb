@@ -38,7 +38,7 @@ module Fastlane
       def self.example_code
         [
           'precheck(
-            apple_things(level: :skip), # Set to skip to not run the `apple_things` rule
+            negative_apple_sentiment(level: :skip), # Set to skip to not run the `negative_apple_sentiment` rule
             curse_words(level: :warn) # Set to warn to only warn on curse word check failures
           )'
         ]

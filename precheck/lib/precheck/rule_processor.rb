@@ -119,18 +119,20 @@ module Precheck
                      friendly_name_postfix: "support URL")
       items += collect_urls_from_hash(hash: app_version.marketing_url,
                                  item_name: :marketing_url,
-                     friendly_name_postfix: "marketing URL")
+                     friendly_name_postfix: "marketing URL",
+                               is_optional: true)
 
       items += collect_urls_from_hash(hash: app.details.privacy_url,
                                  item_name: :privacy_url,
-                     friendly_name_postfix: "privacy URL")
+                     friendly_name_postfix: "privacy URL",
+                               is_optional: true)
       return items
     end
 
-    def self.collect_urls_from_hash(hash: nil, item_name: nil, friendly_name_postfix: nil)
+    def self.collect_urls_from_hash(hash: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
       items = []
       hash.each do |key, value|
-        items << URLItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})")
+        items << URLItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})", is_optional)
       end
       return items
     end
@@ -167,15 +169,16 @@ module Precheck
 
       items += collect_text_items_from_language_item(hash: app.details.subtitle,
                                                 item_name: :app_subtitle,
-                                    friendly_name_postfix: "app name subtitle")
+                                    friendly_name_postfix: "app name subtitle",
+                                              is_optional: true)
       return items
     end
 
     #   # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
-    def self.collect_text_items_from_language_item(hash: nil, item_name: nil, friendly_name_postfix: nil)
+    def self.collect_text_items_from_language_item(hash: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
       items = []
       hash.each do |key, value|
-        items << TextItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})")
+        items << TextItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})", is_optional)
       end
       return items
     end

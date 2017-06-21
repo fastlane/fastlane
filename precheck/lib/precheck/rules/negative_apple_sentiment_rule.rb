@@ -2,13 +2,13 @@ require 'precheck/rule'
 require 'precheck/rules/abstract_text_match_rule'
 
 module Precheck
-  class AppleThingsRule < AbstractTextMatchRule
+  class NegativeAppleSentimentRule < AbstractTextMatchRule
     def self.key
-      :apple_things
+      :negative_apple_sentiment
     end
 
     def self.env_name
-      "RULE_APPLE_THINGS"
+      "RULE_NEGATIVE_APPLE_SENTIMENT"
     end
 
     def self.friendly_name
