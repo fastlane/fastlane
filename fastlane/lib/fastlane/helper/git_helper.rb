@@ -88,12 +88,9 @@ module Fastlane
 
     # Get the hash of the last commit
     def self.last_git_commit_hash(short)
-      if short
-        s = last_git_commit_formatted_with('%h')
-      else
-        s = last_git_commit_formatted_with('%H')
-      end
-      return s if s.to_s.length > 0
+      format_specifier = short ? '%h' : '%H'
+      string = last_git_commit_formatted_with(format_specifier).to_s
+      return string unless string.empty?
       return nil
     end
 

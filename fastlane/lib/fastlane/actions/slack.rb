@@ -230,7 +230,7 @@ module Fastlane
         if Actions.last_git_commit_hash(true) && should_add_payload[:last_git_commit_hash]
           slack_attachment[:fields] << {
             title: 'Git Commit Hash',
-            value: Actions.last_git_commit_hash(true),
+            value: Actions.last_git_commit_hash(short: true),
             short: false
           }
         end
