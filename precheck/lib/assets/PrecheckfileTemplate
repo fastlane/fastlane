@@ -17,7 +17,7 @@
 # when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after precheck finishes
 
 # Examples:
-# apple_things(level: :skip)
+# negative_apple_sentiment(level: :skip)
 # curse_words(level: :warn)
 # future_functionality(level: :error)
 # other_platforms(level: :error)

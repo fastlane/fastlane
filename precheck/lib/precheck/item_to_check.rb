@@ -5,10 +5,12 @@ module Precheck
   class ItemToCheck
     attr_accessor :item_name
     attr_accessor :friendly_name
+    attr_accessor :is_optional
 
-    def initialize(item_name, friendly_name)
+    def initialize(item_name, friendly_name, is_optional = false)
       @item_name = item_name
       @friendly_name = friendly_name
+      @is_optional = is_optional
     end
 
     def item_data
@@ -29,9 +31,9 @@ module Precheck
   class TextItemToCheck < ItemToCheck
     attr_accessor :text
 
-    def initialize(text, item_name, friendly_name)
+    def initialize(text, item_name, friendly_name, is_optional = false)
       @text = text
-      super(item_name, friendly_name)
+      super(item_name, friendly_name, is_optional)
     end
 
     def item_data
@@ -44,9 +46,9 @@ module Precheck
   class URLItemToCheck < ItemToCheck
     attr_accessor :url
 
-    def initialize(url, item_name, friendly_name)
+    def initialize(url, item_name, friendly_name, is_optional = false)
       @url = url
-      super(item_name, friendly_name)
+      super(item_name, friendly_name, is_optional)
     end
 
     def item_data

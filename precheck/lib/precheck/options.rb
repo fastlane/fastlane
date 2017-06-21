@@ -6,7 +6,7 @@ module Precheck
   class Options
     def self.rules
       [
-        AppleThingsRule,
+        NegativeAppleSentimentRule,
         PlaceholderWordsRule,
         OtherPlatformsRule,
         FutureFunctionalityRule,

@@ -12,6 +12,7 @@ module Deliver
     end
 
     def login
+      UI.message("Running precheck before submitting to review, if you'd like to disable this check you can set run_precheck_before_submit to false") unless options[:run_precheck_before_submit] == false
       UI.message("Login to iTunes Connect (#{options[:username]})")
       Spaceship::Tunes.login(options[:username])
       Spaceship::Tunes.select_team
@@ -36,7 +37,7 @@ module Deliver
 
     # Make sure we pass precheck before uploading
     def precheck_app
-      return true unless options[:only_submit_on_precheck_success]
+      return true unless options[:run_precheck_before_submit]
 
       if options[:submit_for_review]
         UI.message("Making sure we pass precheck 👮‍♀️ 👮 before we submit  🛫")

@@ -140,6 +140,12 @@ module Precheck
     end
 
     def perform_check(item: nil)
+      if item.item_data.to_s == "" && item.is_optional
+        # item is optional, and empty, so that's totally fine
+        check_result = RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:passed])
+        return RuleCheckResult.new(item, check_result, self)
+      end
+
       check_result = self.rule_block.call(item.item_data)
       return RuleCheckResult.new(item, check_result, self)
     end
