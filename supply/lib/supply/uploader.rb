@@ -139,18 +139,18 @@ module Supply
         apk_version_code = client.upload_apk(apk_path)
         UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
-        if Supply::config[:obb_main_references_version] && Supply::config[:obb_main_file_size]
+        if Supply.config[:obb_main_references_version] && Supply.config[:obb_main_file_size]
           update_obb(apk_version_code,
                      'main',
-                     Supply::config[:obb_main_references_version],
-                     Supply::config[:obb_main_file_size])
+                     Supply.config[:obb_main_references_version],
+                     Supply.config[:obb_main_file_size])
         end
 
-        if Supply::config[:obb_patch_references_version] && Supply::config[:obb_patch_file_size]
+        if Supply.config[:obb_patch_references_version] && Supply.config[:obb_patch_file_size]
           update_obb(apk_version_code,
                      'patch',
-                     Supply::config[:obb_patch_references_version],
-                     Supply::config[:obb_patch_file_size])
+                     Supply.config[:obb_patch_references_version],
+                     Supply.config[:obb_patch_file_size])
         end
 
         upload_obbs(apk_path, apk_version_code)

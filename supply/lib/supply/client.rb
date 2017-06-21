@@ -345,13 +345,14 @@ module Supply
 
       call_google_api do
         android_publisher.update_edit_expansionfile(
-            current_package_name,
-            current_edit.id,
-            apk_version_code,
-            expansion_file_type,
-            Google::Apis::AndroidpublisherV2::ExpansionFile.new(
-                references_version: references_version,
-                file_size: file_size)
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+            references_version: references_version,
+            file_size: file_size
+          )
         )
       end
     end
