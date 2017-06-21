@@ -172,8 +172,28 @@ module Supply
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
-                                     end)
+                                     end),
 
+        FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
+                                     env_name: "OBB_MAIN_REFERENCES_VERSION",
+                                     description: "References version of 'main' expansion file",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_main_file_size,
+                                     env_name: "OBB_MAIN_FILE SIZE",
+                                     description: "Size of 'main' expansion file in bytes",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_patch_references_version,
+                                     env_name: "OBB_PATCH_REFERENCES_VERSION",
+                                     description: "References version of 'patch' expansion file",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_patch_file_size,
+                                     env_name: "OBB_PATCH_FILE SIZE",
+                                     description: "Size of 'patch' expansion file in bytes",
+                                     optional: true,
+                                     type: Numeric)
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

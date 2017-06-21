@@ -340,6 +340,22 @@ module Supply
       end
     end
 
+    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
+      ensure_active_edit!
+
+      call_google_api do
+        android_publisher.update_edit_expansionfile(
+            current_package_name,
+            current_edit.id,
+            apk_version_code,
+            expansion_file_type,
+            Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+                references_version: references_version,
+                file_size: file_size)
+        )
+      end
+    end
+
     def upload_obb(obb_file_path: nil, apk_version_code: nil, expansion_file_type: nil)
       ensure_active_edit!
 
