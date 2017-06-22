@@ -97,7 +97,7 @@ module Snapshot
         return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
       end
 
-      if Helper.xcode_at_least?("9") && activity["Attachments"]
+      if activity["Attachments"] && activity["Attachments"].last["Filename"]
         return activity["Attachments"].last["Filename"]
       elsif activity["Attachments"]
         return activity["Attachments"].last["FileName"]
