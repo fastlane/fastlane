@@ -17,7 +17,7 @@ module Deliver
     end
 
     def run
-      verify_version if options[:app_version].to_s.length > 0
+      verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
       upload_metadata
 
       has_binary = (options[:ipa] || options[:pkg])

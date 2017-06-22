@@ -208,7 +208,7 @@ module FastlaneCore
         keychain_paths << "#{location}.keychain"
       end
 
-      keychain_path = keychain_paths.find { |path| File.exist?(path) }
+      keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
     end
@@ -238,6 +238,11 @@ module FastlaneCore
     def self.fastlane_enabled?
       # This is called from the root context on the first start
       @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
+    end
+
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
     end
 
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead

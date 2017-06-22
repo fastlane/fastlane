@@ -38,6 +38,20 @@ Optional, as it is usually automatically detected. Specify the version that shou
 app_version "2.0"
 ```
 
+##### skip_app_version_update
+
+In the case if `deliver` uploads your application to iTunes Connect it will automatically update "Prepare for submission" app version (which could be found on iTunes Connect->My Apps->App Store page)
+
+The option allows uploading your app without updating "Prepare for submission" version. 
+
+This could be useful in the case if you are generating a lot of uploads while not submitting the latest build for Apple review.
+
+The default value is false.
+
+```ruby
+skip_app_version_update true
+```
+
 ##### submit_for_review
 
 Add this to your `Deliverfile` to automatically submit the app for review after uploading metadata/binary. This will select the latest build.
@@ -212,6 +226,21 @@ A path to a new app icon for the  Watch, which must be exactly 1024x1024px
 ```ruby
 apple_watch_app_icon './AppleWatchAppIcon.png'
 ```
+
+##### platform
+
+The platform of your application (a.e. ios, osx). 
+
+This option is optional. The default value is "ios" and deliver should be able to figure out the platform from your binary.
+
+However, in the case if multiple binaries present, you can specify a platform which you want to deliver explicitly.
+
+The available options: 
+
+- 'ios'
+- 'appletvos'
+- 'osx'
+
 
 ### Non-Localised
 

@@ -18,6 +18,10 @@ module Snapshot
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 
+      if Helper.xcode_at_least?("9")
+        UI.user_error!("snapshot currently doesn't work with Xcode 9, we're working on implementing the new screenshots API to offer the best experience 🚀\nYou can change the Xcode version to use using `sudo xcode-select -s /Applications/Xcode...app`")
+      end
+
       Snapshot.config[:output_directory] = File.expand_path(Snapshot.config[:output_directory])
 
       verify_helper_is_current

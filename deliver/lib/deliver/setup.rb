@@ -1,7 +1,9 @@
+require 'fastlane_core'
+
 module Deliver
   class Setup
     def run(options)
-      containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
       file_path = File.join(containing, 'Deliverfile')
       data = generate_deliver_file(containing, options)
       setup_deliver(file_path, data, containing, options)
