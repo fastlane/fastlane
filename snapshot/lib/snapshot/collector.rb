@@ -97,7 +97,7 @@ module Snapshot
         return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
       end
 
-      if activity["Attachments"] && activity["Attachments"].last["Filename"]
+      if activity["Attachments"] && activity["Attachments"].last && activity["Attachments"].last["Filename"]
         return activity["Attachments"].last["Filename"]
       elsif activity["Attachments"]
         return activity["Attachments"].last["FileName"]
