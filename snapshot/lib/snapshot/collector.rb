@@ -97,7 +97,9 @@ module Snapshot
         return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
       end
 
-      if activity["Attachments"]
+      if Helper.xcode_at_least?("9") && activity["Attachments"]
+        return activity["Attachments"].last["Filename"]
+      elsif activity["Attachments"]
         return activity["Attachments"].last["FileName"]
       else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
         return "Screenshot_#{activity['UUID']}.png"
