@@ -231,6 +231,7 @@ Style/FileName:
     - '**/Fastfile'
     - '**/Deliverfile'
     - '**/Snapfile'
+    - '**/*.gemspec'
 
 # We're not there yet
 Style/Documentation:
