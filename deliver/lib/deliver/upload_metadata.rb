@@ -121,7 +121,7 @@ module Deliver
       begin
         details.save!
         UI.success("Successfully uploaded set of metadata to iTunes Connect")
-      rescue Spaceship::ITunesConnectError => e
+      rescue Spaceship::TunesClient::ITunesConnectError => e
         # This makes sure that we log invalid app names as user errors
         # If another string needs to be checked here we should
         # figure out a more generic way to handle these cases.
