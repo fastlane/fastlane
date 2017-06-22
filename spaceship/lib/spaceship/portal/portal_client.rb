@@ -560,6 +560,57 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
+    #####################################################
+    # @!group Keys
+    #####################################################
+
+    def list_keys
+      paging do |page_number|
+        response = request(:post, 'account/auth/key/list', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(response, 'keys')
+      end
+    end
+
+    def get_key(id: nil)
+      response = request(:post, 'account/auth/key/get', {teamId: team_id, keyId: id})
+      parse_response(response, 'keys')
+    end
+
+    def download_key(id: nil)
+      response = request(:get, 'account/auth/key/download', {teamId: team_id, keyId: id})
+      parse_response(response)
+    end
+
+    def create_key!(name: nil, service_ids: nil)
+      configs = {}
+      service_ids.each do |sid|
+        configs[sid] = []
+      end
+
+      params = {
+        name: name,
+        serviceConfigurations: configs,
+        teamId: team_id,
+      }
+
+      response = request(:post, 'account/auth/key/create') do |req|
+        req.headers['Content-Type'] = 'application/json'
+        req.body = params.to_json
+      end
+
+      parse_response(response, 'keys')
+    end
+
+    def revoke_key!(id: nil)
+      response = request(:post, 'account/auth/key/revoke', {teamId: team_id, keyId: id})
+      parse_response(response)
+    end
+
     private
 
     # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
