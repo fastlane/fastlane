@@ -13,11 +13,15 @@ module Spaceship
       end
 
       def [](key)
-        get_lang(key)[identifier]['value']
+        get_value(key: key)
       end
 
       def []=(key, value)
         get_lang(key)[identifier]['value'] = value
+      end
+
+      def get_value(key: nil)
+        get_lang(key)[identifier]['value']
       end
 
       def get_lang(lang)

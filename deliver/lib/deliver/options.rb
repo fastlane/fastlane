@@ -185,6 +185,18 @@ module Deliver
                                      description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :run_precheck_before_submit,
+                                     short_option: "-x",
+                                     env_name: "DELIVER_RUN_PRECHECK_BEFORE_SUBMIT",
+                                     description: "Run precheck before submitting to app review",
+                                     is_string: false,
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :precheck_default_rule_level,
+                                     short_option: "-d",
+                                     env_name: "DELIVER_PRECHECK_DEFAULT_RULE_LEVEL",
+                                     description: "The default rule level unless otherwise configured",
+                                     is_string: false,
+                                     default_value: :warn),
 
         # App Metadata
         # Non Localised
