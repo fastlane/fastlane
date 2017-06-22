@@ -46,8 +46,8 @@ module Fastlane
               UI.error(ex)
               UI.verbose(ex.backtrace.join("\n"))
             end
+          end
         end
-
         absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
         absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
