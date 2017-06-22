@@ -28,6 +28,7 @@ module Fastlane
 
           input_format: '--input-format',
           scheme: '--scheme',
+          configuration: '--configuration',
           workspace: '--workspace',
           binary_file: '--binary-file',
           binary_basename: '--binary-basename',
@@ -52,7 +53,20 @@ module Fastlane
         File.file?('.slather.yml')
       end
 
+      def self.slather_version
+        require 'slather'
+        Slather::VERSION
+      end
+
+      def self.configuration_available?
+        Gem::Version.new('2.4.1') <= Gem::Version.new(slather_version)
+      end
+
       def self.validate_params!(params)
+        if params[:configuration]
+          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?
+        end
+
         if params[:proj] || has_config_file
           true
         else
@@ -120,6 +134,10 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_SLATHER_CONFIGURATION", # The name of the environment variable
+                                       description: "Configuration to use when calling slather (since slather-2.4.1)",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable

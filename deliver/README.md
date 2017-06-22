@@ -18,7 +18,8 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
 
 -------
@@ -32,7 +33,6 @@ deliver
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/deliver/LICENSE)
-[![Gem](https://img.shields.io/gem/v/deliver.svg?style=flat)](https://rubygems.org/gems/deliver)
 
 ###### Upload screenshots, metadata and your app to the App Store using a single command
 
@@ -62,6 +62,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
 - Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
 - Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
+- Automatically uses [precheck](https://github.com/fastlane/fastlane/tree/master/precheck) to ensure your app has the highest chances of passing app review the first time
 
 To upload builds to TestFlight check out [pilot](https://github.com/fastlane/fastlane/tree/master/pilot).
 
@@ -180,6 +181,8 @@ Before actually uploading anything to iTunes, ```deliver``` will generate a HTML
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
+
 
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 

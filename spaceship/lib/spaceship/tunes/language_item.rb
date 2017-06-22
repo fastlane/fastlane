@@ -13,11 +13,15 @@ module Spaceship
       end
 
       def [](key)
-        get_lang(key)[identifier]['value']
+        get_value(key: key)
       end
 
       def []=(key, value)
         get_lang(key)[identifier]['value'] = value
+      end
+
+      def get_value(key: nil)
+        get_lang(key)[identifier]['value']
       end
 
       def get_lang(lang)
@@ -31,7 +35,7 @@ module Spaceship
 
       # @return (Array) An array containing all languages that are already available
       def keys
-        self.original_array.collect { |l| l.fetch('language') }
+        return self.original_array.map { |current| current['language'] ||= current['localeCode'] } # Apple being consistent
       end
 
       # @return (Array) An array containing all languages that are already available
@@ -43,7 +47,7 @@ module Spaceship
       def inspect
         result = ""
         self.original_array.collect do |current|
-          result += "#{current.fetch('language')}: #{current.fetch(identifier, {}).fetch('value')}\n"
+          result += "#{current['language'] ||= current['localeCode']}: #{current.fetch(identifier, {}).fetch('value')}\n"
         end
         result
       end

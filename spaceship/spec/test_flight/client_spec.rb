@@ -47,10 +47,17 @@ describe Spaceship::TestFlight::Client do
     end
 
     it 'raises an exception on a HTTP error' do
-      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      response = double('Response', body: '<html>Server Error</html>', status: 400)
       expect do
         subject.handle_response(response)
       end.to raise_error(Spaceship::Client::UnexpectedResponse)
+    end
+
+    it 'raises an InternalServerError exception on a HTTP 500 error' do
+      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      expect do
+        subject.handle_response(response)
+      end.to raise_error(Spaceship::Client::InternalServerError)
     end
   end
 
@@ -123,7 +130,7 @@ describe Spaceship::TestFlight::Client do
     it 'executes the request' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
       subject.testers_for_app(app_id: app_id)
-      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers?limit=10000')
     end
   end
 
@@ -135,11 +142,11 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
-  context '#post_tester' do
+  context '#create_app_level_tester' do
     let(:tester) { double('Tester', email: 'fake@email.com', first_name: 'Fake', last_name: 'Name') }
     it 'executes the request' do
       MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
-      subject.post_tester(app_id: app_id, tester: tester)
+      subject.create_app_level_tester(app_id: app_id, first_name: tester.first_name, last_name: tester.last_name, email: tester.email)
       expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
     end
   end
@@ -161,14 +168,22 @@ describe Spaceship::TestFlight::Client do
   end
 
   ##
-  # @!group TestInfo
+  # @!group AppTestInfo
   ##
 
-  context '#put_testinfo' do
-    let(:testinfo) { double('TestInfo', to_json: '') }
+  context '#get_app_test_info' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo') {}
+      subject.get_app_test_info(app_id: app_id)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo')
+    end
+  end
+
+  context '#put_app_test_info' do
+    let(:app_test_info) { double('AppTestInfo', to_json: '') }
     it 'executes the request' do
       MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo') {}
-      subject.put_testinfo(app_id: app_id, testinfo: testinfo)
+      subject.put_app_test_info(app_id: app_id, app_test_info: app_test_info)
       expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testInfo')
     end
   end

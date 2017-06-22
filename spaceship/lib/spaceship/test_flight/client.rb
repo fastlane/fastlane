@@ -27,25 +27,12 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil)
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
       assert_required_params(__method__, binding)
-
-      response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
-      handle_response(response)
-    end
-
-    def testers_for_app(app_id: nil)
-      assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers"
-      response = request(:get, url)
-      handle_response(response)
-    end
-
-    def delete_tester_from_app(app_id: nil, tester_id: nil)
-      assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
-      response = request(:delete, url)
-      handle_response(response)
+      with_retry(retry_count) do
+        response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
+        handle_response(response)
+      end
     end
 
     ##
@@ -111,16 +98,36 @@ module Spaceship::TestFlight
     # @!group Testers API
     ##
 
-    def post_tester(app_id: nil, tester: nil)
+    def testers_for_app(app_id: nil)
       assert_required_params(__method__, binding)
+      url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
+      response = request(:get, url)
+      handle_response(response)
+    end
 
+    def delete_tester_from_app(app_id: nil, tester_id: nil)
+      assert_required_params(__method__, binding)
+      url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
+      response = request(:delete, url)
+      handle_response(response)
+    end
+
+    def resend_invite_to_external_tester(app_id: nil, tester_id: nil)
+      assert_required_params(__method__, binding)
+      url = "/testflight/v1/invites/#{app_id}/resend?testerId=#{tester_id}"
+      response = request(:post, url)
+      handle_response(response)
+    end
+
+    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
+      assert_required_params(__method__, binding)
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url
         req.body = {
-          "email" => tester.email,
-          "firstName" => tester.first_name,
-          "lastName" => tester.last_name
+          "email" => email,
+          "firstName" => first_name,
+          "lastName" => last_name
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -156,15 +163,22 @@ module Spaceship::TestFlight
     end
 
     ##
-    # @!group TestInfo
+    # @!group AppTestInfo
     ##
 
-    def put_testinfo(app_id: nil, testinfo: nil)
+    def get_app_test_info(app_id: nil)
+      assert_required_params(__method__, binding)
+
+      response = request(:get, "providers/#{team_id}/apps/#{app_id}/testInfo")
+      handle_response(response)
+    end
+
+    def put_app_test_info(app_id: nil, app_test_info: nil)
       assert_required_params(__method__, binding)
 
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/testInfo"
-        req.body = testinfo.to_json
+        req.body = app_test_info.to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_response(response)
@@ -176,6 +190,8 @@ module Spaceship::TestFlight
       if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
         return
       end
+
+      raise InternalServerError, "Server error got #{response.status}" if (500...600).cover?(response.status)
 
       unless response.body.kind_of?(Hash)
         raise UnexpectedResponse, response.body

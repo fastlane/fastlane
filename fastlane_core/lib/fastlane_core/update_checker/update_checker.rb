@@ -6,26 +6,35 @@ require 'fastlane_core/update_checker/changelog'
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
-    # This web service is fully open source: https://github.com/fastlane/refresher
-    UPDATE_URL = "https://refresher.fastlane.tools/"
-
     def self.start_looking_for_update(gem_name)
       return if Helper.is_test?
       return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
 
       @start_time = Time.now
 
-      url = generate_fetch_url(gem_name)
       Thread.new do
         begin
-          server_results[gem_name] = fetch_latest(url)
+          send_launch_analytic_events_for(gem_name)
         rescue
+          # we don't want to show a stack trace if something goes wrong
+        end
+      end
+
+      Thread.new do
+        begin
+          server_results[gem_name] = fetch_latest(gem_name)
+        rescue
+          # we don't want to show a stack trace if something goes wrong
         end
       end
     end
 
     def self.server_results
       @results ||= {}
+    end
+
+    class << self
+      attr_reader :start_time
     end
 
     def self.update_available?(gem_name, current_version)
@@ -36,7 +45,7 @@ module FastlaneCore
     def self.show_update_status(gem_name, current_version)
       fork do
         begin
-          finished_running(gem_name)
+          send_completion_events_for(gem_name)
         rescue
           # we don't want to show a stack trace if something goes wrong
         end
@@ -102,38 +111,12 @@ module FastlaneCore
       UI.command("gem sources --add https://rubygems.org")
     end
 
-    # Generate the URL on the main thread (since we're switching directory)
+    def self.fetch_latest(gem_name)
+      JSON.parse(Excon.get(generate_fetch_url(gem_name)).body)["version"]
+    end
+
     def self.generate_fetch_url(gem_name)
-      url = UPDATE_URL + gem_name
-      params = {}
-      params["ci"] = "1" if Helper.is_ci?
-
-      project_hash = p_hash(ARGV, gem_name)
-      params["p_hash"] = project_hash if project_hash
-      params["platform"] = @platform if @platform # this has to be called after `p_hash`
-
-      url += "?" + URI.encode_www_form(params) if params.count > 0
-      return url
-    end
-
-    def self.fetch_latest(url)
-      JSON.parse(Excon.post(url).body).fetch("version", nil)
-    end
-
-    def self.finished_running(gem_name)
-      return if ENV["FASTLANE_OPT_OUT_USAGE"]
-
-      time = (Time.now - @start_time).to_i
-      url = UPDATE_URL + "time/#{gem_name}"
-      url += "?time=#{time}"
-      url += "&ci=1" if Helper.ci?
-      url += "&gem=1" if Helper.rubygems?
-      url += "&bundler=1" if Helper.bundler?
-      url += "&mac_app=1" if Helper.mac_app?
-      url += "&standalone=1" if Helper.contained_fastlane?
-      url += "&homebrew=1" if Helper.homebrew?
-
-      Excon.post(url)
+      "https://rubygems.org/api/v1/gems/#{gem_name}.json"
     end
 
     # (optional) Returns the app identifier for the current tool
@@ -187,7 +170,7 @@ module FastlaneCore
     end
 
     # To not count the same projects multiple time for the number of launches
-    # More information: https://github.com/fastlane/refresher
+    # Learn more at https://github.com/fastlane/fastlane#metrics
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def self.p_hash(args, gem_name)
@@ -211,6 +194,167 @@ module FastlaneCore
       return nil
     rescue
       return nil
+    end
+
+    def self.send_launch_analytic_events_for(gem_name)
+      return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
+
+      ci = Helper.is_ci?.to_s
+      project_hash = p_hash(ARGV, gem_name)
+      p_hash = project_hash if project_hash
+      platform = @platform if @platform # this has to be called after `p_hash`
+
+      send_launch_analytic_events(p_hash, gem_name, platform, ci)
+    end
+
+    def self.send_launch_analytic_events(p_hash, tool, platform, ci)
+      timestamp_seconds = Time.now.to_i
+
+      analytics = []
+      analytics << event_for_p_hash(p_hash, tool, platform, timestamp_seconds) if p_hash
+      analytics << event_for_launch(tool, ci, timestamp_seconds)
+
+      send_events(analytics)
+    end
+
+    def self.event_for_p_hash(p_hash, tool, platform, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-refresher',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'project',
+          detail: p_hash
+        },
+        action: {
+          name: 'update_checked'
+        },
+        primary_target: {
+          name: 'tool',
+          detail: tool || 'unknown'
+        },
+        secondary_target: {
+          name: 'platform',
+          detail: platform || 'unknown'
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def self.event_for_launch(tool, ci, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-refresher',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'tool',
+          detail: tool || 'unknown'
+        },
+        action: {
+          name: 'launched'
+        },
+        primary_target: {
+          name: 'ci',
+          detail: ci
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def self.send_completion_events_for(gem_name)
+      return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
+
+      ci = Helper.is_ci?.to_s
+      install_method = if Helper.rubygems?
+                         'gem'
+                       elsif Helper.bundler?
+                         'bundler'
+                       elsif Helper.mac_app?
+                         'mac_app'
+                       elsif Helper.contained_fastlane?
+                         'standalone'
+                       elsif Helper.homebrew?
+                         'homebrew'
+                       else
+                         'unknown'
+                       end
+      duration = (Time.now - start_time).to_i
+      timestamp_seconds = Time.now.to_i
+
+      send_completion_events(gem_name, ci, install_method, duration, timestamp_seconds)
+    end
+
+    def self.send_events(analytics)
+      analytic_event_body = { analytics: analytics }.to_json
+
+      url = ENV["FASTLANE_METRICS_URL"] || "https://fastlane-metrics.fabric.io/public"
+      Excon.post(url,
+                 body: analytic_event_body,
+                 headers: { "Content-Type" => 'application/json' })
+    end
+
+    def self.event_for_completion(tool, ci, duration, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-refresher',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'tool',
+          detail: tool || 'unknown'
+        },
+        action: {
+          name: 'completed_with_duration'
+        },
+        primary_target: {
+          name: 'duration',
+          detail: duration.to_s
+        },
+        secondary_target: {
+          name: 'ci',
+          detail: ci
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def self.event_for_install_method(tool, ci, install_method, timestamp_seconds)
+      {
+        event_source: {
+          oauth_app_name: 'fastlane-refresher',
+          product: 'fastlane'
+        },
+        actor: {
+          name: 'tool',
+          detail: tool || 'unknown'
+        },
+        action: {
+          name: 'completed_with_install_method'
+        },
+        primary_target: {
+          name: 'install_method',
+          detail: install_method
+        },
+        secondary_target: {
+          name: 'ci',
+          detail: ci
+        },
+        millis_since_epoch: timestamp_seconds * 1000,
+        version: 1
+      }
+    end
+
+    def self.send_completion_events(tool, ci, install_method, duration, timestamp_seconds)
+      analytics = []
+      analytics << event_for_completion(tool, ci, duration, timestamp_seconds)
+      analytics << event_for_install_method(tool, ci, install_method, timestamp_seconds)
+
+      send_events(analytics)
     end
   end
 end

@@ -296,9 +296,16 @@ module FastlaneCore
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
     def build_settings(key: nil, optional: true)
       unless @build_settings
+        if is_workspace
+          if schemes.count == 0
+            UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
+          end
+          options[:scheme] ||= schemes.first
+        end
+
         command = build_xcodebuild_showbuildsettings_command
 
-        # xcode might hang here and retrying fixes the problem, see fastlane#4059
+        # Xcode might hang here and retrying fixes the problem, see fastlane#4059
         begin
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
@@ -307,9 +314,9 @@ module FastlaneCore
             UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
           end
         rescue Timeout::Error
-          UI.crash!("xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
+          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
             " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
-            " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ")
+            " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ".red
         end
       end
 
@@ -332,7 +339,7 @@ module FastlaneCore
 
     # Returns the build settings and sets the default scheme to the options hash
     def default_build_settings(key: nil, optional: true)
-      options[:scheme] = schemes.first if is_workspace
+      options[:scheme] ||= schemes.first if is_workspace
       build_settings(key: key, optional: optional)
     end
 

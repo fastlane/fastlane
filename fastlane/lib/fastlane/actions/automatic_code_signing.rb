@@ -12,7 +12,7 @@ module Fastlane
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
         unless project.root_object.attributes["TargetAttributes"]
-          UI.user_error!("Seems to be a very old project file format - please use xcode to upgrade to atlease 0800")
+          UI.user_error!("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
           return false
         end
 
@@ -75,6 +75,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
+                                       default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(File.expand_path(value))
                                        end),

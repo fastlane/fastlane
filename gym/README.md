@@ -18,7 +18,8 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <b>gym</b> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
 
 -------
@@ -32,7 +33,6 @@ gym
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/gym/LICENSE)
-[![Gem](https://img.shields.io/gem/v/gym.svg?style=flat)](https://rubygems.org/gems/gym)
 
 ###### Building your app has never been easier
 
@@ -54,7 +54,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # What's gym?
 
-`gym` builds and packages iOS and macOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file :muscle:
+`gym` builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file :muscle:
 
 `gym` is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
@@ -282,6 +282,7 @@ Afterwards the `ipa` file is moved to the output folder. The `dSYM` file is comp
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 

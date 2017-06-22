@@ -2,9 +2,14 @@ require 'pty'
 require 'open3'
 require 'fileutils'
 require 'terminal-table'
+require 'shellwords'
 
 module Scan
   class Runner
+    def initialize
+      @test_command_generator = TestCommandGenerator.new
+    end
+
     def run
       handle_results(test_app)
     end
@@ -16,7 +21,7 @@ module Scan
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
       open_simulator_for_device(Scan.devices.first) if Scan.devices
-      command = TestCommandGenerator.generate
+      command = @test_command_generator.generate
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -46,22 +51,7 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      # First, generate a JUnit report to get the number of tests
-      require 'tempfile'
-      output_file = Tempfile.new("junit_report")
-
-      report_collector = ReportCollector.new(Scan.config[:open_report],
-                                             Scan.config[:output_types],
-                                             Scan.config[:output_directory],
-                                             Scan.config[:use_clang_report_name],
-                                             Scan.config[:custom_report_file_name])
-
-      cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                               types: 'junit',
-                                               output_file_name: output_file.path).values.last
-      system(cmd)
-
-      result = TestResultParser.new.parse_result(output_file.read)
+      result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
 
       if result[:failures] > 0
@@ -81,8 +71,6 @@ module Scan
 
       copy_simulator_logs
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
-
       if result[:failures] > 0
         UI.test_failure!("Tests have failed")
       end
@@ -90,6 +78,25 @@ module Scan
       unless tests_exit_status == 0
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
+
+      if !Helper.is_ci? && Scan.cache[:open_html_report_path]
+        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+      end
+    end
+
+    def test_results
+      temp_junit_report = Scan.cache[:temp_junit_report]
+      return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
+
+      # Something went wrong with the temp junit report for the test success/failures count.
+      # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
+      UI.message("Generating test results. This may take a while for large projects.")
+
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options = reporter_options_generator.generate_reporter_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      system(cmd)
+      File.read(Scan.cache[:temp_junit_report])
     end
 
     def copy_simulator_logs

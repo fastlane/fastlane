@@ -13,9 +13,9 @@ module Fastlane
       def self.details
         [
           "By default, fastlane will track what actions are being used",
-          "No personal information is shared. More information available on",
-          "https://github.com/fastlane/enhancer",
-          "Add `opt_out_usage` at the top of your Fastfile"
+          "No personal/sensitive information is recorded.",
+          "Learn more at https://github.com/fastlane/fastlane#metrics",
+          "Add `opt_out_usage` at the top of your Fastfile to disable metrics collection"
         ].join(' ')
       end
 

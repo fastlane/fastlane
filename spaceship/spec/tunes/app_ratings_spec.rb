@@ -6,29 +6,24 @@ describe Spaceship::Tunes::AppRatings do
   describe "successfully loads rating summary" do
     it "contains the right information" do
       TunesStubbing.itc_stub_ratings
-      ratings = app.ratings
 
-      expect(ratings.versions.count).to eq(24)
-      expect(ratings.store_fronts.count).to eq(4)
-      expect(ratings.rating_summary.review_count).to eq(75)
-      expect(ratings.rating_summary.rating_count).to eq(124)
-      expect(ratings.rating_summary.one_star_rating_count).to eq(36)
-      expect(ratings.rating_summary.two_star_rating_count).to eq(20)
-      expect(ratings.rating_summary.three_star_rating_count).to eq(9)
-      expect(ratings.rating_summary.four_star_rating_count).to eq(13)
-      expect(ratings.rating_summary.five_star_rating_count).to eq(46)
+      expect(app.ratings.rating_count).to eq(1457)
+      expect(app.ratings.one_star_rating_count).to eq(219)
+      expect(app.ratings.two_star_rating_count).to eq(67)
+      expect(app.ratings.three_star_rating_count).to eq(174)
+      expect(app.ratings.four_star_rating_count).to eq(393)
+      expect(app.ratings.five_star_rating_count).to eq(604)
 
-      expect(ratings.store_fronts["US"].review_count).to eq(66)
+      expect(app.ratings(storefront: "US").rating_count).to eq(1300)
     end
   end
 
   describe "successfully calculates the average" do
     it "the average is correct" do
       TunesStubbing.itc_stub_ratings
-      ratings = app.ratings
 
-      expect(ratings.rating_summary.average_rating).to eq(3.1)
-      expect(ratings.store_fronts["US"].average_rating).to eq(3.25)
+      expect(app.ratings.average_rating).to eq(3.75)
+      expect(app.ratings(storefront: "US").average_rating).to eq(4.34)
     end
   end
 

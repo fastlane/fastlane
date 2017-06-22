@@ -254,6 +254,7 @@ module FastlaneCore
 
         logarchive_dst = Shellwords.escape(File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive"))
         FileUtils.rm_rf(logarchive_dst)
+        FileUtils.mkdir_p(logarchive_dst)
         command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end

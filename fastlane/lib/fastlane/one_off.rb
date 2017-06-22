@@ -33,6 +33,7 @@ module Fastlane
           UI.verbose(caller.join("\n"))
           UI.user_error!("The action '#{action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{action}`")
         else
+          Fastlane::ActionsList.print_suggestions(action)
           UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
         end
       end

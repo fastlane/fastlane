@@ -27,8 +27,19 @@ module Spaceship::TestFlight
       self.all(app_id: app_id).find { |tester| tester.email == email }
     end
 
+    def self.create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
+      client.create_app_level_tester(app_id: app_id,
+                                 first_name: first_name,
+                                  last_name: last_name,
+                                      email: email)
+    end
+
     def remove_from_app!(app_id: nil)
       client.delete_tester_from_app(app_id: app_id, tester_id: self.tester_id)
+    end
+
+    def resend_invite(app_id: nil)
+      client.resend_invite_to_external_tester(app_id: app_id, tester_id: self.tester_id)
     end
   end
 end

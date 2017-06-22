@@ -75,6 +75,10 @@ module Deliver
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
+      available_languages = Spaceship::Tunes.client.available_languages.each_with_object({}) do |lang, lang_hash|
+        lang_hash[lang.downcase] = lang
+      end
+
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
 
@@ -91,7 +95,14 @@ module Deliver
 
         UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
 
-        language = File.basename(lng_folder)
+        language_dir_name = File.basename(lng_folder)
+
+        if available_languages[language_dir_name.downcase].nil?
+          UI.user_error!("#{language_dir_name} is not an available language. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
+        end
+
+        language = available_languages[language_dir_name.downcase]
+
         files.each do |file_path|
           is_framed = file_path.downcase.include?("_framed.")
           is_watch = file_path.downcase.include?("watch")

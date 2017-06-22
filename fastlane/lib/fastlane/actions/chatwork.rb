@@ -10,7 +10,7 @@ module Fastlane
 
         emoticon = (options[:success] ? '(dance)' : ';(')
 
-        uri = URI.parse("https://api.chatwork.com/v1/rooms/#{options[:roomid]}/messages")
+        uri = URI.parse("https://api.chatwork.com/v2/rooms/#{options[:roomid]}/messages")
         https = Net::HTTP.new(uri.host, uri.port)
         https.use_ssl = true
 

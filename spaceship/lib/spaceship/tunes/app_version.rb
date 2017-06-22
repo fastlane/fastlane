@@ -72,6 +72,48 @@ module Spaceship
       attr_accessor :transit_app_file
 
       ####
+      # Trade Representative Contact Information
+      ####
+      # @return (String) Trade Representative Contact Information Trade Name. This attribute isn't editable
+      attr_accessor :trade_representative_trade_name
+
+      # @return (String) Trade Representative Contact Information First Name
+      attr_accessor :trade_representative_first_name
+
+      # @return (String) Trade Representative Contact Information Last Name
+      attr_accessor :trade_representative_last_name
+
+      # @return (String) Trade Representative Contact Information Address Line 1
+      attr_accessor :trade_representative_address_line_1
+
+      # @return (String) Trade Representative Contact Information Address Line 2
+      attr_accessor :trade_representative_address_line_2
+
+      # @return (String) Trade Representative Contact Information Address Line 3
+      attr_accessor :trade_representative_address_line_3
+
+      # @return (String) Trade Representative Contact Information City Name
+      attr_accessor :trade_representative_city_name
+
+      # @return (String) Trade Representative Contact Information State
+      attr_accessor :trade_representative_state
+
+      # @return (String) Trade Representative Contact Information Country
+      attr_accessor :trade_representative_country
+
+      # @return (String) Trade Representative Contact Information Postal Code
+      attr_accessor :trade_representative_postal_code
+
+      # @return (String) Trade Representative Contact Information Phone Number
+      attr_accessor :trade_representative_phone_number
+
+      # @return (String) Trade Representative Contact Information Email Address
+      attr_accessor :trade_representative_email
+
+      # @return (Boolean) Display Trade Representative Contact Information on the Korean App Store or not
+      attr_accessor :trade_representative_is_displayed_on_app_store
+
+      ####
       # App Review Information
       ####
       # @return (String) App Review Information First Name
@@ -110,6 +152,9 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
+      # @return (Hash) A hash representing the promotionalText in all languages
+      attr_reader :promotional_text
+
       # @return (Hash) A hash representing the description in all languages
       attr_reader :description
 
@@ -127,6 +172,28 @@ module Spaceship
 
       # @return (Hash) Represents the trailers of this app version (read-only)
       attr_reader :trailers
+
+      # @return (Hash) Represents the phased_release hash (read-only)
+      #   For now, please use the `toggle_phased_release` method and call `.save!`
+      #   as the API will probably change in the future
+      attr_reader :phased_release
+
+      # Currently phased_release doesn't seem to have all the features enabled
+      #
+      #     => {"state"=>{"value"=>"NOT_STARTED", "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil},
+      #        "startDate"=>nil,
+      #        "lastPaused"=>nil,
+      #        "pausedDuration"=>nil,
+      #        "totalPauseDays"=>30,
+      #        "currentDayNumber"=>nil,
+      #        "dayPercentageMap"=>{"1"=>1, "2"=>2, "3"=>5, "4"=>10, "5"=>20, "6"=>50, "7"=>100},
+      #        "isEnabled"=>true}
+      #
+      def toggle_phased_release(enabled: false)
+        state = (enabled ? "INACTIVE" : "NOT_STARTED")
+
+        self.phased_release["state"]["value"] = state
+      end
 
       attr_mapping({
         'appType' => :app_type,
@@ -146,9 +213,26 @@ module Spaceship
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
+        'phasedRelease' => :phased_release,
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
+
+        # Trade Representative Contact Information
+
+        'appStoreInfo.tradeName.value' => :trade_representative_trade_name,
+        'appStoreInfo.firstName.value' => :trade_representative_first_name,
+        'appStoreInfo.lastName.value' => :trade_representative_last_name,
+        'appStoreInfo.addressLine1.value' => :trade_representative_address_line_1,
+        'appStoreInfo.addressLine2.value' => :trade_representative_address_line_2,
+        'appStoreInfo.addressLine3.value' => :trade_representative_address_line_3,
+        'appStoreInfo.cityName.value' => :trade_representative_city_name,
+        'appStoreInfo.state.value' => :trade_representative_state,
+        'appStoreInfo.country.value' => :trade_representative_country,
+        'appStoreInfo.postalCode.value' => :trade_representative_postal_code,
+        'appStoreInfo.phoneNumber.value' => :trade_representative_phone_number,
+        'appStoreInfo.emailAddress.value' => :trade_representative_email,
+        'appStoreInfo.shouldDisplayInStore.value' => :trade_representative_is_displayed_on_app_store,
 
         # App Review Information
         'appReviewInfo.firstName.value' => :review_first_name,
@@ -313,9 +397,9 @@ module Spaceship
 
       # Private methods
       def setup
-        # Properly parse the AppStatus
         status = raw_data['status']
         @app_status = Tunes::AppStatus.get_from_string(status)
+
         setup_large_app_icon
         setup_watch_app_icon
         setup_transit_app_file if supports_app_transit?
@@ -505,7 +589,8 @@ module Spaceship
           description: :description,
           supportUrl: :support_url,
           marketingUrl: :marketing_url,
-          releaseNotes: :release_notes
+          releaseNotes: :release_notes,
+          promotionalText: :promotional_text
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
@@ -592,8 +677,24 @@ module Spaceship
       end
 
       def setup_screenshots
-        @screenshots = {}
+        # Enable Scaling for all screen sizes that don't have at least one screenshot
+        # We automatically disable scaling once we upload at least one screenshot
+        language_details = raw_data_details.each do |current_language|
+          language_details = (current_language["displayFamilies"] || {})["value"]
+          (language_details || []).each do |device_language_details|
+            next if device_language_details["screenshots"].nil?
+            next if device_language_details["screenshots"]["value"].count > 0
 
+            # The current row includes screenshots for all device types
+            # so we need to enable scaling for both iOS and watchOS apps
+            device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
+            device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
+            # we unset `scaled` or `messagesScaled` as soon as we upload a
+            # screenshot for this device/language combination
+          end
+        end
+
+        @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
           @screenshots[row['language']] = setup_screenshots_for(row) + setup_messages_screenshots_for(row)
@@ -737,7 +838,9 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          trailer_data = display_family.fetch("trailer", {}).fetch("value")
+          trailer_raw = display_family["trailer"]
+          next if trailer_raw.nil?
+          trailer_data = trailer_raw["value"]
           next if trailer_data.nil?
           data = {
             device_type: display_family['name'],
