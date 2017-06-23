@@ -140,11 +140,12 @@ module Snapshot
       FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
       FileUtils.mkdir_p(screenshots_path)
 
-      prefix = File.join(Dir.home, "Library/Caches/tools.fastlane")
-      FileUtils.mkdir_p(prefix)
-      File.write(File.join(prefix, "language.txt"), language)
-      File.write(File.join(prefix, "locale.txt"), locale || "")
-      File.write(File.join(prefix, "snapshot-launch_arguments.txt"), launch_arguments.last)
+      FileUtils.mkdir_p(CACHE_DIR)
+      FileUtils.mkdir_p(SCREENSHOTS_DIR)
+
+      File.write(File.join(CACHE_DIR, "language.txt"), language)
+      File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
+      File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
       unless device_type == "Mac"
         # Kill and shutdown all currently running simulators so that the following settings

@@ -7,7 +7,8 @@ module Snapshot
       containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
       attachments_path = File.join(containing, "Attachments")
 
-      to_store = attachments(containing)
+      to_store = Dir["#{SCREENSHOTS_DIR}/*.png"].empty? ? attachments(containing) : Dir["#{SCREENSHOTS_DIR}/*.png"]
+
       matches = output.scan(/snapshot: (.*)/)
 
       if to_store.count == 0 && matches.count == 0
@@ -26,10 +27,13 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
+        # TODO: ASK FELIX ABOUT THIS!
         components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
         screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
         output_path = File.join(language_folder, screenshot_name)
-        from_path = File.join(attachments_path, filename)
+
+        from_path = File.exists?(filename) ? filename : File.join(attachments_path, filename)
+
         if FastlaneCore::Globals.verbose?
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
         else
