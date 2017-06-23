@@ -176,3 +176,7 @@ extension XCUIElement {
         return self.frame.size == CGSize(width: 10, height: 20)
     }
 }
+
+// Please don't remove the lines below
+// They are used to detect outdated configuration files
+// SnapshotHelperVersion [1.4]
