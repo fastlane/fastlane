@@ -16,7 +16,7 @@ module Spaceship
         'keyName' => :name,
         'services' => :services,
         'canDownload' => :can_download,
-        'canRevoke' => :can_revoke,
+        'canRevoke' => :can_revoke
       })
 
       def self.all
@@ -51,7 +51,7 @@ module Spaceship
       end
 
       def services
-        #TODO[snatchev] lazy load services using client.get_key
+        # TODO[snatchev] lazy load services using client.get_key
         []
       end
 
