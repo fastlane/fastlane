@@ -41,7 +41,7 @@ module Snapshot
         end
         FileUtils.cp(from_path, output_path)
       end
-
+      FileUtils.rm_rf(SCREENSHOTS_DIR)
       return true
     end
 
