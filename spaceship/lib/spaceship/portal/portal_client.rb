@@ -578,7 +578,8 @@ module Spaceship
 
     def get_key(id: nil)
       response = request(:post, 'account/auth/key/get', { teamId: team_id, keyId: id })
-      parse_response(response, 'keys')
+      # response contains a list of keys with 1 item
+      parse_response(response, 'keys').first
     end
 
     def download_key(id: nil)
@@ -586,15 +587,10 @@ module Spaceship
       parse_response(response)
     end
 
-    def create_key!(name: nil, service_ids: nil)
-      configs = {}
-      service_ids.each do |sid|
-        configs[sid] = []
-      end
-
+    def create_key!(name: nil, service_configs: nil)
       params = {
         name: name,
-        serviceConfigurations: configs,
+        serviceConfigurations: service_configs,
         teamId: team_id
       }
 
@@ -603,7 +599,8 @@ module Spaceship
         req.body = params.to_json
       end
 
-      parse_response(response, 'keys')
+      # response contains a list of keys with 1 item
+      parse_response(response, 'keys').first
     end
 
     def revoke_key!(id: nil)
