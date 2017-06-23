@@ -88,7 +88,9 @@ task :issue_stats do
   end
 
   # Sort by the last column, "Net" so that the projects with the most unclosed issues are at the top
+  # rubocop: disable Performance/CompareWithBlock
   sorted_issues = issue_counts_by_label.sort { |row_1, row_2| row_1[3] <=> row_2[3] }.reverse
+  # rubocop: enable Performance/CompareWithBlock
   pretty_issues = sorted_issues.map { |issue_row| colorized_row(issue_row) }
 
   totals = issue_counts_by_label.each_with_object(['total', 0, 0, 0]) do |row, total_row|
