@@ -306,7 +306,7 @@ describe Spaceship::Client do
     describe '#download_key' do
       it 'downloads a key' do
         MockAPI::DeveloperPortalServer.get('/services-account/QH65B2/account/auth/key/download') do
-         '----- BEGIN PRIVATE KEY -----'
+          '----- BEGIN PRIVATE KEY -----'
         end
         subject.download_key(id: '123')
         expect(WebMock).to have_requested(:get, api_root + '/download?keyId=123&teamId=XXXXXXXXXX')

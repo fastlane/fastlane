@@ -62,7 +62,7 @@ module Spaceship
       end
 
       def service_configs_for(service_id)
-        if service = find_service(service_id)
+        if (service = find_service(service_id))
           service['configurations']
         end
       end
@@ -94,7 +94,6 @@ module Spaceship
       def has_service?(service_id)
         find_service(service_id) != nil
       end
-
     end
   end
 end
