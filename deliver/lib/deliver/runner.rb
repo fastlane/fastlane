@@ -45,7 +45,12 @@ module Deliver
         UI.message("Running precheck 👮‍♀️ 👮")
       end
 
-      precheck_options = { default_rule_level: options[:precheck_default_rule_level] }
+      precheck_options = {
+        default_rule_level: options[:precheck_default_rule_level],
+        app_identifier: options[:app_identifier],
+        username: options[:username]
+      }
+
       precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
       Precheck.config = precheck_config
 
