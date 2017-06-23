@@ -8,7 +8,7 @@ module Fastlane
           paths = params[:path].map(&:shellescape).join(' ')
         end
 
-        result = Actions.sh("git add #{paths}")
+        result = Actions.sh("git add #{paths}", log: FastlaneCore::Globals.verbose?).chomp
         UI.success("Successfully added \"#{params[:path]}\" 💾.")
         return result
       end
@@ -24,7 +24,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to add",
+                                       description: "The file[s] you want to add",
                                        is_string: false,
                                        verify_block: proc do |value|
                                          if value.kind_of?(String)
