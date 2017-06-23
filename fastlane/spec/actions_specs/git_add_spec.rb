@@ -29,11 +29,11 @@ describe Fastlane do
         end
 
         it "can not have pathspec parameter" do
-          expect {
+          expect do
             Fastlane::FastFile.new.parse("lane :test do
               git_add(path: 'myfile.txt', pathspec: 'Frameworks/*')
             end").runner.execute(:test)
-          }.to raise_error
+          end.to raise_error
         end
       end
 
@@ -46,11 +46,11 @@ describe Fastlane do
         end
 
         it "can not have path parameter" do
-          expect {
+          expect do
             Fastlane::FastFile.new.parse("lane :test do
               git_add(path: 'myfile.txt', pathspec: '*.txt')
             end").runner.execute(:test)
-          }.to raise_error
+          end.to raise_error
         end
       end
 

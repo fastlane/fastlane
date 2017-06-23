@@ -49,7 +49,7 @@ module Fastlane
                                        description: "The pathspec you want to add files from",
                                        is_string: true,
                                        conflicting_options: [:path],
-                                       optional: true),
+                                       optional: true)
         ]
       end
 
