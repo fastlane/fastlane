@@ -32,8 +32,8 @@ module Fastlane
 
     # Helper to convert into the right data type
     def self.convert_value(value)
-      return true if %w{true yes}.include?(value)
-      return false if %w{false no}.include?(value)
+      return true if value == 'true' || value == 'yes'
+      return false if value == 'false' || value == 'no'
 
       # Default case:
       return value

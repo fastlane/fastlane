@@ -123,7 +123,7 @@ module FastlaneCore
     def self.ios_app_identifier(args)
       # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
       args.each_with_index do |current, index|
-        if %w{-a --app_identifier}.include?(current)
+        if current == "-a" || current == "--app_identifier"
           return args[index + 1] if args.count > index
         end
       end

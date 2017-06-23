@@ -8,7 +8,7 @@ module Fastlane
         commands = []
 
         # add to search list if not already added
-        if [true, :add].include?(add_to_search_list)
+        if add_to_search_list == true || add_to_search_list == :add
           commands << add_keychain_to_search_list(keychain_path)
         elsif add_to_search_list == :replace
           commands << replace_keychain_in_search_list(keychain_path)
