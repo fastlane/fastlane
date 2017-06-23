@@ -27,6 +27,40 @@ describe Fastlane do
             end").runner.execute(:test)
           end
         end
+
+        it "can not have pathspec parameter" do
+          expect {
+            Fastlane::FastFile.new.parse("lane :test do
+              git_add(path: 'myfile.txt', pathspec: 'Frameworks/*')
+            end").runner.execute(:test)
+          }.to raise_error
+        end
+      end
+
+      context "with pathspec parameter" do
+        it "executes the correct git command" do
+          allow(Fastlane::Actions).to receive(:sh).with("git add *.txt", anything).and_return("")
+          result = Fastlane::FastFile.new.parse("lane :test do
+            git_add(pathspec: '*.txt')
+          end").runner.execute(:test)
+        end
+
+        it "can not have path parameter" do
+          expect {
+            Fastlane::FastFile.new.parse("lane :test do
+              git_add(path: 'myfile.txt', pathspec: '*.txt')
+            end").runner.execute(:test)
+          }.to raise_error
+        end
+      end
+
+      context "without parameters" do
+        it "executes the correct git command" do
+          allow(Fastlane::Actions).to receive(:sh).with("git add .", anything).and_return("")
+          result = Fastlane::FastFile.new.parse("lane :test do
+            git_add
+          end").runner.execute(:test)
+        end
       end
 
       it "logs the command if verbose" do
