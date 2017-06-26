@@ -146,6 +146,16 @@ automatic_release true
 automatic_release false
 ```
 
+##### phased_release
+
+Should the app be phased release. If set to `true`, this update will be released over 7-day period using phased release. Default value is `false`.
+
+```ruby
+phased_release true
+# or 
+phased_release false
+```
+
 ##### app_rating_config_path
 You can set the app age ratings using `deliver`. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
 

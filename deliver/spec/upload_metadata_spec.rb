@@ -133,4 +133,24 @@ describe Deliver::UploadMetadata do
       end
     end
   end
+
+  context "with phased_release" do
+    let(:app) { double('app') }
+    let(:version) { double('version') }
+    let(:details) { double('details') }
+    before do
+      allow(uploader).to receive(:verify_available_languages!)
+      allow(version).to receive(:save!)
+      allow(version).to receive(:release_on_approval=)
+      allow(version).to receive(:toggle_phased_release).with(enabled: true)
+      allow(app).to receive(:edit_version).and_return(version)
+      allow(app).to receive(:details).and_return(details)
+      allow(details).to receive(:save!)
+    end
+
+    it "toggle_phased_release is called" do
+      uploader.upload(phased_release: true, app: app)
+      expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+    end
+  end
 end
