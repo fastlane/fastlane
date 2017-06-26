@@ -10,12 +10,11 @@ module Snapshot
       language_folder = File.join(Snapshot.config[:output_directory], dir_name)
       FileUtils.mkdir_p(language_folder)
 
-      screenshots_dir_contents = Dir["#{SCREENSHOTS_DIR}/*.png"]
-      if screenshots_dir_contents.empty?
+      if Snapshot.config[:simultaneous]
+        return collect_screenshots_from_multiple_simulators(screenshots_dir_contents, language_folder)
+      else
         to_store = attachments(containing)
         matches = output.scan(/snapshot: (.*)/)
-      else
-        return collect_screenshots_from_multiple_simulators(screenshots_dir_contents, language_folder)
       end
 
 
@@ -45,7 +44,9 @@ module Snapshot
     end
 
     # Returns true if it succeeds
-    def self.collect_screenshots_from_multiple_simulators(screenshots, destination)
+    def self.collect_screenshots_from_multiple_simulators(destination)
+      screenshots = Dir["#{SCREENSHOTS_DIR}/*.png"]
+      return false if screenshots.empty?
       screenshots.each do |screenshot|
         filename = File.basename(screenshot)
         to_path = File.join(destination, filename)

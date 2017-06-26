@@ -181,7 +181,17 @@ module Snapshot
                                      env_name: "SNAPSHOT_NAMESPACE_LOG_FILES",
                                      description: "Separate the log files per device and per language",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :simultaneous,
+                                     env_name: "SNAPSHOT_EXECUTE_TESTS_SIMULTANEOUSLY",
+                                     description: "Take snapshots on multiple devices at once",
+                                     default_value: false,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                        if value && !Helper.xcode_at_least?('9.0')
+                                          UI.user_error('Executing snapshot on multiple simulators at once is only supported in Xcode 9 and higher.')
+                                        end
+                                     end)
       ]
     end
   end

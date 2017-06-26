@@ -34,38 +34,13 @@ module Snapshot
 
       self.number_of_retries_due_to_failing_simulator = 0
       self.collected_errors = []
-      results = {} # collect all the results for a nice table
       launch_arguments_set = config_launch_arguments
 
-      launch_arguments_set.each do |launch_args|
-        Snapshot.config[:languages].each_with_index do |language, language_index|
-          locale = nil
-          if language.kind_of?(Array)
-            locale = language[1]
-            language = language[0]
-          end
-          results[language] = launch_simultaneously(language, locale, launch_args)
-        end
+      if Snapshot.config[:simultaneous]
+        results = take_screenshots_simultaneously(launch_arguments_set)
+      else
+        results = take_screenshots_one_simulator_at_a_time(launch_arguments_set)
       end
-      # Snapshot.config[:devices].each_with_index do |device, device_index|
-      #   launch_arguments_set.each do |launch_arguments|
-      #     Snapshot.config[:languages].each_with_index do |language, language_index|
-      #       locale = nil
-      #       if language.kind_of?(Array)
-      #         locale = language[1]
-      #         language = language[0]
-      #       end
-      #       results[device] ||= {}
-
-      #       current_run = device_index * Snapshot.config[:languages].count + language_index + 1
-      #       number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
-      #       UI.message("snapshot run #{current_run} of #{number_of_runs}")
-
-      #       results[device][language] = run_for_device_and_language(language, locale, device, launch_arguments)
-      #       copy_simulator_logs(device, language, locale, launch_arguments)
-      #     end
-      #   end
-      # end
 
       print_results(results)
 
@@ -78,6 +53,45 @@ module Snapshot
       unless Snapshot.config[:derived_data_path]
         FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
       end
+    end
+
+    def take_screenshots_simultaneously(launch_arguments)
+      results = {}
+      launch_arguments.each do |launch_args|
+        Snapshot.config[:languages].each_with_index do |language, language_index|
+          locale = nil
+          if language.kind_of?(Array)
+            locale = language[1]
+            language = language[0]
+          end
+          results[language] = launch_simultaneously(language, locale, launch_args)
+        end
+      end
+      results
+    end
+
+    def take_screenshots_one_simulator_at_a_time(launch_arguments)
+      results = {} # collect all the results for a nice table
+      Snapshot.config[:devices].each_with_index do |device, device_index|
+        launch_arguments.each do |launch_args|
+          Snapshot.config[:languages].each_with_index do |language, language_index|
+            locale = nil
+            if language.kind_of?(Array)
+              locale = language[1]
+              language = language[0]
+            end
+            results[device] ||= {}
+
+            current_run = device_index * Snapshot.config[:languages].count + language_index + 1
+            number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
+            UI.message("snapshot run #{current_run} of #{number_of_runs}")
+
+            results[device][language] = run_for_device_and_language(language, locale, device, launch_args)
+            copy_simulator_logs(device, language, locale, launch_args)
+          end
+        end
+      end
+      results
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
@@ -224,7 +238,7 @@ module Snapshot
 
     # Returns true if it succeeded
     def launch(language, locale, device_type, launch_arguments)
-      prepare_for_launch(language, locale, launch_arugments)
+      prepare_for_launch(language, locale, launch_arguments)
       prepare_simulators_for_launch(device_type: device_type, language: language, locale: locale)
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
