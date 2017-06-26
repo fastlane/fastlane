@@ -94,19 +94,30 @@ module Snapshot
         # on Mac we will always run on host machine, so should specify only platform
         return ["-destination 'platform=macOS'"] if device_name =~ /^Mac/
 
+        # if device_name is nil, use the config and get all devices
         os = device_name =~ /^Apple TV/ ? "tvOS" : "iOS"
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
-        device = find_device(device_name, os_version)
-        if device.nil?
-          UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
-          return
-        elsif device.os_version != os_version
-          UI.important("Using device named '#{device_name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
-        end
-        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
+        if device_name
+          device = find_device(device_name, os_version)
+          if device.nil?
+            UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
+            return
+          elsif device.os_version != os_version
+            UI.important("Using device named '#{device_name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
+          end
+          value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
 
-        return ["-destination '#{value}'"]
+          return ["-destination '#{value}'"]
+        end
+
+        destinations = Snapshot.config[:devices].map do |d|
+          device = find_device(d, os_version)
+          UI.user_error!("No device found named '#{d}' for version '#{os_version}'") if device.nil?
+          "-destination 'platform=#{os} Simulator,name=#{device.name},OS=#{os_version}'"
+        end
+
+        return [destinations.join(' ')]
       end
 
       def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
