@@ -140,12 +140,6 @@ module Precheck
     def self.generate_text_items_to_check(app: nil, app_version: nil)
       items = []
       items << TextItemToCheck.new(app_version.copyright, :copyright, "copyright")
-      items << TextItemToCheck.new(app_version.review_first_name, :review_first_name, "review first name")
-      items << TextItemToCheck.new(app_version.review_last_name, :review_last_name, "review last name")
-      items << TextItemToCheck.new(app_version.review_phone_number, :review_phone_number, "review phone number")
-      items << TextItemToCheck.new(app_version.review_email, :review_email, "review email")
-      items << TextItemToCheck.new(app_version.review_demo_user, :review_demo_user, "review demo user")
-      items << TextItemToCheck.new(app_version.review_notes, :review_notes, "review notes")
 
       items += collect_text_items_from_language_item(hash: app_version.keywords,
                                                 item_name: :keywords,
