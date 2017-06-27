@@ -297,7 +297,7 @@ describe Fastlane do
         end
       end
 
-      it "collects the lane description for documentation" do
+      it "collects the lane description for +documentation" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
 

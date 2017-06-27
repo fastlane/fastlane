@@ -173,7 +173,6 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
                                      end),
-
         FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
                                      env_name: "OBB_MAIN_REFERENCES_VERSION",
                                      description: "References version of 'main' expansion file",
