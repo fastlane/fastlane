@@ -14,12 +14,26 @@ module Precheck
       not_implemented(__method__)
     end
 
+    # list of words or phrases that should be excluded from this rule
+    # they will be removed from the text string before the rule is executed
+    def allowed_lowercased_words
+      []
+    end
+
     def pass_if_empty?
       return true
     end
 
     def word_search_type
       WORD_SEARCH_TYPES[:fail_on_inclusion]
+    end
+
+    def remove_safe_words(text: nil)
+      text_without_safe_words = text
+      allowed_lowercased_words.each do |safe_word|
+        text_without_safe_words.gsub!(safe_word, '')
+      end
+      return text_without_safe_words
     end
 
     # rule block that checks text for any instance of each string in lowercased_words_to_look_for
@@ -33,6 +47,8 @@ module Precheck
             return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "missing text")
           end
         end
+
+        text = remove_safe_words(text: text)
 
         matches = lowercased_words_to_look_for.each_with_object([]) do |word, found_words|
           if text.include?(word)

@@ -25,8 +25,7 @@ module Precheck
         "bacon ipsum",
         "lorem ipsum",
         "placeholder",
-        "text here",
-        "todo"
+        "text here"
       ].map(&:downcase)
     end
   end
