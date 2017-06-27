@@ -112,7 +112,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :phased_release,
-                                     description: "Should the app be phased released",
+                                     description: "Enable phased the phased release feature of iTC",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,

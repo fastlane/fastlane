@@ -148,7 +148,7 @@ automatic_release false
 
 ##### phased_release
 
-Should the app be phased release. If set to `true`, this update will be released over 7-day period using phased release. Default value is `false`.
+Enable or disable the phased releases feature of iTunes Connect. If set to `true`, the update will be released over a 7 day period. Default value is `false`.
 
 ```ruby
 phased_release true
