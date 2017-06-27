@@ -19,6 +19,10 @@ module Precheck
       "mentioning other platforms, like Android or Blackberry"
     end
 
+    def allowed_lowercased_words
+      ["google analytics"]
+    end
+
     def lowercased_words_to_look_for
       [
         "android",
