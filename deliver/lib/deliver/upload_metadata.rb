@@ -190,6 +190,7 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
+          language = language.to_s
           enabled_languages << language unless enabled_languages.include?(language)
         end
       end
