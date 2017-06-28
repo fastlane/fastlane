@@ -161,7 +161,6 @@ module Pilot
 
     def create_config(options)
       config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
-      config[:ipa] = File.expand_path(config[:ipa]) if config[:ipa]
       return config
     end
   end

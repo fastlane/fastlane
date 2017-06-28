@@ -9,6 +9,7 @@ module Fastlane
         values[:changelog] ||= changelog if changelog
 
         values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
 
         return values if Helper.test?
 
