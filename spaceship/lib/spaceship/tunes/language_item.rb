@@ -26,6 +26,7 @@ module Spaceship
 
       def get_lang(lang)
         result = self.original_array.find do |current|
+          lang = lang.to_s
           current['language'] == lang or current['localeCode'] == lang # Apple being consistent
         end
         return result if result
