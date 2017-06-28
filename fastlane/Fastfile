@@ -171,10 +171,7 @@ end
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
-  if ENV["ENHANCER_USER"].to_s.length == 0 || ENV["ENHANCER_PASSWORD"].to_s.length == 0
-    UI.error("No ENHANCER_USER or ENHANCER_PASSWORD environment variables found, which are required to generate a new Actions.md")
-    next
-  end
+  verify_env_variables
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs do
@@ -348,5 +345,14 @@ lane :donate_food do
       currency: "USD",
       team_id: "fastlane"
     )
+  end
+end
+
+desc "Ensure all the requirement environment variables are provided"
+desc "this way the deployment script will fail early (and often)"
+private_lane :verify_env_variables do
+  ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
+    next if ENV[variable].to_s.length > 0
+    UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
 end

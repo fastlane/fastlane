@@ -25,8 +25,8 @@ module Fastlane
         attr_accessor :data
 
         def initialize(hash)
-          if ENV["FASTLANE_PLUGIN_DIRECTORY_GITHUB_USER"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
-            raise "Missing ENV variables FASTLANE_PLUGIN_DIRECTORY_GITHUB_USER and/or GITHUB_API_TOKEN"
+          if ENV["GITHUB_USER_NAME"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
+            raise "Missing ENV variables GITHUB_USER_NAME and/or GITHUB_API_TOKEN"
           end
 
           self.name = hash["name"]
@@ -154,14 +154,14 @@ module Fastlane
           url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise Github will fail
           puts "Fetching #{url}"
           conn = Faraday.new(url: url)
-          conn.basic_auth(ENV["FASTLANE_PLUGIN_DIRECTORY_GITHUB_USER"], ENV["GITHUB_API_TOKEN"])
+          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
           url += "/stats/contributors"
           puts "Fetching #{url}"
           conn = Faraday.new(url: url)
-          conn.basic_auth(ENV["FASTLANE_PLUGIN_DIRECTORY_GITHUB_USER"], ENV["GITHUB_API_TOKEN"])
+          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           contributor_details = JSON.parse(response.body)
 
