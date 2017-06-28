@@ -111,7 +111,7 @@ module Deliver
       end
 
       v.release_on_approval = options[:automatic_release]
-      v.toggle_phased_release(enabled: !!options[:phased_release])
+      v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
 
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
