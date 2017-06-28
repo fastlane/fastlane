@@ -138,6 +138,18 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 - they are identified as type 'main' or 'patch' (by containing 'main' or 'patch' in their file name)
 - you have at most one of each type
 
+If you want only update expansion files from previous version on Google Play use
+
+```
+fastlane supply --apk path/app.apk --obb_main_references_version version --obb_main_file_size size
+```
+
+or
+ 
+```
+fastlane supply --apk path/app.apk --obb_patch_references_version version --obb_patch_file_size size
+```
+
 ## Images and Screenshots
 
 After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.

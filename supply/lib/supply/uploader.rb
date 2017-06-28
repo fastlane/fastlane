@@ -83,7 +83,7 @@ module Supply
         UI.message("Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
-                              language: language)
+                            language: language)
       end
     end
 
@@ -99,7 +99,7 @@ module Supply
           UI.message("Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
-                                language: language)
+                              language: language)
         end
       end
     end
@@ -139,6 +139,20 @@ module Supply
         apk_version_code = client.upload_apk(apk_path)
         UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
+        if Supply.config[:obb_main_references_version] && Supply.config[:obb_main_file_size]
+          update_obb(apk_version_code,
+                     'main',
+                     Supply.config[:obb_main_references_version],
+                     Supply.config[:obb_main_file_size])
+        end
+
+        if Supply.config[:obb_patch_references_version] && Supply.config[:obb_patch_file_size]
+          update_obb(apk_version_code,
+                     'patch',
+                     Supply.config[:obb_patch_references_version],
+                     Supply.config[:obb_patch_file_size])
+        end
+
         upload_obbs(apk_path, apk_version_code)
 
         if metadata_path
@@ -153,6 +167,14 @@ module Supply
       apk_version_code
     end
 
+    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
+      UI.message("Updating '#{expansion_file_type}' expansion file from verison '#{references_version}'...")
+      client.update_obb(apk_version_code,
+                        expansion_file_type,
+                        references_version,
+                        file_size)
+    end
+
     def update_track(apk_version_codes)
       UI.message("Updating track '#{Supply.config[:track]}'...")
       if Supply.config[:track].eql? "rollout"
@@ -165,9 +187,9 @@ module Supply
     # returns only language directories from metadata_path
     def all_languages
       Dir.entries(metadata_path)
-         .select { |f| File.directory? File.join(metadata_path, f) }
-         .reject { |f| f.start_with?('.') }
-         .sort { |x, y| x <=> y }
+          .select { |f| File.directory? File.join(metadata_path, f) }
+          .reject { |f| f.start_with?('.') }
+          .sort { |x, y| x <=> y }
     end
 
     def client
