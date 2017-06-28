@@ -142,15 +142,31 @@ describe Deliver::UploadMetadata do
       allow(uploader).to receive(:verify_available_languages!)
       allow(version).to receive(:save!)
       allow(version).to receive(:release_on_approval=)
-      allow(version).to receive(:toggle_phased_release).with(enabled: true)
+      allow(version).to receive(:toggle_phased_release)
       allow(app).to receive(:edit_version).and_return(version)
       allow(app).to receive(:details).and_return(details)
       allow(details).to receive(:save!)
     end
 
-    it "toggle_phased_release is called" do
-      uploader.upload(phased_release: true, app: app)
-      expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+    context 'with true' do
+      it "toggle_phased_release is called" do
+        uploader.upload(phased_release: true, app: app)
+        expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+      end
+    end
+
+    context 'with false' do
+      it "toggle_phased_release is called" do
+        uploader.upload(phased_release: false, app: app)
+        expect(version).to have_received(:toggle_phased_release).with(enabled: false)
+      end
+    end
+
+    context 'without value' do
+      it "toggle_phased_release is not called" do
+        uploader.upload(app: app)
+        expect(version).not_to have_received(:toggle_phased_release).with(enabled: false)
+      end
     end
   end
 end
