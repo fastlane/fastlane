@@ -143,9 +143,9 @@ module Supply
 
       begin
         result = android_publisher.get_edit_listing(
-            current_package_name,
-            current_edit.id,
-            language
+          current_package_name,
+          current_edit.id,
+          language
         )
 
         return Listing.new(self, language, result)
@@ -170,9 +170,9 @@ module Supply
 
       result = call_google_api do
         android_publisher.list_edit_apklistings(
-            current_package_name,
-            current_edit.id,
-            apk_version_code
+          current_package_name,
+          current_edit.id,
+          apk_version_code
         )
       end
 
@@ -199,10 +199,10 @@ module Supply
 
       call_google_api do
         android_publisher.update_edit_listing(
-            current_package_name,
-            current_edit.id,
-            language,
-            listing
+          current_package_name,
+          current_edit.id,
+          language,
+          listing
         )
       end
     end
@@ -212,9 +212,9 @@ module Supply
 
       result_upload = call_google_api do
         android_publisher.upload_edit_apk(
-            current_package_name,
-            current_edit.id,
-            upload_source: path_to_apk
+          current_package_name,
+          current_edit.id,
+          upload_source: path_to_apk
         )
       end
 
@@ -226,12 +226,12 @@ module Supply
 
       call_google_api do
         android_publisher.upload_edit_deobfuscationfile(
-            current_package_name,
-            current_edit.id,
-            apk_version_code,
-            "proguard",
-            upload_source: path_to_mapping,
-            content_type: "application/octet-stream"
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          "proguard",
+          upload_source: path_to_mapping,
+          content_type: "application/octet-stream"
         )
       end
     end
@@ -250,10 +250,10 @@ module Supply
 
       call_google_api do
         android_publisher.update_edit_track(
-            current_package_name,
-            current_edit.id,
-            track,
-            track_body
+          current_package_name,
+          current_edit.id,
+          track,
+          track_body
         )
       end
     end
@@ -264,9 +264,9 @@ module Supply
 
       begin
         result = android_publisher.get_edit_track(
-            current_package_name,
-            current_edit.id,
-            track
+          current_package_name,
+          current_edit.id,
+          track
         )
       end
 
@@ -283,11 +283,11 @@ module Supply
 
       call_google_api do
         android_publisher.update_edit_apklisting(
-            current_package_name,
-            current_edit.id,
-            apk_listing.apk_version_code,
-            apk_listing.language,
-            apk_listing_object
+          current_package_name,
+          current_edit.id,
+          apk_listing.apk_version_code,
+          apk_listing.language,
+          apk_listing_object
         )
       end
     end
@@ -301,10 +301,10 @@ module Supply
 
       result = call_google_api do
         android_publisher.list_edit_images(
-            current_package_name,
-            current_edit.id,
-            language,
-            image_type
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type
         )
       end
 
@@ -317,12 +317,12 @@ module Supply
 
       call_google_api do
         android_publisher.upload_edit_image(
-            current_package_name,
-            current_edit.id,
-            language,
-            image_type,
-            upload_source: image_path,
-            content_type: 'image/*'
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type,
+          upload_source: image_path,
+          content_type: 'image/*'
         )
       end
     end
@@ -332,10 +332,10 @@ module Supply
 
       call_google_api do
         android_publisher.deleteall_edit_image(
-            current_package_name,
-            current_edit.id,
-            language,
-            image_type
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type
         )
       end
     end
@@ -345,14 +345,14 @@ module Supply
 
       call_google_api do
         android_publisher.update_edit_expansionfile(
-            current_package_name,
-            current_edit.id,
-            apk_version_code,
-            expansion_file_type,
-            Google::Apis::AndroidpublisherV2::ExpansionFile.new(
-                references_version: references_version,
-                file_size: file_size
-            )
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+            references_version: references_version,
+            file_size: file_size
+          )
         )
       end
     end
@@ -362,12 +362,12 @@ module Supply
 
       call_google_api do
         android_publisher.upload_edit_expansionfile(
-            current_package_name,
-            current_edit.id,
-            apk_version_code,
-            expansion_file_type,
-            upload_source: obb_file_path,
-            content_type: 'application/octet-stream'
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          upload_source: obb_file_path,
+          content_type: 'application/octet-stream'
         )
       end
     end
