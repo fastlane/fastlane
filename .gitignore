@@ -52,6 +52,7 @@ spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml
 **/.bundle
+fastlane/lib/fastlane/plugins/template/.rubocop.yml
 
 # iOS specific ignores, used in sample projects inside the repo
 *.pbxuser
