@@ -193,6 +193,13 @@ module Supply
                                      description: "Size of 'patch' expansion file in bytes",
                                      optional: true,
                                      type: Numeric)
+        FastlaneCore::ConfigItem.new(key: :check_superseded_tracks,
+                                     env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
+                                     optional: true,
+                                     description: "Check the other tracks for superseded versions and disable them",
+                                     is_string: false,
+                                     default_value: false)
+
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

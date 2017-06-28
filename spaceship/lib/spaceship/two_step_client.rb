@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module Spaceship
   class Client
     def handle_two_step(response)
