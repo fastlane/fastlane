@@ -88,9 +88,9 @@ module PEM
           Spaceship.certificate.production_push
         end
       end
-      
+
       def certificate_sorted
-        certificate.all.sort {|x,y| y.expires <=> x.expires }
+        certificate.all.sort { |x, y| y.expires <=> x.expires }
       end
     end
   end
