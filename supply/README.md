@@ -143,7 +143,7 @@ If you want only update expansion files from previous version on Google Play use
 ```
 fastlane supply --apk path/app.apk --obb_main_references_version version --obb_main_file_size size
 ```
-
+ 
 or
 
 ```
