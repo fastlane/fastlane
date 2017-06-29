@@ -85,13 +85,13 @@ fastlane release
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
-:page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs
+:page_with_curl: | Store **everything** in Git. Never lookup build commands on your CI system again.
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
-:hatching_chick: | Over 170 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations and 170 plugins available
 :computer: | Support for iOS and Android apps
 :octocat: | Full git and mercurial support
 
