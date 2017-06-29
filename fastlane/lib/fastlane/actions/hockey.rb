@@ -171,12 +171,11 @@ module Fastlane
         case response.status
         when 200...300
           url = response.body['public_url']
-          version_url = url + "/app_versions/" + response.body['version']
-          Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = version_url
+          app_url = self.download_url(response.body)
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
-
-          UI.message("Version Download URL: #{version_url}") if version_url
+          Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = app_url
           UI.message("Public Download URL: #{url}") if url
+          UI.message("New Version Download URL: #{app_url}") if app_url
           UI.success('Build successfully uploaded to HockeyApp!')
         else
           if response.body.to_s.include?("App could not be created")
@@ -185,6 +184,13 @@ module Fastlane
             UI.user_error!("Error when trying to upload file(s) to HockeyApp: #{response.status} - #{response.body}")
           end
         end
+      end
+
+      def self.download_url(body)
+        version_url = body['public_url']
+        version_url = body['public_url'] + '/app_versions/' + body['config_url'].split('/').last if body['config_url']
+        version_url = body['public_url'] + '/app_versions/' + response.body['version'] if body['version']
+        version_url
       end
 
       def self.description
