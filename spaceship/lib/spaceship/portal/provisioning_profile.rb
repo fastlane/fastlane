@@ -209,8 +209,9 @@ module Spaceship
         #  and Development profiles and add none for AppStore and Enterprise Profiles
         # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @param sub_platform (String) Used to create tvOS profiles at the moment. Value should equal 'tvOS' or nil.
+        # @param template (String) Used to select custom Entitlements found on the Developer Portal
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil)
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
@@ -253,7 +254,8 @@ module Spaceship
                                                 certificate_parameter,
                                                 devices.map(&:id),
                                                 mac: mac,
-                                                sub_platform: sub_platform)
+                                                sub_platform: sub_platform,
+                                                template: template)
           end
 
           self.new(profile)
