@@ -1,9 +1,9 @@
 module FastlaneCore
   class CrashReportGenerator
     class << self
-      def generate(exception: nil, action: nil)
+      def generate(exception: nil)
         message = format_crash_report_message(exception: exception)
-        crash_report_payload(message: message, action: action)
+        crash_report_payload(message: message)
       end
 
       private
@@ -35,11 +35,11 @@ module FastlaneCore
         message + backtrace
       end
 
-      def crash_report_payload(message: '', action: nil)
+      def crash_report_payload(message: '')
         {
           'eventTime' => Time.now.utc.to_datetime.rfc3339,
           'serviceContext' => {
-            'service' => action || 'fastlane',
+            'service' => 'fastlane',
             'version' => Fastlane::VERSION
           },
           'message' => message

@@ -27,7 +27,7 @@ describe Fastlane do
             'Build Date' => Time.new.to_s,
             'Built by' => 'Jenkins'
           },
-          default_payloads: [:lane, :test_result, :git_branch, :git_author]
+          default_payloads: [:lane, :test_result, :git_branch, :git_author, :last_git_commit_hash]
         })
 
         notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)

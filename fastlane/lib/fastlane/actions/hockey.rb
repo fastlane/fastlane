@@ -181,7 +181,8 @@ module Fastlane
             Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = version_url
             UI.message("Version Download URL: #{version_url}") if version_url
           end
-          
+
+          UI.message("Public Download URL: #{url}") if url
           UI.success('Build successfully uploaded to HockeyApp!')
         else
           if response.body.to_s.include?("App could not be created")

@@ -46,7 +46,7 @@ module Gym
         c.syntax = "fastlane gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Gym.gymfile_name)
           UI.user_error! "Gymfile already exists" if File.exist?(path)
           template = File.read("#{Gym::ROOT}/lib/assets/GymfileTemplate")

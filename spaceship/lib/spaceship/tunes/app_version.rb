@@ -152,6 +152,9 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
+      # @return (Hash) A hash representing the promotionalText in all languages
+      attr_reader :promotional_text
+
       # @return (Hash) A hash representing the description in all languages
       attr_reader :description
 
@@ -169,6 +172,28 @@ module Spaceship
 
       # @return (Hash) Represents the trailers of this app version (read-only)
       attr_reader :trailers
+
+      # @return (Hash) Represents the phased_release hash (read-only)
+      #   For now, please use the `toggle_phased_release` method and call `.save!`
+      #   as the API will probably change in the future
+      attr_reader :phased_release
+
+      # Currently phased_release doesn't seem to have all the features enabled
+      #
+      #     => {"state"=>{"value"=>"NOT_STARTED", "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil},
+      #        "startDate"=>nil,
+      #        "lastPaused"=>nil,
+      #        "pausedDuration"=>nil,
+      #        "totalPauseDays"=>30,
+      #        "currentDayNumber"=>nil,
+      #        "dayPercentageMap"=>{"1"=>1, "2"=>2, "3"=>5, "4"=>10, "5"=>20, "6"=>50, "7"=>100},
+      #        "isEnabled"=>true}
+      #
+      def toggle_phased_release(enabled: false)
+        state = (enabled ? "INACTIVE" : "NOT_STARTED")
+
+        self.phased_release["state"]["value"] = state
+      end
 
       attr_mapping({
         'appType' => :app_type,
@@ -188,6 +213,7 @@ module Spaceship
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
+        'phasedRelease' => :phased_release,
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
@@ -563,7 +589,8 @@ module Spaceship
           description: :description,
           supportUrl: :support_url,
           marketingUrl: :marketing_url,
-          releaseNotes: :release_notes
+          releaseNotes: :release_notes,
+          promotionalText: :promotional_text
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
@@ -811,7 +838,9 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          trailer_data = display_family.fetch("trailer", {}).fetch("value")
+          trailer_raw = display_family["trailer"]
+          next if trailer_raw.nil?
+          trailer_data = trailer_raw["value"]
           next if trailer_data.nil?
           data = {
             device_type: display_family['name'],

@@ -20,12 +20,12 @@ describe Fastlane::Actions::CommitVersionBumpAction do
 
   describe 'settings_bundle_file_path' do
     it 'returns the path of a file in the settings bundle from an Xcodeproj::Project' do
-      settings_bundle = double "file", path: "MyApp/Settings.bundle"
-      xcodeproj = double "xcodeproj", files: [settings_bundle], path: "./MyApp.xcodeproj"
+      settings_bundle = double "file", path: "Settings.bundle", real_path: "/path/to/MyApp/Settings.bundle"
+      xcodeproj = double "xcodeproj", files: [settings_bundle]
 
       file_path = action.settings_bundle_file_path xcodeproj, "Root.plist"
 
-      expect(file_path).to eq "./MyApp/Settings.bundle/Root.plist"
+      expect(file_path).to eq "/path/to/MyApp/Settings.bundle/Root.plist"
     end
 
     it 'raises if no settings bundle in the project' do

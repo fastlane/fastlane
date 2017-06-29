@@ -10,10 +10,10 @@ module Gym
   # Responsible for building the fully working xcodebuild command
   class PackageCommandGeneratorXcode7
     class << self
-      def generate
-        print_legacy_information
+      DEFAULT_EXPORT_METHOD = "app-store"
 
-        parts = ["/usr/bin/xcrun #{XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive"]
+      def generate
+        parts = ["/usr/bin/xcrun #{wrap_xcodebuild.shellescape} -exportArchive"]
         parts += options
         parts += pipe
 
@@ -42,6 +42,12 @@ module Gym
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
         Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
+      end
+
+      # Wrap xcodebuild to work-around ipatool dependency to system ruby
+      def wrap_xcodebuild
+        require 'fileutils'
+        @wrapped_xcodebuild_path ||= File.join(Gym::ROOT, "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
       end
 
       def ipa_path
@@ -134,14 +140,14 @@ module Gym
           end
 
           # Saves configuration for later use
-          Gym.config[:export_method] ||= hash[:method]
+          Gym.config[:export_method] ||= hash[:method] || DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = hash[:uploadSymbols] if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = hash[:uploadBitcode] if Gym.config[:include_bitcode].nil?
           Gym.config[:export_team_id] ||= hash[:teamID]
         else
           hash = {}
           # Sets default values
-          Gym.config[:export_method] ||= "app-store"
+          Gym.config[:export_method] ||= DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = true if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = false if Gym.config[:include_bitcode].nil?
         end
@@ -178,14 +184,6 @@ module Gym
       # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
       def to_plist(hash)
         Plist::Emit.dump(hash, true)
-      end
-
-      def print_legacy_information
-        return if Gym.config[:provisioning_profile_path].to_s.length == 0
-
-        UI.error "You're using Xcode 7 or above, the `provisioning_profile_path` value will be ignored"
-        UI.error "Please follow the Code Signing Guide: https://codesigning.guide (for match) or https://docs.fastlane.tools/codesigning/GettingStarted/"
-        UI.error "This is just a warning, gym will continue running just as expected, but the parameter will be ignored"
       end
     end
   end

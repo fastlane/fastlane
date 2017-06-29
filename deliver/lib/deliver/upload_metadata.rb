@@ -2,13 +2,13 @@ module Deliver
   # upload description, rating, etc.
   class UploadMetadata
     # All the localised values attached to the version
-    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url]
+    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url, :promotional_text]
 
     # Everything attached to the version but not being localised
     NON_LOCALISED_VERSION_VALUES = [:copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :privacy_url]
+    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
@@ -118,8 +118,19 @@ module Deliver
 
       UI.message("Uploading metadata to iTunes Connect")
       v.save!
-      details.save!
-      UI.success("Successfully uploaded set of metadata to iTunes Connect")
+      begin
+        details.save!
+        UI.success("Successfully uploaded set of metadata to iTunes Connect")
+      rescue Spaceship::TunesClient::ITunesConnectError => e
+        # This makes sure that we log invalid app names as user errors
+        # If another string needs to be checked here we should
+        # figure out a more generic way to handle these cases.
+        if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
+          UI.user_error!(e.message)
+        else
+          raise e
+        end
+      end
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
@@ -179,6 +190,7 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
+          language = language.to_s
           enabled_languages << language unless enabled_languages.include?(language)
         end
       end

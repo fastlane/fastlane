@@ -233,16 +233,11 @@ module Fastlane
         [key, content.to_s]
       end
 
-      begin
-        require 'terminal-table'
-        puts Terminal::Table.new({
-          title: "Lane Context".yellow,
-          rows: FastlaneCore::PrintTable.transform_output(rows)
-        })
-      rescue
-        os = Helper.linux? ? 'linux' : 'mac'
-        UI.crash!("Something went wrong trying to print the lane context on #{os}")
-      end
+      require 'terminal-table'
+      puts Terminal::Table.new({
+        title: "Lane Context".yellow,
+        rows: FastlaneCore::PrintTable.transform_output(rows)
+      })
     end
   end
 end

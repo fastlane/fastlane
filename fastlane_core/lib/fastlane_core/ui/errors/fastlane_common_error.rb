@@ -1,7 +1,7 @@
 module FastlaneCore
   class Interface
     # Super class for exception types that we do not want to record
-    # explictly as crashes or user errors
+    # explicitly as crashes or user errors
     class FastlaneCommonException < FastlaneException; end
 
     # Raised when there is a build failure in xcodebuild
