@@ -173,7 +173,7 @@ module Fastlane
           url = response.body['public_url']
           version_url = url
           if response.body["version"]
-            version_url = url + "/app_versions/" + response.body["version"].split('/').last
+            version_url = url + "/app_versions/" + response.body["version"]
           elsif response.body['config_url'] 
             version_url = url + "/app_versions/" + response.body["config_url"].split('/').last
           end
