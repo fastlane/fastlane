@@ -1,7 +1,6 @@
 require "bundler/gem_tasks"
 
 GEMS = %w(fastlane danger-device_grid)
-RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
