@@ -186,7 +186,7 @@ module Fastlane
         end
       end
 
-      def self.puts_download_url(body)
+      def self.download_url(body)
         version_url = body['public_url']
         version_url = body['public_url'] + '/app_versions/' + body['config_url'].split('/').last if body['config_url']
         version_url = body['public_url'] + '/app_versions/' + response.body['version'] if body['version']
