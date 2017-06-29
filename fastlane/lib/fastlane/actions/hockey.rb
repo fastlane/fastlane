@@ -171,7 +171,7 @@ module Fastlane
         case response.status
         when 200...300
           url = response.body['public_url']
-          app_url = self.puts_download_url(response.body)
+          app_url = self.download_url(response.body)
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
           Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = app_url
           UI.message("Public Download URL: #{url}") if url
