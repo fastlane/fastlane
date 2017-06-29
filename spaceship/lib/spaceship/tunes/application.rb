@@ -129,10 +129,10 @@ module Spaceship
         client.get_resolution_center(apple_id, platform)
       end
 
-      def ratings
-        attrs = client.get_rating_summary(apple_id, platform)
+      def ratings(version_id: '', storefront: '')
+        attrs = client.get_ratings(apple_id, platform, version_id, storefront)
         attrs[:application] = self
-        Tunes::AppRatings.factory(attrs)
+        Tunes::AppRatings.new(attrs)
       end
 
       def platforms

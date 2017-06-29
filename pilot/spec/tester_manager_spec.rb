@@ -131,10 +131,10 @@ describe Pilot::TesterManager do
           ]
         end
 
-        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers".green,
+        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers (2)".green,
                                                    headings: headings,
                                                        rows: rows)
-        expect(Terminal::Table).to receive(:new).with(title: "External Testers".green,
+        expect(Terminal::Table).to receive(:new).with(title: "External Testers (2)".green,
                                                    headings: headings,
                                                        rows: rows)
 
@@ -152,10 +152,10 @@ describe Pilot::TesterManager do
           [tester.first_name, tester.last_name, tester.email, tester.group_names]
         end
 
-        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers".green,
+        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers (2)".green,
                                                    headings: headings,
                                                        rows: rows)
-        expect(Terminal::Table).to receive(:new).with(title: "External Testers".green,
+        expect(Terminal::Table).to receive(:new).with(title: "External Testers (2)".green,
                                                    headings: headings,
                                                        rows: rows)
 

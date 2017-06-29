@@ -1,3 +1,5 @@
+require 'precheck'
+
 module Deliver
   class Runner
     attr_accessor :options
@@ -10,6 +12,7 @@ module Deliver
     end
 
     def login
+      UI.message("Running precheck before submitting to review, if you'd like to disable this check you can set run_precheck_before_submit to false") unless options[:run_precheck_before_submit] == false
       UI.message("Login to iTunes Connect (#{options[:username]})")
       Spaceship::Tunes.login(options[:username])
       Spaceship::Tunes.select_team
@@ -17,7 +20,7 @@ module Deliver
     end
 
     def run
-      verify_version if options[:app_version].to_s.length > 0
+      verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
       upload_metadata
 
       has_binary = (options[:ipa] || options[:pkg])
@@ -25,9 +28,45 @@ module Deliver
         upload_binary
       end
 
-      UI.success("Finished the upload to iTunes Connect")
+      UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
-      submit_for_review if options[:submit_for_review]
+      precheck_success = precheck_app
+
+      submit_for_review if options[:submit_for_review] && precheck_success
+    end
+
+    # Make sure we pass precheck before uploading
+    def precheck_app
+      return true unless options[:run_precheck_before_submit]
+
+      if options[:submit_for_review]
+        UI.message("Making sure we pass precheck 👮‍♀️ 👮 before we submit  🛫")
+      else
+        UI.message("Running precheck 👮‍♀️ 👮")
+      end
+
+      precheck_options = {
+        default_rule_level: options[:precheck_default_rule_level],
+        app_identifier: options[:app_identifier],
+        username: options[:username]
+      }
+
+      precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
+      Precheck.config = precheck_config
+
+      precheck_success = true
+      begin
+        precheck_success = Precheck::Runner.new.run
+      rescue => ex
+        UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finished. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
+        UI.verbose(ex.inspect)
+        UI.verbose(ex.backtrace.join("\n"))
+
+        # always report this back, since this is a new tool, we don't want to crash, but we still want to see this
+        FastlaneCore::CrashReporter.report_crash(exception: ex)
+      end
+
+      return precheck_success
     end
 
     # Make sure the version on iTunes Connect matches the one in the ipa

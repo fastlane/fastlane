@@ -173,8 +173,19 @@ module Fastlane
           url = response.body['public_url']
           version_url = url + "/app_versions/" + response.body["config_url"].split('/').last
           Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
+<<<<<<< HEAD
           Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = version_url
           UI.message("Version Download URL: #{version_url}") if version_url
+=======
+
+          if response.body['version']
+            version_url = url + "/app_versions/" + response.body['version']
+            Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = version_url
+            UI.message("Version Download URL: #{version_url}") if version_url
+          end
+
+          UI.message("Public Download URL: #{url}") if url
+>>>>>>> 8ef7afa2637bd7debfc392b3b80ccab2adfc0d00
           UI.success('Build successfully uploaded to HockeyApp!')
         else
           if response.body.to_s.include?("App could not be created")

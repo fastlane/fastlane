@@ -1,0 +1,16 @@
+{
+    "data": {
+        "ratingCount": 1300,
+        "ratingOneCount": 400,
+        "ratingTwoCount": 67,
+        "ratingThreeCount": 174,
+        "ratingFourCount": 393,
+        "ratingFiveCount": 604
+    },
+    "messages": {
+        "warn": null,
+        "info": null,
+        "error": null
+    },
+    "statusCode": "SUCCESS"
+}

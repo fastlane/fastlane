@@ -9,24 +9,6 @@ module Gym
       @options = plain_options
     end
 
-    def self.legacy_api_note!
-      UI.important "Unfortunately the legacy build API was removed with Xcode 8.3."
-      UI.important "Please make sure to remove use_legacy_build_api from your ./fastlane/Fastfile"
-      UI.important "and update the gym call to include the export method like this:"
-      UI.important "== App Store Builds =="
-      UI.error '     gym(scheme: "MyScheme", export_method: "app-store")'
-      UI.important "==  Ad Hoc Builds =="
-      UI.error '     gym(scheme: "MyScheme", export_method: "ad-hoc")'
-      UI.important "== Development Builds =="
-      UI.error '     gym(scheme: "MyScheme", export_method: "development")'
-      UI.important "== In-House Enterprise Builds =="
-      UI.error '     gym(scheme: "MyScheme", export_method: "enterprise")'
-      UI.important "If you run into a code signing error, please check out our troubleshooting guide for more information on how to solve the most common issues"
-      UI.error "    https://docs.fastlane.tools/codesigning/troubleshooting/ 🚀"
-      UI.important ""
-      UI.user_error! "legacy_build_api removed!"
-    end
-
     def self.plain_options
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
@@ -117,20 +99,6 @@ module Gym
                                      description: "Should the ipa include bitcode?",
                                      is_string: false,
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
-                                     deprecated: "Don't use this option any more, as it's deprecated by Apple",
-                                     env_name: "GYM_USE_LEGACY_BUILD_API",
-                                     description: "Don't use this option any more, as it's deprecated by Apple",
-                                     default_value: false,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       if value
-                                         UI.important "Don't use this option any more, as it's deprecated by Apple"
-                                       end
-                                       if Gym::Xcode.legacy_api_deprecated?
-                                         Gym::Options.legacy_api_note!
-                                       end
-                                     end),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
@@ -146,7 +114,6 @@ module Gym
                                      description: "Specifies path to export options plist. User xcodebuild -help to print the full set of available options",
                                      is_string: false,
                                      optional: true,
-                                     conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
@@ -154,7 +121,6 @@ module Gym
                                      env_name: "GYM_EXPORT_XCARGS",
                                      description: "Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true,
-                                     conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
                                      end,
@@ -200,15 +166,6 @@ module Gym
                                      description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
                                      optional: true,
                                      is_string: false),
-        FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
-                                     short_option: "-e",
-                                     env_name: "GYM_PROVISIONING_PROFILE_PATH",
-                                     description: "The path to the provisioning profile (optional)",
-                                     optional: true,
-                                     deprecated: 'Use target specific provisioning profiles instead',
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
-                                     end),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
@@ -259,24 +216,15 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_junit,
                                      env_name: "XCPRETTY_REPORT_JUNIT",
                                      description: "Have xcpretty create a JUnit-style XML report at the provided path",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_html,
                                      env_name: "XCPRETTY_REPORT_HTML",
                                      description: "Have xcpretty create a simple HTML report at the provided path",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_report_json,
                                      env_name: "XCPRETTY_REPORT_JSON",
                                      description: "Have xcpretty create a JSON compilation database at the provided path",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Report output location not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :analyze_build_time,
                                      env_name: "GYM_ANALYZE_BUILD_TIME",
                                      description: "Analyze the project build time and store the output in culprits.txt file",

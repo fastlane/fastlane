@@ -176,7 +176,7 @@ module Pilot
 
     def list_global(all_testers, title)
       headers = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
-      list(all_testers, title, headers) do |tester|
+      list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
         [
           tester.first_name,
           tester.last_name,
@@ -191,7 +191,7 @@ module Pilot
 
     def list_by_app(all_testers, title)
       headers = ["First", "Last", "Email", "Groups"]
-      list(all_testers, title, headers) do |tester|
+      list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
         [
           tester.first_name,
           tester.last_name,

@@ -26,7 +26,7 @@ module Supply
                                      description: "The percentage of the user fraction when uploading to the rollout track",
                                      default_value: '0.1',
                                      verify_block: proc do |value|
-                                       min = 0.05
+                                       min = 0.01
                                        max = 0.5
                                        UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
                                      end),
@@ -172,7 +172,13 @@ module Supply
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :check_superseded_tracks,
+                                     env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
+                                     optional: true,
+                                     description: "Check the other tracks for superseded versions and disable them",
+                                     is_string: false,
+                                     default_value: false)
 
       ]
     end

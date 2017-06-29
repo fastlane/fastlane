@@ -4,8 +4,6 @@ module Fastlane
 
     attr_accessor :categories
 
-    attr_accessor :plugins
-
     def initialize
       require 'fastlane'
       require 'fastlane/documentation/actions_list'
@@ -16,7 +14,6 @@ module Fastlane
 
     def work
       fill_built_in_actions
-      fill_plugins
     end
 
     def fill_built_in_actions
@@ -33,41 +30,6 @@ module Fastlane
         else
           UI.error("Action '#{action.name}' doesn't contain category information... skipping")
         end
-      end
-    end
-
-    def fill_plugins
-      self.plugins = []
-
-      all_fastlane_plugins = PluginFetcher.fetch_gems # that's all available gems
-
-      # We iterate over the enhancer data, since this includes the various actions per plugin
-      # we then access `all_fastlane_plugins` to get the URL to the plugin
-      all_actions_from_enhancer.each do |current_action|
-        action_name = current_action["action"] # e.g. "fastlane-plugin-synx/synx"
-
-        next unless action_name.start_with?("fastlane-plugin") # we only care about plugins here
-
-        gem_name = action_name.split("/").first # e.g. fastlane-plugin-synx
-        ruby_gem_info = all_fastlane_plugins.find { |a| a.full_name == gem_name }
-
-        next unless ruby_gem_info
-
-        # `ruby_gem_info` e.g.
-        #
-        # #<Fastlane::FastlanePlugin:0x007ff7fc4de9e0
-        #  @downloads=888,
-        #  @full_name="fastlane-plugin-synx",
-        #  @homepage="https://github.com/afonsograca/fastlane-plugin-synx",
-        #  @info="Organise your Xcode project folder to match your Xcode groups.",
-        #  @name="synx">
-
-        self.plugins << {
-          linked_title: ruby_gem_info.linked_title,
-          action_name: action_name.split("/").last,
-          description: ruby_gem_info.info,
-          usage: number_of_launches_for_action(action_name)
-        }
       end
     end
 

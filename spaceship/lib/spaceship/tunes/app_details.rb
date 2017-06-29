@@ -13,6 +13,9 @@ module Spaceship
       # @return (Hash) A hash representing the app name in all languages
       attr_reader :name
 
+      # @return (Hash) A hash representing the subtitle in all languages
+      attr_reader :subtitle
+
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
@@ -63,6 +66,7 @@ module Spaceship
       def unfold_languages
         {
           name: :name,
+          subtitle: :subtitle,
           privacyPolicyUrl: :privacy_url,
           privacyPolicy: :apple_tv_privacy_policy
         }.each do |json, attribute|

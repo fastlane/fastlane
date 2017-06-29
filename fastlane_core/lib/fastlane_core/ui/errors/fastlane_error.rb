@@ -26,12 +26,12 @@ end
 
 class Exception
   def fastlane_crash_came_from_custom_action?
-    custom_frame = exception.backtrace.find { |frame| frame.start_with?('actions/') }
+    custom_frame = exception && exception.backtrace && exception.backtrace.find { |frame| frame.start_with?('actions/') }
     !custom_frame.nil?
   end
 
   def fastlane_crash_came_from_plugin?
-    plugin_frame = backtrace.find { |frame| frame.include?('fastlane-plugin-') }
+    plugin_frame = exception && exception.backtrace && exception.backtrace.find { |frame| frame.include?('fastlane-plugin-') }
     !plugin_frame.nil?
   end
 

@@ -258,8 +258,13 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_rating_summary(app_id, platform, versionId = '')
-      r = request(:get, "ra/apps/#{app_id}/reviews/summary?platform=#{platform}&versionId=#{versionId}")
+    def get_ratings(app_id, platform, versionId = '', storefront = '')
+      # if storefront or versionId is empty api fails
+      rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
+      rating_url << "storefront=#{storefront}" unless storefront.empty?
+      rating_url << "versionId=#{versionId}" unless versionId.empty?
+
+      r = request(:get, rating_url)
       parse_response(r, 'data')
     end
 
@@ -516,6 +521,14 @@ module Spaceship
     def supported_countries
       r = request(:get, "ra/apps/pricing/supportedCountries")
       parse_response(r, 'data')
+    end
+
+    def available_languages
+      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
+      response = parse_response(r, 'data')
+      response.flat_map { |region| region["storeFronts"] }
+              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
+              .uniq
     end
 
     #####################################################
