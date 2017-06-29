@@ -73,6 +73,11 @@ module Spaceship
       #   "tvOS"
       attr_accessor :sub_platform
 
+      # @return (String) The value of the entitlement that is used on the Apple Developer Portal
+      # @example
+      #   "Standard"
+      attr_accessor :template
+
       # No information about this attribute
       attr_accessor :managing_app
 
@@ -146,7 +151,8 @@ module Spaceship
         'proProPlatform' => :platform,
         'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
-        'appId' => :app
+        'appId' => :app,
+        'template' => :template
       })
 
       class << self
@@ -422,7 +428,8 @@ module Spaceship
             certificates.map(&:id),
             devices.map(&:id),
             mac: mac?,
-            sub_platform: tvos? ? 'tvOS' : nil
+            sub_platform: tvos? ? 'tvOS' : nil,
+            template: template
           )
         end
 
