@@ -121,7 +121,11 @@ module Sigh
                                        value = value.to_s
                                        pt = %w(macos tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template,
+                                     env_name: "SIGH_PROVISIONING_TEMPLATE",
+                                     description: "The value of the entitlement that is used on the Apple Developer Portal",
+                                     optional: true)
       ]
     end
   end
