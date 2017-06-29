@@ -114,7 +114,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      description: "Enable phased the phased release feature of iTC",
                                      is_string: false,
-                                     default_value: false),
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
