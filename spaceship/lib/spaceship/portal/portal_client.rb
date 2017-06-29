@@ -491,7 +491,7 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template: nil)
       ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
       end
@@ -505,6 +505,7 @@ module Spaceship
         deviceIds: device_ids
       }
       params[:subPlatform] = sub_platform if sub_platform
+      params[:template] = template if template
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", params)
       parse_response(r, 'provisioningProfile')
