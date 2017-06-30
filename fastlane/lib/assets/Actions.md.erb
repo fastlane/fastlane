@@ -18,13 +18,12 @@ import './path/to/other/Fastfile'
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
-- [Plugins](#plugins)
-
+- [Plugins](https://docs.fastlane.tools/plugins/available-plugins)
 
 
 <%- @categories.each do |category, actions| %>
 # <%= category %>
-  <%- actions.sort.reverse.to_h.each do |_number_of_launches, action| -%>
+  <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
 
 ### <%= action.action_name %>
 
@@ -72,10 +71,3 @@ Key | Description
 
   <%- end %>
 <%- end %>
-
-# Plugins
-| Action | Plugin | Description | Usage Number
----------|--------|-------------|--------------
-<%- @plugins.each do |plugin| -%>
-<%= plugin[:action_name] %> | <%= plugin[:linked_title] %> | <%= plugin[:description] %> | <%= plugin[:usage] %>
-<%- end -%>

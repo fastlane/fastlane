@@ -55,6 +55,8 @@ module Deliver
     # Directory name it contains review information
     REVIEW_INFORMATION_DIR = "review_information"
 
+    # rubocop:disable Metrics/PerceivedComplexity
+
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
       return if options[:skip_metadata]
@@ -111,6 +113,7 @@ module Deliver
       end
 
       v.release_on_approval = options[:automatic_release]
+      v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
 
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
@@ -121,7 +124,7 @@ module Deliver
       begin
         details.save!
         UI.success("Successfully uploaded set of metadata to iTunes Connect")
-      rescue Spaceship::ITunesConnectError => e
+      rescue Spaceship::TunesClient::ITunesConnectError => e
         # This makes sure that we log invalid app names as user errors
         # If another string needs to be checked here we should
         # figure out a more generic way to handle these cases.
@@ -132,6 +135,8 @@ module Deliver
         end
       end
     end
+
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
@@ -190,6 +195,7 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
+          language = language.to_s
           enabled_languages << language unless enabled_languages.include?(language)
         end
       end

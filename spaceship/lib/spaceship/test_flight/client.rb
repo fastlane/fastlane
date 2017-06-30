@@ -29,7 +29,7 @@ module Spaceship::TestFlight
 
     def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
       assert_required_params(__method__, binding)
-      with_retry(retry_count: retry_count) do
+      with_retry(retry_count) do
         response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
         handle_response(response)
       end

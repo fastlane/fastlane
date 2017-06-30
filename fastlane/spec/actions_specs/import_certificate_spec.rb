@@ -16,8 +16,9 @@ describe Fastlane do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k '' #{keychain_path.shellescape} &> /dev/null"
 
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: false)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: false)
@@ -42,8 +43,9 @@ describe Fastlane do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_set_key_partition_list_command = "security set-key-partition-list -S apple-tool:,apple: -k #{password.shellescape} #{keychain_path.shellescape} &> /dev/null"
 
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_set_key_partition_list_command, print: false)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_security_import_command, print: false)
@@ -69,8 +71,9 @@ describe Fastlane do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k '' #{keychain_path.shellescape}"
 
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
-        allow(File).to receive(:exist?).with(keychain_path).and_return(true)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
         allow(FastlaneCore::Helper).to receive(:backticks).with(allowed_command, print: true)
         expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: true)

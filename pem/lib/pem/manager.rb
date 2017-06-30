@@ -9,7 +9,7 @@ module PEM
         FastlaneCore::PrintTable.print_values(config: PEM.config, hide_keys: [:new_profile], title: "Summary for PEM #{Fastlane::VERSION}")
         login
 
-        existing_certificate = certificate.all.detect do |c|
+        existing_certificate = certificate_sorted.detect do |c|
           c.owner_name == PEM.config[:app_identifier]
         end
 
@@ -87,6 +87,10 @@ module PEM
         else
           Spaceship.certificate.production_push
         end
+      end
+
+      def certificate_sorted
+        certificate.all.sort { |x, y| y.expires <=> x.expires }
       end
     end
   end
