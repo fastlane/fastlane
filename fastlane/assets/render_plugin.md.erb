@@ -2,7 +2,7 @@
 
 <div class="quality-index" style="color: #<%= @plugin.color_to_use %>"><%= @plugin.data[:overall_score] %></div>
 
-<h3><a href="<%= @plugin.homepage %>"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
+<h3><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
 
 <p class="via-text">via <%= @plugin.raw_hash["authors"] %></p>
 
@@ -19,4 +19,11 @@
  
 </details>
 
-<a href="<%= @plugin.homepage %>" target="_blank">Open on GitHub</a>
+<p>
+<% if @plugin.data[:has_github_page] %>
+  <a href="<%= @plugin.homepage %>" target="_blank">Open on GitHub</a>
+<% else %>
+  <a href="<%= @plugin.homepage %>" target="_blank">Open website</a>
+  <span style="color: #a03030">(no GitHub link provided in gemspec)</span>
+<% end %>
+</p>

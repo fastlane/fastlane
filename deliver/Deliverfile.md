@@ -146,6 +146,16 @@ automatic_release true
 automatic_release false
 ```
 
+##### phased_release
+
+Enable or disable the phased releases feature of iTunes Connect. If set to `true`, the update will be released over a 7 day period. Default behavior is to leave whatever you defined on iTunes Connect.
+
+```ruby
+phased_release true
+# or 
+phased_release false
+```
+
 ##### app_rating_config_path
 You can set the app age ratings using `deliver`. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
 

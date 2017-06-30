@@ -100,34 +100,34 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). `deli
 
 ### Available Languages
 
-- `no`
-- `en-US`
-- `en-CA`
-- `fi`
-- `ru`
-- `zh-Hans`
-- `nl-NL`
-- `zh-Hant`
-- `en-AU`
-- `id`
+- `da`
 - `de-DE`
-- `sv`
+- `el`
+- `en-AU`
+- `en-CA`
+- `en-GB`
+- `en-US`
+- `es-ES`
+- `es-MX`
+- `fi`
+- `fr-CA`
+- `fr-FR`
+- `id`
+- `it`
+- `ja`
 - `ko`
 - `ms`
+- `nl-NL`
+- `no`
 - `pt-BR`
-- `el`
-- `es-ES`
-- `it`
-- `fr-CA`
-- `es-MX`
 - `pt-PT`
-- `vi`
+- `ru`
+- `sv`
 - `th`
-- `ja`
-- `fr-FR`
-- `da`
 - `tr`
-- `en-GB`
+- `vi`
+- `zh-Hans`
+- `zh-Hant`
 
 ### Available age rating groups
 
