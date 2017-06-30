@@ -123,11 +123,9 @@ module FastlaneCore
     def self.ios_app_identifier(args)
       # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
       args.each_with_index do |current, index|
-        # rubocop: disable Style/MultipleComparison
         if current == "-a" || current == "--app_identifier"
           return args[index + 1] if args.count > index
         end
-        # rubocop: enable Style/MultipleComparison
       end
 
       ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|

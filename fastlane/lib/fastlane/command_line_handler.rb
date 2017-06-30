@@ -32,10 +32,8 @@ module Fastlane
 
     # Helper to convert into the right data type
     def self.convert_value(value)
-      # rubocop: disable Style/MultipleComparison
       return true if value == 'true' || value == 'yes'
       return false if value == 'false' || value == 'no'
-      # rubocop: enable Style/MultipleComparison
 
       # Default case:
       return value

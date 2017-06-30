@@ -1,3 +1,6 @@
+Style/MultipleComparison:
+  Enabled: false
+
 Style/PercentLiteralDelimiters:
   Enabled: false
 

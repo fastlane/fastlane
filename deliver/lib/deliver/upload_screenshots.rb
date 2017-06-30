@@ -83,12 +83,10 @@ module Deliver
         language = File.basename(lng_folder)
 
         # Check to see if we need to traverse multiple platforms or just a single platform
-        # rubocop: disable Style/MultipleComparison
         if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
           screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
           next
         end
-        # rubocop: enable Style/MultipleComparison
 
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
         next if files.count == 0
