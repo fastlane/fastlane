@@ -96,7 +96,10 @@ module Fastlane
                                    value: (self.data[:github_issues].to_i * -1)),
             FastlanePluginRating.new(key: :downloads,
                              description: "More downloads = more users have been using the plugin for a while",
-                                   value: (self.data[:downloads].to_i / 250))
+                                   value: (self.data[:downloads].to_i / 250)),
+            FastlanePluginRating.new(key: :tests,
+                             description: "The more tests a plugin has, the better",
+                                   value: self.data[:tests].to_i * 3)
           ]
         end
 
@@ -143,6 +146,14 @@ module Fastlane
                 readme_score = 0
               end
               self.data[:readme_score] = readme_score
+
+              # Detect how many tests this plugin has
+              tests_count = 0
+              Dir["spec/**/*_spec.rb"].each do |spec_file|
+                # poor person's way to detect the number of tests, good enough to get a sense
+                tests_count += File.read(spec_file).scan(/ it /).count
+              end
+              self.data[:tests] = tests_count
             end
           end
         end
