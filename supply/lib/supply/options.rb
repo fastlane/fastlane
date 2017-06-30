@@ -10,12 +10,12 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
                                      short_option: "-p",
-                                     description: "The package name of the Application to modify",
+                                     description: "The package name of the Application to use",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: #{valid_tracks.join(', ')}",
+                                     description: "The Track of the Application to use: #{valid_tracks.join(', ')}",
                                      default_value: 'production',
                                      verify_block: proc do |value|
                                        available = valid_tracks
