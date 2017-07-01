@@ -152,6 +152,13 @@ module FastlaneCore
       @xcode_version
     end
 
+    # @return true if Xcode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
+    end
+
     def self.transporter_java_executable_path
       return File.join(self.transporter_java_path, 'bin', 'java')
     end
@@ -211,13 +218,6 @@ module FastlaneCore
       keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
-    end
-
-    # @return true if Xcode version is higher than 8.3
-    def self.xcode_at_least?(version)
-      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-      v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable
