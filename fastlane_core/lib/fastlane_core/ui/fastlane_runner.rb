@@ -34,7 +34,24 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
+      xcode_outdated = false
       begin
+        unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_VERSION)
+          xcode_outdated = true
+        end
+      rescue
+        # We don't care about exceptions here
+        # We'll land here if the user doesn't have Xcode at all for example
+        # which is fine for someone who uses fastlane just for Android project
+        # What we *do* care about is when someone links an old version of Xcode
+      end
+
+      begin
+        if xcode_outdated
+          # We have to raise that error within this `begin` block to show a nice user error without a stack trace
+          FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_VERSION}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
         collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
