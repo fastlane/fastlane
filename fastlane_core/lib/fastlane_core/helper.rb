@@ -220,13 +220,6 @@ module FastlaneCore
       keychain_path
     end
 
-    # @return true if XCode version is higher than 8.3
-    def self.xcode_at_least?(version)
-      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-      v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new(version)
-    end
-
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
