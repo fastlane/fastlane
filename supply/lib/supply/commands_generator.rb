@@ -29,7 +29,7 @@ module Supply
         c.syntax = 'fastlane supply'
         c.description = 'Run a deploy process'
 
-        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
+        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options, command: c)
 
         c.action do |args, options|
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
@@ -43,7 +43,7 @@ module Supply
         c.syntax = 'fastlane supply init'
         c.description = 'Sets up supply for you'
 
-        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options)
+        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options, command: c)
 
         c.action do |args, options|
           require 'supply/setup'

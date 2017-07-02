@@ -47,10 +47,17 @@ describe Spaceship::TestFlight::Client do
     end
 
     it 'raises an exception on a HTTP error' do
-      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      response = double('Response', body: '<html>Server Error</html>', status: 400)
       expect do
         subject.handle_response(response)
       end.to raise_error(Spaceship::Client::UnexpectedResponse)
+    end
+
+    it 'raises an InternalServerError exception on a HTTP 500 error' do
+      response = double('Response', body: '<html>Server Error</html>', status: 500)
+      expect do
+        subject.handle_response(response)
+      end.to raise_error(Spaceship::Client::InternalServerError)
     end
   end
 
@@ -135,11 +142,11 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
-  context '#post_tester' do
+  context '#create_app_level_tester' do
     let(:tester) { double('Tester', email: 'fake@email.com', first_name: 'Fake', last_name: 'Name') }
     it 'executes the request' do
       MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
-      subject.post_tester(app_id: app_id, tester: tester)
+      subject.create_app_level_tester(app_id: app_id, first_name: tester.first_name, last_name: tester.last_name, email: tester.email)
       expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers')
     end
   end

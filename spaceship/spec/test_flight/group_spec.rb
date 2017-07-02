@@ -84,11 +84,13 @@ describe Spaceship::TestFlight::Group do
 
   context 'instances' do
     let(:group) { Spaceship::TestFlight::Group.new('appAdamId' => 1, 'id' => 2, 'isDefaultExternalGroup' => true) }
-    let(:tester) { double('Tester', tester_id: 'some-tester-id') }
+    let(:tester) { double('Tester', tester_id: 'some-tester-id', first_name: 'first name', last_name: 'last name', email: 'some email') }
 
     context '#add_tester!' do
       it 'adds a tester via client' do
-        expect(mock_client).to receive(:post_tester).with(app_id: 1, tester: tester).and_return('id' => 'some-tester-id')
+        expect(mock_client).to receive(:create_app_level_tester)
+          .with(app_id: 1, first_name: tester.first_name, last_name: tester.last_name, email: tester.email)
+          .and_return('id' => 'some-tester-id')
         expect(mock_client).to receive(:put_tester_to_group).with(group_id: 2, tester_id: 'some-tester-id', app_id: 1)
         group.add_tester!(tester)
       end

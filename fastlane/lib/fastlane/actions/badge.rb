@@ -16,7 +16,13 @@ module Fastlane
           shield_gravity: params[:shield_gravity],
           shield_no_resize: params[:shield_no_resize]
         }
-        Badge::Runner.new.run(params[:path], options)
+        begin
+          Badge::Runner.new.run(params[:path], options)
+        rescue => e
+          # We want to catch this error and raise our own so that we are not counting this as a crash in our metrics
+          UI.verbose(e.backtrace.join("\n"))
+          UI.user_error!("Something went wrong while running badge: #{e}")
+        end
       end
 
       #####################################################

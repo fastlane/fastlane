@@ -64,6 +64,9 @@ Examples:
 # Find a specific app based on the bundle identifier
 app = Spaceship::Portal.app.find("com.krausefx.app")
 
+# Get detail informations (e.g. see all enabled app services)
+app.details
+
 # Enable HealthKit, but make sure HomeKit is disabled
 app.update_service(Spaceship::Portal.app_service.health_kit.on)
 app.update_service(Spaceship::Portal.app_service.home_kit.off)

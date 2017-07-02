@@ -7,7 +7,6 @@
 require 'shellwords'
 
 # The concrete implementations
-require 'gym/generators/package_command_generator_legacy'
 require 'gym/generators/package_command_generator_xcode7'
 
 module Gym
@@ -47,12 +46,10 @@ module Gym
       end
 
       # The generator we need to use for the currently used Xcode version
+      # Since we dropped Xcode 6 support, it's just this class, but maybe we'll have
+      # new classes in the future
       def generator
-        if Gym.config[:use_legacy_build_api]
-          PackageCommandGeneratorLegacy
-        else
-          PackageCommandGeneratorXcode7
-        end
+        PackageCommandGeneratorXcode7
       end
     end
   end

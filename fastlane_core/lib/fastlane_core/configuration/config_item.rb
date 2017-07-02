@@ -39,6 +39,9 @@ module FastlaneCore
     # Allows items expected to be strings used in shell arguments to be alternatively provided as a Hash or Array for better readability and auto-escaped for us.
     attr_accessor :allow_shell_conversion
 
+    # [Boolean] Set if the variable can be used from shell
+    attr_accessor :display_in_shell
+
     # Creates a new option
     # @param key (Symbol) the key which is used as command parameters or key in the fastlane tools
     # @param env_name (String) the name of the environment variable, which is only used if no other values were found
@@ -55,7 +58,21 @@ module FastlaneCore
     # @param conflict_block an optional block which is called when options conflict happens
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
-    def initialize(key: nil, env_name: nil, description: nil, short_option: nil, default_value: nil, verify_block: nil, is_string: true, type: nil, optional: nil, conflicting_options: nil, conflict_block: nil, deprecated: nil, sensitive: nil)
+    # @param display_in_shell (Boolean) Set if the variable can be used from shell
+    def initialize(key: nil,
+                   env_name: nil,
+                   description: nil,
+                   short_option: nil,
+                   default_value: nil,
+                   verify_block: nil,
+                   is_string: true,
+                   type: nil,
+                   optional: nil,
+                   conflicting_options: nil,
+                   conflict_block: nil,
+                   deprecated: nil,
+                   sensitive: nil,
+                   display_in_shell: true)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
 
@@ -81,8 +98,8 @@ module FastlaneCore
         # deprecated options are marked deprecated in their description
         description = "[DEPRECATED!] #{deprecated} - #{description}"
       end
-      optional = false if optional.nil?
 
+      optional = false if optional.nil?
       sensitive = false if sensitive.nil?
 
       @key = key
@@ -100,16 +117,15 @@ module FastlaneCore
       @deprecated = deprecated
       @sensitive = sensitive
       @allow_shell_conversion = (type == :shell_string)
+      @display_in_shell = display_in_shell
     end
 
-    # This will raise an exception if the value is not valid
     def verify!(value)
-      UI.user_error!("Invalid value '#{value}' for option '#{self}'") unless valid?(value)
-      true
+      valid?(value)
     end
 
     # Make sure, the value is valid (based on the verify block)
-    # Returns false if that's not the case
+    # Raises an exception if the value is invalid
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value

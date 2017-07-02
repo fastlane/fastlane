@@ -190,6 +190,15 @@ module Fastlane
           'commit_version_bump(
             message: "Version Bump",                    # create a commit with a custom message
             xcodeproj: "./path/to/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+          )',
+          'commit_version_bump(
+            settings: true # Include Settings.bundle/Root.plist
+          )',
+          'commit_version_bump(
+            settings: "About.plist" # Include Settings.bundle/About.plist
+          )',
+          'commit_version_bump(
+            settings: %w[About.plist Root.plist] # Include more than one plist from Settings.bundle
           )'
         ]
       end
@@ -216,8 +225,7 @@ module Fastlane
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          project_parent = File.dirname project.path
-          File.join(project_parent, settings_bundle.path, settings_file_name)
+          File.join(settings_bundle.real_path, settings_file_name)
         end
       end
     end

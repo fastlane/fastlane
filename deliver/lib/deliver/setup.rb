@@ -1,7 +1,9 @@
+require 'fastlane_core'
+
 module Deliver
   class Setup
     def run(options)
-      containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
       file_path = File.join(containing, 'Deliverfile')
       data = generate_deliver_file(containing, options)
       setup_deliver(file_path, data, containing, options)
@@ -62,6 +64,18 @@ module Deliver
         end
         content << "\n"
         resulting_path = File.join(path, "#{key}.txt")
+        File.write(resulting_path, content)
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Trade Representative Contact Information
+      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
+        content = v.send(key).to_s
+        content << "\n"
+        base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
+        FileUtils.mkdir_p(base_dir)
+        resulting_path = File.join(base_dir, "#{option_name}.txt")
+        next if content.to_s.chomp.length == 0 # as many developers won't need trade information
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end

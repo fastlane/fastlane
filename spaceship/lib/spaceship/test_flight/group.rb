@@ -46,8 +46,12 @@ module Spaceship::TestFlight
     # is not enough to add the tester to a group. If this isn't done the next request would fail.
     # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
     def add_tester!(tester)
-      # This post request makes the account-level tester available to the app
-      tester_data = client.post_tester(app_id: self.app_id, tester: tester)
+      # This post request creates an account-level tester and then makes it available to the app, or just makes
+      # it available to the app if it already exists
+      tester_data = client.create_app_level_tester(app_id: self.app_id,
+                                               first_name: tester.first_name,
+                                                last_name: tester.last_name,
+                                                    email: tester.email)
       # This put request adds the tester to the group
       client.put_tester_to_group(group_id: self.id, tester_id: tester_data['id'], app_id: self.app_id)
     end
@@ -84,7 +88,7 @@ module Spaceship::TestFlight
       if groups.nil?
         default_external_group = app.default_external_group
         if default_external_group.nil?
-          UI.user_error!("The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option.")
+          raise "The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option."
         end
         test_flight_groups = [default_external_group]
       else
@@ -92,7 +96,7 @@ module Spaceship::TestFlight
           groups.include?(group.name)
         end
 
-        UI.user_error!("There are no groups available matching the names passed to the `:groups` option.") if test_flight_groups.empty?
+        raise "There are no groups available matching the names passed to the `:groups` option." if test_flight_groups.empty?
       end
 
       test_flight_groups.each(&block)

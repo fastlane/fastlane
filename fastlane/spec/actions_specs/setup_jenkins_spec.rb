@@ -106,6 +106,7 @@ describe Fastlane do
           ENV["KEYCHAIN_PATH"] = keychain_path
 
           expect(UI).to receive(:message).with("Unlocking keychain: \"#{keychain_path}\".")
+          expect(UI).to receive(:message).with("Unlocking keychain at path: #{File.expand_path(keychain_path).shellescape}")
           expect(UI).to receive(:message).with(/Set output directory path to:/)
           expect(UI).to receive(:message).with(/Set derived data path to:/)
           expect(UI).to receive(:message).with("Set result bundle.")

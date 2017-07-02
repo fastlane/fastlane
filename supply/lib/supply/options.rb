@@ -3,18 +3,19 @@ require 'credentials_manager'
 
 module Supply
   class Options
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
       valid_tracks = %w(production beta alpha rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
                                      short_option: "-p",
-                                     description: "The package name of the Application to modify",
+                                     description: "The package name of the Application to use",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: #{valid_tracks.join(', ')}",
+                                     description: "The Track of the Application to use: #{valid_tracks.join(', ')}",
                                      default_value: 'production',
                                      verify_block: proc do |value|
                                        available = valid_tracks
@@ -25,7 +26,7 @@ module Supply
                                      description: "The percentage of the user fraction when uploading to the rollout track",
                                      default_value: '0.1',
                                      verify_block: proc do |value|
-                                       min = 0.05
+                                       min = 0.01
                                        max = 0.5
                                        UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
                                      end),
@@ -164,9 +165,23 @@ module Supply
                                        value.each do |path|
                                          UI.user_error! "Could not find mapping file at path '#{path}'" unless File.exist?(path)
                                        end
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :root_url,
+                                     env_name: "SUPPLY_ROOT_URL",
+                                     description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :check_superseded_tracks,
+                                     env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
+                                     optional: true,
+                                     description: "Check the other tracks for superseded versions and disable them",
+                                     is_string: false,
+                                     default_value: false)
 
       ]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

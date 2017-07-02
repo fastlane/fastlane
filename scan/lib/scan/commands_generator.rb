@@ -45,7 +45,7 @@ module Scan
         c.syntax = "fastlane scan init"
         c.description = "Creates a new Scanfile for you"
         c.action do |_args, options|
-          containing = (Helper.fastlane_enabled? ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Scan.scanfile_name)
           UI.user_error!("Scanfile already exists").yellow if File.exist?(path)
           template = File.read("#{Scan::ROOT}/lib/assets/ScanfileTemplate")

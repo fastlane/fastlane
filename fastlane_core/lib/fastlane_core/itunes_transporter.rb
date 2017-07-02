@@ -169,7 +169,7 @@ module FastlaneCore
 
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
-      unless /^[0-9a-zA-Z\.\$\_]*$/ === password
+      unless password === /^[0-9a-zA-Z\.\$\_]*$/
         UI.error([
           "Password contains special characters, which may not be handled properly by iTMSTransporter.",
           "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."

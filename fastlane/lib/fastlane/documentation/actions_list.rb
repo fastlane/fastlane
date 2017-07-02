@@ -73,7 +73,29 @@ module Fastlane
       else
         puts "Couldn't find action for the given filter.".red
         puts "==========================================\n".red
+
         print_all # show all available actions instead
+        print_suggestions(filter)
+      end
+    end
+
+    def self.print_suggestions(filter)
+      if !filter.nil? && filter.length > 1
+        action_names = []
+        all_actions(nil) do |action_ref, action_name|
+          action_names << action_name
+        end
+
+        corrections = []
+
+        if !Gem.loaded_specs["did_you_mean"].nil? && Gem.loaded_specs["did_you_mean"].version >= Gem::Version.new('1.1.0')
+          spell_checker = DidYouMean::SpellChecker.new(dictionary: action_names)
+          corrections << spell_checker.correct(filter).compact
+        end
+
+        corrections << action_names.select { |name| name.include? filter }
+
+        puts "Did you mean: #{corrections.flatten.uniq.join(', ')}?".green unless corrections.flatten.empty?
       end
     end
 

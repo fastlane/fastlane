@@ -78,7 +78,7 @@ module Spaceship
         #  should it be an ios or an osx app
 
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
-          UI.deprecated("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
+          puts "The `version` parameter is deprecated. Use `ensure_version!` method instead" if version
           client.create_application!(name: name,
                          primary_language: primary_language,
                                       sku: sku,
@@ -129,10 +129,10 @@ module Spaceship
         client.get_resolution_center(apple_id, platform)
       end
 
-      def ratings
-        attrs = client.get_rating_summary(apple_id, platform)
+      def ratings(version_id: '', storefront: '')
+        attrs = client.get_ratings(apple_id, platform, version_id, storefront)
         attrs[:application] = self
-        Tunes::AppRatings.factory(attrs)
+        Tunes::AppRatings.new(attrs)
       end
 
       def platforms

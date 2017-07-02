@@ -8,6 +8,9 @@ describe Supply do
       before(:all) do
         @obb_dir = Dir.mktmpdir('supply')
         @apk_path = File.join(@obb_dir, 'my.apk')
+
+        # Makes Supply::Uploader.new.all_languages public for testing reasons
+        Supply::Uploader.send(:public, *Supply::Uploader.private_instance_methods)
       end
 
       def create_obb(name)
@@ -74,6 +77,17 @@ describe Supply do
         expect(FastlaneCore::UI).to receive(:user_error!).with(/Metadata must be UTF-8 encoded./)
 
         Supply::Uploader.new.upload_metadata('en-US', fake_listing)
+      end
+    end
+
+    describe 'all_languages' do
+      it 'only grabs directories' do
+        Supply.config = {
+          metadata_path: 'supply/spec/fixtures/metadata/android'
+        }
+
+        only_directories = Supply::Uploader.new.all_languages
+        expect(only_directories).to eq(['en-US', 'fr-FR', 'ja-JP'])
       end
     end
   end

@@ -22,6 +22,8 @@ module Fastlane
         escaped_path = keychain_path.shellescape
         escaped_password = params[:password].shellescape
 
+        # Log the full path, useful for troubleshooting
+        UI.message("Unlocking keychain at path: #{escaped_path}")
         # unlock given keychain and disable lock and timeout
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
         commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
@@ -59,7 +61,7 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the give keychain file and adds it to the keychain search list\n" \
+        "Unlocks the given keychain file and adds it to the keychain search list\n" \
         "Keychains can be replaced with `add_to_search_list: :replace`"
       end
 

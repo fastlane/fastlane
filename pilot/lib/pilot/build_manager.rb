@@ -35,7 +35,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform)
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, poll_interval: config[:wait_processing_interval])
 
       distribute(options, build: latest_build)
     end
@@ -51,7 +51,7 @@ module Pilot
         UI.user_error!("No build to distribute!")
       end
 
-      if should_update_app_test_information(options)
+      if should_update_app_test_information?(options)
         app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
         app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
         app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
@@ -63,7 +63,7 @@ module Pilot
         end
       end
 
-      if should_update_build_information(options)
+      if should_update_build_information?(options)
         begin
           build.update_build_information!(whats_new: options[:changelog])
           UI.success "Successfully set the changelog for build"
@@ -120,11 +120,11 @@ module Pilot
       return row
     end
 
-    def should_update_build_information(options)
-      options[:changelog].to_s.length
+    def should_update_build_information?(options)
+      options[:changelog].to_s.length > 0
     end
 
-    def should_update_app_test_information(options)
+    def should_update_app_test_information?(options)
       options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
     end
 

@@ -9,6 +9,8 @@ module Scan
       # First, try loading the Scanfile from the current directory
       config.load_configuration_file(Scan.scanfile_name)
 
+      prevalidate
+
       # Detect the project
       FastlaneCore::Project.detect_projects(config)
       Scan.project = FastlaneCore::Project.new(config)
@@ -40,6 +42,14 @@ module Scan
       coerce_to_array_of_strings(:skip_testing)
 
       return config
+    end
+
+    def self.prevalidate
+      output_types = Scan.config[:output_types]
+      has_multiple_report_types = output_types && output_types.split(',').size > 1
+      if has_multiple_report_types && Scan.config[:custom_report_file_name]
+        UI.user_error!("Using a :custom_report_file_name with multiple :output_types (#{output_types}) will lead to unexpected results. Use :output_files instead.")
+      end
     end
 
     def self.coerce_to_array_of_strings(config_key)
@@ -153,7 +163,7 @@ module Scan
       end
 
       default = lambda do
-        UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator")
+        UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
 
         result = Array(
           simulators
@@ -163,7 +173,7 @@ module Scan
             .last || simulators.first
         )
 
-        UI.error("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
+        UI.message("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
 
         result
       end
