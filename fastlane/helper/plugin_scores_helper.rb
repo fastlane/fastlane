@@ -164,14 +164,18 @@ module Fastlane
           url = self.homepage.gsub("github.com/", "api.github.com/repos/")
           url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise Github will fail
           puts "Fetching #{url}"
-          conn = Faraday.new(url: url)
+          conn = Faraday.new(url: url) do |builder|
+            builder.use FaradayMiddleware::FollowRedirects
+          end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
           url += "/stats/contributors"
           puts "Fetching #{url}"
-          conn = Faraday.new(url: url)
+          conn = Faraday.new(url: url) do |builder|
+            builder.use FaradayMiddleware::FollowRedirects
+          end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           contributor_details = JSON.parse(response.body)
