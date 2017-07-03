@@ -111,7 +111,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
                                      env_name: "GYM_EXPORT_OPTIONS",
-                                     description: "Specifies path to export options plist. User xcodebuild -help to print the full set of available options",
+                                     description: "Specifies path to export options plist. Use xcodebuild -help to print the full set of available options",
                                      is_string: false,
                                      optional: true,
                                      conflict_block: proc do |value|
