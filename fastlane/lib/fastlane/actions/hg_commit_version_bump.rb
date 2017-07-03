@@ -138,7 +138,7 @@ module Fastlane
                                        default_value: "file1, file2"),
           FastlaneCore::ConfigItem.new(key: :test_expected_files,
                                        env_name: "FL_HG_COMMIT_TEST_EXP_FILES",
-                                       description: "A list of expected changed files passed in for testin",
+                                       description: "A list of expected changed files passed in for testing",
                                        optional: true,
                                        default_value: "file1, file2")
         ]
