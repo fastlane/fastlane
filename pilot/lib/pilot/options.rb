@@ -34,6 +34,7 @@ module Pilot
                                      description: "Path to the ipa file to upload",
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
+                                       value = File.expand_path(value)
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),

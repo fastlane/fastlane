@@ -13,15 +13,20 @@ module Spaceship
       end
 
       def [](key)
-        get_lang(key)[identifier]['value']
+        get_value(key: key)
       end
 
       def []=(key, value)
         get_lang(key)[identifier]['value'] = value
       end
 
+      def get_value(key: nil)
+        get_lang(key)[identifier]['value']
+      end
+
       def get_lang(lang)
         result = self.original_array.find do |current|
+          lang = lang.to_s
           current['language'] == lang or current['localeCode'] == lang # Apple being consistent
         end
         return result if result

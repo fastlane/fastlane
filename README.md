@@ -41,13 +41,13 @@ Then to deploy a new 'beta' version of your app just run
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (*e.g.* path to the `ipa` file)
-:page_with_curl: | Store **everything** in Git. Never lookup build commands in `Jenkins` configs again.
+:page_with_curl: | Store **everything** in Git. Never lookup build commands on your CI system again.
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
-:hatching_chick: | Over 170 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations and 170 plugins available
 :computer: | Support for iOS and Android apps
 :octocat: | Full Git and Mercurial support
 
@@ -138,6 +138,7 @@ In addition to `fastlane`'s commands, you also have access to these `fastlane` t
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 ## Metrics
 
