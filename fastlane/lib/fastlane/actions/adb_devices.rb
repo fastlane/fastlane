@@ -15,7 +15,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Get an Array of Connected android device serials"
+        "Get an array of Connected android device serials"
       end
 
       def self.details

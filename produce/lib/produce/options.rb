@@ -22,7 +22,7 @@ module Produce
                                      short_option: "-e",
                                      env_name: "PRODUCE_APP_IDENTIFIER_SUFFIX",
                                      optional: true,
-                                     description: "App Identifier Suffix (Ignored if App Identifier does not ends with .*)"),
+                                     description: "App Identifier Suffix (Ignored if App Identifier does not end with .*)"),
         FastlaneCore::ConfigItem.new(key: :app_name,
                                      env_name: "PRODUCE_APP_NAME",
                                      short_option: "-q",

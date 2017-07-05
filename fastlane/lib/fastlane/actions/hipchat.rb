@@ -160,7 +160,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :from,
                                        env_name: "FL_HIPCHAT_FROM",
-                                       description: "Name the message will appear be sent from",
+                                       description: "Name the message will appear to be sent from",
                                        default_value: "fastlane",
                                        optional: true)
         ]

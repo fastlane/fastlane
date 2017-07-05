@@ -42,7 +42,7 @@ module Pilot
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
-                                     description: "Provide the what's new text when uploading a new build"),
+                                     description: "Provide the 'what's new' text when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :beta_app_description,
                                      short_option: "-d",
                                      optional: true,
