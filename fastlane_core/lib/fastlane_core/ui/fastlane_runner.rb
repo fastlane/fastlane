@@ -36,7 +36,7 @@ module Commander
 
       xcode_outdated = false
       begin
-        unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_VERSION)
+        unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
           xcode_outdated = true
         end
       rescue
@@ -49,7 +49,7 @@ module Commander
       begin
         if xcode_outdated
           # We have to raise that error within this `begin` block to show a nice user error without a stack trace
-          FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_VERSION}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+          FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
         collector.did_launch_action(@program[:name])
