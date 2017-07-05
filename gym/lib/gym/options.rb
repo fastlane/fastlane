@@ -149,7 +149,7 @@ module Gym
                                      short_option: "-u",
                                      env_name: "GYM_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Produce the result bundle describing what occurred will be placed", # TODO: I seriously do not understand what this is supposed to mean
+                                     description: "Produce the result bundle describing what occurred will be placed",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",

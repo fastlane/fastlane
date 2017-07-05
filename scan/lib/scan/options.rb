@@ -168,7 +168,7 @@ module Scan
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Produce the result bundle describing what occurred will be placed", #TODO: Again, this needs a better description
+                                     description: "Produce the result bundle describing what occurred will be placed",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
