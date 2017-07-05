@@ -69,7 +69,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PATH",
-                                       description: "Path to the Keychain file",
+                                       description: "Path to the keychain file",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",

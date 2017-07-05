@@ -66,7 +66,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "KEYCHAIN_PATH",
-                                       description: "Path to Keychain",
+                                       description: "Path to keychain",
                                        is_string: true,
                                        conflicting_options: [:name],
                                        optional: true),
