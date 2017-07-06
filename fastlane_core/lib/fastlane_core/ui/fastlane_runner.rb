@@ -10,6 +10,14 @@ unless Object.const_defined?("Faraday")
   end
 end
 
+unless Object.const_defined?("OpenSSL")
+  module OpenSSL
+    module SSL
+      class SSLError < StandardError; end
+    end
+  end
+end
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
@@ -101,7 +109,7 @@ module Commander
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)
-      rescue Faraday::SSLError => e # SSL issues are very common
+      rescue Faraday::SSLError, OpenSSL::SSL::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
         rescue_connection_failed_error(e)
