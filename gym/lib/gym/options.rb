@@ -149,7 +149,7 @@ module Gym
                                      short_option: "-u",
                                      env_name: "GYM_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Produce the result bundle describing what occurred will be placed",
+                                     description: "Location of the Xcode result bundle",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
