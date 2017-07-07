@@ -27,6 +27,9 @@ module Fastlane
           # If the user used sigh we can match the profiles from sigh
           values[:export_options] ||= {}
           if values[:export_options].kind_of?(Hash)
+            # It's not always a hash, because the user might have passed a string path to a ready plist file
+            # If that's the case, we won't set the provisioning profiles
+            # see https://github.com/fastlane/fastlane/issues/9684
             values[:export_options][:provisioningProfiles] ||= {}
             Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS].each do |profile_path|
               begin
@@ -42,6 +45,7 @@ module Fastlane
               end
             end
           end
+        end
         absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
         absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
