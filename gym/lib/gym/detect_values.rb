@@ -60,7 +60,9 @@ module Gym
     # each target of your app
     # rubocop:disable Style/MultilineBlockChain
     def self.detect_selected_provisioning_profiles
-      return if Gym.config[:export_options] && Gym.config[:export_options][:provisioningProfiles]
+      if Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash) && Gym.config[:export_options][:provisioningProfiles]
+        return
+      end
 
       require 'xcodeproj'
 

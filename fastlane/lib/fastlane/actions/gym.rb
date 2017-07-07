@@ -26,21 +26,22 @@ module Fastlane
           # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
           # If the user used sigh we can match the profiles from sigh
           values[:export_options] ||= {}
-          values[:export_options][:provisioningProfiles] ||= {}
-          Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS].each do |profile_path|
-            begin
-              profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
-              profile_team_id = profile["TeamIdentifier"].first
-              next if profile_team_id != values[:export_team_id] && !values[:export_team_id].nil?
-              bundle_id = profile["Entitlements"]["application-identifier"].gsub "#{profile_team_id}.", ""
-              values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
-            rescue => ex
-              UI.error("Couldn't load profile at path: #{profile_path}")
-              UI.error(ex)
-              UI.verbose(ex.backtrace.join("\n"))
+          if values[:export_options].kind_of?(Hash)
+            values[:export_options][:provisioningProfiles] ||= {}
+            Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS].each do |profile_path|
+              begin
+                profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
+                profile_team_id = profile["TeamIdentifier"].first
+                next if profile_team_id != values[:export_team_id] && !values[:export_team_id].nil?
+                bundle_id = profile["Entitlements"]["application-identifier"].gsub "#{profile_team_id}.", ""
+                values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
+              rescue => ex
+                UI.error("Couldn't load profile at path: #{profile_path}")
+                UI.error(ex)
+                UI.verbose(ex.backtrace.join("\n"))
+              end
             end
           end
-        end
         absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
         absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
