@@ -5,6 +5,8 @@ module Fastlane
       OPTIONS = [
         :package_name,
         :track,
+        :key,
+        :issuer,
         :json_key,
         :json_key_data,
         :root_url
