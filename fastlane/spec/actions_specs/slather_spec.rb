@@ -27,7 +27,7 @@ describe Fastlane do
             output_directory: '123',
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
-            binary_basename: 'YourApp',
+            binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace',
             source_files: '*.swift',
@@ -58,6 +58,7 @@ describe Fastlane do
                     --workspace foo.xcworkspace
                     --binary-file you
                     --binary-basename YourApp
+                    --binary-basename YourFramework
                     --source-files \\*.swift
                     --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
@@ -87,7 +88,7 @@ describe Fastlane do
             output_directory: '123',
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
-            binary_basename: 'YourApp',
+            binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace'
           })
@@ -113,7 +114,8 @@ describe Fastlane do
                     --configuration Bar
                     --workspace foo.xcworkspace
                     --binary-file you
-                    --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, ' ')
+                    --binary-basename YourApp
+                    --binary-basename YourFramework foo.xcodeproj'.gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
 
