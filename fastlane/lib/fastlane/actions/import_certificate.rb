@@ -21,7 +21,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "KEYCHAIN_PATH",
-                                       description: "Path to the Keychain file which the items should be imported to",
+                                       description: "Path to the Keychain file to which the items should be imported.",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_password,
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
