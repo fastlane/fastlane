@@ -33,7 +33,7 @@ module Gym
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
-      path
+      return path
     end
 
     #####################################################
