@@ -25,7 +25,8 @@ public class LocaleUtil {
             methodGetDefault.setAccessible(true);
             Object activityManagerNative = methodGetDefault.invoke(amnClass);
 
-            Method methodGetConfiguration = amnClass.getMethod("getConfiguration");
+            Class iam = Class.forName(activityManagerNative.getClass().toString());
+            Method methodGetConfiguration = iam.getMethod("getConfiguration");
             methodGetConfiguration.setAccessible(true);
             Configuration config  = (Configuration) methodGetConfiguration.invoke(activityManagerNative);
 
