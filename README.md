@@ -95,6 +95,9 @@ Get started distributing your first app with fastlane within minutes:
 Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
  or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
 
+## System Requirements
+Currently _fastlane_ is officially supported on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms (one example: we make use of `fork()` and it is not supported on Windows). 
+
 ## Available Commands
 
 Typically you'll use `fastlane` by triggering individual lanes:
@@ -139,11 +142,6 @@ In addition to `fastlane`'s commands, you also have access to these `fastlane` t
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 - [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
-
-## Where can fastlane run?
-Currently _fastlane_ is officially supported on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system apis that may not be implemented on other platforms (one example: we make use of `fork()` and it is not supported on Windows). 
-
-**Note:** If you'd like to add support for your favorite platform, feel free to [contribute a PR](https://github.com/fastlane/fastlane/tree/master/YourFirstPR.md)!
 
 ## Metrics
 
