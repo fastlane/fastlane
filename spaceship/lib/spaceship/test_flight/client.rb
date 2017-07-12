@@ -20,15 +20,13 @@ module Spaceship::TestFlight
     ##
 
     # Returns an array of all available build trains (not the builds they include)
-    def get_build_trains(app_id: nil, platform: "ios")
-      assert_required_params(__method__, binding)
+    def get_build_trains(app_id: nil, platform: "ios") nonnil!
 
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
-      assert_required_params(__method__, binding)
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0) nonnil!
       with_retry(retry_count) do
         response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
         handle_response(response)
@@ -39,16 +37,12 @@ module Spaceship::TestFlight
     # @!group Builds API
     ##
 
-    def get_build(app_id: nil, build_id: nil)
-      assert_required_params(__method__, binding)
-
+    def get_build(app_id: nil, build_id: nil) nonnil!
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
       handle_response(response)
     end
 
-    def put_build(app_id: nil, build_id: nil, build: nil)
-      assert_required_params(__method__, binding)
-
+    def put_build(app_id: nil, build_id: nil, build: nil) nonnil!
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
         req.body = build.to_json
@@ -57,9 +51,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def post_for_testflight_review(app_id: nil, build_id: nil, build: nil)
-      assert_required_params(__method__, binding)
-
+    def post_for_testflight_review(app_id: nil, build_id: nil, build: nil) nonnil!
       response = request(:post) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
         req.body = build.to_json
@@ -72,16 +64,12 @@ module Spaceship::TestFlight
     # @!group Groups API
     ##
 
-    def get_groups(app_id: nil)
-      assert_required_params(__method__, binding)
-
+    def get_groups(app_id: nil) nonnil(:app_id)
       response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
       handle_response(response)
     end
 
-    def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
-      assert_required_params(__method__, binding)
-
+    def add_group_to_build(app_id: nil, group_id: nil, build_id: nil) nonnil!
       body = {
         'groupId' => group_id,
         'buildId' => build_id
@@ -98,29 +86,25 @@ module Spaceship::TestFlight
     # @!group Testers API
     ##
 
-    def testers_for_app(app_id: nil)
-      assert_required_params(__method__, binding)
+    def testers_for_app(app_id: nil) nonnil!
       url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
       response = request(:get, url)
       handle_response(response)
     end
 
-    def delete_tester_from_app(app_id: nil, tester_id: nil)
-      assert_required_params(__method__, binding)
+    def delete_tester_from_app(app_id: nil, tester_id: nil) nonnil!
       url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
       response = request(:delete, url)
       handle_response(response)
     end
 
-    def resend_invite_to_external_tester(app_id: nil, tester_id: nil)
-      assert_required_params(__method__, binding)
+    def resend_invite_to_external_tester(app_id: nil, tester_id: nil) nonnil!
       url = "/testflight/v1/invites/#{app_id}/resend?testerId=#{tester_id}"
       response = request(:post, url)
       handle_response(response)
     end
 
-    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
-      assert_required_params(__method__, binding)
+    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil) nonnil!
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url
@@ -134,9 +118,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil)
-      assert_required_params(__method__, binding)
-
+    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil) nonnil!
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
@@ -151,9 +133,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil)
-      assert_required_params(__method__, binding)
-
+    def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil) nonnil!
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
         req.url url
@@ -166,16 +146,12 @@ module Spaceship::TestFlight
     # @!group AppTestInfo
     ##
 
-    def get_app_test_info(app_id: nil)
-      assert_required_params(__method__, binding)
-
+    def get_app_test_info(app_id: nil) nonnil!
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/testInfo")
       handle_response(response)
     end
 
-    def put_app_test_info(app_id: nil, app_test_info: nil)
-      assert_required_params(__method__, binding)
-
+    def put_app_test_info(app_id: nil, app_test_info: nil) nonnil!
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/testInfo"
         req.body = app_test_info.to_json
@@ -202,28 +178,6 @@ module Spaceship::TestFlight
       return response.body['data'] if response.body['data']
 
       return response.body
-    end
-
-    private
-
-    # used to assert all of the named parameters are supplied values
-    #
-    # @raises NameError if the values are nil
-    def assert_required_params(method_name, binding)
-      parameter_names = method(method_name).parameters.map { |k, v| v }
-      parameter_names.each do |name|
-        if local_variable_get(binding, name).nil?
-          raise NameError, "`#{name}' is a required parameter"
-        end
-      end
-    end
-
-    def local_variable_get(binding, name)
-      if binding.respond_to?(:local_variable_get)
-        binding.local_variable_get(name)
-      else
-        binding.eval(name.to_s)
-      end
     end
   end
 end
