@@ -115,6 +115,8 @@ module Gym
         return if Gym.config[:disable_xcpretty]
 
         log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        return unless File.exist?(log_content)
+
         # `xcodebuild` doesn't properly mark lines as failure reason or important information
         # so we assume that the last few lines show the error message that's relevant
         # (at least that's what was correct during testing)
