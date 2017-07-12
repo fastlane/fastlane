@@ -28,7 +28,6 @@ describe Gym do
       code_signing_output = @output + %(
 SetMode u+w,go-w,a+rX /Users/fkrause/Library/Developer/Xcode/DerivedData/Themoji-aanbocksacwzrydzjzjvnfrcqibb/Build/Intermediates.noindex/ArchiveIntermediates/Themoji/IntermediateBuildFilesPath/UninstalledProducts/iphoneos/Pods_Themoji.framework
     cd /Users/fkrause/Developer/hacking/themoji/Pods
-    export PATH="/Applications/Xcode-9.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode-9.app/Contents/Developer/usr/bin:/Users/fkrause/.rbenv/versions/2.4.0/lib/ruby/gems/2.4.0/bin:/Users/fkrause/.rbenv/versions/2.4.0/bin:/Users/fkrause/homebrew/Cellar/rbenv/1.1.0/libexec:/Users/fkrause/.rbenv/shims:/Users/fkrause/homebrew/bin:/Users/fkrause/bin:/usr/local/heroku/bin:/usr/local/git/current/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Postgres.app/Contents/Versions/latest/bin"
     /bin/chmod -RH u+w,go-w,a+rX /Users/fkrause/Library/Developer/Xcode/DerivedData/Themoji-aanbocksacwzrydzjzjvnfrcqibb/Build/Intermediates.noindex/ArchiveIntermediates/Themoji/IntermediateBuildFilesPath/UninstalledProducts/iphoneos/Pods_Themoji.framework
 
 === BUILD TARGET Themoji OF PROJECT Themoji WITH CONFIGURATION Release ===
@@ -42,7 +41,8 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       expect(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
       expect(File).to receive(:read).with(log_path).and_return(code_signing_output)
       expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: code_signing_output)
-      expect(UI).to receive(:command_output).with("No profile for team 'N8X438SEU2' matching 'match AppStore me.themoji.app.beta' found:  Xcode couldn't find any provisioning profiles matching 'N8X438SEU2/match AppStore me.themoji.app.beta'. Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.")
+      expect(UI).to receive(:command_output).with("No profile for team 'N8X438SEU2' matching 'match AppStore me.themoji.app.beta' found:  Xcode couldn't find any provisioning profiles matching 'N8X438SEU2/match AppStore me.themoji.app.beta'. " \
+        "Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.")
       expect(UI).to receive(:command_output).with("Code signing is required for product type 'Application' in SDK 'iOS 11.0'")
       expect(UI).to receive(:command_output).at_least(:once) # as this is called multiple times before
 
