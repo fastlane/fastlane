@@ -14,12 +14,21 @@ describe Gym do
   describe Gym::ErrorHandler do
     before(:each) { Gym.config = @config }
 
+    def mock_gym_path(content)
+      log_path = "log_path"
+      expect(File).to receive(:exist?).with(log_path).and_return(true)
+      expect(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
+      expect(File).to receive(:read).with(log_path).and_return(content)
+    end
+
     it "raises build error with error_info" do
+      mock_gym_path(@output)
       expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
       Gym::ErrorHandler.handle_build_error(@output)
     end
 
     it "raises package error with error_info" do
+      mock_gym_path(@output)
       expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
       Gym::ErrorHandler.handle_package_error(@output)
     end
@@ -36,10 +45,7 @@ Check dependencies
 No profile for team 'N8X438SEU2' matching 'match AppStore me.themoji.app.beta' found:  Xcode couldn't find any provisioning profiles matching 'N8X438SEU2/match AppStore me.themoji.app.beta'. Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.
 Code signing is required for product type 'Application' in SDK 'iOS 11.0'
 )
-
-      log_path = "log_path"
-      expect(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
-      expect(File).to receive(:read).with(log_path).and_return(code_signing_output)
+      mock_gym_path(code_signing_output)
       expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: code_signing_output)
       expect(UI).to receive(:command_output).with("No profile for team 'N8X438SEU2' matching 'match AppStore me.themoji.app.beta' found:  Xcode couldn't find any provisioning profiles matching 'N8X438SEU2/match AppStore me.themoji.app.beta'. " \
         "Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.")
