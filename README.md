@@ -95,6 +95,10 @@ Get started distributing your first app with fastlane within minutes:
 Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
  or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
 
+## System Requirements
+
+Currently, _fastlane_ is officially supported to run on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms, for example, we use the Ruby `fork` method for sub-process management, which isn't available on Windows.
+
 ## Available Commands
 
 Typically you'll use `fastlane` by triggering individual lanes:
