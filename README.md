@@ -97,7 +97,7 @@ Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting
 
 ## System Requirements
 
-Currently, _fastlane_ is officially supported to run on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms (one example: we make use of `fork()` and it is not supported on Windows).
+Currently, _fastlane_ is officially supported to run on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms, for example, we use the Ruby `fork` method for sub-process management, which isn't available on Windows.
 
 ## Available Commands
 
