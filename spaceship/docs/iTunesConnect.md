@@ -299,7 +299,7 @@ Spaceship::Tunes::Tester::External.create!(email: "github@krausefx.com",
                                       first_name: "Felix",
                                        last_name: "Krause",
                                           groups: ["spaceship"])
-
+```
 Right now, `spaceship` can't modify or create internal testers.
 
 ```ruby
