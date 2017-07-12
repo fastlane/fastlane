@@ -20,12 +20,12 @@ describe Gym do
     end
 
     it "raises build error with error_info" do
-      expect(UI).to receive(:user_error!).with("Error building the application - see the log above", error_info: @output)
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
       Gym::ErrorHandler.handle_build_error(@output)
     end
 
     it "raises package error with error_info" do
-      expect(UI).to receive(:user_error!).with("Error packaging up the application", error_info: @output)
+      expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
       Gym::ErrorHandler.handle_package_error(@output)
     end
   end
