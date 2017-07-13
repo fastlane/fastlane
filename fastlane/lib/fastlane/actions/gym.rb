@@ -9,7 +9,7 @@ module Fastlane
       def self.run(values)
         require 'gym'
 
-        unless Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE].to_sym == :development
+        unless Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE].to_s == "development"
           values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE]
         end
 
