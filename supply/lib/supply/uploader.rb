@@ -41,7 +41,7 @@ module Supply
     def promote_track
       version_codes = client.track_version_codes(Supply.config[:track])
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
-      # but it has to be between 0.01 and 0.5 to pass the validity check. So we are passing the default value 0.1
+      # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
       client.update_track(Supply.config[:track], 0.1, nil)
       client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], version_codes)
     end
