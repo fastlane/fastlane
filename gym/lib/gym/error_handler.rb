@@ -187,6 +187,60 @@ module Gym
           UI.error("Please make sure to define a correct `export_method` when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")
+        elsif Gym.config[:export_options]
+          # We want to tell the user if there is an obvious mismatch between the selected
+          # `export_method` and the selected provisioning profiles
+          selected_export_method = Gym.config[:export_method].to_s
+          selected_provisioning_profiles = Gym.config[:export_options][:provisioningProfiles] || []
+          # We could go ahead and find all provisioning profiles that match that name
+          # and then get its type, however that's not 100% reliable, as we can't distinguish between
+          # Ad Hoc and Development profiles for example.
+          # As an easier and more obvious alternative, we'll take the provisioning profile names
+          # and see if it contains the export_method name and see if there is a mismatch
+
+          # The reason we have multiple variations of the spelling is that
+          # the provisioning profile might be called anything below
+          # There is no 100% good way to detect the profile type based on the name
+          available_export_types = {
+            "app-store" => :appstore,
+            "app store" => :appstore,
+            "appstore" => :appstore,
+            "ad-hoc" => :adhoc,
+            "adhoc" => :adhoc,
+            "ad hoc" => :adhoc,
+            "enterprise" => :enterprise, 
+            "development" => :development,
+          }
+
+          selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
+            available_export_types.each do |current_to_try, matching_type|
+              next unless current_profile_name.downcase.include?(current_to_try.downcase)
+
+              # Check if there is a mismatch between the name and the selected export method
+              # Example
+              # 
+              #   current_profile_name = "me.themoji.app.beta App Store""
+              #   current_to_try = "app store"
+              #   matching_type = :appstore
+              #   selected_export_method = "enterprise"
+              # 
+              # As seen above, there is obviously a mismatch, the user selected an App Store
+              # profile, but the export method that's being passed to Xcode is "enterprise"
+
+              next if matching_type.to_s == selected_export_method
+              UI.message("")
+              UI.error("There is a mismatch between your provided `export_method` in gym")
+              UI.error("and the selected provisioning profiles. You passed the following options:")
+              UI.important("  export_method:      #{selected_export_method}")
+              UI.important("  Bundle identifier:  #{current_bundle_identifier}")
+              UI.important("  Profile name:       #{current_profile_name}")
+              UI.important("  Profile type:       #{matching_type}")
+              UI.error("Make sure to either change the `export_method` passed from your Fastfile or CLI")
+              UI.error("or select the correct provisioning profiles by updating your Xcode project")
+              UI.error("or passing the profiles to use by using match or manually via the `export_options` hash")
+              UI.message("")
+            end
+          end
         end
       end
 
