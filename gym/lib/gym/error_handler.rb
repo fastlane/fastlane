@@ -180,7 +180,7 @@ module Gym
       end
 
       def print_environment_information
-        if Gym.config[:export_method].to_sym == :development
+        if Gym.config[:export_method].to_s == "development"
           UI.message("")
           UI.error("Your `export_method` in gym is defined as `:development`")
           UI.error("which can't be used for `ipa` files for beta or App Store distribution")
@@ -208,8 +208,8 @@ module Gym
             "ad-hoc" => :adhoc,
             "adhoc" => :adhoc,
             "ad hoc" => :adhoc,
-            "enterprise" => :enterprise, 
-            "development" => :development,
+            "enterprise" => :enterprise,
+            "development" => :development
           }
 
           selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
@@ -218,12 +218,12 @@ module Gym
 
               # Check if there is a mismatch between the name and the selected export method
               # Example
-              # 
+              #
               #   current_profile_name = "me.themoji.app.beta App Store""
               #   current_to_try = "app store"
               #   matching_type = :appstore
               #   selected_export_method = "enterprise"
-              # 
+              #
               # As seen above, there is obviously a mismatch, the user selected an App Store
               # profile, but the export method that's being passed to Xcode is "enterprise"
 
