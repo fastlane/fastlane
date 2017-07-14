@@ -114,7 +114,7 @@ module Fastlane
         end
         UI.important "For more information, check out https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
 
-        sleep 1
+        sleep 2 # napping is life, otherwise the user might not see this message
       end
 
       # Returns an array of symbols for the available lanes for the Fastfile
