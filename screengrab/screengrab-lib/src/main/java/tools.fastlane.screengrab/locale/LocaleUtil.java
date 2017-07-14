@@ -37,7 +37,7 @@ public class LocaleUtil {
                 config.setLayoutDirection(locale);
             }
 
-            Method updateConfigurationMethod = iactivityman.getMethod("updateConfiguration", Configuration.class);
+            Method updateConfigurationMethod = iam.getMethod("updateConfiguration", Configuration.class);
             updateConfigurationMethod.setAccessible(true);
             updateConfigurationMethod.invoke(activityManagerNative, config);
 
