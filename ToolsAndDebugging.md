@@ -130,7 +130,7 @@ To make it easier to run the same script again, you can temporarily edit the `sp
 # leave existing code, and append the following
 
 task :debug do
-  require ‘spaceship’
+  require 'spaceship'
 
   # first login
   Spaceship::Tunes.login("apple@fastlane.tools") # use your own test account
