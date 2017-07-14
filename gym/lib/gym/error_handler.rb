@@ -184,7 +184,7 @@ module Gym
           UI.message("")
           UI.error("Your `export_method` in gym is defined as `:development`")
           UI.error("which can't be used for `ipa` files for beta or App Store distribution")
-          UI.error("Please make sure to define a correct `export_method` when calling")
+          UI.error("Please make sure to define the correct export methods when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")
         elsif Gym.config[:export_options]
