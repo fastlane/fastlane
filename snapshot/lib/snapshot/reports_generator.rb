@@ -15,7 +15,6 @@ module Snapshot
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
           available_devices.each do |key_name, output_name|
             next unless File.basename(screenshot).include?(key_name)
-
             # This screenshot is from this device
             @data[language] ||= {}
             @data[language][output_name] ||= []
@@ -60,7 +59,11 @@ module Snapshot
         'iPadPro(12.9inch)' => "iPad Pro (12.9-inch)",
         'iPadPro' => "iPad Pro",
         'iPad' => "iPad",
-        'Mac' => "Mac"
+        'Mac' => "Mac",
+        # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
+        # which includes spaces
+        'iPhone 7 Plus' => "iPhone 7 Plus (5.5-Inch)",
+        'iPhone 7' => "iPhone 7 (4.7-Inch)",
       }
     end
   end

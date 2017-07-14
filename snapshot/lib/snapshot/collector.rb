@@ -11,7 +11,7 @@ module Snapshot
       FileUtils.mkdir_p(language_folder)
 
       if Snapshot.config[:simultaneous]
-        return collect_screenshots_from_multiple_simulators(screenshots_dir_contents, language_folder)
+        return collect_screenshots_from_multiple_simulators(language_folder)
       else
         to_store = attachments(containing)
         matches = output.scan(/snapshot: (.*)/)

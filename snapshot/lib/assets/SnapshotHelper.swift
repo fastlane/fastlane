@@ -113,7 +113,7 @@ open class Snapshot: NSObject {
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
             let screenshot = app.windows.firstMatch.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"], let screenshotsDir = screenshotsDirectory else { return }
+            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
             do {
                 try screenshot.pngRepresentation.write(to: path)

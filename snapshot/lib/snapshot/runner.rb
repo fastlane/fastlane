@@ -56,7 +56,7 @@ module Snapshot
     end
 
     def take_screenshots_simultaneously(launch_arguments)
-      results = {}
+      languages_finished = {}
       launch_arguments.each do |launch_args|
         Snapshot.config[:languages].each_with_index do |language, language_index|
           locale = nil
@@ -64,10 +64,12 @@ module Snapshot
             locale = language[1]
             language = language[0]
           end
-          results[language] = launch_simultaneously(language, locale, launch_args)
+          languages_finished[language] = launch_simultaneously(language, locale, launch_args)
         end
       end
-      results
+      Snapshot.config[:devices].each_with_object({}) do |device, results_hash|
+        results_hash[device] = languages_finished
+      end
     end
 
     def take_screenshots_one_simulator_at_a_time(launch_arguments)
