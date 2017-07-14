@@ -31,10 +31,10 @@ describe Precheck do
       allow(fake_happy_app_version).to receive(:support_url).and_return(fake_language_item_for_url_item(fieldname: "support_url"))
       allow(fake_happy_app_version).to receive(:marketing_url).and_return(fake_language_item_for_url_item(fieldname: "marketing_url"))
 
-      setup_url_rule_mock
+      setup_happy_url_rule_mock
     end
 
-    def setup_url_rule_mock
+    def setup_happy_url_rule_mock
       request = "fake request"
       head_object = "fake head object"
 
