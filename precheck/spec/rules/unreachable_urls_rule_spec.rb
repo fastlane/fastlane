@@ -1,42 +1,88 @@
-require 'precheck/rule'
+require 'precheck'
 
 module Precheck
-  class UnreachableURLRule < URLRule
-    def self.key
-      :unreachable_urls
-    end
+  describe Precheck do
+    describe Precheck::UnreachableURLRule do
+      let(:rule) { UnreachableURLRule.new }
 
-    def self.env_name
-      "RULE_UNREACHABLE_URLS"
-    end
+      def setup_url_rule_mock(return_status: 200)
+        request = "fake request"
+        head_object = "fake head object"
 
-    def self.friendly_name
-      "No broken urls"
-    end
+        allow(head_object).to receive(:status).and_return(return_status)
 
-    def self.description
-      "unreachable URLs in app metadata"
-    end
+        allow(request).to receive(:use).and_return(nil)
+        allow(request).to receive(:adapter).and_return(nil)
+        allow(request).to receive(:head).and_return(head_object)
 
-    def rule_block
-      return lambda { |url|
-        url = url.to_s.strip
-        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "empty url") if url.empty?
+        allow(Faraday).to receive(:new).and_return(request)
+      end
 
-        begin
-          request = Faraday.new(url) do |connection|
-            connection.use FaradayMiddleware::FollowRedirects
-            connection.adapter :net_http
-          end
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: url) unless request.head.status == 200
-        rescue
-          UI.verbose "URL #{url} not reachable 😵"
-          # I can only return :fail here, but I also want to return #{url}
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "unreachable: #{url}")
-        end
+      it "passes for 200 status URL" do
+        setup_url_rule_mock
+        item = URLItemToCheck.new("http://fastlane.tools", "some_url", "test URL")
+        result = rule.check_item(item)
 
-        return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
-      }
+        expect(result.status).to eq(VALIDATION_STATES[:passed])
+      end
+
+      it "fails for anything else" do
+        setup_url_rule_mock(return_status: 500)
+        item = URLItemToCheck.new("http://fastlane.tools", "some_url", "test URL")
+
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+
+        setup_url_rule_mock(return_status: 404)
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+
+        setup_url_rule_mock(return_status: 409)
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+
+        setup_url_rule_mock(return_status: 403)
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+      end
+
+      it "fails if not optional and URL is nil" do
+        setup_url_rule_mock
+        item = URLItemToCheck.new(nil, "some_url", "test URL", false)
+
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("empty url")
+      end
+
+      it "fails if not optional and URL is empty" do
+        setup_url_rule_mock
+        item = URLItemToCheck.new("", "some_url", "test URL", false)
+
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+        expect(result.rule_return.failure_data).to eq("empty url")
+      end
+
+      it "passes if empty and optional is true" do
+        setup_url_rule_mock
+        item = URLItemToCheck.new("", "some_url", "test URL", true)
+
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:passed])
+      end
+
+      it "passes if nil and optional is true" do
+        setup_url_rule_mock
+        item = URLItemToCheck.new(nil, "some_url", "test URL", true)
+
+        result = rule.check_item(item)
+        expect(result.status).to eq(VALIDATION_STATES[:passed])
+      end
     end
   end
 end

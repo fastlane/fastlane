@@ -13,6 +13,12 @@ module Precheck
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
+      it "skips for fields that aren't copyright" do
+        not_copyright_item = TextItemToCheck.new("not copyright", :description, "description")
+        result = rule.check_item(not_copyright_item)
+        expect(result).to eq(nil)
+      end
+
       it "fails for old date" do
         result = rule.check_item(old_copyright_item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])

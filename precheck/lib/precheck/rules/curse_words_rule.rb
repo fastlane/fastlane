@@ -25,7 +25,7 @@ module Precheck
         text = text.downcase
         split_words = text.split
         split_words_without_punctuation = text.gsub(/\W/, ' ').split
-        
+
         # remove punctuation and add only unique words
         all_metadata_words_list = (split_words + split_words_without_punctuation).uniq
         metadata_word_hashes = all_metadata_words_list.map { |word| Digest::SHA256.hexdigest(word) }
