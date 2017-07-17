@@ -5,8 +5,7 @@ require 'precheck/rule_check_result'
 module Precheck
   VALIDATION_STATES = {
     passed: "passed",
-    failed: "failed",
-    skipped: "skipped"
+    failed: "failed"
   }
 
   # rules can cause warnings, errors, or be skipped all together
