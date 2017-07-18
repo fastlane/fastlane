@@ -121,7 +121,13 @@ module Sigh
                                        value = value.to_s
                                        pt = %w(macos tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :download_xcode_profiles,
+                                     description: "Also download Xcode managed provisioning profiles",
+                                     is_string: false,
+                                     env_name: "SIGH_DOWNLOAD_XCODE_PROFILES",
+                                     short_option: "-x",
+                                     default_value: false)
       ]
     end
   end

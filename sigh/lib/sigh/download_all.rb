@@ -1,13 +1,15 @@
 module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
-    def download_all
+    def download_all(options, args)
+      download_xcode_profiles = options.download_xcode_profiles
+
       UI.message "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
       UI.message "Successfully logged in"
 
-      Spaceship.provisioning_profile.all.each do |profile|
+      Spaceship.provisioning_profile.all(xcode: download_xcode_profiles).each do |profile|
         if profile.valid?
           UI.message "Downloading profile '#{profile.name}'..."
           download_profile(profile)
