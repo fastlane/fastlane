@@ -25,8 +25,12 @@ public class LocaleUtil {
             methodGetDefault.setAccessible(true);
             Object activityManagerNative = methodGetDefault.invoke(amnClass);
 
-            Class iam = Class.forName(activityManagerNative.getClass().toString());
-            Method methodGetConfiguration = iam.getMethod("getConfiguration");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // getConfiguration moved from ActivityManagerNative to ActivityManagerProxy
+                amnClass = Class.forName(activityManagerNative.getClass().toString());
+            }
+
+            Method methodGetConfiguration = amnClass.getMethod("getConfiguration");
             methodGetConfiguration.setAccessible(true);
             Configuration config  = (Configuration) methodGetConfiguration.invoke(activityManagerNative);
 
@@ -37,7 +41,7 @@ public class LocaleUtil {
                 config.setLayoutDirection(locale);
             }
 
-            Method updateConfigurationMethod = iam.getMethod("updateConfiguration", Configuration.class);
+            Method updateConfigurationMethod = amnClass.getMethod("updateConfiguration", Configuration.class);
             updateConfigurationMethod.setAccessible(true);
             updateConfigurationMethod.invoke(activityManagerNative, config);
 
