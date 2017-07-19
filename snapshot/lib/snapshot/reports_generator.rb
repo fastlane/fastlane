@@ -64,6 +64,17 @@ module Snapshot
         # which includes spaces
         'iPhone 7 Plus' => "iPhone 7 Plus (5.5-Inch)",
         'iPhone 7' => "iPhone 7 (4.7-Inch)",
+        'iPhone 6s Plus' => "iPhone 6s Plus (5.5-Inch)",
+        'iPhone 6 Plus' => "iPhone 6 Plus (5.5-Inch)",
+        'iPhone 6s' => "iPhone 6s (4.7-Inch)",
+        'iPhone 6' => "iPhone 6 (4.7-Inch)",
+        'iPhone 5s' => "iPhone 5 (4-Inch)",
+        'iPhoneSE' => "iPhone SE",
+        'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
+        'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
+        'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
+        'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
+        'Apple TV 1080p' => 'Apple TV'
       }
     end
   end
