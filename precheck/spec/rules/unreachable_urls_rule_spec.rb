@@ -5,7 +5,7 @@ module Precheck
     describe Precheck::UnreachableURLRule do
       let(:rule) { UnreachableURLRule.new }
 
-      def setup_url_rule_mock(return_status: 200)
+      def setup_url_rule_mock(url: "http://fastlane.tools", return_status: 200)
         request = "fake request"
         head_object = "fake head object"
 
@@ -15,12 +15,21 @@ module Precheck
         allow(request).to receive(:adapter).and_return(nil)
         allow(request).to receive(:head).and_return(head_object)
 
-        allow(Faraday).to receive(:new).and_return(request)
+        allow(Faraday).to receive(:new).with(url).and_return(request)
       end
 
       it "passes for 200 status URL" do
         setup_url_rule_mock
         item = URLItemToCheck.new("http://fastlane.tools", "some_url", "test URL")
+        result = rule.check_item(item)
+
+        expect(result.status).to eq(VALIDATION_STATES[:passed])
+      end
+
+      it "passes for valid non encoded URL" do
+        setup_url_rule_mock(url: "http://fastlane.tools/%E3%83%86%E3%82%B9%E3%83%88")
+
+        item = URLItemToCheck.new("http://fastlane.tools/テスト", "some_url", "test URL")
         result = rule.check_item(item)
 
         expect(result.status).to eq(VALIDATION_STATES[:passed])
