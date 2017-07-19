@@ -35,6 +35,7 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [gym](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 * [match](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 * [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
+* [precheck](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 ## _fastlane_’s Relationship with [Google](https://google.com) and [Fabric](https://get.fabric.io/)
 
