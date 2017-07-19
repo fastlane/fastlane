@@ -24,7 +24,7 @@ module Precheck
         return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "empty url") if url.empty?
 
         begin
-          request = Faraday.new(url) do |connection|
+          request = Faraday.new(URI.encode(url)) do |connection|
             connection.use FaradayMiddleware::FollowRedirects
             connection.adapter :net_http
           end
