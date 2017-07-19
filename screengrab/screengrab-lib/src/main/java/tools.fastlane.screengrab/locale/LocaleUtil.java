@@ -27,7 +27,7 @@ public class LocaleUtil {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // getConfiguration moved from ActivityManagerNative to ActivityManagerProxy
-                amnClass = Class.forName(activityManagerNative.getClass().toString());
+                amnClass = Class.forName(activityManagerNative.getClass().getName());
             }
 
             Method methodGetConfiguration = amnClass.getMethod("getConfiguration");
