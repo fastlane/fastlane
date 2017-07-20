@@ -134,7 +134,7 @@ describe Spaceship::Tunes::IAPDetail do
             }
           }
       edited.save!
-      expect(edited.versions).to eq({ "en-US": { name: "Edit It", description: "Description has at least 10 characters" } })
+      expect(edited.versions).to eq({ :"en-US" => { name: "Edit It", description: "Description has at least 10 characters" } })
     end
   end
 
