@@ -51,6 +51,54 @@ describe Fastlane do
           end
         end
       end
+
+      describe "build_configuration" do
+        before do
+          allow(Fastlane::Actions::UpdateProjectProvisioningAction).to receive(:run)
+        end
+
+        context 'with String' do
+          it 'should be valid' do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  update_project_provisioning ({
+                    xcodeproj: '#{xcodeproj}',
+                    profile: '#{profile_path}',
+                    build_configuration: 'Debug'
+                })
+              end").runner.execute(:test)
+            end.not_to raise_error
+          end
+        end
+
+        context 'with Regexp' do
+          it 'should be valid' do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  update_project_provisioning ({
+                    xcodeproj: '#{xcodeproj}',
+                    profile: '#{profile_path}',
+                    build_configuration: /Debug/
+                })
+              end").runner.execute(:test)
+            end.not_to raise_error
+          end
+        end
+
+        context 'with other type' do
+          it 'should be invalid' do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  update_project_provisioning ({
+                    xcodeproj: '#{xcodeproj}',
+                    profile: '#{profile_path}',
+                    build_configuration: 1
+                })
+              end").runner.execute(:test)
+            end.to raise_error
+          end
+        end
+      end
     end
   end
 end
