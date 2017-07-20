@@ -25,7 +25,7 @@ public class LocaleUtil {
             methodGetDefault.setAccessible(true);
             Object activityManagerNative = methodGetDefault.invoke(amnClass);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // getConfiguration moved from ActivityManagerNative to ActivityManagerProxy
                 amnClass = Class.forName(activityManagerNative.getClass().getName());
             }
