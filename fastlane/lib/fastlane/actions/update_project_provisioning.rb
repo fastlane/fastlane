@@ -108,7 +108,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :target_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("target_filter should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                       end),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
                                        description: "Legacy option, use 'target_filter' instead",
