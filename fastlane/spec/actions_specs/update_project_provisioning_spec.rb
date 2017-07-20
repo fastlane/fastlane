@@ -11,7 +11,7 @@ describe Fastlane do
 
         context 'with String' do
           it 'should be valid' do
-            expect {
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
                   update_project_provisioning ({
                     xcodeproj: '#{xcodeproj}',
@@ -19,13 +19,13 @@ describe Fastlane do
                     target_filter: 'Name'
                 })
               end").runner.execute(:test)
-            }.not_to raise_error
+            end.not_to raise_error
           end
         end
 
         context 'with Regexp' do
           it 'should be valid' do
-            expect {
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
                   update_project_provisioning ({
                     xcodeproj: '#{xcodeproj}',
@@ -33,13 +33,13 @@ describe Fastlane do
                     target_filter: /Name/
                 })
               end").runner.execute(:test)
-            }.not_to raise_error
+            end.not_to raise_error
           end
         end
 
         context 'with other type' do
           it 'should be invalid' do
-            expect {
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
                   update_project_provisioning ({
                     xcodeproj: '#{xcodeproj}',
@@ -47,7 +47,7 @@ describe Fastlane do
                     target_filter: 1
                 })
               end").runner.execute(:test)
-            }.to raise_error
+            end.to raise_error
           end
         end
       end
