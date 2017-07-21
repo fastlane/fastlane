@@ -9,6 +9,7 @@ require "pilot/build_manager"
 require "pilot/tester_manager"
 require "pilot/tester_importer"
 require "pilot/tester_exporter"
+require "pilot/group_manager"
 
 require "spaceship"
 require "terminal-table"
