@@ -123,7 +123,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("target_filter should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                         UI.user_error!("build_configuration should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
                                        end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
