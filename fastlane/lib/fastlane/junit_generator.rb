@@ -14,7 +14,12 @@ module Fastlane
 
       xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
 
-      File.write(path, xml)
+      begin
+        File.write(path, xml)
+      rescue => ex
+        UI.error(ex)
+        UI.error("Couldn't save report.xml at path '#{File.expand_path(output_path)}', make sure you have write access to the containing directory.")
+      end
 
       return path
     end
