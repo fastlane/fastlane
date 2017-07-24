@@ -104,10 +104,11 @@ module Gym
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
         print "Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/"
         print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
-        print "This error might also happen if your workspace/project file is not in the root directory of your project"
-        print "To workaround that issue, you can add `Dir.chdir('../path/to/dir/containing/proj') do`"
-        print "Check out https://github.com/artsy/emission-nebula/blob/77a516e9a84116d509c1f570c2525f05b0749f2e/fastlane/Fastfile#L34"
-        print "for example usage on how to navigate into the subfolder."
+        print "This error might also happen if your workspace/project file is not in the root directory of your project."
+        print "To workaround that issue, you can wrap your calls to gym with"
+        print "`Dir.chdir('../path/to/dir/containing/proj') do`"
+        print "For an example you can check out"
+        print "https://github.com/artsy/emission-nebula/commit/44fe51a7fea8f7d52f0f77d6c3084827fe5dd59e"
         UI.build_failure!("Archive invalid")
       end
 
