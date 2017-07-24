@@ -160,7 +160,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :group_name,
                                      env_name: "PILOT_GROUP_NAME",
                                      description: "The name of the group being made for external testers",
-                                     optional: true),
+                                     optional: true)
       ]
     end
   end

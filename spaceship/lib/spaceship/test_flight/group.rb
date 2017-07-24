@@ -101,9 +101,9 @@ module Spaceship::TestFlight
 
       test_flight_groups.each(&block)
     end
-    
+
     def self.create_group!(app_id: nil, group_name: nil)
-        client.add_group_to_app(app_id: app_id, group_name: group_name)
+      client.add_group_to_app(app_id: app_id, group_name: group_name)
     end
   end
 end
