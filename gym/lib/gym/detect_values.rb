@@ -94,8 +94,10 @@ module Gym
           project = Xcodeproj::Project.open(project_path)
           project.targets.each do |target|
             target.build_configuration_list.build_configurations.each do |build_configuration|
-              bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER", target)
-              provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER", target)
+              current = build_configuration.build_settings
+
+              bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
+              provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
               next if provisioning_profile_specifier.to_s.length == 0
 
               provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
