@@ -15,6 +15,12 @@ module Sigh
           UI.important "Skipping invalid/expired profile '#{profile.name}'"
         end
       end
+
+      if download_xcode_profiles
+        UI.message("This run also included all Xcode managed provisioning profiles, as you used the `--download_xcode_profiles` flag")
+      else
+        UI.message("All Xcode managed provisioning profiles were ignored on this, to include them use the `--download_xcode_profiles` flag")
+      end
     end
 
     def download_profile(profile)
