@@ -64,7 +64,7 @@ module Sigh
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          Sigh::Manager.download_all(options, args)
+          Sigh::Manager.download_all(options)
         end
       end
 

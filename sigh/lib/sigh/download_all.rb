@@ -1,7 +1,7 @@
 module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
-    def download_all(commander_options, args)
+    def download_all(commander_options)
       download_xcode_profiles = commander_options.download_xcode_profiles
 
       UI.message "Starting login with user '#{Sigh.config[:username]}'"

@@ -29,9 +29,9 @@ module Sigh
       return File.expand_path(output)
     end
 
-    def self.download_all(options, args)
+    def self.download_all(options)
       require 'sigh/download_all'
-      DownloadAll.new.download_all(options, args)
+      DownloadAll.new.download_all(options)
     end
 
     def self.install_profile(profile)
