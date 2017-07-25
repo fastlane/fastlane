@@ -1,9 +1,7 @@
 module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
-    def download_all(commander_options)
-      download_xcode_profiles = commander_options.download_xcode_profiles
-
+    def download_all(download_xcode_profiles: false)
       UI.message "Starting login with user '#{Sigh.config[:username]}'"
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
