@@ -107,7 +107,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
-                                       UI.user_error!("Unsupported export_method, must be: #{av}") unless av.include?(value)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
                                      env_name: "GYM_EXPORT_OPTIONS",
