@@ -99,7 +99,7 @@ module Fastlane
                                    value: (self.data[:downloads].to_i / 250)),
             FastlanePluginRating.new(key: :tests,
                              description: "The more tests a plugin has, the better",
-                                   value: self.data[:tests].to_i * 3)
+                                   value: [self.data[:tests].to_i * 3, 80].min)
           ]
         end
 
