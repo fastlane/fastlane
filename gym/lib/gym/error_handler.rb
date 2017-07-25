@@ -94,6 +94,7 @@ module Gym
         print_full_log_path
         print_environment_information
         print_build_error_instructions
+        print_xcode9_plist_warning
         UI.build_failure!("Error packaging up the application", error_info: output)
       end
 
@@ -137,6 +138,21 @@ module Gym
         UI.error("⬆️  Check out the few lines of raw `xcodebuild` output above for potential hints on how to solve this error")
         UI.important("📋  For the complete and more detailed error log, check the full log at:")
         UI.important("📋  #{log_path}")
+      end
+
+      def print_xcode9_plist_warning
+        return unless Helper.xcode_at_least?("9.0")
+
+        export_options = Gym.config[:export_options] || {}
+        provisioning_profiles = export_options[:provisioningProfiles] || []
+        if provisioning_profiles.count == 0
+          UI.error("Looks like no provisioning profile mapping was provided")
+          UI.error("Please check the complete output, in particular the very top")
+          UI.error("and see if you can find more information. You can also run fastlane")
+          UI.error("with the `--verbose` flag.")
+          UI.error("Alternatively you can provide the provisioning profile mapping manually")
+          UI.error("https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
+        end
       end
 
       def print_xcode_version
