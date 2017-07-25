@@ -123,7 +123,7 @@ module Sigh
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :download_xcode_profiles,
-                                     description: "Also download Xcode managed provisioning profiles",
+                                     description: "Also download Xcode managed provisioning profiles. Should be used with download_all command",
                                      is_string: false,
                                      env_name: "SIGH_DOWNLOAD_XCODE_PROFILES",
                                      short_option: "-x",
