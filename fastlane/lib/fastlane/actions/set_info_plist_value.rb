@@ -58,7 +58,7 @@ module Fastlane
                                          UI.user_error!("Couldn't find plist file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :output,
-                                       env_name: "FL_SET_INFO_PLIST_OUTPUT_VALUE",
+                                       env_name: "FL_SET_INFO_PLIST_OUTPUT",
                                        description: "Path to the output file you want to generate",
                                        optional: true)
         ]
