@@ -207,14 +207,14 @@ module Gym
           # the provisioning profile might be called anything below
           # There is no 100% good way to detect the profile type based on the name
           available_export_types = {
-            "app-store" => :appstore,
-            "app store" => :appstore,
-            "appstore" => :appstore,
-            "ad-hoc" => :adhoc,
-            "adhoc" => :adhoc,
-            "ad hoc" => :adhoc,
-            "enterprise" => :enterprise,
-            "development" => :development
+            "app-store" => "app-store",
+            "app store" => "app-store",
+            "appstore" => "app-store",
+            "ad-hoc" => "ad-hoc",
+            "adhoc" => "ad-hoc",
+            "ad hoc" => "ad-hoc",
+            "enterprise" => "enterprise",
+            "development" => "development"
           }
 
           selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
