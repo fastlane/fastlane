@@ -150,6 +150,13 @@ module Spaceship
         self.class.factory(app)
       end
 
+      # Associate specific merchants with this app
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found
+      def associate_merchants(merchants)
+        app = client.associate_merchants_with_app(self, merchants, mac?)
+        self.class.factory(app)
+      end
+
       # Update a service for the app with given AppService object
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
       def update_service(service)

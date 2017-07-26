@@ -73,6 +73,11 @@ module Spaceship
       def provisioning_profile
         Spaceship::ProvisioningProfile.set_client(@client)
       end
+
+      # @return (Class) Access the merchants for the spaceship
+      def merchant
+        Spaceship::Merchant.set_client(@client)
+      end
     end
   end
 
@@ -116,6 +121,10 @@ module Spaceship
 
     def client
       Spaceship::Portal.client
+    end
+
+    def merchant
+      Spaceship::Portal.merchant
     end
   end
 end

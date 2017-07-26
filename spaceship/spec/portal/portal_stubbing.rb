@@ -254,6 +254,20 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
+    def adp_stub_merchants
+      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listOMCs.action').
+        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+        to_return(status: 200, body: adp_read_fixture_file('listOMCs.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addOMC.action").
+        with(body: { "name" => "ExampleApp Production", "identifier" => "merchant.com.example.app.production", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addOMC.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteOMC.action").
+        with(body: { "omcId" => "LM3IY56BXC", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('deleteOMC.action.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
     def adp_stub_website_pushes
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listWebsitePushIds.action').
         with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).

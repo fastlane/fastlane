@@ -1,0 +1,35 @@
+{
+    "creationTimestamp": "2017-07-26T08:03:13Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": "9fcc4659-642d-45d6-y54c-02c5515r6e9s",
+    "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/listOMCs.action",
+    "responseId": "26659bc5-671f-4f88-85ec-b8b4c863f024",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": true,
+    "pageNumber": 1,
+    "pageSize": 500,
+    "totalRecords": 2,
+    "identifierList": [
+        {
+            "name": "ExampleApp Production",
+            "prefix": "9J57U9392R",
+            "identifier": "merchant.com.example.app.production",
+            "status": "current",
+            "canEdit": true,
+            "canDelete": true,
+            "omcId": "LM3IY56BXC"
+        },
+        {
+            "name": "ExampleApp Sandbox",
+            "prefix": "9J57U9392R",
+            "identifier": "merchant.com.example.app.sandbox",
+            "status": "current",
+            "canEdit": true,
+            "canDelete": true,
+            "omcId": "Z6676498T7"
+        }
+    ]
+}

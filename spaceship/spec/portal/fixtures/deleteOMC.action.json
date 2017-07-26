@@ -1,0 +1,12 @@
+{
+    "creationTimestamp": "2017-07-26T08:04:50Z",
+    "resultCode": 0,
+    "userLocale": "en_US",
+    "protocolVersion": "QH65B2",
+    "requestId": "74e1ge8b-fdaf-4560-y510-b5e553bb5t02",
+    "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/deleteOMC.action",
+    "responseId": "85365bc7-3gd6-41b1-9222-124fd424ec0f",
+    "isAdmin": true,
+    "isMember": false,
+    "isAgent": true
+}
