@@ -136,7 +136,6 @@ lane :release do
   end
 
   clubmate
-  donate_food
 
   puts "You can now tweet:".green
   releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
@@ -336,16 +335,6 @@ private_lane :ensure_code_samples do
   UI.message "<U+1F557>  Verifying all code samples work with the latest fastlane release"
   test_sample_code(path: File.expand_path("docs/Actions.md"))
   UI.success "<U+2705>  All fastlane code samples work as expected"
-end
-
-lane :donate_food do
-  if ENV["SHARETHEMEAL_USERHASH"].to_s.length > 0
-    sharethemeal(
-      amount: "0.5",
-      currency: "USD",
-      team_id: "fastlane"
-    )
-  end
 end
 
 desc "Ensure all the requirement environment variables are provided"
