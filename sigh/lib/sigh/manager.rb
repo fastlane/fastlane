@@ -29,9 +29,9 @@ module Sigh
       return File.expand_path(output)
     end
 
-    def self.download_all
+    def self.download_all(download_xcode_profiles: false)
       require 'sigh/download_all'
-      DownloadAll.new.download_all
+      DownloadAll.new.download_all(download_xcode_profiles: download_xcode_profiles)
     end
 
     def self.install_profile(profile)

@@ -60,11 +60,21 @@ module Sigh
         c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
 
+        c.option '--download_xcode_profiles', 'Only works with `fastlane sigh download_all` command: Also download Xcode managed provisioning profiles'
+
         FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          Sigh::Manager.download_all
+          # Below is some custom code to get an extra flag that's only available
+          # for the `fastlane sigh download_all` command and not for the `sigh` action
+          user_hash = options.__hash__
+          download_xcode_profiles = options.download_xcode_profiles
+
+          if download_xcode_profiles == true
+            user_hash.delete(:download_xcode_profiles)
+          end
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, user_hash)
+          Sigh::Manager.download_all(download_xcode_profiles: download_xcode_profiles)
         end
       end
 
