@@ -94,7 +94,7 @@ describe Fastlane do
         # Useful, but flakey tests below, we don't want to run them on each
         # commit for now. Ideally we can enable those tests sometime in the
         # future again, as it might be related to Circle
-        # 
+        #
         # it "don't unlock keychain" do
         #   expect(UI).to receive(:message).with(/Set output directory path to:/)
         #   expect(UI).to receive(:message).with(/Set derived data path to:/)
