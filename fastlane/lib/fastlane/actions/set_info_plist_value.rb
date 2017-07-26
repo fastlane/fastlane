@@ -21,7 +21,7 @@ module Fastlane
             plist[params[:key]] = params[:value]
           end
           new_plist = Plist::Emit.dump(plist)
-          output = params[:output] || path
+          output = params[:output_file_name] || path
           File.write(output, new_plist)
 
           return params[:value]
@@ -57,8 +57,8 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find plist file at path '#{value}'") unless File.exist?(value)
                                        end),
-          FastlaneCore::ConfigItem.new(key: :output,
-                                       env_name: "FL_SET_INFO_PLIST_OUTPUT",
+          FastlaneCore::ConfigItem.new(key: :output_file_name,
+                                       env_name: "FL_SET_INFO_PLIST_OUTPUT_FILE_NAME",
                                        description: "Path to the output file you want to generate",
                                        optional: true)
         ]
@@ -75,7 +75,7 @@ module Fastlane
       def self.example_code
         [
           'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")',
-          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output: "./Info.plist")'
+          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output_file_name: "./Info.plist")'
         ]
       end
 

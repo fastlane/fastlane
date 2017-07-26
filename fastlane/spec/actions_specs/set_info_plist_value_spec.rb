@@ -35,7 +35,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         Fastlane::FastFile.new.parse("lane :test do
-          set_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier', value: '#{new_value}', output:'#{File.join(test_path, output_path)}')
+          set_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier', value: '#{new_value}', output_file_name:'#{File.join(test_path, output_path)}')
         end").runner.execute(:test)
 
         value = Fastlane::FastFile.new.parse("lane :test do
