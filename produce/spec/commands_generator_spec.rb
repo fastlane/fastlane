@@ -1,6 +1,7 @@
 require 'produce/commands_generator'
 require 'produce/service'
 require 'produce/group'
+require 'produce/merchant'
 
 describe Produce::CommandsGenerator do
   let(:available_options) { Produce::Options.available_options }
@@ -164,6 +165,60 @@ describe Produce::CommandsGenerator do
       Produce::CommandsGenerator.start
 
       expect(Produce.config[:app_identifier]).to eq('your.awesome.App')
+    end
+  end
+
+  describe ":merchant option handling" do
+    def expect_merchant_create_with(merchant_name, merchant_identifier)
+      fake_merchant = "fake_merchant"
+      expect(Produce::Merchant).to receive(:new).and_return(fake_merchant)
+      expect(fake_merchant).to receive(:create) do |options, args|
+        expect(options.merchant_name).to eq(merchant_name)
+        expect(options.merchant_identifier).to eq(merchant_identifier)
+        expect(args).to eq([])
+      end
+    end
+
+    it "can use the username short flag from tool options" do
+      stub_commander_runner_args(['merchant', '-u', 'me@it.com', '-o', 'merchant.example.app.production', '-r', 'Example Merchant'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
+
+      expect_merchant_create_with('Example Merchant', 'merchant.example.app.production')
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:username]).to eq('me@it.com')
+    end
+  end
+
+  describe ":associate_merchant option handling" do
+    def expect_merchant_associate_with(merchant_ids)
+      fake_merchant = "fake_merchant"
+      expect(Produce::Merchant).to receive(:new).and_return(fake_merchant)
+      expect(fake_merchant).to receive(:associate) do |options, args|
+        expect(args).to eq(merchant_ids)
+      end
+    end
+
+    it "can associate multiple merchant identifiers" do
+      stub_commander_runner_args(['associate_merchant', 'merchant.example.app.sandbox', 'merchant.example.app.production'])
+
+      expect_merchant_associate_with(['merchant.example.app.sandbox', 'merchant.example.app.production'])
+
+      Produce::CommandsGenerator.start
+    end
+
+    it "can use the username short flag from tool options" do
+      stub_commander_runner_args(['associate_merchant', '-u', 'me@it.com', 'merchant.example.app.production'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
+
+      expect_merchant_associate_with(['merchant.example.app.production'])
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:username]).to eq('me@it.com')
     end
   end
 end

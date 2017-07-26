@@ -137,7 +137,19 @@ module Produce
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :merchant_name,
+                                      short_option: "-r",
+                                      env_name: "PRODUCE_MERCHANT_NAME",
+                                      description: "Name for the merchant that is created",
+                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :merchant_identifier,
+                                       short_option: "-o",
+                                       env_name: "PRODUCE_MERCHANT_IDENTIFIER",
+                                       description: "Merchant identifier for the merchant",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Merchant ID identifiers should start with 'merchant.'") unless value.start_with?("merchant.")
+                                       end)
       ]
     end
 
