@@ -98,9 +98,12 @@ module Gym
 
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
               provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
-              next if provisioning_profile_specifier.to_s.length == 0
-
-              provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+              provisioning_profile_uuid = current["PROVISIONING_PROFILE"]
+              if provisioning_profile_specifier.to_s.length > 0
+                provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+              elsif provisioning_profile_uuid.to_s.length > 0
+                provisioning_profile_mapping[bundle_identifier] = provisioning_profile_uuid
+              end
             end
           end
         rescue => ex
