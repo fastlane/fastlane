@@ -54,7 +54,7 @@ module Fastlane
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
         command << "-a #{params[:api_token]}"
-        command << "-p #{params[:platform] == "appletvos" ? "tvos" : params[:platform]}"
+        command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
           Actions.sh(command.join(" "), log: false)
