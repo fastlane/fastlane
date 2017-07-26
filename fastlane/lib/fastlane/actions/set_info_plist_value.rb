@@ -21,8 +21,13 @@ module Fastlane
             plist[params[:key]] = params[:value]
           end
           new_plist = Plist::Emit.dump(plist)
-          output = params[:output_file_name] || path
-          File.write(output, new_plist)
+          if params[:output_file_name]
+            output = params[:output_file_name]
+            FileUtils.mkdir_p(File.expand_path("..", output))
+            File.write(File.expand_path(output), new_plist)
+          else
+            File.write(path, new_plist)
+          end
 
           return params[:value]
         rescue => ex

@@ -3,7 +3,7 @@ describe Fastlane do
     describe "set_info_plist" do
       let (:plist_path) { "./fastlane/spec/fixtures/plist/Info.plist" }
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:output_path) { "output.plist" }
+      let (:output_path) { "Folder/output.plist" }
       let (:new_value) { "NewValue#{Time.now.to_i}" }
 
       it "stores changes in the plist file" do
