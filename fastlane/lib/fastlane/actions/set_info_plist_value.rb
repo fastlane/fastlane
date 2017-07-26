@@ -75,7 +75,7 @@ module Fastlane
       def self.example_code
         [
           'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")',
-          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output: "./Info.plist)'
+          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output: "./Info.plist")'
         ]
       end
 
