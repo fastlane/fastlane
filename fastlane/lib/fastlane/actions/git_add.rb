@@ -34,10 +34,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file(s) and path(s) you want to add",
                                        is_string: false,
+                                       conflicting_options: [:pathspec],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :pathspec,
                                        description: "The pathspec you want to add files from",
                                        is_string: true,
+                                       conflicting_options: [:path],
                                        optional: true,
                                        deprecated: "Use --path instead")
         ]
