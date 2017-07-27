@@ -2,7 +2,10 @@ module Fastlane
   module Actions
     class GitAddAction < Action
       def self.run(params)
-        if params[:path]
+        if params[:pathspec]
+          paths = params[:pathspec]
+          UI.success("Successfully added from \"#{paths}\" 💾.")
+        elsif params[:path]
           if params[:path].kind_of?(String)
             paths = params[:path]
           else
@@ -31,7 +34,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file(s) and path(s) you want to add",
                                        is_string: false,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :pathspec,
+                                       description: "The pathspec you want to add files from",
+                                       is_string: true,
+                                       optional: true,
+                                       deprecated: "Use --path instead")
         ]
       end
 
