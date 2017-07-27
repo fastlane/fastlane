@@ -94,6 +94,7 @@ module Gym
           project = Xcodeproj::Project.open(project_path)
           project.targets.each do |target|
             target.build_configuration_list.build_configurations.each do |build_configuration|
+              next unless build_configuration.to_s == Gym.config[:configuration]
               current = build_configuration.build_settings
 
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
