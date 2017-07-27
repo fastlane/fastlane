@@ -38,18 +38,18 @@ describe Gym do
       describe "provisioning profile" do
         let(:configuration) { "Debug" }
         let(:options) do
-        {
-            workspace: "./gym/examples/cocoapods/Example.xcworkspace",
-            export_method: "enterprise",
-            scheme: "Example",
-            configuration: configuration
-        }
+          {
+              workspace: "./gym/examples/cocoapods/Example.xcworkspace",
+              export_method: "enterprise",
+              scheme: "Example",
+              configuration: configuration
+          }
         end
         it "fetches the default build path from the Xcode config when missing Xcode preferences plit" do
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
           Gym::DetectValues.detect_selected_provisioning_profiles
-          expect(Gym.config[:export_options][:provisioningProfiles]).to eq({"tools.fastlane.debug.app" => "Test Provisioning Profile for Debug"})
+          expect(Gym.config[:export_options][:provisioningProfiles]).to eq({ "tools.fastlane.debug.app" => "Test Provisioning Profile for Debug" })
         end
       end
     end
