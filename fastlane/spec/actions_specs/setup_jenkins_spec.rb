@@ -62,7 +62,7 @@ describe Fastlane do
 
       it "works inside CI" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        stub_const("ENV", { "TRAVIS" => true })
+        stub_const("ENV", { "JENKINS_URL" => "123" })
 
         Fastlane::FastFile.new.parse("lane :test do
           setup_jenkins
@@ -88,7 +88,7 @@ describe Fastlane do
 
       describe "under CI" do
         before :each do
-          stub_const("ENV", { "TRAVIS" => true })
+          stub_const("ENV", { "JENKINS_URL" => "123" })
         end
 
         it "disable keychain unlock" do
