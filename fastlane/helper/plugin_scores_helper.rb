@@ -112,7 +112,7 @@ module Fastlane
             '558000'
           when 100...250
             '63b319'
-          when 250...10000
+          when 250...10_000
             '72CC1D'
           else
             '558000' # this shouldn't happen
