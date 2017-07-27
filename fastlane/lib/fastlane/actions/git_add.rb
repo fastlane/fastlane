@@ -2,14 +2,11 @@ module Fastlane
   module Actions
     class GitAddAction < Action
       def self.run(params)
-        if params[:pathspec]
-          paths = params[:pathspec]
-          UI.success("Successfully added from \"#{paths}\" 💾.")
-        elsif params[:path]
+        if params[:path]
           if params[:path].kind_of?(String)
-            paths = params[:path].shellescape
+            paths = params[:path]
           else
-            paths = params[:path].map(&:shellescape).join(' ')
+            paths = params[:path].join(' ')
           end
           UI.success("Successfully added \"#{paths}\" 💾.")
         else
@@ -32,23 +29,8 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to add",
+                                       description: "The file(s) and path(s) you want to add",
                                        is_string: false,
-                                       conflicting_options: [:pathspec],
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         if value.kind_of?(String)
-                                           UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
-                                         else
-                                           value.each do |x|
-                                             UI.user_error!("Couldn't find file at path '#{x}'") unless File.exist?(x)
-                                           end
-                                         end
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :pathspec,
-                                       description: "The pathspec you want to add files from",
-                                       is_string: true,
-                                       conflicting_options: [:path],
                                        optional: true)
         ]
       end
@@ -70,8 +52,8 @@ module Fastlane
           'git_add',
           'git_add(path: "./version.txt")',
           'git_add(path: ["./version.txt", "./changelog.txt"])',
-          'git_add(pathspec: "./Frameworks/*")',
-          'git_add(pathspec: "*.txt")'
+          'git_add(path: "./Frameworks/*")',
+          'git_add(path: ["*.h", "*.m"])'
         ]
       end
 
