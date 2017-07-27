@@ -32,14 +32,15 @@ describe Fastlane do
 
       it "works inside CI" do
         expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(
-        {
-          name: tmp_keychain_name,
-          default_keychain: true,
-          unlock: true,
-          timeout: 3600,
-          lock_when_sleeps: true,
-          password: ""
-        })
+          {
+            name: tmp_keychain_name,
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: true,
+            password: ""
+          }
+        )
 
         stub_const("ENV", { "TRAVIS" => "true" })
 
