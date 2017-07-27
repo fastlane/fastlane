@@ -76,7 +76,7 @@ module Fastlane
                                        sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :default_keychain,
-                                       description: 'Set the default keychain',
+                                       description: 'Should the newly created Keychain be the new system default keychain',
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :unlock,
