@@ -5,7 +5,7 @@ machine:
     version: "8.2"
 dependencies:
   pre:
-    - brew install shellcheck
+    - brew install ghc shellcheck
   override:
     - bundle check || bundle install --jobs=4 --retry=3 --path .bundle
 test:
