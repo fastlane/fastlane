@@ -58,7 +58,6 @@ module Gym
 
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
-    # rubocop:disable Style/MultilineBlockChain
     def self.detect_selected_provisioning_profiles
       if Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash) && Gym.config[:export_options][:provisioningProfiles]
         return
@@ -135,7 +134,6 @@ module Gym
         UI.verbose(ex.backtrace.join("\n"))
       end
     end
-    # rubocop:enable Style/MultilineBlockChain
 
     def self.detect_scheme
       Gym.project.select_scheme
