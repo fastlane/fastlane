@@ -56,6 +56,16 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
+    def self.provisioning_profile_specifier_from_xcargs
+      return unless Gym.config[:xcargs]
+
+      provisioning_profile_specifier = ''
+      Gym.config[:xcargs].match(/PROVISIONING_PROFILE_SPECIFIER[ ]*=[ ]*['"](.+?)["']/) do |match|
+        provisioning_profile_specifier = match[1]
+      end
+      provisioning_profile_specifier
+    end
+
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
     # rubocop:disable Style/MultilineBlockChain
@@ -96,8 +106,9 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
 
+              provisioning_profile_specifier = provisioning_profile_specifier_from_xcargs
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
-              provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
+              provisioning_profile_specifier ||= current["PROVISIONING_PROFILE_SPECIFIER"]
               provisioning_profile_uuid = current["PROVISIONING_PROFILE"]
               if provisioning_profile_specifier.to_s.length > 0
                 provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier

@@ -34,6 +34,49 @@ describe Gym do
         path = Gym.config[:build_path]
         expect(path).to eq(archive_path)
       end
+
+      describe "provisioning profile" do
+        let(:configuration) { "Debug" }
+        let(:options) do
+          {
+              workspace: "./gym/examples/cocoapods/Example.xcworkspace",
+              export_method: "enterprise",
+              scheme: "Example",
+              configuration: configuration
+          }
+        end
+
+        describe "overwrite PROVISIONING_PROFILE_SPECIFIER set in xcargs option" do
+          context "when single quote is used" do
+            it "overwrite the value correctly" do
+              options[:xcargs] = "PROVISIONING_PROFILE_SPECIFIER='Overwrited Provisioning'"
+              Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+              Gym::DetectValues.detect_selected_provisioning_profiles
+              expect(Gym.config[:export_options][:provisioningProfiles]).to eq({
+                "tools.fastlane.debug.app" => "Overwrited Provisioning",
+                "tools.fastlane.app" => "Overwrited Provisioning",
+                "com.krausefx.ExampleTests" => "Overwrited Provisioning",
+                "com.krausefx.ExampleUITests" => "Overwrited Provisioning"
+              })
+            end
+          end
+          context "when double quote is used" do
+            it "overwrite the value correctly" do
+              options[:xcargs] = 'PROVISIONING_PROFILE_SPECIFIER="Overwrited Provisioning"'
+              Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+              Gym::DetectValues.detect_selected_provisioning_profiles
+              expect(Gym.config[:export_options][:provisioningProfiles]).to eq({
+                "tools.fastlane.debug.app" => "Overwrited Provisioning",
+                "tools.fastlane.app" => "Overwrited Provisioning",
+                "com.krausefx.ExampleTests" => "Overwrited Provisioning",
+                "com.krausefx.ExampleUITests" => "Overwrited Provisioning"
+              })
+            end
+          end
+        end
+      end
     end
   end
 end
