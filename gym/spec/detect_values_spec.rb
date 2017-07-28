@@ -45,7 +45,7 @@ describe Gym do
               configuration: configuration
           }
         end
-        it "fetches the default build path from the Xcode config when missing Xcode preferences plit" do
+        it "fetches the provisioning profiles from the Xcode config" do
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
           Gym::DetectValues.detect_selected_provisioning_profiles
