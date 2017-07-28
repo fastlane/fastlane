@@ -182,7 +182,7 @@ export_options(
   method: "app-store",
   provisioningProfiles: { 
     "com.example.bundleid": "Provisioning Profile Name",
-    "com.example.bundleid2": "Provisioning Profile Name 2",
+    "com.example.bundleid2": "Provisioning Profile Name 2"
   }
 )
 ```
