@@ -6,7 +6,7 @@ module RequiredParameters
   # Some parameters are not optional, and we must assert that they have values. Using this module, we can do that via the following pattern
   #
   # ```ruby
-  #   def some_method(foo: nil, bar: nil, baz: nil) nonnil(:foo, :bar)
+  #   def some_method(foo: nil, bar: nil, baz: nil) requires_params(:foo, :bar)
   #     .
   #     .
   #     .
@@ -14,20 +14,17 @@ module RequiredParameters
   #
   #   when `some_method()` is called, `foo` and `bar` must be non-nil
   # ```
-  def required_params(*args)
+  def requires_params!(*args)
     assert_required_params(__callee__, binding, args)
   end
-  alias nonnil required_params
 
-  def required_params!
-    assert_required_params(__callee__, binding)
+  def requires_all_params!
+    assert_required_params(__callee__, binding, all_method_parameters(__callee__))
   end
-  alias nonnil! required_params!
 
   private
 
-  def assert_required_params(method_name, binding, parameter_names = nil)
-    parameter_names ||= all_method_parameters
+  def assert_required_params(method_name, binding, parameter_names)
     parameter_names.each do |name|
       if local_variable_get(binding, name).nil?
         raise NameError, "`#{name}' is a required parameter"

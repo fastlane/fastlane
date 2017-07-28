@@ -20,13 +20,12 @@ module Spaceship::TestFlight
     ##
 
     # Returns an array of all available build trains (not the builds they include)
-    def get_build_trains(app_id: nil, platform: "ios") nonnil!
-
+    def get_build_trains(app_id: nil, platform: "ios") requires_all_params!
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0) nonnil!
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0) requires_all_params!
       with_retry(retry_count) do
         response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
         handle_response(response)
@@ -37,12 +36,12 @@ module Spaceship::TestFlight
     # @!group Builds API
     ##
 
-    def get_build(app_id: nil, build_id: nil) nonnil!
+    def get_build(app_id: nil, build_id: nil) requires_all_params!
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
       handle_response(response)
     end
 
-    def put_build(app_id: nil, build_id: nil, build: nil) nonnil!
+    def put_build(app_id: nil, build_id: nil, build: nil) requires_all_params!
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
         req.body = build.to_json
@@ -51,7 +50,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def post_for_testflight_review(app_id: nil, build_id: nil, build: nil) nonnil!
+    def post_for_testflight_review(app_id: nil, build_id: nil, build: nil) requires_all_params!
       response = request(:post) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
         req.body = build.to_json
@@ -64,12 +63,12 @@ module Spaceship::TestFlight
     # @!group Groups API
     ##
 
-    def get_groups(app_id: nil) nonnil(:app_id)
+    def get_groups(app_id: nil) requires_params!(:app_id)
       response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
       handle_response(response)
     end
 
-    def add_group_to_build(app_id: nil, group_id: nil, build_id: nil) nonnil!
+    def add_group_to_build(app_id: nil, group_id: nil, build_id: nil) requires_all_params!
       body = {
         'groupId' => group_id,
         'buildId' => build_id
@@ -86,25 +85,25 @@ module Spaceship::TestFlight
     # @!group Testers API
     ##
 
-    def testers_for_app(app_id: nil) nonnil!
+    def testers_for_app(app_id: nil) requires_all_params!
       url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
       response = request(:get, url)
       handle_response(response)
     end
 
-    def delete_tester_from_app(app_id: nil, tester_id: nil) nonnil!
+    def delete_tester_from_app(app_id: nil, tester_id: nil) requires_all_params!
       url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
       response = request(:delete, url)
       handle_response(response)
     end
 
-    def resend_invite_to_external_tester(app_id: nil, tester_id: nil) nonnil!
+    def resend_invite_to_external_tester(app_id: nil, tester_id: nil) requires_all_params!
       url = "/testflight/v1/invites/#{app_id}/resend?testerId=#{tester_id}"
       response = request(:post, url)
       handle_response(response)
     end
 
-    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil) nonnil!
+    def create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil) requires_all_params!
       url = "providers/#{team_id}/apps/#{app_id}/testers"
       response = request(:post) do |req|
         req.url url
@@ -118,7 +117,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil) nonnil!
+    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil) requires_all_params!
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
@@ -133,7 +132,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil) nonnil!
+    def delete_tester_from_group(group_id: nil, tester_id: nil, app_id: nil) requires_all_params!
       url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
       response = request(:delete) do |req|
         req.url url
@@ -146,12 +145,12 @@ module Spaceship::TestFlight
     # @!group AppTestInfo
     ##
 
-    def get_app_test_info(app_id: nil) nonnil!
+    def get_app_test_info(app_id: nil) requires_all_params!
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/testInfo")
       handle_response(response)
     end
 
-    def put_app_test_info(app_id: nil, app_test_info: nil) nonnil!
+    def put_app_test_info(app_id: nil, app_test_info: nil) requires_all_params!
       response = request(:put) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/testInfo"
         req.body = app_test_info.to_json

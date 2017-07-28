@@ -306,12 +306,12 @@ module Spaceship
       app_version_data(app_id, version_platform: version_platform, version_id: version_id)
     end
 
-    def app_version_data(app_id, version_platform: nil, version_id: nil) nonnil(:app_id, :version_platform, :version_id)
+    def app_version_data(app_id, version_platform: nil, version_id: nil) requires_params!(:app_id, :version_platform, :version_id)
       r = request(:get, "ra/apps/#{app_id}/platforms/#{version_platform}/versions/#{version_id}")
       parse_response(r, 'data')
     end
 
-    def update_app_version!(app_id, version_id, data) nonnil(:app_id, :version_id)
+    def update_app_version!(app_id, version_id, data) requires_params!(:app_id, :version_id)
       with_tunes_retry do
         r = request(:post) do |req|
           req.url "ra/apps/#{app_id}/platforms/ios/versions/#{version_id}"
@@ -563,7 +563,7 @@ module Spaceship
     # @param device (string): The target device
     # @param is_messages (Bool): True if the screenshot is for iMessage
     # @return [JSON] the response
-    def upload_screenshot(app_version, upload_image, device, is_messages) nonnil(:app_version, :upload_image, :device)
+    def upload_screenshot(app_version, upload_image, device, is_messages) requires_params!(:app_version, :upload_image, :device)
       du_client.upload_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device, is_messages)
     end
 
@@ -572,7 +572,7 @@ module Spaceship
     # @param upload_image (UploadFile): The image to upload
     # @param device (string): The target device
     # @return [JSON] the response
-    def upload_messages_screenshot(app_version, upload_image, device) nonnil(:app_version, :upload_image, :device)
+    def upload_messages_screenshot(app_version, upload_image, device) requires_params!(:app_version, :upload_image, :device)
       du_client.upload_messages_screenshot(app_version, upload_image, content_provider_id, sso_token_for_image, device)
     end
 
@@ -580,7 +580,7 @@ module Spaceship
     # @param app_version (AppVersion): The version of your app
     # @param upload_file (UploadFile): The image to upload
     # @return [JSON] the response
-    def upload_geojson(app_version, upload_file) nonnil!
+    def upload_geojson(app_version, upload_file) requires_all_params!
       du_client.upload_geojson(app_version, upload_file, content_provider_id, sso_token_for_image)
     end
 
@@ -588,7 +588,7 @@ module Spaceship
     # @param app_version (AppVersion): The version of your app
     # @param upload_trailer (UploadFile): The trailer to upload
     # @return [JSON] the response
-    def upload_trailer(app_version, upload_trailer) nonnil!
+    def upload_trailer(app_version, upload_trailer) requires_all_params!
       du_client.upload_trailer(app_version, upload_trailer, content_provider_id, sso_token_for_video)
     end
 
@@ -596,7 +596,7 @@ module Spaceship
     # @param app_version (AppVersion): The version of your app
     # @param upload_trailer_preview (UploadFile): The trailer preview to upload
     # @return [JSON] the response
-    def upload_trailer_preview(app_version, upload_trailer_preview) nonnil!
+    def upload_trailer_preview(app_version, upload_trailer_preview) requires_all_params!
       du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image)
     end
 
@@ -630,7 +630,7 @@ module Spaceship
 
     # rubocop:disable Metrics/BlockNesting
     # @param (testing_type) internal or external
-    def build_trains(app_id, testing_type, tries = 5, platform: nil) nonnil(:app_id)
+    def build_trains(app_id, testing_type, tries = 5, platform: nil) requires_params!(:app_id)
       url = "ra/apps/#{app_id}/trains/?testingType=#{testing_type}"
       url += "&platform=#{platform}" unless platform.nil?
       r = request(:get, url)
@@ -658,7 +658,7 @@ module Spaceship
     end
     # rubocop:enable Metrics/BlockNesting
 
-    def update_build_trains!(app_id, testing_type, data) nonnil(:app_id)
+    def update_build_trains!(app_id, testing_type, data) requires_params!(:app_id)
       # The request fails if this key is present in the data
       data.delete("dailySubmissionCountByPlatform")
 
@@ -671,7 +671,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios') nonnil!
+    def remove_testflight_build_from_review!(app_id: nil, train: nil, build_number: nil, platform: 'ios') requires_all_params!
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/reject"
         req.body = {}.to_json
@@ -815,7 +815,7 @@ module Spaceship
     # @!group Submit for Review
     #####################################################
 
-    def prepare_app_submissions(app_id, version) nonnil!
+    def prepare_app_submissions(app_id, version) requires_all_params!
       r = request(:get) do |req|
         req.url "ra/apps/#{app_id}/versions/#{version}/submit/summary"
         req.headers['Content-Type'] = 'application/json'
@@ -825,7 +825,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, data) nonnil(:app_id)
+    def send_app_submission(app_id, data) requires_params!(:app_id)
       # ra/apps/1039164429/version/submit/complete
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/version/submit/complete"
@@ -848,7 +848,7 @@ module Spaceship
     # @!group release
     #####################################################
 
-    def release!(app_id, version) nonnil!
+    def release!(app_id, version) requires_all_params!
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/versions/#{version}/releaseToStore"
         req.headers['Content-Type'] = 'application/json'
@@ -864,31 +864,31 @@ module Spaceship
     #####################################################
 
     # Returns list of all available In-App-Purchases
-    def iaps(app_id: nil) nonnil!
+    def iaps(app_id: nil) requires_all_params!
       r = request(:get, "ra/apps/#{app_id}/iaps")
       return r.body["data"]
     end
 
     # Returns list of all available Families
-    def iap_families(app_id: nil) nonnil!
+    def iap_families(app_id: nil) requires_all_params!
       r = request(:get, "ra/apps/#{app_id}/iaps/families")
       return r.body["data"]
     end
 
     # Deletes a In-App-Purchases
-    def delete_iap!(app_id: nil, purchase_id: nil) nonnil!
+    def delete_iap!(app_id: nil, purchase_id: nil) requires_all_params!
       r = request(:delete, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       handle_itc_response(r)
     end
 
     # Loads the full In-App-Purchases
-    def load_iap(app_id: nil, purchase_id: nil) nonnil!
+    def load_iap(app_id: nil, purchase_id: nil) requires_all_params!
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
     end
 
     # Loads the full In-App-Purchases-Family
-    def load_iap_family(app_id: nil, family_id: nil) nonnil!
+    def load_iap_family(app_id: nil, family_id: nil) requires_all_params!
       r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")
       parse_response(r, 'data')
     end
@@ -898,7 +898,7 @@ module Spaceship
     #
     # @param app_id (String) The Apple ID of any app
     # @return ([Spaceship::Tunes::IAPSubscriptionPricingTier]) An array of pricing tiers
-    def subscription_pricing_tiers(app_id) nonnil!
+    def subscription_pricing_tiers(app_id) requires_all_params!
       @subscription_pricing_tiers ||= begin
         r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix/recurring")
         data = parse_response(r, "data")["pricingTiers"]
@@ -1241,7 +1241,7 @@ module Spaceship
     # @!group reject
     #####################################################
 
-    def reject!(app_id, version) nonnil!
+    def reject!(app_id, version) requires_all_params!
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/versions/#{version}/reject"
         req.headers['Content-Type'] = 'application/json'
