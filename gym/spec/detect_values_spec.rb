@@ -70,7 +70,7 @@ describe Gym do
         end
         context "when double quote is used" do
           it "return the value of PROVISIONING_PROFILE_SPECIFIER" do
-            xcargs = { PROVISIONING_PROFILE_SPECIFIER: "Overwrited Provisioning Name"}
+            xcargs = { PROVISIONING_PROFILE_SPECIFIER: "Overwrited Provisioning Name" }
             options[:xcargs] = xcargs
             Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
