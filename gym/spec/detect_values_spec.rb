@@ -35,6 +35,50 @@ describe Gym do
         expect(path).to eq(archive_path)
       end
 
+      describe "self.provisioning_profile_specifier_from_xcargs" do
+        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj" } }
+        context "when xcargs is nil" do
+          it "return nil" do
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            expect(Gym::DetectValues.provisioning_profile_specifier_from_xcargs).to be nil
+          end
+        end
+        context "when PROVISIONING_PROFILE_SPECIFIER does not exist" do
+          it "return nil" do
+            options[:xcargs] = 'FOO="BAR"'
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            expect(Gym::DetectValues.provisioning_profile_specifier_from_xcargs).to be nil
+          end
+        end
+        context "when single quote is used" do
+          it "return the value of PROVISIONING_PROFILE_SPECIFIER" do
+            options[:xcargs] = "PROVISIONING_PROFILE_SPECIFIER='Overwrited Provisioning Name'"
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            expect(Gym::DetectValues.provisioning_profile_specifier_from_xcargs).to eq('Overwrited Provisioning Name')
+          end
+        end
+        context "when double quote is used" do
+          it "return the value of PROVISIONING_PROFILE_SPECIFIER" do
+            options[:xcargs] = 'PROVISIONING_PROFILE_SPECIFIER="Overwrited Provisioning Name"'
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            expect(Gym::DetectValues.provisioning_profile_specifier_from_xcargs).to eq('Overwrited Provisioning Name')
+          end
+        end
+        context "when double quote is used" do
+          it "return the value of PROVISIONING_PROFILE_SPECIFIER" do
+            xcargs = { PROVISIONING_PROFILE_SPECIFIER: "Overwrited Provisioning Name"}
+            options[:xcargs] = xcargs
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            expect(Gym::DetectValues.provisioning_profile_specifier_from_xcargs).to eq('Overwrited Provisioning Name')
+          end
+        end
+      end
+
       describe "provisioning profile" do
         let(:configuration) { "Debug" }
         let(:options) do
@@ -47,33 +91,17 @@ describe Gym do
         end
 
         describe "overwrite PROVISIONING_PROFILE_SPECIFIER set in xcargs option" do
-          context "when single quote is used" do
-            it "overwrite the value correctly" do
-              options[:xcargs] = "PROVISIONING_PROFILE_SPECIFIER='Overwrited Provisioning'"
-              Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+          it "overwrite the value correctly" do
+            options[:xcargs] = "PROVISIONING_PROFILE_SPECIFIER='Overwrited Provisioning'"
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-              Gym::DetectValues.detect_selected_provisioning_profiles
-              expect(Gym.config[:export_options][:provisioningProfiles]).to eq({
-                "tools.fastlane.debug.app" => "Overwrited Provisioning",
-                "tools.fastlane.app" => "Overwrited Provisioning",
-                "com.krausefx.ExampleTests" => "Overwrited Provisioning",
-                "com.krausefx.ExampleUITests" => "Overwrited Provisioning"
-              })
-            end
-          end
-          context "when double quote is used" do
-            it "overwrite the value correctly" do
-              options[:xcargs] = 'PROVISIONING_PROFILE_SPECIFIER="Overwrited Provisioning"'
-              Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-
-              Gym::DetectValues.detect_selected_provisioning_profiles
-              expect(Gym.config[:export_options][:provisioningProfiles]).to eq({
-                "tools.fastlane.debug.app" => "Overwrited Provisioning",
-                "tools.fastlane.app" => "Overwrited Provisioning",
-                "com.krausefx.ExampleTests" => "Overwrited Provisioning",
-                "com.krausefx.ExampleUITests" => "Overwrited Provisioning"
-              })
-            end
+            Gym::DetectValues.detect_selected_provisioning_profiles
+            expect(Gym.config[:export_options][:provisioningProfiles]).to eq({
+              "tools.fastlane.debug.app" => "Overwrited Provisioning",
+              "tools.fastlane.app" => "Overwrited Provisioning",
+              "com.krausefx.ExampleTests" => "Overwrited Provisioning",
+              "com.krausefx.ExampleUITests" => "Overwrited Provisioning"
+            })
           end
         end
       end

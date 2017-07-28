@@ -59,9 +59,14 @@ module Gym
     def self.provisioning_profile_specifier_from_xcargs
       return unless Gym.config[:xcargs]
 
-      provisioning_profile_specifier = ''
-      Gym.config[:xcargs].match(/PROVISIONING_PROFILE_SPECIFIER[ ]*=[ ]*['"](.+?)["']/) do |match|
-        provisioning_profile_specifier = match[1]
+      provisioning_profile_specifier = nil
+      require 'shellwords'
+      xcargs = Shellwords.shellwords(Gym.config[:xcargs])
+      xcargs.each do |arg|
+        arg.match(/^PROVISIONING_PROFILE_SPECIFIER=(.+)$/) do |match|
+          provisioning_profile_specifier = match[1]
+          break
+        end
       end
       provisioning_profile_specifier
     end
