@@ -35,6 +35,27 @@ describe Gym do
         expect(path).to eq(archive_path)
       end
 
+      describe "#self.test_target?" do
+        context "when build_setting include TEST_TARGET_NAME" do
+          it "is test target" do
+            build_settings = { "TEST_TARGET_NAME" => "Sample" }
+            expect(Gym::DetectValues.test_target?(build_settings)).to be true
+          end
+        end
+        context "when build_setting include TEST_HOST" do
+          it "is test target" do
+            build_settings = { "TEST_HOST" => "Sample" }
+            expect(Gym::DetectValues.test_target?(build_settings)).to be true
+          end
+        end
+        context "when build_setting include neither TEST_HOST nor TEST_TARGET_NAME" do
+          it "is not test target" do
+            build_settings = {}
+            expect(Gym::DetectValues.test_target?(build_settings)).to be false
+          end
+        end
+      end
+
       describe "provisioning profile" do
         let(:configuration) { "Debug" }
         let(:options) do

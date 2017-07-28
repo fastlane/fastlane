@@ -56,6 +56,10 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
+    def self.test_target?(build_settings)
+      return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
+    end
+
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
     # rubocop:disable Style/MultilineBlockChain
@@ -95,6 +99,7 @@ module Gym
           project.targets.each do |target|
             target.build_configuration_list.build_configurations.each do |build_configuration|
               next unless build_configuration.to_s == Gym.config[:configuration]
+              next if test_target?(build_configuration.build_settings)
               current = build_configuration.build_settings
 
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
