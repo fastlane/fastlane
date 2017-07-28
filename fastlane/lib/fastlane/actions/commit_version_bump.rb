@@ -40,7 +40,6 @@ module Fastlane
         pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
-        # rubocop:disable Style/MultilineBlockChain
         project = Xcodeproj::Project.open(xcodeproj_path)
         info_plist_files = project.objects.select do |object|
           object.isa == 'XCBuildConfiguration'
@@ -53,7 +52,6 @@ module Fastlane
         end.uniq.map do |info_plist_path|
           Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
         end
-        # rubocop:enable Style/MultilineBlockChain
 
         # Removes .plist files that matched the given expression in the 'ignore' parameter
         ignore_expression = params[:ignore]
