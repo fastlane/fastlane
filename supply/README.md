@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,15 +33,16 @@ supply
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/supply/LICENSE)
-[![Gem](https://img.shields.io/gem/v/supply.svg?style=flat)](http://rubygems.org/gems/supply)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
+
+`supply` uploads app metadata, screenshots and binaries to Google Play. You can also select tracks for builds and promote builds to production.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -52,7 +55,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>supply</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Features
 - Update existing Android applications on Google Play via the command line
@@ -60,28 +63,34 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - Retrieve and edit metadata, such as title and description, for multiple languages
 - Upload the app icon, promo graphics and screenshots for multiple languages
 - Have a local copy of the metadata in your git repository
+- Retrieve version code numbers from existing Google Play tracks
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Installation
 
 Install the gem
 
-    sudo gem install supply
+    sudo gem install fastlane
 
 ## Setup
 
 Setup consists of setting up your Google Developers Service Account
 
-- Open the [Google Play Console](https://play.google.com/apps/publish/)
-- Select **Settings** tab, followed by the **API access** tab
-- Click the **Create Service Account** button and follow the **Google Developers Console** link in the dialog
-- Click **Create credentials** and select **Service account**
-- Select **JSON** as the Key type and click **Create**
-- Make a note of the file name of the JSON file downloaded to your computer, and close the dialog
-- Back on the Google Play developer console, click **Done** to close the dialog
-- Click on **Grant Access** for the newly added service account
-- Choose **Release Manager** from the **Role** dropdown and click **Send Invitation** to close the dialog
+1. Open the [Google Play Console](https://play.google.com/apps/publish/)
+1. Select **Settings** tab, followed by the **API access** tab
+1. Click the **Create Service Account** button and follow the **Google API Console** link in the dialog
+1. Click the **Create Service account** button at the top of the developers console screen
+1. Provide a name for the service account
+1. Click **Select a role** and choose **Project > Service Account Actor**
+1. Check the **Furnish a new private key** checkbox
+1. Select **JSON** as the Key type
+1. Click **Create** to close the dialog
+1. Make a note of the file name of the JSON file downloaded to your computer
+1. Back on the Google Play developer console, click **Done** to close the dialog
+1. Click on **Grant Access** for the newly added service account
+1. Choose **Release Manager** from the **Role** dropdown
+1. Click **Add user** to close the dialog
 
 ### Migrating Google credential format (from .p12 key file to .json)
 
@@ -98,15 +107,15 @@ The previous p12 configuration is still currently supported.
 ## Quick Start
 
 - `cd [your_project_folder]`
-- `supply init`
+- `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
-- `supply run`
+- `fastlane supply run`
 
 ## Available Commands
 
-- `supply`: update an app with metadata, a build, images and screenshots
-- `supply init`: download metadata for an existing app to a local directory
-- `supply --help`: show information on available commands, arguments and environment variables
+- `fastlane supply`: update an app with metadata, a build, images and screenshots
+- `fastlane supply init`: download metadata for an existing app to a local directory
+- `fastlane supply --help`: show information on available commands, arguments and environment variables
 
 You can either run `supply` on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
 
@@ -115,15 +124,15 @@ You can either run `supply` on its own and use it interactively, or you can pass
 To upload a new binary to Google Play, simply run
 
 ```
-supply --apk path/to/app.apk
+fastlane supply --apk path/to/app.apk
 ```
 
-This will also upload app metadata if you previously ran `supply init`.
+This will also upload app metadata if you previously ran `fastlane supply init`.
 
 To gradually roll out a new build use
 
 ```
-supply --apk path/app.apk --track rollout --rollout 0.5
+fastlane supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
@@ -133,9 +142,9 @@ Expansion files (obbs) found under the same directory as your APK will also be u
 
 ## Images and Screenshots
 
-After running `supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
+After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
 
-Here you can supply images with the following file names (extension can be png, jpg or jpeg):
+Inside of a given locale directory is a folder called `images`. Here you can supply images with the following file names (extension can be png, jpg or jpeg):
 
 - `featureGraphic`
 - `icon`
@@ -154,7 +163,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```
 └── fastlane
@@ -169,11 +178,21 @@ You can add changelog files under the `changelogs/` directory for each locale. T
                     └── 100100.txt
 ```
 
+## Track Promotion
+
+A common Play publishing scenario might involve uploading an APK version to a test track, testing it, and finally promoting that version to production.
+
+This can be done using the `--track_promote_to` parameter.  The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
+
+## Retrieve Track Version Codes
+
+Before performing a new APK upload you may want to check existing track version codes, or you may simply want to provide an informational lane that displays the currently promoted version codes for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. For more information, see `fastlane action google_play_track_version_codes` help output.
+
 ## Tips
 
 ### [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -186,8 +205,9 @@ You can add changelog files under the `changelogs/` directory for each locale. T
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

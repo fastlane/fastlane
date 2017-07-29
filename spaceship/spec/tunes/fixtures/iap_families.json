@@ -1,0 +1,299 @@
+{
+  "data": [{
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": "Product name1234",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": "20372345",
+    "activeAddOns": [],
+    "totalActiveAddOns": 5,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [{
+        "value": {
+          "localeCode": {
+            "value": "da",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "dsaasdasd",
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": "asdadsdas",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309575"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }, {
+        "value": {
+          "localeCode": {
+            "value": "fi",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "sdadsaasd",
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": null,
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309576"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }, {
+        "value": {
+          "localeCode": {
+            "value": "de-DE",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "dasdsads",
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": null,
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309354"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }, {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": "dasadsdasdassad",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": "20372807",
+    "activeAddOns": [],
+    "totalActiveAddOns": 1,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }, {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": "Renamed to something diff",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": "20372554",
+    "activeAddOns": [],
+    "totalActiveAddOns": 1,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [{
+        "value": {
+          "localeCode": {
+            "value": "da",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "App Name DA",
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": "Subname DA",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309622"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }, {
+        "value": {
+          "localeCode": {
+            "value": "de-DE",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "App Name German",
+            "isEditable": true,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": "Subname German",
+            "isEditable": true,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309623"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }, {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": "Familyname",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": "20372464",
+    "activeAddOns": [],
+    "totalActiveAddOns": 1,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }, {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "name": {
+      "value": "Verweisname",
+      "isEditable": false,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "id": "20372172",
+    "activeAddOns": [],
+    "totalActiveAddOns": 0,
+    "replacementFamilyId": null,
+    "details": {
+      "value": [{
+        "value": {
+          "localeCode": {
+            "value": "de-DE",
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
+          },
+          "name": {
+            "value": "Deutsch",
+            "isEditable": false,
+            "isRequired": true,
+            "errorKeys": null,
+            "maxLength": 64,
+            "minLength": 2
+          },
+          "subscriptionName": {
+            "value": null,
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null,
+            "maxLength": 30,
+            "minLength": 2
+          },
+          "status": "proposed",
+          "id": "309344"
+        },
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      }],
+      "isEditable": false,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }],
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

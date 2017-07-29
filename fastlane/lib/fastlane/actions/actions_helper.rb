@@ -6,6 +6,21 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
+    def self.reset_aliases
+      @alias_actions = nil
+    end
+
+    def self.alias_actions
+      unless @alias_actions
+        @alias_actions = {}
+        ActionsList.all_actions do |action, name|
+          next unless action.respond_to?(:aliases)
+          @alias_actions[name] = action.aliases
+        end
+      end
+      @alias_actions
+    end
+
     def self.executed_actions
       @executed_actions ||= []
     end
@@ -61,6 +76,19 @@ module Fastlane
     end
     # rubocop:enable Style/AccessorMethodName
 
+    # Returns the class ref to the action based on the action name
+    # Returns nil if the action is not aailable
+    def self.action_class_ref(action_name)
+      class_name = action_name.to_s.fastlane_class + 'Action'
+      class_ref = nil
+      begin
+        class_ref = Fastlane::Actions.const_get(class_name)
+      rescue NameError
+        return nil
+      end
+      return class_ref
+    end
+
     def self.load_default_actions
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
         require file
@@ -87,19 +115,38 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            UI.success "Successfully loaded custom action '#{file}'."
+            UI.success "Successfully loaded custom action '#{file}'." if FastlaneCore::Globals.verbose?
           else
             UI.error "Could not find method 'run' in class #{class_name}."
-            UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
-            UI.user_error!("Action '#{file_name}' is damaged!")
+            UI.error 'For more information, check out the docs: https://docs.fastlane.tools/'
+            UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
           end
         rescue NameError
           # Action not found
           UI.error "Could not find '#{class_name}' class defined."
-          UI.error 'For more information, check out the docs: https://github.com/fastlane/fastlane/tree/master/fastlane'
-          UI.user_error!("Action '#{file_name}' is damaged!")
+          UI.error 'For more information, check out the docs: https://docs.fastlane.tools/'
+          UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
         end
       end
+      Actions.reset_aliases
+    end
+
+    def self.formerly_bundled_actions
+      ["xcake"]
+    end
+
+    # Returns a boolean indicating whether the class
+    # reference is a Fastlane::Action
+    def self.is_class_action?(class_ref)
+      return false if class_ref.nil?
+      is_an_action = class_ref < Fastlane::Action
+      return is_an_action || false
+    end
+
+    # Returns a boolean indicating if the class
+    # reference is a deprecated Fastlane::Action
+    def self.is_deprecated?(class_ref)
+      is_class_action?(class_ref) && class_ref.category == :deprecated
     end
   end
 end

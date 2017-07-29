@@ -2,10 +2,16 @@ module Fastlane
   module Helper
     class CrashlyticsHelper
       class << self
-        def generate_ios_command(params)
-          unless params[:crashlytics_path]
-            params[:crashlytics_path] = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+        def discover_default_crashlytics_path
+          path = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+          unless path
+            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
           end
+          return path
+        end
+
+        def generate_ios_command(params)
+          params[:crashlytics_path] ||= discover_default_crashlytics_path
 
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
           submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
@@ -13,7 +19,7 @@ module Fastlane
           UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
 
           command = []
-          command << submit_binary
+          command << submit_binary.shellescape
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"
@@ -47,7 +53,7 @@ module Fastlane
 
           # Optional
           command << "-betaDistributionEmails '#{params[:emails]}'" if params[:emails]
-          command << "-betaDistributionReleaseNotesFilePath '#{params[:notes_path]}'" if params[:notes_path]
+          command << "-betaDistributionReleaseNotesFilePath '#{File.expand_path(params[:notes_path])}'" if params[:notes_path]
           command << "-betaDistributionGroupAliases '#{params[:groups]}'" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
@@ -68,15 +74,21 @@ module Fastlane
           begin
             UI.important("Downloading Crashlytics Support Library - this might take a minute...")
 
-            result = Net::HTTP.get(URI(url))
-            File.write(zip_path, result)
+            # Work around ruby defect, where HTTP#get_response and HTTP#post_form don't use ENV proxy settings
+            # https://bugs.ruby-lang.org/issues/12724
+            uri = URI(url)
+            http_conn = Net::HTTP.new(uri.host, uri.port)
+            http_conn.use_ssl = true
+            result = http_conn.request_get(uri.path)
+            UI.error! "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            File.write(zip_path, result.body)
 
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"
 
-            UI.user_error!("Coulnd't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
+            UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
-            UI.success "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'"
+            UI.success "Successfully downloaded Crashlytics Support Library to '#{jar_path}'"
           rescue => ex
             UI.user_error!("Error fetching remote file: #{ex}")
           end

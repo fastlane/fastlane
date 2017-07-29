@@ -140,6 +140,24 @@ module Fastlane
       def self.author
         "dtrenz"
       end
+
+      def self.example_code
+        [
+          'gcovr(
+            html: true,
+            html_details: true,
+            output: "./code-coverage/report.html"
+          )'
+        ]
+      end
+
+      def self.details
+        "Generate summarized code coverage reports using [gcovr](http://gcovr.com/)"
+      end
+
+      def self.category
+        :testing
+      end
     end
   end
 end

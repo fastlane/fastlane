@@ -16,7 +16,7 @@ The bundle identifier (e.g. "com.krausefx.app")
 Your Apple ID email address
 
 ##### ipa
-A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
+A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `fastlane deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
 
 ```ruby
 ipa "App.ipa"
@@ -36,6 +36,20 @@ Optional, as it is usually automatically detected. Specify the version that shou
 
 ```ruby
 app_version "2.0"
+```
+
+##### skip_app_version_update
+
+In the case if `deliver` uploads your application to iTunes Connect it will automatically update "Prepare for submission" app version (which could be found on iTunes Connect->My Apps->App Store page)
+
+The option allows uploading your app without updating "Prepare for submission" version. 
+
+This could be useful in the case if you are generating a lot of uploads while not submitting the latest build for Apple review.
+
+The default value is false.
+
+```ruby
+skip_app_version_update true
 ```
 
 ##### submit_for_review
@@ -71,6 +85,29 @@ Pass the price tier as number. This will be active from the current day.
 ```ruby
 price_tier 0
 ```
+##### trade_representative_contact_information
+Trade Representative Contact information for Korean App Store. Available options: `first_name`, `last_name`, `address_line1`, `address_line2`, `address_line3`, `city_name`, `state`, `country`, `postal_code`, `phone_number`, `email_address`, `is_displayed_on_app_store`.
+
+
+```ruby
+trade_representative_contact_information(
+  first_name: "Felix",
+  last_name: "Krause",
+  address_line1: "1 Infinite Loop",
+  address_line2: "",
+  address_line3: null,
+  city_name: "Cupertino",
+  state: "California",
+  country: "United States",
+  postal_code: "95014",
+  phone_number: "+43 123123123",
+  email_address: "github@krausefx.com",
+)
+```
+
+You can also provide these values by creating files in a `metadata/trade_representative_contact_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `address_line1.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
+
+`is_displayed_on_app_store` is the option on iTunes Connect described as: `Display Trade Representative Contact Information on the Korean App Store`
 
 ##### app_review_information
 Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. 
@@ -87,6 +124,8 @@ app_review_information(
   notes: "such notes, very text"
 )
 ```
+
+You can also provide these values by creating files in a `metadata/review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `notes.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
 
 ##### submission_information 
 Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb#L18-L69).
@@ -105,6 +144,16 @@ Should the app be released to all users once Apple approves it? If set to `false
 automatic_release true
 # or 
 automatic_release false
+```
+
+##### phased_release
+
+Enable or disable the phased releases feature of iTunes Connect. If set to `true`, the update will be released over a 7 day period. Default behavior is to leave whatever you defined on iTunes Connect.
+
+```ruby
+phased_release true
+# or 
+phased_release false
 ```
 
 ##### app_rating_config_path
@@ -135,6 +184,17 @@ description({
 ##### name
 The title/name of the app
 
+##### subtitle
+
+Localised subtitle of the app
+
+```ruby
+subtitle(
+  "en-US" => "Awesome English subtitle here",
+  "de-DE" => "Jetzt mit deutschen Untertiteln!"
+)
+```
+
 ##### description
 The description of the app
 
@@ -154,6 +214,17 @@ keywords(
 )
 ```
 
+##### promotional_text
+
+Localised promotional text
+
+```ruby
+promotional_text(
+  "en-US" => "Hey, you should totally buy our app, it's the best",
+  "de-DE" => "App kaufen bitte"
+)
+```
+
 ##### app_icon
 A path to a new app icon, which must be exactly 1024x1024px
 ```ruby
@@ -165,6 +236,21 @@ A path to a new app icon for the  Watch, which must be exactly 1024x1024px
 ```ruby
 apple_watch_app_icon './AppleWatchAppIcon.png'
 ```
+
+##### platform
+
+The platform of your application (a.e. ios, osx). 
+
+This option is optional. The default value is "ios" and deliver should be able to figure out the platform from your binary.
+
+However, in the case if multiple binaries present, you can specify a platform which you want to deliver explicitly.
+
+The available options: 
+
+- 'ios'
+- 'appletvos'
+- 'osx'
+
 
 ### Non-Localised
 

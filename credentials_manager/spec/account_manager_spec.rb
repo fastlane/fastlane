@@ -34,7 +34,7 @@ describe CredentialsManager do
     end
 
     it "fetches the Apple ID from the Appfile if available" do
-      Dir.chdir("./spec/fixtures/") do
+      Dir.chdir("./credentials_manager/spec/fixtures/") do
         c = CredentialsManager::AccountManager.new
         expect(c.user).to eq("appfile@krausefx.com")
       end

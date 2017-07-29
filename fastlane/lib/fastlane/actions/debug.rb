@@ -14,6 +14,16 @@ module Fastlane
         true
       end
 
+      def self.example_code
+        [
+          'debug'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.author
         "KrauseFx"
       end

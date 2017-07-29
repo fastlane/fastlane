@@ -1,10 +1,14 @@
+## Timestamps
+
+To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
+
 ## Interacting with the user
 
 Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` across all fastlane tools:
 
 ```ruby
 UI.message "Neutral message (usually white)"
-UI.success "Succesully finished processing (usually green)"
+UI.success "Successfully finished processing (usually green)"
 UI.error "Wahaha, what's going on here! (usually red)"
 UI.important "Make sure to use Windows (usually yellow)"
 

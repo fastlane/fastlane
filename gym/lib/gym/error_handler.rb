@@ -1,4 +1,5 @@
 # coding: utf-8
+
 module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler
@@ -6,36 +7,36 @@ module Gym
       # @param [String] The output of the errored build
       # This method should raise an exception in any case, as the return code indicated a failed build
       def handle_build_error(output)
-        # The order of the handling below is import
+        # The order of the handling below is important
         case output
         when /Your build settings specify a provisioning profile with the UUID/
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile which doesn't exist on your local machine"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
         when /Provisioning profile does not match bundle identifier/
           print "Invalid code signing settings"
           print "Your project defines a provisioning profile that doesn't match the bundle identifier of your app"
           print "Make sure you use the correct provisioning profile for this app"
           print "Take a look at the ouptput above for more information"
-          print "You can follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+          print "You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print "You don't have the provisioning profile for '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
         when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
           print "You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine"
           print "Make sure you have the profile on this computer and it's properly installed"
           print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
 
         # Insert more code signing specific errors here
         when /code signing is required/
           print "Your project settings define invalid code signing settings"
           print "To generate an ipa file you need to enable code signing for your project"
           print "Additionally make sure you have a code signing identity set"
-          print "Follow this guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
         when /US\-ASCII/
           print "Your shell environment is not correctly configured"
           print "Instead of UTF-8 your shell uses US-ASCII"
@@ -50,7 +51,12 @@ module Gym
           print "For more information visit this stackoverflow answer:"
           print "https://stackoverflow.com/a/17031697/445598"
         end
-        UI.user_error!("Error building the application - see the log above")
+        print_xcode_path_instructions
+        print_xcode_version
+        print_full_log_path
+        print_environment_information
+        print_build_error_instructions
+        UI.build_failure!("Error building the application - see the log above", error_info: output)
       end
 
       # @param [Array] The output of the errored build (line by line)
@@ -75,23 +81,21 @@ module Gym
           print "This means, the specified provisioning profile was not created using"
           print "the specified certificate."
           print "Run cert and sigh before gym to make sure to have all signing resources ready"
+        when /requires a provisioning profile/
+          print "No provisioning profile provided"
+          print "Make sure to pass a valid provisioning for each required target"
+          print "Check out the docs on how to fix this: https://github.com/fastlane/fastlane/tree/master/gym#export-options"
         # insert more specific code signing errors here
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
           print "provisioning profile and code signing identity."
-        when /expected one of \{\}/
-          print "It seems like you ran into this radar"
-          print "https://openradar.appspot.com/radar?id=4952000420642816"
-          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
-        when /IDEDistributionErrorDomain error 1/
-        when /Error Domain=IDEDistributionErrorDomain Code=/
-          standard_output = read_standard_output output
-          print standard_output if standard_output
-          print "There was an error exporting your application"
-          print "Unfortunately the new Xcode export API is unstable and causes problems on some project"
-          print "You can temporary use the :use_legacy_build_api option to get the build to work again"
         end
-        UI.user_error!("Error packaging up the application")
+        print_xcode_version
+        print_full_log_path
+        print_environment_information
+        print_build_error_instructions
+        print_xcode9_plist_warning
+        UI.build_failure!("Error packaging up the application", error_info: output)
       end
 
       def handle_empty_archive
@@ -99,26 +103,181 @@ module Gym
         print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
         print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
-        print "Follow this guide to setup code signing https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
+        print "Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/"
         print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
-        UI.user_error!("Archive invalid")
-      end
-
-      def find_standard_output_path(output)
-        m = /Created bundle at path '(.*)'/.match(output)
-        return File.join(m[1], 'IDEDistribution.standard.log') unless m.nil?
+        print "This error might also happen if your workspace/project file is not in the root directory of your project."
+        print "To workaround that issue, you can wrap your calls to gym with"
+        print "`Dir.chdir('../path/to/dir/containing/proj') do`"
+        print "For an example you can check out"
+        print "https://github.com/artsy/emission-nebula/commit/44fe51a7fea8f7d52f0f77d6c3084827fe5dd59e"
+        UI.build_failure!("Archive invalid")
       end
 
       private
 
-      def read_standard_output(output)
-        path = find_standard_output_path output
-        return File.read(path) if File.exist?(path)
-      end
-
       # Just to make things easier
       def print(text)
         UI.error text
+      end
+
+      def print_full_log_path
+        return if Gym.config[:disable_xcpretty]
+
+        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        return unless File.exist?(log_path)
+
+        # `xcodebuild` doesn't properly mark lines as failure reason or important information
+        # so we assume that the last few lines show the error message that's relevant
+        # (at least that's what was correct during testing)
+        log_content = File.read(log_path).split("\n")[-5..-1]
+        log_content.each do |row|
+          UI.command_output(row)
+        end
+
+        UI.message("")
+        UI.error("⬆️  Check out the few lines of raw `xcodebuild` output above for potential hints on how to solve this error")
+        UI.important("📋  For the complete and more detailed error log, check the full log at:")
+        UI.important("📋  #{log_path}")
+      end
+
+      def print_xcode9_plist_warning
+        return unless Helper.xcode_at_least?("9.0")
+
+        export_options = Gym.config[:export_options] || {}
+        provisioning_profiles = export_options[:provisioningProfiles] || []
+        if provisioning_profiles.count == 0
+          UI.error("Looks like no provisioning profile mapping was provided")
+          UI.error("Please check the complete output, in particular the very top")
+          UI.error("and see if you can find more information. You can also run fastlane")
+          UI.error("with the `--verbose` flag.")
+          UI.error("Alternatively you can provide the provisioning profile mapping manually")
+          UI.error("https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
+        end
+      end
+
+      def print_xcode_version
+        # lots of the times, the user didn't set the correct Xcode version to their Xcode path
+        # since many users don't look at the table of summary before running a tool, let's make
+        # sure they are aware of the Xcode version and SDK they're using
+        values = {
+          xcode_path: File.expand_path("../..", FastlaneCore::Helper.xcode_path),
+          gym_version: Fastlane::VERSION,
+          export_method: Gym.config[:export_method]
+        }
+
+        sdk_path = Gym.project.build_settings(key: "SDKROOT")
+        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+
+        FastlaneCore::PrintTable.print_values(config: values,
+                                           hide_keys: [],
+                                               title: "Build environment".yellow)
+      end
+
+      def print_xcode_path_instructions
+        xcode_path = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
+        default_xcode_path = "/Applications/"
+
+        xcode_installations_in_default_path = Dir[File.join(default_xcode_path, "Xcode*.app")]
+        return unless xcode_installations_in_default_path.count > 1
+        UI.message ""
+        UI.important "Maybe the error shown is caused by using the wrong version of Xcode"
+        UI.important "Found multiple versions of Xcode in '#{default_xcode_path}'"
+        UI.important "Make sure you selected the right version for your project"
+        UI.important "This build process was executed using '#{xcode_path}'"
+        UI.important "If you want to update your Xcode path, either"
+        UI.message ""
+
+        UI.message "- Specify the Xcode version in your Fastfile"
+        UI.command_output "xcversion(version: \"8.1\") # Selects Xcode 8.1.0"
+        UI.message ""
+
+        UI.message "- Specify an absolute path to your Xcode installation in your Fastfile"
+        UI.command_output "xcode_select \"/Applications/Xcode8.app\""
+        UI.message ""
+
+        UI.message "- Manually update the path using"
+        UI.command_output "sudo xcode-select -s /Applications/Xcode.app"
+        UI.message ""
+      end
+
+      def print_environment_information
+        if Gym.config[:export_method].to_s == "development"
+          UI.message("")
+          UI.error("Your `export_method` in gym is defined as `:development`")
+          UI.error("which can't be used for `ipa` files for beta or App Store distribution")
+          UI.error("Please make sure to define the correct export methods when calling")
+          UI.error("gym in your Fastfile or from the command line")
+          UI.message("")
+        elsif Gym.config[:export_options]
+          # We want to tell the user if there is an obvious mismatch between the selected
+          # `export_method` and the selected provisioning profiles
+          selected_export_method = Gym.config[:export_method].to_s
+          selected_provisioning_profiles = Gym.config[:export_options][:provisioningProfiles] || []
+          # We could go ahead and find all provisioning profiles that match that name
+          # and then get its type, however that's not 100% reliable, as we can't distinguish between
+          # Ad Hoc and Development profiles for example.
+          # As an easier and more obvious alternative, we'll take the provisioning profile names
+          # and see if it contains the export_method name and see if there is a mismatch
+
+          # The reason we have multiple variations of the spelling is that
+          # the provisioning profile might be called anything below
+          # There is no 100% good way to detect the profile type based on the name
+          available_export_types = {
+            "app-store" => "app-store",
+            "app store" => "app-store",
+            "appstore" => "app-store",
+            "ad-hoc" => "ad-hoc",
+            "adhoc" => "ad-hoc",
+            "ad hoc" => "ad-hoc",
+            "enterprise" => "enterprise",
+            "development" => "development"
+          }
+
+          selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
+            available_export_types.each do |current_to_try, matching_type|
+              next unless current_profile_name.downcase.include?(current_to_try.downcase)
+
+              # Check if there is a mismatch between the name and the selected export method
+              # Example
+              #
+              #   current_profile_name = "me.themoji.app.beta App Store""
+              #   current_to_try = "app store"
+              #   matching_type = :appstore
+              #   selected_export_method = "enterprise"
+              #
+              # As seen above, there is obviously a mismatch, the user selected an App Store
+              # profile, but the export method that's being passed to Xcode is "enterprise"
+
+              next if matching_type.to_s == selected_export_method
+              UI.message("")
+              UI.error("There is a mismatch between your provided `export_method` in gym")
+              UI.error("and the selected provisioning profiles. You passed the following options:")
+              UI.important("  export_method:      #{selected_export_method}")
+              UI.important("  Bundle identifier:  #{current_bundle_identifier}")
+              UI.important("  Profile name:       #{current_profile_name}")
+              UI.important("  Profile type:       #{matching_type}")
+              UI.error("Make sure to either change the `export_method` passed from your Fastfile or CLI")
+              UI.error("or select the correct provisioning profiles by updating your Xcode project")
+              UI.error("or passing the profiles to use by using match or manually via the `export_options` hash")
+              UI.message("")
+            end
+          end
+        end
+      end
+
+      # Indicate that code signing errors are not caused by fastlane
+      # and that fastlane only runs `xcodebuild` commands
+      def print_build_error_instructions
+        UI.message("")
+        UI.error("Looks like fastlane ran into a build/archive error with your project")
+        UI.error("It's hard to tell what's causing the error, so we wrote some guides on how")
+        UI.error("to troubleshoot build and signing issues: https://docs.fastlane.tools/codesigning/getting-started/")
+        UI.error("Before submitting an issue on GitHub, please follow the guide above and make")
+        UI.error("sure your project is set up correctly.")
+        UI.error("fastlane uses `xcodebuild` commands to generate your binary, you can see the")
+        UI.error("the full commands printed out in yellow in the above log.")
+        UI.error("Make sure to inspect the output above, as usually you'll find more error information there")
+        UI.message("")
       end
     end
   end

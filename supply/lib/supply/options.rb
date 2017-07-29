@@ -3,29 +3,32 @@ require 'credentials_manager'
 
 module Supply
   class Options
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
+      valid_tracks = %w(production beta alpha rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
                                      short_option: "-p",
-                                     description: "The package name of the Application to modify",
+                                     description: "The package name of the application to use",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: production, beta, alpha or rollout",
+                                     description: "The track of the application to use: #{valid_tracks.join(', ')}",
                                      default_value: 'production',
                                      verify_block: proc do |value|
-                                       available = %w(production beta alpha rollout)
+                                       available = valid_tracks
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the rollout",
-                                     default_value: '1.0',
+                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     default_value: '0.1',
                                      verify_block: proc do |value|
-                                       available = %w(0.005 0.01 0.05 0.1 0.2 0.5 1.0)
-                                       UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
+                                       min = 0.0
+                                       max = 1.0
+                                       UI.user_error! "Invalid value '#{value}', must be greater than #{min} and less than #{max}" unless value.to_f > min && value.to_f < max
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      env_name: "SUPPLY_METADATA_PATH",
@@ -56,12 +59,27 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :json_key,
                                      env_name: "SUPPLY_JSON_KEY",
                                      short_option: "-j",
-                                     conflicting_options: [:issuer, :key],
-                                     optional: true, # this is shouldn't be optional but is until --key and --issuer are completely removed
+                                     conflicting_options: [:issuer, :key, :json_key_data],
+                                     optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
                                      description: "The service account json file used to authenticate with Google",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      verify_block: proc do |value|
+                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        UI.user_error! "Could not find service account json file at path '#{File.expand_path(value)}'" unless File.exist?(File.expand_path(value))
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :json_key_data,
+                                     env_name: "SUPPLY_JSON_KEY_DATA",
+                                     short_option: "-c",
+                                     conflicting_options: [:issuer, :key, :json_key],
+                                     optional: true,
+                                     description: "The service account json used to authenticate with Google",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+                                     verify_block: proc do |value|
+                                       begin
+                                         JSON.parse(value)
+                                       rescue JSON::ParserError
+                                         UI.user_error! "Could not parse service account json  JSON::ParseError"
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk,
                                      env_name: "SUPPLY_APK",
@@ -111,8 +129,59 @@ module Supply
                                      optional: true,
                                      description: "Whether to skip uploading SCREENSHOTS",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :track_promote_to,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_TO",
+                                     optional: true,
+                                     description: "The track to promote to: #{valid_tracks.join(', ')}",
+                                     verify_block: proc do |value|
+                                       available = valid_tracks
+                                       UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :validate_only,
+                                     env_name: "SUPPLY_VALIDATE_ONLY",
+                                     optional: true,
+                                     description: "Only validate changes with Google Play rather than actually publish",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :mapping,
+                                     env_name: "SUPPLY_MAPPING",
+                                     description: "Path to the mapping file to upload",
+                                     short_option: "-d",
+                                     conflicting_options: [:mapping_paths],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error! "Could not find mapping file at path '#{value}'" unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :mapping_paths,
+                                     env_name: "SUPPLY_MAPPING_PATHS",
+                                     conflicting_options: [:mapping],
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of paths to mapping files to upload",
+                                     short_option: "-s",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                       value.each do |path|
+                                         UI.user_error! "Could not find mapping file at path '#{path}'" unless File.exist?(path)
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :root_url,
+                                     env_name: "SUPPLY_ROOT_URL",
+                                     description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error! "Could not parse URL '#{value}'" unless value =~ URI.regexp
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :check_superseded_tracks,
+                                     env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
+                                     optional: true,
+                                     description: "Check the other tracks for superseded versions and disable them",
+                                     is_string: false,
                                      default_value: false)
+
       ]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

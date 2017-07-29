@@ -27,6 +27,16 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :ios
       end
+
+      def self.example_code
+        [
+          'team_name "Felix Krause"'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

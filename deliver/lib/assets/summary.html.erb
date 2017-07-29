@@ -13,6 +13,14 @@
               margin-right: 25px;
           }
 
+          .app-subtitle {
+              font-size: 26px;
+              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
+              font-weight: 300;
+              margin-left: 25px;
+              margin-right: 25px;
+          }
+
           .app-urls {
               margin-left: 25px;
               font-size: 14px;
@@ -107,10 +115,45 @@
               margin-left: 10px;
               margin-right: 10px;
           }
+          .app-icons {
+            overflow: hidden;
+          }
+          .app-icons img {
+            width: 150px;
+          }
+          .app-icons .app-icon {
+              float: left;
+              margin-right: 20px;
+          }
+
+          .app-minor-information {
+            margin-left: 15px;
+            margin-right: 15px;
+            margin-top: 22px;
+          }
+
+          .app-minor-information-key {
+            font-weight: 700;
+          }
         </style>
     </head>
     
     <body>
+      <div class="app-icons">
+        
+        <% if @options[:app_icon] %>
+        <div class="app-icon">
+          Large App Icon:<br>
+          <img src="<%= @options[:app_icon] %>">
+        </div>
+        <% end %>
+        <% if @options[:apple_watch_app_icon] %>
+        <div class="watch-icon">
+          Watch App Icon:<br>
+          <img src="<%= @options[:apple_watch_app_icon] %>">
+        </div>
+        <% end %>
+      </div>
       <% @languages.each do |language| %>
         <% if @options[:name] %>
           <div class="app-name">
@@ -119,6 +162,12 @@
         <% else %>
           <div class="app-name">
             <%= language %>
+          </div>
+        <% end %>
+
+        <% if @options[:subtitle] %>
+          <div class="app-subtitle">
+            Subtitle:  <%= @options[:subtitle][language] %>
           </div>
         <% end %>
 
@@ -160,6 +209,13 @@
               <%= (@options[:release_notes][language] || '').gsub("\n", "<br />") %>
           </div>
         <% end %>
+
+        <% if @options[:promotional_text] %>
+          <div class="app-changelog">
+              <div class="cat-headline">Promotional Text</div>
+              <%= (@options[:promotional_text][language] || '').gsub("\n", "<br />") %>
+          </div>
+        <% end %>
         
         <div class="app-screenshots">
           <div class="cat-headline">Screenshots</div>
@@ -190,9 +246,15 @@
             <div style="border: 3px solid red; padding: 0px 20px">
               <h2 style="color: red">No Screenshots Found</h2>
               <p>
-                deliver couldn't find any screenshots. This will <b>remove</b> existing screenshots, but will also not upload any.
+                deliver couldn't find any screenshots.
+                <% if options[:overwrite_screenshots] %>
+                  <b>--overwrite_screenshots</b> is set, existing screenshots will be removed, but none will be uploaded.
+                <% else %>
+                  The existing screenshots on iTunes Connect will be kept. 
+                  if you want to remove them you have to use the <i>--overwrite_screenshots</i> flag.
+                <% end %>
               <p>
-                Please make sure to store your screenshots in the screenshots folder. If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
+                If you want to download your existing screenshots, run <i>deliver download_screenshots</i>.
               </p>
             </div>
           <% end %>
@@ -200,5 +262,37 @@
         
         <hr />
       <% end # end data %>
+      <% if @options[:trade_representative_contact_information] %>
+        <div class="app-minor-information">
+          <div class="cat-headline">Trade Representative Contact Information</div>
+          <dl class="app-minor-information">
+            <% @options[:trade_representative_contact_information].each do |key, value| %>
+                <dt class="app-minor-information-key">
+                  <%= key.to_s.capitalize.gsub("_", " ") %>
+                </dt>
+                <dd class="app-minor-information-text">
+                  <%= (value || '').gsub("\n", "<br />") %>
+                </dd>
+            <% end %>
+          </dl>
+        </div>
+        <hr />
+      <% end %>
+
+      <% if @options[:app_review_information] %>
+        <div class="app-minor-information">
+          <div class="cat-headline">Review Information</div>
+          <dl class="app-minor-information">
+            <% @options[:app_review_information].each do |key, value| %>
+                <dt class="app-minor-information-key">
+                  <%= key.to_s.capitalize.gsub("_", " ") %>
+                </dt>
+                <dd class="app-minor-information-text">
+                  <%= (value || '').gsub("\n", "<br />") %>
+                </dd>
+            <% end %>
+          </dl>
+        </div>
+      <% end %>
     </body>
 </html>

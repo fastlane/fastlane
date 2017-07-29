@@ -77,7 +77,7 @@ module Fastlane
 
       def self.params_hash_to_cli_args(params)
         # Remove nil and false value params
-        params = params.delete_if { |_, v| v.nil? || v == false}
+        params = params.delete_if { |_, v| v.nil? || v == false }
 
         cli_args = []
         params.each do |key, value|
@@ -113,6 +113,10 @@ module Fastlane
       end
 
       def self.description
+        "Generate Apple-like source code documentation from the source code"
+      end
+
+      def self.details
         "Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project"
       end
 
@@ -155,7 +159,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :docset_publisher_id, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_ID", description: "DocSet publisher identifier", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_publisher_name, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_NAME", description: "DocSet publisher name", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_min_xcode_version, env_name: "FL_APPLEDOC_DOCSET_MIN_XCODE_VERSION", description: "DocSet min. Xcode version", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform familiy", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform family", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_cert_issuer, env_name: "FL_APPLEDOC_DOCSET_CERT_ISSUER", description: "DocSet certificate issuer", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_cert_signer, env_name: "FL_APPLEDOC_DOCSET_CERT_SIGNER", description: "DocSet certificate signer", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_bundle_filename, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_FILENAME", description: "DocSet bundle filename", is_string: true, optional: true),
@@ -190,6 +194,26 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.category
+        :documentation
+      end
+
+      def self.example_code
+        [
+          'appledoc(
+            project_name: "MyProjectName",
+            project_company: "Company Name",
+            input: "MyProjectSources",
+            ignore: [
+              "ignore/path/1",
+              "ingore/path/2"
+            ],
+            options: "--keep-intermediate-files --search-undocumented-doc",
+            warnings: "--warn-missing-output-path --warn-missing-company-id"
+          )'
+        ]
       end
     end
   end

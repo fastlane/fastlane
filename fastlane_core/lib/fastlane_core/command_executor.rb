@@ -7,7 +7,7 @@ module FastlaneCore
       #
       #    which('ruby') #=> /usr/bin/ruby
       #
-      # Derived from http://stackoverflow.com/a/5471032/3005
+      # Derived from https://stackoverflow.com/a/5471032/3005
       def which(cmd)
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"
@@ -27,11 +27,11 @@ module FastlaneCore
       # @param print_all [Boolean] Do we want to print out the command output while running?
       # @param print_command [Boolean] Should we print the command that's being executed
       # @param error [Block] A block that's called if an error occurs
-      # @param prefix [Array] An array containg a prefix + block which might get applied to the output
+      # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
       def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
-        print_all = true if $verbose
+        print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
         output = []
@@ -44,24 +44,27 @@ module FastlaneCore
 
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
-            stdin.each do |l|
-              line = l.strip # strip so that \n gets removed
-              output << line
+            begin
+              stdin.each do |l|
+                line = l.strip # strip so that \n gets removed
+                output << line
 
-              next unless print_all
+                next unless print_all
 
-              # Prefix the current line with a string
-              prefix.each do |element|
-                line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                # Prefix the current line with a string
+                prefix.each do |element|
+                  line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                end
+
+                UI.command_output(line)
               end
-
-              UI.command_output(line)
+            rescue Errno::EIO
+              # This is expected on some linux systems, that indicates that the subcommand finished
+              # and we kept trying to read, ignore it
+            ensure
+              Process.wait(pid)
             end
-            Process.wait(pid)
           end
-        rescue Errno::EIO
-          # This is expected on some linux systems, that indicates that the subcommand finished
-          # and we kept trying to read, ignore it
         rescue => ex
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)

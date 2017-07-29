@@ -6,16 +6,16 @@ module PEM
   class Manager
     class << self
       def start
-        FastlaneCore::PrintTable.print_values(config: PEM.config, hide_keys: [], title: "Summary for PEM #{PEM::VERSION}")
+        FastlaneCore::PrintTable.print_values(config: PEM.config, hide_keys: [:new_profile], title: "Summary for PEM #{Fastlane::VERSION}")
         login
 
-        existing_certificate = certificate.all.detect do |c|
-          c.name == PEM.config[:app_identifier]
+        existing_certificate = certificate_sorted.detect do |c|
+          c.owner_name == PEM.config[:app_identifier]
         end
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
-          UI.message "Existing push notification profile '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
+          UI.message "Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
           if remaining_days > 30
             if PEM.config[:force]
               UI.success "You already have an existing push certificate, but a new one will be created since the --force option has been set."
@@ -37,7 +37,6 @@ module PEM
         UI.message "Successfully logged in"
       end
 
-      # rubocop:disable Metrics/AbcSize
       def create_certificate
         UI.important "Creating a new push certificate for app '#{PEM.config[:app_identifier]}'."
 
@@ -60,27 +59,27 @@ module PEM
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
+        output_path = PEM.config[:output_path]
+        FileUtils.mkdir_p(File.expand_path(output_path))
+
         if PEM.config[:save_private_key]
-          private_key_path = File.join(PEM.config[:output_path], "#{filename_base}.pkey")
+          private_key_path = File.join(output_path, "#{filename_base}.pkey")
           File.write(private_key_path, pkey.to_pem)
           UI.message("Private key: ".green + Pathname.new(private_key_path).realpath.to_s)
         end
 
         if PEM.config[:generate_p12]
-          output_path = PEM.config[:output_path]
-          FileUtils.mkdir_p(File.expand_path(output_path))
           p12_cert_path = File.join(output_path, "#{filename_base}.p12")
           p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
           File.write(p12_cert_path, p12.to_der)
           UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
         end
 
-        x509_cert_path = File.join(PEM.config[:output_path], "#{filename_base}.pem")
+        x509_cert_path = File.join(output_path, "#{filename_base}.pem")
         File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
         UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
         return x509_cert_path
       end
-      # rubocop:enable Metrics/AbcSize
 
       def certificate
         if PEM.config[:development]
@@ -88,6 +87,10 @@ module PEM
         else
           Spaceship.certificate.production_push
         end
+      end
+
+      def certificate_sorted
+        certificate.all.sort { |x, y| y.expires <=> x.expires }
       end
     end
   end

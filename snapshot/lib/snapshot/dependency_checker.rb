@@ -10,14 +10,14 @@ module Snapshot
     def self.check_xcode_select
       unless `xcode-select -v`.include? "xcode-select version"
         UI.error '#############################################################'
-        UI.error "# You have to install the Xcode commdand line tools to use snapshot"
+        UI.error "# You have to install Xcode command line tools to use snapshot"
         UI.error "# Install the latest version of Xcode from the AppStore"
         UI.error "# Run xcode-select --install to install the developer tools"
         UI.error '#############################################################'
         UI.user_error!("Run 'xcode-select --install' and start snapshot again")
       end
 
-      if Snapshot::LatestIosVersion.version.to_f < 9 # to_f is bad, but should be good enough
+      if Snapshot::LatestOsVersion.ios_version.to_f < 9 # to_f is bad, but should be good enough
         UI.error '#############################################################'
         UI.error "# Your xcode-select Xcode version is below 7.0"
         UI.error "# To use snapshot 1.0 and above you need at least iOS 9"
@@ -43,7 +43,7 @@ module Snapshot
 
     def self.check_simctl
       unless `xcrun simctl`.include? "openurl"
-        UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and Mac OS installed.")
+        UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and macOS installed.")
       end
     end
   end

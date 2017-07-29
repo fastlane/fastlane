@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,15 +33,16 @@ frameit
 
 [![Twitter: @KauseFx](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/frameit/LICENSE)
-[![Gem](https://img.shields.io/gem/v/frameit.svg?style=flat)](http://rubygems.org/gems/frameit)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Quickly put your screenshots into the right device frames
 
+`frameit` allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
+
+
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
-
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -49,18 +52,20 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 </p>
 
 -------
-<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
 
+<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
 # Features
 
-Put a gorgeous device frame around your iOS screenshots just by running one simple command. Support for:
-- iPhone 6 Plus, iPhone 6, iPhone 5s and iPad mini
-- Portrait and Landscape
-- Black and Silver devices
+Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
+- iPhone, iPad and Mac
+- Portrait and Landscape modes
+- Several colors
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
+
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 Here is a nice gif, that shows ```frameit``` in action:
 
@@ -88,19 +93,11 @@ Make sure, you have the commandline tools installed
 
 Install the gem
 
-    sudo gem install frameit
+    sudo gem install fastlane
 
-Because of legal reasons, I can not pre-package the device frames with ```frameit```.
+The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
-The process of adding is really easy, just run ```frameit``` and the guide will help you set it up.
-You only have to do this once per computer.
-
-- Run ```frameit```
-- Press ```Enter```. The [Apple page](https://developer.apple.com/app-store/marketing/guidelines/#images) to download the images should open in your browser.
-- Download the devices you want to use
-- Press ```Enter```
-- Unzip and move the content of the zip files to ```~/.frameit/devices_frames```
-- Press ```Enter```
+More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 
 # Usage
 
@@ -108,15 +105,15 @@ Why should you have to use Photoshop, just to add a frame around your screenshot
 
 Just navigate to your folder of screenshots and use the following command:
 
-    frameit
+    fastlane frameit
 
 To use the silver version of the frames:
 
-    frameit silver
+    fastlane frameit silver
 
-To run the setup process again to add new frames use:
+To download the latest frames
 
-    frameit setup
+    fastlane frameit download_frames
 
 When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
@@ -132,6 +129,7 @@ Use it to define the general information:
 
 ```json
 {
+  "device_frame_version": "latest",
   "default": {
     "keyword": {
       "font": "./fonts/MyFont-Rg.otf"
@@ -141,7 +139,9 @@ Use it to define the general information:
       "color": "#545454"
     },
     "background": "./background.jpg",
-    "padding": 50
+    "padding": 50,
+    "show_complete_frame": false,
+    "stack_title" : false
   },
 
   "data": [
@@ -172,6 +172,9 @@ Use it to define the general information:
   ]
 }
 ```
+The `stack_title` value specifies whether `frameit` should display the keyword above the title when both keyword and title are defined.
+
+The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
@@ -185,8 +188,9 @@ To define the title and optionally the keyword, put two `.strings` files into th
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
-**Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 LE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
+**Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 BE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
+**Note:** You **MUST** provide a background if you want titles. `frameit` will not add the tiles if a background is not specified.
 
 #### Uploading screenshots to iTC
 
@@ -194,7 +198,7 @@ Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to uploa
 
 ### Mac
 
-With `frameit` 2.0 it's possible to also frame Mac OS X Application screenshots. You have to provide the following:
+With `frameit` 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
 
 - The `offset` information so `frameit` knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac
@@ -230,7 +234,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
@@ -243,8 +247,9 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Generate localized screenshots
 Check out [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot) to automatically generate screenshots using ```UI Automation```.
@@ -255,7 +260,7 @@ Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``
 
 ## White background of frames
 
-Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `frameit` again.
+Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
@@ -270,7 +275,7 @@ brew install imagemagick
 ```
 
 ## Uninstall
-- ```sudo gem uninstall frameit```
+- ```sudo gem uninstall fastlane```
 - ```rm -rf ~/.frameit```
 
 # Need help?

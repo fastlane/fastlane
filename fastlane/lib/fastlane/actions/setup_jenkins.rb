@@ -4,6 +4,8 @@ module Fastlane
       USED_ENV_NAMES = [
         "BACKUP_XCARCHIVE_DESTINATION",
         "DERIVED_DATA_PATH",
+        "FL_CARTHAGE_DERIVED_DATA",
+        "FL_SLATHER_BUILD_DIRECTORY",
         "GYM_BUILD_PATH",
         "GYM_CODE_SIGNING_IDENTITY",
         "GYM_DERIVED_DATA_PATH",
@@ -30,7 +32,7 @@ module Fastlane
 
         # Keychain
         if params[:unlock_keychain] && params[:keychain_path]
-          keychain_path = File.expand_path(params[:keychain_path])
+          keychain_path = params[:keychain_path]
           UI.message "Unlocking keychain: \"#{keychain_path}\"."
           Actions::UnlockKeychainAction.run(
             path: keychain_path,
@@ -65,6 +67,8 @@ module Fastlane
           ENV['XCODE_DERIVED_DATA_PATH'] = derived_data_path
           ENV['GYM_DERIVED_DATA_PATH'] = derived_data_path
           ENV['SCAN_DERIVED_DATA_PATH'] = derived_data_path
+          ENV['FL_CARTHAGE_DERIVED_DATA'] = derived_data_path
+          ENV['FL_SLATHER_BUILD_DIRECTORY'] = derived_data_path
         end
 
         # Set result bundle
@@ -88,8 +92,12 @@ module Fastlane
           "- Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'",
           "- Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'",
           "- Sets output directory to './output' (gym, scan and backup_xcarchive).",
-          "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data).",
-          "- Produce result bundle (gym and scan)."
+          "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage).",
+          "- Produce result bundle (gym and scan).",
+          "",
+          "This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.",
+          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain",
+          "will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system."
         ].join("\n")
       end
 
@@ -127,6 +135,7 @@ module Fastlane
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Keychain password",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: ""),
 
           # Code signing identity
@@ -149,7 +158,7 @@ module Fastlane
                                        default_value: "./output"),
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "FL_SETUP_JENKINS_DERIVED_DATA_PATH",
-                                       description: "The directory where build products and other derived data will go",
+                                       description: "The directory where built products and other derived data will go",
                                        is_string: true,
                                        default_value: "./derivedData"),
           FastlaneCore::ConfigItem.new(key: :result_bundle,
@@ -166,6 +175,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'setup_jenkins'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

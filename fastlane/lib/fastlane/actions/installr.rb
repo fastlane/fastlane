@@ -67,13 +67,14 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
                                      env_name: "INSTALLR_API_TOKEN",
+                                     sensitive: true,
                                      description: "API Token for Installr Access",
                                      verify_block: proc do |value|
                                        UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value and !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                      env_name: "INSTALLR_IPA_PATH",
-                                     description: "Path to your IPA file. Optional if you use the `gym` or `xcodebuild` action",
+                                     description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
@@ -108,6 +109,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'installr(
+            api_token: "...",
+            ipa: "test.ipa",
+            notes: "The next great version of the app!",
+            notify: "dev,qa",
+            add: "exec,ops"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

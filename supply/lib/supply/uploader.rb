@@ -1,11 +1,11 @@
 module Supply
   class Uploader
     def perform_upload
-      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], title: "Summary for supply #{Supply::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
+      UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
@@ -25,9 +25,25 @@ module Supply
 
       upload_binaries unless Supply.config[:skip_upload_apk]
 
-      UI.message("Uploading all changes to Google Play...")
-      client.commit_current_edit!
-      UI.success("Successfully finished the upload to Google Play")
+      promote_track if Supply.config[:track_promote_to]
+
+      if Supply.config[:validate_only]
+        UI.message("Validating all changes with Google Play...")
+        client.validate_current_edit!
+        UI.success("Successfully validated the upload to Google Play")
+      else
+        UI.message("Uploading all changes to Google Play...")
+        client.commit_current_edit!
+        UI.success("Successfully finished the upload to Google Play")
+      end
+    end
+
+    def promote_track
+      version_codes = client.track_version_codes(Supply.config[:track])
+      # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
+      # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
+      client.update_track(Supply.config[:track], 0.1, nil)
+      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], version_codes)
     end
 
     def upload_changelogs(language)
@@ -97,6 +113,13 @@ module Supply
         apk_version_codes.push(upload_binary_data(apk_path))
       end
 
+      mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
+      mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
+        if mapping_path
+          client.upload_mapping(mapping_path, version_code)
+        end
+      end
+
       update_track(apk_version_codes)
     end
 
@@ -132,6 +155,8 @@ module Supply
 
     def update_track(apk_version_codes)
       UI.message("Updating track '#{Supply.config[:track]}'...")
+      check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
+
       if Supply.config[:track].eql? "rollout"
         client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
       else
@@ -139,8 +164,47 @@ module Supply
       end
     end
 
+    # Remove any version codes that is:
+    #  - Lesser than the greatest of any later (i.e. production) track
+    #  - Or lesser than the currently being uploaded if it's in an earlier (i.e. alpha) track
+    def check_superseded_tracks(apk_version_codes)
+      UI.message("Checking superseded tracks...")
+      max_apk_version_code = apk_version_codes.max
+      max_tracks_version_code = nil
+
+      tracks = ["production", "rollout", "beta", "alpha"]
+      config_track_index = tracks.index(Supply.config[:track])
+
+      tracks.each_index do |track_index|
+        next if track_index.eql? config_track_index
+        track = tracks[track_index]
+
+        track_version_codes = client.track_version_codes(track).sort
+        next if track_version_codes.empty?
+
+        if max_tracks_version_code.nil?
+          max_tracks_version_code = track_version_codes.max
+        else
+          removed_version_codes = track_version_codes.take_while do |v|
+            v < max_tracks_version_code || (v < max_apk_version_code && track_index > config_track_index)
+          end
+
+          unless removed_version_codes.empty?
+            keep_version_codes = track_version_codes - removed_version_codes
+            max_tracks_version_code = keep_version_codes[0] unless keep_version_codes.empty?
+            client.update_track(track, 1.0, keep_version_codes)
+            UI.message("Superseded track '#{track}', removed '#{removed_version_codes}'")
+          end
+        end
+      end
+    end
+
+    # returns only language directories from metadata_path
     def all_languages
-      Dir.foreach(metadata_path).sort { |x, y| x <=> y }
+      Dir.entries(metadata_path)
+         .select { |f| File.directory? File.join(metadata_path, f) }
+         .reject { |f| f.start_with?('.') }
+         .sort { |x, y| x <=> y }
     end
 
     def client

@@ -37,6 +37,17 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'git_pull',
+          'git_pull(only_tags: true) # only the tags, no commits'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

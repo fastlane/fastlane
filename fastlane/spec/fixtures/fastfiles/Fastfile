@@ -9,9 +9,7 @@ lane :test do
   1
 end
 
-
 platform :ios do
-
   lane :beta do
     File.write("/tmp/fastlane/mac_beta.txt", Time.now.to_s)
     frameit
@@ -28,7 +26,6 @@ platform :ios do
   lane :crashy do
     raise "my exception"
   end
-  
 end
 
 before_all do |lane|

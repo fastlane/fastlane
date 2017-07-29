@@ -1,53 +1,111 @@
+require 'tmpdir'
+
 module Pilot
   class BuildManager < Manager
     def upload(options)
       start(options)
 
+      options[:changelog] = self.class.truncate_changelog(options[:changelog]) if options[:changelog]
+
       UI.user_error!("No ipa file given") unless config[:ipa]
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
-      plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(config[:ipa]) || {}
-      platform = plist["DTPlatformName"]
-      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/spaceship/issues/247
+      dir = Dir.mktmpdir
+
+      platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
                                                                       ipa_path: config[:ipa],
-                                                                  package_path: "/tmp",
+                                                                  package_path: dir,
                                                                       platform: platform)
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(app.apple_id, package_path)
 
-      if result
-        UI.message("Successfully uploaded the new binary to iTunes Connect")
-
-        unless config[:skip_submission]
-          uploaded_build = wait_for_processing_build
-          distribute_build(uploaded_build, options)
-
-          UI.message("Successfully distributed build to beta testers 🚀")
-        end
-      else
-        UI.user_error!("Error uploading ipa file, more information see above")
+      unless result
+        UI.user_error!("Error uploading ipa file, for more information see above")
       end
+
+      UI.success("Successfully uploaded the new binary to iTunes Connect")
+
+      if config[:skip_waiting_for_build_processing]
+        UI.important("Skip waiting for build processing")
+        UI.important("This means that no changelog will be set and no build will be distributed to testers")
+        return
+      end
+
+      UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, poll_interval: config[:wait_processing_interval])
+
+      distribute(options, build: latest_build)
+    end
+
+    def distribute(options, build: nil)
+      start(options)
+      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+        config[:app_identifier] = UI.input("App Identifier: ")
+      end
+
+      build ||= Spaceship::TestFlight::Build.latest(app_id: app.apple_id, platform: fetch_app_platform)
+      if build.nil?
+        UI.user_error!("No build to distribute!")
+      end
+
+      if should_update_app_test_information?(options)
+        app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
+        app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
+        app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
+        begin
+          app_test_info.save_for_app!(app_id: build.app_id)
+          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
+        rescue => ex
+          UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
+        end
+      end
+
+      if should_update_build_information?(options)
+        begin
+          build.update_build_information!(whats_new: options[:changelog])
+          UI.success "Successfully set the changelog for build"
+        rescue => ex
+          UI.user_error!("Could not set changelog: #{ex}")
+        end
+      end
+
+      return if config[:skip_submission]
+      distribute_build(build, options)
+      type = options[:distribute_external] ? 'External' : 'Internal'
+      UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
     def list(options)
       start(options)
       if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
-        config[:app_identifier] = ask("App Identifier: ")
+        config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      builds = app.all_processing_builds + app.builds
+      platform = fetch_app_platform(required: false)
+      builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
       # sort by upload_date
-      builds.sort! {|a, b| a.upload_date <=> b.upload_date }
+      builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
         headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
+    end
+
+    def self.truncate_changelog(changelog)
+      max_changelog_length = 4000
+      if changelog && changelog.length > max_changelog_length
+        original_length = changelog.length
+        bottom_message = "..."
+        changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
+        UI.important "Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters."
+      end
+      return changelog
     end
 
     private
@@ -62,67 +120,46 @@ module Pilot
       return row
     end
 
-    # This method will takes care of checking for the processing builds every few seconds
-    # @return [Build] The build that we just uploaded
-    def wait_for_processing_build
-      # the upload date of the new buid
-      # we use it to identify the build
+    def should_update_build_information?(options)
+      options[:changelog].to_s.length > 0
+    end
 
-      start = Time.now
-      wait_processing_interval = config[:wait_processing_interval].to_i
-      latest_build = nil
-      loop do
-        UI.message("Waiting for iTunes Connect to process the new build")
-        sleep wait_processing_interval
-        builds = app.all_processing_builds
-        break if builds.count == 0
-        latest_build = builds.last # store the latest pre-processing build here
-      end
-
-      full_build = nil
-
-      while full_build.nil? || full_build.processing
-        # Now get the full builds with a reference to the application and more
-        # As the processing build from before doesn't have a refernece to the application
-        full_build = app.build_trains[latest_build.train_version].builds.find do |b|
-          b.build_version == latest_build.build_version
-        end
-
-        UI.message("Waiting for iTunes Connect to finish processing the new build (#{full_build.train_version} - #{full_build.build_version})")
-        sleep wait_processing_interval
-      end
-
-      if full_build
-        minutes = ((Time.now - start) / 60).round
-        UI.success("Successfully finished processing the build")
-        UI.message("You can now tweet: ")
-        UI.important("iTunes Connect #iosprocessingtime #{minutes} minutes")
-        return full_build
-      else
-        UI.user_error!("Error: Seems like iTunes Connect didn't properly pre-process the binary")
-      end
+    def should_update_app_test_information?(options)
+      options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
     end
 
     def distribute_build(uploaded_build, options)
-      UI.message("Distributing new build to testers")
+      UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
-      # First, set the changelog (if necessary)
-      uploaded_build.update_build_information!(whats_new: options[:changelog])
+      # This is where we could add a check to see if encryption is required and has been updated
+      uploaded_build.export_compliance.encryption_updated = false
 
-      # Submit for review before external testflight is available
       if options[:distribute_external]
-        uploaded_build.client.submit_testflight_build_for_review!(
-          app_id: uploaded_build.build_train.application.apple_id,
-          train: uploaded_build.build_train.version_string,
-          build_number: uploaded_build.build_version,
-          platform: uploaded_build.platform
-        )
+        uploaded_build.beta_review_info.demo_account_required = false
+        uploaded_build.submit_for_testflight_review!
+        external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
+        uploaded_build.add_group!(external_group) unless external_group.nil?
+
+        if external_group.nil? && options[:groups].nil?
+          UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
+        end
+
+        if options[:groups]
+          groups = Spaceship::TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
+            options[:groups].include?(group.name)
+          end
+          groups.each do |group|
+            uploaded_build.add_group!(group)
+          end
+        end
+      else # distribute internally
+        # in case any changes to export_compliance are required
+        if uploaded_build.export_compliance_missing?
+          uploaded_build.save!
+        end
       end
 
-      # Submit for beta testing
-      type = options[:distribute_external] ? 'external' : 'internal'
-      uploaded_build.build_train.update_testing_status!(true, type, uploaded_build)
-      return true
+      true
     end
   end
 end

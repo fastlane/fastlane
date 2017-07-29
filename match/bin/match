@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'match'
-require 'match/commands_generator'
-Match::CommandsGenerator.start

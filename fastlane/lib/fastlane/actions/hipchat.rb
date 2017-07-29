@@ -51,7 +51,8 @@ module Fastlane
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
-            uri = URI.parse("https://#{api_host}/v2/user/#{channel}/message")
+            escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
+            uri = URI.parse("https://#{api_host}/v2/user/#{escaped_channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
 
@@ -101,6 +102,7 @@ module Fastlane
                                        description: "The room or @username"),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "HIPCHAT_API_TOKEN",
+                                       sensitive: true,
                                        description: "Hipchat API Token",
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
@@ -158,7 +160,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :from,
                                        env_name: "FL_HIPCHAT_FROM",
-                                       description: "Name the message will appear be sent from",
+                                       description: "Name the message will appear to be sent from",
                                        default_value: "fastlane",
                                        optional: true)
         ]
@@ -170,6 +172,25 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.details
+        "Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status."
+      end
+
+      def self.example_code
+        [
+          'hipchat(
+            message: "App successfully released!",
+            message_format: "html", # or "text", defaults to "html"
+            channel: "Room or @username",
+            success: true
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

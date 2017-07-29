@@ -15,7 +15,7 @@ module Gym
                                      short_option: "-w",
                                      env_name: "GYM_WORKSPACE",
                                      optional: true,
-                                     description: "Path the workspace file",
+                                     description: "Path to the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -30,7 +30,7 @@ module Gym
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "GYM_PROJECT",
-                                     description: "Path the project file",
+                                     description: "Path to the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
@@ -64,6 +64,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        value.gsub!(".ipa", "")
+                                       value.gsub!(File::SEPARATOR, "_")
                                      end),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
@@ -81,6 +82,11 @@ module Gym
                                      env_name: "GYM_CODE_SIGNING_IDENTITY",
                                      description: "The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_ipa,
+                                     env_name: "GYM_SKIP_PACKAGE_IPA",
+                                     description: "Should we skip packaging the ipa?",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -90,41 +96,38 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :include_bitcode,
                                      short_option: "-z",
                                      env_name: "GYM_INCLUDE_BITCODE",
-                                     description: "Should the ipa include bitcode?",
+                                     description: "Should the ipa file include bitcode?",
                                      is_string: false,
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :use_legacy_build_api,
-                                     env_name: "GYM_USE_LEGACY_BUILD_API",
-                                     description: "Don't use the new API because of https://openradar.appspot.com/radar?id=4952000420642816",
-                                     default_value: false,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       if value
-                                         UI.important "Using legacy build system - waiting for radar to be fixed: https://openradar.appspot.com/radar?id=4952000420642816"
-                                       end
-                                     end),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
-                                     description: "How should gym export the archive?",
+                                     description: "Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id",
                                      is_string: true,
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
-                                       UI.user_error!("Unsupported export_method, must be: #{av}") unless av.include?(value)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
                                      env_name: "GYM_EXPORT_OPTIONS",
-                                     description: "Specifies path to export options plist. User xcodebuild -help to print the full set of available options",
+                                     description: "Specifies path to export options plist. Use 'xcodebuild -help' to print the full set of available options",
                                      is_string: false,
                                      optional: true,
-                                     conflicting_options: [:use_legacy_build_api],
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :export_xcargs,
+                                     env_name: "GYM_EXPORT_XCARGS",
+                                     description: "Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     optional: true,
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
+                                     end,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
-                                     description: "Export ipa from previously build xarchive. Uses archive_path as source",
+                                     description: "Export ipa from previously built xarchive. Uses archive_path as source",
                                      is_string: false,
                                      optional: true),
         # Very optional
@@ -140,32 +143,29 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-f",
                                      env_name: "GYM_DERIVED_DATA_PATH",
-                                     description: "The directory where build products and other derived data will go",
+                                     description: "The directory where built products and other derived data will go",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-u",
                                      env_name: "GYM_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Produce the result bundle describing what occurred will be placed",
+                                     description: "Location of the Xcode result bundle",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "GYM_BUILDLOG_PATH",
                                      description: "The directory where to store the build log",
-                                     default_value: "~/Library/Logs/gym"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/gym"),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",
                                      description: "The SDK that should be used for building the application",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
-                                     short_option: "-e",
-                                     env_name: "GYM_PROVISIONING_PROFILE_PATH",
-                                     description: "The path to the provisioning profile (optional)",
+        FastlaneCore::ConfigItem.new(key: :toolchain,
+                                     env_name: "GYM_TOOLCHAIN",
+                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Provisioning profile not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end),
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
@@ -179,8 +179,9 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "GYM_XCARGS",
-                                     description: "Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
-                                     optional: true),
+                                     description: "Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
+                                     optional: true,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :xcconfig,
                                      short_option: "-y",
                                      env_name: "GYM_XCCONFIG",
@@ -194,8 +195,46 @@ module Gym
                                      env_name: "SUPPRESS_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     is_string: false
-                                    )
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build output",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_test_format,
+                                     env_name: "XCPRETTY_TEST_FORMAT",
+                                     description: "Use the test (RSpec style) format for build output",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_formatter,
+                                     env_name: "XCPRETTY_FORMATTER",
+                                     description: "A custom xcpretty formatter to use",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Formatter file not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_junit,
+                                     env_name: "XCPRETTY_REPORT_JUNIT",
+                                     description: "Have xcpretty create a JUnit-style XML report at the provided path",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_html,
+                                     env_name: "XCPRETTY_REPORT_HTML",
+                                     description: "Have xcpretty create a simple HTML report at the provided path",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_report_json,
+                                     env_name: "XCPRETTY_REPORT_JSON",
+                                     description: "Have xcpretty create a JSON compilation database at the provided path",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in 'culprits.txt' file",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
+                                     env_name: "XCPRETTY_UTF",
+                                     description: "Have xcpretty use unicode encoding when reporting builds",
+                                     optional: true,
+                                     is_string: false)
       ]
     end
   end

@@ -2,46 +2,12 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
-  # rubocop:disable Metrics/ModuleLength
   module Helper
-    # Logging happens using this method
+    # This method is deprecated, use the `UI` class
+    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
     def self.log
-      $stdout.sync = true
-
-      if is_test?
-        @log ||= Logger.new(nil) # don't show any logs when running tests
-      else
-        @log ||= Logger.new($stdout)
-      end
-
-      @log.formatter = proc do |severity, datetime, progname, msg|
-        string = "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: " if $verbose
-        string = "[#{datetime.strftime('%H:%M:%S')}]: " unless $verbose
-        second = "#{msg}\n"
-
-        if severity == "DEBUG"
-          string = string.magenta
-        elsif severity == "INFO"
-          string = string.white
-        elsif severity == "WARN"
-          string = string.yellow
-        elsif severity == "ERROR"
-          string = string.red
-        elsif severity == "FATAL"
-          string = string.red.bold
-        end
-
-        [string, second].join("")
-      end
-
-      @log
-    end
-
-    # This method can be used to add nice lines around the actual log
-    # Use this to log more important things
-    # The logs will be green automatically
-    def self.log_alert(text)
-      UI.header(text)
+      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.current.log
     end
 
     # Runs a given command using backticks (`)
@@ -55,16 +21,78 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined?SpecHelper
+      defined? SpecHelper
+    end
+
+    # @return true if it is enabled to execute external commands
+    def self.sh_enabled?
+      !self.test?
+    end
+
+    # removes ANSI colors from string
+    def self.strip_ansi_colors(str)
+      str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # checks if given file is a valid json file
+    # base taken from: http://stackoverflow.com/a/26235831/1945875
+    def self.json_file?(filename)
+      return false unless File.exist?(filename)
+      begin
+        JSON.parse(File.read(filename))
+        return true
+      rescue JSON::ParserError
+        return false
+      end
+    end
+
+    # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
+    def self.bundler?
+      # Bundler environment variable
+      ['BUNDLE_BIN_PATH', 'BUNDLE_GEMFILE'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
+    end
+
+    # Do we run from a bundled fastlane, which contains Ruby and OpenSSL?
+    # Usually this means the fastlane directory is ~/.fastlane/bin/
+    # We set this value via the environment variable `FASTLANE_SELF_CONTAINED`
+    def self.contained_fastlane?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "true" && !self.homebrew?
+    end
+
+    # returns true if fastlane was installed from the Fabric Mac app
+    def self.mac_app?
+      ENV["FASTLANE_SELF_CONTAINED"].to_s == "false"
+    end
+
+    # returns true if fastlane was installed via Homebrew
+    def self.homebrew?
+      ENV["FASTLANE_INSTALLED_VIA_HOMEBREW"].to_s == "true"
+    end
+
+    # returns true if fastlane was installed via RubyGems
+    def self.rubygems?
+      !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
+    end
+
+    def self.windows?
+      # taken from: https://stackoverflow.com/a/171011/1945875
+      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def self.linux?
+      (/linux/ =~ RUBY_PLATFORM) != nil
     end
 
     # Is the currently running computer a Mac?
@@ -87,17 +115,17 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      ENV["FASTLANE_DISABLE_COLORS"]
+      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
     end
 
     # Does the user use the Mac stock terminal
     def self.mac_stock_terminal?
-      !!ENV["TERM_PROGRAM_VERSION"]
+      FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      !!ENV["ITERM_SESSION_ID"]
+    # Logs base directory
+    def self.buildlog_path
+      return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
     end
 
     # All Xcode Related things
@@ -119,9 +147,16 @@ module FastlaneCore
         @xcode_version = output.split("\n").first.split(' ')[1]
       rescue => ex
         UI.error(ex)
-        UI.error("Error detecting currently used Xcode installation")
+        UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have Xcode installed and set it using `sudo xcode-select -s [path]`")
       end
       @xcode_version
+    end
+
+    # @return true if Xcode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     def self.transporter_java_executable_path
@@ -149,9 +184,45 @@ module FastlaneCore
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
 
+    def self.keychain_path(name)
+      # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
+      # in the user's home directory. However, this will not allow the user to pass an absolute path
+      # for the keychain value
+      #
+      # So, if the passed value can't be resolved as a file in Library/Keychains, just use it as-is
+      # as the keychain path.
+      #
+      # We need to expand each path because File.exist? won't handle directories including ~ properly
+      #
+      # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
+      # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
+      #
+
+      # Remove the ".keychain" at the end of the name
+      name.sub!(/\.keychain$/, "")
+
+      possible_locations = [
+        File.join(Dir.home, 'Library', 'Keychains', name),
+        name
+      ].map { |path| File.expand_path(path) }
+
+      # Transforms ["thing"] to ["thing-db", "thing.keychain-db", "thing", "thing.keychain"]
+      keychain_paths = []
+      possible_locations.each do |location|
+        keychain_paths << "#{location}-db"
+        keychain_paths << "#{location}.keychain-db"
+        keychain_paths << location
+        keychain_paths << "#{location}.keychain"
+      end
+
+      keychain_path = keychain_paths.find { |path| File.file?(path) }
+      UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
+      keychain_path
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"]
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
       return '' unless self.is_mac? # so tests work on Linx too
 
       [
@@ -166,11 +237,21 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= File.directory? "./fastlane"
+      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
     end
 
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+    end
+
+    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
+    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    #
     # Path to the installed gem to load resources (e.g. resign.sh)
     def self.gem_path(gem_name)
+      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
+
       if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
@@ -178,5 +259,4 @@ module FastlaneCore
       end
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end

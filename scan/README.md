@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <b>scan</b> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,14 +33,15 @@ scan
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/scan/LICENSE)
-[![Gem](https://img.shields.io/gem/v/scan.svg?style=flat)](http://rubygems.org/gems/scan)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### The easiest way to run tests of your iOS and Mac app
+
+`scan` makes it easy to run tests of your iOS and Mac app on a simulator or connected device.
 
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#whats-scan">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -49,11 +52,9 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>scan</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>scan</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's scan?
-
-`scan` makes it super easy to run tests of your iOS and Mac app. It does all the heavy lifting for you to run your tests... the easy way.
 
 ![https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large](https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large)
 
@@ -102,8 +103,8 @@ scan
 
 `scan` uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
 
-              |  scan Features
---------------------------|------------------------------------------------------------
+|          |  scan Features  |
+|----------|-----------------|
 :checkered_flag: | Beautiful inline build output while running the tests
 :mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
 :bar_chart: | Support for HTML, JSON and JUnit reports
@@ -127,7 +128,7 @@ scan
 
 # Installation
 
-    sudo gem install scan
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -135,19 +136,28 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    scan
+    fastlane scan
 
 That's all you need to run your tests. If you want more control, here are some available parameters:
 
-    scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+    fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 
-If you need to use a different xcode install, use xcode-select or define DEVELOPER_DIR:
+If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
     DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
 
+To run `scan` on multiple devices via [fastlane](https://fastlane.tools), add this to your `Fastfile`:
+
+```ruby
+scan(
+  workspace: "Example.xcworkspace",
+  devices: ["iPhone 6s", "iPad Air"]
+)
+```
+
 For a list of all available parameters use
 
-    scan --help
+    fastlane scan --help
 
 To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
@@ -155,10 +165,11 @@ To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
 Since you might want to manually trigger the tests but don't want to specify all the parameters every time, you can store your defaults in a so called `Scanfile`.
 
-Run `scan init` to create a new configuration file. Example:
+Run `fastlane scan init` to create a new configuration file. Example:
 
 ```ruby
 scheme "Example"
+devices ["iPhone 6s", "iPad Air"]
 
 clean true
 
@@ -183,7 +194,7 @@ For more information visit the [fastlane GitHub page](https://github.com/fastlan
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -195,8 +206,9 @@ For more information visit the [fastlane GitHub page](https://github.com/fastlan
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

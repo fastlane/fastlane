@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     # Commits version bump.
@@ -25,8 +24,9 @@ module Fastlane
             UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
           end
         else
+          all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -50,7 +50,6 @@ module Fastlane
           pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
           # find the info_plist files
-          # rubocop:disable Style/MultilineBlockChain
           project = Xcodeproj::Project.open(xcodeproj_path)
           info_plist_files = project.objects.select do |object|
             object.isa == 'XCBuildConfiguration'
@@ -63,7 +62,6 @@ module Fastlane
           end.uniq.map do |info_plist_path|
             Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
           end
-          # rubocop:enable Style/MultilineBlockChain
 
           # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the hg workdir root
           expected_changed_files = []
@@ -84,13 +82,12 @@ module Fastlane
         changed_files_as_expected = dirty_set.subset? expected_set
         unless changed_files_as_expected
           unless params[:force]
-            str = ["Found unexpected uncommited changes in the working directory. Expected these files to have changed:",
+            str = ["Found unexpected uncommitted changes in the working directory. Expected these files to have changed:",
                    "#{expected_changed_files.join("\n")}.",
                    "But found these actual changes: \n#{hg_dirty_files.join("\n")}.",
                    "Make sure you have cleaned up the build artifacts and are only left with the changed version files at this",
                    "stage in your lane, and don't touch the working directory while your lane is running. You can also use the :force option to ",
-                   "bypass this check, and always commit a version bump regardless of the state of the working directory."
-                  ].join("\n")
+                   "bypass this check, and always commit a version bump regardless of the state of the working directory."].join("\n")
             UI.user_error!(str)
           end
         end
@@ -139,7 +136,7 @@ module Fastlane
                                        default_value: "file1, file2"),
           FastlaneCore::ConfigItem.new(key: :test_expected_files,
                                        env_name: "FL_HG_COMMIT_TEST_EXP_FILES",
-                                       description: "A list of expected changed files passed in for testin",
+                                       description: "A list of expected changed files passed in for testing",
                                        optional: true,
                                        default_value: "file1, file2")
         ]
@@ -153,7 +150,32 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.details
+        [
+          "The mercurial equivalent of the [`commit_version_bump`](#commit_version_bump) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](#increment_build_number).",
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
+          "- All .plist files",
+          "- The `.xcodeproj/project.pbxproj` file",
+          "Then commits those files to the repo.",
+          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action."
+        ].join("\n")
+      end
+
+      def self.example_code
+        [
+          'hg_commit_version_bump',
+          'hg_commit_version_bump(
+            message: "Version Bump",                 # create a commit with a custom message
+            xcodeproj: "./path/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

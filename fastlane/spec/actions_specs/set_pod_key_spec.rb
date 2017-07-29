@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "CocoaPods-Keys Integration" do
       it "default use case" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           set_pod_key(
             key: 'APIToken',
@@ -25,6 +26,7 @@ describe Fastlane do
       end
 
       it "appends the project name when provided" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         result = Fastlane::FastFile.new.parse("lane :test do
           set_pod_key(
             key: 'APIToken',
@@ -43,7 +45,7 @@ describe Fastlane do
               value: '1234'
             )
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /'key'/)
       end
 
       it "requires a value" do
@@ -53,7 +55,7 @@ describe Fastlane do
               key: 'APIToken'
             )
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /'value'/)
       end
     end
   end

@@ -2,6 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Crashlytics Integration" do
       before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ENV.delete "CRASHLYTICS_API_TOKEN"
         ENV.delete "CRASHLYTICS_BUILD_SECRET"
         ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
@@ -126,8 +127,7 @@ describe Fastlane do
              "secret",
              "-ipaPath './fastlane/spec/fixtures/fastfiles/Fastfile1'",
              "-notifications YES",
-             "-debug NO"
-            ].each do |to_be|
+             "-debug NO"].each do |to_be|
               expect(command).to include(to_be)
             end
           end
@@ -272,8 +272,8 @@ describe Fastlane do
         end
 
         describe "Invalid Parameters" do
-          # If this test fails, there might be a Crashlytics.framework somewhere in the .. directory
           it "raises an error if no crashlytics path was given" do
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -295,7 +295,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error
+            end.to raise_error(%r{Couldn't find crashlytics at path .*fastlane/wadus})
           end
 
           it "raises an error if no api token was given" do

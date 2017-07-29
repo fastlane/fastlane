@@ -26,6 +26,7 @@ module Fastlane
         url_params << "scale=#{params[:scale]}"
         url_params << "launchUrl=#{params[:launch_url]}" if params[:launch_url]
         url_params << "language=#{params[:language]}" if params[:language]
+        url_params << "osVersion=#{params[:os_version]}" if params[:os_version]
 
         return link + "?" + url_params.join("&")
       end
@@ -39,6 +40,7 @@ module Fastlane
       end
 
       def self.details
+        "Check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) for more information"
       end
 
       def self.available_options
@@ -47,6 +49,7 @@ module Fastlane
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "Public key of the app you wish to update",
                                        is_string: true,
+                                       sensitive: true,
                                        default_value: Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY],
                                        optional: false,
                                        verify_block: proc do |value|
@@ -95,11 +98,17 @@ module Fastlane
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_LAUNCH_URL",
                                        description: "Specify a deep link to open when your app is launched",
                                        is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :os_version,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_OS_VERSION",
+                                       description: "The operating system version on which to run your app, e.g. 10.3, 8.0",
+                                       is_string: true,
                                        optional: true)
         ]
       end
 
-      def self.output
+      def self.category
+        :misc
       end
 
       def self.return_value

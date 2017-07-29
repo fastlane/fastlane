@@ -6,10 +6,10 @@ HexColors
 
 HexColors is drop in category for HexColor Support for NSColor and UIColor. Support for HexColors with prefixed # and without.
 
-#RELEASE 2.3.0
-Attention the API has changed! 
+# RELEASE 2.3.0
+Attention the API has changed!
 
-#Example iOS
+# Example iOS
 ``` objective-c
 // with hash
 UIColor *colorWithHex = [UIColor colorWithHexString:@"#ff8942"];
@@ -21,7 +21,7 @@ UIColor *secondColorWithHex = [UIColor colorWithHexString:@"ff8942"];
 UIColor *shortColorWithHex = [UIColor colorWithHexString:@"fff"];
 ```
 
-#Example Mac OS X
+# Example macOS
 ``` objective-c
 // with hash
 NSColor *colorWithHex = [NSColor colorWithHexString:@"#ff8942"];
@@ -33,21 +33,21 @@ NSColor *secondColorWithHex = [NSColor colorWithHexString:@"ff8942"];
 NSColor *shortColorWithHex = [NSColor colorWithHexString:@"fff"];
 ```
 
-#Installation
+# Installation
 * `#import "HexColors.h"` where you want to use easy as pie HexColors
 * `pod install HexColors`
 * or just drag the source files in your project
 
-##Requirements
+## Requirements
 HexColors requires [iOS 5.0](http://developer.apple.com/library/ios/#releasenotes/General/WhatsNewIniPhoneOS/Articles/iPhoneOS4.html) and above, and Mac OS X 10.6
 
-##Credits
+## Credits
 HexColors was created by [Marius Landwehr](https://github.com/mRs-) because of the pain recalculating Hex values to RGB.
 
-HexColors was ported to Mac OS X by [holgersindbaek](https://github.com/holgersindbaek).
+HexColors was ported to macOS by [holgersindbaek](https://github.com/holgersindbaek).
 
-##Creator
+## Creator
 [Marius Landwehr](https://github.com/mRs-) [@mariusLAN](https://twitter.com/mariusLAN)
 
-##License
+## License
 HexColors is available underthe MIT license. See the LICENSE file for more info.

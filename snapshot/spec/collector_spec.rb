@@ -8,7 +8,7 @@ describe Snapshot do
           "Screenshot_AE21B4B1-6C45-44A2-BDF6-A30A33735688.png",
           "Screenshot_0B17C04E-5ED1-4667-AF31-EFDDCAC71EDB.png"
         ]
-        expect(Snapshot::Collector.attachments_in_file('spec/fixtures/Xcode-7_2_1-TestSummaries.plist')).to contain_exactly(*expected_files)
+        expect(Snapshot::Collector.attachments_in_file('snapshot/spec/fixtures/Xcode-7_2_1-TestSummaries.plist')).to contain_exactly(*expected_files)
       end
     end
 
@@ -20,7 +20,7 @@ describe Snapshot do
           "Screenshot_75352671-22A3-4DAF-BCFA-D0DFF5EBFE2C.png",
           "Screenshot_8752EB61-7EAB-4908-AD6D-A4973E40E9CB.png"
         ]
-        expect(Snapshot::Collector.attachments_in_file('spec/fixtures/Xcode-7_3-TestSummaries.plist')).to contain_exactly(*expected_files)
+        expect(Snapshot::Collector.attachments_in_file('snapshot/spec/fixtures/Xcode-7_3-TestSummaries.plist')).to contain_exactly(*expected_files)
       end
     end
   end

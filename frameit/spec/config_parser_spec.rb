@@ -27,7 +27,7 @@ describe Frameit do
             font: "/",
             color: "#7F8081"
           },
-          background: "./spec/fixtures/background.jpg"
+          background: "./frameit/spec/fixtures/background.jpg"
         }
         specific = {
           filter: "filter",
@@ -50,7 +50,7 @@ describe Frameit do
             font: "/tmp",
             color: "#7F8081"
           },
-          background: "./spec/fixtures/background.jpg",
+          background: "./frameit/spec/fixtures/background.jpg",
           filter: "filter"
         }.to_json))
       end

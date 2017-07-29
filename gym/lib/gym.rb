@@ -1,5 +1,4 @@
 require 'json'
-require 'gym/version'
 require 'gym/manager'
 require 'gym/generators/build_command_generator'
 require 'gym/generators/package_command_generator'
@@ -11,6 +10,7 @@ require 'gym/xcode'
 
 require 'fastlane_core'
 require 'terminal-table'
+require 'shellwords'
 
 module Gym
   class << self
@@ -32,16 +32,14 @@ module Gym
 
     def init_libs
       # Import all the fixes
-      require 'gym/xcodebuild_fixes/swift_fix'
-      require 'gym/xcodebuild_fixes/watchkit_fix'
-      require 'gym/xcodebuild_fixes/watchkit2_fix'
       require 'gym/xcodebuild_fixes/generic_archive_fix'
-      require 'gym/xcodebuild_fixes/package_application_fix'
     end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  DESCRIPTION = "Building your iOS apps has never been easier"
 
   Gym.init_libs
 end

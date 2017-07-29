@@ -43,6 +43,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :client_secret,
                                        env_name: 'PODIO_ITEM_CLIENT_SECRET',
+                                       sensitive: true,
                                        description: 'Client secret for Podio API (see https://developers.podio.com/api-key)',
                                        is_string: true,
                                        verify_block: proc do |value|
@@ -57,6 +58,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_token,
                                        env_name: 'PODIO_ITEM_APP_TOKEN',
+                                       sensitive: true,
                                        description: 'App token of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)',
                                        is_string: true,
                                        verify_block: proc do |value|
@@ -192,6 +194,22 @@ module Fastlane
 
         embed_response_dictionary = JSON.parse(embed_response.body)
         embed_response_dictionary['embed_id']
+      end
+
+      def self.example_code
+        [
+          'podio_item(
+            identifying_value: "Your unique value",
+            other_fields: {
+              "field1" => "fieldValue",
+              "field2" => "fieldValue2"
+            }
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

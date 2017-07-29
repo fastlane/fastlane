@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Base do
   let(:client) { double('Client') }
   before { Spaceship::Portal.client = double('Default Client') }

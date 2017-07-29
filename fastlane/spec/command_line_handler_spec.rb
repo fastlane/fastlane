@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Fastlane do
   describe Fastlane::CommandLineHandler do
     it "properly handles default calls" do
@@ -9,14 +7,14 @@ describe Fastlane do
 
     it "properly handles calls with custom parameters" do
       expect(Fastlane::LaneManager).to receive(:cruise_lane).with("ios", "deploy",
-                                                                  {key: "value", build_number: '123'},
+                                                                  { key: "value", build_number: '123' },
                                                                   nil)
       Fastlane::CommandLineHandler.handle(["ios", "deploy", "key:value", "build_number:123"], {})
     end
 
     it "properly converts boolean values to real boolean variables" do
       expect(Fastlane::LaneManager).to receive(:cruise_lane).with("ios", "deploy",
-                                                                  {key: true, key2: false},
+                                                                  { key: true, key2: false },
                                                                   nil)
       Fastlane::CommandLineHandler.handle(["ios", "deploy", "key:true", "key2:false"], {})
     end

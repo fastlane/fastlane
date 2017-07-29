@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,29 +8,27 @@ module Screengrab
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('screengrab')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('screengrab', Screengrab::VERSION)
     end
 
     def run
-      program :version, Screengrab::VERSION
+      program :name, 'screengrab'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'screengrab\' - Automate taking localized screenshots of your Android app on emulators or real devices'
-      program :help, 'Authors', 'Andrea Falcone <afalcone@twitter.com>, Michael Furtak <mfurtak@twitter.com>'
+      program :help, 'Authors', 'Andrea Falcone <asfalcone@google.com>, Michael Furtak <mfurtak@google.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/screengrab'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/screengrab#readme'
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { $verbose = true }
+      global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
       always_trace!
 
-      FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options)
-
       command :run do |c|
-        c.syntax = 'screengrab'
-        c.description = 'Take new screenshots based on the screengrabfile.'
+        c.syntax = 'fastlane screengrab'
+        c.description = 'Take new screenshots based on the Screengrabfile.'
+
+        FastlaneCore::CommanderGenerator.new.generate(Screengrab::Options.available_options, command: c)
 
         c.action do |args, options|
           o = options.__hash__.dup
@@ -44,12 +43,12 @@ module Screengrab
       end
 
       command :init do |c|
-        c.syntax = 'screengrab init'
+        c.syntax = 'fastlane screengrab init'
         c.description = "Creates a new Screengrabfile in the current directory"
 
         c.action do |args, options|
           require 'screengrab/setup'
-          path = (Screengrab::Helper.fastlane_enabled? ? './fastlane' : '.')
+          path = Screengrab::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           Screengrab::Setup.create(path)
         end
       end

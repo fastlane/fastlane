@@ -1,0 +1,47 @@
+2016-08-10 14:10:25.865 simctl[48890:1712880] CoreSimulator is attempting to unload a stale CoreSimulatorService job.  Detected Xcode.app relocation or CoreSimulatorService version change.  Framework path (/Applications/Xcode-beta.app/Contents/Developer/Library/PrivateFrameworks/CoreSimulator.framework) and version (260.5) does not match existing job path (/Applications/Xcode.app/Contents/Developer/Library/PrivateFrameworks/CoreSimulator.framework/Versions/A/XPCServices/com.apple.CoreSimulator.CoreSimulatorService.xpc) and version (209.19).
+2016-08-10 14:10:26.116 simctl[48890:1712880] Failed to locate a valid instance of CoreSimulatorService in the bootstrap.  Adding it now.
+== Devices ==
+-- iOS 10.0 --
+    iPhone 5 (6B3494CA-7ECA-4BE7-9197-D7129424309F) (Shutdown)
+    iPhone 5s (54C29A47-27B0-4F5A-A2E7-99D5A357868E) (Shutdown)
+    iPhone 6 (A4971D18-FFC6-4D0F-8235-1B4933F593C7) (Shutdown)
+    iPhone 6 Plus (0D94AEB9-F82D-4394-B9C0-344EABD2B1E2) (Shutdown)
+    iPhone 6s (521336F6-CB62-409B-8387-D064F658276B) (Shutdown)
+    iPhone 6s Plus (116B35D2-078C-4B46-B2E5-B36F8B95BAF2) (Shutdown)
+    iPhone SE (B68B2B7F-4FA2-4E70-9BF2-C32308F75B31) (Shutdown)
+    iPad Retina (FC48E01A-1125-425E-8960-63C31BB4CA3A) (Shutdown)
+    iPad Air (2A170591-9728-4A2D-8A36-B8E37E94090A) (Shutdown)
+    iPad Air 2 (0FDEB396-0582-438A-B09E-8F8F889DB632) (Shutdown)
+    iPad Pro (9.7-inch) (C03658EC-1362-4D8D-A40A-45B1D7D5405E) (Shutdown)
+    iPad Pro (12.9-inch) (CEF11EB3-79DF-43CB-896A-0F33916C8BDE) (Shutdown)
+-- tvOS 10.0 --
+    Apple TV 1080p (3E34EBF2-8000-4722-91BB-8B83AE357C71) (Shutdown)
+-- watchOS 3.0 --
+    Apple Watch - 38mm (EFA535E5-44E2-4CAE-A6D2-F8456521360F) (Shutdown)
+    Apple Watch - 42mm (043B59BE-7CB2-4DFE-9284-CFE036A8E7ED) (Shutdown)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-9-2 --
+    iPhone 6s (084CEAFB-902B-455C-9D91-6B942E6968B6) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 6s Plus (B1EAC7F0-58EE-404E-BD88-CB2334703413) (Shutdown) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-9-3 --
+    iPhone 4s (BFFA7DB1-4FB6-45E0-8CBA-EEB9386B66D7) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 5 (051EBB13-7A3F-4A8F-A440-96BB8DE7CD3C) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 5s (A14A009A-31FC-4310-A35F-C9BF5BAF10F4) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 6 (2E7F1719-52CF-42C0-8438-621572F8A244) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 6 Plus (221B775F-CF78-4D83-A1E4-1F7B84741AEE) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 6s (9F9B3609-6510-4A1A-9F0E-A9F77752DC5F) (Shutdown) (unavailable, runtime profile not found)
+    iPhone 6s Plus (E128F3A2-BA0C-4730-9044-BAE44FA28038) (Shutdown) (unavailable, runtime profile not found)
+    iPad 2 (4C4CDDFD-C6B6-4396-82AC-2BC19DB9495A) (Shutdown) (unavailable, runtime profile not found)
+    iPad Retina (BBD82005-724E-4D47-8DCE-A237132C9ED5) (Shutdown) (unavailable, runtime profile not found)
+    iPad Air (B61CB41D-354B-4991-992A-80AFFF1062E6) (Shutdown) (unavailable, runtime profile not found)
+    iPad Air 2 (57836FE1-5443-4433-B164-A6C9EADAB3F9) (Shutdown) (unavailable, runtime profile not found)
+    iPad Pro (B1DDED8D-E449-461A-94A5-4146A1F58B20) (Shutdown) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.tvOS-9-2 --
+    Apple TV 1080p (D5EB104D-B2BB-42EB-89B6-BBEEF2B5B7F4) (Shutdown) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.watchOS-2-0 --
+    Apple Watch - 38mm (D0416909-B290-44C8-901E-B32CE0E82BBB) (Shutdown) (unavailable, runtime profile not found)
+    Apple Watch - 42mm (C259841E-4219-49CE-A682-CE9681FC35F5) (Shutdown) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.watchOS-2-1 --
+    Apple Watch - 38mm (AB008E1E-5C52-4E82-9D69-4690FA7B6B11) (Shutdown) (unavailable, runtime profile not found)
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.watchOS-2-2 --
+    Apple Watch - 38mm (BB13129B-6E57-48F4-8E7C-FDC31A1D1BED) (Shutdown) (unavailable, runtime profile not found)
+    Apple Watch - 42mm (68AFDDC1-FA81-426A-BD93-2BDE0D956DED) (Shutdown) (unavailable, runtime profile not found)

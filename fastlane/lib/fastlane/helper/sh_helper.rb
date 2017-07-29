@@ -5,7 +5,7 @@ module Fastlane
     # Just an alias for sh_no_action
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
-    # @param error_callback [Block] a callback invoked with the command ouptut if there is a non-zero exit status
+    # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     def self.sh(command, log: true, error_callback: nil)
       sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
@@ -19,6 +19,7 @@ module Fastlane
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
     def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
+      print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
@@ -28,9 +29,7 @@ module Fastlane
       UI.command(command) if print_command
 
       result = ''
-      if Helper.test?
-        result << command # only for the tests
-      else
+      if Helper.sh_enabled?
         exit_status = nil
         IO.popen(command, err: [:child, :out]) do |io|
           io.sync = true
@@ -50,9 +49,15 @@ module Fastlane
                     end
           message += "\n#{result}" if print_command_output
 
-          error_callback.call(result) if error_callback
-          UI.user_error!(message)
+          if error_callback
+            UI.error(message)
+            error_callback.call(result)
+          else
+            UI.shell_error!(message)
+          end
         end
+      else
+        result << command # only for the tests
       end
 
       result

@@ -18,13 +18,13 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        dsym_path = File.expand_path('./spec/fixtures/dSYM/Themoji.dSYM.zip')
+        dsym_path = File.expand_path('./fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip')
         result = Fastlane::FastFile.new.parse("lane :test do
           apteligent(dsym: '#{dsym_path}',app_id: '123',api_key: 'abc')
         end").runner.execute(:test)
 
         expect(result).to include("https://api.crittercism.com/api_beta/dsym/123")
-        expect(result).to include("-F dsym=@#{dsym_path}")
+        expect(result).to include("-F dsym=@#{Shellwords.shellescape(dsym_path)}")
         expect(result).to include("-F key=abc")
       end
     end

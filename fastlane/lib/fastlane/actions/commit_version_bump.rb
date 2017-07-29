@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/AbcSize
 module Fastlane
   module Actions
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
@@ -19,8 +18,9 @@ module Fastlane
           # ensure that the xcodeproj passed in was OK
           UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
         else
+          all_xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))]
           # find an xcodeproj (ignoring the Cocoapods one)
-          xcodeproj_paths = Dir[File.expand_path(File.join(repo_path, '**/*.xcodeproj'))].reject { |path| %r{Pods\/.*.xcodeproj} =~ path }
+          xcodeproj_paths = Fastlane::Actions.ignore_cocoapods_path(all_xcodeproj_paths)
 
           # no projects found: error
           UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
@@ -40,7 +40,6 @@ module Fastlane
         pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
-        # rubocop:disable Style/MultilineBlockChain
         project = Xcodeproj::Project.open(xcodeproj_path)
         info_plist_files = project.objects.select do |object|
           object.isa == 'XCBuildConfiguration'
@@ -53,12 +52,27 @@ module Fastlane
         end.uniq.map do |info_plist_path|
           Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
         end
-        # rubocop:enable Style/MultilineBlockChain
+
+        # Removes .plist files that matched the given expression in the 'ignore' parameter
+        ignore_expression = params[:ignore]
+        if ignore_expression
+          info_plist_files.reject! do |info_plist_file|
+            info_plist_file.match(ignore_expression)
+          end
+        end
 
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = []
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
+
+        if params[:settings]
+          settings_plists_from_param(params[:settings]).each do |file|
+            settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
+            expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
+          end
+        end
+
         expected_changed_files.flatten!.uniq!
 
         # get the list of files that have actually changed in our git workdir
@@ -72,19 +86,15 @@ module Fastlane
         unless changed_files_as_expected
           unless params[:force]
             error = [
-              "Found unexpected uncommited changes in the working directory. Expected these files to have ",
+              "Found unexpected uncommitted changes in the working directory. Expected these files to have ",
               "changed: \n#{expected_changed_files.join("\n")}.\nBut found these actual changes: ",
               "#{git_dirty_files.join("\n")}.\nMake sure you have cleaned up the build artifacts and ",
               "are only left with the changed version files at this stage in your lane, and don't touch the ",
               "working directory while your lane is running. You can also use the :force option to bypass this ",
               "check, and always commit a version bump regardless of the state of the working directory."
             ].join("\n")
-            raise error.red
+            UI.user_error!(error)
           end
-        end
-
-        if params[:settings]
-          expected_changed_files << 'Settings.bundle/Root.plist'
         end
 
         # get the absolute paths to the files
@@ -139,8 +149,29 @@ module Fastlane
                                        description: "Include Settings.bundle/Root.plist with version bump",
                                        optional: true,
                                        default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :ignore,
+                                       description: "A regular expression used to filter matched plist files to be modified",
+                                       optional: true,
+                                       default_value: nil,
                                        is_string: false)
         ]
+      end
+
+      def self.details
+        [
+          "This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.",
+          "",
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
+          "- All .plist files",
+          "- The `.xcodeproj/project.pbxproj` file",
+          "",
+          "Then commits those files to the repo.",
+          "",
+          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "",
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action."
+        ].join("\n")
       end
 
       def self.author
@@ -150,7 +181,51 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
       end
+
+      def self.example_code
+        [
+          'commit_version_bump',
+          'commit_version_bump(
+            message: "Version Bump",                    # create a commit with a custom message
+            xcodeproj: "./path/to/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+          )',
+          'commit_version_bump(
+            settings: true # Include Settings.bundle/Root.plist
+          )',
+          'commit_version_bump(
+            settings: "About.plist" # Include Settings.bundle/About.plist
+          )',
+          'commit_version_bump(
+            settings: %w[About.plist Root.plist] # Include more than one plist from Settings.bundle
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
+
+      class << self
+        def settings_plists_from_param(param)
+          if param.kind_of? String
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+            return [param]
+          elsif param.kind_of? Array
+            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+            return param
+          end
+
+          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
+          ["Root.plist"]
+        end
+
+        def settings_bundle_file_path(project, settings_file_name)
+          settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
+          raise "No Settings.bundle in project" if settings_bundle.nil?
+
+          File.join(settings_bundle.real_path, settings_file_name)
+        end
+      end
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

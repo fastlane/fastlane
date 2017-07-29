@@ -4,9 +4,7 @@ module Fastlane
       def self.run(params)
         command = []
 
-        if File.exist?("Gemfile") && params[:use_bundle_exec]
-          command << "bundle exec"
-        end
+        command << "bundle exec" if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
 
         command << "pod lib lint"
 
@@ -23,8 +21,13 @@ module Fastlane
           command << "--allow-warnings"
         end
 
+        command << "--use-libraries" if params[:use_libraries]
+        command << "--fail-fast" if params[:fail_fast]
+        command << "--private" if params[:private]
+        command << "--quick" if params[:quick]
+
         result = Actions.sh(command.join(' '))
-        Helper.log.info "Pod lib lint Successfully ⬆️ ".green
+        UI.success("Pod lib lint Successfully ⬆️ ")
         return result
       end
 
@@ -47,7 +50,7 @@ module Fastlane
                                          is_string: false,
                                          default_value: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
-                                         description: "Allow ouput detail in console",
+                                         description: "Allow output detail in console",
                                          optional: true,
                                          is_string: false),
           FastlaneCore::ConfigItem.new(key: :allow_warnings,
@@ -59,8 +62,24 @@ module Fastlane
                                          optional: true,
                                          is_string: false,
                                          verify_block: proc do |value|
-                                           raise "Sources must be an array.".red unless value.kind_of?(Array)
-                                         end)
+                                           UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
+                                         end),
+          FastlaneCore::ConfigItem.new(key: :use_libraries,
+                                       description: "Lint uses static libraries to install the spec",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :fail_fast,
+                                       description: "Lint stops on the first failing platform or subspec",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :private,
+                                       description: "Lint skips checks that apply only to public specs",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :quick,
+                                       description: "Lint skips checks that would require to download and build the spec",
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 
@@ -76,9 +95,24 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include?(platform)
       end
 
+      def self.example_code
+        [
+          'pod_lib_lint',
+          '# Allow output detail in console
+          pod_lib_lint(verbose: true)',
+          '# Allow warnings during pod lint
+          pod_lib_lint(allow_warnings: true)',
+          '# If the podspec has a dependency on another private pod, then you will have to supply the sources
+          pod_lib_lint(sources: ["https://github.com/MyGithubPage/Specs", "https://github.com/CocoaPods/Specs"])'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

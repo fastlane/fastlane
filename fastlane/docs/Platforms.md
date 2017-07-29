@@ -1,6 +1,6 @@
 # Support for multiple platforms
 
-`fastlane` can handle multiple operating systems in one `Fastfile`. This is super useful for projects supporting both iPhone and Mac OS apps.
+`fastlane` can handle multiple app platforms in one `Fastfile`. This is super useful for projects supporting iPhone, macOS and Android apps.
 
 Watch this magic:
 
@@ -15,7 +15,7 @@ platform :ios do
   end
 
   lane :beta do
-    ipa
+    gym
     hockey
   end
 
@@ -55,7 +55,3 @@ Execute lanes just like this:
 When running `fastlane ios beta`, both `before_all` blocks will be called: the general one on the top and the platform specific one.
 
 The same is the case for the `after_all` and `error` block: Always both blocks are being executed, the **more specific one first**.
-
-### Future
-
-As you might have guessed, this doesn't only work for `ios` and `mac`, but also for `android`. This not only allows you to automate the deployment process of your Android app, but also enabled developers to maintain both platforms in a single configuration file. Over the next few months, `fastlane` will be extended to also work for Android apps.

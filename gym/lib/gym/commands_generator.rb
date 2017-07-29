@@ -8,13 +8,8 @@ module Gym
     include Commander::Methods
     UI = FastlaneCore::UI
 
-    FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options)
-
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update("gym")
       new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status("gym", Gym::VERSION)
     end
 
     def convert_options(options)
@@ -24,18 +19,22 @@ module Gym
     end
 
     def run
-      program :version, Gym::VERSION
+      program :name, 'gym'
+      program :version, Fastlane::VERSION
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
       program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/gym"
       program :help_formatter, :compact
 
-      global_option("--verbose") { $verbose = true }
+      global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 
       command :build do |c|
-        c.syntax = "gym"
-        c.description = "Just builds your app"
+        c.syntax = "fastlane gym"
+        c.description = "Build your iOS/macOS app"
+
+        FastlaneCore::CommanderGenerator.new.generate(Gym::Options.available_options, command: c)
+
         c.action do |_args, options|
           config = FastlaneCore::Configuration.create(Gym::Options.available_options,
                                                       convert_options(options))
@@ -44,13 +43,13 @@ module Gym
       end
 
       command :init do |c|
-        c.syntax = "gym init"
+        c.syntax = "fastlane gym init"
         c.description = "Creates a new Gymfile for you"
         c.action do |_args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Gym.gymfile_name)
           UI.user_error! "Gymfile already exists" if File.exist?(path)
-          template = File.read("#{Helper.gem_path('gym')}/lib/assets/GymfileTemplate")
+          template = File.read("#{Gym::ROOT}/lib/assets/GymfileTemplate")
           File.write(path, template)
           UI.success "Successfully created '#{path}'. Open the file using a code editor."
         end

@@ -59,6 +59,19 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'make_changelog_from_jenkins(
+            # Optional, lets you set a changelog in the case is not generated on Jenkins or if ran outside of Jenkins
+            fallback_changelog: "Bug fixes and performance enhancements"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
+      end
     end
   end
 end

@@ -8,21 +8,15 @@ module Fastlane
       def self.run(params)
         require 'screengrab'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('screengrab') unless Helper.is_test?
+        Screengrab.config = params
+        Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
+                                                                            params[:build_tools_version])
+        Screengrab::DependencyChecker.check(Screengrab.android_environment)
+        Screengrab::Runner.new.run
 
-          Screengrab.config = params
-          Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
-                                                                              params[:build_tools_version])
-          Screengrab::DependencyChecker.check(Screengrab.android_environment)
-          Screengrab::Runner.new.run
+        Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] = File.expand_path(params[:output_directory])
 
-          Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] = File.expand_path(params[:output_directory])
-
-          true
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('screengrab', Screengrab::VERSION)
-        end
+        true
       end
 
       def self.description
@@ -40,6 +34,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :android
+      end
+
+      def self.example_code
+        [
+          'screengrab',
+          'screengrab(
+            locales: ["en-US", "fr-FR", "ja-JP"],
+            clear_previous_screenshots: true,
+            app_apk_path: "build/outputs/apk/example-debug.apk",
+            tests_apk_path: "build/outputs/apk/example-debug-androidTest-unaligned.apk"
+          )'
+        ]
+      end
+
+      def self.category
+        :screenshots
       end
     end
   end

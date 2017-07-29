@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,13 +33,15 @@ produce
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/produce/LICENSE)
-[![Gem](https://img.shields.io/gem/v/produce.svg?style=flat)](http://rubygems.org/gems/produce)
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+`produce` creates new iOS apps on both the Apple Developer Portal and iTunes Connect with the minimum required information.
+
+Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -49,8 +53,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
-
+<h5 align="center"><code>produce</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 
@@ -60,110 +63,125 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 - **Associate** apps with App Groups on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Installation
-    sudo gem install produce
+
+    sudo gem install fastlane
 
 # Usage
 
 ## Creating a new application
 
-    produce
+    fastlane produce
 
 To get a list of all available parameters:
 
-    produce --help
-
+    fastlane produce --help
+    
 ```
-  Commands:
-    associate_group  Associate with a group, which is create if needed or simply located otherwise
-    create           Creates a new app on iTunes Connect and the Apple Developer Portal
-    disable_services Disable specific Application Services for a specific app on the Apple Developer Portal
-    enable_services  Enable specific Application Services for a specific app on the Apple Developer Portal
-    group            Ensure that a specific App Group exists
-    help             Display global or [command] help documentation
+  Commands: (* default)
+    associate_group    Associate with a group, which is created if needed or simply located otherwise
+    create           * Creates a new app on iTunes Connect and the Apple Developer Portal
+    disable_services   Disable specific Application Services for a specific app on the Apple Developer Portal
+    enable_services    Enable specific Application Services for a specific app on the Apple Developer Portal
+    group              Ensure that a specific App Group exists
+    help               Display global or [command] help documentation
 
   Global Options:
+    --verbose
+    -h, --help           Display help documentation
+    -v, --version        Display version information
+
+  Options for create:
     -u, --username STRING Your Apple ID Username (PRODUCE_USERNAME)
     -a, --app_identifier STRING App Identifier (Bundle ID, e.g. com.krausefx.app) (PRODUCE_APP_IDENTIFIER)
     -e, --bundle_identifier_suffix STRING App Identifier Suffix (Ignored if App Identifier does not ends with .*) (PRODUCE_APP_IDENTIFIER_SUFFIX)
     -q, --app_name STRING App Name (PRODUCE_APP_NAME)
     -z, --app_version STRING Initial version number (e.g. '1.0') (PRODUCE_VERSION)
     -y, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
+    -j, --platform STRING The platform to use (optional) (PRODUCE_PLATFORM)
     -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
     -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
-    -i, --skip_itc       Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
-    -d, --skip_devcenter  Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
-    -b, --team_id STRING The ID of your team if you're in multiple teams (PRODUCE_TEAM_ID)
-    -l, --team_name STRING The name of your team if you're in multiple teams (PRODUCE_TEAM_NAME)
-    -h, --help           Display help documentation
-    -v, --version        Display version information
+    -i, --skip_itc [VALUE] Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
+    -d, --skip_devcenter [VALUE] Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -b, --team_id STRING The ID of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_ID)
+    -l, --team_name STRING The name of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_NAME)
+    -k, --itc_team_id [VALUE] The ID of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_ID)
+    -p, --itc_team_name STRING The name of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_NAME)
 ```
 
 ## Enabling / Disabling Application Services
 
 If you want to enable Application Services for an App ID (HomeKit and HealthKit in this example):
 
-    produce enable_services --homekit --healthkit
+    fastlane produce enable_services --homekit --healthkit
 
-If you want to disable Application Servies for an App ID (iCloud in this case):
+If you want to disable Application Services for an App ID (iCloud in this case):
 
-    produce disable_services --icloud
+    fastlane produce disable_services --icloud
 
 If you want to create a new App Group:
 
-    produce group -g group.krausefx -n "Example App Group"
+    fastlane produce group -g group.krausefx -n "Example App Group"
 
 If you want to associate an app with an App Group:
 
-    produce associate_group -a com.krausefx.app group.krausefx
+    fastlane produce associate_group -a com.krausefx.app group.krausefx
 
 # Parameters
 
 Get a list of all available options using
 
-    produce enable_services --help
+    fastlane produce enable_services --help
 
 ```
     --app-group          Enable App Groups
+    --apple-pay          Enable Apple Pay
     --associated-domains Enable Associated Domains
     --data-protection STRING Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+    --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
     --wireless-conf      Enable Wireless Accessory Configuration
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
+    --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
     --passbook           Enable Passbook
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
+    --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
 ```
 
-    produce disable_services --help
+    fastlane produce disable_services --help
 
 ```
     --app-group          Disable App Groups
+    --apple-pay          Disable Apple Pay
     --associated-domains Disable Associated Domains
     --data-protection    Disable Data Protection
+    --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
     --wireless-conf      Disable Wireless Accessory Configuration
     --icloud             Disable iCloud
+    --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
     --passbook           Disable Passbook
     --push-notification  Disable Push notifications
+    --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
 ```
 
 ## Environment Variables
 
-All available values can also be passed using environment variables, run `produce --help` to get a list of all available parameters.
+All available values can also be passed using environment variables, run `fastlane produce --help` to get a list of all available parameters.
 
 ## [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) Integration
 
 Your `Fastfile` should look like this
 ```ruby
-lane :appstore do
+lane :release do
   produce(
     username: 'felix@krausefx.com',
     app_identifier: 'com.krausefx.app',
@@ -172,6 +190,26 @@ lane :appstore do
     app_version: '1.0',
     sku: '123',
     team_name: 'SunApps GmbH' # only necessary when in multiple teams
+    
+    # Optional
+    # App services can be enabled during app creation
+    enable_services: {
+      app_group: "on"               # Valid values: "on", "off"
+      apple_pay: "on"               # Valid values: "on", "off"
+      associated_domains: "on"      # Valid values: "on", "off"
+      data_protection: "complete"   # Valid values: "complete", "unlessopen", "untilfirstauth"
+      game_center: "on"             # Valid values: "on", "off"
+      health_kit: "on"              # Valid values: "on", "off"
+      home_kit: "on"                # Valid values: "on", "off"
+      wireless_accessory: "on"      # Valid values: "on", "off"
+      icloud: "cloudkit"            # Valid values: "legacy", "cloudkit"
+      in_app_purchase: "on"         # Valid values: "on", "off"
+      inter_app_audio: "on"         # Valid values: "on", "off"
+      passbook: "on"                # Valid values: "on", "off"
+      push_notification: "on"       # Valid values: "on", "off"
+      siri_kit: "on"                # Valid values: "on", "off"
+      vpn_configuration: "on"       # Valid values: "on", "off"
+    }
   )
 
   deliver
@@ -194,7 +232,7 @@ You'll still have to fill out the remaining information (like screenshots, app d
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -207,8 +245,9 @@ You'll still have to fill out the remaining information (like screenshots, app d
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

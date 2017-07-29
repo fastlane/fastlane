@@ -3,38 +3,51 @@ module Deliver
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
+      return if options[:edit_live]
 
       app = options[:app]
 
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
 
       UI.message("Starting with the upload of screenshots...")
+      screenshots_per_language = screenshots.group_by(&:language)
 
-      # First, clear all previously uploaded screenshots, but only where we have new ones
-      # screenshots.each do |screenshot|
-      #   to_remove = v.screenshots[screenshot.language].find_all do |current|
-      #     current.device_type == screenshot.device_type
-      #   end
-      #   to_remove.each { |t| t.reset! }
-      # end
-      # This part is not working yet...
+      if options[:overwrite_screenshots]
+        UI.message("Removing all previously uploaded screenshots...")
+        # First, clear all previously uploaded screenshots
+        screenshots_per_language.keys.each do |language|
+          v.screenshots[language].each_with_index do |t, index|
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
+          end
+        end
+      end
 
       # Now, fill in the new ones
       indized = {} # per language and device type
 
-      screenshots_per_language = screenshots.group_by(&:language)
+      enabled_languages = screenshots_per_language.keys
+      if enabled_languages.count > 0
+        v.create_languages(enabled_languages)
+        lng_text = "language"
+        lng_text += "s" if enabled_languages.count != 1
+        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        v.save!
+        # This refreshes the app version from iTC after enabling a localization
+        v = app.edit_version
+      end
+
       screenshots_per_language.each do |language, screenshots_for_language|
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
           indized[screenshot.language] ||= {}
-          indized[screenshot.language][screenshot.device_type] ||= 0
-          indized[screenshot.language][screenshot.device_type] += 1 # we actually start with 1... wtf iTC
+          indized[screenshot.language][screenshot.formatted_name] ||= 0
+          indized[screenshot.language][screenshot.formatted_name] += 1 # we actually start with 1... wtf iTC
 
-          index = indized[screenshot.language][screenshot.device_type]
+          index = indized[screenshot.language][screenshot.formatted_name]
 
           if index > 5
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}'")
+            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
 
@@ -42,7 +55,8 @@ module Deliver
           v.upload_screenshot!(screenshot.path,
                                index,
                                screenshot.language,
-                               screenshot.device_type)
+                               screenshot.device_type,
+                               screenshot.is_messages?)
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
@@ -61,11 +75,15 @@ module Deliver
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
+      available_languages = Spaceship::Tunes.client.available_languages.each_with_object({}) do |lang, lang_hash|
+        lang_hash[lang.downcase] = lang
+      end
+
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
 
         # Check to see if we need to traverse multiple platforms or just a single platform
-        if language == Loader::APPLE_TV_DIR_NAME
+        if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
           screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
           next
         end
@@ -77,7 +95,14 @@ module Deliver
 
         UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
 
-        language = File.basename(lng_folder)
+        language_dir_name = File.basename(lng_folder)
+
+        if available_languages[language_dir_name.downcase].nil?
+          UI.user_error!("#{language_dir_name} is not an available language. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
+        end
+
+        language = available_languages[language_dir_name.downcase]
+
         files.each do |file_path|
           is_framed = file_path.downcase.include?("_framed.")
           is_watch = file_path.downcase.include?("watch")

@@ -15,7 +15,7 @@ module Spaceship
       # @example Company
       #   "SunApps GmbH"
       # @example Push Profile
-      #   "com.krausefx.app"
+      #   "Apple Push Services"
       attr_accessor :name
 
       # @return (String) Status of the certificate
@@ -46,8 +46,8 @@ module Spaceship
       #
       # @example Code Signing Identity (usually the company name)
       #   "SunApps Gmbh"
-      # @example Push Certificate (the name of your App ID)
-      #   "Awesome App"
+      # @example Push Certificate (the bundle identifier)
+      #   "tools.fastlane.app"
       attr_accessor :owner_name
 
       # @return (String) The ID of the owner, that can be used to
@@ -151,7 +151,7 @@ module Spaceship
         "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
-        "E5D663CMZW" => WebsitePush,
+        "E5D663CMZW" => VoipPush,
         "4APLUP237T" => ApplePay
       }
 
@@ -283,10 +283,11 @@ module Spaceship
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
           type = CERTIFICATE_TYPE_IDS.key(self)
+          mac = MAC_CERTIFICATE_TYPE_IDS.include? type
 
           # look up the app_id by the bundle_id
           if bundle_id
-            app = Spaceship::App.find(bundle_id)
+            app = Spaceship::App.set_client(client).find(bundle_id)
             raise "Could not find app with bundle id '#{bundle_id}'" unless app
             app_id = app.app_id
           end
@@ -295,7 +296,7 @@ module Spaceship
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          response = client.create_certificate!(type, csr.to_pem, app_id)
+          response = client.create_certificate!(type, csr.to_pem, app_id, mac)
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)

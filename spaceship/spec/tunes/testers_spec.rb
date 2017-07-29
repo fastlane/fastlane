@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Tunes::Tester do
   before { Spaceship::Tunes.login }
 
@@ -43,21 +41,7 @@ describe Spaceship::Tunes::Tester do
       expect(t.first_name).to eq("Detlef")
       expect(t.last_name).to eq("Müller")
       expect(t.devices).to eq([{ "model" => "iPhone 6", "os" => "iOS", "osVersion" => "8.3", "name" => nil }])
-    end
-  end
-
-  describe "Receiving existing testers from an app" do
-    it "Internal Testers" do
-      testers = app.internal_testers
-      expect(testers.count).to eq(1)
-      t = testers.first
-      expect(t.class).to eq(Spaceship::Tunes::Tester::Internal)
-
-      expect(t.tester_id).to eq("1d167b89-13c5-4dd8-b988-7a6a0190f774")
-      expect(t.email).to eq("felix@sunapps.net")
-      expect(t.first_name).to eq("Felix")
-      expect(t.last_name).to eq("Krause")
-      expect(t.devices).to eq([])
+      expect(t.groups[0]["id"]).to eq("e031d021-4f0f-4c1e-8d8a-c3341a267986")
     end
   end
 
@@ -71,9 +55,48 @@ describe Spaceship::Tunes::Tester do
     end
   end
 
-  # describe "invite testers to an existing app" do
-  #   it "invite all users to an app" do
-  #     app.add_all_testers!
-  #   end
-  # end
+  describe "Sandbox testers" do
+    describe "listing" do
+      it 'loads sandbox testers correctly' do
+        testers = Spaceship::Tunes::SandboxTester.all
+        expect(testers.count).to eq(1)
+        t = testers[0]
+        expect(t.class).to eq(Spaceship::Tunes::SandboxTester)
+
+        expect(t.email).to eq("test@test.com")
+        expect(t.first_name).to eq("Test")
+        expect(t.last_name).to eq("McTestington")
+        expect(t.country).to eq("GB")
+      end
+    end
+
+    describe "creation" do
+      before { allow(SecureRandom).to receive(:hex).and_return('so_secret') }
+      it 'creates sandbox testers correctly' do
+        t = Spaceship::Tunes::SandboxTester.create!(
+          email: 'test2@test.com',
+          password: 'Passwordtest1',
+          country: 'US',
+          first_name: 'Steve',
+          last_name: 'Brule'
+        )
+        expect(t.class).to eq(Spaceship::Tunes::SandboxTester)
+
+        expect(t.email).to eq("test2@test.com")
+        expect(t.first_name).to eq("Steve")
+        expect(t.last_name).to eq("Brule")
+        expect(t.country).to eq("US")
+      end
+    end
+
+    describe "deletion" do
+      it 'deletes a user' do
+        expect { Spaceship::Tunes::SandboxTester.delete!(['test@test.com']) }.not_to raise_error
+      end
+
+      it 'deletes all users' do
+        expect { Spaceship::Tunes::SandboxTester.delete_all! }.not_to raise_error
+      end
+    end
+  end
 end

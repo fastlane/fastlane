@@ -92,7 +92,7 @@ module Fastlane
                  "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",
                  "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",
                  "body"=> ...Markdown...
-                "This is one of the biggest updates of `fastlane` yet"
+                "This is one of the biggest updates of _fastlane_ yet"
               }'
 
         [
@@ -129,6 +129,7 @@ module Fastlane
                                        description: "The version tag of the release to check"),
           FastlaneCore::ConfigItem.new(key: :api_token,
                              env_name: "FL_GITHUB_RELEASE_API_TOKEN",
+                             sensitive: true,
                              description: "GitHub Personal Token (required for private repositories)",
                              optional: true)
         ]
@@ -140,6 +141,23 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'release = get_github_release(url: "fastlane/fastlane", version: "1.0.0")
+          puts release["name"]'
+        ]
+      end
+
+      def self.sample_return_value
+        {
+          "name" => "name"
+        }
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

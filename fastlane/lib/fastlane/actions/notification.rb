@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.description
-        "Display a Mac OS X notification with custom message and title"
+        "Display a macOS notification with custom message and title"
       end
 
       def self.author
@@ -59,6 +59,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         Helper.mac?
+      end
+
+      def self.example_code
+        [
+          'notification(subtitle: "Finished Building", message: "Ready to upload...")'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

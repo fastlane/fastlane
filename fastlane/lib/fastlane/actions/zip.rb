@@ -4,14 +4,26 @@ module Fastlane
       def self.run(params)
         UI.message "Compressing #{params[:path]}..."
 
-        params[:output_path] ||= "#{params[:path]}.zip"
+        params[:output_path] ||= params[:path]
 
-        Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
-          Actions.sh "zip -r #{params[:output_path].shellescape} #{File.basename(params[:path]).shellescape}"
+        absolute_output_path = File.expand_path(params[:output_path])
+
+        # Appends ".zip" if path does not end in ".zip"
+        unless absolute_output_path.end_with?(".zip")
+          absolute_output_path += ".zip"
         end
 
-        UI.success "Successfully generated zip file at path '#{File.expand_path(params[:output_path])}'"
-        return File.expand_path(params[:output_path])
+        absolute_output_dir = File.expand_path("..", absolute_output_path)
+        FileUtils.mkdir_p(absolute_output_dir)
+
+        Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
+          zip_options = params[:verbose] ? "r" : "rq"
+
+          Actions.sh "zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}"
+        end
+
+        UI.success "Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'"
+        return File.expand_path(absolute_output_path)
       end
 
       #####################################################
@@ -36,8 +48,32 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :output_path,
                                        env_name: "FL_ZIP_OUTPUT_NAME",
                                        description: "The name of the resulting zip file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_ZIP_VERBOSE",
+                                       description: "Enable verbose output of zipped file",
+                                       default_value: true,
                                        optional: true)
         ]
+      end
+
+      def self.example_code
+        [
+          'zip',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip"
+          )',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip",
+            verbose: false
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.output

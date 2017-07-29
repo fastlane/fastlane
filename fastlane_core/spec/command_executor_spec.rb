@@ -9,18 +9,23 @@ describe FastlaneCore do
         # we raise when the line is cleaned up with `strip` afterward
         expect(explodes_on_strip).to receive(:strip).and_raise Errno::EIO
 
+        child_process_id = 1
+        expect(Process).to receive(:wait).with(child_process_id)
+
+        # Hacky approach because $? is not be defined since we skip the actual spawn
+        allow_message_expectations_on_nil
+        expect($?).to receive(:exitstatus).and_return 0
+
+        # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
-          block.yield fake_std_in, 'not_really_std_out', Process.pid
+          block.yield fake_std_in, 'not_really_std_out', child_process_id
         end
-
-        expect($?).to receive(:exitstatus).and_return 0
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
 
-        # We are implicity also checking that the error was not rethrown because that would
+        # We are implicitly also checking that the error was not rethrown because that would
         # have crashed the test
-
         expect(result).to eq('a_filename')
       end
     end

@@ -1,27 +1,117 @@
+Style/MultipleComparison:
+  Enabled: false
 
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+# kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Style/SafeNavigation:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Performance/RegexpMatch:
+  Enabled: false
+
+# This suggests use of `tr` instead of `gsub`. While this might be more performant,
+# these methods are not at all interchangable, and behave very differently. This can
+# lead to people making the substitution without considering the differences.
+Performance/StringReplacement:
+  Enabled: false
+
+# .length == 0 is also good, we don't always want .zero?
+Style/NumericPredicate:
+  Enabled: false
+
+# this would cause errors with long lanes
+Metrics/BlockLength:
+  Enabled: false
+
+# this is a bit buggy
+Metrics/ModuleLength:
+  Enabled: false
+
+# certificate_1 is an okay variable name
+Style/VariableNumber:
+  Enabled: false
+
+# This is used a lot across the fastlane code base for config files
+Style/MethodMissing:
+  Enabled: false
+
+# This rule isn't useful, lots of discussion happening around it also
+# e.g. https://github.com/bbatsov/rubocop/issues/2338
+MultilineBlockChain:
+  Enabled: false
+
+#
+#   File.chmod(0777, f)
+#
+# is easier to read than
+#
+#   File.chmod(0o777, f)
+#
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+#
+# command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
+#
+# is easier to read than
+#
+# command = !clean_expired.nil? || !clean_pattern.nil? ? CLEANUP : LIST
+#
+Style/TernaryParentheses:
+  Enabled: false
+
+# sometimes it is useful to have those empty methods
+Style/EmptyMethod:
+  Enabled: false
+
+# It's better to be more explicit about the type
 Style/BracesAroundHashParameters:
   Enabled: false
 
+# specs sometimes have useless assignments, which is fine
 Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
+# We could potentially enable the 2 below:
+Layout/IndentHash:
   Enabled: false
 
-Style/RaiseArgs:
-  EnforcedStyle: exploded
+Layout/AlignHash:
+  Enabled: false
 
+# HoundCI doesn't like this rule
+Layout/DotPosition:
+  Enabled: false
+
+# We allow !! as it's an easy way to convert ot boolean
 Style/DoubleNegation:
   Enabled: false
 
+# Prevent to replace [] into %i
+Style/SymbolArray:
+  Enabled: false
+
+# We still support Ruby 2.0.0
+Layout/IndentHeredoc:
+  Enabled: false
+
+# This cop would not work fine with rspec
+Style/MixinGrouping:
+  Exclude:
+    - '**/spec/**/*'
+
+# Sometimes we allow a rescue block that doesn't contain code
 Lint/HandleExceptions:
   Enabled: false
 
@@ -29,36 +119,33 @@ Lint/HandleExceptions:
 Lint/UnusedBlockArgument:
   Enabled: false
 
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
 # Needed for $verbose
 Style/GlobalVars:
   Enabled: false
 
-Style/FileName:
+# We want to allow class Fastlane::Class
+Style/ClassAndModuleChildren:
   Enabled: false
 
 # $? Exit
 Style/SpecialGlobalVars:
   Enabled: false
 
-Style/RaiseArgs:
+Metrics/AbcSize:
   Enabled: false
 
-Metrics/AbcSize:
-  Max: 63
-  Exclude:
-    - '**/lib/*/options.rb'
+Metrics/MethodLength:
+  Enabled: false
 
-# Both string notations are okay
-Style/StringLiterals:
+Metrics/CyclomaticComplexity:
   Enabled: false
 
 # The %w might be confusing for new users
 Style/WordArray:
   MinSize: 19
-
-# Not a good thing
-Style/RedundantSelf:
-  Enabled: false
 
 # raise and fail are both okay
 Style/SignalException:
@@ -72,10 +159,6 @@ Style/RedundantReturn:
 Style/IfUnlessModifier:
   Enabled: false
 
-# That looks wrong
-Style/AlignHash:
-  Enabled: false
-
 # and and or is okay
 Style/AndOr:
   Enabled: false
@@ -84,8 +167,6 @@ Style/AndOr:
 Metrics/ClassLength:
   Max: 320
 
-Metrics/CyclomaticComplexity:
-  Max: 17
 
 # Configuration parameters: AllowURI, URISchemes.
 Metrics/LineLength:
@@ -98,16 +179,22 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 18
 
-Style/DotPosition:
-  Enabled: false
-
+# Sometimes it's easier to read without guards
 Style/GuardClause:
   Enabled: false
 
+# We allow both " and '
+Style/StringLiterals:
+  Enabled: false
 
+# something = if something_else
+# that's confusing
+Style/ConditionalAssignment:
+  Enabled: false
 
-# Split
-
+# Better to have too much self than missing a self
+Style/RedundantSelf:
+  Enabled: false
 
 # e.g.
 # def self.is_supported?(platform)
@@ -120,168 +207,46 @@ Lint/ParenthesesAsGroupedExpression:
   Exclude:
     - '**/spec/**/*'
 
+# This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
 Style/PredicateName:
   Enabled: false
 
+# We allow the $
+Style/PerlBackrefs:
+  Enabled: false
+
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
-Metrics/MethodLength:
-  Exclude:
-    - '**/lib/fastlane/actions/*.rb'
-    - '**/bin/fastlane'
-    - '**/lib/*/options.rb'
-    - '**/bin/sigh'
-  Max: 60
-
 AllCops:
+  TargetRubyVersion: 2.0
   Include:
     - '**/fastlane/Fastfile'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
+    - './vendor/**/*'
 
-##################
-# TODO
-##################
+# They have not to be snake_case
+Style/FileName:
+  Exclude:
+    - '**/Dangerfile'
+    - '**/Brewfile'
+    - '**/Gemfile'
+    - '**/Podfile'
+    - '**/Rakefile'
+    - '**/Fastfile'
+    - '**/Deliverfile'
+    - '**/Snapfile'
+    - '**/*.gemspec'
 
-# Offense count: 7
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 320
-
-# Offense count: 4
-Metrics/CyclomaticComplexity:
-  Max: 17
-
-# Offense count: 489
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 372
-
-# Offense count: 5
-# Configuration parameters: CountKeywordArgs.
-Metrics/ParameterLists:
-  Max: 17
-
-# Offense count: 3
-Metrics/PerceivedComplexity:
-  Max: 18
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Alias:
-  Enabled: false
-
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
-  Enabled: false
-
-# Offense count: 22
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/ClassAndModuleChildren:
-  Enabled: false
-
-# Offense count: 19
+# We're not there yet
 Style/Documentation:
   Enabled: false
 
-# Offense count: 112
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/DotPosition:
-  Enabled: false
-
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 74
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
-
-# Offense count: 10
-# Cop supports --auto-correct.
-Style/NumericLiterals:
-  MinDigits: 14
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Enabled: false
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
-
-# Offense count: 77
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Enabled: false
-
-# Offense count: 38
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SignalException:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-Style/SpaceInsideBlockBraces:
-  Enabled: false
-
-# Offense count: 291
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/SpaceInsideParens:
-  Enabled: false
-
-# Offense count: 881
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/StringLiterals:
-  Enabled: false
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 19
-
 # Added after upgrade to 0.38.0
-
 Style/MutableConstant:
   Enabled: false
 
@@ -289,11 +254,10 @@ Style/MutableConstant:
 Style/ZeroLengthPredicate:
   Enabled: false
 
-Style/ConditionalAssignment:
-  Enabled: false
-
-Style/SpaceAroundKeyword:
-  Enabled: false
-
+# Adds complexity
 Style/IfInsideElse:
+  Enabled: false
+
+# Sometimes we just want to 'collect'
+Style/CollectionMethods:
   Enabled: false

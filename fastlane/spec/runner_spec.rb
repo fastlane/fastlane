@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::Runner do
     describe "#available_lanes" do
       before do
-        @ff = Fastlane::FastFile.new('./spec/fixtures/fastfiles/FastfileGrouped')
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       end
 
       it "lists all available lanes" do

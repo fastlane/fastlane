@@ -3,6 +3,9 @@ describe Fastlane do
     APPALOOSA_SERVER = Fastlane::Actions::AppaloosaAction::APPALOOSA_SERVER
 
     describe 'Appaloosa Integration' do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
       let(:appaloosa_lane) do
         "lane :test do appaloosa(
           {
@@ -21,7 +24,8 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/Couldn't find ipa/)
-            end)
+            end
+          )
         end
       end
 
@@ -39,7 +43,8 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/No value found for 'api_token'/)
-            end)
+            end
+          )
         end
       end
 
@@ -57,7 +62,8 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match("No value found for 'store_id'")
-            end)
+            end
+          )
         end
       end
 
@@ -71,7 +77,8 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match('ERROR: A group id is incorrect')
-            end)
+            end
+          )
         end
       end
 
@@ -93,7 +100,8 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to eq(expect_error)
-            end)
+            end
+          )
         end
       end
 
@@ -115,13 +123,14 @@ describe Fastlane do
           expect { Fastlane::FastFile.new.parse(appaloosa_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to eq(expect_error)
-            end)
+            end
+          )
         end
       end
 
       context 'with valid parameters' do
         let(:presign_s3_key) { Base64.encode64('https://appaloosa.com/test') }
-        let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk'}.to_json }
+        let(:presign_payload) { { s3_sign: presign_s3_key, path: 'https://appaloosa.com/file.apk' }.to_json }
         let(:upload_services_payload) do
           {
             store_id: '673',

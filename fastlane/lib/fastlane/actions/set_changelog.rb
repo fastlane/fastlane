@@ -4,8 +4,13 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
+        UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
-        app = Spaceship::Application.find(params[:app_identifier])
+        Spaceship::Tunes.select_team
+        UI.message("Login successful")
+
+        app = Spaceship::Application.find(params[:app_identifier]) || Spaceship::Application.find(params[:app_identifier], mac: true)
+        UI.user_error!("Couldn't find app with identifier #{params[:app_identifier]}") if app.nil?
 
         version_number = params[:version]
         unless version_number
@@ -23,7 +28,7 @@ module Fastlane
 
         changelog = params[:changelog]
         unless changelog
-          path = "./fastlane/changelog.txt"
+          path = default_changelog_path
           UI.message("Looking for changelog in '#{path}'...")
           if File.exist? path
             changelog = File.read(path)
@@ -58,7 +63,11 @@ module Fastlane
         UI.message("Uploading changes to iTunes Connect...")
         v.save!
 
-        UI.success("👼 Successfully pushed the new changelog to #{v.url}")
+        UI.success("👼  Successfully pushed the new changelog to #{v.url}")
+      end
+
+      def self.default_changelog_path
+        File.join(FastlaneCore::FastlaneFolder.path.to_s, 'changelog.txt')
       end
 
       #####################################################
@@ -70,7 +79,10 @@ module Fastlane
       end
 
       def self.details
-        "This is useful if you have only one changelog for all languages"
+        [
+          "This is useful if you have only one changelog for all languages.",
+          "You can store the changelog in `#{default_changelog_path}` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages."
+        ].join("\n")
       end
 
       def self.available_options
@@ -95,7 +107,26 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :changelog,
                                        env_name: "FL_SET_CHANGELOG_CHANGELOG",
                                        description: "Changelog text that should be uploaded to iTunes Connect",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :team_id,
+                                       short_option: "-k",
+                                       env_name: "FL_SET_CHANGELOG_TEAM_ID",
+                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       short_option: "-e",
+                                       env_name: "FL_SET_CHANGELOG_TEAM_NAME",
+                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
+                                       end)
         ]
       end
 
@@ -105,6 +136,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

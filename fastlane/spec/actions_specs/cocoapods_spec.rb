@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Cocoapods Integration" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "default use case" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
@@ -37,14 +41,14 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod install --no-integrate")
       end
 
-      it "adds no-repo-update to command if repo_update is set to false" do
+      it "adds repo-update to command if repo_update is set to true" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
-            repo_update: false
+            repo_update: true
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod install --no-repo-update")
+        expect(result).to eq("bundle exec pod install --repo-update")
       end
 
       it "adds silent to command if silent is set to true" do
@@ -95,6 +99,25 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("cd 'Project' && bundle exec pod install")
+      end
+
+      it "adds error_callback to command" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            error_callback: lambda { |result| puts 'failure' }
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install")
+      end
+
+      it "error_callback is executed on failure" do
+        error_callback = double('error_callback')
+
+        allow(Fastlane::Actions).to receive(:sh_control_output) {
+          expect(Fastlane::Actions).to have_received(:sh_control_output).with(kind_of(String),
+                                                                              hash_including(error_callback: error_callback))
+        }
       end
     end
   end

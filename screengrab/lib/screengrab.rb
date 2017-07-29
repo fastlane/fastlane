@@ -3,8 +3,8 @@ require 'fileutils'
 
 require 'fastlane_core'
 
-require 'screengrab/version'
 require 'screengrab/runner'
+require 'screengrab/reports_generator'
 require 'screengrab/detect_values'
 require 'screengrab/dependency_checker'
 require 'screengrab/options'
@@ -28,4 +28,6 @@ module Screengrab
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  DESCRIPTION = "Automated localized screenshots of your Android app on every device".freeze
 end

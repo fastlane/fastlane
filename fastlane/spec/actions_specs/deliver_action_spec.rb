@@ -19,7 +19,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             deliver
           end").runner.execute(:test)
-        end.to raise_error(/Could not find ipa file at path 'something.ipa'/)
+        end.to raise_error(/Could not find ipa file at path '/)
       end
     end
   end

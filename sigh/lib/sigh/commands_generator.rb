@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane/version'
 
 HighLine.track_eof = false
 
@@ -7,48 +8,81 @@ module Sigh
     include Commander::Methods
 
     def self.start
-      FastlaneCore::UpdateChecker.start_looking_for_update('sigh')
       self.new.run
-    ensure
-      FastlaneCore::UpdateChecker.show_update_status('sigh', Sigh::VERSION)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def run
-      program :version, Sigh::VERSION
+      program :name, 'sigh'
+      program :version, Fastlane::VERSION
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/sigh'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/sigh#readme'
       program :help_formatter, :compact
 
-      global_option('--verbose') { $verbose = true }
-
-      FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options)
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :renew do |c|
-        c.syntax = 'sigh renew'
+        c.syntax = 'fastlane sigh renew'
         c.description = 'Renews the certificate (in case it expired) and outputs the path to the generated file'
 
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
+
         c.action do |args, options|
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
+          user_input = options.__hash__
+
+          # The user might run sigh using
+          #
+          #   sigh development
+          #
+          #   sigh adhoc -u user@krausefx.com
+          #
+          # When the user runs this, it will use :development
+          #
+          #   sigh development --adhoc
+          #
+          case args.first
+          when "development"
+            user_input[:development] = true
+            user_input.delete(:adhoc)
+          when "adhoc"
+            user_input[:adhoc] = true
+            user_input.delete(:development)
+          end
+
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, user_input)
+
           Sigh::Manager.start
         end
       end
 
       command :download_all do |c|
-        c.syntax = 'sigh download_all'
+        c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
 
+        c.option '--download_xcode_profiles', 'Only works with `fastlane sigh download_all` command: Also download Xcode managed provisioning profiles'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
+
         c.action do |args, options|
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          Sigh::Manager.download_all
+          # Below is some custom code to get an extra flag that's only available
+          # for the `fastlane sigh download_all` command and not for the `sigh` action
+          user_hash = options.__hash__
+          download_xcode_profiles = options.download_xcode_profiles
+
+          if download_xcode_profiles == true
+            user_hash.delete(:download_xcode_profiles)
+          end
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, user_hash)
+          Sigh::Manager.download_all(download_xcode_profiles: download_xcode_profiles)
         end
       end
 
       command :repair do |c|
-        c.syntax = 'sigh repair'
+        c.syntax = 'fastlane sigh repair'
         c.description = 'Repairs all expired or invalid provisioning profiles'
+
+        FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
@@ -58,7 +92,7 @@ module Sigh
       end
 
       command :resign do |c|
-        c.syntax = 'sigh resign'
+        c.syntax = 'fastlane sigh resign'
         c.description = 'Resigns an existing ipa file with the given provisioning profile'
         c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
         c.option '-x', '--version_number STRING', String, 'Version number to force binary and all nested binaries to use. Changes both CFBundleShortVersionString and CFBundleIdentifier.'
@@ -69,8 +103,10 @@ module Sigh
         c.option '-d', '--display_name STRING', String, 'Display name to use'
         c.option '-e', '--entitlements PATH', String, 'The path to the entitlements file to use.'
         c.option '--short_version STRING', String, 'Short version string to force binary and all nested binaries to use (CFBundleShortVersionString).'
-        c.option '--bundle_version STRING', String, 'Bundle version to force binary and all nested binaries to use (CFBundleIdentifier).'
-        c.option '-g', '--new_bundle_id STRING', String, 'New application bundle ID'
+        c.option '--bundle_version STRING', String, 'Bundle version to force binary and all nested binaries to use (CFBundleVersion).'
+        c.option '--use_app_entitlements', 'Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile.'
+        c.option '-g', '--new_bundle_id STRING', String, 'New application bundle ID (CFBundleIdentifier)'
+        c.option '--keychain_path STRING', String, 'Path to the keychain that /usr/bin/codesign should use'
 
         c.action do |args, options|
           Sigh::Resign.new.run(options, args)
@@ -78,14 +114,14 @@ module Sigh
       end
 
       command :manage do |c|
-        c.syntax = 'sigh manage'
+        c.syntax = 'fastlane sigh manage'
         c.description = 'Manage installed provisioning profiles on your system.'
 
         c.option '-f', '--force', 'Force remove all expired provisioning profiles. Required on CI.'
         c.option '-e', '--clean_expired', 'Remove all expired provisioning profiles.'
 
         c.option '-p', '--clean_pattern STRING', String, 'Remove any provisioning profiles that matches the regular expression.'
-        c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'sigh manage -p "iOS\ ?Team Provisioning Profile"'
+        c.example 'Remove all "iOS Team Provisioning" provisioning profiles', 'fastlane sigh manage -p "iOS\ ?Team Provisioning Profile"'
 
         c.action do |args, options|
           Sigh::LocalManage.start(options, args)
@@ -96,7 +132,6 @@ module Sigh
 
       run!
     end
-    # rubocop:enable Metrics/MethodLength
 
     def multiple_values_option_proc(command, name)
       proc do |value|

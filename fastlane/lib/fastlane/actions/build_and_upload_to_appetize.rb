@@ -7,6 +7,7 @@ module Fastlane
         xcodebuild_configs = params[:xcodebuild]
         xcodebuild_configs[:sdk] = "iphonesimulator"
         xcodebuild_configs[:derivedDataPath] = tmp_path
+        xcodebuild_configs[:xcargs] = "CONFIGURATION_BUILD_DIR=" + tmp_path
         xcodebuild_configs[:scheme] ||= params[:scheme] if params[:scheme].to_s.length > 0
 
         Actions::XcodebuildAction.run(xcodebuild_configs)
@@ -17,7 +18,7 @@ module Fastlane
         zipped_bundle = Actions::ZipAction.run(path: app_path,
                                         output_path: File.join(tmp_path, "Result.zip"))
 
-        Actions::AppetizeAction.run(path: zipped_bundle,
+        other_action.appetize(path: zipped_bundle,
                                api_token: params[:api_token])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
@@ -37,7 +38,10 @@ module Fastlane
       end
 
       def self.details
-        "This should be called from danger"
+        [
+          "This should be called from danger",
+          "More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+        ].join("\n")
       end
 
       def self.available_options
@@ -56,6 +60,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
                                        description: "Appetize.io API Token",
+                                       sensitive: true,
                                        is_string: true)
         ]
       end
@@ -73,6 +78,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

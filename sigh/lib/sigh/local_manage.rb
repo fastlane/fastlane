@@ -15,7 +15,8 @@ module Sigh
     def self.install_profile(profile)
       UI.message "Installing provisioning profile..."
       profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
-      profile_filename = ENV["SIGH_UDID"] + ".mobileprovision"
+      uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"]
+      profile_filename = uuid + ".mobileprovision"
       destination = profile_path + profile_filename
 
       # If the directory doesn't exist, make it first
@@ -81,11 +82,11 @@ module Sigh
       UI.message "#{profiles_soon.count} are valid but will expire within 30 days".yellow
       UI.message "#{profiles_valid.count} are valid".green
 
-      UI.message "You can remove all expired profiles using `sigh manage -e`" if profiles_expired.count > 0
+      UI.message "You can remove all expired profiles using `fastlane sigh manage -e`" if profiles_expired.count > 0
     end
 
     def self.profile_info(profile)
-      if $verbose
+      if FastlaneCore::Globals.verbose?
         "#{profile['Name']} - #{File.basename profile['Path']}"
       else
         profile['Name']
@@ -107,7 +108,7 @@ module Sigh
         if Helper.ci?
           UI.user_error! "On a CI server, cleanup cannot be used without the --force option"
         else
-          delete = agree("Delete these provisioning profiles #{profiles.length}? (y/n)  ", true)
+          delete = UI.confirm("Delete these provisioning profiles #{profiles.length}?")
         end
       end
 
@@ -126,7 +127,7 @@ module Sigh
 
       profiles = []
       profile_paths.each do |profile_path|
-        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}'`)
+        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}' 2> /dev/null`) # /dev/null: https://github.com/fastlane/fastlane/issues/6387
         profile['Path'] = profile_path
         profiles << profile
       end

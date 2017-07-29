@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Public/Private lanes" do
-      let (:path) { './spec/fixtures/fastfiles/FastfilePrivatePublic' }
+      let (:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
       before do
         FileUtils.rm_rf('/tmp/fastlane/')
 
@@ -25,6 +25,7 @@ describe Fastlane do
       end
 
       it "doesn't expose the private lanes in `fastlane lanes`" do
+        require 'fastlane/lane_list'
         result = Fastlane::LaneList.generate(path)
         expect(result).to include("such smooth")
         expect(result).to_not include("private call")

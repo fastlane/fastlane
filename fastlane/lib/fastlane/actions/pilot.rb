@@ -5,20 +5,15 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('pilot') unless Helper.is_test?
+        changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
+        values[:changelog] ||= changelog if changelog
 
-          changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
-          values[:changelog] ||= changelog if changelog
+        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
 
-          values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+        return values if Helper.test?
 
-          return values if Helper.test?
-
-          Pilot::BuildManager.new.upload(values) # we already have the finished config
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('pilot', Pilot::VERSION)
-        end
+        Pilot::BuildManager.new.upload(values) # we already have the finished config
       end
 
       #####################################################
@@ -42,12 +37,29 @@ module Fastlane
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
       end
 
+      def self.example_code
+        [
+          'testflight',
+          'pilot # alias for "testflight"',
+          'testflight(skip_submission: true) # to only upload the build',
+          'testflight(
+            username: "felix@krausefx.com",
+            app_identifier: "com.krausefx.app",
+            itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
+      end
+
       def self.authors
         ["KrauseFx"]
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        true
       end
     end
   end

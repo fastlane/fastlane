@@ -12,7 +12,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Copies a given string into the clipboard. Works only on Mac OS X computers"
+        "Copies a given string into the clipboard. Works only on macOS"
       end
 
       def self.available_options
@@ -29,6 +29,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'clipboard(value: "https://docs.fastlane.tools/")',
+          'clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] || "")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

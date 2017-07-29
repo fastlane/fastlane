@@ -14,6 +14,8 @@ module Fastlane
 
         if params[:version_number]
           new_version = params[:version_number]
+        elsif params[:version_appendix]
+          new_version = version_podspec_file.update_version_appendix(params[:version_appendix])
         else
           new_version = version_podspec_file.bump_version(params[:bump_type])
         end
@@ -34,7 +36,9 @@ module Fastlane
       def self.details
         [
           "You can use this action to manipulate any 'version' variable contained in a ruby file.",
-          "For example, you can use it to bump the version of a cocoapods' podspec file."
+          "For example, you can use it to bump the version of a cocoapods' podspec file.",
+          "It also supports versions that are not semantic: 1.4.14.4.1",
+          "For such versions there is an option to change appendix (4.1)"
         ].join("\n")
       end
 
@@ -57,6 +61,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_NUMBER",
                                        description: "Change to a specific version. This will replace the bump type value",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_appendix,
+                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_APPENDIX",
+                                       description: "Change version appendix to a specific value. For example 1.4.14.4.1 -> 1.4.14.5",
                                        optional: true)
         ]
       end
@@ -72,7 +80,18 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'version = version_bump_podspec(path: "TSMessages.podspec", bump_type: "patch")',
+          'version = version_bump_podspec(path: "TSMessages.podspec", version_number: "1.4")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

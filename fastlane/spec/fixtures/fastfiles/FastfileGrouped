@@ -67,6 +67,14 @@ before_all do |lane|
   File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
 end
 
+before_each do |lane|
+  File.write("/tmp/fastlane/before_each_#{lane}.txt", Time.now.to_s)
+end
+
+after_each do |lane|
+  File.write("/tmp/fastlane/after_each_#{lane}.txt", Time.now.to_s)
+end
+
 lane :anotherroot do
   File.write("/tmp/fastlane/another_root.txt", Time.now.to_s)
 end

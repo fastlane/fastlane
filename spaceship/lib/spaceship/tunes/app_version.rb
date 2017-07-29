@@ -30,6 +30,9 @@ module Spaceship
       # @return (String) App Status (e.g. 'readyForSale'). You should use `app_status` instead
       attr_accessor :raw_status
 
+      # @return (String) Build Version
+      attr_accessor :build_version
+
       # @return (Bool)
       attr_accessor :can_reject_version
 
@@ -41,6 +44,11 @@ module Spaceship
 
       # @return (Bool) Should the app automatically be released once it's approved?
       attr_accessor :release_on_approval
+
+      # @return (Fixnum) Milliseconds for releasing in GMT (e.g. 1480435200000 = Tue, 29 Nov 2016 16:00:00 GMT).
+      #   Use nil to unset. Setting this will supercede the release_on_approval field, so this field must be nil
+      #   for release_on_approval to be used.
+      attr_accessor :auto_release_date
 
       # @return (Bool)
       attr_accessor :can_beta_test
@@ -62,6 +70,48 @@ module Spaceship
       ####
       # @return (Spaceship::Tunes::TransitAppFile) the structure containing information about the geo json. Can be nil
       attr_accessor :transit_app_file
+
+      ####
+      # Trade Representative Contact Information
+      ####
+      # @return (String) Trade Representative Contact Information Trade Name. This attribute isn't editable
+      attr_accessor :trade_representative_trade_name
+
+      # @return (String) Trade Representative Contact Information First Name
+      attr_accessor :trade_representative_first_name
+
+      # @return (String) Trade Representative Contact Information Last Name
+      attr_accessor :trade_representative_last_name
+
+      # @return (String) Trade Representative Contact Information Address Line 1
+      attr_accessor :trade_representative_address_line_1
+
+      # @return (String) Trade Representative Contact Information Address Line 2
+      attr_accessor :trade_representative_address_line_2
+
+      # @return (String) Trade Representative Contact Information Address Line 3
+      attr_accessor :trade_representative_address_line_3
+
+      # @return (String) Trade Representative Contact Information City Name
+      attr_accessor :trade_representative_city_name
+
+      # @return (String) Trade Representative Contact Information State
+      attr_accessor :trade_representative_state
+
+      # @return (String) Trade Representative Contact Information Country
+      attr_accessor :trade_representative_country
+
+      # @return (String) Trade Representative Contact Information Postal Code
+      attr_accessor :trade_representative_postal_code
+
+      # @return (String) Trade Representative Contact Information Phone Number
+      attr_accessor :trade_representative_phone_number
+
+      # @return (String) Trade Representative Contact Information Email Address
+      attr_accessor :trade_representative_email
+
+      # @return (Boolean) Display Trade Representative Contact Information on the Korean App Store or not
+      attr_accessor :trade_representative_is_displayed_on_app_store
 
       ####
       # App Review Information
@@ -102,6 +152,9 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
+      # @return (Hash) A hash representing the promotionalText in all languages
+      attr_reader :promotional_text
+
       # @return (Hash) A hash representing the description in all languages
       attr_reader :description
 
@@ -120,6 +173,28 @@ module Spaceship
       # @return (Hash) Represents the trailers of this app version (read-only)
       attr_reader :trailers
 
+      # @return (Hash) Represents the phased_release hash (read-only)
+      #   For now, please use the `toggle_phased_release` method and call `.save!`
+      #   as the API will probably change in the future
+      attr_reader :phased_release
+
+      # Currently phased_release doesn't seem to have all the features enabled
+      #
+      #     => {"state"=>{"value"=>"NOT_STARTED", "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil},
+      #        "startDate"=>nil,
+      #        "lastPaused"=>nil,
+      #        "pausedDuration"=>nil,
+      #        "totalPauseDays"=>30,
+      #        "currentDayNumber"=>nil,
+      #        "dayPercentageMap"=>{"1"=>1, "2"=>2, "3"=>5, "4"=>10, "5"=>20, "6"=>50, "7"=>100},
+      #        "isEnabled"=>true}
+      #
+      def toggle_phased_release(enabled: false)
+        state = (enabled ? "INACTIVE" : "NOT_STARTED")
+
+        self.phased_release["state"]["value"] = state
+      end
+
       attr_mapping({
         'appType' => :app_type,
         'platform' => :platform,
@@ -132,13 +207,32 @@ module Spaceship
         'largeAppIcon.value.originalFileName' => :app_icon_original_name,
         'largeAppIcon.value.url' => :app_icon_url,
         'releaseOnApproval.value' => :release_on_approval,
+        'autoReleaseDate.value' => :auto_release_date,
         'status' => :raw_status,
+        'preReleaseBuild.buildVersion' => :build_version,
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
+        'phasedRelease' => :phased_release,
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
+
+        # Trade Representative Contact Information
+
+        'appStoreInfo.tradeName.value' => :trade_representative_trade_name,
+        'appStoreInfo.firstName.value' => :trade_representative_first_name,
+        'appStoreInfo.lastName.value' => :trade_representative_last_name,
+        'appStoreInfo.addressLine1.value' => :trade_representative_address_line_1,
+        'appStoreInfo.addressLine2.value' => :trade_representative_address_line_2,
+        'appStoreInfo.addressLine3.value' => :trade_representative_address_line_3,
+        'appStoreInfo.cityName.value' => :trade_representative_city_name,
+        'appStoreInfo.state.value' => :trade_representative_state,
+        'appStoreInfo.country.value' => :trade_representative_country,
+        'appStoreInfo.postalCode.value' => :trade_representative_postal_code,
+        'appStoreInfo.phoneNumber.value' => :trade_representative_phone_number,
+        'appStoreInfo.emailAddress.value' => :trade_representative_email,
+        'appStoreInfo.shouldDisplayInStore.value' => :trade_representative_is_displayed_on_app_store,
 
         # App Review Information
         'appReviewInfo.firstName.value' => :review_first_name,
@@ -164,14 +258,13 @@ module Spaceship
         # @param application (Spaceship::Tunes::Application) The app this version is for
         # @param app_id (String) The unique Apple ID of this app
         # @param is_live (Boolean)
-        def find(application, app_id, is_live)
+        def find(application, app_id, is_live, platform: nil)
           # we only support applications
-          platform = Spaceship::Tunes::AppVersionCommon.find_platform(application.raw_data['versionSets'])
-          raise "We do not support BUNDLE types right now" if platform['type'] == 'BUNDLE'
+          raise "We do not support BUNDLE types right now" if application.type == 'BUNDLE'
 
           # too bad the "id" field is empty, it forces us to make more requests to the server
           # these could also be cached
-          attrs = client.app_version(app_id, is_live)
+          attrs = client.app_version(app_id, is_live, platform: platform)
           return nil unless attrs
 
           attrs[:application] = application
@@ -213,6 +306,16 @@ module Spaceship
           self.languages << new_language
         end
         nil
+      end
+
+      def current_build_number
+        if self.is_live?
+          build_version
+        else
+          if candidate_builds.length > 0
+            candidate_builds.first.build_version
+          end
+        end
       end
 
       # Returns an array of all builds that can be sent to review
@@ -294,14 +397,27 @@ module Spaceship
 
       # Private methods
       def setup
-        # Properly parse the AppStatus
         status = raw_data['status']
         @app_status = Tunes::AppStatus.get_from_string(status)
+
         setup_large_app_icon
         setup_watch_app_icon
         setup_transit_app_file if supports_app_transit?
         setup_screenshots
         setup_trailers
+      end
+
+      # This method will generate the required keys/values
+      # for iTunes Connect to validate the uploaded image
+      def generate_image_metadata(image_data, original_file_name)
+        {
+          assetToken: image_data["token"],
+          originalFileName: original_file_name,
+          size: image_data["length"],
+          height: image_data["height"],
+          width: image_data["width"],
+          checksum: image_data["md5"]
+        }
       end
 
       # Uploads or removes the large icon
@@ -314,7 +430,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_large_icon(self, upload_image)
 
-        @large_app_icon.reset!({ asset_token: image_data['token'], original_file_name: upload_image.file_name })
+        raw_data["largeAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
       end
 
       # Uploads or removes the watch icon
@@ -327,7 +443,7 @@ module Spaceship
         upload_image = UploadFile.from_path icon_path
         image_data = client.upload_watch_icon(self, upload_image)
 
-        @watch_app_icon.reset!({ asset_token: image_data["token"], original_file_name: upload_image.file_name })
+        raw_data["watchAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
       end
 
       # Uploads or removes the transit app file
@@ -353,25 +469,41 @@ module Spaceship
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
       # @param device (string): The device for this screenshot
-      def upload_screenshot!(screenshot_path, sort_order, language, device)
-        raise "sort_order must be positive" unless sort_order > 0
+      # @param is_messages (Bool): True if the screenshot is for iMessage
+      def upload_screenshot!(screenshot_path, sort_order, language, device, is_messages)
+        raise "sort_order must be higher than 0" unless sort_order > 0
         raise "sort_order must not be > 5" if sort_order > 5
         # this will also check both language and device parameters
-        device_lang_screenshots = screenshots_data_for_language_and_device(language, device)["value"]
+        device_lang_screenshots = screenshots_data_for_language_and_device(language, device, is_messages)["value"]
+
         existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
           upload_file = UploadFile.from_path screenshot_path
-          screenshot_data = client.upload_screenshot(self, upload_file, device)
+          screenshot_data = client.upload_screenshot(self, upload_file, device, is_messages)
 
+          # Since October 2016 we also need to pass the size, height, width and checksum
+          # otherwise iTunes Connect validation will fail at a later point
           new_screenshot = {
-              "value" => {
-                  "assetToken" => screenshot_data["token"],
-                  "sortOrder" => sort_order,
-                  "url" => nil,
-                  "thumbNailUrl" => nil,
-                  "originalFileName" => upload_file.file_name
-              }
+            "value" => {
+              "assetToken" => screenshot_data["token"],
+              "sortOrder" => sort_order,
+              "originalFileName" => upload_file.file_name,
+              "size" => screenshot_data["length"],
+              "height" => screenshot_data["height"],
+              "width" => screenshot_data["width"],
+              "checksum" => screenshot_data["md5"]
+            }
           }
+
+          # We disable "scaling" for this device type / language combination
+          # We only set this, if we actually successfully uploaded a new screenshot
+          # for this device / language combination
+          # if this value is not set, iTC will fallback to another device type for screenshots
+          language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
+          device_language_details = language_details.find { |display_family| display_family['name'] == device }
+          scaled_key = is_messages ? "messagesScaled" : "scaled"
+          device_language_details[scaled_key]["value"] = false
+
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
           else # add
@@ -406,7 +538,7 @@ module Spaceship
       def upload_trailer!(trailer_path, language, device, timestamp = "05.00", preview_image_path = nil)
         raise "No app trailer supported for iphone35" if device == 'iphone35'
 
-        device_lang_trailer = trailer_data_for_language_and_device(language, device)
+        device_lang_trailer = trailer_data_for_language_and_device(language, device, is_messages)
         if trailer_path # adding / replacing trailer / replacing preview
           raise "Invalid timestamp #{timestamp}" if (timestamp =~ /^[0-9][0-9].[0-9][0-9]$/).nil?
 
@@ -455,9 +587,10 @@ module Spaceship
         {
           keywords: :keywords,
           description: :description,
-          supportURL: :support_url,
-          marketingURL: :marketing_url,
-          releaseNotes: :release_notes
+          supportUrl: :support_url,
+          marketingUrl: :marketing_url,
+          releaseNotes: :release_notes,
+          promotionalText: :promotional_text
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
@@ -489,6 +622,11 @@ module Spaceship
         !super.nil?
       end
 
+      def reject!
+        raise 'Version not rejectable' unless can_reject_version
+        client.reject!(self.application.apple_id, self.version_id)
+      end
+
       private
 
       def setup_large_app_icon
@@ -513,8 +651,9 @@ module Spaceship
         @transit_app_file = Tunes::TransitAppFile.factory(transit_app_file) if transit_app_file
       end
 
-      def screenshots_data_for_language_and_device(language, device)
-        container_data_for_language_and_device("screenshots", language, device)
+      def screenshots_data_for_language_and_device(language, device, is_messages)
+        data_field = is_messages ? "messagesScreenshots" : "screenshots"
+        container_data_for_language_and_device(data_field, language, device)
       end
 
       def trailer_data_for_language_and_device(language, device)
@@ -528,32 +667,151 @@ module Spaceship
         # IDEA: better error for non existing language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
-        devices_details = lang_details[data_field]["value"]
-        raise "Unexpected state: missing device details for #{device}" unless devices_details.key? device
-        devices_details[device]
+        display_families = lang_details["displayFamilies"]["value"]
+        device_details = display_families.find { |display_family| display_family['name'] == device }
+        raise "Couldn't find device family for #{device}" if device_details.nil?
+        raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
+        return device_details[data_field]
+      rescue => ex
+        raise "iTunes Connect error: #{ex}"
       end
 
       def setup_screenshots
+        # Enable Scaling for all screen sizes that don't have at least one screenshot
+        # We automatically disable scaling once we upload at least one screenshot
+        language_details = raw_data_details.each do |current_language|
+          language_details = (current_language["displayFamilies"] || {})["value"]
+          (language_details || []).each do |device_language_details|
+            next if device_language_details["screenshots"].nil?
+            next if device_language_details["screenshots"]["value"].count > 0
+
+            # The current row includes screenshots for all device types
+            # so we need to enable scaling for both iOS and watchOS apps
+            device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
+            device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
+            # we unset `scaled` or `messagesScaled` as soon as we upload a
+            # screenshot for this device/language combination
+          end
+        end
+
         @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
-          @screenshots[row['language']] = setup_screenshots_for(row)
+          @screenshots[row['language']] = setup_screenshots_for(row) + setup_messages_screenshots_for(row)
         end
       end
 
       # generates the nested data structure to represent screenshots
       def setup_screenshots_for(row)
-        screenshots = row.fetch("screenshots", {}).fetch("value", nil)
-        return [] unless screenshots
+        return [] if row.nil? || row["displayFamilies"].nil?
+
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        screenshots.each do |device_type, value|
-          value["value"].each do |screenshot|
+        display_families.each do |display_family|
+          # {
+          #   "name": "iphone6Plus",
+          #   "scaled": {
+          #     "value": false,
+          #     "isEditable": false,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "screenshots": {
+          #     "value": [{
+          #       "value": {
+          #         "assetToken": "Purple62/v4/08/0a/04/080a0430-c2cc-2577-f491-9e0a09c58ffe/mzl.pbcpzqyg.jpg",
+          #         "sortOrder": 1,
+          #         "type": null,
+          #         "originalFileName": "ios-414-1.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }, {
+          #       "value": {
+          #         "assetToken": "Purple71/v4/de/81/aa/de81aa10-64f6-332e-c974-9ee46adab675/mzl.cshkjvwl.jpg",
+          #         "sortOrder": 2,
+          #         "type": null,
+          #         "originalFileName": "ios-414-2.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }],
+          #   "messagesScaled": {
+          #     "value": false,
+          #     "isEditable": false,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "messagesScreenshots": {
+          #     "value": [{
+          #       "value": {
+          #         "assetToken": "Purple62/v4/08/0a/04/080a0430-c2cc-2577-f491-9e0a09c58ffe/mzl.pbcpzqyg.jpg",
+          #         "sortOrder": 1,
+          #         "type": null,
+          #         "originalFileName": "ios-414-1.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }, {
+          #       "value": {
+          #         "assetToken": "Purple71/v4/de/81/aa/de81aa10-64f6-332e-c974-9ee46adab675/mzl.cshkjvwl.jpg",
+          #         "sortOrder": 2,
+          #         "type": null,
+          #         "originalFileName": "ios-414-2.jpg"
+          #       },
+          #       "isEditable": true,
+          #       "isRequired": false,
+          #       "errorKeys": null
+          #     }],
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   },
+          #   "trailer": {
+          #     "value": null,
+          #     "isEditable": true,
+          #     "isRequired": false,
+          #     "errorKeys": null
+          #   }
+          # }
+
+          display_family.fetch("screenshots", {}).fetch("value", []).each do |screenshot|
             screenshot_data = screenshot["value"]
             data = {
-                device_type: device_type,
+                device_type: display_family['name'],
                 language: row["language"]
+            }.merge(screenshot_data)
+            result << Tunes::AppScreenshot.factory(data)
+          end
+        end
+
+        return result
+      end
+
+      # generates the nested data structure to represent screenshots
+      def setup_messages_screenshots_for(row)
+        return [] if row.nil? || row["displayFamilies"].nil?
+
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
+
+        result = []
+
+        display_families.each do |display_family|
+          display_family_screenshots = display_family.fetch("messagesScreenshots", {})
+          next unless display_family_screenshots
+          display_family_screenshots.fetch("value", []).each do |screenshot|
+            screenshot_data = screenshot["value"]
+            data = {
+                device_type: display_family['name'],
+                language: row["language"],
+                is_imessage: true # to identify imessage screenshots later on (e.g: during download)
             }.merge(screenshot_data)
             result << Tunes::AppScreenshot.factory(data)
           end
@@ -572,17 +830,21 @@ module Spaceship
 
       # generates the nested data structure to represent trailers
       def setup_trailers_for(row)
-        trailers = row.fetch("appTrailers", {}).fetch("value", nil)
-        return [] unless trailers
+        return [] if row.nil? || row["displayFamilies"].nil?
+
+        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        return [] unless display_families
 
         result = []
 
-        trailers.each do |device_type, value|
-          trailer_data = value["value"]
+        display_families.each do |display_family|
+          trailer_raw = display_family["trailer"]
+          next if trailer_raw.nil?
+          trailer_data = trailer_raw["value"]
           next if trailer_data.nil?
           data = {
-              device_type: device_type,
-              language: row["language"]
+            device_type: display_family['name'],
+            language: row["language"]
           }.merge(trailer_data)
           result << Tunes::AppTrailer.factory(data)
         end

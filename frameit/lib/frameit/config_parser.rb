@@ -1,8 +1,10 @@
 module Frameit
   class ConfigParser
+    attr_reader :data
+
     def load(path)
       return nil unless File.exist?(path) # we are okay with no config at all
-      UI.message "Parsing config file '#{path}'" if $verbose
+      UI.verbose("Parsing config file '#{path}'")
       @path = path
       self.parse(File.read(path))
     end
@@ -59,33 +61,32 @@ module Frameit
     # Make sure the paths/colors are valid
     def validate_values(values)
       values.each do |key, value|
-        if value.kind_of? Hash
+        if value.kind_of?(Hash)
           validate_values(value) # recursive call
         else
-          if key == 'font'
-            UI.user_error! "Could not find font at path '#{File.expand_path(value)}'" unless File.exist? value
-          end
-
-          if key == 'fonts'
-            UI.user_error! "`fonts` must be an array" unless value.kind_of? Array
+          case key
+          when 'font'
+            UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
+          when 'fonts'
+            UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
 
             value.each do |current|
-              UI.user_error! "You must specify a font path" if current.fetch('font', '').length == 0
-              UI.user_error! "Could not find font at path '#{File.expand_path(current.fetch('font'))}'" unless File.exist? current.fetch('font')
-              UI.user_error! "`supported` must be an array" unless current.fetch('supported', []).kind_of? Array
+              UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
+              UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
+              UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of? Array
             end
-          end
-
-          if key == 'background'
-            UI.user_error! "Could not find background image at path '#{File.expand_path(value)}'" unless File.exist? value
-          end
-
-          if key == 'color'
-            UI.user_error! "Invalid color '#{value}'. Must be valid Hex #123123" unless value.include? "#"
-          end
-
-          if key == 'padding'
-            UI.user_error! "padding must be type integer or pair of integers of format 'AxB'" unless value.kind_of?(Integer) || value.split('x').length == 2
+          when 'background'
+            UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist? value
+          when 'color'
+            UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
+          when 'padding'
+            unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
+              UI.user_error!("padding must be type integer or pair of integers of format 'AxB' or a percentage of screen size")
+            end
+          when 'show_complete_frame'
+            UI.user_error! "show_complete_frame must be a Boolean" unless [true, false].include?(value)
+          when 'font_scale_factor'
+            UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
           end
         end
       end

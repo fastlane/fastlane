@@ -1,5 +1,10 @@
 module Fastlane
   module Actions
+    module SharedValues
+      ARTIFACTORY_DOWNLOAD_URL = :ARTIFACTORY_DOWNLOAD_URL
+      ARTIFACTORY_DOWNLOAD_SIZE = :ARTIFACTORY_DOWNLOAD_SIZE
+    end
+
     class ArtifactoryAction < Action
       def self.run(params)
         Actions.verify_gem!('artifactory')
@@ -17,6 +22,10 @@ module Fastlane
           }
           UI.message("Uploading file: #{artifact.local_path} ...")
           upload = artifact.upload(params[:repo], params[:repo_path], params[:properties])
+
+          Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_URL] = upload.uri
+          Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_SIZE] = upload.size
+
           UI.message("Uploaded Artifact:")
           UI.message("Repo: #{upload.repo}")
           UI.message("URI: #{upload.uri}")
@@ -44,7 +53,31 @@ module Fastlane
       end
 
       def self.author
-        ["koglinjg"]
+        ["koglinjg", "tommeier"]
+      end
+
+      def self.output
+        [
+          ['ARTIFACTORY_DOWNLOAD_URL', 'The download url for file uploaded'],
+          ['ARTIFACTORY_DOWNLOAD_SIZE', 'The reported file size for file uploaded']
+        ]
+      end
+
+      def self.example_code
+        [
+          'artifactory(
+            username: "username",
+            password: "password",
+            endpoint: "https://artifactory.example.com/artifactory/",
+            file: "example.ipa",                                # File to upload
+            repo: "mobile_artifacts",                           # Artifactory repo
+            repo_path: "/ios/appname/example-major.minor.ipa"   # Path to place the artifact including its filename
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.available_options
@@ -72,6 +105,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_ARTIFACTORY_PASSWORD",
                                        description: "Artifactory password",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: "FL_ARTIFACTORY_PROPERTIES",
@@ -97,6 +131,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_ARTIFACTORY_PROXY_PASSWORD",
                                        description: "Proxy password",
+                                       sensitive: true,
                                        default_value: nil,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,

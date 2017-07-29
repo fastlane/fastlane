@@ -3,7 +3,8 @@ describe Fastlane do
     describe "Create dSYM zip" do
       xcodebuild_archive = 'MyApp.xcarchive'
 
-      before :each do
+      before(:each) do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::XCODEBUILD_ARCHIVE] = xcodebuild_archive
       end
 
@@ -18,7 +19,7 @@ describe Fastlane do
 
         it "creates a zip file with default archive_path from xcodebuild" do
           # Move one folder above as specs are execute in fastlane folder
-          root_path = File.expand_path("..")
+          root_path = File.expand_path(".")
           file_basename = File.basename(xcodebuild_archive, '.*')
 
           dsym_folder_path = File.join(root_path, File.join(xcodebuild_archive, 'dSYMs'))
@@ -43,7 +44,7 @@ describe Fastlane do
           custom_app_path = 'CustomApp.xcarchive'
 
           # Move one folder above as specs are execute in fastlane folder
-          root_path = File.expand_path("..")
+          root_path = File.expand_path(".")
           file_basename = File.basename(custom_app_path.to_s, '.*')
 
           dsym_folder_path = File.join(root_path, File.join(custom_app_path.to_s, 'dSYMs'))
@@ -67,7 +68,7 @@ describe Fastlane do
 
         it "creates a zip file with a custom dsym path" do
           # Move one folder above as specs are execute in fastlane folder
-          root_path = File.expand_path("..")
+          root_path = File.expand_path(".")
           file_basename = File.basename(xcodebuild_archive, '.*')
 
           dsym_folder_path = File.join(root_path, File.join(xcodebuild_archive, 'dSYMs'))

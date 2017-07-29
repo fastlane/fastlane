@@ -1,15 +1,18 @@
+require 'precheck'
+
 module Deliver
   class Runner
     attr_accessor :options
 
-    def initialize(options)
+    def initialize(options, skip_auto_detection = {})
       self.options = options
       login
-      Deliver::DetectValues.new.run!(self.options)
-      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Deliver::VERSION} Summary")
+      Deliver::DetectValues.new.run!(self.options, skip_auto_detection)
+      FastlaneCore::PrintTable.print_values(config: options, hide_keys: [:app], mask_keys: ['app_review_information.demo_password'], title: "deliver #{Fastlane::VERSION} Summary")
     end
 
     def login
+      UI.message("Running precheck before submitting to review, if you'd like to disable this check you can set run_precheck_before_submit to false") unless options[:run_precheck_before_submit] == false
       UI.message("Login to iTunes Connect (#{options[:username]})")
       Spaceship::Tunes.login(options[:username])
       Spaceship::Tunes.select_team
@@ -17,7 +20,7 @@ module Deliver
     end
 
     def run
-      verify_version if options[:app_version].to_s.length > 0
+      verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
       upload_metadata
 
       has_binary = (options[:ipa] || options[:pkg])
@@ -25,9 +28,45 @@ module Deliver
         upload_binary
       end
 
-      UI.success("Finished the upload to iTunes Connect")
+      UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
-      submit_for_review if options[:submit_for_review]
+      precheck_success = precheck_app
+
+      submit_for_review if options[:submit_for_review] && precheck_success
+    end
+
+    # Make sure we pass precheck before uploading
+    def precheck_app
+      return true unless options[:run_precheck_before_submit]
+
+      if options[:submit_for_review]
+        UI.message("Making sure we pass precheck 👮‍♀️ 👮 before we submit  🛫")
+      else
+        UI.message("Running precheck 👮‍♀️ 👮")
+      end
+
+      precheck_options = {
+        default_rule_level: options[:precheck_default_rule_level],
+        app_identifier: options[:app_identifier],
+        username: options[:username]
+      }
+
+      precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
+      Precheck.config = precheck_config
+
+      precheck_success = true
+      begin
+        precheck_success = Precheck::Runner.new.run
+      rescue => ex
+        UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finished. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
+        UI.verbose(ex.inspect)
+        UI.verbose(ex.backtrace.join("\n"))
+
+        # always report this back, since this is a new tool, we don't want to crash, but we still want to see this
+        FastlaneCore::CrashReporter.report_crash(exception: ex)
+      end
+
+      return precheck_success
     end
 
     # Make sure the version on iTunes Connect matches the one in the ipa
@@ -36,7 +75,8 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file...")
 
-      changed = options[:app].ensure_version!(app_version)
+      changed = options[:app].ensure_version!(app_version, platform: options[:platform])
+
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
       else
@@ -51,6 +91,9 @@ module Deliver
       UploadMetadata.new.load_from_filesystem(options)
       UploadMetadata.new.assign_defaults(options)
 
+      # Handle app icon / watch icon
+      prepare_app_icons(options)
+
       # Validate
       validate_html(screenshots)
 
@@ -61,6 +104,20 @@ module Deliver
       UploadAssets.new.upload(options) # e.g. app icon
     end
 
+    # If options[:app_icon]/options[:apple_watch_app_icon]
+    # is supplied value/path will be used.
+    # If it is unset files (app_icon/watch_icon) exists in
+    # the fastlane/metadata/ folder, those will be used
+    def prepare_app_icons(options = {})
+      return unless options[:metadata_path]
+
+      default_app_icon_path = Dir[File.join(options[:metadata_path], "app_icon.{png,jpg}")].first
+      options[:app_icon] ||= default_app_icon_path if default_app_icon_path && File.exist?(default_app_icon_path)
+
+      default_watch_icon_path = Dir[File.join(options[:metadata_path], "watch_icon.{png,jpg}")].first
+      options[:apple_watch_app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
+    end
+
     # Upload the binary to iTunes Connect
     def upload_binary
       UI.message("Uploading binary to iTunes Connect")
@@ -68,19 +125,21 @@ module Deliver
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           ipa_path: options[:ipa],
-          package_path: "/tmp"
+          package_path: "/tmp",
+          platform: options[:platform]
         )
       elsif options[:pkg]
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           pkg_path: options[:pkg],
-          package_path: "/tmp"
+          package_path: "/tmp",
+          platform: options[:platform]
         )
       end
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username])
+      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(options[:app].apple_id, package_path)
-      UI.user_error!("Could not upload binary to iTunes Connect. Check out the error above") unless result
+      UI.user_error!("Could not upload binary to iTunes Connect. Check out the error above", show_github_issues: true) unless result
     end
 
     def submit_for_review

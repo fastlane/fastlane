@@ -12,21 +12,30 @@ module Sigh
                                      env_name: "SIGH_AD_HOC",
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
                                      is_string: false,
-                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :skip_install,
-                                     env_name: "SIGH_SKIP_INSTALL",
-                                     description: "By default, the certificate will be added on your local machine. Setting this flag will skip this action",
-                                     is_string: false,
-                                     default_value: false),
+                                     default_value: false,
+                                     conflicting_options: [:development],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
                                      description: "Renew the development certificate instead of the production one",
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:adhoc],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_install,
+                                     env_name: "SIGH_SKIP_INSTALL",
+                                     description: "By default, the certificate will be added to your local machine. Setting this flag will skip this action",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "SIGH_FORCE",
                                      description: "Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles",
                                      is_string: false,
+                                     short_option: "-f",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
@@ -41,20 +50,20 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "SIGH_TEAM_ID",
-                                     description: "The ID of your team if you're in multiple teams",
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "SIGH_TEAM_NAME",
-                                     description: "The name of your team if you're in multiple teams",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
@@ -101,7 +110,18 @@ module Sigh
                                      env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
                                      description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: '-p',
+                                     env_name: "SIGH_PLATFORM",
+                                     description: "Set the provisioning profile's platform (i.e. ios, tvos)",
+                                     is_string: false,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       pt = %w(macos tvos ios)
+                                       UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
+                                     end)
       ]
     end
   end

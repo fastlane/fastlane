@@ -2,17 +2,26 @@ require 'pty'
 require 'open3'
 require 'fileutils'
 require 'terminal-table'
+require 'shellwords'
 
 module Scan
   class Runner
+    def initialize
+      @test_command_generator = TestCommandGenerator.new
+    end
+
     def run
       handle_results(test_app)
     end
 
     def test_app
-      open_simulator_for_device(Scan.device)
-
-      command = TestCommandGenerator.generate
+      # We call this method, to be sure that all other simulators are killed
+      # And a correct one is freshly launched. Switching between multiple simulator
+      # in case the user specified multiple targets works with no issues
+      # This way it's okay to just call it for the first simulator we're using for
+      # the first test run
+      open_simulator_for_device(Scan.devices.first) if Scan.devices
+      command = @test_command_generator.generate
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -42,20 +51,7 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      # First, generate a JUnit report to get the number of tests
-      require 'tempfile'
-      output_file = Tempfile.new("junit_report")
-
-      report_collector = ReportCollector.new(Scan.config[:open_report],
-                                             Scan.config[:output_types],
-                                             Scan.config[:output_directory])
-
-      cmd = report_collector.generate_commands(TestCommandGenerator.xcodebuild_log_path,
-                                               types: 'junit',
-                                               output_file_name: output_file.path).values.last
-      system(cmd)
-
-      result = TestResultParser.new.parse_result(output_file.read)
+      result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
 
       if result[:failures] > 0
@@ -73,20 +69,53 @@ module Scan
       })
       puts ""
 
-      report_collector.parse_raw_file(TestCommandGenerator.xcodebuild_log_path)
+      copy_simulator_logs
 
-      UI.user_error!("Test execution failed. Exit status: #{tests_exit_status}") unless tests_exit_status == 0
-      UI.user_error!("Tests failed") unless result[:failures] == 0
+      if result[:failures] > 0
+        UI.test_failure!("Tests have failed")
+      end
+
+      unless tests_exit_status == 0
+        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+      end
+
+      if !Helper.is_ci? && Scan.cache[:open_html_report_path]
+        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+      end
+    end
+
+    def test_results
+      temp_junit_report = Scan.cache[:temp_junit_report]
+      return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
+
+      # Something went wrong with the temp junit report for the test success/failures count.
+      # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
+      UI.message("Generating test results. This may take a while for large projects.")
+
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options = reporter_options_generator.generate_reporter_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      system(cmd)
+      File.read(Scan.cache[:temp_junit_report])
+    end
+
+    def copy_simulator_logs
+      return unless Scan.config[:include_simulator_logs]
+
+      UI.header("Collecting system logs")
+      Scan.devices.each do |device|
+        log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
+      end
     end
 
     def open_simulator_for_device(device)
-      return unless ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR']
+      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
       UI.message("Killing all running simulators")
       `killall Simulator &> /dev/null`
 
-      UI.message("Explicitly opening simulator for device: #{device.name}")
-      `open -a Simulator --args -CurrentDeviceUDID #{device.udid}`
+      FastlaneCore::Simulator.launch(device)
     end
   end
 end

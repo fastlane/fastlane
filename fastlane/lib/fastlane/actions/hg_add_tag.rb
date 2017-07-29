@@ -33,6 +33,16 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'hg_add_tag(tag: "1.3")'
+        ]
+      end
+
+      def self.category
+        :source_control
+      end
     end
   end
 end

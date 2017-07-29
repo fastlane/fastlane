@@ -33,14 +33,15 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath '#{archive_path}'"
+        options << "-archivePath #{archive_path.shellescape}"
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
+        options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
@@ -57,14 +58,36 @@ module Gym
 
       def suffix
         suffix = []
-        suffix << "CODE_SIGN_IDENTITY='#{Gym.config[:codesigning_identity]}'" if Gym.config[:codesigning_identity]
+        suffix << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
         suffix
       end
 
       def pipe
         pipe = []
-        pipe << "| tee #{xcodebuild_log_path.shellescape} | xcpretty"
-        pipe << "--no-color" if Helper.colors_disabled?
+        pipe << "| tee #{xcodebuild_log_path.shellescape}"
+        pipe << "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if Gym.config[:analyze_build_time]
+        unless Gym.config[:disable_xcpretty]
+          formatter = Gym.config[:xcpretty_formatter]
+          pipe << "| xcpretty"
+          pipe << " --test" if Gym.config[:xcpretty_test_format]
+          pipe << " --no-color" if Helper.colors_disabled?
+          pipe << " --formatter " if formatter
+          pipe << formatter if formatter
+          pipe << "--utf" if Gym.config[:xcpretty_utf]
+          report_output_junit = Gym.config[:xcpretty_report_junit]
+          report_output_html = Gym.config[:xcpretty_report_html]
+          report_output_json = Gym.config[:xcpretty_report_json]
+          if report_output_junit
+            pipe << " --report junit --output "
+            pipe << report_output_junit.shellescape
+          elsif report_output_html
+            pipe << " --report html --output "
+            pipe << report_output_html.shellescape
+          elsif report_output_json
+            pipe << " --report json-compilation-database --output "
+            pipe << report_output_json.shellescape
+          end
+        end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
 
         pipe
@@ -82,10 +105,6 @@ module Gym
       def build_path
         unless Gym.cache[:build_path]
           Gym.cache[:build_path] = Gym.config[:build_path]
-          unless Gym.cache[:build_path]
-            day = Time.now.strftime("%F") # e.g. 2015-08-07
-            Gym.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-          end
           FileUtils.mkdir_p Gym.cache[:build_path]
         end
         Gym.cache[:build_path]

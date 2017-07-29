@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,8 +33,6 @@ sigh
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/sigh/LICENSE)
-[![Gem](https://img.shields.io/gem/v/sigh.svg?style=flat)](http://rubygems.org/gems/sigh)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Because you would rather spend your time building stuff than fighting provisioning
 
@@ -41,6 +41,7 @@ sigh
 Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -53,7 +54,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>sigh</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>sigh</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 
@@ -68,7 +69,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fastlane/tree/master/pem).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ### Why not let Xcode do the work?
 
@@ -85,7 +86,7 @@ See ```sigh``` in action:
 
 **Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
 
-    sudo gem install sigh
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -93,60 +94,63 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    sigh
+    fastlane sigh
+
 Yes, that's the whole command!
 
 ```sigh``` will create, repair and download profiles for the App Store by default.
 
 You can pass your bundle identifier and username like this:
 
-    sigh -a com.krausefx.app -u username
+    fastlane sigh -a com.krausefx.app -u username
 
 If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
-    sigh --adhoc
+    fastlane sigh --adhoc
 
 If you want to generate a **Development** profile:
 
-    sigh --development
+    fastlane sigh --development
 
 To generate the profile in a specific directory:
 
-    sigh -o "~/Certificates/"
+    fastlane sigh -o "~/Certificates/"
 
 To download all your provisioning profiles use
 
-    sigh download_all
+    fastlane sigh download_all
+
+Optionally, use `fastlane sigh download_all --download_xcode_profiles` to also include the Xcode managed provisioning profiles
 
 For a list of available parameters and commands run
 
-    sigh --help
+    fastlane sigh --help
 
 ### Advanced
 
 By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
-    sigh --skip_install
+    fastlane sigh --skip_install
 
 To save the provisioning profile under a specific name, use the -q option:
 
-    sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
+    fastlane sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
 
 If for some reason you don't want `sigh` to verify that the code signing identity is installed on your local machine:
 
-    sigh --skip_certificate_verification
+    fastlane sigh --skip_certificate_verification
 
 If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime. `--force` will also add all available devices to this profile.
 
-    sigh --force
+    fastlane sigh --force
 
 By default, `sigh` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
-    sigh -c "SunApps GmbH"
+    fastlane sigh -c "SunApps GmbH"
 
 For a list of available parameters and commands run
 
-    sigh --help
+    fastlane sigh --help
 
 
 ### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
@@ -170,39 +174,37 @@ This will result in `sigh` always using the correct signing certificate, which i
 
 `sigh` can automatically repair all your existing provisioning profiles which are expired or just invalid.
 
-    sigh repair
-
+    fastlane sigh repair
 
 # Resign
 
 If you generated your `ipa` file but want to apply a different code signing onto the ipa file, you can use `sigh resign`:
 
-
-    sigh resign
+    fastlane sigh resign
 
 `sigh` will find the ipa file and the provisioning profile for you if they are located in the current folder.
 
 You can pass more information using the command line:
 
-    sigh resign ./path/app.ipa --signing_identity "iPhone Distribution: Felix Krause" -n "my.mobileprovision"
+    fastlane sigh resign ./path/app.ipa --signing_identity "iPhone Distribution: Felix Krause" -p "my.mobileprovision"
 
 # Manage
 
 With `sigh manage` you can list all provisioning profiles installed locally.
 
-    sigh manage
+    fastlane sigh manage
 
 Delete all expired provisioning profiles
 
-    sigh manage -e
+    fastlane sigh manage -e
 
 Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
-    sigh manage -p "iOS\ ?Team Provisioning Profile:"
+    fastlane sigh manage -p "iOS\ ?Team Provisioning Profile:"
 
 ## Environment Variables
 
-Run `sigh --help` to get a list of all available environment variables.
+Run `fastlane sigh --help` to get a list of all available environment variables.
 
 If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in combination with [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
 
@@ -210,14 +212,13 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 
 `sigh` will access the `iOS Dev Center` to download, renew or generate the `.mobileprovision` file. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
 
-
 ## How is my password stored?
 `sigh` uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`.
 
 # Tips
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -230,8 +231,9 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

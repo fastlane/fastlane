@@ -147,7 +147,7 @@
             imageDisplay.dataset.counter = img.dataset.counter;
             
             imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
-            imageInfo.innerHTML         += img.src.split("/").pop();
+            imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
             imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
                     
             overlay.style.display        = "block";

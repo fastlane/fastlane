@@ -9,7 +9,7 @@ module Fastlane
 
       def initialize(path = nil)
         version_var_name = 'version'
-        @version_regex = /^(?<begin>[^#]*#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?)(?<end>['"])/i
+        @version_regex = /^(?<begin>[^#]*#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?)(?<end>['"])/i
 
         return unless (path || '').length > 0
         UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)
@@ -28,6 +28,8 @@ module Fastlane
       end
 
       def bump_version(bump_type)
+        UI.user_error!("Do not support bump of 'appendix', please use `update_version_appendix(appendix)` instead") if bump_type == 'appendix'
+
         major = version_match[:major].to_i
         minor = version_match[:minor].to_i || 0
         patch = version_match[:patch].to_i || 0
@@ -47,11 +49,23 @@ module Fastlane
         @version_value = "#{major}.#{minor}.#{patch}"
       end
 
+      def update_version_appendix(appendix = nil)
+        new_appendix = appendix || @version_value[:appendix]
+        return if new_appendix.nil?
+
+        new_appendix = new_appendix.sub(".", "") if new_appendix.start_with?(".")
+        major = version_match[:major].to_i
+        minor = version_match[:minor].to_i || 0
+        patch = version_match[:patch].to_i || 0
+
+        @version_value = "#{major}.#{minor}.#{patch}.#{new_appendix}"
+      end
+
       def update_podspec(version = nil)
         new_version = version || @version_value
         updated_podspec_content = @podspec_content.gsub(@version_regex, "#{@version_match[:begin]}#{new_version}#{@version_match[:end]}")
 
-        File.open(@path, "w") {|file| file.puts updated_podspec_content} unless Helper.test?
+        File.open(@path, "w") { |file| file.puts updated_podspec_content } unless Helper.test?
 
         updated_podspec_content
       end

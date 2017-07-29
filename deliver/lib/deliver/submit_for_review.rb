@@ -50,7 +50,7 @@ module Deliver
     end
 
     def wait_for_build(app)
-      UI.user_error!("Could not find app with app identifier #{WatchBuild.config[:app_identifier]}") unless app
+      UI.user_error!("Could not find app with app identifier") unless app
 
       start = Time.now
 
@@ -69,16 +69,15 @@ module Deliver
     end
 
     def find_build(candidate_builds)
-      build = nil
-      candidate_builds.each do |b|
-        if !build or b.upload_date > build.upload_date
-          build = b
-        end
+      if (candidate_builds || []).count == 0
+        UI.user_error!("Could not find any available candidate builds on iTunes Connect to submit")
       end
 
-      unless build
-        UI.error(candidate_builds)
-        UI.crash!("Could not find build")
+      build = candidate_builds.first
+      candidate_builds.each do |b|
+        if b.upload_date > build.upload_date
+          build = b
+        end
       end
 
       return build

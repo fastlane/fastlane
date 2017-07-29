@@ -1,0 +1,22 @@
+{
+  "creationTimestamp": "2016-11-17T19:15:50Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "5fbf6cd3-29a1-4892-yec8-7fc3853b2722",
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/device/enableDevice.action",
+  "responseId": "411027f3-c0ed-4201-8054-dd2a12901350",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "nextDeviceResetDate": null,
+  "device": {
+    "deviceId": "DISABLED_B",
+    "name": "Old iPod",
+    "deviceNumber": "44ee59893cb94ead4635743b25012e5b9f8c67c1",
+    "devicePlatform": "ios",
+    "status": "c",
+    "model": "iPod touch",
+    "deviceClass": "ipod"
+  }
+}

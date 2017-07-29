@@ -3,15 +3,20 @@ require "credentials_manager"
 
 module Scan
   class Options
+    def self.verify_type(item_name, acceptable_types, value)
+      type_ok = [Array, String].any? { |type| value.kind_of?(type) }
+      UI.user_error!("'#{item_name}' should be of type #{acceptable_types.join(' or ')} but found: #{value.class.name}") unless type_ok
+    end
+
     def self.available_options
-      containing = Helper.fastlane_enabled? ? './fastlane' : '.'
+      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
 
       [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      env_name: "SCAN_WORKSPACE",
                                      optional: true,
-                                     description: "Path the workspace file",
+                                     description: "Path to the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -22,7 +27,7 @@ module Scan
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "SCAN_PROJECT",
-                                     description: "Path the project file",
+                                     description: "Path to the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
@@ -34,7 +39,27 @@ module Scan
                                      optional: true,
                                      is_string: true,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on"),
+                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6')",
+                                     conflicting_options: [:devices],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :toolchain,
+                                     env_name: "SCAN_TOOLCHAIN",
+                                     conflicting_options: [:xctestrun],
+                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :devices,
+                                     optional: true,
+                                     is_string: false,
+                                     env_name: "SCAN_DEVICES",
+                                     type: Array,
+                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])",
+                                     conflicting_options: [:device],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'device' and 'devices' options in one run")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
@@ -47,11 +72,27 @@ module Scan
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :code_coverage,
-                                     description: "Should generate code coverage (Xcode 7 only)?",
+                                     description: "Should code coverage be generated (Xcode 7 only)?",
                                      is_string: false,
-                                     default_value: false),
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :address_sanitizer,
+                                     description: "Should the address sanitizer be turned on?",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:thread_sanitizer],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'address_sanitizer' and 'thread_sanitizer' options in one run")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :thread_sanitizer,
+                                     description: "Should the thread sanitizer be turned on?",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:address_sanitizer],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'thread_sanitizer' and 'address_sanitizer' options in one run")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_build,
-                                     description: "Should skip debug build before test build?",
+                                     description: "Should debug build be skipped before test build?",
                                      short_option: "-r",
                                      env_name: "SCAN_SKIP_BUILD",
                                      is_string: false,
@@ -64,25 +105,59 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like (standard, basic or rspec)",
+                                     description: "Define how the output should look like (standard, basic, rspec or raw)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', "rspec"].include?(value)
+                                       UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :output_types,
                                      short_option: "-f",
                                      env_name: "SCAN_OUTPUT_TYPES",
-                                     description: "Comma seperated list of the output types (e.g. html, junit)",
+                                     description: "Comma separated list of the output types (e.g. html, junit, json-compilation-database)",
                                      default_value: "html,junit"),
+        FastlaneCore::ConfigItem.new(key: :output_files,
+                                     env_name: "SCAN_OUTPUT_FILES",
+                                     description: "Comma separated list of the output files, corresponding to the types provided by :output_types (order should match). If specifying an output type of json-compilation-database with :use_clang_report_name enabled, that option will take precedence",
+                                     conflicting_options: [:custom_report_file_name],
+                                     optional: true,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "SCAN_BUILDLOG_PATH",
-                                     description: "The directory were to store the raw log",
-                                     default_value: "~/Library/Logs/scan"),
+                                     description: "The directory where to store the raw log",
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/scan"),
+        FastlaneCore::ConfigItem.new(key: :include_simulator_logs,
+                                     env_name: "SCAN_INCLUDE_SIMULATOR_LOGS",
+                                     description: "If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory",
+                                     type: TrueClass,
+                                     default_value: false,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
+                                     optional: true),
+
+        FastlaneCore::ConfigItem.new(key: :test_without_building,
+                                     short_option: "-T",
+                                     env_name: "SCAN_TEST_WITHOUT_BUILDING",
+                                     description: "Test without building, requires a derived data path",
+                                     is_string: false,
+                                     conflicting_options: [:build_for_testing],
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :build_for_testing,
+                                     short_option: "-B",
+                                     env_name: "SCAN_BUILD_FOR_TESTING",
+                                     description: "Build for testing only, does not run tests",
+                                     conflicting_options: [:test_without_building],
+                                     is_string: false,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xctestrun,
+                                     short_option: "-X",
+                                     env_name: "SCAN_XCTESTRUN",
+                                     description: "Run tests using the provided .xctestrun file",
+                                     conflicting_options: [:test_without_building, :build_for_testing],
+                                     is_string: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-j",
@@ -93,7 +168,7 @@ module Scan
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Produce the result bundle describing what occurred will be placed",
+                                     description: "Location of the Xcode result bundle",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
@@ -103,7 +178,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :open_report,
                                      short_option: "-g",
                                      env_name: "SCAN_OPEN_REPORT",
-                                     description: "Don't open the HTML report when tests are completed",
+                                     description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :configuration,
@@ -115,12 +190,14 @@ module Scan
                                      short_option: "-d",
                                      env_name: "SCAN_DESTINATION",
                                      description: "Use only if you're a pro, use the other options instead",
+                                     is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcargs,
                                      short_option: "-x",
                                      env_name: "SCAN_XCARGS",
                                      description: "Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
-                                     optional: true),
+                                     optional: true,
+                                     type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :xcconfig,
                                      short_option: "-y",
                                      env_name: "SCAN_XCCONFIG",
@@ -129,13 +206,32 @@ module Scan
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :only_testing,
+                                     env_name: "SCAN_ONLY_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_testing', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_testing,
+                                     env_name: "SCAN_SKIP_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_testing', [Array, String], value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
                                      env_name: "SLACK_URL",
+                                     sensitive: true,
                                      description: "Create an Incoming WebHook for your Slack group to post results there",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
+                                       if !value.to_s.empty? && !value.start_with?("https://")
+                                         UI.user_error!("Invalid URL, must start with https://")
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :slack_channel,
                                      short_option: "-e",
@@ -154,7 +250,18 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
                                     description: "Only post on Slack if the tests fail",
                                     is_string: false,
-                                    default_value: false)
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
+                                    is_string: false,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name when generating a single report",
+                                     deprecated: "Use --output_files",
+                                     conflicting_options: [:output_files],
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end

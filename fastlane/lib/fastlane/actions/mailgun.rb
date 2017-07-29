@@ -3,7 +3,6 @@ require 'fastlane/erb_template_helper'
 module Fastlane
   module Actions
     class MailgunAction < Action
-
       def self.is_supported?(platform)
         true
       end
@@ -34,6 +33,7 @@ module Fastlane
           # This is here just for while due to the transition, should use apikey instead
           FastlaneCore::ConfigItem.new(key: :mailgun_apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        optional: true,
                                        description: "Mailgun apikey for your mail. Please use postmaster instead"),
 
@@ -42,6 +42,7 @@ module Fastlane
                                        description: "Mailgun sandbox domain postmaster for your mail"),
           FastlaneCore::ConfigItem.new(key: :apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        description: "Mailgun apikey for your mail"),
           FastlaneCore::ConfigItem.new(key: :to,
                                        env_name: "MAILGUN_TO",
@@ -80,7 +81,17 @@ module Fastlane
                                       env_name: "MAILGUN_TEMPLATE_PATH",
                                       description: "Mail HTML template",
                                       optional: true,
-                                      is_string: true)
+                                      is_string: true),
+          FastlaneCore::ConfigItem.new(key: :reply_to,
+                                      env_name: "MAILGUN_REPLY_TO",
+                                      description: "Mail Reply to",
+                                      optional: true,
+                                      is_string: true),
+          FastlaneCore::ConfigItem.new(key: :attachment,
+                                      env_name: "MAILGUN_ATTACHMENT",
+                                      description: "Mail Attachment filenames, either an array or just one string",
+                                      optional: true,
+                                      is_string: false)
 
         ]
       end
@@ -99,11 +110,23 @@ module Fastlane
 
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
-        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-                        from: "#{options[:from]}<#{options[:postmaster]}>",
-                        to: (options[:to]).to_s,
-                        subject: options[:subject],
-                        html: mail_template(options)
+        params = {
+          from: "#{options[:from]}<#{options[:postmaster]}>",
+          to: (options[:to]).to_s,
+          subject: options[:subject],
+          html: mail_template(options)
+        }
+        unless options[:reply_to].nil?
+          params.store(:"h:Reply-To", options[:reply_to])
+        end
+
+        unless options[:attachment].nil?
+          attachment_filenames = [*options[:attachment]]
+          attachments = attachment_filenames.map { |filename| File.new(filename, 'rb') }
+          params.store(:attachment, attachments)
+        end
+
+        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
         mail_template(options)
       end
 
@@ -130,6 +153,32 @@ module Fastlane
         eth.render(html_template, hash)
       end
 
+      def self.example_code
+        [
+          'mailgun(
+            to: "fastlane@krausefx.com",
+            success: true,
+            message: "This is the mail\'s content"
+          )',
+          'mailgun(
+            postmaster: "MY_POSTMASTER",
+            apikey: "MY_API_KEY",
+            to: "DESTINATION_EMAIL",
+            from: "EMAIL_FROM_NAME",
+            reply_to: "EMAIL_REPLY_TO",
+            success: true,
+            message: "Mail Body",
+            app_link: "http://www.myapplink.com",
+            ci_build_link: "http://www.mycibuildlink.com",
+            template_path: "HTML_TEMPLATE_PATH",
+            attachment: "dirname/filename.ext"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
+      end
     end
   end
 end

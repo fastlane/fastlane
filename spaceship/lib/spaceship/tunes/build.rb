@@ -29,6 +29,11 @@ module Spaceship
       # @return (Boolean) Is this build currently processing?
       attr_accessor :processing
 
+      # @return (String) The build processing state, may be nil
+      # @example "invalidBinary"
+      # @example "processingFailed"
+      attr_accessor :processing_state
+
       # @return (Integer) The number of ticks since 1970 (e.g. 1413966436000)
       attr_accessor :upload_date
 
@@ -91,6 +96,7 @@ module Spaceship
         'id' => :id,
         'valid' => :valid,
         'processing' => :processing,
+        'processingState' => :processing_state,
 
         'installCount' => :install_count,
         'internalInstallCount' => :internal_install_count,
@@ -106,14 +112,6 @@ module Spaceship
         'buildTestInformationTO.externalStatus' => :external_testing_status
       )
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
-
       def setup
         super
 
@@ -124,7 +122,8 @@ module Spaceship
       def details
         response = client.build_details(app_id: self.apple_id,
                                          train: self.train_version,
-                                  build_number: self.build_version)
+                                  build_number: self.build_version,
+                                      platform: self.platform)
         response['apple_id'] = self.apple_id
         BuildDetails.factory(response)
       end
@@ -230,6 +229,7 @@ end
 #  "exceededFileSizeLimit"=>false,
 #  "wentLiveWithVersion"=>false,
 #  "processing"=>false,
+#  "processingState": nil,
 #  "id"=>5298023,
 #  "valid"=>true,
 #  "missingExportCompliance"=>false,

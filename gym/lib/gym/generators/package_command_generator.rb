@@ -1,12 +1,12 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
 require 'shellwords'
 
 # The concrete implementations
-require 'gym/generators/package_command_generator_legacy'
 require 'gym/generators/package_command_generator_xcode7'
 
 module Gym
@@ -46,12 +46,10 @@ module Gym
       end
 
       # The generator we need to use for the currently used Xcode version
+      # Since we dropped Xcode 6 support, it's just this class, but maybe we'll have
+      # new classes in the future
       def generator
-        if Gym.config[:use_legacy_build_api]
-          PackageCommandGeneratorLegacy
-        else
-          PackageCommandGeneratorXcode7
-        end
+        PackageCommandGeneratorXcode7
       end
     end
   end

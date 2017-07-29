@@ -1,0 +1,9 @@
+{
+  "data": null, 
+  "messages": {
+    "warn": null, 
+    "error": ["ITC.response.error.OPERATION_FAILED"],
+    "info": null
+  },
+  "statusCode": "ERROR"
+}

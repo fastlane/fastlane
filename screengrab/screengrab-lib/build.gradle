@@ -19,8 +19,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         versionCode versionCodeInt
@@ -46,8 +46,9 @@ publish {
 }
 
 dependencies {
-    compile "com.android.support:support-annotations:23.1.1"
-    compile 'com.android.support.test:runner:0.4.1'
-    compile 'com.android.support.test:rules:0.4.1'
-    compile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    compile "com.android.support:support-annotations:25.1.0"
+    compile 'com.android.support.test:runner:0.5'
+    compile 'com.android.support.test:rules:0.5'
+    compile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    compile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 }

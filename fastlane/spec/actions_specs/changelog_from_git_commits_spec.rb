@@ -17,6 +17,14 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%s%n%b\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
       end
 
+      it "Uses the provided date format to collect log messages if specified" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(pretty: '%s%n%b', date_format: 'short')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%s%n%b\" --date=\"short\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
+
       it "Does not match lightweight tags when searching for the last one if so requested" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(match_lightweight_tag: false)
@@ -33,7 +41,7 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
       end
 
-      it "handles tag names with characters that need shell escaping" do
+      it "Handles tag names with characters that need shell escaping" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(between: ['v1.8.0(30)', 'HEAD'])
         end").runner.execute(:test)
@@ -65,8 +73,40 @@ describe Fastlane do
         end.to raise_error(":between must not contain nil values")
       end
 
+      it "Converts a string value for :commits_count" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(commits_count: '10')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" -n 10")
+      end
+
+      it "Does not accept a :commits_count and :between at the same time" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(commits_count: 10, between: ['abcd', '1234'])
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'commits_count' and 'between'")
+      end
+
+      it "Does not accept a :commits_count < 1" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(commits_count: -1)
+          end").runner.execute(:test)
+        end.to raise_error(":commits_count must be >= 1")
+      end
+
+      it "Collects logs with specified number of commits" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(commits_count: 10)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" -n 10")
+      end
+
       it "Does not accept an invalid value for :merge_commit_filtering" do
-        values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')
+        values = Fastlane::Actions::GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')
         error_msg = "Valid values for :merge_commit_filtering are #{values}"
 
         expect do

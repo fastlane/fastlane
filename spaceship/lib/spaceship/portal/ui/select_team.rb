@@ -31,10 +31,29 @@ module Spaceship
       #     {...}
       #   ]
 
+      def self.ci?
+        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
+          return FastlaneCore::Helper.ci?
+        end
+        return false
+      end
+
+      def self.interactive?
+        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("UI")
+          return FastlaneCore::UI.interactive?
+        end
+        return true
+      end
+
       def select_team
         teams = client.teams
 
-        raise "Your account is in no teams" if teams.count == 0
+        if teams.count == 0
+          puts "No teams available on the Developer Portal"
+          puts "You must accept an invitation to a team for it to be available"
+          puts "To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html"
+          raise "Your account is in no teams"
+        end
 
         team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
         team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
@@ -58,6 +77,16 @@ module Spaceship
         end
 
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
+
+        unless self.class.interactive?
+          puts "Multiple teams found on the Developer Portal, Your Terminal is running in non-interactive mode! Cannot continue from here."
+          puts "Please check that you set FASTLANE_TEAM_ID or FASTLANE_TEAM_NAME to the right value."
+          puts "Available Teams:"
+          teams.each_with_index do |team, i|
+            puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
+          end
+          raise "Multiple Teams found; unable to choose, terminal not ineractive!"
+        end
 
         # User Selection
         loop do

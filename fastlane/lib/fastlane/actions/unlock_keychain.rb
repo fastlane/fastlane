@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class UnlockKeychainAction < Action
       def self.run(params)
-        keychain_path = self.expand_keychain_path(params[:path])
+        keychain_path = FastlaneCore::Helper.keychain_path(params[:path])
         add_to_search_list = params[:add_to_search_list]
         set_default = params[:set_default]
         commands = []
@@ -22,6 +22,8 @@ module Fastlane
         escaped_path = keychain_path.shellescape
         escaped_password = params[:password].shellescape
 
+        # Log the full path, useful for troubleshooting
+        UI.message("Unlocking keychain at path: #{escaped_path}")
         # unlock given keychain and disable lock and timeout
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
         commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
@@ -50,22 +52,6 @@ module Fastlane
         Fastlane::Actions.sh("security default-keychain -s #{escaped_path}", log: false)
       end
 
-      def self.expand_keychain_path(keychain_path)
-        possible_locations = []
-        possible_locations << keychain_path
-        possible_locations << "~/Library/Keychains/#{keychain_path}"
-        possible_locations << "~/Library/Keychains/#{keychain_path}.keychain"
-
-        possible_locations.each do |location|
-          expanded_location = File.expand_path(location)
-          if File.exist?(expanded_location)
-            return expanded_location
-          end
-        end
-
-        UI.user_error!("Could not find the keychain file in: #{possible_locations}")
-      end
-
       #####################################################
       # @!group Documentation
       #####################################################
@@ -75,7 +61,7 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the give keychain file and adds it to the keychain search list\n" \
+        "Unlocks the given keychain file and adds it to the keychain search list\n" \
         "Keychains can be replaced with `add_to_search_list: :replace`"
       end
 
@@ -83,10 +69,11 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PATH",
-                                       description: "Path to the Keychain file",
+                                       description: "Path to the keychain file",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",
+                                       sensitive: true,
                                        description: "Keychain password",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
@@ -109,6 +96,33 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'unlock_keychain( # Unlock an existing keychain and add it to the keychain search list
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret"
+          )',
+          'unlock_keychain( # By default the keychain is added to the existing. To replace them with the selected keychain you may use `:replace`
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret",
+            add_to_search_list: :replace # To only add a keychain use `true` or `:add`.
+          )',
+          'unlock_keychain( # In addition, the keychain can be selected as a default keychain
+            path: "/path/to/KeychainName.keychain",
+            password: "mysecret",
+            set_default: true
+          )',
+          'unlock_keychain( # If the keychain file is located in the standard location `~/Library/Keychains`, then it is sufficient to provide the keychain file name, or file name with its suffix.
+            path: "KeychainName",
+            password: "mysecret"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

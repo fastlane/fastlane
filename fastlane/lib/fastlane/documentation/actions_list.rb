@@ -13,7 +13,12 @@ module Fastlane
       rows = []
       all_actions(platform) do |action, name|
         current = []
-        current << name.yellow
+
+        if Fastlane::Actions.is_deprecated?(action)
+          current << "#{name} (DEPRECATED)".deprecated
+        else
+          current << name.yellow
+        end
 
         if action < Action
           current << action.description if action.description
@@ -32,7 +37,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "Available fastlane actions".green,
         headings: ['Action', 'Description', 'Author'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
       puts "  Platform filter: #{platform}".magenta if platform
       puts "  Total of #{rows.count} actions"
@@ -56,12 +61,41 @@ module Fastlane
         print_output_variables(action, filter)
         print_return_value(action, filter)
 
-        puts "More information can be found on https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md"
+        if Fastlane::Actions.is_deprecated?(action)
+          puts "==========================================".deprecated
+          puts "This action (#{filter}) is deprecated".deprecated
+          puts action.deprecated_notes.to_s.deprecated if action.deprecated_notes
+          puts "==========================================\n".deprecated
+        end
+
+        puts "More information can be found on https://docs.fastlane.tools/actions"
         puts ""
       else
         puts "Couldn't find action for the given filter.".red
         puts "==========================================\n".red
+
         print_all # show all available actions instead
+        print_suggestions(filter)
+      end
+    end
+
+    def self.print_suggestions(filter)
+      if !filter.nil? && filter.length > 1
+        action_names = []
+        all_actions(nil) do |action_ref, action_name|
+          action_names << action_name
+        end
+
+        corrections = []
+
+        if defined?(DidYouMean::SpellChecker)
+          spell_checker = DidYouMean::SpellChecker.new(dictionary: action_names)
+          corrections << spell_checker.correct(filter).compact
+        end
+
+        corrections << action_names.select { |name| name.include? filter }
+
+        puts "Did you mean: #{corrections.flatten.uniq.join(', ')}?".green unless corrections.flatten.empty?
       end
     end
 
@@ -85,7 +119,7 @@ module Fastlane
       authors = Array(action.author || action.authors)
       rows << ["Created by #{authors.join(', ').green}"] unless authors.empty?
 
-      puts Terminal::Table.new(title: name.green, rows: rows)
+      puts Terminal::Table.new(title: name.green, rows: FastlaneCore::PrintTable.transform_output(rows))
       puts ""
     end
 
@@ -96,7 +130,7 @@ module Fastlane
         puts Terminal::Table.new(
           title: "#{name} Options".green,
           headings: ['Key', 'Description', 'Env Var', 'Default'],
-          rows: options
+          rows: FastlaneCore::PrintTable.transform_output(options)
         )
       else
         puts "No available options".yellow
@@ -111,7 +145,7 @@ module Fastlane
       puts Terminal::Table.new(
         title: "#{name} Output Variables".green,
         headings: ['Key', 'Description'],
-        rows: output.map { |key, desc| [key.yellow, desc] }
+        rows: FastlaneCore::PrintTable.transform_output(output.map { |key, desc| [key.yellow, desc] })
       )
       puts "Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`"
       puts ""
@@ -120,13 +154,14 @@ module Fastlane
     def self.print_return_value(action, name)
       return unless action.return_value
 
-      puts Terminal::Table.new(title: "#{name} Return Value".green, rows: [[action.return_value]])
+      puts Terminal::Table.new(title: "#{name} Return Value".green,
+                                rows: FastlaneCore::PrintTable.transform_output([[action.return_value]]))
       puts ""
     end
 
     # Iterates through all available actions and yields from there
     def self.all_actions(platform = nil)
-      action_symbols = Fastlane::Actions.constants.select {|c| Fastlane::Actions.const_get(c).kind_of? Class }
+      action_symbols = Fastlane::Actions.constants.select { |c| Fastlane::Actions.const_get(c).kind_of?(Class) && c != :TestSampleCodeAction }
       action_symbols.sort.each do |symbol|
         action = Fastlane::Actions.const_get(symbol)
 
@@ -161,7 +196,7 @@ module Fastlane
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
             rows << current
             rows.last[0] = rows.last.first.yellow # color it yellow :)
-            rows.last << nil while fill_all and rows.last.count < 3 # to have a nice border in the table
+            rows.last << nil while fill_all && rows.last.count < 4 # to have a nice border in the table
           end
         end
       end

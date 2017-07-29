@@ -2,15 +2,22 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
       let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:xcodeproj) { "/tmp/fastlane/tests/fastlane/Test.xcodeproj" }
-      let (:plist_path) { "com.test.plist" }
+      let (:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
+      let (:proj_file) { "bundle.xcodeproj" }
+      let (:xcodeproj) { File.join(test_path, proj_file) }
+      let (:plist_path) { "Info.plist" }
+      let (:scheme) { "bundle" }
       let (:app_identifier) { "com.test.plist" }
       let (:display_name) { "Update Info Plist Test" }
 
       before do
         # Set up example info.plist
         FileUtils.mkdir_p(test_path)
-        FileUtils.mkdir_p(xcodeproj)
+        source = File.join(fixtures_path, proj_file)
+        destination = File.join(test_path, proj_file)
+
+        # Copy .xcodeproj fixture, as it will be modified during the test
+        FileUtils.cp_r(source, destination)
         File.write(File.join(test_path, plist_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleDisplayName</key><string>empty</string><key>CFBundleIdentifier</key><string>empty</string></dict></plist>')
       end
 
@@ -42,7 +49,23 @@ describe Fastlane do
         expect(result).to include("<string>#{app_identifier}</string>")
       end
 
+      it "obtains info plist from the scheme" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_info_plist ({
+            xcodeproj: '#{xcodeproj}',
+            scheme: '#{scheme}',
+            block: lambda { |plist|
+              plist['TEST_PLIST_SUCCESSFULLY_RETRIEVED'] = true
+            }
+          })
+        end").runner.execute(:test)
+        expect(result).to include("TEST_PLIST_SUCCESSFULLY_RETRIEVED")
+      end
+
       it "throws an error when the info plist file does not exist" do
+        # This is path update_info_plist creates to locate the plist file.
+        full_path = [test_path, proj_file, '..', "NOEXIST-#{plist_path}"].join(File::SEPARATOR)
+
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             update_info_plist ({
@@ -52,7 +75,20 @@ describe Fastlane do
               display_name: '#{display_name}'
             })
           end").runner.execute(:test)
-        end.to raise_error("Couldn't find info plist file at path 'NOEXIST-#{plist_path}'")
+        end.to raise_error("Couldn't find info plist file at path '#{full_path}'")
+      end
+
+      it "throws an error when the scheme does not exist" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            update_info_plist ({
+              xcodeproj: '#{xcodeproj}',
+              scheme: 'NOEXIST-#{scheme}',
+              app_identifier: '#{app_identifier}',
+              display_name: '#{display_name}'
+            })
+          end").runner.execute(:test)
+        end.to raise_error("Couldn't find scheme named 'NOEXIST-#{scheme}'")
       end
 
       it "returns 'false' if no plist parameters are specified" do

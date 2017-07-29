@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,9 +33,10 @@ screengrab
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/screengrab/LICENSE)
-[![Gem](https://img.shields.io/gem/v/screengrab.svg?style=flat)](http://rubygems.org/gems/screengrab)
 
 ###### Automated localized screenshots of your Android app on every device
+
+`screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using [`supply`](https://github.com/fastlane/fastlane/tree/master/supply).
 
 <img src="assets/running-screengrab.gif" width="640">
 
@@ -48,13 +51,15 @@ screengrab
 Install the gem
 
 ```
-sudo gem install screengrab
+sudo gem install fastlane
 ```
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:0.3.2'
+androidTestCompile 'tools.fastlane:screengrab:x.x.x'
 ```
+
+The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
 
 ##### Configuring your Manifest Permissions
 Ensure that the following permissions exist in your **src/debug/AndroidManifest.xml**
@@ -78,15 +83,29 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 2.  To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
-- Then, before running `screengrab` you'll need a debug and test apk
+- Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
-- Once complete run `screengrab` in your app project directory to generate screenshots
+- Once complete run `fastlane screengrab` in your app project directory to generate screenshots
     - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
-- Your screenshots will be saved in a /screenshots directory in the directory where you ran `screengrab`
+- Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran `screengrab`
+
+## Improved screenshot capture with UI Automator
+
+As of `screengrab` 0.5.0, you can specify different strategies to control the way `screengrab` captures screenshots. The newer strategy delegates to [UI Automator](https://developer.android.com/topic/libraries/testing-support-library/index.html#UIAutomator) which fixes a number of problems compared to the original strategy:
+
+* Shadows/elevation are correctly captured for Material UI
+* Multi-window situations are correctly captured (dialogs, etc.)
+* Works on Android N
+
+However, UI Automator requires a device with **API level >= 18**, so it is not yet the default strategy. To enable it for all screenshots by default, make the following call before your tests run:
+
+```java
+Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+```
 
 ## Advanced Screengrabfile Configuration
 
-Running `screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
+Running `fastlane screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
 
 The `Screengrabfile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
 
@@ -108,12 +127,12 @@ clear_previous_screenshots true
 For more information about all available options run
 
 ```
-screengrab --help
+fastlane screengrab --help
 ```
 
 # Tips
 
-# UI Tests
+## UI Tests
 
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
@@ -150,14 +169,18 @@ When using JUnit 3 you'll need to add a bit more code:
 
 If you're having trouble getting your device unlocked and the screen activated to run tests, try using `ScreenUtil.activateScreenForTesting(activity);` in your test setup.
 
+## Clean Status Bar
+
+You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
+
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload screenshots, metadata and your app to the Play Store
 
 You can find all the tools on [fastlane.tools](https://fastlane.tools).
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup.

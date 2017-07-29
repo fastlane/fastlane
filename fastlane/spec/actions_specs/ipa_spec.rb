@@ -121,6 +121,7 @@ describe Fastlane do
       end
 
       it "works with object argument with all and extras and auto-use sigh profile if not given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ENV["SIGH_PROFILE_PATH"] = "some/great/value.file"
 
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -141,7 +142,7 @@ describe Fastlane do
         expect(result).to include("-m \"#{ENV['SIGH_PROFILE_PATH']}\"")
         expect(result.size).to eq(11)
 
-        dest_path = File.expand_path(File.join('..', 'Nowhere'))
+        dest_path = File.expand_path('Nowhere')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH]).to eq(File.join(dest_path, 'test.ipa'))
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH]).to eq(File.join(dest_path, 'test.app.dSYM.zip'))
 

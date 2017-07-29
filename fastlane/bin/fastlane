@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
-
-require "fastlane/cli_tools_distributor"
-Fastlane::CLIToolsDistributor.take_off

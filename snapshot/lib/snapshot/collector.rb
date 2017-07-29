@@ -26,11 +26,11 @@ module Snapshot
         FileUtils.mkdir_p(language_folder)
 
         device_name = device_type.delete(" ")
-        components = [device_name, launch_arguments_index, name].delete_if { |a| a.to_s.length == 0 }
-
-        output_path = File.join(language_folder, components.join("-") + ".png")
+        components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+        screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
+        output_path = File.join(language_folder, screenshot_name)
         from_path = File.join(attachments_path, filename)
-        if $verbose
+        if FastlaneCore::Globals.verbose?
           UI.success "Copying file '#{from_path}' to '#{output_path}'..."
         else
           UI.success "Copying '#{output_path}'..."
@@ -73,16 +73,36 @@ module Snapshot
     end
 
     def self.check_activity(activity, to_store)
-      # We now check if it's the rotation gesture, because that's the only thing we care about
-      if activity["Title"] == "Set device orientation to Unknown"
-        if activity["Attachments"]
-          to_store << activity["Attachments"].last["FileName"]
-        else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
-          to_store << "Screenshot_#{activity['UUID']}.png"
-        end
+      # On iOS, we look for the "Unknown" rotation gesture that signals a snapshot was taken here.
+      # On tvOS, we look for "Browser" count.
+      # On OSX we look for type `Fn` key on keyboard, it shouldn't change anything for app
+      # These are events that are not normally triggered by UI testing, making it easy for us to
+      # locate where snapshot() was invoked.
+      ios_detected = activity["Title"] == "Set device orientation to Unknown"
+      tvos_detected = activity["Title"] == "Get number of matches for: Children matching type Browser"
+      osx_detected = activity["Title"] == "Type 'Fn' key (XCUIKeyboardKeySecondaryFn) with no modifiers"
+      if ios_detected || tvos_detected || osx_detected
+        find_screenshot = find_screenshot(activity)
+        to_store << find_screenshot
       end
+
       (activity["SubActivities"] || []).each do |subactivity|
         check_activity(subactivity, to_store)
+      end
+    end
+
+    def self.find_screenshot(activity)
+      (activity["SubActivities"] || []).each do |subactivity|
+        # we are interested in `Synthesize event` part of event in subactivities
+        return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
+      end
+
+      if activity["Attachments"] && activity["Attachments"].last && activity["Attachments"].last["Filename"]
+        return activity["Attachments"].last["Filename"]
+      elsif activity["Attachments"]
+        return activity["Attachments"].last["FileName"]
+      else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
+        return "Screenshot_#{activity['UUID']}.png"
       end
     end
   end

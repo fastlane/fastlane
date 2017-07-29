@@ -27,6 +27,14 @@ module Fastlane
         'KrauseFx'
       end
 
+      def self.example_code
+        Actions::PilotAction.example_code
+      end
+
+      def self.category
+        Actions::PilotAction.category
+      end
+
       def self.is_supported?(platform)
         Actions::PilotAction.is_supported?(platform)
       end

@@ -1,22 +1,43 @@
+-----
+
+<h4 align="center">For fastlane guides, check out the new <a href="https://docs.fastlane.tools">docs.fastlane.tools</a> page</h4>
+
+-----
+
+
 # Documentation
 
-- [fastlane guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Guide.md) to get started. 
-- [Actions.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md) for all the built-in integrations
-- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
-- [Code signing guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md) to show you how to do code signing right.
+- [Actions.md](https://docs.fastlane.tools/actions) for all the built-in integrations
+- [Code signing guide](Codesigning) How to get started with code signing and resolve common issues
 - [FAQs](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/FAQs.md) for frequently asked questions
-- [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips.
-- [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
+- [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips
 - [Platforms.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
 - [Appfile.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md) describes the `Appfile`
-- [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#passing-parameters) to show how to pass parameters to lanes from the command line.
 - [Android.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Android.md) Getting started with fastlane for Android
 - [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
 - [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
 
+### Plugins
+
+- [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) Getting started with using and building fastlane plugins
+- [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) A list of all available fastlane plugins
+- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) for help when plugins don't work
+
+### CI Systems
+
+- [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
+- [Circle.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Circle.md) for Circle CI specific help
+- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
+
+-----
+
+<h4 align="center">For fastlane guides, check out the new <a href="https://docs.fastlane.tools">docs.fastlane.tools</a> page</h4>
+
+-----
+
 ## Fastfile
 
-The Fastfile is used to configure `fastlane`. Open it in your favourite text editor, using Ruby syntax highlighting.
+The Fastfile is used to configure [fastlane](https://fastlane.tools). Open it in your favourite text editor, using Ruby syntax highlighting.
 
 Defining lanes is easy. 
 
@@ -57,12 +78,14 @@ end
 ### `error` block
 
 This block will get executed when an error occurs, in any of the blocks (*before_all*, the lane itself or *after_all*).
+You can get more information about the error using the `error_info` property.
 
 ```ruby
 error do |lane, exception|
   slack(
     message: "Something went wrong with the deployment.",
-    success: false
+    success: false,
+    payload: { "Error Info" => exception.error_info.to_s } 
   )
 end
 ```

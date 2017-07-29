@@ -6,12 +6,6 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DEFAULT_PLATFORM]).to eq(:ios)
       end
 
-      it "raises an error if platform is not supported" do
-        expect do
-          Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
-        end.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android]")
-      end
-
       it "raises an error if no platform is given" do
         expect do
           Fastlane::Actions::DefaultPlatformAction.run([])
@@ -23,6 +17,23 @@ describe Fastlane do
           default_platform :ios
         end").runner.execute(:test)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DEFAULT_PLATFORM]).to eq(:ios)
+      end
+    end
+    describe "Extra platforms" do
+      around(:each) do |example|
+        Fastlane::SupportedPlatforms.extra = []
+        example.run
+        Fastlane::SupportedPlatforms.extra = []
+      end
+      it "displays a warning if a platform is not supported" do
+        expect(FastlaneCore::UI).to receive(:important).with("Platform 'notSupportedOS' is not officially supported. Currently supported platforms are [:ios, :mac, :android].")
+        Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
+      end
+
+      it "doesn't display a warning at every run if a platform has been added to extra" do
+        Fastlane::SupportedPlatforms.extra = [:notSupportedOS]
+        expect(FastlaneCore::UI).not_to receive(:important)
+        Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
       end
     end
   end

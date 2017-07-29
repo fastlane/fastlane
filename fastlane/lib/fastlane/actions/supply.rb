@@ -5,22 +5,20 @@ module Fastlane
         require 'supply'
         require 'supply/options'
 
-        begin
-          FastlaneCore::UpdateChecker.start_looking_for_update('supply') unless Helper.is_test?
-
+        # If no APK params were provided, try to fill in the values from lane context, preferring
+        # the multiple APKs over the single APK if set.
+        if params[:apk_paths].nil? && params[:apk].nil?
           all_apk_paths = Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] || []
-          if all_apk_paths.length > 1
-            params[:apk_paths] ||= all_apk_paths
+          if all_apk_paths.size > 1
+            params[:apk_paths] = all_apk_paths
           else
-            params[:apk] ||= Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+            params[:apk] = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
           end
-
-          Supply.config = params # we already have the finished config
-
-          Supply::Uploader.new.perform_upload
-        ensure
-          FastlaneCore::UpdateChecker.show_update_status('supply', Supply::VERSION)
         end
+
+        Supply.config = params # we already have the finished config
+
+        Supply::Uploader.new.perform_upload
       end
 
       #####################################################
@@ -45,16 +43,24 @@ module Fastlane
       end
 
       def self.return_value
-        # If you method provides a return value, you can describe here what it does
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["KrauseFx"]
       end
 
       def self.is_supported?(platform)
         platform == :android
+      end
+
+      def self.example_code
+        [
+          'supply'
+        ]
+      end
+
+      def self.category
+        :production
       end
     end
   end

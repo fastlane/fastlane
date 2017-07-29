@@ -15,12 +15,12 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Get an Array of Connected android device serials"
+        "Get an array of Connected android device serials"
       end
 
       def self.details
         [
-          "fetches device list via adb"
+          "Fetches device list via adb, e.g. run an adb command on all connected devices."
         ].join("\n")
       end
 
@@ -31,16 +31,34 @@ module Fastlane
                                        description: "The path to your `adb` binary",
                                        is_string: true,
                                        optional: true,
-                                       default_value: "adb"
-                                      )
+                                       default_value: "adb")
         ]
       end
 
       def self.output
       end
 
+      def self.example_code
+        [
+          'adb_devices.each do |device|
+            model = adb(command: "shell getprop ro.product.model",
+                        serial: device.serial).strip
+
+            puts "Model #{model} is connected"
+          end'
+        ]
+      end
+
+      def self.sample_return_value
+        []
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.return_value
-        "Array of devices"
+        "Returns an array of all currently connected android devices"
       end
 
       def self.authors

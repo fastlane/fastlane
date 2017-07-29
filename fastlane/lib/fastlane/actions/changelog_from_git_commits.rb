@@ -6,15 +6,18 @@ module Fastlane
 
     class ChangelogFromGitCommitsAction < Action
       def self.run(params)
-        if params[:between]
-          from, to = params[:between]
+        if params[:commits_count]
+          UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
-          from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
-          UI.verbose("Found the last Git tag: #{from}")
-          to = 'HEAD'
+          if params[:between]
+            from, to = params[:between]
+          else
+            from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
+            UI.verbose("Found the last Git tag: #{from}")
+            to = 'HEAD'
+          end
+          UI.success("Collecting Git commits between #{from} and #{to}")
         end
-
-        UI.success("Collecting Git commits between #{from} and #{to}")
 
         # Normally it is not good practice to take arbitrary input and convert it to a symbol
         # because prior to Ruby 2.2, symbols are never garbage collected. However, we've
@@ -26,9 +29,17 @@ module Fastlane
           merge_commit_filtering = :exclude_merges
         end
 
-        changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering)
+        if params[:commits_count]
+          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
+        else
+          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
+        end
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
+
+        puts ""
+        puts changelog
+        puts ""
 
         changelog
       end
@@ -53,13 +64,24 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :between,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN',
-                                       description: 'Array containing two Git revision values between which to collect messages',
+                                       description: 'Array containing two Git revision values between which to collect messages, you mustn\'t use it with :commits_count key at the same time',
                                        optional: true,
                                        is_string: false,
+                                       conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
                                          UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
                                          UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
                                          UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :commits_count,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
+                                       description: 'Number of commits to include in changelog, you mustn\'t use it with :between key at the same time',
+                                       optional: true,
+                                       is_string: false,
+                                       conflicting_options: [:between],
+                                       type: Integer,
+                                       verify_block: proc do |value|
+                                         UI.user_error!(":commits_count must be >= 1") unless value.to_i >= 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
@@ -67,6 +89,17 @@ module Fastlane
                                        optional: true,
                                        default_value: '%B',
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :date_format,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_DATE_FORMAT',
+                                       description: 'The date format applied to each commit while generating the collected value',
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :ancestry_path,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_ANCESTRY_PATH',
+                                       description: 'Whether or not to use ancestry-path param',
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :tag_match_pattern,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_MATCH_PATTERN',
                                        description: 'A glob(7) pattern to match against when finding the last git tag',
@@ -87,14 +120,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
-                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}",
+                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
                                          matches_option = GIT_MERGE_COMMIT_FILTERING_OPTIONS.any? { |opt| opt.to_s == value }
-                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map {|o| "'#{o}'" }.join(', ')}") unless matches_option
-                                       end
-                                      )
+                                         UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}") unless matches_option
+                                       end)
         ]
       end
 
@@ -103,11 +135,28 @@ module Fastlane
       end
 
       def self.author
-        ['mfurtak', 'asfalcone']
+        ['mfurtak', 'asfalcone', 'SiarheiFedartsou', 'allewun']
       end
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'changelog_from_git_commits',
+          'changelog_from_git_commits(
+            between: ["7b092b3", "HEAD"],            # Optional, lets you specify a revision/tag range between which to collect commit info
+            pretty: "- (%ae) %s",                    # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
+            date_format: "short",                    # Optional, lets you provide an additional date format to dates within the pretty-formatted string
+            match_lightweight_tag: false,            # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+            merge_commit_filtering: "exclude_merges" # Optional, lets you filter out merge commits
+          )'
+        ]
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

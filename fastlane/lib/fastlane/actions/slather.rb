@@ -5,27 +5,35 @@ module Fastlane
     end
 
     class SlatherAction < Action
-
+      # https://github.com/SlatherOrg/slather/blob/cbc5099cd25beb43fd978b7a3e5428f02230122d/lib/slather/command/coverage_command.rb#L24
       ARGS_MAP = {
-        build_directory: "--build-directory",
-        input_format: "--input-format",
-        scheme: "--scheme",
-        buildkite: "--buildkite",
-        jenkins: "--jenkins",
-        travis: "--travis",
-        circleci: "--circleci",
-        coveralls: "--coveralls",
-        simple_output: "--simple-output",
-        gutter_json: "--gutter-json",
-        cobertura_xml: "--cobertura-xml",
-        html: "--html",
-        show: "--show",
-        source_directory: "--source-directory",
-        output_directory: "--output-directory",
-        binary_basename: "--binary-basename",
-        binary_file: "--binary-file",
-        ignore: "--ignore",
-        workspace: "--workspace"
+          travis: '--travis',
+          circleci: '--circleci',
+          jenkins: '--jenkins',
+          buildkite: '--buildkite',
+          teamcity: '--teamcity',
+
+          coveralls: '--coveralls',
+          simple_output: '--simple-output',
+          gutter_json: '--gutter-json',
+          cobertura_xml: '--cobertura-xml',
+          html: '--html',
+          show: '--show',
+
+          build_directory: '--build-directory',
+          source_directory: '--source-directory',
+          output_directory: '--output-directory',
+          ignore: '--ignore',
+          verbose: '--verbose',
+
+          input_format: '--input-format',
+          scheme: '--scheme',
+          configuration: '--configuration',
+          workspace: '--workspace',
+          binary_file: '--binary-file',
+          binary_basename: '--binary-basename',
+          source_files: '--source-files',
+          decimals: '--decimals'
       }.freeze
 
       def self.run(params)
@@ -45,7 +53,20 @@ module Fastlane
         File.file?('.slather.yml')
       end
 
+      def self.slather_version
+        require 'slather'
+        Slather::VERSION
+      end
+
+      def self.configuration_available?
+        Gem::Version.new('2.4.1') <= Gem::Version.new(slather_version)
+      end
+
       def self.validate_params!(params)
+        if params[:configuration]
+          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?
+        end
+
         if params[:proj] || has_config_file
           true
         else
@@ -55,7 +76,7 @@ module Fastlane
 
       def self.build_command(params)
         command = []
-        command.push("bundle exec") if params[:use_bundle_exec]
+        command.push("bundle exec") if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
         command << "slather coverage"
 
         ARGS_MAP.each do |key, cli_param|
@@ -98,8 +119,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :build_directory,
                                        env_name: "FL_SLATHER_BUILD_DIRECTORY", # The name of the environment variable
                                        description: "The location of the build output", # a short description of this parameter
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :proj,
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
@@ -110,21 +130,27 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :workspace,
                                        env_name: "FL_SLATHER_WORKSPACE",
                                        description: "The workspace that slather looks at",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
-                                       optional: true
-                                      ),
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_SLATHER_CONFIGURATION", # The name of the environment variable
+                                       description: "Configuration to use when calling slather (since slather-2.4.1)",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
                                        description: "The input format that slather should look for",
-                                       optional: true
-                                      ),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,
                                        env_name: "FL_SLATHER_BUILDKITE_ENABLED", # The name of the environment variable
                                        description: "Tell slather that it is running on Buildkite",
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :teamcity,
+                                       env_name: "FL_SLATHER_TEAMCITY_ENABLED", # The name of the environment variable
+                                       description: "Tell slather that it is running on TeamCity",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :jenkins,
@@ -185,33 +211,64 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        description: "Tell slather to ignore files matching a path or any path from an array of paths",
                                        is_string: false,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_SLATHER_VERBOSE",
+                                       description: "Tell slather to enable verbose mode",
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
                                       description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
                                       is_string: false,
                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_basename,
-                                      env_name: "FL_SLATHER_BINARY_BASENAME",
-                                      description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
-                                      default_value: false),
+                                       env_name: "FL_SLATHER_BINARY_BASENAME",
+                                       description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_file,
-                                      env_name: "FL_SLATHER_BINARY_FILE",
-                                      description: "Binary file name to be used for code coverage",
-                                      default_value: false)
+                                       env_name: "FL_SLATHER_BINARY_FILE",
+                                       description: "Binary file name to be used for code coverage",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :source_files,
+                                       env_name: "FL_SLATHER_SOURCE_FILES",
+                                       description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
+                                       default_value: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :decimals,
+                                      env_name: "FL_SLATHER_DECIMALS",
+                                      description: "The amount of decimals to use for % coverage reporting",
+                                      is_string: false,
+                                      default_value: false,
+                                      optional: true)
         ]
       end
 
       def self.output
-        # Define the shared values you are going to provide
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["mattdelves"]
       end
 
       def self.is_supported?(platform)
         [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'slather(
+            build_directory: "foo",
+            input_format: "bah",
+            scheme: "MyScheme",
+            proj: "MyProject.xcodeproj"
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

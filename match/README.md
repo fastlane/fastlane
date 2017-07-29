@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <b>match</b>
+  <b>match</b> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,14 +33,17 @@ match
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/match/LICENSE)
-[![Gem](https://img.shields.io/gem/v/match.svg?style=flat)](http://rubygems.org/gems/match)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
 ###### Easily sync your certificates and profiles across your team using git
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
+`match` is the implementation of the https://codesigning.guide concept. `match` creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. `match` also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+
+[More information on how to get started with codesigning](/fastlane/docs/Codesigning)
+
 -------
+
 <p align="center">
     <a href="#why-match">Why?</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -49,7 +54,7 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 
@@ -74,8 +79,8 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 
 ### What does `match` do for you?
 
-              |  match
---------------------------|------------------------------------------------------------
+|          |  match  |
+|----------|---------|
 :arrows_counterclockwise:  | Automatically sync your iOS keys and profiles across all your team members using git
 :package:  | Handle all the heavy lifting of creating and storing your certificates and profiles
 :computer:  | Setup codesigning on a new machine in under a minute
@@ -92,7 +97,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 ## Installation
 
 ```
-sudo gem install match
+sudo gem install fastlane
 ```
 
 Make sure you have the latest version of the Xcode command line tools installed:
@@ -110,12 +115,12 @@ Make sure you have the latest version of the Xcode command line tools installed:
 3. Run the following in your project folder to start using `match`:
 
 ```
-match init
+fastlane match init
 ```
 
 <img src="assets/match_init.gif" width="550" />
 
-You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. `match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -128,21 +133,27 @@ app_identifier "tools.fastlane.app"
 username "user@fastlane.tools"
 ```
 
-#### Important: Use one git repo per team
+#### Important: Use one git branch per team
 
-`match` was designed to have one git repository per Apple account. If you work in multiple teams, please create one repo for each of them. More information on [codesigning.guide](https://codesigning.guide)
+`match` also supports storing certificates of multiple teams in one repo, by using separate git branches. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, `match` will automatically create and use the specified branch for you.
+
+```ruby
+match(git_branch: "team1", username: "user@team1.com")
+match(git_branch: "team2", username: "user@team2.com")
+```
 
 ### Run
 
 > Before running `match` for the first time, you should consider clearing your existing profiles and certificates using the [match nuke command](#nuke).
 
-After running `match init` you can run the following to generate new certificates and profiles:
+After running `fastlane match init` you can run the following to generate new certificates and profiles:
 
 ```
-match appstore
+fastlane match appstore
 ```
+
 ```
-match development
+fastlane match development
 ```
 
 <img src="assets/match_appstore_small.gif" width="550" />
@@ -154,54 +165,51 @@ The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning 
 To get a more detailed output of what `match` is doing use
 
 ```
-match --verbose
+fastlane match --verbose
 ```
 
 For a list of all available options run
 
 ```
-match --help
+fastlane match --help
 ```
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, call `match` for each of them:
+If you have several targets with different bundle identifiers, supply them as a comma-separated list to   :
 
 ```
-match appstore -a tools.fastlane.app
-match appstore -a tools.fastlane.app.watchkitapp
+fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a match lane like this:
+You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
 
 ```
-lane :match do
-  match(app_identifier: "com.krausefx.app1", readonly: true)
-  match(app_identifier: "com.krausefx.app2", readonly: true)
-  match(app_identifier: "com.krausefx.app3", readonly: true)
+lane :certificates do
+  match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"], readonly: true)
 end
 ```
 
-Then all your team has to do is `fastlane match` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
 #### Passphrase
 
 When running `match` for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase using an environment variable, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
 
 #### New machine
 
 To set up the certificates and provisioning profiles on a new machine, you just run the same command using:
 
 ```
-match development
+fastlane match development
 ```
 
 You can also run `match` in a `readonly` mode to be sure it won't create any new certificates or profiles.
 
 ```
-match development --readonly
+fastlane match development --readonly
 ```
 
 #### Access Control
@@ -244,9 +252,32 @@ match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
       type: "adhoc",
       app_identifier: "tools.fastlane.app")
 
+match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+      type: "enterprise",
+      app_identifier: "tools.fastlane.app")
+
 # `match` should be called before building the app with `gym`
 gym
 ...
+```
+
+##### Registering new devices
+
+By using `match`, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use `match` in combination with the [`register_devices`](https://docs.fastlane.tools/actions#register_devices) action.
+
+```ruby
+lane :beta do
+  register_devices(devices_file: "./devices.txt")
+  match(type: "adhoc", force_for_new_devices: true)
+end
+```
+
+By using the `force_for_new_devices` parameter, `match` will check if the device count has changed since the last time you ran `match`, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
+
+If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
+
+```
+fastlane match adhoc --force_for_new_devices
 ```
 
 ##### Multiple Targets
@@ -254,37 +285,28 @@ gym
 If your app has multiple targets (e.g. Today Widget or WatchOS Extension)
 
 ```ruby
-match(app_identifier: "tools.fastlane.app", type: "appstore")
-match(app_identifier: "tools.fastlane.app.today_widget", type: "appstore")
+match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"], type: "appstore")
 ```
 
 `match` can even use the same one Git repository for all bundle identifiers.
 
 ### Setup Xcode project
 
-To make sure Xcode is using the right provisioning profile for each target, don't use the `Automatic` feature for the profile selection.
-
-Additionally it is recommended to disable the `Fix Issue` button using the [FixCode Xcode Plugin](https://github.com/neonichu/FixCode). The `Fix Issue` button can revoke your existing certificates, which will invalidate your provisioning profiles.
+[Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
 `match` automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
-<img src="assets/UDIDPrint.png" width="700" />
-
-Open your target settings, open the dropdown for `Provisioning Profile` and select `Other`:
-
-<img src="assets/XcodeProjectSettings.png" width="700" />
-
-Profile environment variables are named after `$(sigh_<bundle_identifier>_<profile_type>)`
-
-e.g. `$(sigh_tools.fastlane.app_development)`
+More information about how to setup your Xcode project can be found [here](https://docs.fastlane.tools/codesigning/XcodeProject/)
 
 #### To build from Xcode manually
 
 This is useful when installing your application on your device using the Development profile.
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
+
+[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
 
 ### Continuous Integration
 
@@ -295,23 +317,23 @@ Some repo hosts might allow you to use the same deploy key for different repos, 
 
 There are a few ways around this:
 
-1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/docs/adding-projects-with-submodules).
-2. Some CIs allow you to upload your signing credientials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
+1. Create a new account on your repo host with read-only access to your `match` repo. Bitrise have a good description of this [here](http://devcenter.bitrise.io/faq/adding-projects-with-submodules/).
+2. Some CIs allow you to upload your signing credentials manually, but obviously this means that you'll have to re-upload the profiles/keys/certs each time they change.
 
 Neither solution is pretty. It's one of those _trade-off_ things. Do you care more about **not** having an extra account sitting around, or do you care more about having the :sparkles: of auto-syncing of credentials.
 
 #### Encryption password
-Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. Match will pick this up when it's run.
+Once you've decided which approach to take, all that's left to do is to set your encryption password as secret environment variable named `MATCH_PASSWORD`. `match` will pick this up when it's run.
 
 ### Nuke
 
-If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store will still work. Builds distributed via TestFlight might be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
+If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store / TestFlight will still work. Builds distributed via Ad Hoc or Enterprise will be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run `match` to generate your certificates and profiles again.
 
 To revoke all certificates and provisioning profiles for a specific environment:
 
 ```sh
-match nuke development
-match nuke distribution
+fastlane match nuke development
+fastlane match nuke distribution
 ```
 
 <img src="assets/match_nuke.gif" width="550" />
@@ -323,7 +345,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 To change the password of your repo and therefore decrypting and encrypting all files run
 
 ```
-match change_password
+fastlane match change_password
 ```
 
 You'll be asked for the new password on all your machines on the next run.
@@ -351,7 +373,7 @@ What's the worst that could happen for each of the profile types?
 
 ##### App Store Profiles
 
-An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review (which takes around 7 days). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
+An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
 
 ##### Development and Ad Hoc Profiles
 
@@ -361,19 +383,19 @@ In general those profiles are harmless as they can only be used to install a sig
 
 Attackers could use an In-House profile to distribute signed application to a potentially unlimited number of devices. All this would run under your company name and it could eventually lead to Apple revoking your In-House account. However it is very easy to revoke a certificate to remotely break the app on all devices.
 
-Because of the potentially dangerous nature of In-House profiles we decided to not allow the use of `match` with enterprise accounts.
+Because of the potentially dangerous nature of In-House profiles please use _match_ with enterprise profiles with caution, ensure your git repository is private and use a secure password.
 
 ##### To sum up
 
 - You have full control over the access list of your Git repo, no third party service involved
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
-- `match` does not currently support In-House Enterprise profiles as they are harder to control
+- Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
 - The complete source code of `match` is fully open source on [GitHub](https://github.com/fastlane/fastlane/tree/master/match)
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -385,6 +407,7 @@ Because of the potentially dangerous nature of In-House profiles we decided to n
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 # Need help?
 Please submit an issue on GitHub and provide information about your setup

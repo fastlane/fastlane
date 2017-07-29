@@ -33,15 +33,12 @@ module Produce
     end
 
     def valid_services_for(options)
-      allowed_keys = [:app_group, :associated_domains, :data_protection, :healthkit, :homekit,
-                      :wireless_conf, :icloud, :inter_app_audio, :passbook, :push_notification, :vpn_conf]
+      allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :healthkit, :homekit,
+                      :wireless_conf, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :sirikit, :vpn_conf]
       options.__hash__.select { |key, value| allowed_keys.include? key }
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Metrics/MethodLength
-    # rubocop:disable Metrics/CyclomaticComplexity
-    # rubocop:disable Metrics/AbcSize
     def update(on, app, options)
       updated = valid_services_for(options).count
 
@@ -52,6 +49,16 @@ module Produce
           app.update_service(Spaceship.app_service.app_group.on)
         else
           app.update_service(Spaceship.app_service.app_group.off)
+        end
+      end
+
+      if options.apple_pay
+        UI.message("\tApple Pay")
+
+        if on
+          app.update_service(Spaceship.app_service.apple_pay.on)
+        else
+          app.update_service(Spaceship.app_service.apple_pay.off)
         end
       end
 
@@ -73,7 +80,7 @@ module Produce
           when "complete"
             app.update_service(Spaceship.app_service.data_protection.complete)
           when "unlessopen"
-            app.update_service(Spaceship.app_service.data_proection.unless_open)
+            app.update_service(Spaceship.app_service.data_protection.unless_open)
           when "untilfirstauth"
             app.update_service(Spaceship.app_service.data_protection.until_first_auth)
           else
@@ -81,6 +88,16 @@ module Produce
           end
         else
           app.update_service(Spaceship.app_service.data_protection.off)
+        end
+      end
+
+      if options.game_center
+        UI.message("\tGame Center")
+
+        if on
+          app.update_service(Spaceship.app_service.game_center.on)
+        else
+          app.update_service(Spaceship.app_service.game_center.off)
         end
       end
 
@@ -133,6 +150,16 @@ module Produce
         end
       end
 
+      if options.in_app_purchase
+        UI.message("\tIn-App Purchase")
+
+        if on
+          app.update_service(Spaceship.app_service.in_app_purchase.on)
+        else
+          app.update_service(Spaceship.app_service.in_app_purchase.off)
+        end
+      end
+
       if options.inter_app_audio
         UI.message("\tInter-App Audio")
 
@@ -160,6 +187,16 @@ module Produce
           app.update_service(Spaceship.app_service.push_notification.on)
         else
           app.update_service(Spaceship.app_service.push_notification.off)
+        end
+      end
+
+      if options.sirikit
+        UI.message("\tSiriKit")
+
+        if on
+          app.update_service(Spaceship.app_service.siri_kit.on)
+        else
+          app.update_service(Spaceship.app_service.siri_kit.off)
         end
       end
 

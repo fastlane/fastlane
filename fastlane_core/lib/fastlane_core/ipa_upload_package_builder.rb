@@ -12,8 +12,6 @@ module FastlaneCore
       FileUtils.rm_rf self.package_path if File.directory?(self.package_path)
       FileUtils.mkdir_p self.package_path
 
-      lib_path = Helper.gem_path("fastlane_core")
-
       ipa_path = copy_ipa(ipa_path)
       @data = {
         apple_id: app_id,
@@ -24,11 +22,11 @@ module FastlaneCore
         platform: (platform || "ios") # pass "appletvos" for Apple TV's IPA
       }
 
-      xml_path = File.join(lib_path, "lib/assets/XMLTemplate.xml.erb")
+      xml_path = File.join(FastlaneCore::ROOT, "lib/assets/XMLTemplate.xml.erb")
       xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
-      UI.success("Wrote XML data to '#{self.package_path}'") if $verbose
+      UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
 
       return package_path
     end

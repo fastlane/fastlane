@@ -18,8 +18,10 @@
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
   <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
+  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
+  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
 </p>
+
 -------
 
 <p align="center">
@@ -31,19 +33,19 @@ pem
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/pem/LICENSE)
-[![Gem](https://img.shields.io/gem/v/pem.svg?style=flat)](http://rubygems.org/gems/pem)
 
 ###### Automatically generate and renew your push notification profiles
 
 Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server?
 
-`pem` does all that for, just by running `pem`.
+`pem` does all that for you, just by simply running `pem`.
 
-To automate iOS Provisioning profiles you can use [sigh](https://github.com/fastlane/fastlane/tree/master/sigh).
+`pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
 
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
+To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
 -------
+
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#installation">Installation</a> &bull;
@@ -55,18 +57,17 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 -------
 
-<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 Well, it's actually just one: Generate the ```pem``` file for your server.
-
 
 Check out this gif:
 
 ![assets/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Installation
-    sudo gem install pem
+    sudo gem install fastlane
 
 Make sure, you have the latest version of the Xcode command line tools installed:
 
@@ -74,7 +75,7 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    pem
+    fastlane pem
 
 Yes, that's the whole command!
 
@@ -85,47 +86,63 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-```pem``` will never revoke your existing certificates.
+Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
 
 If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
 
-    pem --force
+    fastlane pem --force
 
 You can pass parameters like this:
 
-    pem -a com.krausefx.app -u username
+    fastlane pem -a com.krausefx.app -u username
 
 If you want to generate a development certificate instead:
 
-    pem --development
+    fastlane pem --development
 
 Set a password for your `p12` file:
 
-    pem -p "MyPass"
+    fastlane pem -p "MyPass"
 
 You can specify a name for the output file:
 
-    pem -o my.pem
+    fastlane pem -o my.pem
 
 To get a list of available options run:
 
-    pem --help
+    fastlane pem --help
 
 
 ### Note about empty `p12` passwords and Keychain Access.app
 
 `pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password.
-While the file is valid, Mac OSX's Keychain Access will not allow you to open the file without specifing a passphrase.
+While the file is valid, the Mac's Keychain Access will not allow you to open the file without specifying a passphrase.
 
 Instead, you may verify the file is valid using OpenSSL:
 
     openssl pkcs12 -info -in my.p12
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to `pem` and back to `p12`:
+
+    % openssl pkcs12 -in my.p12 -out my.pem
+    Enter Import Password:
+      <hit enter: the p12 has no password>
+    MAC verified OK
+    Enter PEM pass phrase:
+      <enter a temporary password to encrypt the pem file>
+      
+    % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
+    Enter pass phrase for temp.pem:
+      <enter the temporary password to decrypt the pem file>
+
+    Enter Export Password:
+      <enter a password for encrypting the new p12 file>
+
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Environment Variables
 
-Run `pem --help` to get a list of available environment variables.
+Run `fastlane pem --help` to get a list of available environment variables.
 
 # How does it work?
 
@@ -138,7 +155,7 @@ Run `pem --help` to get a list of available environment variables.
 
 ## [`fastlane`](https://fastlane.tools) Toolchain
 
-- [`fastlane`](https://fastlane.tools): The easiest way to automate building and releasing your iOS and Android apps
+- [`fastlane`](https://fastlane.tools): The easiest way to automate beta deployments and releases for your iOS and Android apps
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata and your app to the App Store
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
@@ -151,8 +168,9 @@ Run `pem --help` to get a list of available environment variables.
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS app has never been easier
 - [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests of your iOS and Mac app
 - [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using git
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

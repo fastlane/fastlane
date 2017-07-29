@@ -21,7 +21,8 @@ module Fastlane
       # the fastlane folder too
 
       self.runner.trigger_action_by_name(method_sym,
-                                         "./fastlane",
+                                         FastlaneCore::FastlaneFolder.path,
+                                         true,
                                          *arguments)
     end
   end

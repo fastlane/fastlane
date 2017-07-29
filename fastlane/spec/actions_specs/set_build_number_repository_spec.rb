@@ -5,7 +5,7 @@ describe Fastlane do
         expect(Fastlane::Actions::GetBuildNumberRepositoryAction).to receive(:run).and_return("asd123")
       end
 
-      it "set build number" do
+      it "set build number without xcodeproj" do
         result = Fastlane::FastFile.new.parse("lane :test do
             set_build_number_repository
         end").runner.execute(:test)
@@ -13,10 +13,20 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all asd123/)
       end
 
-      it "set build number" do
+      it "set build number with use_hg_revision_number" do
         result = Fastlane::FastFile.new.parse("lane :test do
             set_build_number_repository(
               use_hg_revision_number: true
+            )
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all asd123/)
+      end
+
+      it "set build number with explicit xcodeproj" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            set_build_number_repository(
+              xcodeproj: 'asd123/project.xcodeproj'
             )
         end").runner.execute(:test)
 

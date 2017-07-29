@@ -1,8 +1,9 @@
 module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)
   class AppfileConfig
-
     def self.try_fetch_value(key)
+      # We need to load the file every time we call this method
+      # to support the `for_lane` keyword
       begin
         return self.new.data[key]
       rescue => ex
@@ -21,7 +22,7 @@ module CredentialsManager
 
     def initialize(path = nil)
       if path
-        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(path)
+        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(File.expand_path(path))
       end
 
       path ||= self.class.default_path
@@ -39,17 +40,40 @@ module CredentialsManager
                  'you should turn off smart quotes in your editor of choice.'.red
           end
 
-          # rubocop:disable Lint/Eval
+          # rubocop:disable Security/Eval
           eval(content)
-          # rubocop:enable Lint/Eval
+          # rubocop:enable Security/Eval
+
+          print_debug_information(path: full_path) if FastlaneCore::Globals.verbose?
         end
       end
 
       fallback_to_default_values
     end
 
+    def print_debug_information(path: nil)
+      self.class.already_printed_debug_information ||= {}
+      return if self.class.already_printed_debug_information[self.data]
+      # self.class.already_printed_debug_information is a hash, we use to detect if we already printed this data
+      # this is necessary, as on the course of a fastlane run, the values might change, e.g. when using
+      # the `for_lane` keyword.
+
+      puts "Successfully loaded Appfile at path '#{path}'".yellow
+
+      self.data.each do |key, value|
+        puts "- #{key.to_s.cyan}: '#{value.to_s.green}'"
+      end
+      puts "-------"
+
+      self.class.already_printed_debug_information[self.data] = true
+    end
+
+    def self.already_printed_debug_information
+      @already_printed_debug_information ||= {}
+    end
+
     def fallback_to_default_values
-      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"]
+      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"] || ENV["DELIVER_USERNAME"]
     end
 
     def data
@@ -98,6 +122,10 @@ module CredentialsManager
       setter(:json_key_file, *args, &block)
     end
 
+    def json_key_data_raw(*args, &block)
+      setter(:json_key_data_raw, *args, &block)
+    end
+
     def issuer(*args, &block)
       puts "Appfile: DEPRECATED issuer: use json_key_file instead".red
       setter(:issuer, *args, &block)
@@ -140,7 +168,7 @@ module CredentialsManager
     # platform_name  - Symbol representing a platform name.
     # block - Block to execute to override configuration values.
     #
-    # Discussion If received paltform name does not match the platform name available as environment variable, no changes will
+    # Discussion If received platform name does not match the platform name available as environment variable, no changes will
     #             be applied.
     def for_platform(platform_name)
       if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s

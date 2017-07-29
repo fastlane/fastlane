@@ -37,6 +37,10 @@ module Fastlane
         "This action changes the app group identifiers in the entitlements file"
       end
 
+      def self.details
+        "Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :entitlements_file,
@@ -66,6 +70,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'update_app_group_identifiers(
+            entitlements_file: "/path/to/entitlements_file.entitlements",
+            app_group_identifiers: ["group.your.app.group.identifier"]
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

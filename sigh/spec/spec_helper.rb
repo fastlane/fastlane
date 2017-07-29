@@ -1,12 +1,7 @@
-require 'coveralls'
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+require_relative 'stubbing.rb'
 
-require 'sigh'
-require 'webmock/rspec'
-require 'stubbing.rb'
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
+# Commander::Command::Options does not define sane equals behavior,
+# so we need this to make testing easier
+RSpec::Matchers.define :match_commander_options do |expected|
+  match { |actual| actual.__hash__ == expected.__hash__ }
 end
-
-WebMock.disable_net_connect!(allow: 'coveralls.io')

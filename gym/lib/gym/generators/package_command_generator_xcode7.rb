@@ -1,5 +1,6 @@
 # encoding: utf-8
-# from http://stackoverflow.com/a/9857493/445598
+
+# from https://stackoverflow.com/a/9857493/445598
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
@@ -9,10 +10,10 @@ module Gym
   # Responsible for building the fully working xcodebuild command
   class PackageCommandGeneratorXcode7
     class << self
-      def generate
-        print_legacy_information unless Helper.fastlane_enabled?
+      DEFAULT_EXPORT_METHOD = "app-store"
 
-        parts = ["/usr/bin/xcrun #{XcodebuildFixes.wrap_xcodebuild} -exportArchive"]
+      def generate
+        parts = ["/usr/bin/xcrun #{wrap_xcodebuild.shellescape} -exportArchive"]
         parts += options
         parts += pipe
 
@@ -22,11 +23,14 @@ module Gym
       end
 
       def options
-        options = []
+        config = Gym.config
 
+        options = []
         options << "-exportOptionsPlist '#{config_path}'"
-        options << "-archivePath '#{BuildCommandGenerator.archive_path}'"
+        options << "-archivePath #{BuildCommandGenerator.archive_path.shellescape}"
         options << "-exportPath '#{temporary_output_path}'"
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+        options << config[:export_xcargs] if config[:export_xcargs]
 
         options
       end
@@ -38,6 +42,12 @@ module Gym
       # We export the ipa into this directory, as we can't specify the ipa file directly
       def temporary_output_path
         Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
+      end
+
+      # Wrap xcodebuild to work-around ipatool dependency to system ruby
+      def wrap_xcodebuild
+        require 'fileutils'
+        @wrapped_xcodebuild_path ||= File.join(Gym::ROOT, "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
       end
 
       def ipa_path
@@ -123,21 +133,21 @@ module Gym
             # Reads options from hash
             hash = normalize_export_options(Gym.config[:export_options])
           else
-            # Reads optoins from file
+            # Reads options from file
             hash = Plist.parse_xml(Gym.config[:export_options])
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
           end
 
           # Saves configuration for later use
-          Gym.config[:export_method] ||= hash[:method]
+          Gym.config[:export_method] ||= hash[:method] || DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = hash[:uploadSymbols] if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = hash[:uploadBitcode] if Gym.config[:include_bitcode].nil?
           Gym.config[:export_team_id] ||= hash[:teamID]
         else
           hash = {}
           # Sets default values
-          Gym.config[:export_method] ||= "app-store"
+          Gym.config[:export_method] ||= DEFAULT_EXPORT_METHOD
           Gym.config[:include_symbols] = true if Gym.config[:include_symbols].nil?
           Gym.config[:include_bitcode] = false if Gym.config[:include_bitcode].nil?
         end
@@ -157,14 +167,23 @@ module Gym
         end
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
-        hash.to_plist
+        UI.important("Generated plist file with the following values:")
+        UI.command_output("-----------------------------------------")
+        UI.command_output(JSON.pretty_generate(hash))
+        UI.command_output("-----------------------------------------")
+        if FastlaneCore::Globals.verbose?
+          UI.message("This results in the following plist file:")
+          UI.command_output("-----------------------------------------")
+          UI.command_output(to_plist(hash))
+          UI.command_output("-----------------------------------------")
+        end
+
+        to_plist(hash)
       end
 
-      def print_legacy_information
-        if Gym.config[:provisioning_profile_path]
-          UI.important "You're using Xcode 7, the `provisioning_profile_path` value will be ignored"
-          UI.important "Please follow the Code Signing Guide: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md"
-        end
+      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
+      def to_plist(hash)
+        Plist::Emit.dump(hash, true)
       end
     end
   end

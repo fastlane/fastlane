@@ -28,7 +28,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :serial,
                                        env_name: "FL_ANDROID_SERIAL",
-                                       description: "Android serial, which device should be used for this command",
+                                       description: "Android serial of the device to use for this command",
                                        is_string: true,
                                        default_value: ""),
           FastlaneCore::ConfigItem.new(key: :command,
@@ -41,12 +41,23 @@ module Fastlane
                                        optional: true,
                                        description: "The path to your `adb` binary",
                                        is_string: true,
-                                       default_value: "adb"
-                                      )
+                                       default_value: "adb")
         ]
       end
 
       def self.output
+      end
+
+      def self.category
+        :building
+      end
+
+      def self.example_code
+        [
+          'adb(
+            command: "shell ls"
+          )'
+        ]
       end
 
       def self.return_value
