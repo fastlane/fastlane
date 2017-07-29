@@ -82,7 +82,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield,
                                        env_name: "FL_BADGE_SHIELD",
-                                       description: "Add a shield to your app icon from shield.io",
+                                       description: "Add a shield to your app icon from shields.io",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :alpha,
@@ -104,7 +104,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield_io_timeout,
                                        env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
-                                       description: "Set custom duration for the timeout of the shield.io request in seconds",
+                                       description: "Set custom duration for the timeout of the shields.io request in seconds",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
