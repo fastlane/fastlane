@@ -22,10 +22,14 @@ For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.
 <%- end -%>
 - [Plugins](https://docs.fastlane.tools/plugins/available-plugins)
 
-
 <%- @categories.each do |category, actions| %>
 # <%= category %>
-  <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
+
+<div class='category-actions'>
+
+<%- actions.sort.to_h.each do |_number_of_launches, action| -%>
+
+<div class='action'>
 
 ### <%= action.action_name %>
 
@@ -51,8 +55,8 @@ Returns | <%= action.return_value %>
 ```ruby
 <%= current_sample.gsub("          ", "") %>
 ```
-<% end %>
-<% end %>
+<% end %><%# End of action.example_code... %>
+<% end %><%# End of if %>
 </details>
 
 <% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
@@ -67,9 +71,11 @@ Key | Description
   `<%= config_item.key %>` | <%= config_item.description %>
 <%- end %>
 </details>
-<% end %>
+</div>
 
+<% end %><%# End of action.available_options... %>
 
+  <%- end %><%# End of actions.sort... %>
+</div>
 
-  <%- end %>
-<%- end %>
+<%- end %><%# End of categories.each %>
