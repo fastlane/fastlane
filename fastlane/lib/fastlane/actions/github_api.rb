@@ -65,11 +65,11 @@ module Fastlane
         #####################################################
 
         def description
-          "Call a Github API endpoint and get the resulting JSON response"
+          "Call a GitHub API endpoint and get the resulting JSON response"
         end
 
         def details
-          "Calls any Github API endpoint. You must provide your GitHub Personal token (get one from https://github.com/settings/tokens/new).
+          "Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from https://github.com/settings/tokens/new).
           Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.
           Documentation: https://developer.github.com/v3"
         end
@@ -146,7 +146,7 @@ module Fastlane
           [
             ['GITHUB_API_STATUS_CODE', 'The status code returned from the request'],
             ['GITHUB_API_RESPONSE', 'The full response body'],
-            ['GITHUB_API_JSON', 'The parsed json returned from Github']
+            ['GITHUB_API_JSON', 'The parsed json returned from GitHub']
           ]
         end
 
@@ -210,7 +210,7 @@ module Fastlane
 
           return_url = path ? File.join(server_url, path) : url
 
-          UI.user_error!("Please provide either 'path' or full 'url' for github api endpoint") unless return_url
+          UI.user_error!("Please provide either 'path' or full 'url' for GitHub API endpoint") unless return_url
 
           return_url
         end
