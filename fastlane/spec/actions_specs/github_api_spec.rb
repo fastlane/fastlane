@@ -304,7 +304,7 @@ describe Fastlane do
             ").runner.execute(:test)
           end.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to match("Please provide either 'path' or full 'url' for github api endpoint")
+              expect(error.message).to match("Please provide either 'path' or full 'url' for GitHub API endpoint")
             end
           )
         end
