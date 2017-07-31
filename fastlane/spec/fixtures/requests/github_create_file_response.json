@@ -1,0 +1,45 @@
+{
+  "content":{
+    "name":"TEST_FILE.md",
+    "path":"TEST_FILE.md",
+    "sha":"33def9af0e8512d90b2e5b2857436e1e6213b4a7",
+    "size":13,
+    "url":"https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md?ref=test-branch",
+    "html_url":"https://github.com/fastlane/fastlane/blob/test-branch/TEST_FILE.md",
+    "git_url":"https://api.github.com/repos/fastlane/fastlane/git/blobs/33def9af0e8512d90b2e5b2857436e1e6213b4a7",
+    "download_url":"https://raw.githubusercontent.com/fastlane/fastlane/test-branch/TEST_FILE.md?token=AABOBYcuttEPbItwO32pGc-Snz7XoCfXks5Y-ZCewA%3D%3D",
+    "type":"file",
+    "_links":{
+      "self":"https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md?ref=test-branch",
+      "git":"https://api.github.com/repos/fastlane/fastlane/git/blobs/33def9af0e8512d90b2e5b2857436e1e6213b4a7",
+      "html":"https://github.com/fastlane/fastlane/blob/test-branch/TEST_FILE.md"
+    }
+  },
+  "commit":{
+    "sha":"faa361b0c282fca74e2170bcb4ac3ec577fd2922",
+    "url":"https://api.github.com/repos/fastlane/fastlane/git/commits/faa361b0c282fca74e2170bcb4ac3ec577fd2922",
+    "html_url":"https://github.com/fastlane/fastlane/commit/faa361b0c282fca74e2170bcb4ac3ec577fd2922",
+    "author":{
+      "name":"Tom Meier",
+      "email":"fastlane@venombytes.com",
+      "date":"2017-04-21T04:53:53Z"
+    },
+    "committer":{
+      "name":"Tom Meier",
+      "email":"fastlane@venombytes.com",
+      "date":"2017-04-21T04:53:53Z"
+    },
+    "tree":{
+      "sha":"c6397b6304893d1dca18d8c0cfd17a63ba8dc330",
+      "url":"https://api.github.com/repos/fastlane/fastlane/git/trees/c6397b6304893d1dca18d8c0cfd17a63ba8dc330"
+    },
+    "message":"File committed",
+    "parents":[
+      {
+        "sha":"15a399ae95414ceb898c1de2ea5968c80b5dbf16",
+        "url":"https://api.github.com/repos/fastlane/fastlane/git/commits/15a399ae95414ceb898c1de2ea5968c80b5dbf16",
+        "html_url":"https://github.com/fastlane/fastlane/commit/15a399ae95414ceb898c1de2ea5968c80b5dbf16"
+      }
+    ]
+  }
+}
