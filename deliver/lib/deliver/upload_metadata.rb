@@ -222,7 +222,7 @@ module Deliver
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
-          options[key] ||= {}
+          options[key] = {}
           options[key][language] ||= File.read(path)
         end
       end
