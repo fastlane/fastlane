@@ -162,6 +162,88 @@ describe Fastlane do
             end
           end
         end
+
+        context "url isn't set" do
+          context "path is set, server_url isn't set" do
+            it "uses default server_url" do
+              expect do
+                result = Fastlane::FastFile.new.parse("
+                  lane :test do
+                    github_api(
+                      api_token: '123456789',
+                      http_method: 'PUT',
+                      path: 'repos/fastlane/fastlane/contents/TEST_FILE.md'
+                    )
+                  end
+                ").runner.execute(:test)
+                expect(result[:status]).to eq(200)
+                expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
+              end
+            end
+          end
+
+          context "path and server_url are set" do
+            it "correctly submits by building the full url from server_url and path" do
+              expect do
+                result = Fastlane::FastFile.new.parse("
+                    lane :test do
+                      github_api(
+                        api_token: '123456789',
+                        http_method: 'PUT',
+                        path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                        server_url: 'https://api.github.com'
+                      )
+                    end
+                  ").runner.execute(:test)
+                expect(result[:status]).to eq(200)
+                expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
+              end
+            end
+          end
+        end
+
+        context "url is set" do
+          context "path and server_url are set" do
+            it "correctly submits using the path and server_url instead of the url" do
+              expect do
+                result = Fastlane::FastFile.new.parse("
+                    lane :test do
+                      github_api(
+                        api_token: '123456789',
+                        http_method: 'PUT',
+                        url: 'https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md',
+                        path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                        server_url: 'https://api.github.com'
+                      )
+                    end
+                  ").runner.execute(:test)
+
+                expect(result[:status]).to eq(200)
+                expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
+                expect(result[:html_url]).to_not eq("https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md")
+              end
+            end
+          end
+
+          context "path and server_url aren't set" do
+            it "correctly submits using the full url" do
+              expect do
+                result = Fastlane::FastFile.new.parse("
+                    lane :test do
+                      github_api(
+                        api_token: '123456789',
+                        http_method: 'PUT',
+                        url: 'https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md'
+                      )
+                    end
+                  ").runner.execute(:test)
+
+                expect(result[:status]).to eq(200)
+                expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
+              end
+            end
+          end
+        end
       end
 
       context 'failures' do
@@ -292,21 +374,26 @@ describe Fastlane do
           expect(result[:json]).to eq(JSON.parse(error_response_body))
         end
 
-        it "raises when path and url aren't set" do
-          expect do
-            Fastlane::FastFile.new.parse("
-              lane :test do
-                github_api(
-                  api_token: '123456789',
-                  http_method: 'PUT',
-                )
-              end
-            ").runner.execute(:test)
-          end.to(
-            raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to match("Please provide either 'path' or full 'url' for GitHub API endpoint")
+        context "url isn't set" do
+          context "path isn't set, server_url is set" do
+            it "raises" do
+              expect do
+                Fastlane::FastFile.new.parse("
+                  lane :test do
+                    github_api(
+                      api_token: '123456789',
+                      http_method: 'PUT',
+                      server_url: 'https://api.github.com'
+                    )
+                  end
+                ").runner.execute(:test)
+              end.to(
+                raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+                  expect(error.message).to match("Please provide either `server_url` (e.g. https://api.github.com) and 'path' or full 'url' for GitHub API endpoint")
+                end
+              )
             end
-          )
+          end
         end
       end
     end
