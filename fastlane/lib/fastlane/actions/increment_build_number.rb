@@ -31,9 +31,7 @@ module Fastlane
         # Attention: This is NOT the version number - but the build number
 
         # We do not want to run agvtool under tests to avoid output about not having a project available
-        if Helper.test?
-          agv_enabled = false
-        else
+        unless Helper.test?
           agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
           raise "Apple Generic Versioning is not enabled." unless agv_enabled
         end
