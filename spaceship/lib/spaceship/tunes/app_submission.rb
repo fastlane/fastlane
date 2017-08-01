@@ -124,7 +124,10 @@ module Spaceship
 
       # Save and complete the app submission
       def complete!
-        client.send_app_submission(application.apple_id, raw_data)
+        if self.content_rights_has_rights.nil? || self.content_rights_contains_third_party_content.nil?
+          raw_data.set(['contentRights'], nil)
+        end
+        client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data)
         @submitted_for_review = true
       end
 

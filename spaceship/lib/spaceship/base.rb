@@ -59,6 +59,9 @@ module Spaceship
       def to_json(*a)
         h = @hash.dup
         h.delete(:application)
+        if h.key?(:version) && h[:version].is_a?(Spaceship::Tunes::AppVersion)
+          h.delete(:version)
+        end
         h.to_json(*a)
       end
 
