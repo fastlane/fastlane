@@ -206,11 +206,9 @@ module Fastlane
         end
 
         def construct_url(server_url, path, url)
-          UI.user_error!("Please provide server URL, eg: https://api.github.com") unless server_url
+          return_url = (server_url && path) ? File.join(server_url, path) : url
 
-          return_url = path ? File.join(server_url, path) : url
-
-          UI.user_error!("Please provide either 'path' or full 'url' for GitHub API endpoint") unless return_url
+          UI.user_error!("Please provide either `server_url` (e.g. https://api.github.com) and 'path' or full 'url' for GitHub API endpoint") unless return_url
 
           return_url
         end
