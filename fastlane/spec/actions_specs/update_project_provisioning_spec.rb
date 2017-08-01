@@ -19,7 +19,7 @@ describe Fastlane do
                     target_filter: 'Name'
                 })
               end").runner.execute(:test)
-            end.not_to raise_error(FastlaneCore::Interface::FastlaneError)
+            end.not_to raise_error
           end
         end
 
@@ -33,7 +33,7 @@ describe Fastlane do
                     target_filter: /Name/
                 })
               end").runner.execute(:test)
-            end.not_to raise_error(FastlaneCore::Interface::FastlaneError)
+            end.not_to raise_error
           end
         end
 
@@ -67,7 +67,7 @@ describe Fastlane do
                     build_configuration: 'Debug'
                 })
               end").runner.execute(:test)
-            end.not_to raise_error(FastlaneCore::Interface::FastlaneError)
+            end.not_to raise_error
           end
         end
 
@@ -81,7 +81,7 @@ describe Fastlane do
                     build_configuration: /Debug/
                 })
               end").runner.execute(:test)
-            end.not_to raise_error(FastlaneCore::Interface::FastlaneError)
+            end.not_to raise_error
           end
         end
 
