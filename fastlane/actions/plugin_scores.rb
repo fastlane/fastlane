@@ -26,8 +26,10 @@ module Fastlane
           break if results.count == 0
 
           plugins += results.collect do |current|
+            next if self.hidden_plugins.include?(current['name'])
+
             Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current)
-          end
+          end.compact
 
           page += 1
         end
@@ -53,6 +55,13 @@ module Fastlane
 
       def self.category
         :misc
+      end
+
+      # Those are plugins that are now part of fastlane core actions, so we don't want to show them in the directory
+      def self.hidden_plugins
+        [
+          "fastlane-plugin-update_project_codesigning"
+        ]
       end
     end
   end
