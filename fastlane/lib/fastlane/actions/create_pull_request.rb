@@ -34,7 +34,6 @@ module Fastlane
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
-          return html_url
         end
       end
 
