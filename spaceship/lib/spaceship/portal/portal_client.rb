@@ -324,6 +324,17 @@ module Spaceship
       parse_response(response)
     end
 
+    def team_invited
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/getInvites"
+        req.body = {
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
     def team_set_role(team_member_id, role)
       ensure_csrf(Spaceship::Portal::Persons)
       response = request(:post) do |req|

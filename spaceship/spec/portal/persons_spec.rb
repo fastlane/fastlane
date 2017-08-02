@@ -7,6 +7,11 @@ describe Spaceship::Portal::Persons do
     expect(all.length).to eq(3)
   end
 
+  it "Should load all invites" do
+    all = Spaceship::Portal::Persons.invited
+    expect(all.length).to eq(3)
+  end
+
   it "Should find a specific person" do
     person = Spaceship::Portal::Persons.find("helmut@januschka.com")
     expect(person.email_address).to eq("helmut@januschka.com")
