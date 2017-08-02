@@ -34,6 +34,7 @@ class String
 
   # Base taken from: https://www.ruby-forum.com/topic/57805
   def wordwrap(length = 80)
+    return [] if length == 0
     self.gsub!(/(\S{#{length}})(?=\S)/, '\1 ')
     self.scan(/.{1,#{length}}(?:\s+|$)/)
   end
