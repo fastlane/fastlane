@@ -42,6 +42,15 @@ module Spaceship
       def change_role(role)
         client.team_set_role(team_member_id, role)
       end
+
+      class << self
+        def factory(attrs)
+          # rubocop:disable Style/RescueModifier
+          attrs['dateJoined'] = (Time.parse(attrs['dateJoined']) rescue attrs['dateJoined'])
+          # rubocop:enable Style/RescueModifier
+          return self.new(attrs)
+        end
+      end
     end
   end
 end
