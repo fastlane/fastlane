@@ -12,9 +12,9 @@ describe WordWrap do
     it 'will return an array of strings, each being <= the length passed to wordwrap' do
       wrap_length = 5
       result = test_string.wordwrap(wrap_length)
-      string_lengths = result.map { |string| string.length }
-      expect(result).to all( be_a(String) )
-      expect(string_lengths).to all( be <= wrap_length + 1) # The +1 is to consider spaces
+      string_lengths = result.map(&:length)
+      expect(result).to all(be_a(String))
+      expect(string_lengths).to all(be <= wrap_length + 1) # The +1 is to consider spaces
     end
   end
 end
