@@ -2,19 +2,21 @@ describe Spaceship::Portal::Persons do
   before { Spaceship.login }
   let(:client) { Spaceship::Persons.client }
   it "should factor a new person object" do
+    joined = "2016-06-20T06:30:26Z"
     attrs = {
       "personId" => "1234",
       "firstName" => "Helmut",
       "lastName" => "Januschka",
       "email" => "helmut@januschka.com",
       "developerStatus" => "active",
-      "dateJoined" => "XXXXX",
+      "dateJoined" => joined,
       "teamMemberId" => "1234"
     }
     person = Spaceship::Portal::Person.factory(attrs)
     expect(person.email_address).to eq("helmut@januschka.com")
+    expect(person.joined).to eq(Time.parse(joined))
   end
-  it "Should remove a member" do
+  it "should remove a member" do
     expect(client).to receive(:team_remove_member!).with("5M8TWKRZ3J")
     person = Spaceship::Portal::Persons.find("helmut@januschka.com")
     person.remove!
