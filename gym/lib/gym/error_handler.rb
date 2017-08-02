@@ -235,7 +235,7 @@ module Gym
 
           selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
             available_export_types.each do |current_to_try, matching_type|
-              next unless current_profile_name.downcase.include?(current_to_try.downcase)
+              next unless current_profile_name.to_s.downcase.include?(current_to_try.to_s.downcase)
 
               # Check if there is a mismatch between the name and the selected export method
               # Example
