@@ -98,6 +98,23 @@ group = Spaceship::Portal.app_group.create!(group_id: "group.com.example.another
 app = app.associate_groups([group])
 ```
 
+## Passbook
+
+```ruby
+# Fetch all existing passbooks
+all_passbooks = Spaceship::Portal.passbook.all
+
+# Find a specific passbook, based on the identifier
+passbook = Spaceship::Portal.passbook.find("pass.com.example.passbook")
+
+# Create a new passbook
+passbook = Spaceship::Portal.passbook.create!(bundle_id: 'pass.com.example.passbook', name: 'Fastlane Passbook')
+
+# Delete a passbook using his identifier
+passbook = Spaceship::Portal.passbook.find("pass.com.example.passbook").delete!
+
+```
+
 ## Certificates
 
 ```ruby
