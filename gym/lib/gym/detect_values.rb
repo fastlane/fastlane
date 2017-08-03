@@ -59,10 +59,6 @@ module Gym
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
     def self.detect_selected_provisioning_profiles
-      if Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash) && Gym.config[:export_options][:provisioningProfiles]
-        return
-      end
-
       require 'xcodeproj'
 
       provisioning_profile_mapping = {}
@@ -121,7 +117,55 @@ module Gym
       return if provisioning_profile_mapping.count == 0
 
       Gym.config[:export_options] ||= {}
-      Gym.config[:export_options][:provisioningProfiles] = provisioning_profile_mapping
+      hash_to_use = Gym.config[:export_options][:provisioningProfiles].dup # dup so we can show the original values in `verbose` mode
+
+      # Now it's time to merge the (potentially) existing `provisioningProfiles` of the `export_options`
+      # with the hash we just created. Both might include information about what profile to use
+      # This is important, as :bell: (some users) didn't know to call match for each app target he wants profiles for
+      # before adding this code, we'd only either use whatever we get from match, or what's defined in the Xcode project
+      # With the code below, we'll make sure to take the best of it:
+      #
+      #   1) A provisioning profile is defined in the Xcode project only: we'll take that
+      #   2) A provisioning profile is defined manually from the user: we'll take that (same as 3)
+      #   3) A provisioning profile is defined after calling match: we'll take that (same as 2)
+      #   4) On a conflict (app identifier assigned both in xcode and match)
+      #     4.1) we'll choose whatever matches the `export_method` defined
+      #     4.2) If both include the export_method, we'll prefer the one from match
+      #     4.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
+      #
+      # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
+      # the export method (which it usually does, but with different notations)
+
+      # 2) is already covered by assigning `hash_to_use` above
+      # 3) see 2
+
+      provisioning_profile_mapping.each do |bundle_identifier, provisioning_profile|
+        if hash_to_use[bundle_identifier].nil?
+          # 1)
+          hash_to_use[bundle_identifier] = provisioning_profile
+        else
+          # 4) Conflict, we now have to choose if we prefer whatever match provides
+          #    or what's defined in the project
+          if self.app_identifier_contains?(hash_to_use[bundle_identifier], Gym.config[:export_method])
+            # 4.1
+            # 4.2 is automatically covered by this, as we're checking for the one coming from the export plist first
+          elsif self.app_identifier_contains?(provisioning_profile, Gym.config[:export_method])
+            # 4.1
+            hash_to_use[bundle_identifier] = provisioning_profile
+          end
+          # rubocop won't let us keep an empty else, imagine one being here
+          # else 4.3 let's keep it as is, prefer the Xcode project
+        end
+      end
+
+      UI.verbose("export_options coming from user or match:")
+      UI.verbose(Gym.config[:export_options][:provisioningProfiles])
+      UI.verbose("Detected profiles from Xcode project")
+      UI.verbose(provisioning_profile_mapping)
+      UI.verbose("Resulting in the following mapping")
+      UI.verbose(hash_to_use)
+
+      Gym.config[:export_options][:provisioningProfiles] = hash_to_use
       UI.message("Detected provisioning profile mapping: #{provisioning_profile_mapping}")
     rescue => ex
       # We don't want to fail the build if the automatic detection doesn't work
@@ -133,6 +177,12 @@ module Gym
         UI.error(ex)
         UI.verbose(ex.backtrace.join("\n"))
       end
+    end
+
+    # Helper method to remove "-" and " " and downcase app identifier
+    # and compare if an app identifier includes a certain string
+    def self.app_identifier_contains?(str, contains)
+      return str.to_s.gsub("-", "").gsub(" ", "").downcase
     end
 
     def self.detect_scheme
