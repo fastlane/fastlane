@@ -132,9 +132,6 @@ module Gym
       #     4.1) we'll choose whatever matches the `export_method` defined
       #     4.2) If both include the export_method, we'll prefer the one from match
       #     4.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
-      #
-      # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
-      # the export method (which it usually does, but with different notations)
 
       # 2) is already covered by assigning `hash_to_use` above
       # 3) see 2
@@ -181,6 +178,8 @@ module Gym
 
     # Helper method to remove "-" and " " and downcase app identifier
     # and compare if an app identifier includes a certain string
+    # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
+    # the export method (which it usually does, but with different notations)
     def self.app_identifier_contains?(str, contains)
       return str.to_s.gsub("-", "").gsub(" ", "").downcase
     end
