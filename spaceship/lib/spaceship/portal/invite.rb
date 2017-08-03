@@ -30,10 +30,18 @@ module Spaceship
 
       class << self
         def factory(attrs)
-          # rubocop:disable Style/RescueModifier
-          attrs['dateCreated'] = (Time.at(attrs['dateCreated'] / 1000).utc rescue attrs['dateCreated'])
-          attrs['dateExpires'] = (Time.at(attrs['dateExpires'] / 1000).utc rescue attrs['dateExpires'])
-          # rubocop:enable Style/RescueModifier
+          begin
+            attrs['dateCreated'] = Time.at(attrs['dateCreated'] / 1000).utc
+          rescue NoMethodError
+            # if attrs['dateCreated'] does not implement /
+          rescue TypeError
+            # if TIme.at receives an invalid type
+          end
+          begin
+            attrs['dateExpires'] = Time.at(attrs['dateExpires'] / 1000).utc
+          rescue NoMethodError
+          rescue TypeError
+          end
           attrs['recipientRole'] = attrs['recipientRole'].downcase
           return self.new(attrs)
         end

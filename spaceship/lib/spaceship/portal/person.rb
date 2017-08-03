@@ -45,9 +45,13 @@ module Spaceship
 
       class << self
         def factory(attrs)
-          # rubocop:disable Style/RescueModifier
-          attrs['dateJoined'] = (Time.parse(attrs['dateJoined']) rescue attrs['dateJoined'])
-          # rubocop:enable Style/RescueModifier
+          begin
+            attrs['dateJoined'] = Time.parse(attrs['dateJoined'])
+          rescue TypeError
+            # Raised if we start getting integer timestamps
+          rescue ArgumentError
+            # Raised if the string's format can't be parsed
+          end
           return self.new(attrs)
         end
       end
