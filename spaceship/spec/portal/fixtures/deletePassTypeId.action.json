@@ -1,0 +1,16 @@
+{
+  "creationTimestamp": "2016-11-09T22:20:45Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "71b72c82-eb8b-4bdd-ycc7-f5aaa678b473",
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/deletePassTypeId.action",
+  "responseId": "cd650f1f-cc8f-4be7-8fd5-71c4f4240a6a",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "httpResponseHeaders": null
+}
