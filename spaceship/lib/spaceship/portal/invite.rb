@@ -35,7 +35,7 @@ module Spaceship
           rescue NoMethodError
             # if attrs['dateCreated'] does not implement /
           rescue TypeError
-            # if TIme.at receives an invalid type
+            # if Time.at receives an invalid type
           end
           begin
             attrs['dateExpires'] = Time.at(attrs['dateExpires'] / 1000).utc
