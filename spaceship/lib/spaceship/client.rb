@@ -12,12 +12,6 @@ require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
-if ENV["SPACESHIP_DEBUG"]
-  require 'openssl'
-  # this has to be on top of this file, since the value can't be changed later
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-end
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class Client
@@ -264,6 +258,7 @@ module Spaceship
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy "https://127.0.0.1:8888"
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
 
         if ENV["DEBUG"]
