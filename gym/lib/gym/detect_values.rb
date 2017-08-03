@@ -117,7 +117,7 @@ module Gym
       return if provisioning_profile_mapping.count == 0
 
       Gym.config[:export_options] ||= {}
-      hash_to_use = Gym.config[:export_options][:provisioningProfiles].dup # dup so we can show the original values in `verbose` mode
+      hash_to_use = Gym.config[:export_options][:provisioningProfiles].dup || {} # dup so we can show the original values in `verbose` mode
 
       # Now it's time to merge the (potentially) existing `provisioningProfiles` of the `export_options`
       # with the hash we just created. Both might include information about what profile to use
