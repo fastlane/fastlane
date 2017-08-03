@@ -121,10 +121,10 @@ They key is to do the same action you want to test on both the website, and in _
 
 To pipe _spaceship_ requests through your local proxy, you need to set an environment variable:
 ```
-SPACESHIP_DEBUG=1 spaceship
+SPACESHIP_DEBUG=1 bundle exec fastlane spaceship
 ```
 
-To make it easier to run the same script again, you can temporarily edit the `spaceship/Rakefile` to look like this:
+To make it easier to run the same script again, you can temporarily edit the `Rakefile` to look like this:
 
 ```ruby
 # leave existing code, and append the following
@@ -145,10 +145,10 @@ task :debug do
 end
 ```
 
-To run the newly created script, `cd` into the _spaceship_ directory and run
+To run the newly created script, run
 
 ```
-FASTLANE_DEBUG=1 fastlane debug
+SPACESHIP_DEBUG=1 bundle exec rake debug
 ```
 
 <!--Links-->
