@@ -6,8 +6,9 @@ module Produce
       login
 
       merchant_identifier = detect_merchant_identifier
+      merchant = find_merchant(merchant_identifier)
 
-      if merchant = find_merchant(merchant_identifier)
+      if merchant
         UI.success("[DevCenter] Merchant '#{merchant.bundle_id})' already exists, nothing to do on the Dev Center")
       else
         merchant_name = Produce.config[:merchant_name] || merchant_identifier.split(".").map(&:capitalize).reverse.join(' ')
@@ -27,7 +28,9 @@ module Produce
     def associate(_options, args)
       login
 
-      if app = Spaceship.app.find(app_identifier)
+      app = Spaceship.app.find(app_identifier)
+
+      if app
         app.update_service(Spaceship.app_service.apple_pay.on)
 
         UI.message("Validating merchants before association")
@@ -39,7 +42,7 @@ module Produce
           UI.message("[DevCenter] Merchant '#{merchant_identifier}' does not exist, please create it first, skipping for now")
         end
 
-        UI.message("Finalising association with #{new_merchants.count} #{pluralize("merchant", new_merchants)}")
+        UI.message("Finalising association with #{new_merchants.count} #{pluralize('merchant', new_merchants)}")
         app.associate_merchants(new_merchants)
         UI.success("Done!")
       else
