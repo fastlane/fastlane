@@ -98,8 +98,8 @@ module Spaceship
         'lastModified' => :last_modified,
         'helpfulViews' => :helpful_views,
         'totalViews' => :total_views,
-        'developerResponse' => :raw_developer_response,
-        'edited' => :edited
+        'edited' => :edited,
+        'developerResponse' => :raw_developer_response
       })
       class << self
         # Create a new object based on a hash.
