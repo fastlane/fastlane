@@ -23,7 +23,7 @@ module PEM
                                      description: "If the current certificate is active for less than this number of days, generate a new one. Default value is 30 days",
                                      default_value: 30,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Value of active_days_limit must be a positive integer or left blank") if value.to_s !~ /\A\d*\z/
+                                       UI.user_error!("Value of active_days_limit must be a positive integer or left blank") if value.to_i <= 0
                                      end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "PEM_FORCE",
