@@ -38,9 +38,10 @@ module Pilot
     def find_tester(options)
       start(options)
 
-      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      app = find_app(app_filter: app_filter)
 
+      tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
 
       describe_tester(tester)
@@ -50,11 +51,12 @@ module Pilot
     def remove_tester(options)
       start(options)
 
-      tester = Spaceship::Tunes::Tester::External.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
-      UI.user_error!("Tester not found: #{config[:email]}") if tester.nil?
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      app = find_app(app_filter: app_filter)
 
-      app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
+      tester = find_app_tester(email: config[:email], app: app)
+      UI.user_error!("Tester #{config[:email]} not found") unless tester
+
       unless app
         tester.delete!
         UI.success("Successfully removed tester #{tester.email} from Users and Roles")
@@ -223,7 +225,7 @@ module Pilot
       rows << ["Last name", tester.last_name]
       rows << ["Email", tester.email]
 
-      if tester.groups.length > 0
+      if tester.groups.to_s.length > 0
         rows << ["Groups", tester.groups_list]
       end
 
@@ -232,7 +234,7 @@ module Pilot
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
-      if tester.devices.length == 0
+      if tester.devices.to_s.length == 0
         rows << ["Devices", "No devices"]
       else
         rows << ["#{tester.devices.count} Devices", ""]
