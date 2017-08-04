@@ -234,7 +234,7 @@ module Pilot
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
-      if tester.devices.to_so.length == 0
+      if tester.devices.to_s.length == 0
         rows << ["Devices", "No devices"]
       else
         rows << ["#{tester.devices.count} Devices", ""]
