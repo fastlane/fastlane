@@ -83,14 +83,14 @@ To get a list of all available parameters:
 
 ```
   Commands: (* default)
-  associate_group      Associate with a group, which is created if needed or simply located otherwise
-  associate_merchant   Associate with a merchant for use with Apple Pay. Apple Pay will be enabled for this app
-  create             * Creates a new app on iTunes Connect and the Apple Developer Portal
-  disable_services     Disable specific Application Services for a specific app on the Apple Developer Portal
-  enable_services      Enable specific Application Services for a specific app on the Apple Developer Portal
-  group                Ensure that a specific App Group exists
-  help                 Display global or [command] help documentation
-  merchant             Ensure that a specific Merchant exists
+    associate_group      Associate with a group, which is created if needed or simply located otherwise
+    associate_merchant   Associate with a merchant for use with Apple Pay. Apple Pay will be enabled for this app
+    create             * Creates a new app on iTunes Connect and the Apple Developer Portal
+    disable_services     Disable specific Application Services for a specific app on the Apple Developer Portal
+    enable_services      Enable specific Application Services for a specific app on the Apple Developer Portal
+    group                Ensure that a specific App Group exists
+    help                 Display global or [command] help documentation
+    merchant             Ensure that a specific Merchant exists
 
   Global Options:
     --verbose
@@ -181,23 +181,32 @@ Get a list of all available options using
 
 If you want to create a new Apple Pay Merchant Identifier:
 
-    fastlane produce merchant -o merchant.com.example.production -r "Example Merchant Production"
+```
+fastlane produce merchant -o merchant.com.example.production -r "Example Merchant Production"
+```
 
-See help:
-
-    fastlane produce merchant --help
+Use `--help` for more information about all available parameters
+```
+fastlane produce merchant --help
+```
 
 If you want to associate an app with a Merchant Identifier:
 
-    fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production
+```
+fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production
+```
 
 If you want to associate an app with multiple Merchant Identifiers:
 
-    fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production merchant.com.example.sandbox
+```
+fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production merchant.com.example.sandbox
+```
 
-See help:
+Use --help for more information about all available parameters
 
-    fastlane produce associate_merchant --help
+```
+fastlane produce associate_merchant --help
+```
 
 ## Environment Variables
 

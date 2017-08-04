@@ -5,60 +5,46 @@ module Produce
     def create(_options, _args)
       login
 
-      merchant_identifier = Produce.config[:merchant_identifier] || UI.input("Merchant identifier (reverse-domain name style string starting with 'merchant'): ")
+      merchant_identifier = detect_merchant_identifier
 
-      if merchant_exists? merchant_identifier
-        UI.success("[DevCenter] Merchant '#{merchant_identifier})' already exists, nothing to do on the Dev Center")
+      if merchant = find_merchant(merchant_identifier)
+        UI.success("[DevCenter] Merchant '#{merchant.bundle_id})' already exists, nothing to do on the Dev Center")
       else
         merchant_name = Produce.config[:merchant_name] || merchant_identifier.split(".").map(&:capitalize).reverse.join(' ')
-
         UI.success("Creating new merchant '#{merchant_name}' with identifier '#{merchant_identifier}' on the Apple Dev Center")
-
-        merchant = Spaceship.merchant.create!(bundle_id: merchant_identifier,
-                                            name: merchant_name,
-                                            mac: Produce.config[:platform].to_s == 'mac')
+        merchant = Spaceship.merchant.create!(bundle_id: merchant_identifier, name: merchant_name, mac: self.class.mac?)
 
         if merchant.name != merchant_name
-          UI.important("Your merchant name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
+          UI.important("Your merchant name might include non-ASCII characters, which are not supported by the Apple Developer Portal.")
           UI.important("To fix this a unique (internal) name '#{merchant.name}' has been created for you.")
         end
 
         UI.message("Created merchant #{merchant.merchant_id}")
-        UI.user_error!("Something went wrong when creating the new merchant - it's not listed in the merchants list") unless merchant_exists? merchant_identifier
         UI.success("Finished creating new merchant '#{merchant_name}' on the Dev Center")
       end
-
-      return true
     end
 
     def associate(_options, args)
       login
 
-      if !app_exists?
-        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the merchants")
-      else
-        app = Spaceship.app.find(app_identifier)
-        UI.user_error!("Something went wrong when fetching the app - it's not listed in the apps list") if app.nil?
-
+      if app = Spaceship.app.find(app_identifier)
         app.update_service(Spaceship.app_service.apple_pay.on)
-        new_merchants = []
 
         UI.message("Validating merchants before association")
 
-        args.each do |merchant_identifier|
-          if !merchant_exists?(merchant_identifier)
-            UI.message("[DevCenter] Merchant '#{merchant_identifier}' does not exist, please create it first, skipping for now")
-          else
-            new_merchants.push(Spaceship.merchant.find(merchant_identifier, mac: Produce.config[:platform].to_s == 'mac'))
-          end
+        valid_identifiers, errored_identifiers = args.partition { |identifier| merchant_exists?(identifier) }
+        new_merchants = valid_identifiers.map { |identifier| find_merchant(identifier) }
+
+        errored_identifiers.each do |merchant_identifier|
+          UI.message("[DevCenter] Merchant '#{merchant_identifier}' does not exist, please create it first, skipping for now")
         end
 
-        UI.message("Finalising association with #{new_merchants.count} #{new_merchants.count != 1 ? 'merchants' : 'merchant'}")
+        UI.message("Finalising association with #{new_merchants.count} #{pluralize("merchant", new_merchants)}")
         app.associate_merchants(new_merchants)
         UI.success("Done!")
+      else
+        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the merchants")
       end
-
-      return true
     end
 
     def login
@@ -72,12 +58,50 @@ module Produce
       Produce.config[:app_identifier].to_s
     end
 
-    def merchant_exists?(identifier)
-      Spaceship.merchant.find(identifier, mac: Produce.config[:platform].to_s == 'mac') != nil
+    def pluralize(singular, arr)
+      return singular if arr.count == 1
+
+      "#{singular}s"
     end
 
-    def app_exists?
-      Spaceship.app.find(app_identifier) != nil
+    def merchant_exists?(identifier)
+      find_merchant(identifier)
+    end
+
+    def detect_merchant_identifier
+      self.class.detect_merchant_identifier
+    end
+
+    def self.detect_merchant_identifier(config = Produce.config)
+      identifier = config[:merchant_identifier] || input("Merchant identifier (reverse-domain name style string starting with 'merchant'): ", ":merchant_identifier option is required")
+      prepare_identifier(identifier)
+    end
+
+    def self.input(message, error_message)
+      if UI.interactive?
+        UI.input(message)
+      else
+        UI.user_error!(error_message)
+      end
+    end
+
+    def self.prepare_identifier(identifier)
+      return identifier if identifier.start_with?("merchant.")
+
+      "merchant.#{identifier}"
+    end
+
+    def find_merchant(identifier)
+      self.class.find_merchant(identifier)
+    end
+
+    def self.find_merchant(identifier, merchant: Spaceship.merchant)
+      @cache ||= {}
+      @cache[identifier] ||= merchant.find(identifier, mac: mac?)
+    end
+
+    def self.mac?(config = Produce.config)
+      config[:platform].to_s == "mac"
     end
   end
 end

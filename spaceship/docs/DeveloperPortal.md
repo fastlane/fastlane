@@ -113,8 +113,7 @@ Spaceship::Portal.merchant.all.collect do |merchant|
 end
 
 # Create a new merchant
-another_merchant = Spaceship::Portal.merchant.create!(bundle_id: "merchant.com.example.another",
-                                        name: "Another merchant")
+another_merchant = Spaceship::Portal.merchant.create!(bundle_id: "merchant.com.example.another", name: "Another merchant")
 
 # Delete a merchant
 another_merchant.delete!

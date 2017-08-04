@@ -146,8 +146,11 @@ module Produce
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
         c.action do |args, options|
-          allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include? key })
+          extra_options = [FastlaneCore::ConfigItem.new(key: :merchant_name),FastlaneCore::ConfigItem.new(key: :merchant_identifier)]
+          all_options = Produce::Options.available_options + extra_options
+          allowed_keys = all_options.collect(&:key)
+
+          Produce.config = FastlaneCore::Configuration.create(all_options, options.__hash__.select { |key, value| allowed_keys.include? key })
 
           require 'produce/merchant'
           Produce::Merchant.new.create(options, args)
