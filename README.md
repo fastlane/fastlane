@@ -127,22 +127,42 @@ If you'd like to take a look at a project already using `fastlane` check out [fa
 
 In addition to `fastlane`'s commands, you also have access to these `fastlane` tools:
 
+### iOS
+
+#### App Store
+- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
+- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 - [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app to the App Store
-- [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
+
+#### Screenshots
 - [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS and tvOS apps on every device
-- [`screengrab`](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
 - [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+
+#### Certificates and Provisioning Profiles
+- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 - [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
 - [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
 - [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+
+#### Testing
+- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 - [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 - [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
+
+#### Building
 - [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
-- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
-- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
-- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
+
+#### Plumbing
+- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
+
+### Android
+
+#### Google Play
+- [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
+
+#### Screenshots
+- [`screengrab`](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
+
 
 ## Metrics
 
