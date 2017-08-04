@@ -118,7 +118,7 @@ module Fastlane
         require 'addressable/template'
         file_name = File.basename(file)
         expanded_url = Addressable::Template.new(url_template).expand(name: file_name).to_s
-        headers = {'Content-Type' => 'application/zip'} # works for all binary files
+        headers = { 'Content-Type' => 'application/zip' } # works for all binary files
         UI.important("Uploading #{file_name}")
         GithubApiAction.run(
           api_token: api_token,
