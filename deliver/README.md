@@ -153,7 +153,7 @@ Already using `deliver` and just updated to 1.0? Check out the [Migration Guide]
 
 A detailed description about how your credentials are handled is available in a [credentials_manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
 
-### How does this thing even work? Is magic involved? 🎩###
+### How does this thing even work? Is magic involved? 🎩
 
 Your password will be stored in the macOS keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 

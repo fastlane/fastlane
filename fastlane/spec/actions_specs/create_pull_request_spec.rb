@@ -27,8 +27,7 @@ describe Fastlane do
             end
           ").runner.execute(:test)
 
-          expect(result['id']).to eq(1)
-          expect(result['html_url']).to eq('https://github.com/fastlane/fastlane/pull/1347')
+          expect(result).to eq('https://github.com/fastlane/fastlane/pull/1347')
         end
       end
     end

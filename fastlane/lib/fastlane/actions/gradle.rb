@@ -161,7 +161,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :android || platform == :ios
+        [:ios, :android].include?(platform) # we support iOS as cross platforms apps might want to call `gradle` also
       end
 
       def self.example_code
