@@ -258,22 +258,28 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_ratings(app_id, platform, versionId = '', storefront = '')
-      # if storefront or versionId is empty api fails
+    def get_ratings(app_id, platform, version_id = '', storefront = '')
+      # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
       rating_url << "storefront=#{storefront}" unless storefront.empty?
-      rating_url << "versionId=#{versionId}" unless versionId.empty?
+      rating_url << "version_id=#{version_id}" unless version_id.empty?
 
       r = request(:get, rating_url)
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, versionId = '')
+    def get_reviews(app_id, platform, storefront, version_id)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
       loop do
-        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
+        rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
+        rating_url << "&index=#{index}"
+        rating_url << "&storefront=#{storefront}" unless storefront.empty?
+        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+
+        r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
