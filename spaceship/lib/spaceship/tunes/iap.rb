@@ -14,17 +14,11 @@ module Spaceship
       # @return (Spaceship::Tunes::Application) A reference to the application
       attr_accessor :application
 
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
-
       # @return (Spaceship::Tunes::IAPFamilies) A reference to the familie list
       def families
         attrs = {}
         attrs[:application] = self.application
-        Tunes::IAPFamilies.factory(attrs)
+        Tunes::IAPFamilies.new(attrs)
       end
 
       # Creates a new In-App-Purchese on iTunes Connect
