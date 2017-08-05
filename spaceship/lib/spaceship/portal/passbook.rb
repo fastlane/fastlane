@@ -41,15 +41,9 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @return (Array) Returns all passbook available for this account
         def all
-          client.passbooks.map { |pass_type| self.factory(pass_type) }
+          client.passbooks.map { |pass_type| self.new(pass_type) }
         end
 
         # Creates a new Passbook ID on the Apple Dev Portal
