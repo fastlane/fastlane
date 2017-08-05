@@ -16,12 +16,6 @@ module Spaceship
         'name.value' => :name
       })
 
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
-
       def versions=(value = {})
         if value.kind_of?(Array)
           # input that comes from iTC api
