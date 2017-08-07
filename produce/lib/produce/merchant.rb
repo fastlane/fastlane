@@ -11,7 +11,7 @@ module Produce
       if merchant
         UI.success("[DevCenter] Merchant '#{merchant.bundle_id})' already exists, nothing to do on the Dev Center")
       else
-        merchant_name = Produce.config[:merchant_name] || merchant_identifier.split(".").map(&:capitalize).reverse.join(' ')
+        merchant_name = Produce.config[:merchant_name] || merchant_name_from_identifier(merchant_identifier)
         UI.success("Creating new merchant '#{merchant_name}' with identifier '#{merchant_identifier}' on the Apple Dev Center")
         merchant = Spaceship.merchant.create!(bundle_id: merchant_identifier, name: merchant_name, mac: self.class.mac?)
 
@@ -35,6 +35,7 @@ module Produce
 
         UI.message("Validating merchants before association")
 
+        # associate requires identifiers to exist. This splits the provided identifiers into existing/non-existing. See: https://ruby-doc.org/core/Enumerable.html#method-i-partition
         valid_identifiers, errored_identifiers = args.partition { |identifier| merchant_exists?(identifier) }
         new_merchants = valid_identifiers.map { |identifier| find_merchant(identifier) }
 
@@ -58,7 +59,7 @@ module Produce
     end
 
     def app_identifier
-      Produce.config[:app_identifier].to_s
+      Produce.config[:app_identifier]
     end
 
     def pluralize(singular, arr)
@@ -105,6 +106,15 @@ module Produce
 
     def self.mac?(config = Produce.config)
       config[:platform].to_s == "mac"
+    end
+
+    def merchant_name_from_identifier(identifier)
+      self.class.merchant_name_from_identifier(identifier)
+    end
+
+    def self.merchant_name_from_identifier(identifier)
+      capitalized_words = identifier.split(".").map(&:capitalize)
+      capitalized_words.reverse.join(' ')
     end
   end
 end

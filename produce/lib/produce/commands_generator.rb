@@ -146,7 +146,7 @@ module Produce
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
         c.action do |args, options|
-          extra_options = [FastlaneCore::ConfigItem.new(key: :merchant_name), FastlaneCore::ConfigItem.new(key: :merchant_identifier)]
+          extra_options = [FastlaneCore::ConfigItem.new(key: :merchant_name, optional: true), FastlaneCore::ConfigItem.new(key: :merchant_identifier)]
           all_options = Produce::Options.available_options + extra_options
           allowed_keys = all_options.collect(&:key)
 

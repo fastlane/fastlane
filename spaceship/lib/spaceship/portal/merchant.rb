@@ -41,16 +41,10 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param mac [Bool] Fetches Mac merchant if true
         # @return (Array) Returns all merchants available for this account
         def all(mac: false)
-          client.merchants(mac: mac).map { |merchant| self.factory(merchant) }
+          client.merchants(mac: mac).map { |merchant| new(merchant) }
         end
 
         # Creates a new Merchant on the Apple Dev Portal
@@ -61,7 +55,7 @@ module Spaceship
         # @return (Merchant) The Merchant you just created
         def create!(bundle_id: nil, name: nil, mac: false)
           new_merchant = client.create_merchant!(name, bundle_id, mac: mac)
-          self.new(new_merchant)
+          new(new_merchant)
         end
 
         # Find a specific Merchant ID based on the bundle_id
