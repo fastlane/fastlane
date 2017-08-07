@@ -181,7 +181,7 @@ module Gym
     # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
     # the export method (which it usually does, but with different notations)
     def self.app_identifier_contains?(str, contains)
-      return str.to_s.gsub("-", "").gsub(" ", "").downcase
+      return str.to_s.gsub("-", "").gsub(" ", "").downcase.include?(contains.to_s.downcase)
     end
 
     def self.detect_scheme
