@@ -104,7 +104,8 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
+      current_user = find_current_user
+
       if current_user.admin?
         tester = Spaceship::Tunes::Tester::Internal.find(email)
         tester ||= Spaceship::Tunes::Tester::External.find(email)
@@ -126,8 +127,20 @@ module Pilot
       return tester
     end
 
+    def find_current_user
+      current_user_email = Spaceship::Tunes.client.user_email
+      current_user_apple_id = Spaceship::Tunes.client.user
+
+      current_user = Spaceship::Members.find(current_user_email)
+      unless current_user
+        UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
+        return nil
+      end
+      return current_user
+    end
+
     def create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
-      current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
+      current_user = find_current_user
       if current_user.admin?
         tester = Spaceship::Tunes::Tester::External.create!(email: email,
                                                        first_name: first_name,
