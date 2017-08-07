@@ -85,6 +85,8 @@ module Frameit
             end
           when 'show_complete_frame'
             UI.user_error! "show_complete_frame must be a Boolean" unless [true, false].include?(value)
+          when 'title_below_image'
+            UI.user_error! "title_below_image must be a Boolean" unless [true, false].include?(value)
           when 'font_scale_factor'
             UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
           end
