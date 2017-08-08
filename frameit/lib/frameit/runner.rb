@@ -25,7 +25,11 @@ module Frameit
           next if full_path.include? "_framed.png"
           next if full_path.include? ".itmsp/" # a package file, we don't want to modify that
           next if full_path.include? "device_frames/" # these are the device frames the user is using
-          next if full_path.downcase.include? "watch" # we don't care about watches right now
+          device = full_path.rpartition('/').last.partition('-').first # extract device name
+          if device.downcase.include? "watch"
+            UI.error("Apple Watch screenshots are not framed: '#{full_path}'")
+            next # we don't care about watches right now
+          end
 
           UI.message("Framing screenshot '#{full_path}'")
 
