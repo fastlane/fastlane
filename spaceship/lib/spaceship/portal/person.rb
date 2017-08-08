@@ -42,6 +42,19 @@ module Spaceship
       def change_role(role)
         client.team_set_role(team_member_id, role)
       end
+
+      class << self
+        def factory(attrs)
+          begin
+            attrs['dateJoined'] = Time.parse(attrs['dateJoined'])
+          rescue TypeError
+            # Raised if we start getting integer timestamps
+          rescue ArgumentError
+            # Raised if the string's format can't be parsed
+          end
+          return self.new(attrs)
+        end
+      end
     end
   end
 end
