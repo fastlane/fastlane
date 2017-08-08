@@ -112,6 +112,7 @@ describe Pilot::TesterManager do
       allow(tester_manager).to receive(:login) # prevent attempting to log in with iTC
       allow(fake_client).to receive(:user).and_return(current_user)
       allow(fake_client).to receive(:testers).and_return(global_testers)
+      allow(fake_client).to receive(:user_email).and_return("taquitos@fastlane.tools")
     end
 
     describe "when invoked from a global context" do
