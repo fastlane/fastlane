@@ -140,6 +140,7 @@ module FastlaneCore
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
+      return nil unless self.is_mac?
       return @xcode_version if @xcode_version
 
       begin
