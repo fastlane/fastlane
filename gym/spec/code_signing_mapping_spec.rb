@@ -94,7 +94,7 @@ describe Gym::CodeSigningMapping do
         expect(result).to eq({ "identifier.1" => "Ap-p StoreValue1" })
       end
 
-      it "Both Xcode project and match (user) are available, and and the Xcode project is the only one that matches the export type", nower: true do
+      it "Both Xcode project and match (user) are available, and and the Xcode project is the only one that matches the export type" do
         expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "Ad-HocValue" })
         result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "Ap-p StoreValue1" }, export_method: "ad-hoc")
 
