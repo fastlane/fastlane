@@ -1,7 +1,9 @@
 ### New Issue Checklist
 
 - [ ] Updated fastlane to the latest version
-- [ ] I have read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I read [docs.fastlane.tools](https://docs.fastlane.tools)
+- [ ] I searched for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 
 ### Issue Description
 
