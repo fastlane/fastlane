@@ -140,7 +140,7 @@ module Gym
     end
 
     def self.min_xcode8?
-      Helper.xcode_version.split(".").first.to_i >= 8
+      Helper.xcode_at_least?("8.0")
     end
 
     # Is it an iOS device or a Mac?
