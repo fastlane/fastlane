@@ -167,7 +167,13 @@ You can easily opt-out of crash reporting by adding `opt_out_crash_reporting` at
 
 ## Need Help?
 
-Please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup.
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 ## Special Thanks
 
