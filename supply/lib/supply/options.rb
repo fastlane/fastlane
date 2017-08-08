@@ -24,7 +24,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
-                                     default_value: '0.1',
+                                     optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
                                        max = 1.0
