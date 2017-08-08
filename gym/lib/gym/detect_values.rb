@@ -60,7 +60,7 @@ module Gym
     # each target of your app
     def self.detect_selected_provisioning_profiles
       Gym.config[:export_options] ||= {}
-      hash_to_use = Gym.config[:export_options][:provisioningProfiles].dup || {} # dup so we can show the original values in `verbose` mode
+      hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
       mapping_object = CodeSigningMapping.new(project: Gym.project)
       hash_to_use = mapping_object.merge_profile_mapping(existing_mapping: hash_to_use,

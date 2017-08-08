@@ -59,8 +59,6 @@ module Gym
       return final_mapping
     end
 
-    # private # TODO
-
     # Helper method to remove "-" and " " and downcase app identifier
     # and compare if an app identifier includes a certain string
     # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
