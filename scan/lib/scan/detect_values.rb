@@ -186,7 +186,7 @@ module Scan
     end
 
     def self.min_xcode8?
-      Helper.xcode_version.split(".").first.to_i >= 8
+      Helper.xcode_at_least?("8.0")
     end
 
     def self.detect_destination
