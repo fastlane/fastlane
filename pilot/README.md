@@ -277,7 +277,14 @@ If your password contains special characters, `pilot` may throw a confusing erro
 `pilot` uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`.
 
 # Need help?
-Please submit an issue on GitHub and provide information about your setup
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 # Code of Conduct
 Help us keep `pilot` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
