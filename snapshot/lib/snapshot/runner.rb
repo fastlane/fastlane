@@ -1,5 +1,7 @@
 require 'shellwords'
 require 'plist'
+require 'rexml/document'
+require 'fileutils'
 
 module Snapshot
   class Runner
@@ -24,6 +26,11 @@ module Snapshot
 
       # Also print out the path to the used Xcode installation
       # We go 2 folders up, to not show "Contents/Developer/"
+
+      if Helper.xcode_at_least?("9.0")
+        scheme_path = patch_scheme_to_save_screenshots
+      end
+
       values = Snapshot.config.values(ask: false)
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
       FastlaneCore::PrintTable.print_values(config: values, hide_keys: [], title: "Summary for snapshot #{Fastlane::VERSION}")
@@ -57,6 +64,10 @@ module Snapshot
         end
       end
 
+      if Helper.xcode_at_least?("9.0")
+        cleanup_backup(scheme_absolute_path: scheme_path)
+      end
+
       print_results(results)
 
       UI.test_failure!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
@@ -68,6 +79,56 @@ module Snapshot
       unless Snapshot.config[:derived_data_path]
         FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
       end
+    end
+
+    def patch_scheme_to_save_screenshots
+      scheme = Snapshot.config[:scheme]
+      scheme_absolute_path = File.join(File.expand_path(".", Snapshot.project.path), 'xcshareddata', 'xcschemes', scheme + ".xcscheme")
+
+      scheme_xml_doc = fetch_scheme_xml_file(scheme_file_path: scheme_absolute_path)
+
+      backup_scheme_file_path = scheme_absolute_path + "_original"
+      backup_scheme(scheme_absolute_path: scheme_absolute_path, backup_scheme_absolute_path: backup_scheme_file_path)
+
+      scheme_elements = scheme_xml_doc.elements['Scheme']
+      test_action = scheme_elements.elements['TestAction']
+      test_action.attributes["systemAttachmentLifetime"] = "keepAlways"
+
+      modified_scheme_text = ""
+      scheme_xml_doc.write modified_scheme_text
+
+      File.open(scheme_absolute_path, 'w') { |file| file.write(modified_scheme_text) }
+      return scheme_absolute_path
+    end
+
+    def cleanup_backup(scheme_absolute_path: nil)
+      return move_original_scheme_back(modified_scheme_file_path: scheme_absolute_path, backup_scheme_absolute_path: scheme_absolute_path + "_original")
+    end
+
+    def backup_scheme(scheme_absolute_path: nil, backup_scheme_absolute_path: nil)
+      UI.message "Backing up '#{scheme_absolute_path}' to #{backup_scheme_absolute_path} so we can patch it to enable screenshot saving"
+      FileUtils.cp(scheme_absolute_path, backup_scheme_absolute_path)
+    end
+
+    def move_original_scheme_back(modified_scheme_file_path: nil, backup_scheme_absolute_path: nil)
+      UI.message "Moving'#{backup_scheme_absolute_path}' back to #{modified_scheme_file_path} now that we're done with screenshotting"
+      unless File.file?(backup_scheme_absolute_path)
+        return
+      end
+
+      FileUtils.mv(backup_scheme_absolute_path, modified_scheme_file_path)
+    end
+
+    def fetch_scheme_xml_file(scheme_file_path: nil)
+      content = File.open(scheme_file_path)
+      xml = REXML::Document.new(content)
+      scheme_elements = xml.elements['Scheme']
+      if scheme_elements
+        return xml
+      end
+    rescue => ex
+      UI.error(ex)
+      UI.error("Error parsing project scheme file #{scheme_file_path}")
     end
 
     # This is its own method so that it can re-try if the tests fail randomly
