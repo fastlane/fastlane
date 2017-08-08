@@ -36,7 +36,6 @@ def before_each_spaceship
   PortalStubbing.adp_stub_login
 
   PortalStubbing.adp_stub_app_groups
-  PortalStubbing.adp_stub_merchants
   PortalStubbing.adp_stub_apps
 
   PortalStubbing.adp_stub_provisioning

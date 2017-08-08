@@ -1,55 +1,119 @@
+require 'spec_helper'
+
 describe Spaceship::Portal::Merchant do
-  before { Spaceship.login }
-  let(:client) { Spaceship::Portal::Merchant.client }
+  let(:mock_client) { double('MockClient') }
 
-  describe "successfully loads and parses all merchants" do
-    it "the number is correct" do
-      expect(Spaceship::Portal::Merchant.all.count).to eq(2)
-    end
+  before do
+    allow(Spaceship::Portal::Merchant).to receive(:client).and_return(mock_client)
+  end
 
-    it "inspect works" do
-      expect(Spaceship::Portal::Merchant.all.first.inspect).to include("Portal::Merchant")
-    end
+  describe ".all" do
+    it "fetches all merchants" do
+      mock_client_response(:merchants, with: any_args) do
+        [
+          {
+            name: "ExampleApp Production",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.production",
+            status: "current",
+            omcId: "LM3IY56BXC"
+          },
+          {
+            name: "ExampleApp Sandbox",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.sandbox",
+            status: "current",
+            omcId: "Z6676498T7"
+          }
+        ]
+      end
 
-    it "parses merchant correctly" do
-      merchant = Spaceship::Portal::Merchant.all.first
-
-      expect(merchant.merchant_id).to eq("LM3IY56BXC")
-      expect(merchant.name).to eq("ExampleApp Production")
-      expect(merchant.status).to eq("current")
-      expect(merchant.bundle_id).to eq("merchant.com.example.app.production")
-      expect(merchant.prefix).to eq("9J57U9392R")
-    end
-
-    it "allows modification of values and properly retrieving them" do
-      merchant = Spaceship::Merchant.all.first
-      merchant.name = "New name"
-      expect(merchant.name).to eq("New name")
+      merchants = Spaceship::Portal::Merchant.all
+      expect(merchants.count).to eq(2)
+      expect(merchants.first).to be_instance_of(Spaceship::Portal::Merchant)
     end
   end
 
-  describe "Filter merchant based on merchant identifier" do
+  describe ".find" do
     it "works with specific Merchant IDs" do
+      mock_client_response(:merchants, with: any_args) do
+        [
+          {
+            name: "ExampleApp Production",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.production",
+            status: "current",
+            omcId: "LM3IY56BXC"
+          },
+          {
+            name: "ExampleApp Sandbox",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.sandbox",
+            status: "current",
+            omcId: "Z6676498T7"
+          }
+        ]
+      end
+
       merchant = Spaceship::Portal::Merchant.find("merchant.com.example.app.sandbox")
+      expect(merchant).to be_instance_of(Spaceship::Portal::Merchant)
       expect(merchant.merchant_id).to eq("Z6676498T7")
     end
 
     it "returns nil when merchant ID wasn't found" do
+      mock_client_response(:merchants, with: any_args) do
+        [
+          {
+            name: "ExampleApp Production",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.production",
+            status: "current",
+            omcId: "LM3IY56BXC"
+          }
+        ]
+      end
+
       expect(Spaceship::Portal::Merchant.find("asdfasdf")).to be_nil
     end
   end
 
-  describe '#create' do
+  describe ".create" do
     it 'creates a merchant' do
-      expect(client).to receive(:create_merchant!).with('ExampleApp Production', 'merchant.com.example.app.production', mac: false).and_return({})
-      merchant = Spaceship::Portal::Merchant.create!(bundle_id: 'merchant.com.example.app.production', name: 'ExampleApp Production')
+      allow(mock_client).to receive(:create_merchant!).with("ExampleApp Production", "merchant.com.example.app.production", mac: anything).and_return(
+        JSON.parse({
+          name: "ExampleApp Production",
+          prefix: "9J57U9392R",
+          identifier: "merchant.com.example.app.production",
+          status: "current",
+          omcId: "LM3IY56BXC"
+        }.to_json)
+      )
+
+      merchant = Spaceship::Portal::Merchant.create!(bundle_id: "merchant.com.example.app.production", name: "ExampleApp Production", mac: false)
+      expect(merchant).to be_instance_of(Spaceship::Portal::Merchant)
+      expect(merchant.merchant_id).to eq("LM3IY56BXC")
+      expect(merchant.bundle_id).to eq("merchant.com.example.app.production")
+      expect(merchant.name).to eq("ExampleApp Production")
     end
   end
 
-  describe '#delete' do
-    subject { Spaceship::Portal::Merchant.find("merchant.com.example.app.production") }
+  describe ".delete" do
     it 'deletes the merchant by a given merchant_id' do
-      expect(client).to receive(:delete_merchant!).with('LM3IY56BXC', mac: false)
+      mock_client_response(:merchants, with: any_args) do
+        [
+          {
+            name: "ExampleApp Production",
+            prefix: "9J57U9392R",
+            identifier: "merchant.com.example.app.production",
+            status: "current",
+            omcId: "LM3IY56BXC"
+          }
+        ]
+      end
+
+      allow(mock_client).to receive(:delete_merchant!).with("LM3IY56BXC", mac: anything)
+
+      subject = Spaceship::Portal::Merchant.find("merchant.com.example.app.production")
       merchant = subject.delete!
       expect(merchant.merchant_id).to eq('LM3IY56BXC')
     end

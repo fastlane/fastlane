@@ -327,4 +327,37 @@ describe Spaceship::Client do
       end
     end
   end
+
+  describe 'merchant api' do
+    let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
+    before do
+      MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/ios/identifiers/:action') do
+        {
+          identifierList: [],
+          omcId: []
+        }
+      end
+    end
+
+    describe '#merchants' do
+      it 'lists merchants' do
+        subject.merchants
+        expect(WebMock).to have_requested(:post, api_root + 'listOMCs.action')
+      end
+    end
+
+    describe '#create_merchant!' do
+      it 'creates a merchant' do
+        subject.create_merchant!('ExampleApp Production', 'merchant.com.example.app.production')
+        expect(WebMock).to have_requested(:post, api_root + 'addOMC.action').with(body: { name: 'ExampleApp Production', identifier: 'merchant.com.example.app.production', teamId: 'XXXXXXXXXX' })
+      end
+    end
+
+    describe '#delete_merchant!' do
+      it 'deletes a merchant' do
+        subject.delete_merchant!('LM3IY56BXC')
+        expect(WebMock).to have_requested(:post, api_root + 'deleteOMC.action').with(body: { omcId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+      end
+    end
+  end
 end
