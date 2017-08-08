@@ -210,8 +210,7 @@ module FastlaneCore
         '-Xms1024m',
         '-Djava.awt.headless=true',
         '-Dsun.net.http.retryPost=false',
-        "-classpath #{Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
+        java_code_option,
         '-m upload',
         "-u #{username.shellescape}",
         "-p #{password.shellescape}",
@@ -234,8 +233,7 @@ module FastlaneCore
         '-Xms1024m',
         '-Djava.awt.headless=true',
         '-Dsun.net.http.retryPost=false',
-        "-classpath #{Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
+        java_code_option,
         '-m lookupMetadata',
         "-u #{username.shellescape}",
         "-p #{password.shellescape}",
@@ -244,6 +242,14 @@ module FastlaneCore
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
         '2>&1' # cause stderr to be written to stdout
       ].compact.join(' ')
+    end
+
+    def java_code_option
+      if Helper.xcode_at_least?(9)
+        return "-jar #{Helper.transporter_java_jar_path.shellescape}"
+      else
+        return "-classpath #{Helper.transporter_java_jar_path.shellescape} com.apple.transporter.Application"
+      end
     end
 
     def handle_error(password)
