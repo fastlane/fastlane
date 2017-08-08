@@ -15,20 +15,8 @@ module Spaceship
         "tierName" => :tier_name
       )
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          obj.unfold_pricing_info(attrs["pricingInfo"])
-
-          return obj
-        end
-      end
-
-      def unfold_pricing_info(attrs)
-        unfolded_pricing_info = attrs.map { |info| IAPSubscriptionPricingInfo.new(info) }
-        instance_variable_set(:@pricing_info, unfolded_pricing_info)
+      def pricing_info
+        @pricing_info ||= raw_data['pricingInfo'].map { |info| IAPSubscriptionPricingInfo.new(info) }
       end
     end
 
