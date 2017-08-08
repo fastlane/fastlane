@@ -63,9 +63,10 @@ module Gym
       hash_to_use = Gym.config[:export_options][:provisioningProfiles].dup || {} # dup so we can show the original values in `verbose` mode
 
       mapping_object = CodeSigningMapping.new(project: Gym.project)
-      hash_to_use = mapping_object.merge_profile_mapping(existing_mapping: hash_to_use, 
+      hash_to_use = mapping_object.merge_profile_mapping(existing_mapping: hash_to_use,
                                                             export_method: Gym.config[:export_method])
 
+      return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
       Gym.config[:export_options][:provisioningProfiles] = hash_to_use
       UI.message("Detected provisioning profile mapping: #{hash_to_use}")
     rescue => ex

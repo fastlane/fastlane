@@ -30,6 +30,8 @@ module Gym
 
       # 2) is already covered by assigning `final_mapping` above
       # 3) see 2
+      #
+      # To get a better sense of this, check out code_signing_spec.rb for some test cases
 
       project_mapping.each do |bundle_identifier, provisioning_profile|
         if final_mapping[bundle_identifier].nil?
@@ -64,7 +66,7 @@ module Gym
     # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
     # the export method (which it usually does, but with different notations)
     def app_identifier_contains?(str, contains)
-      return str.to_s.gsub("-", "").gsub(" ", "").downcase.include?(contains.to_s.downcase)
+      return str.to_s.gsub("-", "").gsub(" ", "").downcase.include?(contains.to_s.gsub("-", "").gsub(" ", "").downcase)
     end
 
     # Array of paths to all project files
