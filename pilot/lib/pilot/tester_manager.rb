@@ -134,7 +134,6 @@ module Pilot
       current_user = Spaceship::Members.find(current_user_email)
       unless current_user
         UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
-        return nil
       end
       return current_user
     end
