@@ -38,9 +38,10 @@ module Pilot
     def find_tester(options)
       start(options)
 
-      tester = Spaceship::Tunes::Tester::Internal.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::External.find(config[:email])
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      app = find_app(app_filter: app_filter)
 
+      tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
 
       describe_tester(tester)
@@ -50,11 +51,12 @@ module Pilot
     def remove_tester(options)
       start(options)
 
-      tester = Spaceship::Tunes::Tester::External.find(config[:email])
-      tester ||= Spaceship::Tunes::Tester::Internal.find(config[:email])
-      UI.user_error!("Tester not found: #{config[:email]}") if tester.nil?
+      app_filter = (config[:apple_id] || config[:app_identifier])
+      app = find_app(app_filter: app_filter)
 
-      app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
+      tester = find_app_tester(email: config[:email], app: app)
+      UI.user_error!("Tester #{config[:email]} not found") unless tester
+
       unless app
         tester.delete!
         UI.success("Successfully removed tester #{tester.email} from Users and Roles")
@@ -102,7 +104,8 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
+      current_user = find_current_user
+
       if current_user.admin?
         tester = Spaceship::Tunes::Tester::Internal.find(email)
         tester ||= Spaceship::Tunes::Tester::External.find(email)
@@ -124,8 +127,19 @@ module Pilot
       return tester
     end
 
+    def find_current_user
+      current_user_email = Spaceship::Tunes.client.user_email
+      current_user_apple_id = Spaceship::Tunes.client.user
+
+      current_user = Spaceship::Members.find(current_user_email)
+      unless current_user
+        UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
+      end
+      return current_user
+    end
+
     def create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
-      current_user = Spaceship::Members.find(Spaceship::Tunes.client.user)
+      current_user = find_current_user
       if current_user.admin?
         tester = Spaceship::Tunes::Tester::External.create!(email: email,
                                                        first_name: first_name,
@@ -223,7 +237,7 @@ module Pilot
       rows << ["Last name", tester.last_name]
       rows << ["Email", tester.email]
 
-      if tester.groups.length > 0
+      if tester.groups.to_s.length > 0
         rows << ["Groups", tester.groups_list]
       end
 
@@ -232,7 +246,7 @@ module Pilot
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
-      if tester.devices.length == 0
+      if tester.devices.to_s.length == 0
         rows << ["Devices", "No devices"]
       else
         rows << ["#{tester.devices.count} Devices", ""]

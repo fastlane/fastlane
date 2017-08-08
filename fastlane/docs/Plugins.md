@@ -33,7 +33,7 @@ In general, we might not accept actions that
 
 ### Find a plugin
 
-Head over to the [Plugins List](https://docs.fastlane.tools/actions/#plugins) for a list of plugins you can use.
+Head over to the [Plugins List](https://docs.fastlane.tools/plugins/available-plugins) for a list of plugins you can use.
 
 List all available plugins using
 

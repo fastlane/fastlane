@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name])
+        keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
       end
@@ -19,6 +19,10 @@ module Fastlane
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain the items should be imported to",
                                        optional: false),
+          FastlaneCore::ConfigItem.new(key: :keychain_path,
+                                       env_name: "KEYCHAIN_PATH",
+                                       description: "Path to the Keychain file to which the items should be imported",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_password,
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
                                        description: "The password for the keychain. Note that for the login keychain this is your user's password",

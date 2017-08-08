@@ -29,8 +29,12 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
-        agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
-        raise "Apple Generic Versioning is not enabled." unless Helper.test? || agv_enabled
+
+        # We do not want to run agvtool under tests to avoid output about not having a project available
+        unless Helper.test?
+          agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
+          raise "Apple Generic Versioning is not enabled." unless agv_enabled
+        end
 
         command = [
           command_prefix,

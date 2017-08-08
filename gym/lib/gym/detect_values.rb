@@ -58,7 +58,6 @@ module Gym
 
     # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
     # each target of your app
-    # rubocop:disable Style/MultilineBlockChain
     def self.detect_selected_provisioning_profiles
       if Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash) && Gym.config[:export_options][:provisioningProfiles]
         return
@@ -98,15 +97,21 @@ module Gym
 
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
               provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
-              next if provisioning_profile_specifier.to_s.length == 0
-
-              provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+              provisioning_profile_uuid = current["PROVISIONING_PROFILE"]
+              if provisioning_profile_specifier.to_s.length > 0
+                provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
+              elsif provisioning_profile_uuid.to_s.length > 0
+                provisioning_profile_mapping[bundle_identifier] = provisioning_profile_uuid
+              end
             end
           end
         rescue => ex
           # We catch errors here, as we might run into an exception on one included project
           # But maybe the next project actually contains the information we need
           if Helper.xcode_at_least?("9.0")
+            UI.error("Couldn't automatically detect the provisioning profile mapping")
+            UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+            UI.error("provisioning profile to use for each target of your app")
             UI.error(ex)
             UI.verbose(ex.backtrace.join("\n"))
           end
@@ -129,7 +134,6 @@ module Gym
         UI.verbose(ex.backtrace.join("\n"))
       end
     end
-    # rubocop:enable Style/MultilineBlockChain
 
     def self.detect_scheme
       Gym.project.select_scheme

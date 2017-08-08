@@ -8,3 +8,4 @@ Gemfile.lock
 /rdoc/
 fastlane/README.md
 fastlane/report.xml
+coverage

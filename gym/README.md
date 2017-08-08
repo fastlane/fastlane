@@ -157,7 +157,7 @@ output_name "MyApp"           # the name of the ipa file
 
 ## Export options
 
-Since Xcode 7, `gym` is using new Xcode API which allows us to specify export options using `plist` file. By default `gym` creates this file for you and you are able to modify some parameters by using `export_method`, `export_team_id`, `include_symbols` or `include_bitcode`. If you want to have more options, like creating manifest file or app thinning, you can provide your own `plist` file:
+Since Xcode 7, `gym` is using new Xcode API which allows us to specify export options using `plist` file. By default `gym` creates this file for you and you are able to modify some parameters by using `export_method`, `export_team_id`, `include_symbols` or `include_bitcode`. If you want to have more options, like creating manifest file for app thinning, you can provide your own `plist` file:
 
 ```ruby
 export_options "./ExportOptions.plist"
@@ -182,7 +182,7 @@ export_options(
   method: "app-store",
   provisioningProfiles: { 
     "com.example.bundleid": "Provisioning Profile Name",
-    "com.example.bundleid2": "Provisioning Profile Name 2",
+    "com.example.bundleid2": "Provisioning Profile Name 2"
   }
 )
 ```

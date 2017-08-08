@@ -18,9 +18,16 @@ module PEM
                                      description: "Generate a p12 file additionally to a PEM file",
                                      is_string: false,
                                      default_value: true),
+        FastlaneCore::ConfigItem.new(key: :active_days_limit,
+                                     env_name: "PEM_ACTIVE_DAYS_LIMIT",
+                                     description: "If the current certificate is active for less than this number of days, generate a new one. Default value is 30 days",
+                                     default_value: 30,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Value of active_days_limit must be a positive integer or left blank") unless value.kind_of?(Integer) && value > 0
+                                     end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "PEM_FORCE",
-                                     description: "Create a new push certificate, even if the current one is active for 30 more days",
+                                     description: "Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :save_private_key,

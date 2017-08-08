@@ -99,7 +99,7 @@ module Fastlane
                                    value: (self.data[:downloads].to_i / 250)),
             FastlanePluginRating.new(key: :tests,
                              description: "The more tests a plugin has, the better",
-                                   value: self.data[:tests].to_i * 3)
+                                   value: [self.data[:tests].to_i * 3, 80].min)
           ]
         end
 
@@ -112,7 +112,7 @@ module Fastlane
             '558000'
           when 100...250
             '63b319'
-          when 250...1000
+          when 250...10_000
             '72CC1D'
           else
             '558000' # this shouldn't happen
@@ -165,7 +165,10 @@ module Fastlane
           url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise Github will fail
           puts "Fetching #{url}"
           conn = Faraday.new(url: url) do |builder|
+            # The order below IS important
+            # See bug here https://github.com/lostisland/faraday_middleware/issues/105
             builder.use FaradayMiddleware::FollowRedirects
+            builder.adapter Faraday.default_adapter
           end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
@@ -174,8 +177,12 @@ module Fastlane
           url += "/stats/contributors"
           puts "Fetching #{url}"
           conn = Faraday.new(url: url) do |builder|
+            # The order below IS important
+            # See bug here https://github.com/lostisland/faraday_middleware/issues/105
             builder.use FaradayMiddleware::FollowRedirects
+            builder.adapter Faraday.default_adapter
           end
+
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           contributor_details = JSON.parse(response.body)

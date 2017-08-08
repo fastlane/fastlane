@@ -120,6 +120,8 @@ To download all your provisioning profiles use
 
     fastlane sigh download_all
 
+Optionally, use `fastlane sigh download_all --download_xcode_profiles` to also include the Xcode managed provisioning profiles
+
 For a list of available parameters and commands run
 
     fastlane sigh --help
