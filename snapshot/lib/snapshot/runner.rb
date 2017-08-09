@@ -84,8 +84,8 @@ module Snapshot
     def patch_scheme_to_save_screenshots
       scheme = Snapshot.config[:scheme]
       scheme_filename = scheme + ".xcscheme"
-      scheme_absolute_path = File.join(File.expand_path(".", Snapshot.project.path), 'xcshareddata', 'xcschemes', scheme_filename)
-      unless File.file?(scheme_absolute_path)
+      scheme_absolute_path = Dir[File.join(Snapshot.project.path, "**", scheme_filename)].last
+      unless scheme_absolute_path
         UI.user_error!("Your scheme was expected to be here: #{scheme_absolute_path} but we couldn't find it,\nplease create an issue including this information along with the path to where #{scheme_filename} is located for this project")
       end
 
