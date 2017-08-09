@@ -44,12 +44,6 @@ module Spaceship
         'canDeleteAddOn' => :can_delete_addon
       })
 
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
-
       def type
         Tunes::IAPType.get_from_string(raw_data["addOnType"])
       end
@@ -61,7 +55,7 @@ module Spaceship
       def edit
         attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
         attrs[:application] = application
-        Tunes::IAPDetail.factory(attrs)
+        Tunes::IAPDetail.new(attrs)
       end
 
       def delete!

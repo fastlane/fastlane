@@ -22,6 +22,7 @@ module Spaceship
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
   AppGroup = Spaceship::Portal::AppGroup
+  Passbook = Spaceship::Portal::Passbook
   WebsitePush = Spaceship::Portal::WebsitePush
   AppService = Spaceship::Portal::AppService
   Merchant = Spaceship::Portal::Merchant

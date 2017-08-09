@@ -86,6 +86,12 @@ module Spaceship
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
 
+        unless Spaceship::Client::UserInterface.interactive?
+          puts "Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here."
+          puts "Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value."
+          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not ineractive!"
+        end
+
         selected = ($stdin.gets || '').strip.to_i - 1
         team_to_use = teams[selected] if selected >= 0
 
@@ -258,22 +264,28 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_ratings(app_id, platform, versionId = '', storefront = '')
-      # if storefront or versionId is empty api fails
+    def get_ratings(app_id, platform, version_id = '', storefront = '')
+      # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
       rating_url << "storefront=#{storefront}" unless storefront.empty?
-      rating_url << "versionId=#{versionId}" unless versionId.empty?
+      rating_url << "version_id=#{version_id}" unless version_id.empty?
 
       r = request(:get, rating_url)
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, versionId = '')
+    def get_reviews(app_id, platform, storefront, version_id)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
       loop do
-        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
+        rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
+        rating_url << "&index=#{index}"
+        rating_url << "&storefront=#{storefront}" unless storefront.empty?
+        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+
+        r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page

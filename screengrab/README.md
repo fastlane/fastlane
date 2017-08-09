@@ -183,7 +183,14 @@ You can find all the tools on [fastlane.tools](https://fastlane.tools).
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
-Please submit an issue on GitHub and provide information about your setup.
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 ## Code of Conduct
 
