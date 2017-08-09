@@ -16,7 +16,7 @@ module Gym
 
       # Now it's time to merge the (potentially) existing `provisioningProfiles` of the `export_options`
       # with the hash we just created. Both might include information about what profile to use
-      # This is important, as :bell: (some users) didn't know to call match for each app target he wants profiles for
+      # This is important as it mght not be clear for the user that they have to call match for each app target
       # before adding this code, we'd only either use whatever we get from match, or what's defined in the Xcode project
       # With the code below, we'll make sure to take the best of it:
       #
