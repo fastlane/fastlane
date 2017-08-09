@@ -83,22 +83,32 @@ module Snapshot
 
     def patch_scheme_to_save_screenshots
       scheme = Snapshot.config[:scheme]
-      scheme_absolute_path = File.join(File.expand_path(".", Snapshot.project.path), 'xcshareddata', 'xcschemes', scheme + ".xcscheme")
-
-      scheme_xml_doc = fetch_scheme_xml_file(scheme_file_path: scheme_absolute_path)
+      scheme_filename = scheme + ".xcscheme"
+      scheme_absolute_path = File.join(File.expand_path(".", Snapshot.project.path), 'xcshareddata', 'xcschemes', scheme_filename)
+      unless File.file?(scheme_absolute_path)
+        UI.user_error!("Your scheme was expected to be here: #{scheme_absolute_path} but we couldn't find it,\nplease create an issue including this information along with the path to where #{scheme_filename} is located for this project")
+      end
 
       backup_scheme_file_path = scheme_absolute_path + "_original"
       backup_scheme(scheme_absolute_path: scheme_absolute_path, backup_scheme_absolute_path: backup_scheme_file_path)
 
-      scheme_elements = scheme_xml_doc.elements['Scheme']
-      test_action = scheme_elements.elements['TestAction']
-      test_action.attributes["systemAttachmentLifetime"] = "keepAlways"
+      add_system_attachment_lifetime_to_scheme(scheme_absolute_path: scheme_absolute_path)
+
+      return scheme_absolute_path
+    end
+
+    def add_system_attachment_lifetime_to_scheme(scheme_absolute_path: nil)
+      scheme_xml_doc = fetch_scheme_xml_file(scheme_file_path: scheme_absolute_path)
+
+      # find each TestAction no matter where it is, and add the 'systemAttachmentLifetime' attribute
+      REXML::XPath.each(scheme_xml_doc, "//TestAction") do |test_action_element|
+        test_action_element.attributes["systemAttachmentLifetime"] = "keepAlways"
+      end
 
       modified_scheme_text = ""
-      scheme_xml_doc.write modified_scheme_text
+      scheme_xml_doc.write(modified_scheme_text)
 
-      File.open(scheme_absolute_path, 'w') { |file| file.write(modified_scheme_text) }
-      return scheme_absolute_path
+      File.write(scheme_absolute_path, modified_scheme_text)
     end
 
     def cleanup_backup(scheme_absolute_path: nil)
@@ -106,12 +116,12 @@ module Snapshot
     end
 
     def backup_scheme(scheme_absolute_path: nil, backup_scheme_absolute_path: nil)
-      UI.message "Backing up '#{scheme_absolute_path}' to #{backup_scheme_absolute_path} so we can patch it to enable screenshot saving"
+      UI.message "Backing up '#{scheme_absolute_path}' to #{backup_scheme_absolute_path} so we can patch it to enable screenshot 📸 saving"
       FileUtils.cp(scheme_absolute_path, backup_scheme_absolute_path)
     end
 
     def move_original_scheme_back(modified_scheme_file_path: nil, backup_scheme_absolute_path: nil)
-      UI.message "Moving'#{backup_scheme_absolute_path}' back to #{modified_scheme_file_path} now that we're done with screenshotting"
+      UI.message "Moving'#{backup_scheme_absolute_path}' back to #{modified_scheme_file_path} now that we're done with screenshotting 📸"
       unless File.file?(backup_scheme_absolute_path)
         return
       end
