@@ -43,7 +43,7 @@ module Supply
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
       # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
       client.update_track(Supply.config[:track], 0.1, nil)
-      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout], version_codes)
+      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
     end
 
     def upload_changelogs(language)
@@ -157,8 +157,8 @@ module Supply
       UI.message("Updating track '#{Supply.config[:track]}'...")
       check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
 
-      if Supply.config[:track].eql? "rollout"
-        client.update_track(Supply.config[:track], Supply.config[:rollout], apk_version_codes)
+      if Supply.config[:track].eql?("rollout")
+        client.update_track(Supply.config[:track], Supply.config[:rollout] || 0.1, apk_version_codes)
       else
         client.update_track(Supply.config[:track], 1.0, apk_version_codes)
       end
