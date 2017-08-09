@@ -184,7 +184,7 @@ module Frameit
         if title_below_image
           show_complete_frame = fetch_config['show_complete_frame']
           c.geometry "+#{left_space}+#{background.height - image.height - space_to_device}" unless show_complete_frame
-          c.geometry "+#{left_space}" if show_complete_frame
+          c.geometry "+#{left_space}+#{vertical_frame_padding}" if show_complete_frame
         else
           c.geometry "+#{left_space}+#{space_to_device}"
         end
