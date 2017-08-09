@@ -29,7 +29,6 @@ module Precheck
         "google",
         "compuserve",
         "windows phone",
-        "tizen",
         "windows 10 mobile",
         "sailfish os",
         "windows universal app",

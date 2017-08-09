@@ -60,11 +60,21 @@ module Sigh
         c.syntax = 'fastlane sigh download_all'
         c.description = 'Downloads all valid provisioning profiles'
 
+        c.option '--download_xcode_profiles', 'Only works with `fastlane sigh download_all` command: Also download Xcode managed provisioning profiles'
+
         FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
-          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          Sigh::Manager.download_all
+          # Below is some custom code to get an extra flag that's only available
+          # for the `fastlane sigh download_all` command and not for the `sigh` action
+          user_hash = options.__hash__
+          download_xcode_profiles = options.download_xcode_profiles
+
+          if download_xcode_profiles == true
+            user_hash.delete(:download_xcode_profiles)
+          end
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, user_hash)
+          Sigh::Manager.download_all(download_xcode_profiles: download_xcode_profiles)
         end
       end
 
@@ -85,7 +95,7 @@ module Sigh
         c.syntax = 'fastlane sigh resign'
         c.description = 'Resigns an existing ipa file with the given provisioning profile'
         c.option '-i', '--signing_identity STRING', String, 'The signing identity to use. Must match the one defined in the provisioning profile.'
-        c.option '-x', '--version_number STRING', String, 'Version number to force binary and all nested binaries to use. Changes both CFBundleShortVersionString and CFBundleIdentifier.'
+        c.option '-x', '--version_number STRING', String, 'Version number to force binary and all nested binaries to use. Changes both CFBundleShortVersionString and CFBundleVersion.'
         c.option '-p', '--provisioning_profile PATH', String, '(or BUNDLE_ID=PATH) The path to the provisioning profile which should be used. '\
                  'Can be provided multiple times if the application contains nested applications and app extensions, which need their own provisioning profile. '\
                  'The path may be prefixed with a identifier in order to determine which provisioning profile should be used on which app.',

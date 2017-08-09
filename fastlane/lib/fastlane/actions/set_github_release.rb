@@ -11,70 +11,83 @@ module Fastlane
         UI.important("Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".")
         UI.important("Will also upload assets #{params[:upload_assets]}.") if params[:upload_assets]
 
-        require 'json'
-        body_obj = {
+        repo_name = params[:repository_name]
+        api_token = params[:api_token]
+        server_url = params[:server_url]
+        tag_name = params[:tag_name]
+
+        payload = {
           'tag_name' => params[:tag_name],
           'name' => params[:name],
           'body' => params[:description],
           'draft' => !!params[:is_draft],
           'prerelease' => !!params[:is_prerelease]
         }
-        body_obj['target_commitish'] = params[:commitish] if params[:commitish]
-        body = body_obj.to_json
+        payload['target_commitish'] = params[:commitish] if params[:commitish]
 
-        repo_name = params[:repository_name]
-        api_token = params[:api_token]
-        server_url = params[:server_url]
-        server_url = server_url[0..-2] if server_url.end_with? '/'
+        GithubApiAction.run(
+          server_url: server_url,
+          api_token: api_token,
+          http_method: 'POST',
+          path: "repos/#{repo_name}/releases",
+          body: payload,
+          error_handlers: {
+            422 => proc do |result|
+              UI.error(result[:body])
+              UI.error("Release on tag #{tag_name} already exists!")
+              return nil
+            end,
+            404 => proc do |result|
+              UI.error(result[:body])
+              UI.user_error!("Repository #{repo_name} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)")
+            end,
+            401 => proc do |result|
+              UI.error(result[:body])
+              UI.user_error!("You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
+            end,
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
+              return nil
+            end
+          }
+        ) do |result|
+          json = result[:json]
+          html_url = json['html_url']
+          release_id = json['id']
 
-        # create the release
-        response = call_releases_endpoint("post", server_url, repo_name, "/releases", api_token, body)
-
-        case response[:status]
-        when 201
-          UI.success("Successfully created release at tag \"#{params[:tag_name]}\" on GitHub")
-          body = JSON.parse(response.body)
-          html_url = body['html_url']
-          release_id = body['id']
+          UI.success("Successfully created release at tag \"#{tag_name}\" on GitHub")
           UI.important("See release at \"#{html_url}\"")
+
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
-          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = body
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = json
 
           assets = params[:upload_assets]
           if assets && assets.count > 0
             # upload assets
-            self.upload_assets(assets, body['upload_url'], api_token)
+            self.upload_assets(assets, json['upload_url'], api_token)
 
             # fetch the release again, so that it contains the uploaded assets
-            get_response = self.call_releases_endpoint("get", server_url, repo_name, "/releases/#{release_id}", api_token, nil)
-            if get_response[:status] != 200
-              UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
-              UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
+            GithubApiAction.run(
+              server_url: server_url,
+              api_token: api_token,
+              http_method: 'GET',
+              path: "repos/#{repo_name}/releases/#{release_id}",
+              error_handlers: {
+                '*' => proc do |get_result|
+                  UI.error("GitHub responded with #{get_result[:status]}:#{get_result[:body]}")
+                  UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
+                end
+              }
+            ) do |get_result|
+              Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = get_result[:json]
+              UI.success("Successfully uploaded assets #{assets} to release \"#{html_url}\"")
+              return get_result[:json]
             end
-
-            get_body = JSON.parse(get_response.body)
-            Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = get_body
-            UI.success("Successfully uploaded assets #{assets} to release \"#{html_url}\"")
-            return get_body
           else
-            return body
-          end
-        when 422
-          UI.error(response.body)
-          UI.error("Release on tag #{params[:tag_name]} already exists!")
-        when 404
-          UI.error(response.body)
-          UI.user_error!("Repository #{params[:repository_name]} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)")
-        when 401
-          UI.error(response.body)
-          UI.user_error!("You are not authorized to access #{params[:repository_name]}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
-        else
-          if response[:status] != 200
-            UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
+            return json || result[:body]
           end
         end
-        return nil
       end
 
       def self.upload_assets(assets, upload_url_template, api_token)
@@ -90,65 +103,38 @@ module Fastlane
         # check that the asset even exists
         UI.user_error!("Asset #{absolute_path} doesn't exist") unless File.exist?(absolute_path)
 
-        name = File.basename(absolute_path)
-        response = nil
         if File.directory?(absolute_path)
           Dir.mktmpdir do |dir|
             tmpzip = File.join(dir, File.basename(absolute_path) + '.zip')
-            name = File.basename(tmpzip)
             sh "cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null"
-            response = self.upload_file(tmpzip, upload_url_template, api_token)
+            self.upload_file(tmpzip, upload_url_template, api_token)
           end
         else
-          response = self.upload_file(absolute_path, upload_url_template, api_token)
+          self.upload_file(absolute_path, upload_url_template, api_token)
         end
-        return response
       end
 
       def self.upload_file(file, url_template, api_token)
         require 'addressable/template'
-        name = File.basename(file)
-        expanded_url = Addressable::Template.new(url_template).expand(name: name).to_s
-        headers = self.headers(api_token)
-        headers['Content-Type'] = 'application/zip' # how do we detect other types e.g. other binary files? file extensions?
-
-        UI.important("Uploading #{name}")
-        response = self.call_endpoint(expanded_url, "post", headers, File.read(file))
-
-        # inspect the response
-        case response.status
-        when 201
-          # all good in the hood
-          UI.success("Successfully uploaded #{name}.")
-        else
-          UI.error("GitHub responded with #{response[:status]}:#{response[:body]}")
-          UI.user_error!("Failed to upload asset #{name} to GitHub.")
+        file_name = File.basename(file)
+        expanded_url = Addressable::Template.new(url_template).expand(name: file_name).to_s
+        headers = { 'Content-Type' => 'application/zip' } # works for all binary files
+        UI.important("Uploading #{file_name}")
+        GithubApiAction.run(
+          api_token: api_token,
+          http_method: 'POST',
+          headers: headers,
+          url: expanded_url,
+          raw_body: File.read(file),
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
+              UI.user_error!("Failed to upload asset #{file_name} to GitHub.")
+            end
+          }
+        ) do |result|
+          UI.success("Successfully uploaded #{file_name}.")
         end
-      end
-
-      def self.call_endpoint(url, method, headers, body)
-        require 'excon'
-        case method
-        when "post"
-          response = Excon.post(url, headers: headers, body: body)
-        when "get"
-          response = Excon.get(url, headers: headers, body: body)
-        else
-          UI.user_error!("Unsupported method #{method}")
-        end
-        return response
-      end
-
-      def self.call_releases_endpoint(method, server, repo, endpoint, api_token, body)
-        url = "#{server}/repos/#{repo}#{endpoint}"
-        self.call_endpoint(url, method, self.headers(api_token), body)
-      end
-
-      def self.headers(api_token)
-        require 'base64'
-        headers = { 'User-Agent' => 'fastlane-set_github_release' }
-        headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
-        headers
       end
 
       #####################################################
@@ -251,7 +237,7 @@ module Fastlane
       end
 
       def self.authors
-        ["czechboy0"]
+        ["czechboy0", "tommeier"]
       end
 
       def self.is_supported?(platform)
@@ -273,7 +259,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :source_control
       end
     end
   end

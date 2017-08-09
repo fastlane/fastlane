@@ -15,15 +15,17 @@ You can import another `Fastfile` by using the `import` action. This is useful i
 import './path/to/other/Fastfile'
 ```
 
+For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.tools/plugins/available-plugins) page.
+
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
 - [Plugins](https://docs.fastlane.tools/plugins/available-plugins)
 
-
 <%- @categories.each do |category, actions| %>
 # <%= category %>
-  <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
+
+<%- actions.sort.to_h.each do |_number_of_launches, action| -%>
 
 ### <%= action.action_name %>
 
@@ -33,7 +35,7 @@ import './path/to/other/Fastfile'
 
 <%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
 
-<%= action.action_name %> | 
+<%= action.action_name %> |
 -----|----
 Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 Author | @<%= Array(action.author || action.authors).join(", @") %>
@@ -49,8 +51,8 @@ Returns | <%= action.return_value %>
 ```ruby
 <%= current_sample.gsub("          ", "") %>
 ```
-<% end %>
-<% end %>
+<% end %><%# End of action.example_code... %>
+<% end %><%# End of if %>
 </details>
 
 <% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
@@ -65,9 +67,9 @@ Key | Description
   `<%= config_item.key %>` | <%= config_item.description %>
 <%- end %>
 </details>
-<% end %>
 
+<% end %><%# End of action.available_options... %>
 
+  <%- end %><%# End of actions.sort... %>
 
-  <%- end %>
-<%- end %>
+<%- end %><%# End of categories.each %>

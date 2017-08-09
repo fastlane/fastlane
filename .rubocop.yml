@@ -45,6 +45,11 @@ Style/VariableNumber:
 Style/MethodMissing:
   Enabled: false
 
+# This rule isn't useful, lots of discussion happening around it also
+# e.g. https://github.com/bbatsov/rubocop/issues/2338
+MultilineBlockChain:
+  Enabled: false
+
 #
 #   File.chmod(0777, f)
 #
@@ -217,6 +222,7 @@ Layout/SpaceAroundOperators:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
 AllCops:
+  TargetRubyVersion: 2.0
   Include:
     - '**/fastlane/Fastfile'
   Exclude:

@@ -12,12 +12,6 @@ require 'cgi'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
-if ENV["SPACESHIP_DEBUG"]
-  require 'openssl'
-  # this has to be on top of this file, since the value can't be changed later
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-end
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class Client
@@ -28,6 +22,9 @@ module Spaceship
 
     # The user that is currently logged in
     attr_accessor :user
+
+    # The email of the user that is currently logged in
+    attr_accessor :user_email
 
     # The logger in which all requests are logged
     # /tmp/spaceship[time]_[pid].log by default
@@ -264,6 +261,7 @@ module Spaceship
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy "https://127.0.0.1:8888"
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
 
         if ENV["DEBUG"]
@@ -484,7 +482,13 @@ module Spaceship
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
-      request(:get, "https://olympus.itunes.apple.com/v1/session")
+      response = request(:get, "https://olympus.itunes.apple.com/v1/session")
+      if response.body
+        user_map = response.body["user"]
+        if user_map
+          self.user_email = user_map["emailAddress"]
+        end
+      end
     end
 
     def itc_service_key

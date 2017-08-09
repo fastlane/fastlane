@@ -94,6 +94,7 @@ module Gym
         print_full_log_path
         print_environment_information
         print_build_error_instructions
+        print_xcode9_plist_warning
         UI.build_failure!("Error packaging up the application", error_info: output)
       end
 
@@ -104,6 +105,11 @@ module Gym
         print "Also, make sure to have a valid code signing identity and provisioning profile installed"
         print "Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/"
         print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
+        print "This error might also happen if your workspace/project file is not in the root directory of your project."
+        print "To workaround that issue, you can wrap your calls to gym with"
+        print "`Dir.chdir('../path/to/dir/containing/proj') do`"
+        print "For an example you can check out"
+        print "https://github.com/artsy/emission-nebula/commit/44fe51a7fea8f7d52f0f77d6c3084827fe5dd59e"
         UI.build_failure!("Archive invalid")
       end
 
@@ -132,6 +138,21 @@ module Gym
         UI.error("⬆️  Check out the few lines of raw `xcodebuild` output above for potential hints on how to solve this error")
         UI.important("📋  For the complete and more detailed error log, check the full log at:")
         UI.important("📋  #{log_path}")
+      end
+
+      def print_xcode9_plist_warning
+        return unless Helper.xcode_at_least?("9.0")
+
+        export_options = Gym.config[:export_options] || {}
+        provisioning_profiles = export_options[:provisioningProfiles] || []
+        if provisioning_profiles.count == 0
+          UI.error("Looks like no provisioning profile mapping was provided")
+          UI.error("Please check the complete output, in particular the very top")
+          UI.error("and see if you can find more information. You can also run fastlane")
+          UI.error("with the `--verbose` flag.")
+          UI.error("Alternatively you can provide the provisioning profile mapping manually")
+          UI.error("https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
+        end
       end
 
       def print_xcode_version
@@ -202,19 +223,19 @@ module Gym
           # the provisioning profile might be called anything below
           # There is no 100% good way to detect the profile type based on the name
           available_export_types = {
-            "app-store" => :appstore,
-            "app store" => :appstore,
-            "appstore" => :appstore,
-            "ad-hoc" => :adhoc,
-            "adhoc" => :adhoc,
-            "ad hoc" => :adhoc,
-            "enterprise" => :enterprise,
-            "development" => :development
+            "app-store" => "app-store",
+            "app store" => "app-store",
+            "appstore" => "app-store",
+            "ad-hoc" => "ad-hoc",
+            "adhoc" => "ad-hoc",
+            "ad hoc" => "ad-hoc",
+            "enterprise" => "enterprise",
+            "development" => "development"
           }
 
           selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|
             available_export_types.each do |current_to_try, matching_type|
-              next unless current_profile_name.downcase.include?(current_to_try.downcase)
+              next unless current_profile_name.to_s.downcase.include?(current_to_try.to_s.downcase)
 
               # Check if there is a mismatch between the name and the selected export method
               # Example

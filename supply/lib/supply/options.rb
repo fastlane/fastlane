@@ -24,11 +24,11 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
-                                     default_value: '0.1',
+                                     optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
                                        max = 1.0
-                                       UI.user_error! "Invalid value '#{value}', must be greater than #{min} and less than #{max}" unless value.to_f > min && value.to_f < max
+                                       UI.user_error! "Invalid value '#{value}', must be greater than #{min} and less than #{max}" unless value.to_f > min && value.to_f <= max
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      env_name: "SUPPLY_METADATA_PATH",

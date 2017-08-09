@@ -1,4 +1,4 @@
-#!/bin/bash --login
+#!/bin/bash
 # shellcheck disable=SC2155
 # shellcheck disable=SC1090
 

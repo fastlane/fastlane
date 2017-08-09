@@ -61,6 +61,8 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 - **Modify** Application Services on the Apple Developer Portal
 - **Create** App Groups on the Apple Developer Portal
 - **Associate** apps with App Groups on the Apple Developer Portal
+- **Create** Merchant Identifiers on the Apple Developer Portal
+- **Associate** apps with Merchant Identifiers on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
 
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
@@ -78,15 +80,17 @@ Get in contact with the developers on Twitter: [@FastlaneTools](https://twitter.
 To get a list of all available parameters:
 
     fastlane produce --help
-    
+
 ```
   Commands: (* default)
-    associate_group    Associate with a group, which is created if needed or simply located otherwise
-    create           * Creates a new app on iTunes Connect and the Apple Developer Portal
-    disable_services   Disable specific Application Services for a specific app on the Apple Developer Portal
-    enable_services    Enable specific Application Services for a specific app on the Apple Developer Portal
-    group              Ensure that a specific App Group exists
-    help               Display global or [command] help documentation
+    associate_group      Associate with a group, which is created if needed or simply located otherwise
+    associate_merchant   Associate with a merchant for use with Apple Pay. Apple Pay will be enabled for this app
+    create             * Creates a new app on iTunes Connect and the Apple Developer Portal
+    disable_services     Disable specific Application Services for a specific app on the Apple Developer Portal
+    enable_services      Enable specific Application Services for a specific app on the Apple Developer Portal
+    group                Ensure that a specific App Group exists
+    help                 Display global or [command] help documentation
+    merchant             Ensure that a specific Merchant exists
 
   Global Options:
     --verbose
@@ -105,6 +109,7 @@ To get a list of all available parameters:
     -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
     -i, --skip_itc [VALUE] Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
     -d, --skip_devcenter [VALUE] Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -s, --itc_users ARRAY Array of iTunes Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles (ITC_USERS)
     -b, --team_id STRING The ID of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_ID)
     -l, --team_name STRING The name of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_NAME)
     -k, --itc_team_id [VALUE] The ID of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_ID)
@@ -171,6 +176,37 @@ Get a list of all available options using
     --push-notification  Disable Push notifications
     --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
+```
+
+## Creating Apple Pay merchants and associating them with an App ID
+
+If you want to create a new Apple Pay Merchant Identifier:
+
+```
+fastlane produce merchant -o merchant.com.example.production -r "Example Merchant Production"
+```
+
+Use `--help` for more information about all available parameters
+```
+fastlane produce merchant --help
+```
+
+If you want to associate an app with a Merchant Identifier:
+
+```
+fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production
+```
+
+If you want to associate an app with multiple Merchant Identifiers:
+
+```
+fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production merchant.com.example.sandbox
+```
+
+Use --help for more information about all available parameters
+
+```
+fastlane produce associate_merchant --help
 ```
 
 ## Environment Variables
@@ -250,7 +286,14 @@ You'll still have to fill out the remaining information (like screenshots, app d
 ##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 # Need help?
-Please submit an issue on GitHub and provide information about your setup
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 # Code of Conduct
 Help us keep `produce` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
