@@ -135,6 +135,43 @@ module Produce
         end
       end
 
+      command :merchant do |c|
+        c.syntax = 'fastlane produce merchant'
+        c.description = 'Ensure that a specific Merchant exists'
+        c.example 'Create merchant', 'fastlane produce merchant -o merchant.com.example.production -r "Example Merchant Production"'
+
+        c.option '-r', '--merchant_name STRING', String, 'Name for the merchant that is created (PRODUCE_MERCHANT_NAME)'
+        c.option '-o', '--merchant_identifier STRING', String, 'Merchant identifier for the merchant (PRODUCE_MERCHANT_IDENTIFIER)'
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
+        c.action do |args, options|
+          extra_options = [FastlaneCore::ConfigItem.new(key: :merchant_name, optional: true), FastlaneCore::ConfigItem.new(key: :merchant_identifier)]
+          all_options = Produce::Options.available_options + extra_options
+          allowed_keys = all_options.collect(&:key)
+
+          Produce.config = FastlaneCore::Configuration.create(all_options, options.__hash__.select { |key, value| allowed_keys.include? key })
+
+          require 'produce/merchant'
+          Produce::Merchant.new.create(options, args)
+        end
+      end
+
+      command :associate_merchant do |c|
+        c.syntax = 'fastlane produce associate_merchant -a APP_IDENTIFIER MERCHANT_IDENTIFIER1, MERCHANT_IDENTIFIER2, ...'
+        c.description = 'Associate with a merchant for use with Apple Pay. Apple Pay will be enabled for this app.'
+        c.example 'Associate with merchant', 'fastlane produce associate_merchant -a com.example.app merchant.com.example.production'
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
+        c.action do |args, options|
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
+
+          require 'produce/merchant'
+          Produce::Merchant.new.associate(options, args)
+        end
+      end
+
       default_command :create
 
       run!

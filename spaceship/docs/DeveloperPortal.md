@@ -98,6 +98,31 @@ group = Spaceship::Portal.app_group.create!(group_id: "group.com.example.another
 app = app.associate_groups([group])
 ```
 
+## Apple Pay Merchants
+
+```ruby
+# Fetch all existing merchants
+all_merchants = Spaceship::Portal.merchant.all
+
+# Find a specific merchant, based on the identifier
+sandbox_merchant = Spaceship::Portal.merchant.find("merchant.com.example.application.sandbox")
+
+# Show the names of all the merchants
+Spaceship::Portal.merchant.all.collect do |merchant|
+  merchant.name
+end
+
+# Create a new merchant
+another_merchant = Spaceship::Portal.merchant.create!(bundle_id: "merchant.com.example.another", name: "Another merchant")
+
+# Delete a merchant
+another_merchant.delete!
+
+# Associate an app with merchant/s (overwrites any previous associations)
+# Assumes app contains a fetched app, as described above
+app = app.associate_merchants([sandbox_merchant, production_merchant])
+```
+
 ## Passbook
 
 ```ruby
