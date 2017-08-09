@@ -115,12 +115,21 @@ module Fastlane
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :team_name,
+                                       short_option: "-l",
+                                       env_name: "PRODUCE_TEAM_NAME",
+                                       description: "The name of your Developer Portal team if you're in multiple teams",
+                                       optional: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       verify_block: proc do |value|
+                                         ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end)
         ]
       end
 
       def self.author
-        "Bhimsen Padalkar"
+        "bhimsenpadalkar"
       end
 
       def self.is_supported?(platform)
@@ -130,8 +139,8 @@ module Fastlane
       def self.example_code
         [
           'modify_services(
-            username: "bhimsenp@thoughtworks.com",
-            app_identifier: "com.thoughtworks.app",
+            username: "test.account@gmail.com",
+            app_identifier: "com.someorg.app",
             services: {
               push_notifications: "on",
               associated_domains: "off"
