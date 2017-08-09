@@ -231,6 +231,11 @@ class PortalStubbing
         with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
         to_return(status: 200, body: "", headers: {})
 
+      # get invites
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getInvites").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: adp_read_fixture_file("inviteList.json"), headers: { 'Content-Type' => 'application/json' })
+
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
         with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
         to_return(status: 200, body: "", headers: {})
