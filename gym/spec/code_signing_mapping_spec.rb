@@ -82,6 +82,13 @@ describe Gym::CodeSigningMapping do
       expect(result).to eq({ "identifier.1" => "value.1", "identifier.2" => "value.2" })
     end
 
+    it "doesn't crash if nil is provided" do
+      result = csm.merge_profile_mapping(primary_mapping: nil,
+                                       secondary_mapping: {},
+                                           export_method: "app-store")
+      expect(result).to eq({})
+    end
+
     it "accesses the Xcode profile mapping, if nothing else is given" do
       expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "value.1" })
       result = csm.merge_profile_mapping(primary_mapping: {}, export_method: "app-store")
