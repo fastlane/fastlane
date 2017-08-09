@@ -22,7 +22,7 @@ module Fastlane
           # If that's the case, we won't set the provisioning profiles
           # see https://github.com/fastlane/fastlane/issues/9490
           if values[:export_options].kind_of?(Hash)
-            match_mapping = (Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}).dup
+            match_mapping = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].dup
             existing_mapping = values[:export_options][:provisioningProfiles].dup
 
             # Be smart about how we merge those mappings in case there are conflicts
