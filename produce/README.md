@@ -109,6 +109,7 @@ To get a list of all available parameters:
     -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
     -i, --skip_itc [VALUE] Skip the creation of the app on iTunes Connect (PRODUCE_SKIP_ITC)
     -d, --skip_devcenter [VALUE] Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
+    -s, --itc_users ARRAY Array of iTunes Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles (ITC_USERS)
     -b, --team_id STRING The ID of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_ID)
     -l, --team_name STRING The name of your Developer Portal team if you're in multiple teams (PRODUCE_TEAM_NAME)
     -k, --itc_team_id [VALUE] The ID of your iTunes Connect team if you're in multiple teams (PRODUCE_ITC_TEAM_ID)
