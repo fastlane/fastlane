@@ -65,7 +65,13 @@ module Produce
                                      description: "Skip the creation of the app on iTunes Connect",
                                      is_string: false,
                                      default_value: false),
-
+        FastlaneCore::ConfigItem.new(key: :itc_users,
+                                     short_option: "-s",
+                                     env_name: "ITC_USERS",
+                                     optional: true,
+                                     type: Array,
+                                     description: "Array of iTunes Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles",
+                                     is_string: false),
         # Deprecating this in favor of a rename from "enabled_features" to "enable_services"
         FastlaneCore::ConfigItem.new(key: :enabled_features,
                                      deprecated: "Please use `enable_services` instead",
