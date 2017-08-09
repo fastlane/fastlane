@@ -70,9 +70,8 @@ module Produce
                                      env_name: "ITC_USERS",
                                      optional: true,
                                      type: Array,
-                                     description: "Array with Itunes Connect Users for Limit User Access",
+                                     description: "Array of iTunes Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles",
                                      is_string: false),
-
         # Deprecating this in favor of a rename from "enabled_features" to "enable_services"
         FastlaneCore::ConfigItem.new(key: :enabled_features,
                                      deprecated: "Please use `enable_services` instead",
