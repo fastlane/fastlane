@@ -59,46 +59,67 @@ describe Gym::CodeSigningMapping do
     let (:csm) { Gym::CodeSigningMapping.new }
 
     it "only mapping from Xcode Project is available" do
-      expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "value.1" })
-      result = csm.merge_profile_mapping(existing_mapping: {}, export_method: "app-store")
+      result = csm.merge_profile_mapping(primary_mapping: {},
+                                       secondary_mapping: { "identifier.1" => "value.1" },
+                                           export_method: "app-store")
 
       expect(result).to eq({ "identifier.1" => "value.1" })
     end
 
     it "only mapping from match (user) is available" do
-      expect(csm).to receive(:detect_project_profile_mapping).and_return({})
-      result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "value.1" }, export_method: "app-store")
+      result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "value.1" },
+                                       secondary_mapping: {},
+                                           export_method: "app-store")
 
       expect(result).to eq({ "identifier.1" => "value.1" })
     end
 
     it "keeps both profiles if they don't conflict" do
-      expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.2" => "value.2" })
-      result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "value.1" }, export_method: "app-store")
+      result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "value.1" },
+                                       secondary_mapping: { "identifier.2" => "value.2" },
+                                           export_method: "app-store")
 
       expect(result).to eq({ "identifier.1" => "value.1", "identifier.2" => "value.2" })
     end
 
+    it "accesses the Xcode profile mapping, if nothing else is given" do
+      expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "value.1" })
+      result = csm.merge_profile_mapping(primary_mapping: {}, export_method: "app-store")
+
+      expect(result).to eq({ "identifier.1" => "value.1" })
+    end
+
     describe "handle conflicts" do
-      it "Both Xcode project and match (user) are available, and both match the export method, it should prefer the user input (match)" do
-        expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "Ap-pStoreValue1" })
-        result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "Ap-pStoreValue2" }, export_method: "app-store")
+      it "Both primary and secondary are available, and both match the export method, it should prefer the primary mapping" do
+        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-pStoreValue2" },
+                                       secondary_mapping: { "identifier.1" => "Ap-pStoreValue1" },
+                                           export_method: "app-store")
 
         expect(result).to eq({ "identifier.1" => "Ap-pStoreValue2" })
       end
 
-      it "Both Xcode project and match (user) are available, and and the match (user) is the only one that matches the export type" do
-        expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "Ad-HocValue" })
-        result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "Ap-p StoreValue1" }, export_method: "app-store")
+      it "Both primary and secondary are available, and and the secondary is the only one that matches the export type" do
+        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
+                                       secondary_mapping: { "identifier.1" => "Ad-HocValue" },
+                                           export_method: "app-store")
 
         expect(result).to eq({ "identifier.1" => "Ap-p StoreValue1" })
       end
 
-      it "Both Xcode project and match (user) are available, and and the Xcode project is the only one that matches the export type" do
-        expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "Ad-HocValue" })
-        result = csm.merge_profile_mapping(existing_mapping: { "identifier.1" => "Ap-p StoreValue1" }, export_method: "ad-hoc")
+      it "Both primary and secondary are available, and and the seocndary is the only one that matches the export type" do
+        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
+                                       secondary_mapping: { "identifier.1" => "Ad-HocValue" },
+                                           export_method: "ad-hoc")
 
         expect(result).to eq({ "identifier.1" => "Ad-HocValue" })
+      end
+
+      it "both primary and secondary are available, and neither of them match the export type, it should choose the secondary_mapping" do
+        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "AppStore" },
+                                       secondary_mapping: { "identifier.1" => "Adhoc" },
+                                           export_method: "development")
+
+        expect(result).to eq({ "identifier.1" => "Adhoc" })
       end
     end
   end

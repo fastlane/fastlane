@@ -22,7 +22,18 @@ module Fastlane
           # If that's the case, we won't set the provisioning profiles
           # see https://github.com/fastlane/fastlane/issues/9490
           if values[:export_options].kind_of?(Hash)
-            values[:export_options][:provisioningProfiles] = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+            match_mapping = (Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}).dup
+            existing_mapping = values[:export_options][:provisioningProfiles].dup
+
+            # Be smart about how we merge those mappings in case there are conflicts
+            mapping_object = Gym::CodeSigningMapping.new
+            hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: existing_mapping,
+                                                             secondary_mapping: match_mapping,
+                                                                export_method: values[:export_method])
+
+            values[:export_options][:provisioningProfiles] = hash_to_use
+          else
+            self.show_xcode_9_warning
           end
         elsif Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS]
           # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
@@ -38,7 +49,7 @@ module Fastlane
                 profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
                 profile_team_id = profile["TeamIdentifier"].first
                 next if profile_team_id != values[:export_team_id] && !values[:export_team_id].nil?
-                bundle_id = profile["Entitlements"]["application-identifier"].gsub "#{profile_team_id}.", ""
+                bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{profile_team_id}.", "")
                 values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
               rescue => ex
                 UI.error("Couldn't load profile at path: #{profile_path}")
@@ -46,6 +57,8 @@ module Fastlane
                 UI.verbose(ex.backtrace.join("\n"))
               end
             end
+          else
+            self.show_xcode_9_warning
           end
         end
 
@@ -115,6 +128,13 @@ module Fastlane
 
       def self.category
         :building
+      end
+
+      def self.show_xcode_9_warning
+        return unless Helper.xcode_at_least?("9.0")
+        UI.message("You passed a path to a custom plist file for exporting the binary.")
+        UI.message("Make sure to include information about what provisioning profiles to use with Xcode 9")
+        UI.message("More information: https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
       end
     end
   end

@@ -10,50 +10,52 @@ module Gym
       self.project = project
     end
 
-    def merge_profile_mapping(existing_mapping: nil, export_method: nil)
-      final_mapping = existing_mapping.dup # for verbose output at the end of the method
-      project_mapping = self.detect_project_profile_mapping
+    # @param primary_mapping [Hash] The preferred mapping (e.g. whatever the user provided)
+    # @param secondary_mapping [Hash] (optional) The secondary mapping (e.g. whatever is detected from the Xcode project)
+    # @param export_method [String] The method that should be preferred in case there is a conflict
+    def merge_profile_mapping(primary_mapping: nil, secondary_mapping: nil, export_method: nil)
+      final_mapping = primary_mapping.dup # for verbose output at the end of the method
+      secondary_mapping ||= self.detect_project_profile_mapping # default to Xcode project
 
-      # Now it's time to merge the (potentially) existing `provisioningProfiles` of the `export_options`
-      # with the hash we just created. Both might include information about what profile to use
+      # Now it's time to merge the (potentially) existing mapping
+      #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
+      # with the secondary hash we just created (or was provided as parameter).
+      # Both might include information about what profile to use
       # This is important as it mght not be clear for the user that they have to call match for each app target
       # before adding this code, we'd only either use whatever we get from match, or what's defined in the Xcode project
       # With the code below, we'll make sure to take the best of it:
       #
-      #   1) A provisioning profile is defined in the Xcode project only: we'll take that
-      #   2) A provisioning profile is defined manually from the user: we'll take that (same as 3)
-      #   3) A provisioning profile is defined after calling match: we'll take that (same as 2)
-      #   4) On a conflict (app identifier assigned both in xcode and match)
-      #     4.1) we'll choose whatever matches what's defined in the `export_method`
-      #     4.2) If both include the export_method, we'll prefer the one from match
-      #     4.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
-
-      # 2) is already covered by assigning `final_mapping` above
-      # 3) see 2
+      #   1) A provisioning profile is defined in the `primary_mapping`
+      #   2) A provisioning profile is defined in the `secondary_mapping`
+      #   3) On a conflict (app identifier assigned both in xcode and match)
+      #     3.1) we'll choose whatever matches what's defined as the `export_method`
+      #     3.2) If both include the right `export_method`, we'll prefer the one from `primary_mapping`
+      #     3.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
       #
       # To get a better sense of this, check out code_signing_spec.rb for some test cases
 
-      project_mapping.each do |bundle_identifier, provisioning_profile|
+      secondary_mapping.each do |bundle_identifier, provisioning_profile|
         if final_mapping[bundle_identifier].nil?
-          # 1)
           final_mapping[bundle_identifier] = provisioning_profile
         else
-          # 4) Conflict, we now have to choose if we prefer whatever match provides
-          #    or what's defined in the project
-          if self.app_identifier_contains?(final_mapping[bundle_identifier], export_method)
+          if self.app_identifier_contains?(final_mapping[bundle_identifier], export_method) # 3.1 + 3.2 nothing to do in this case
           elsif self.app_identifier_contains?(provisioning_profile, export_method)
+            # Also 3.1 (3.1 is "implemented" twice, as it could be either the primary, or the secondary being the one that matches)
+            final_mapping[bundle_identifier] = provisioning_profile
+          else
+            # 3.3
             final_mapping[bundle_identifier] = provisioning_profile
           end
-          # rubocop won't let us keep an empty else, imagine one being here
-          # else 4.3 let's keep it as is, prefer the Xcode project
         end
       end
 
-      UI.verbose("export_options coming from user or match:")
-      UI.verbose(existing_mapping)
-      UI.verbose("Detected profiles from Xcode project")
-      UI.verbose(project_mapping)
-      UI.verbose("Resulting in the following mapping")
+      UI.verbose("Merging provisioning profile mappings")
+      UI.verbose("-------------------------------------")
+      UI.verbose("Primary provisioning profile mapping:")
+      UI.verbose(primary_mapping)
+      UI.verbose("Secondary provisioning profile mapping:")
+      UI.verbose(secondary_mapping)
+      UI.verbose("Resulting in the following mapping:")
       UI.verbose(final_mapping)
 
       return final_mapping
