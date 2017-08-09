@@ -139,6 +139,10 @@ module Fastlane
           )'
         ]
       end
+
+      def self.category
+        :misc
+      end
     end
   end
 end
