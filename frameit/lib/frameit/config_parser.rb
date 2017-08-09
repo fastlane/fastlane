@@ -83,8 +83,8 @@ module Frameit
             unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB' or a percentage of screen size")
             end
-          when 'show_complete_frame'
-            UI.user_error! "show_complete_frame must be a Boolean" unless [true, false].include?(value)
+          when 'show_complete_frame', 'title_below_image'
+            UI.user_error! "'#{key}' must be a Boolean" unless [true, false].include?(value)
           when 'font_scale_factor'
             UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
           end
