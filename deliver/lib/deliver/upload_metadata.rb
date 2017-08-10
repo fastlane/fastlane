@@ -277,7 +277,7 @@ module Deliver
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       REVIEW_INFORMATION_VALUES.each do |key, option_name|
-        v.send("#{key}=", info[option_name]) if info[option_name]
+        v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
       v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
     end
