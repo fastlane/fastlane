@@ -7,6 +7,7 @@ require 'gym/error_handler'
 require 'gym/options'
 require 'gym/detect_values'
 require 'gym/xcode'
+require 'gym/code_signing_mapping'
 
 require 'fastlane_core'
 require 'terminal-table'

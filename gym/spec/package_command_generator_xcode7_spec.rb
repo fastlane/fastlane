@@ -82,9 +82,7 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "app-store",
-        'uploadBitcode' => false,
-        'uploadSymbols' => true
+        'method' => "app-store"
       })
     end
 
