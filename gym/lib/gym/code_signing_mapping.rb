@@ -97,6 +97,10 @@ module Gym
       end
     end
 
+    def test_target?(build_settings)
+      return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
+    end
+
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
 
@@ -108,6 +112,7 @@ module Gym
           project.targets.each do |target|
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
+              next if test_target?(current)
 
               bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
               provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]

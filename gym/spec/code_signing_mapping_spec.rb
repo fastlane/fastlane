@@ -49,7 +49,6 @@ describe Gym::CodeSigningMapping do
       project = FastlaneCore::Project.new({
         workspace: workspace_path
       })
-
       csm = Gym::CodeSigningMapping.new(project: project)
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app" })
     end
@@ -127,6 +126,27 @@ describe Gym::CodeSigningMapping do
                                            export_method: "development")
 
         expect(result).to eq({ "identifier.1" => "Adhoc" })
+      end
+    end
+    describe "#test_target?" do
+      let(:csm) { Gym::CodeSigningMapping.new(project: nil) }
+      context "when build_setting include TEST_TARGET_NAME" do
+        it "is test target" do
+          build_settings = { "TEST_TARGET_NAME" => "Sample" }
+          expect(csm.test_target?(build_settings)).to be true
+        end
+      end
+      context "when build_setting include TEST_HOST" do
+        it "is test target" do
+          build_settings = { "TEST_HOST" => "Sample" }
+          expect(csm.test_target?(build_settings)).to be true
+        end
+      end
+      context "when build_setting include neither TEST_HOST nor TEST_TARGET_NAME" do
+        it "is not test target" do
+          build_settings = {}
+          expect(csm.test_target?(build_settings)).to be false
+        end
       end
     end
   end
