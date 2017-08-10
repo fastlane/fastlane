@@ -30,7 +30,7 @@ module Snapshot
         filename = to_store[index]
 
         device_name = device_type.delete(" ")
-        # TODO: ASK FELIX ABOUT THIS!
+
         components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
         screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
         output_path = File.join(language_folder, screenshot_name)
