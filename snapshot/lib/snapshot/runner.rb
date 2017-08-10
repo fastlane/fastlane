@@ -1,5 +1,7 @@
 require 'shellwords'
 require 'plist'
+require 'os'
+require 'thread'
 
 module Snapshot
   class Runner
@@ -99,7 +101,7 @@ module Snapshot
     # This is its own method so that it can re-try if the tests fail randomly
     # @return true/false depending on if the tests succeeded
     def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
-      return launch(language, locale, device, launch_arguments)
+      return launch_one_at_a_time(language, locale, device, launch_arguments)
     rescue => ex
       UI.error ex.to_s # show the reason for failure to the user, but still maybe retry
 
@@ -137,6 +139,15 @@ module Snapshot
       FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
     end
 
+    def default_number_of_simultaneous_simulators
+      cpu_count = OS.cpu_count
+      if cpu_count <= 2
+        return OS.cpu_count
+      end
+
+      return OS.cpu_count - 1
+    end
+
     def print_results(results)
       return if results.count == 0
 
@@ -171,19 +182,22 @@ module Snapshot
       File.write(File.join(CACHE_DIR, "language.txt"), language)
       File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
       File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
+
+      prepare_simulators_for_launch(language: language, locale: locale)
     end
 
     def prepare_simulators_for_launch(device_type: nil, language: nil, locale: nil)
+      # Kill and shutdown all currently running simulators so that the following settings
+      # changes will be picked up when they are started again.
+      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+      `xcrun simctl shutdown booted &> /dev/null`
+
+      Fixes::SimulatorZoomFix.patch
+      Fixes::HardwareKeyboardFix.patch
+
       devices = device_type.nil? ? Snapshot.config[:devices] : [device_type]
       devices.each do |type|
         unless device_type == "Mac"
-          # Kill and shutdown all currently running simulators so that the following settings
-          # changes will be picked up when they are started again.
-          Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
-          `xcrun simctl shutdown booted &> /dev/null`
-
-          Fixes::SimulatorZoomFix.patch
-          Fixes::HardwareKeyboardFix.patch
 
           if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
             erase_simulator(type)
@@ -200,7 +214,7 @@ module Snapshot
 
     def launch_simultaneously(language, locale, launch_arguments)
       prepare_for_launch(language, locale, launch_arguments)
-      prepare_simulators_for_launch(language: language, locale: locale)
+
       command = TestCommandGenerator.generate(language: language, locale: locale)
 
       prefix_hash = [
@@ -225,7 +239,7 @@ module Snapshot
 
                                                 self.number_of_retries_due_to_failing_simulator += 1
                                                 if self.number_of_retries_due_to_failing_simulator < 20
-                                                  launch(language, locale, device_type, launch_arguments)
+                                                  launch_simultaneously(language, locale, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   UI.crash!("Too many errors... no more retries...")
@@ -239,9 +253,8 @@ module Snapshot
     end
 
     # Returns true if it succeeded
-    def launch(language, locale, device_type, launch_arguments)
+    def launch_one_at_a_time(language, locale, device_type, launch_arguments)
       prepare_for_launch(language, locale, launch_arguments)
-      prepare_simulators_for_launch(device_type: device_type, language: language, locale: locale)
 
       add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
       add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
@@ -278,7 +291,7 @@ module Snapshot
 
                                                 self.number_of_retries_due_to_failing_simulator += 1
                                                 if self.number_of_retries_due_to_failing_simulator < 20
-                                                  launch(language, locale, device_type, launch_arguments)
+                                                  launch_one_at_a_time(language, locale, device_type, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   UI.crash!("Too many errors... no more retries...")
@@ -360,8 +373,15 @@ module Snapshot
 
     def version_of_bundled_helper
       runner_dir = File.dirname(__FILE__)
-      bundled_helper = File.read File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
-      current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
+
+      current_version = ""
+      if Helper.xcode_at_least?("9.0")
+        bundled_helper = File.read File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
+        current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
+      else
+        bundled_helper = File.read File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir)
+        current_version = bundled_helper.match(/\n.*SnapshotHelperXcode8Version \[.+\]/)[0]
+      end
 
       ## Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
       current_version.gsub(%r{^//\w*}, '').strip

@@ -17,7 +17,6 @@ module Snapshot
         matches = output.scan(/snapshot: (.*)/)
       end
 
-
       if to_store.count == 0 && matches.count == 0
         return false
       end
@@ -58,11 +57,11 @@ module Snapshot
 
     def self.copy(from_path, to_path)
       if FastlaneCore::Globals.verbose?
-          UI.success "Copying file '#{from_path}' to '#{to_path}'..."
-        else
-          UI.success "Copying '#{to_path}'..."
-        end
-        FileUtils.cp(from_path, to_path)
+        UI.success "Copying file '#{from_path}' to '#{to_path}'..."
+      else
+        UI.success "Copying '#{to_path}'..."
+      end
+      FileUtils.cp(from_path, to_path)
     end
 
     def self.attachments(containing)

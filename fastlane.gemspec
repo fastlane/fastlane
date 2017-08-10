@@ -64,6 +64,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bundler', '>= 1.12.0', '< 2.0.0' # Used for fastlane plugins
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
+  spec.add_dependency 'os', '~> 0.9' # Used to get CPU count for Xcode 9 multiple sim support
 
   # Development only
   spec.add_development_dependency 'rake', '< 12'

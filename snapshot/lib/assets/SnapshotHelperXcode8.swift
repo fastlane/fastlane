@@ -1,5 +1,5 @@
 //
-//  SnapshotHelper.swift
+//  SnapshotHelperXcode8.swift
 //  Example
 //
 //  Created by Felix Krause on 10/8/15.
@@ -7,10 +7,10 @@
 //
 
 // -----------------------------------------------------
-// IMPORTANT: When modifying this file, make sure to
+// IMPORTANT: When modifying this file, make sure to 
 //            increment the version number at the very
 //            bottom of the file to notify users about
-//            the new SnapshotHelper.swift
+//            the new SnapshotHelperXcode8.swift
 // -----------------------------------------------------
 
 import Foundation
@@ -33,26 +33,19 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
 }
 
 open class Snapshot: NSObject {
-    static var app: XCUIApplication!
-    static var cacheDirectory: URL!
-    static var screenshotsDirectory: URL? {
-        return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
-    }
 
     open class func setupSnapshot(_ app: XCUIApplication) {
-        guard let cacheDir = pathPrefix else {
-            print("Problem locating the fastlane cache directory")
-            return
-        }
-        Snapshot.cacheDirectory = cacheDir
-        Snapshot.app = app
         setLanguage(app)
         setLocale(app)
         setLaunchArguments(app)
     }
 
     class func setLanguage(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("language.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("language.txt")
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
@@ -64,7 +57,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLocale(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("locale.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("locale.txt")
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
@@ -79,7 +76,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLaunchArguments(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
@@ -109,14 +110,7 @@ open class Snapshot: NSObject {
         #elseif os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
-            let screenshot = app.windows.firstMatch.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
-            let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
-            do {
-                try screenshot.pngRepresentation.write(to: path)
-            } catch {
-                print("Problem writing screenshot: \(name) to \(path)")
-            }
+            XCUIDevice.shared().orientation = .unknown
         #endif
     }
 
@@ -133,7 +127,7 @@ open class Snapshot: NSObject {
         }
     }
 
-    class var pathPrefix: URL? {
+    class func pathPrefix() -> URL? {
         let homeDir: URL
         //on OSX config is stored in /Users/<username>/Library
         //and on iOS/tvOS/WatchOS it's in simulator's home dir
@@ -176,4 +170,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.5]
+// SnapshotHelperXcode8Version [1.4]
