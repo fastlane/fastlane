@@ -3,7 +3,11 @@ module Snapshot
     attr_accessor :collected_errors
 
     def initialize
-      @collected_errors = []
+      not_implemented(__method__)
+    end
+
+    def collected_errors
+      @collected_errors || []
     end
 
     def prepare_for_launch(language, locale, launch_arguments)

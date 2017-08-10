@@ -2,6 +2,10 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 
 module Snapshot
   class SimulatorLauncher < SimulatorLauncherBase
+
+    def initialize
+    end
+
     def default_number_of_simultaneous_simulators
       cpu_count = OS.cpu_count
       if cpu_count <= 2
