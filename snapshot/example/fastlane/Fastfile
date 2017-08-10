@@ -3,6 +3,7 @@ lane :snappy do |options|
     project: 'Example.xcodeproj',
     scheme: 'ExampleUITests',
     devices: ['iPhone 6s', 'iPad Air'],
-    output_simulator_logs: true
+    output_simulator_logs: true,
+    clear_previous_screenshots: true
   )
 end

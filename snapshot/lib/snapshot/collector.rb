@@ -10,8 +10,8 @@ module Snapshot
       language_folder = File.join(Snapshot.config[:output_directory], dir_name)
       FileUtils.mkdir_p(language_folder)
 
-      if Snapshot.config[:simultaneous]
-        return collect_screenshots_from_multiple_simulators(language_folder)
+      if Snapshot.config[:simultaneous] || Helper.xcode_at_least?(9)
+        return collect_screenshots_for_language_folder(language_folder)
       else
         to_store = attachments(containing)
         matches = output.scan(/snapshot: (.*)/)
@@ -43,7 +43,7 @@ module Snapshot
     end
 
     # Returns true if it succeeds
-    def self.collect_screenshots_from_multiple_simulators(destination)
+    def self.collect_screenshots_for_language_folder(destination)
       screenshots = Dir["#{SCREENSHOTS_DIR}/*.png"]
       return false if screenshots.empty?
       screenshots.each do |screenshot|
