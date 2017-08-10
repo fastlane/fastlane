@@ -215,7 +215,7 @@ end
 # Get all Development profiles
 profiles_dev = Spaceship::Portal.provisioning_profile.development.all
 
-# Fetch all profiles for a specific app identifier for the App Store
+# Fetch all profiles for a specific app identifier for the App Store (Array of profiles)
 filtered_profiles = Spaceship::Portal.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
 
 # Check if a provisioning profile is valid
@@ -230,8 +230,10 @@ profile.certificate_valid?
 profile_content = profiles.first.download
 
 # Download a specific profile as file
-my_profile = Spaceship::Portal.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
-File.write("output.mobileprovision", my_profile.download)
+matching_profiles = Spaceship::Portal.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
+first_profile = matching_profiles.first
+
+File.write("output.mobileprovision", first_profile.download)
 ```
 
 ### Create a Provisioning Profile
