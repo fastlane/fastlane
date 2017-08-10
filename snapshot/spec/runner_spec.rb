@@ -22,7 +22,7 @@ describe Snapshot do
 
     describe 'Decides on the number of sims to launch when simultaneously snapshotting' do
       it 'finds that the # of CPUs -1 is the number of sims to launch' do
-        sims = runner.default_number_of_simultaneous_simulators
+        sims = Snapshot::ConcurrentSimulatorLauncher.new.default_number_of_simultaneous_simulators
         expect(sims).to eq(OS.cpu_count - 1)
         expect(sims >= 1).to be(true)
       end

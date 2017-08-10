@@ -61,8 +61,8 @@ describe Snapshot do
           to receive(:execute).
           with(command: "xcrun simctl spawn 98765 log collect --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
 
-        Snapshot::Runner.new.copy_simulator_logs("iPhone 6 (10.1)", "de-DE", nil, 0)
-        Snapshot::Runner.new.copy_simulator_logs("iPhone 6s (10.1)", "en-US", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPhone 6 (10.1)", "de-DE", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPhone 6s (10.1)", "en-US", nil, 0)
       end
 
       it 'copies all iOS 9 device log files to the output directory on macOS 10.12 (Sierra)' do
@@ -77,8 +77,8 @@ describe Snapshot do
         expect(FileUtils).to receive(:rm_f).with(%r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
         expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
 
-        Snapshot::Runner.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
-        Snapshot::Runner.new.copy_simulator_logs("iPhone 6", "en-US", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPhone 6", "en-US", nil, 0)
       end
 
       it 'copies all device log files to the output directory on macOS 10.11 (El Capitan)' do
@@ -93,8 +93,8 @@ describe Snapshot do
         expect(FileUtils).to receive(:rm_f).with(%r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
         expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
 
-        Snapshot::Runner.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
-        Snapshot::Runner.new.copy_simulator_logs("iPad Air", "en-US", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPhone 6s", "de-DE", nil, 0)
+        Snapshot::Xcode8SimulatorLauncher.new.copy_simulator_logs("iPad Air", "en-US", nil, 0)
       end
     end
 
