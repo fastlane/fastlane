@@ -8,9 +8,6 @@ module Snapshot
     # The number of times we failed on launching the simulator... sigh
     attr_accessor :number_of_retries_due_to_failing_simulator
 
-    # All the errors we experience while running snapshot
-    attr_accessor :collected_errors
-
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
@@ -35,18 +32,19 @@ module Snapshot
       UI.success "Building and running project - this might take some time..."
 
       self.number_of_retries_due_to_failing_simulator = 0
-      self.collected_errors = []
       launch_arguments_set = config_launch_arguments
 
       if Snapshot.config[:simultaneous]
-        results = take_screenshots_simultaneously(launch_arguments_set)
+        launcher = ConcurrentSimulatorLauncher.new
+        results = launcher.take_screenshots_simultaneously(launch_arguments_set)
       else
-        results = take_screenshots_one_simulator_at_a_time(launch_arguments_set)
+        launcher = Xcode8SimulatorLauncher.new
+        results = launcher.take_screenshots_one_simulator_at_a_time(launch_arguments_set)
       end
 
       print_results(results)
 
-      UI.test_failure!(self.collected_errors.join('; ')) if self.collected_errors.count > 0
+      UI.test_failure!(launcher.collected_errors.join('; ')) if launcher.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -54,65 +52,6 @@ module Snapshot
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
         FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
-      end
-    end
-
-    def take_screenshots_simultaneously(launch_arguments)
-      languages_finished = {}
-      launch_arguments.each do |launch_args|
-        Snapshot.config[:languages].each_with_index do |language, language_index|
-          locale = nil
-          if language.kind_of?(Array)
-            locale = language[1]
-            language = language[0]
-          end
-          languages_finished[language] = launch_simultaneously(language, locale, launch_args)
-        end
-      end
-      Snapshot.config[:devices].each_with_object({}) do |device, results_hash|
-        results_hash[device] = languages_finished
-      end
-    end
-
-    def take_screenshots_one_simulator_at_a_time(launch_arguments)
-      results = {} # collect all the results for a nice table
-      Snapshot.config[:devices].each_with_index do |device, device_index|
-        launch_arguments.each do |launch_args|
-          Snapshot.config[:languages].each_with_index do |language, language_index|
-            locale = nil
-            if language.kind_of?(Array)
-              locale = language[1]
-              language = language[0]
-            end
-            results[device] ||= {}
-
-            current_run = device_index * Snapshot.config[:languages].count + language_index + 1
-            number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
-            UI.message("snapshot run #{current_run} of #{number_of_runs}")
-
-            results[device][language] = run_for_device_and_language(language, locale, device, launch_args)
-            copy_simulator_logs(device, language, locale, launch_args)
-          end
-        end
-      end
-      results
-    end
-
-    # This is its own method so that it can re-try if the tests fail randomly
-    # @return true/false depending on if the tests succeeded
-    def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
-      return launch_one_at_a_time(language, locale, device, launch_arguments)
-    rescue => ex
-      UI.error ex.to_s # show the reason for failure to the user, but still maybe retry
-
-      if retries < Snapshot.config[:number_of_retries]
-        UI.important "Tests failed, re-trying #{retries + 1} out of #{Snapshot.config[:number_of_retries] + 1} times"
-        run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
-      else
-        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if FastlaneCore::Globals.verbose?
-        self.collected_errors << ex
-        raise ex if Snapshot.config[:stop_after_first_error]
-        return false # for the results
       end
     end
 
@@ -124,28 +63,6 @@ module Snapshot
       else
         launch_arguments.map.with_index { |e, i| [i, e] }
       end
-    end
-
-    def copy_simulator_logs(device_name, language, locale, launch_arguments)
-      return unless Snapshot.config[:output_simulator_logs]
-
-      detected_language = locale || language
-      language_folder = File.join(Snapshot.config[:output_directory], detected_language)
-      device = TestCommandGenerator.find_device(device_name)
-      components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
-
-      UI.header("Collecting system logs #{device_name} - #{language}")
-      log_identity = Digest::MD5.hexdigest(components.join("-"))
-      FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
-    end
-
-    def default_number_of_simultaneous_simulators
-      cpu_count = OS.cpu_count
-      if cpu_count <= 2
-        return OS.cpu_count
-      end
-
-      return OS.cpu_count - 1
     end
 
     def print_results(results)
@@ -168,198 +85,6 @@ module Snapshot
       puts ""
       puts Terminal::Table.new(params)
       puts ""
-    end
-
-    def prepare_for_launch(language, locale, launch_arguments)
-      screenshots_path = TestCommandGenerator.derived_data_path
-      FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
-      FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
-      FileUtils.mkdir_p(screenshots_path)
-
-      FileUtils.mkdir_p(CACHE_DIR)
-      FileUtils.mkdir_p(SCREENSHOTS_DIR)
-
-      File.write(File.join(CACHE_DIR, "language.txt"), language)
-      File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
-      File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
-
-      prepare_simulators_for_launch(language: language, locale: locale)
-    end
-
-    def prepare_simulators_for_launch(device_type: nil, language: nil, locale: nil)
-      # Kill and shutdown all currently running simulators so that the following settings
-      # changes will be picked up when they are started again.
-      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
-      `xcrun simctl shutdown booted &> /dev/null`
-
-      Fixes::SimulatorZoomFix.patch
-      Fixes::HardwareKeyboardFix.patch
-
-      devices = device_type.nil? ? Snapshot.config[:devices] : [device_type]
-      devices.each do |type|
-        unless device_type == "Mac"
-
-          if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
-            erase_simulator(type)
-            if Snapshot.config[:localize_simulator]
-              localize_simulator(type, language, locale)
-            end
-          elsif Snapshot.config[:reinstall_app]
-            # no need to reinstall if device has been erased
-            uninstall_app(type)
-          end
-        end
-      end
-    end
-
-    def launch_simultaneously(language, locale, launch_arguments)
-      prepare_for_launch(language, locale, launch_arguments)
-
-      command = TestCommandGenerator.generate(language: language, locale: locale)
-
-      prefix_hash = [
-        {
-          prefix: "Running Tests: ",
-          block: proc do |value|
-            value.include?("Touching")
-          end
-        }
-      ]
-
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
-                                            loading: "Loading...",
-                                              error: proc do |output, return_code|
-                                                ErrorHandler.handle_test_error(output, return_code)
-
-                                                # no exception raised... that means we need to retry
-                                                UI.error "Caught error... #{return_code}"
-
-                                                self.number_of_retries_due_to_failing_simulator += 1
-                                                if self.number_of_retries_due_to_failing_simulator < 20
-                                                  launch_simultaneously(language, locale, launch_arguments)
-                                                else
-                                                  # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...")
-                                                end
-                                              end)
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(language: language, locale: locale))
-
-      dir_name = locale || language
-
-      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
-    end
-
-    # Returns true if it succeeded
-    def launch_one_at_a_time(language, locale, device_type, launch_arguments)
-      prepare_for_launch(language, locale, launch_arguments)
-
-      add_media(device_type, :photo, Snapshot.config[:add_photos]) if Snapshot.config[:add_photos]
-      add_media(device_type, :video, Snapshot.config[:add_videos]) if Snapshot.config[:add_videos]
-
-      open_simulator_for_device(device_type)
-
-      command = TestCommandGenerator.generate(device_type: device_type, language: language, locale: locale)
-
-      if locale
-        UI.header("#{device_type} - #{language} (#{locale})")
-      else
-        UI.header("#{device_type} - #{language}")
-      end
-
-      prefix_hash = [
-        {
-          prefix: "Running Tests: ",
-          block: proc do |value|
-            value.include?("Touching")
-          end
-        }
-      ]
-
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
-                                            loading: "Loading...",
-                                              error: proc do |output, return_code|
-                                                ErrorHandler.handle_test_error(output, return_code)
-
-                                                # no exception raised... that means we need to retry
-                                                UI.error "Caught error... #{return_code}"
-
-                                                self.number_of_retries_due_to_failing_simulator += 1
-                                                if self.number_of_retries_due_to_failing_simulator < 20
-                                                  launch_one_at_a_time(language, locale, device_type, launch_arguments)
-                                                else
-                                                  # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...")
-                                                end
-                                              end)
-
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
-
-      dir_name = locale || language
-
-      return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
-    end
-
-    def open_simulator_for_device(device_name)
-      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
-
-      device = TestCommandGenerator.find_device(device_name)
-      FastlaneCore::Simulator.launch(device) if device
-    end
-
-    def uninstall_app(device_type)
-      UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
-      Snapshot.config[:app_identifier] ||= UI.input("App Identifier: ")
-      device_udid = TestCommandGenerator.device_udid(device_type)
-
-      UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
-
-      UI.message "Uninstall application #{Snapshot.config[:app_identifier]}"
-      Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
-    end
-
-    def erase_simulator(device_type)
-      UI.verbose("Erasing #{device_type}...")
-      device_udid = TestCommandGenerator.device_udid(device_type)
-
-      UI.important("Erasing #{device_type}...")
-
-      `xcrun simctl erase #{device_udid} &> /dev/null`
-    end
-
-    def localize_simulator(device_type, language, locale)
-      device_udid = TestCommandGenerator.device_udid(device_type)
-      if device_udid
-        locale ||= language.sub("-", "_")
-        plist = {
-          AppleLocale: locale,
-          AppleLanguages: [language]
-        }
-        UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
-        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
-        File.write(plist_path, Plist::Emit.dump(plist))
-      end
-    end
-
-    def add_media(device_type, media_type, paths)
-      media_type = media_type.to_s
-
-      UI.verbose "Adding #{media_type}s to #{device_type}..."
-      device_udid = TestCommandGenerator.device_udid(device_type)
-
-      UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
-
-      paths.each do |path|
-        UI.message "Adding '#{path}'"
-        Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
-      end
     end
 
     def clear_previous_screenshots

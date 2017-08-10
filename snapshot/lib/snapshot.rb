@@ -13,6 +13,8 @@ require 'snapshot/options'
 require 'snapshot/update'
 require 'snapshot/fixes/simulator_zoom_fix'
 require 'snapshot/fixes/hardware_keyboard_fix'
+require 'snapshot/simulator_launchers/simulator_launcher'
+require 'snapshot/simulator_launchers/xcode_8_simulator_launcher'
 
 require 'fastlane_core'
 
