@@ -250,7 +250,7 @@ module Gym
 
               next if matching_type.to_s == selected_export_method
               UI.message("")
-              UI.error("There is a mismatch between your provided `export_method` in gym")
+              UI.error("There seems to be a mismatch between your provided `export_method` in gym")
               UI.error("and the selected provisioning profiles. You passed the following options:")
               UI.important("  export_method:      #{selected_export_method}")
               UI.important("  Bundle identifier:  #{current_bundle_identifier}")
