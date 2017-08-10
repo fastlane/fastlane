@@ -1,7 +1,7 @@
-require 'snapshot/simulator_launchers/simulator_launcher'
+require 'snapshot/simulator_launchers/simulator_launcher_base'
 
 module Snapshot
-  class Xcode8SimulatorLauncher < SimulatorLauncher
+  class Xcode8SimulatorLauncher < SimulatorLauncherBase
     def take_screenshots_one_simulator_at_a_time(launch_arguments)
       results = {} # collect all the results for a nice table
       Snapshot.config[:devices].each_with_index do |device, device_index|
