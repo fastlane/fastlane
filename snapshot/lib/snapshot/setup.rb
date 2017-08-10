@@ -14,7 +14,8 @@ module Snapshot
         snapshot_helper_filename = "SnapshotHelper.swift"
       end
 
-      File.write(File.join(path, '#{snapshot_helper_filename}'), File.read("#{Snapshot::ROOT}/lib/assets/#{snapshot_helper_filename}"))
+      # ensure that upgrade is cause when going from 8 to 9
+      File.write(File.join(path, snapshot_helper_filename), File.read("#{Snapshot::ROOT}/lib/assets/#{snapshot_helper_filename}"))
 
       puts "✅  Successfully created #{snapshot_helper_filename} '#{File.join(path, snapshot_helper_filename)}'".green
       puts "✅  Successfully created new Snapfile at '#{snapfile_path}'".green

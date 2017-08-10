@@ -1,8 +1,7 @@
 require 'snapshot/simulator_launchers/simulator_launcher_base'
 
 module Snapshot
-  class Xcode8SimulatorLauncher < SimulatorLauncherBase
-
+  class SimulatorLauncherXcode8 < SimulatorLauncherBase
     def initialize
     end
 
@@ -56,7 +55,7 @@ module Snapshot
 
       open_simulator_for_device(device_type)
 
-      command = TestCommandGenerator.generate(device_type: device_type, language: language, locale: locale)
+      command = TestCommandGeneratorXcode8.generate(device_type: device_type, language: language, locale: locale)
 
       if locale
         UI.header("#{device_type} - #{language} (#{locale})")
@@ -93,7 +92,7 @@ module Snapshot
                                                 end
                                               end)
 
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
+      raw_output = File.read(TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
 
       dir_name = locale || language
 
@@ -105,7 +104,7 @@ module Snapshot
 
       detected_language = locale || language
       language_folder = File.join(Snapshot.config[:output_directory], detected_language)
-      device = TestCommandGenerator.find_device(device_name)
+      device = TestCommandGeneratorXcode8.find_device(device_name)
       components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
 
       UI.header("Collecting system logs #{device_name} - #{language}")
@@ -116,7 +115,7 @@ module Snapshot
     def open_simulator_for_device(device_name)
       return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
 
-      device = TestCommandGenerator.find_device(device_name)
+      device = TestCommandGeneratorXcode8.find_device(device_name)
       FastlaneCore::Simulator.launch(device) if device
     end
   end

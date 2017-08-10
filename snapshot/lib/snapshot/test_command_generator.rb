@@ -14,7 +14,7 @@ module Snapshot
         parts += suffix
         parts += pipe(device_type, language, locale)
 
-        parts
+        return parts
       end
 
       def pipe(device_type, language, locale)

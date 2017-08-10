@@ -16,7 +16,6 @@ module Snapshot
 
       def options
         config = Snapshot.config
-
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]

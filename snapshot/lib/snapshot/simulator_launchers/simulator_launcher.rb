@@ -2,7 +2,6 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 
 module Snapshot
   class SimulatorLauncher < SimulatorLauncherBase
-
     def initialize
     end
 

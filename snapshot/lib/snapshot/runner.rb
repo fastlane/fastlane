@@ -35,10 +35,10 @@ module Snapshot
       launch_arguments_set = config_launch_arguments
 
       if Snapshot.config[:simultaneous]
-        launcher = ConcurrentSimulatorLauncher.new
+        launcher = SimulatorLauncher.new
         results = launcher.take_screenshots_simultaneously(launch_arguments_set)
       else
-        launcher = Xcode8SimulatorLauncher.new
+        launcher = SimulatorLauncherXcode8.new
         results = launcher.take_screenshots_one_simulator_at_a_time(launch_arguments_set)
       end
 
@@ -51,7 +51,8 @@ module Snapshot
 
       # Clear the Derived Data
       unless Snapshot.config[:derived_data_path]
-        FileUtils.rm_rf(TestCommandGenerator.derived_data_path)
+        # this should actually be launcher.derived_data_path
+        FileUtils.rm_rf(TestCommandGeneratorBase.derived_data_path)
       end
     end
 
