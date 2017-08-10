@@ -3,7 +3,10 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 module Snapshot
   class SimulatorLauncher < SimulatorLauncherBase
 
-    def initialize
+    def initialize(launch_arguments: nil, languages: nil, devices: nil)
+      @launch_arguments = launch_arguments
+      @languages = languages
+      @devices = devices
     end
 
     def default_number_of_simultaneous_simulators
@@ -15,10 +18,10 @@ module Snapshot
       return OS.cpu_count - 1
     end
 
-    def take_screenshots_simultaneously(launch_arguments)
+    def take_screenshots_simultaneously
       languages_finished = {}
       launch_arguments.each do |launch_args|
-        Snapshot.config[:languages].each_with_index do |language, language_index|
+        languages.each_with_index do |language, language_index|
           locale = nil
           if language.kind_of?(Array)
             locale = language[1]
@@ -27,7 +30,7 @@ module Snapshot
           languages_finished[language] = launch_simultaneously(language, locale, launch_args)
         end
       end
-      Snapshot.config[:devices].each_with_object({}) do |device, results_hash|
+      devices.each_with_object({}) do |device, results_hash|
         results_hash[device] = languages_finished
       end
     end

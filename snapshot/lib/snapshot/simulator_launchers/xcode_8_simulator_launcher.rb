@@ -3,14 +3,17 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 module Snapshot
   class Xcode8SimulatorLauncher < SimulatorLauncherBase
 
-    def initialize
+    def initialize(launch_arguments: nil, languages: nil, devices: nil)
+      @launch_arguments = launch_arguments
+      @languages = languages
+      @devices = devices
     end
 
-    def take_screenshots_one_simulator_at_a_time(launch_arguments)
+    def take_screenshots_one_simulator_at_a_time
       results = {} # collect all the results for a nice table
-      Snapshot.config[:devices].each_with_index do |device, device_index|
-        launch_arguments.each do |launch_args|
-          Snapshot.config[:languages].each_with_index do |language, language_index|
+      devices.each_with_index do |device, device_index|
+        launch_arguments.each do |launch_arg|
+          languages.each_with_index do |language, language_index|
             locale = nil
             if language.kind_of?(Array)
               locale = language[1]
@@ -18,11 +21,11 @@ module Snapshot
             end
             results[device] ||= {}
 
-            current_run = device_index * Snapshot.config[:languages].count + language_index + 1
-            number_of_runs = Snapshot.config[:languages].count * Snapshot.config[:devices].count
+            current_run = device_index * languages.count + language_index + 1
+            number_of_runs = languages.count * devices.count
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
             results[device][language] = run_for_device_and_language(language, locale, device, launch_args)
-            copy_simulator_logs(device, language, locale, launch_args)
+            copy_simulator_logs(device, language, locale, launch_arg)
           end
         end
       end

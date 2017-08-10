@@ -35,8 +35,8 @@ module Snapshot
       launch_arguments_set = config_launch_arguments
 
       if Snapshot.config[:simultaneous]
-        launcher = ConcurrentSimulatorLauncher.new
-        results = launcher.take_screenshots_simultaneously(launch_arguments_set)
+        launcher = SimulatorLauncher.new(launch_arguments: launch_arguments_set, languages: Snapshot.config[:languages], devices: Snapshot.config[:devices])
+        results = launcher.take_screenshots_simultaneously
       else
         launcher = Xcode8SimulatorLauncher.new
         results = launcher.take_screenshots_one_simulator_at_a_time(launch_arguments_set)

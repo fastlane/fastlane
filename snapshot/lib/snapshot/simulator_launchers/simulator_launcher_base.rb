@@ -1,6 +1,10 @@
 module Snapshot
   class SimulatorLauncherBase
+
     attr_accessor :collected_errors
+    attr_accessor :launch_arguments
+    attr_accessor :languages
+    attr_accessor :devices
 
     def initialize
       not_implemented(__method__)
