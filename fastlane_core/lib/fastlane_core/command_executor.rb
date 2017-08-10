@@ -30,7 +30,7 @@ module FastlaneCore
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
+      def execute(command: nil, print_all: false, print_command: true, pidCreated: nil, error: nil, prefix: nil, loading: nil)
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
@@ -45,6 +45,9 @@ module FastlaneCore
         begin
           PTY.spawn(command) do |stdin, stdout, pid|
             begin
+              if pidCreated
+                pidCreated.call(pid)
+              end
               stdin.each do |l|
                 line = l.strip # strip so that \n gets removed
                 output << line

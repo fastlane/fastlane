@@ -32,6 +32,24 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
+func startRecording(name: String) {
+    guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
+    guard let writePath = NSURL(fileURLWithPath: path).appendingPathComponent("tmp") else { return }
+    try? FileManager.default.createDirectory(atPath: writePath.path, withIntermediateDirectories: true)
+    let file = writePath.appendingPathComponent("fatslane_video.txt")
+    print("file: \(file)")
+    try? name.write(to: file, atomically: false, encoding: String.Encoding.utf8)
+}
+
+func stopRecording() {
+    guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
+    guard let writePath = NSURL(fileURLWithPath: path).appendingPathComponent("tmp") else { return }
+    let file = writePath.appendingPathComponent("fatslane_video.txt")
+    print("file: \(file)")
+    try? FileManager.default.removeItem(at: file)
+}
+
+
 open class Snapshot: NSObject {
 
     open class func setupSnapshot(_ app: XCUIApplication) {
@@ -95,7 +113,7 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set launch_arguments...")
         }
     }
-
+    
     open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()

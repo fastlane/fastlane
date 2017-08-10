@@ -1,6 +1,8 @@
 require 'shellwords'
 require 'plist'
 
+require 'listen'
+
 module Snapshot
   class Runner
     # The number of times we failed on launching the simulator... sigh
@@ -8,6 +10,8 @@ module Snapshot
 
     # All the errors we experience while running snapshot
     attr_accessor :collected_errors
+
+    attr_accessor :recordingPid
 
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
@@ -19,6 +23,7 @@ module Snapshot
       end
 
       Snapshot.config[:output_directory] = File.expand_path(Snapshot.config[:output_directory])
+      Snapshot.config[:video_output_directory] = File.expand_path(Snapshot.config[:video_output_directory])
 
       verify_helper_is_current
 
@@ -179,6 +184,13 @@ module Snapshot
         UI.header("#{device_type} - #{language}")
       end
 
+      device = TestCommandGenerator.find_device(device_type)
+      listener = Listen.to("#{Dir.home}/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/Containers/Data/Application", only: /fatslane_video.txt/) do |modified, added, removed|
+        start_recording(added.first) if added.count > 0
+        stop_recording if removed.count > 0
+      end
+      listener.start
+
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -213,6 +225,31 @@ module Snapshot
       dir_name = locale || language
 
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
+    end
+
+    def start_recording(file)
+      name = File.open(file, 'rb', &:read)
+      UI.message("start_recording")
+      FileUtils.mkdir_p(Snapshot.config[:video_output_directory])
+      Thread.new do
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo #{Snapshot.config[:video_output_directory]}/#{name}.mp4",
+                                            print_all: true,
+                                        print_command: true,
+                                              loading: "Recording video...",
+                                           pidCreated: proc do |pid|
+                                                         self.recordingPid = pid
+                                                       end,
+                                                error: proc do |output, return_code|
+                                                         ErrorHandler.handle_test_error(output, return_code)
+                                                         UI.error "Caught error... #{return_code}"
+                                                         UI.error "Caught output... #{output}"
+                                                       end)
+      end
+    end
+
+    def stop_recording
+      UI.message("stop_recording")
+      Process.kill("SIGINT", recordingPid)
     end
 
     def open_simulator_for_device(device_name)
