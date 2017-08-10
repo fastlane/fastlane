@@ -210,7 +210,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
       puts "The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead" if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -232,6 +232,11 @@ module Spaceship
 
       data['initialPlatform'] = platform
       data['enabledPlatformsForCreation'] = { value: [platform] }
+
+      unless itunes_connect_users.nil?
+        data['iTunesConnectUsers']['grantedAllUsers'] = false
+        data['iTunesConnectUsers']['grantedUsers'] = data['iTunesConnectUsers']['availableUsers'].select { |user| itunes_connect_users.include? user['username'] }
+      end
 
       # Now send back the modified hash
       r = request(:post) do |req|

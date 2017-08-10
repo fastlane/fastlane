@@ -141,7 +141,8 @@ Use it to define the general information:
     "background": "./background.jpg",
     "padding": 50,
     "show_complete_frame": false,
-    "stack_title" : false
+    "stack_title" : false,
+    "title_below_image": true
   },
 
   "data": [
@@ -175,6 +176,8 @@ Use it to define the general information:
 The `stack_title` value specifies whether `frameit` should display the keyword above the title when both keyword and title are defined.
 
 The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
+
+The `title_below_image` value specifies whether `frameit` should place the title below the screenshot. If it is false, it will be placed above the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
