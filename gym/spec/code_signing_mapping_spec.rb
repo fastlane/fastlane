@@ -44,36 +44,13 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#detect_project_profile_mapping" do
-    let(:configuration) { "Debug" }
-    let(:workspace_path) { "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace" }
-    let(:options) do
-      {
-          workspace: workspace_path,
-          export_method: "enterprise",
-          scheme: "Example",
-          configuration: configuration
-      }
-    end
-    let(:csm) do
-      project = FastlaneCore::Project.new({ workspace: workspace_path })
-      Gym::CodeSigningMapping.new(project: project)
-    end
-
-    before do
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-    end
-
-    context "when :configuration = 'Debug'" do
-      it "fetches the provisioning profiles for 'Debug' configuration from the Xcode config" do
-        expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.debug.app" })
-      end
-    end
-
-    context "when :configuration = 'Release'" do
-      let(:configuration) { "Release" }
-      it "fetches the provisioning profiles for 'Release' configuration from the Xcode config" do
-        expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.release.app" })
-      end
+    it "returns the mapping of the selected provisioning profiles" do
+      workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+      project = FastlaneCore::Project.new({
+        workspace: workspace_path
+      })
+      csm = Gym::CodeSigningMapping.new(project: project)
+      expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app" })
     end
   end
 
