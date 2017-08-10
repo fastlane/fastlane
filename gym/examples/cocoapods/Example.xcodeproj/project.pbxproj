@@ -233,7 +233,6 @@
 				TargetAttributes = {
 					CAC1E1971B6A326100A8B23A = {
 						CreatedOnToolsVersion = 7.0;
-						ProvisioningStyle = Manual;
 					};
 					CAC1E1B01B6A326100A8B23A = {
 						CreatedOnToolsVersion = 7.0;
@@ -473,13 +472,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.debug.app;
+				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Test Provisioning Profile for Debug";
 			};
 			name = Debug;
 		};
@@ -489,13 +486,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app;
 				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Test Provisioning Profile for Release";
 			};
 			name = Release;
 		};

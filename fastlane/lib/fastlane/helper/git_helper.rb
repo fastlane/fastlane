@@ -2,10 +2,11 @@ module Fastlane
   module Actions
     GIT_MERGE_COMMIT_FILTERING_OPTIONS = [:include_merges, :exclude_merges, :only_include_merges].freeze
 
-    def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil)
+    def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path)
       command = ['git log']
       command << "--pretty=\"#{pretty_format}\""
       command << "--date=\"#{date_format}\"" if date_format
+      command << '--ancestry-path' if ancestry_path
       command << "#{from.shellescape}...#{to.shellescape}"
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
       Actions.sh(command.compact.join(' '), log: false).chomp
@@ -13,10 +14,11 @@ module Fastlane
       nil
     end
 
-    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil)
+    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil, ancestry_path)
       command = ['git log']
       command << "--pretty=\"#{pretty_format}\""
       command << "--date=\"#{date_format}\"" if date_format
+      command << '--ancestry-path' if ancestry_path
       command << "-n #{commit_count}"
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
       Actions.sh(command.compact.join(' '), log: false).chomp

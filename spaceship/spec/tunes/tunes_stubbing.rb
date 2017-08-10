@@ -84,7 +84,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews/summary?storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('ratings_US.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&storefront=US&versionId=").
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
     end
 

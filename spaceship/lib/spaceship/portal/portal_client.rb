@@ -132,6 +132,18 @@ module Spaceship
       details_for_app(app)
     end
 
+    def associate_merchants_with_app(app, merchants, mac)
+      ensure_csrf(Spaceship::Merchant)
+
+      request(:post, "account/#{platform_slug(mac)}/identifiers/assignOMCToAppId.action", {
+        teamId: team_id,
+        appIdId: app.app_id,
+        omcIds: merchants.map(&:merchant_id)
+      })
+
+      details_for_app(app)
+    end
+
     def valid_name_for(input)
       latinized = input.to_slug.transliterate
       latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
@@ -200,6 +212,43 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Passbook
+    #####################################################
+
+    def passbooks
+      paging do |page_number|
+        r = request(:post, "account/ios/identifiers/listPassTypeIds.action", {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'passTypeIdList')
+      end
+    end
+
+    def create_passbook!(name, bundle_id)
+      ensure_csrf(Spaceship::Passbook)
+
+      r = request(:post, "account/ios/identifiers/addPassTypeId.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'passTypeId')
+    end
+
+    def delete_passbook!(passbook_id)
+      ensure_csrf(Spaceship::Passbook)
+
+      r = request(:post, "account/ios/identifiers/deletePassTypeId.action", {
+          teamId: team_id,
+          passTypeId: passbook_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
     # @!group Website Push
     #####################################################
 
@@ -232,6 +281,43 @@ module Spaceship
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteWebsitePushId.action", {
           teamId: team_id,
           websitePushId: website_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
+    # @!group Merchant
+    #####################################################
+
+    def merchants(mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listOMCs.action", {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        parse_response(r, 'identifierList')
+      end
+    end
+
+    def create_merchant!(name, bundle_id, mac: false)
+      ensure_csrf(Spaceship::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addOMC.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'omcId')
+    end
+
+    def delete_merchant!(merchant_id, mac: false)
+      ensure_csrf(Spaceship::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteOMC.action", {
+          teamId: team_id,
+          omcId: merchant_id
       })
       parse_response(r)
     end
@@ -279,6 +365,17 @@ module Spaceship
     def team_members
       response = request(:post) do |req|
         req.url "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+        req.body = {
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_invited
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/getInvites"
         req.body = {
           teamId: team_id
         }.to_json

@@ -1,0 +1,22 @@
+{
+  "creationTimestamp": "2016-11-09T22:32:25Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/addPassTypeId.action",
+  "responseId": "702402cd-0769-47bc-b541-d5af0ecbf3ae",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "pageNumber": null,
+  "pageSize": null,
+  "totalRecords": null,
+  "websitePushId": {
+    "name": "Fastlane Passbook",
+    "prefix": "3KQEE2SU36",
+    "identifier": "pass.com.fastlane.example",
+    "status": "current",
+    "websitePushId": "AXUVGTHPF6"
+  }
+}

@@ -111,6 +111,8 @@ describe Pilot::TesterManager do
 
       allow(tester_manager).to receive(:login) # prevent attempting to log in with iTC
       allow(fake_client).to receive(:user).and_return(current_user)
+      allow(fake_client).to receive(:testers).and_return(global_testers)
+      allow(fake_client).to receive(:user_email).and_return("taquitos@fastlane.tools")
     end
 
     describe "when invoked from a global context" do
@@ -265,6 +267,7 @@ describe Pilot::TesterManager do
 
         expect(Spaceship::Tunes::Tester::External).to receive(:find).and_return(fake_tester)
         expect(Spaceship::TestFlight::Group).to_not receive(:remove_tester_from_groups!)
+        expect(FastlaneCore::UI).to receive(:success).with('Found existing tester fabric-devtools@gmail.com+fake@gmail.com')
         expect(FastlaneCore::UI).to receive(:success).with('Successfully removed tester fabric-devtools@gmail.com+fake@gmail.com from Users and Roles')
 
         tester_manager.remove_tester(remove_tester_options)

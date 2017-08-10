@@ -33,7 +33,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               git_add(path: 'myfile.txt', pathspec: 'Frameworks/*')
             end").runner.execute(:test)
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneError)
         end
       end
 
@@ -50,7 +50,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               git_add(path: 'myfile.txt', pathspec: '*.txt')
             end").runner.execute(:test)
-          end.to raise_error
+          end.to raise_error(FastlaneCore::Interface::FastlaneError)
         end
       end
 

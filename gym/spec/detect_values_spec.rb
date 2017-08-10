@@ -34,45 +34,6 @@ describe Gym do
         path = Gym.config[:build_path]
         expect(path).to eq(archive_path)
       end
-
-      describe "#self.test_target?" do
-        context "when build_setting include TEST_TARGET_NAME" do
-          it "is test target" do
-            build_settings = { "TEST_TARGET_NAME" => "Sample" }
-            expect(Gym::DetectValues.test_target?(build_settings)).to be true
-          end
-        end
-        context "when build_setting include TEST_HOST" do
-          it "is test target" do
-            build_settings = { "TEST_HOST" => "Sample" }
-            expect(Gym::DetectValues.test_target?(build_settings)).to be true
-          end
-        end
-        context "when build_setting include neither TEST_HOST nor TEST_TARGET_NAME" do
-          it "is not test target" do
-            build_settings = {}
-            expect(Gym::DetectValues.test_target?(build_settings)).to be false
-          end
-        end
-      end
-
-      describe "provisioning profile" do
-        let(:configuration) { "Debug" }
-        let(:options) do
-          {
-              workspace: "./gym/examples/cocoapods/Example.xcworkspace",
-              export_method: "enterprise",
-              scheme: "Example",
-              configuration: configuration
-          }
-        end
-        it "fetches the provisioning profiles from the Xcode config" do
-          Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-
-          Gym::DetectValues.detect_selected_provisioning_profiles
-          expect(Gym.config[:export_options][:provisioningProfiles]).to eq({ "tools.fastlane.debug.app" => "Test Provisioning Profile for Debug" })
-        end
-      end
     end
   end
 end
