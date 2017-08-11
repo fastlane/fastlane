@@ -4,7 +4,7 @@ module Snapshot
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator < TestCommandGeneratorBase
     class << self
-      def generate(devices: nil, language: nil, locale: nil)
+      def generate(devices: nil, language: nil, locale: nil, log_path: nil)
         parts = prefix
         parts << "xcodebuild"
         parts += options
@@ -12,14 +12,16 @@ module Snapshot
         parts += build_settings
         parts += actions
         parts += suffix
-        parts += pipe(devices, language, locale)
+        parts += pipe(language, locale, log_path)
 
         return parts
       end
 
-      def pipe(devices, language, locale)
-        log_path = xcodebuild_log_path(devices: devices, language: language, locale: locale)
-        return ["| tee #{log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+      def pipe(language, locale, log_path)
+        tee_command = ['tee']
+        tee_command << '-a' if File.exist?(log_path)
+        tee_command << log_path.shellescape
+        return ["| #{tee_command.join(' ')} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
       def destination(devices)
@@ -56,23 +58,6 @@ module Snapshot
         # device in the array, and they are not all iOS
         # as checked above, that would imply that this is a mixed bag
         return devices.count == 1
-      end
-
-      def xcodebuild_log_path(devices: nil, language: nil, locale: nil)
-        name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
-
-        if Snapshot.config[:namespace_log_files]
-          name_components << devices.join('-') if devices.count >= 1
-          name_components << language if language
-          name_components << locale if locale
-        end
-
-        file_name = "#{name_components.join('-')}.log"
-
-        containing = File.expand_path(Snapshot.config[:buildlog_path])
-        FileUtils.mkdir_p(containing)
-
-        return File.join(containing, file_name)
       end
     end
   end

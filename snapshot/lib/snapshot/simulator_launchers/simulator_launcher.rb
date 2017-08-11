@@ -20,6 +20,11 @@ module Snapshot
             locale = language[1]
             language = language[0]
           end
+
+          # Clear logs so subsequent xcodebuild executions dont append to old ones
+          log_path = xcodebuild_log_path(language: language, locale: locale)
+          File.delete(log_path) if File.exist?(log_path)
+
           # Break up the array of devices into chunks that can
           # be run simultaneously.
           launcher_config.devices.each_slice(default_number_of_simultaneous_simulators) do |devices|
@@ -38,7 +43,12 @@ module Snapshot
       add_media(device_types(:photo, launcher_config.add_photos)) if launcher_config.add_photos
       add_media(device_types(:video, launcher_config.add_videos)) if launcher_config.add_videos
 
-      command = TestCommandGenerator.generate(devices: devices, language: language, locale: locale)
+      command = TestCommandGenerator.generate(
+        devices: devices,
+        language: language,
+        locale: locale,
+        log_path: xcodebuild_log_path(language: language, locale: locale)
+      )
 
       prefix_hash = [
         {
@@ -68,11 +78,28 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(devices: devices, language: language, locale: locale))
+      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
 
       dir_name = locale || language
 
       return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
+    end
+
+    def xcodebuild_log_path(language: nil, locale: nil)
+      name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
+
+      if Snapshot.config[:namespace_log_files]
+        name_components << launcher_config.devices.join('-') if launcher_config.devices.count >= 1
+        name_components << language if language
+        name_components << locale if locale
+      end
+
+      file_name = "#{name_components.join('-')}.log"
+
+      containing = File.expand_path(Snapshot.config[:buildlog_path])
+      FileUtils.mkdir_p(containing)
+
+      return File.join(containing, file_name)
     end
   end
 
