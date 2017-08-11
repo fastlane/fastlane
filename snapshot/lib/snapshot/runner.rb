@@ -5,9 +5,6 @@ require 'thread'
 
 module Snapshot
   class Runner
-    # The number of times we failed on launching the simulator... sigh
-    attr_accessor :number_of_retries_due_to_failing_simulator
-
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
@@ -31,15 +28,14 @@ module Snapshot
 
       UI.success "Building and running project - this might take some time..."
 
-      self.number_of_retries_due_to_failing_simulator = 0
-      launch_arguments_set = config_launch_arguments
+      launcher_config = SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
       if Snapshot.config[:simultaneous]
-        launcher = SimulatorLauncher.new
-        results = launcher.take_screenshots_simultaneously(launch_arguments_set)
+        launcher = SimulatorLauncher.new(launcher_configuration: launcher_config)
+        results = launcher.take_screenshots_simultaneously
       else
-        launcher = SimulatorLauncherXcode8.new
-        results = launcher.take_screenshots_one_simulator_at_a_time(launch_arguments_set)
+        launcher = SimulatorLauncherXcode8.new(launcher_configuration: launcher_config)
+        results = launcher.take_screenshots_one_simulator_at_a_time
       end
 
       print_results(results)
@@ -53,16 +49,6 @@ module Snapshot
       unless Snapshot.config[:derived_data_path]
         # this should actually be launcher.derived_data_path
         FileUtils.rm_rf(TestCommandGeneratorBase.derived_data_path)
-      end
-    end
-
-    def config_launch_arguments
-      launch_arguments = Array(Snapshot.config[:launch_arguments])
-      # if more than 1 set of arguments, use a tuple with an index
-      if launch_arguments.count == 1
-        [launch_arguments]
-      else
-        launch_arguments.map.with_index { |e, i| [i, e] }
       end
     end
 

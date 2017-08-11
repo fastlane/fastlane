@@ -2,18 +2,26 @@ module Snapshot
   class SimulatorLauncherBase
     attr_accessor :collected_errors
 
-    def initialize
-      not_implemented(__method__)
+    # The number of times we failed on launching the simulator... sigh
+    attr_accessor :current_number_of_retries_due_to_failing_simulator
+    attr_accessor :launcher_config
+
+    def initialize(launcher_configuration: nil)
+      @launcher_config = launcher_configuration
     end
 
     def collected_errors
       @collected_errors || []
     end
 
+    def current_number_of_retries_due_to_failing_simulator
+      @current_number_of_retries_due_to_failing_simulator || 0
+    end
+
     def prepare_for_launch(language, locale, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
-      FileUtils.rm_rf(screenshots_path) if Snapshot.config[:clean]
+      FileUtils.rm_rf(screenshots_path) if launcher_config.clean
       FileUtils.mkdir_p(screenshots_path)
 
       FileUtils.mkdir_p(CACHE_DIR)
@@ -35,48 +43,48 @@ module Snapshot
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
 
-      devices = Snapshot.config[:devices] || []
+      devices = launcher_config.devices || []
       devices.each do |type|
-        if Snapshot.config[:erase_simulator] || Snapshot.config[:localize_simulator]
+        if launcher_config.erase_simulator || launcher_config.localize_simulator
           erase_simulator(type)
-          if Snapshot.config[:localize_simulator]
+          if launcher_config.localize_simulator
             localize_simulator(type, language, locale)
           end
-        elsif Snapshot.config[:reinstall_app]
+        elsif launcher_config.reinstall_app
           # no need to reinstall if device has been erased
           uninstall_app(type)
         end
       end
     end
 
-    # TODO: Check if this works with concurrent sims
     # pass an array of device types
-    def add_media(device_type, media_type, paths)
+    def add_media(device_types, media_type, paths)
       media_type = media_type.to_s
 
-      UI.verbose "Adding #{media_type}s to #{device_type}..."
-      device_udid = TestCommandGenerator.device_udid(device_type)
+      device_types.each do |device_type|
+        UI.verbose "Adding #{media_type}s to #{device_type}..."
+        device_udid = TestCommandGenerator.device_udid(device_type)
 
-      UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        UI.message "Launch Simulator #{device_type}"
+        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
-      paths.each do |path|
-        UI.message "Adding '#{path}'"
-        Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+        paths.each do |path|
+          UI.message "Adding '#{path}'"
+          Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+        end
       end
     end
 
-    # TODO: Can these move to a simulator object?
     def uninstall_app(device_type)
-      UI.verbose "Uninstalling app '#{Snapshot.config[:app_identifier]}' from #{device_type}..."
-      Snapshot.config[:app_identifier] ||= UI.input("App Identifier: ")
+      UI.verbose "Uninstalling app '#{launcher_config.app_identifier}' from #{device_type}..."
+      launcher_config.app_identifier ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message "Launch Simulator #{device_type}"
       Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
-      UI.message "Uninstall application #{Snapshot.config[:app_identifier]}"
-      Helper.backticks("xcrun simctl uninstall #{device_udid} #{Snapshot.config[:app_identifier]} &> /dev/null")
+      UI.message "Uninstall application #{launcher_config.app_identifier}"
+      Helper.backticks("xcrun simctl uninstall #{device_udid} #{launcher_config.app_identifier} &> /dev/null")
     end
 
     def erase_simulator(device_type)
@@ -99,6 +107,22 @@ module Snapshot
         UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
+      end
+    end
+
+    def copy_simulator_logs(device_names, language, locale, launch_arguments)
+      return unless launcher_config.output_simulator_logs
+
+      detected_language = locale || language
+      language_folder = File.join(launcher_config.output_directory, detected_language)
+
+      device_names.each do |device_name|
+        device = TestCommandGeneratorBase.find_device(device_name)
+        components = [launch_arguments].delete_if { |a| a.to_s.length == 0 }
+
+        UI.header("Collecting system logs #{device_name} - #{language}")
+        log_identity = Digest::MD5.hexdigest(components.join("-"))
+        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
       end
     end
   end
