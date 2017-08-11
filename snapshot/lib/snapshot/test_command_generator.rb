@@ -45,11 +45,12 @@ module Snapshot
 
       def verify_devices_share_os(devices)
         # Check each device to see if it is an iOS device
-        all_iOS = devices.map do |device|
-          device.start_with?('iPhone') || device.start_with?('iPad')
+        all_ios = devices.map do |device|
+          device = device.downcase
+          device.start_with?('iphone', 'ipad')
         end
         # Return true if all devices are iOS devices
-        return true unless all_iOS.include?(false)
+        return true unless all_ios.include?(false)
         # There should only be more than 1 device type if
         # it is iOS, therefore, if there is more than 1
         # device in the array, and they are not all iOS
