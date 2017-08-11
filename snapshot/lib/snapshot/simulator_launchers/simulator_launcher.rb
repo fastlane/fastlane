@@ -3,12 +3,12 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 module Snapshot
   class SimulatorLauncher < SimulatorLauncherBase
     def default_number_of_simultaneous_simulators
-      cpu_count = OS.cpu_count
+      cpu_count = CPUInspector.cpu_count
       if cpu_count <= 2
-        return OS.cpu_count
+        return cpu_count
       end
 
-      return OS.cpu_count - 1
+      return cpu_count - 1
     end
 
     def take_screenshots_simultaneously
@@ -73,6 +73,32 @@ module Snapshot
       dir_name = locale || language
 
       return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
+    end
+  end
+
+  class CPUInspector
+    def self.hwprefs_available?
+      `which hwprefs` != ''
+    end
+
+    def self.cpu_count
+      @cpu_count ||=
+        case RUBY_PLATFORM
+        when /darwin9/
+          `hwprefs cpu_count`.to_i
+        when /darwin10/
+          (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+        when /linux/
+          `cat /proc/cpuinfo | grep processor | wc -l`.to_i
+        when /freebsd/
+          `sysctl -n hw.physicalcpu_max`.to_i
+        else
+          if RbConfig::CONFIG['host_os'] =~ /darwin/
+            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+          else
+            raise 'unknown platform processor_count'
+          end
+        end
     end
   end
 end
