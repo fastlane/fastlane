@@ -26,8 +26,26 @@ describe Snapshot do
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
 
         sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
-        expect(sims).to eq(OS.cpu_count - 1)
+        expect(sims).to eq(Snapshot::CPUInspector.cpu_count - 1)
         expect(sims >= 1).to be(true)
+      end
+
+      it 'returns 1 if CPUs is 1' do
+        snapshot_config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {})
+        launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
+        allow(Snapshot::CPUInspector).to receive(:cpu_count).and_return(1)
+
+        sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
+        expect(sims).to eq(1)
+      end
+
+      it 'returns 2 if CPUs is 2' do
+        snapshot_config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {})
+        launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
+        allow(Snapshot::CPUInspector).to receive(:cpu_count).and_return(2)
+
+        sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
+        expect(sims).to eq(2)
       end
     end
   end

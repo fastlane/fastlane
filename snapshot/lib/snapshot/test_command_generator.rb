@@ -12,15 +12,15 @@ module Snapshot
         parts += build_settings
         parts += actions
         parts += suffix
-        parts += pipe(language, locale, log_path)
+        parts += pipe(language: language, locale: locale, log_path: log_path)
 
         return parts
       end
 
-      def pipe(language, locale, log_path)
+      def pipe(language: nil, locale: nil, log_path: nil)
         tee_command = ['tee']
-        tee_command << '-a' if File.exist?(log_path)
-        tee_command << log_path.shellescape
+        tee_command << '-a' if log_path && File.exist?(log_path)
+        tee_command << log_path.shellescape if log_path
         return ["| #{tee_command.join(' ')} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
