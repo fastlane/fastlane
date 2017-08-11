@@ -74,28 +74,13 @@ module Sigh
       end
 
       # Take the provisioning profile name into account
-      if Sigh.config[:provisioning_name].to_s.length > 0
-        filtered = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
-        if Sigh.config[:ignore_profiles_with_different_name]
-          results = filtered
-        elsif (filtered || []).count > 0
-          results = filtered
-        end
-      end
+      results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
 
       # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
       # any more, since it requires an additional request
       # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
 
-      results = results.find_all do |current_profile|
-        if profile_type == Spaceship.provisioning_profile.ad_hoc
-          current_profile.is_adhoc?
-        elsif profile_type == Spaceship.provisioning_profile.app_store
-          !current_profile.is_adhoc?
-        else
-          true
-        end
-      end
+      results = filter_profiles_for_adhoc_or_app_store(results)
 
       return results if Sigh.config[:skip_certificate_verification]
 
@@ -154,6 +139,28 @@ module Sigh
                                       mac: Sigh.config[:platform].to_s == 'macos',
                              sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
       profile
+    end
+
+    def filter_profiles_by_name(profiles)
+      filtered = profiles.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
+      if Sigh.config[:ignore_profiles_with_different_name]
+        profiles = filtered
+      elsif (filtered || []).count > 0
+        profiles = filtered
+      end
+      profiles
+    end
+
+    def filter_profiles_for_adhoc_or_app_store(profiles)
+      profiles.find_all do |current_profile|
+        if profile_type == Spaceship.provisioning_profile.ad_hoc
+          current_profile.is_adhoc?
+        elsif profile_type == Spaceship.provisioning_profile.app_store
+          !current_profile.is_adhoc?
+        else
+          true
+        end
+      end
     end
 
     def certificates_for_profile_and_platform
