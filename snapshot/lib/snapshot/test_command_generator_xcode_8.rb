@@ -33,7 +33,6 @@ module Snapshot
         device = find_device(device_name, os_version)
         if device.nil?
           UI.user_error!("No device found named '#{device_name}' for version '#{os_version}'")
-          return
         elsif device.os_version != os_version
           UI.important("Using device named '#{device_name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
         end
