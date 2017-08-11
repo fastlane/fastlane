@@ -127,7 +127,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :beta
       end
 
       def self.output
