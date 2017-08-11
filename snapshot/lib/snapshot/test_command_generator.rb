@@ -12,13 +12,13 @@ module Snapshot
         parts += build_settings
         parts += actions
         parts += suffix
-        # parts += pipe(devices, language, locale)
+        parts += pipe(devices, language, locale)
 
         return parts
       end
 
-      def pipe(device_type, language, locale)
-        log_path = xcodebuild_log_path(device_type: device_type, language: language, locale: locale)
+      def pipe(devices, language, locale)
+        log_path = xcodebuild_log_path(devices: devices, language: language, locale: locale)
         return ["| tee #{log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
       end
 
@@ -58,11 +58,11 @@ module Snapshot
         return devices.count == 1
       end
 
-      def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
+      def xcodebuild_log_path(devices: nil, language: nil, locale: nil)
         name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
 
         if Snapshot.config[:namespace_log_files]
-          name_components << device_type if device_type
+          name_components << devices.join('-') if devices.count >= 1
           name_components << language if language
           name_components << locale if locale
         end

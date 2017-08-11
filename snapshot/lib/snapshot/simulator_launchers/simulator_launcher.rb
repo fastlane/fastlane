@@ -68,7 +68,7 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
-      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(language: language, locale: locale))
+      raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(devices: devices, language: language, locale: locale))
 
       dir_name = locale || language
 
