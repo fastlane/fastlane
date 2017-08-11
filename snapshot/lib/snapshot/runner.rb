@@ -30,7 +30,7 @@ module Snapshot
 
       launcher_config = SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
-      if Snapshot.config[:simultaneous]
+      if Helper.xcode_at_least?(9)
         launcher = SimulatorLauncher.new(launcher_configuration: launcher_config)
         results = launcher.take_screenshots_simultaneously
       else

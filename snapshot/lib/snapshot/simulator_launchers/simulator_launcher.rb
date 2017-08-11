@@ -13,14 +13,18 @@ module Snapshot
 
     def take_screenshots_simultaneously
       languages_finished = {}
-      config.launch_args_set.each do |launch_args|
+      launcher_config.launch_args_set.each do |launch_args|
         launcher_config.languages.each_with_index do |language, language_index|
           locale = nil
           if language.kind_of?(Array)
             locale = language[1]
             language = language[0]
           end
-          languages_finished[language] = launch_simultaneously(language, locale, launch_args)
+          # Break up the array of devices into chunks that can
+          # be run simultaneously.
+          launcher_config.devices.each_slice(default_number_of_simultaneous_simulators) do |devices|
+            languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
+          end
         end
       end
       launcher_config.devices.each_with_object({}) do |device, results_hash|
@@ -28,13 +32,13 @@ module Snapshot
       end
     end
 
-    def launch_simultaneously(language, locale, launch_arguments)
+    def launch_simultaneously(devices, language, locale, launch_arguments)
       prepare_for_launch(language, locale, launch_arguments)
 
       add_media(device_types(:photo, launcher_config.add_photos)) if launcher_config.add_photos
       add_media(device_types(:video, launcher_config.add_videos)) if launcher_config.add_videos
 
-      command = TestCommandGenerator.generate(language: language, locale: locale)
+      command = TestCommandGenerator.generate(devices: devices, language: language, locale: locale)
 
       prefix_hash = [
         {
