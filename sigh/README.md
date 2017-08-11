@@ -94,11 +94,15 @@ Make sure, you have the latest version of the Xcode command line tools installed
 
 # Usage
 
-    fastlane sigh
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+
+```
+fastlane sigh
+```
 
 Yes, that's the whole command!
 
-```sigh``` will create, repair and download profiles for the App Store by default.
+`sigh` will create, repair and download profiles for the App Store by default.
 
 You can pass your bundle identifier and username like this:
 
