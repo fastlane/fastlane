@@ -41,7 +41,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :update,
                                        env_name: "FL_COCOAPODS_UPDATE",
-                                       description: "Runs pod update instead of pod install, no-clean, no-integratio and repo-update command is not working in the update state",
+                                       description: "Runs pod update instead of pod install. Commands no-clean, no-integrate and repo-update are not working when update is used.",
                                        is_string: false,
                                        default_value: false)
           FastlaneCore::ConfigItem.new(key: :clean,
