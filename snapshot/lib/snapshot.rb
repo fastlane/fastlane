@@ -12,6 +12,7 @@ require 'snapshot/options'
 require 'snapshot/update'
 require 'snapshot/fixes/simulator_zoom_fix'
 require 'snapshot/fixes/hardware_keyboard_fix'
+require 'snapshot/command_listener'
 
 require 'fastlane_core'
 

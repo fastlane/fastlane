@@ -1,8 +1,6 @@
 require 'shellwords'
 require 'plist'
 
-require 'listen'
-
 module Snapshot
   class Runner
     # The number of times we failed on launching the simulator... sigh
@@ -11,7 +9,7 @@ module Snapshot
     # All the errors we experience while running snapshot
     attr_accessor :collected_errors
 
-    attr_accessor :recordingPid
+    @recordingPid
 
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
@@ -185,11 +183,12 @@ module Snapshot
       end
 
       device = TestCommandGenerator.find_device(device_type)
-      listener = Listen.to("#{Dir.home}/Library/Developer/CoreSimulator/Devices/#{device.udid}/data/Containers/Data/Application", only: /fatslane_video.txt/) do |modified, added, removed|
-        start_recording(added.first) if added.count > 0
-        stop_recording if removed.count > 0
+      dir_name = locale || language
+        
+      listener = CommandListener.new() do |command, args|
+        start_recording(dir_name, device_type, args["name"].first) if command == "startRecording"
+        stop_recording if command == "stopRecording"
       end
-      listener.start
 
       prefix_hash = [
         {
@@ -207,6 +206,8 @@ module Snapshot
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
+                                                listener.close()
+                                                stop_recording()
 
                                                 # no exception raised... that means we need to retry
                                                 UI.error "Caught error... #{return_code}"
@@ -220,24 +221,25 @@ module Snapshot
                                                 end
                                               end)
 
+      listener.close
+      stop_recording()
+        
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
-
-      dir_name = locale || language
 
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
-    def start_recording(file)
-      name = File.open(file, 'rb', &:read)
-      UI.message("start_recording")
-      FileUtils.mkdir_p(Snapshot.config[:video_output_directory])
+    def start_recording(dir_name, device_type, name)
+      UI.message("start_recording '#{name}'")
+      language_folder = File.join(Snapshot.config[:video_output_directory], dir_name, device_type.delete(" "))
+      FileUtils.mkdir_p(language_folder)
       Thread.new do
-        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo #{Snapshot.config[:video_output_directory]}/#{name}.mp4",
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo #{language_folder}/#{name}.mp4",
                                             print_all: true,
                                         print_command: true,
                                               loading: "Recording video...",
                                            pidCreated: proc do |pid|
-                                                         self.recordingPid = pid
+                                                         @recordingPid = pid
                                                        end,
                                                 error: proc do |output, return_code|
                                                          ErrorHandler.handle_test_error(output, return_code)
@@ -248,8 +250,10 @@ module Snapshot
     end
 
     def stop_recording
+      return if @recordingPid == nil
       UI.message("stop_recording")
-      Process.kill("SIGINT", recordingPid)
+      Process.kill("SIGINT", @recordingPid)
+      @recordingPid = nil
     end
 
     def open_simulator_for_device(device_name)

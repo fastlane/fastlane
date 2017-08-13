@@ -33,22 +33,21 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
 }
 
 func startRecording(name: String) {
-    guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
-    guard let writePath = NSURL(fileURLWithPath: path).appendingPathComponent("tmp") else { return }
-    try? FileManager.default.createDirectory(atPath: writePath.path, withIntermediateDirectories: true)
-    let file = writePath.appendingPathComponent("fatslane_video.txt")
-    print("file: \(file)")
-    try? name.write(to: file, atomically: false, encoding: String.Encoding.utf8)
+    sendCommand(commnad: "startRecording?name=\(name)")
 }
 
 func stopRecording() {
-    guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
-    guard let writePath = NSURL(fileURLWithPath: path).appendingPathComponent("tmp") else { return }
-    let file = writePath.appendingPathComponent("fatslane_video.txt")
-    print("file: \(file)")
-    try? FileManager.default.removeItem(at: file)
+    sendCommand(commnad: "stopRecording")
 }
 
+func sendCommand(commnad: String) {
+    if let url = URL(string: "http://localhost:2345/\(commnad)") {
+        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
+        if (error != nil) {
+            print("Error sending commnad: \(String(describing: error))")
+        }
+    }
+}
 
 open class Snapshot: NSObject {
 
@@ -183,6 +182,29 @@ extension XCUIElement {
             return false
         }
         return self.frame.size == CGSize(width: 10, height: 20)
+    }
+}
+
+extension URLSession {
+    func synchronousDataTask(with url: URL) -> (Data?, URLResponse?, Error?) {
+        var data: Data?
+        var response: URLResponse?
+        var error: Error?
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        let dataTask = self.dataTask(with: url) {
+            data = $0
+            response = $1
+            error = $2
+            
+            semaphore.signal()
+        }
+        dataTask.resume()
+        
+        _ = semaphore.wait(timeout: .distantFuture)
+        
+        return (data, response, error)
     }
 }
 
