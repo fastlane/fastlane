@@ -884,7 +884,13 @@ module Spaceship
 
       handle_itc_response(r.body)
 
-      if r.body.fetch('messages').fetch('info').last == "Successful POST"
+      # iTunes Connect still returns a success status code even the submission
+      # was failed because of Ad ID info.  This checks for any section error
+      # keys in returned adIdInfo and prints them out.
+      ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
+      if ad_id_error_keys.any?
+        raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
+      elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
         raise "Something went wrong when submitting the app for review. Make sure to pass valid options to submit your app for review"
