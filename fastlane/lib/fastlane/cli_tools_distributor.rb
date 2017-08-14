@@ -112,7 +112,7 @@ module Fastlane
           UI.message ""
           UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
         end
-        UI.important "For more information, check out https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
+        UI.important "Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
 
         sleep 2 # napping is life, otherwise the user might not see this message
       end
