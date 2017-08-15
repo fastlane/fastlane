@@ -82,7 +82,8 @@ module Snapshot
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
         'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
         'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
-        'Apple TV 1080p' => 'Apple TV'
+        'Apple TV 1080p' => 'Apple TV',
+        'Mac' => 'Mac'
       }
     end
 
