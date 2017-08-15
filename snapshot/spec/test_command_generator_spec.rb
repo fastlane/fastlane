@@ -45,7 +45,7 @@ describe Snapshot do
         })
       end
 
-      it 'copies all device log archives to the output directory on macOS 10.12 (Siera)' do
+      it 'copies all device log archives to the output directory on macOS 10.12 (Sierra)' do
         Snapshot.config = @config
 
         allow(FastlaneCore::CommandExecutor).
