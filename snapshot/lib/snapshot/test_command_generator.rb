@@ -25,14 +25,13 @@ module Snapshot
       end
 
       def destination(devices)
+        unless verify_devices_share_os(devices)
+          UI.user_error!('All devices provided to snapshot should run the same operating system')
+        end
         # on Mac we will always run on host machine, so should specify only platform
         return ["-destination 'platform=macOS'"] if devices.first.to_s =~ /^Mac/
 
         os = devices.first.to_s =~ /^Apple TV/ ? "tvOS" : "iOS"
-
-        unless verify_devices_share_os(devices)
-          UI.user_error!('All devices provided to snapshot should run the same operating system')
-        end
 
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
