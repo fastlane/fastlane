@@ -104,9 +104,7 @@ open class Snapshot: NSObject {
 
         sleep(1) // Waiting for the animation to be finished (kind of)
 
-        #if os(tvOS)
-            XCUIApplication().childrenMatchingType(.Browser).count
-        #elseif os(OSX)
+        #if os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
             let screenshot = app.windows.firstMatch.screenshot()
