@@ -55,7 +55,7 @@ module Snapshot
           config[:devices] << sim.name
         end
       elsif Snapshot.project.mac?
-        config[:devices] << "Mac"
+        config[:devices] = ["Mac"]
       end
     end
   end
