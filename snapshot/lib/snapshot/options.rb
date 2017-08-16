@@ -189,7 +189,7 @@ module Snapshot
                                      is_string: false,
                                      verify_block: proc do |value|
                                        if value && !Helper.xcode_at_least?('9.0')
-                                         UI.user_error('Executing snapshot on multiple simulators at once is only supported in Xcode 9 and higher.')
+                                         UI.user_error('Executing snapshot on multiple simulators at once is only supported in Xcode 9 and higher')
                                        end
                                      end)
       ]

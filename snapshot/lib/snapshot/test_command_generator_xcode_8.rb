@@ -2,6 +2,9 @@ require 'snapshot/test_command_generator_base'
 
 module Snapshot
   # Responsible for building the fully working xcodebuild command
+  # This TestCommandGenerator supports Xcode 8's `xcodebuild` requirements
+  # It is its own object, as the logic differs for how we want to handle
+  # creating `xcodebuild` commands for Xcode 9 (see test_command_generator.rb)
   class TestCommandGeneratorXcode8 < TestCommandGeneratorBase
     class << self
       def generate(device_type: nil, language: nil, locale: nil)

@@ -2,6 +2,9 @@ require 'snapshot/test_command_generator_base'
 
 module Snapshot
   # Responsible for building the fully working xcodebuild command
+  # Xcode 9 introduced the ability to run tests in parallel on multiple simulators
+  # This TestCommandGenerator constructs the appropriate `xcodebuild` command
+  # to be used for executing simultaneous tests
   class TestCommandGenerator < TestCommandGeneratorBase
     class << self
       def generate(devices: nil, language: nil, locale: nil, log_path: nil)

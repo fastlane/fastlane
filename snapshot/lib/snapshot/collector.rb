@@ -10,7 +10,10 @@ module Snapshot
       language_folder = File.join(Snapshot.config[:output_directory], dir_name)
       FileUtils.mkdir_p(language_folder)
 
-      if Snapshot.config[:simultaneous] || Helper.xcode_at_least?(9)
+      # Xcode 9 introduced a new API to take screenshots which allows us
+      # to avoid parsing the generated plist file to find the screenshots
+      # and instead, we can save them to a known location to use later on.
+      if Helper.xcode_at_least?(9)
         return collect_screenshots_for_language_folder(language_folder)
       else
         to_store = attachments(containing)
