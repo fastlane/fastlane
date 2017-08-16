@@ -97,6 +97,35 @@ describe FastlaneCore do
           is_simulator: true
         )
       end
+
+      it 'Xcode 9' do
+        response = "response"
+        simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode9')
+        expect(response).to receive(:read).and_return(simctl_output)
+        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+
+        devices = FastlaneCore::Simulator.all
+        expect(devices.count).to eq(15)
+
+        expect(devices[-3]).to have_attributes(
+          name: "iPad Pro (12.9-inch)", os_type: "iOS", os_version: "11.0",
+          udid: "C7C55339-DE8F-4DA3-B94A-09879CB1E5B5",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-2]).to have_attributes(
+          name: "iPad Pro (12.9-inch) (2nd generation)", os_type: "iOS", os_version: "11.0",
+          udid: "D2408DE5-C74F-4AD1-93FA-CC083D438321",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-1]).to have_attributes(
+          name: "iPad Pro (10.5-inch)", os_type: "iOS", os_version: "11.0",
+          udid: "ED8B6B96-11CC-4848-93B8-4D5D627ABF7E",
+          state: "Shutdown",
+          is_simulator: true
+        )
+      end
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS simulator" do
