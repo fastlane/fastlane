@@ -21,6 +21,9 @@ module Snapshot
     attr_accessor :launch_args_set
     attr_accessor :output_directory
 
+    # xcode 9
+    attr_accessor :serialized_executions
+
     def initialize(snapshot_config: nil)
       @languages = snapshot_config[:languages]
       @devices = snapshot_config[:devices]
@@ -35,6 +38,7 @@ module Snapshot
       @stop_after_first_error = snapshot_config[:stop_after_first_error]
       @output_simulator_logs = snapshot_config[:output_simulator_logs]
       @output_directory = snapshot_config[:output_directory]
+      @serialized_executions = snapshot_config[:serialized_executions]
 
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index

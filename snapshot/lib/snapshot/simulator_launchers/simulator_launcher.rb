@@ -27,7 +27,14 @@ module Snapshot
 
           # Break up the array of devices into chunks that can
           # be run simultaneously.
-          launcher_config.devices.each_slice(default_number_of_simultaneous_simulators) do |devices|
+          if launcher_config.serialized_executions
+            # Put each device in it's own array to run tests one at a time
+            device_batches = launcher_config.devices.map { |d| [d] }
+          else
+            device_batches = launcher_config.devices.each_slice(default_number_of_simultaneous_simulators).to_a
+          end
+
+          device_batches.each do |devices|
             languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
           end
         end
@@ -58,6 +65,8 @@ module Snapshot
           end
         }
       ]
+
+      UI.important("Running snapshot on: #{devices.join(', ')}")
 
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
