@@ -182,10 +182,10 @@ module Snapshot
                                      description: "Separate the log files per device and per language",
                                      optional: true,
                                      is_string: false),
-        FastlaneCore::ConfigItem.new(key: :serialized_executions,
-                                     env_name: "SNAPSHOT_EXECUTE_SERIALIZED_TESTS",
-                                     description: "Take snapshots on one device at a time",
-                                     default_value: false,
+        FastlaneCore::ConfigItem.new(key: :concurrent_simulators,
+                                     env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
+                                     description: "Take snapshots on multiple simulators concurrently",
+                                     default_value: true,
                                      is_string: false)
       ]
     end

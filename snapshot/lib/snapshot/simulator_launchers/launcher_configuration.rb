@@ -22,7 +22,8 @@ module Snapshot
     attr_accessor :output_directory
 
     # xcode 9
-    attr_accessor :serialized_executions
+    attr_accessor :concurrent_simulators
+    alias_method :concurrent_simulators?, :concurrent_simulators
 
     def initialize(snapshot_config: nil)
       @languages = snapshot_config[:languages]
@@ -38,7 +39,7 @@ module Snapshot
       @stop_after_first_error = snapshot_config[:stop_after_first_error]
       @output_simulator_logs = snapshot_config[:output_simulator_logs]
       @output_directory = snapshot_config[:output_directory]
-      @serialized_executions = snapshot_config[:serialized_executions]
+      @concurrent_simulators = snapshot_config[:concurrent_simulators]
 
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index
