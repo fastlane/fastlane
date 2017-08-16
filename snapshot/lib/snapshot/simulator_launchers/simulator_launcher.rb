@@ -40,8 +40,8 @@ module Snapshot
     def launch_simultaneously(devices, language, locale, launch_arguments)
       prepare_for_launch(language, locale, launch_arguments)
 
-      add_media(device_types(:photo, launcher_config.add_photos)) if launcher_config.add_photos
-      add_media(device_types(:video, launcher_config.add_videos)) if launcher_config.add_videos
+      add_media(devices, :photo, launcher_config.add_photos) if launcher_config.add_photos
+      add_media(devices, :video, launcher_config.add_videos) if launcher_config.add_videos
 
       command = TestCommandGenerator.generate(
         devices: devices,
