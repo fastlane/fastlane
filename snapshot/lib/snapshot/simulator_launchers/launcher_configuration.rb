@@ -23,7 +23,7 @@ module Snapshot
 
     # xcode 9
     attr_accessor :concurrent_simulators
-    alias_method :concurrent_simulators?, :concurrent_simulators
+    alias concurrent_simulators? concurrent_simulators
 
     def initialize(snapshot_config: nil)
       @languages = snapshot_config[:languages]
