@@ -7,11 +7,7 @@ module Deliver
       find_folders(options)
       ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> Moved language verification into Deliver::DetectValues so it can use the real time language list from the iTC API
       verify_languages!(options)
     end
 
@@ -73,7 +69,6 @@ module Deliver
         options[:platform] = 'osx'
       end
     end
-<<<<<<< HEAD
 
     def verify_languages!(options)
       languages = options[:languages]
@@ -82,16 +77,6 @@ module Deliver
       all_languages = Spaceship::Tunes.client.available_languages
       diff = languages - all_languages
 
-=======
-    
-    def verify_languages!(options)
-      languages = options[:languages]
-      return unless languages
-      
-      all_languages = Spaceship::Tunes.client.available_languages
-      diff = languages - all_languages
-       
->>>>>>> Moved language verification into Deliver::DetectValues so it can use the real time language list from the iTC API
       unless diff.empty?
         UI.user_error!("The following languages are invalid and cannot be activated: #{diff.join(',')}\n\nValid languages are: #{all_languages}")
       end
