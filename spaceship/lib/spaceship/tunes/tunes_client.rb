@@ -872,12 +872,12 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, data)
+    def send_app_submission(app_id, version, data)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/version/submit/complete"
+        req.url "ra/apps/#{app_id}/versions/#{version}/submit/complete"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
