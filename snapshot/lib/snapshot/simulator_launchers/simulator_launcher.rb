@@ -64,11 +64,7 @@ module Snapshot
 
       execute(command: command, language: language, locale: locale, launch_args: launch_arguments, devices: devices)
 
-      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
-
-      dir_name = locale || language
-
-      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
+      return copy_screenshots(language: language, locale: locale, launch_args: launch_arguments)
     end
 
     def execute(command: nil, language: nil, locale: nil, launch_args: nil, devices: nil)
@@ -86,15 +82,22 @@ module Snapshot
                                              prefix: prefix_hash,
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
-                                                if return_code == 65
-                                                  UI.important("Tests failed while running on: #{devices.join(', ')}")
-                                                  UI.important("For more detail about the test failures, check the logs here:")
-                                                  UI.important(xcodebuild_log_path(language: language, locale: locale))
-                                                  UI.important("You can find the incomplete screenshots here:")
-                                                  UI.important(SCREENSHOTS_DIR)
-                                                  UI.important(launcher_config.output_directory)
-                                                end
-                                                ErrorHandler.handle_test_error(output, return_code)
+                                                self.collected_errors.concat(failed_devices.map do |device, messages|
+                                                  "#{device}: #{messages.join(', ')}"
+                                                end)
+
+                                                copy_screenshots(language: language, locale: locale, launch_args: launch_args)
+
+                                                UI.important("Tests failed while running on: #{devices.join(', ')}")
+                                                UI.important("For more detail about the test failures, check the logs here:")
+                                                UI.important(xcodebuild_log_path(language: language, locale: locale))
+                                                UI.important(" ")
+                                                UI.important("You can also find the test result data here:")
+                                                UI.important(test_results_path)
+                                                UI.important(" ")
+                                                UI.important("You can find the incomplete screenshots here:")
+                                                UI.important(SCREENSHOTS_DIR)
+                                                UI.important(launcher_config.output_directory)
 
                                                 # no exception raised... that means we need to retry
                                                 UI.error "Caught error... #{return_code}"
@@ -104,9 +107,39 @@ module Snapshot
                                                   launch_simultaneously(language, locale, launch_arguments)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...")
+                                                  UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
                                                 end
                                               end)
+    end
+
+    def copy_screenshots(language: nil, locale: nil, launch_args: nil)
+      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
+      dir_name = locale || language
+      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_args.first)
+    end
+
+    def test_results_path
+      derived_data_path = TestCommandGenerator.derived_data_path
+      return File.join(derived_data_path, 'Logs/Test')
+    end
+
+    # This method returns a hash of { device name => [failure messages] }
+    # {
+    #   'iPhone 7': [], # this empty array indicates success
+    #   'iPhone 7 Plus': ["No tests were executed"],
+    #   'iPad Air': ["Launch session expired", "Array out of bounds"]
+    # }
+    def failed_devices
+      test_summaries = Dir["#{test_summaries_path}/*_TestSummaries.plist"]
+      test_summaries.each_with_object({}) do |plist, hash|
+        summary = FastlaneCore::TestParser.new(plist)
+        name = summary.data[:run_destination_name]
+        if summary.data[:number_of_tests] == 0
+          hash[name] = ["No tests were executed"]
+        else
+          hash[name] = Array(summary.data[:failures]).map(&:failure_message)
+        end
+      end
     end
 
     def xcodebuild_log_path(language: nil, locale: nil)
