@@ -61,6 +61,16 @@ module Snapshot
         UI.header("#{device_type} - #{language}")
       end
 
+      execute(command: command, language: language, locale: locale, device_type: device_type, launch_args: launch_arguments)
+
+      raw_output = File.read(TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
+
+      dir_name = locale || language
+
+      return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
+    end
+
+    def execute(command: nil, language: nil, locale: nil, device_type: nil, launch_args: nil)
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -69,7 +79,6 @@ module Snapshot
           end
         }
       ]
-
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
@@ -89,12 +98,6 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
-
-      raw_output = File.read(TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
-
-      dir_name = locale || language
-
-      return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
     def open_simulator_for_device(device_name)

@@ -60,6 +60,18 @@ module Snapshot
         log_path: xcodebuild_log_path(language: language, locale: locale)
       )
 
+      UI.important("Running snapshot on: #{devices.join(', ')}")
+
+      execute(command: command, language: language, locale: locale, launch_args: launch_arguments)
+
+      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
+
+      dir_name = locale || language
+
+      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
+    end
+
+    def execute(command: nil, language: nil, locale: nil, launch_args: nil)
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -68,15 +80,19 @@ module Snapshot
           end
         }
       ]
-
-      UI.important("Running snapshot on: #{devices.join(', ')}")
-
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
                                              prefix: prefix_hash,
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
+                                                if return_code == 65
+                                                  UI.important("For more detail about the test failures, check the logs here:")
+                                                  UI.important(xcodebuild_log_path(language: language, locale: locale))
+                                                  UI.important("You can find the incomplete screenshots here:")
+                                                  UI.important(SCREENSHOTS_DIR)
+                                                  UI.important(launcher_config.output_directory)
+                                                end
                                                 ErrorHandler.handle_test_error(output, return_code)
 
                                                 # no exception raised... that means we need to retry
@@ -90,11 +106,6 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
-      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
-
-      dir_name = locale || language
-
-      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
     end
 
     def xcodebuild_log_path(language: nil, locale: nil)
