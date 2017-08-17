@@ -210,10 +210,7 @@ module Spaceship
         # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @param sub_platform (String) Used to create tvOS profiles at the moment. Value should equal 'tvOS' or nil.
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil)
-          raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
-          raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
-
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil) requires_params!(:bundle_id, :certificate)
           app = Spaceship::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
