@@ -43,6 +43,10 @@ module Spaceship
         ref[last] = value
       end
 
+      def delete(key)
+        @hash.delete(key)
+      end
+
       def lookup(keys)
         head, *tail = *keys
         if tail.empty?
@@ -59,9 +63,6 @@ module Spaceship
       def to_json(*a)
         h = @hash.dup
         h.delete(:application)
-        if h.key?(:version) && h[:version].kind_of?(Spaceship::Tunes::AppVersion)
-          h.delete(:version)
-        end
         h.to_json(*a)
       end
 
