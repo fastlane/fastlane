@@ -2,6 +2,9 @@ require 'snapshot/simulator_launchers/simulator_launcher_base'
 
 module Snapshot
   class SimulatorLauncher < SimulatorLauncherBase
+    # With Xcode 9's ability to run tests on multiple concurrent simulators,
+    # this method sets the maximum number of simulators to run simultaneously
+    # to avoid overloading your machine.
     def default_number_of_simultaneous_simulators
       cpu_count = CPUInspector.cpu_count
       if cpu_count <= 2
@@ -125,14 +128,14 @@ module Snapshot
         when /darwin10/
           (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
         when /linux/
-          `cat /proc/cpuinfo | grep processor | wc -l`.to_i
+          UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
         when /freebsd/
-          `sysctl -n hw.physicalcpu_max`.to_i
+          UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
         else
           if RbConfig::CONFIG['host_os'] =~ /darwin/
             (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
           else
-            raise 'unknown platform processor_count'
+            UI.crash!("Cannot find the machine's processor count.")
           end
         end
     end
