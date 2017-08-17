@@ -62,7 +62,7 @@ module Snapshot
 
       UI.important("Running snapshot on: #{devices.join(', ')}")
 
-      execute(command: command, language: language, locale: locale, launch_args: launch_arguments)
+      execute(command: command, language: language, locale: locale, launch_args: launch_arguments, devices: devices)
 
       raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
 
@@ -71,7 +71,7 @@ module Snapshot
       return Collector.fetch_screenshots(raw_output, dir_name, '', launch_arguments.first)
     end
 
-    def execute(command: nil, language: nil, locale: nil, launch_args: nil)
+    def execute(command: nil, language: nil, locale: nil, launch_args: nil, devices: nil)
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -87,6 +87,7 @@ module Snapshot
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 if return_code == 65
+                                                  UI.important("Tests failed while running on: #{devices.join(', ')}")
                                                   UI.important("For more detail about the test failures, check the logs here:")
                                                   UI.important(xcodebuild_log_path(language: language, locale: locale))
                                                   UI.important("You can find the incomplete screenshots here:")
