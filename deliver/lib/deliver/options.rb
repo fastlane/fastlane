@@ -310,16 +310,12 @@ module Deliver
                                      description: "Metadata: Localised marketing url",
                                      optional: true,
                                      is_string: false),
+        # The verify_block has been removed from here and verification now happens in Deliver::DetectValues
+        # Verification needed Spaceship::Tunes.client which required the Deliver::Runner to already by started
         FastlaneCore::ConfigItem.new(key: :languages,
                                      description: "Metadata: List of languages to activate",
                                      type: Array,
-                                     optional: true,
-                                     verify_block: proc do |languages|
-                                       diff = languages - FastlaneCore::Languages::ALL_LANGUAGES
-
-                                       unless diff.empty?
-                                         UI.user_error!("the following languages are not valid: #{diff.join(',')}")
-                                       end
+                                     optional: true
                                      end)
       ]
     end
