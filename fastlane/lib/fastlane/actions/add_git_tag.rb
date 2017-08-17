@@ -3,7 +3,8 @@ module Fastlane
     # Adds a git tag to the current commit
     class AddGitTagAction < Action
       def self.run(options)
-        lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].delete(' ') # no spaces allowed
+
+        lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].to_s.delete(' ') # no spaces allowed
 
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
         message = options[:message] || "#{tag} (fastlane)"
