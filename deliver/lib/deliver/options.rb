@@ -315,8 +315,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :languages,
                                      description: "Metadata: List of languages to activate",
                                      type: Array,
-                                     optional: true
-                                     end)
+                                     optional: true)
       ]
     end
   end
