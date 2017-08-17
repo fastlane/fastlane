@@ -130,7 +130,7 @@ module Snapshot
     #   'iPad Air': ["Launch session expired", "Array out of bounds"]
     # }
     def failed_devices
-      test_summaries = Dir["#{test_summaries_path}/*_TestSummaries.plist"]
+      test_summaries = Dir["#{test_results_path}/*_TestSummaries.plist"]
       test_summaries.each_with_object({}) do |plist, hash|
         summary = FastlaneCore::TestParser.new(plist)
         name = summary.data[:run_destination_name]
