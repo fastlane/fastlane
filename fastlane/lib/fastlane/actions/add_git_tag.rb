@@ -3,6 +3,7 @@ module Fastlane
     # Adds a git tag to the current commit
     class AddGitTagAction < Action
       def self.run(options)
+        # lane name in lane_context could be nil because you can just call $fastlane add_git_tag which has no context
         lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].to_s.delete(' ') # no spaces allowed
 
         tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}"
