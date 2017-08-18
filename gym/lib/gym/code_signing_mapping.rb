@@ -107,11 +107,11 @@ module Gym
       self.project_paths.each do |project_path|
         UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
 
-        # Storing bundle identifiers with duplicate profiles
-        # for informing user later on
-        bundle_identifiers_with_duplicates = []
-
         begin
+          # Storing bundle identifiers with duplicate profiles
+          # for informing user later on
+          bundle_identifiers_with_duplicates = []
+
           project = Xcodeproj::Project.open(project_path)
           project.targets.each do |target|
             target.build_configuration_list.build_configurations.each do |build_configuration|
@@ -121,15 +121,15 @@ module Gym
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
               provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
               provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
-              
+
               has_profile_specifier = provisioning_profile_specifier.to_s.length > 0
               has_profile_uuid = provisioning_profile_uuid.to_s.length > 0
-              
+
               # Stores bundle identifiers that have already been mapped to inform user
               if provisioning_profile_mapping[bundle_identifier] && (has_profile_specifier || has_profile_uuid)
                 bundle_identifiers_with_duplicates << bundle_identifier
               end
-              
+
               # Creates the mapping for a bundle identifier and profile specifier/uuid
               if has_profile_specifier
                 provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
@@ -137,10 +137,9 @@ module Gym
                 provisioning_profile_mapping[bundle_identifier] = provisioning_profile_uuid
               end
             end
-          end
-          
-          # Alerting user to explicitly specify a mapping it cannot be determined
-          unless bundle_identifiers_with_duplicates.empty?
+
+            # Alerting user to explicitly specify a mapping it cannot be determined
+            next if bundle_identifiers_with_duplicates.empty?
             UI.error("Couldn't automatically detect the provisioning profile mapping")
             UI.error("There were multiple profiles for bundle identifier(s): #{bundle_identifiers_with_duplicates.uniq.join(', ')}")
             UI.error("You need to provide an explicit mapping of what provisioning")
