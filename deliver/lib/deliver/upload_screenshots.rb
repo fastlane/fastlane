@@ -57,6 +57,8 @@ module Deliver
                                screenshot.language,
                                screenshot.device_type,
                                screenshot.is_messages?)
+          # Refresh app version to start clean again. See issue #9859
+          v = app.edit_version
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
