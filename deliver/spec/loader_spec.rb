@@ -16,8 +16,6 @@ describe Deliver::Loader do
     @languages[1..-1].each.with_index do |lang, index|
       FileUtils.mkdir(File.join(@root, (index.even? ? lang : lang.downcase)))
     end
-    # Create an unrelated dir
-    FileUtils.mkdir(File.join(@root, 'unrelated-dir'))
 
     @folders = Deliver::Loader.language_folders(@root)
     expect(@folders.size).not_to eq(0)

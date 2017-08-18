@@ -158,7 +158,7 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path], options[:skip_unsupported_languages]).each do |lng_folder|
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
         next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
 
       # Build a complete list of the required languages
@@ -289,8 +289,8 @@ module Deliver
       return if options[:skip_metadata]
 
       # Load localised data
-      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
-        language = File.basename(lang_folder)
+      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
+        language = File.basename(lng_folder)
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
           next unless File.exist?(path)

@@ -7,7 +7,7 @@ describe Deliver::UploadMetadata do
 
   describe '#load_from_filesystem' do
     context 'with review information' do
-      let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information, skip_unsupported_languages: false } }
+      let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
 
       def create_metadata(path, text)
         File.open(File.join(path), 'w') do |f|

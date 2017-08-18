@@ -68,10 +68,10 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options, options[:screenshots_path])
+      return collect_screenshots_for_languages(options[:screenshots_path])
     end
 
-    def collect_screenshots_for_languages(options, path)
+    def collect_screenshots_for_languages(path)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
@@ -79,11 +79,11 @@ module Deliver
         lang_hash[lang.downcase] = lang
       end
 
-      Loader.language_folders(path, options[:skip_unsupported_languages]).each do |lng_folder|
+      Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
         # Check to see if we need to traverse multiple platforms or just a single platform
         if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
-          screenshots.concat(collect_screenshots_for_languages(options, File.join(path, language)))
+          screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
           next
         end
 
