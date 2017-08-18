@@ -11,7 +11,7 @@ module Snapshot
     end
 
     def collected_errors
-      @collected_errors || []
+      @collected_errors ||= []
     end
 
     def current_number_of_retries_due_to_failing_simulator

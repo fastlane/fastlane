@@ -40,7 +40,7 @@ module Snapshot
 
       print_results(results)
 
-      UI.test_failure!(launcher.collected_errors.join('; ')) if launcher.collected_errors.count > 0
+      UI.test_failure!(launcher.collected_errors.uniq.join('; ')) if launcher.collected_errors.count > 0
 
       # Generate HTML report
       ReportsGenerator.new.generate

@@ -151,7 +151,8 @@ module Snapshot
         if summary.data.first[:number_of_tests] == 0
           hash[name] = ["No tests were executed"]
         else
-          hash[name] = Array(summary.data.first[:failures]).map(&:failure_message)
+          tests = Array(summary.data.first[:tests])
+          hash[name] = tests.map { |test| test[:failures].map { |failure| failure[:failure_message] } }.flatten
         end
       end
     end
