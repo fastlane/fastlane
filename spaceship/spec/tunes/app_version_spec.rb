@@ -636,6 +636,17 @@ describe Spaceship::AppVersion, all: true do
         TunesStubbing.itc_stub_valid_update
       end
 
+      def setup_handle_itc_potential_server_failure(nb_failures)
+        @times_called = 0
+        allow(client).to receive(:handle_itc_response) do |data|
+          @times_called += 1
+          raise Spaceship::TunesClient::ITunesConnectPotentialServerError, "simulated try again" if @times_called <= nb_failures
+          update_success_data
+        end
+        # arbitrary stub to prevent mock network failures. We override itc_response
+        TunesStubbing.itc_stub_valid_update
+      end
+
       it "retries when ITC is temporarily unable to save changes" do
         setup_handle_itc_response_failure(1)
 
@@ -643,13 +654,29 @@ describe Spaceship::AppVersion, all: true do
         expect(@times_called).to eq(2)
       end
 
+      it "retries when ITC throws an error and it might be a server issue" do
+        setup_handle_itc_potential_server_failure(1)
+
+        version.save!
+        expect(@times_called).to eq(2)
+      end
+
       it "retries a maximum number of times when ITC is temporarily unable to save changes" do
-        setup_handle_itc_response_failure(5)
+        setup_handle_itc_response_failure(6) # set to more than should happen
 
         expect do
           version.save!
         end.to raise_error(Spaceship::TunesClient::ITunesConnectTemporaryError)
         expect(@times_called).to eq(5)
+      end
+
+      it "retries a maximum number of times when ITC is not responding properly" do
+        setup_handle_itc_potential_server_failure(4) # set to more than should happen
+
+        expect do
+          version.save!
+        end.to raise_error(Spaceship::TunesClient::ITunesConnectPotentialServerError)
+        expect(@times_called).to eq(3)
       end
     end
 
