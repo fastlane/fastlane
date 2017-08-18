@@ -67,7 +67,7 @@ module Snapshot
       return copy_screenshots(language: language, locale: locale, launch_args: launch_arguments)
     end
 
-    def execute(command: nil, language: nil, locale: nil, launch_args: nil, devices: nil)
+    def execute(retries = 0, command: nil, language: nil, locale: nil, launch_args: nil, devices: nil)
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -86,30 +86,44 @@ module Snapshot
                                                   "#{device}: #{messages.join(', ')}"
                                                 end)
 
-                                                copy_screenshots(language: language, locale: locale, launch_args: launch_args)
-
-                                                UI.important("Tests failed while running on: #{devices.join(', ')}")
-                                                UI.important("For more detail about the test failures, check the logs here:")
-                                                UI.important(xcodebuild_log_path(language: language, locale: locale))
-                                                UI.important(" ")
-                                                UI.important("You can also find the test result data here:")
-                                                UI.important(test_results_path)
-                                                UI.important(" ")
-                                                UI.important("You can find the incomplete screenshots here:")
-                                                UI.important(SCREENSHOTS_DIR)
-                                                UI.important(launcher_config.output_directory)
+                                                cleanup_after_failure(devices, language, locale, launch_args, return_code)
 
                                                 # no exception raised... that means we need to retry
                                                 UI.error "Caught error... #{return_code}"
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
                                                 if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
+                                                  # If the return code is not 65, we should assume its a simulator failure and retry
                                                   launch_simultaneously(devices, language, locale, launch_args)
+                                                elsif retries < launcher_config.number_of_retries
+                                                  # If there are retries remaining, run the tests again
+                                                  retry_tests(retries, command, language, locale, launch_args, devices)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
                                                 end
                                               end)
+    end
+
+    def cleanup_after_failure(devices, language, locale, launch_args, return_code)
+      copy_screenshots(language: language, locale: locale, launch_args: launch_args)
+
+      UI.important("Tests failed while running on: #{devices.join(', ')}")
+      UI.important("For more detail about the test failures, check the logs here:")
+      UI.important(xcodebuild_log_path(language: language, locale: locale))
+      UI.important(" ")
+      UI.important("You can also find the test result data here:")
+      UI.important(test_results_path)
+      UI.important(" ")
+      UI.important("You can find the incomplete screenshots here:")
+      UI.important(SCREENSHOTS_DIR)
+      UI.important(launcher_config.output_directory)
+    end
+
+    def retry_tests(retries, command, language, locale, launch_args, devices)
+      UI.important("Retrying on devices: #{devices.join(', ')}")
+      UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+      execute(retries + 1, command: command, language: language, locale: locale, launch_args: launch_args, devices: devices)
     end
 
     def copy_screenshots(language: nil, locale: nil, launch_args: nil)
