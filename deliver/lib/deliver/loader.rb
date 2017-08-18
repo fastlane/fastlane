@@ -12,13 +12,13 @@ module Deliver
 
     def self.language_folders(root)
       folders = Dir.glob(File.join(root, '*'))
-      
-      unless Helper.is_test?
-        available_languages = Spaceship::Tunes.client.available_languages
-      else
+
+      if Helper.is_test?
         available_languages = FastlaneCore::Languages::ALL_LANGUAGES
+      else
+        available_languages = Spaceship::Tunes.client.available_languages.sort
       end
-      
+
       all_languages = (available_languages + [APPLE_TV_DIR_NAME, APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME]).map(&:downcase).freeze
 
       selected_folders = folders.select do |path|
