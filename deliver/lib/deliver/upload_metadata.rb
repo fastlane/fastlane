@@ -146,7 +146,7 @@ module Deliver
       normalize_language_keys(options)
 
       # Build a complete list of the required languages
-      enabled_languages = []
+      enabled_languages = detect_languages(options)
 
       # Get all languages used in existing settings
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
@@ -158,15 +158,11 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
-
-      # Build a complete list of the required languages
-      enabled_languages = detect_languages(options)
-        language = File.basename(lng_folder)
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
+        language = File.basename(lang_folder)
         enabled_languages << language unless enabled_languages.include?(language)
       end
-      enabled_languages.uniq!
 
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
@@ -289,8 +285,8 @@ module Deliver
       return if options[:skip_metadata]
 
       # Load localised data
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        language = File.basename(lng_folder)
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
           next unless File.exist?(path)
