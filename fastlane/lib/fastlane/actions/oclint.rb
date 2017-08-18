@@ -31,6 +31,8 @@ module Fastlane
         end
 
         select_regex = params[:select_regex] if params[:select_regex] # Overwrite deprecated select_reqex
+        select_regex = ensure_regex_is_not_string!(select_regex)
+
         exclude_regex = params[:exclude_regex]
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
@@ -88,6 +90,22 @@ module Fastlane
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)
 
         return Action.sh(command)
+      end
+
+      # return a proper regex object if regex string is single-quoted
+      def self.ensure_regex_is_not_string!(regex)
+        unless regex.nil?
+          if regex.kind_of?(String)
+            safer_eval = Thread.new do
+              $SAFE = 4
+              # rubocop:disable Security/Eval
+              eval(regex)
+              # rubocop:enable Security/Eval
+            end
+            regex = safer_eval.value
+          end
+        end
+        return regex
       end
 
       #####################################################
