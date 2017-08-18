@@ -114,9 +114,9 @@ module Gym
               current = build_configuration.build_settings
               next if test_target?(current)
 
-              bundle_identifier = current["PRODUCT_BUNDLE_IDENTIFIER"]
-              provisioning_profile_specifier = current["PROVISIONING_PROFILE_SPECIFIER"]
-              provisioning_profile_uuid = current["PROVISIONING_PROFILE"]
+              bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
+              provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
+              provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
               if provisioning_profile_specifier.to_s.length > 0
                 provisioning_profile_mapping[bundle_identifier] = provisioning_profile_specifier
               elsif provisioning_profile_uuid.to_s.length > 0
