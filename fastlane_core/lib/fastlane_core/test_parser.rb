@@ -1,4 +1,4 @@
-module Snapshot
+module FastlaneCore
   class TestParser
     attr_accessor :data
 
@@ -138,7 +138,7 @@ module Snapshot
         summary_row[:number_of_failures] = summary_row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
         summary_row
       end
-      self.data[:run_destination_name] = self.raw_json["RunDestination"]["Name"]
+      self.data.first[:run_destination_name] = self.raw_json["RunDestination"]["Name"]
       return self.data
     end
   end

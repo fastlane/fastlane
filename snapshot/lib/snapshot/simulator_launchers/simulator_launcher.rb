@@ -103,8 +103,8 @@ module Snapshot
                                                 UI.error "Caught error... #{return_code}"
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
-                                                if self.current_number_of_retries_due_to_failing_simulator < 20
-                                                  launch_simultaneously(language, locale, launch_arguments)
+                                                if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
+                                                  launch_simultaneously(devices, language, locale, launch_args)
                                                 else
                                                   # It's important to raise an error, as we don't want to collect the screenshots
                                                   UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
@@ -133,11 +133,11 @@ module Snapshot
       test_summaries = Dir["#{test_results_path}/*_TestSummaries.plist"]
       test_summaries.each_with_object({}) do |plist, hash|
         summary = FastlaneCore::TestParser.new(plist)
-        name = summary.data[:run_destination_name]
-        if summary.data[:number_of_tests] == 0
+        name = summary.data.first[:run_destination_name]
+        if summary.data.first[:number_of_tests] == 0
           hash[name] = ["No tests were executed"]
         else
-          hash[name] = Array(summary.data[:failures]).map(&:failure_message)
+          hash[name] = Array(summary.data.first[:failures]).map(&:failure_message)
         end
       end
     end
