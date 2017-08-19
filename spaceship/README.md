@@ -167,23 +167,23 @@ Overview of the used API endpoints
 
 - `https://idmsa.apple.com`: Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
- - Get a list of all available provisioning profiles
- - Register new devices
+  - Get a list of all available provisioning profiles
+  - Register new devices
 - `https://developer.apple.com`:
- - List all devices, certificates, apps and app groups
- - Create new certificates, provisioning profiles and apps
- - Disable/enable services on apps and assign them to app groups
- - Delete certificates and apps
- - Repair provisioning profiles
- - Download provisioning profiles
- - Team selection
+  - List all devices, certificates, apps and app groups
+  - Create new certificates, provisioning profiles and apps
+  - Disable/enable services on apps and assign them to app groups
+  - Delete certificates and apps
+  - Repair provisioning profiles
+  - Download provisioning profiles
+  - Team selection
 - `https://itunesconnect.apple.com`:
- - Managing apps
- - Managing beta testers
- - Submitting updates to review
- - Managing app metadata
+  - Managing apps
+  - Managing beta testers
+  - Submitting updates to review
+  - Managing app metadata
 - `https://du-itc.itunesconnect.apple.com`:
- - Upload icons, screenshots, trailers ...
+  - Upload icons, screenshots, trailers ...
 
 `spaceship` uses all those API points to offer this seamless experience.
 
