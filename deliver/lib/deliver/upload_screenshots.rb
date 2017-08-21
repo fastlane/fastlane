@@ -81,7 +81,7 @@ module Deliver
 
       Loader.language_folders(path).each do |lng_folder|
         language = File.basename(lng_folder)
-        
+
         # Check to see if we need to traverse multiple platforms or just a single platform
         if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
           screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
