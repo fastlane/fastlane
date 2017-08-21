@@ -95,15 +95,14 @@ module Snapshot
     end
 
     def version_of_bundled_helper
-      current_version = ""
       asset_path = self.class.path_to_helper_file_from_gem
       regex_to_use = Helper.xcode_at_least?("9.0") ? /\n.*SnapshotHelperVersion \[.+\]/ : /\n.*SnapshotHelperXcode8Version \[.+\]/
 
       bundled_helper = File.read(asset_path)
       current_version = bundled_helper.match(regex_to_use)[0]
 
-      ## Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
-      current_version.gsub(%r{^//\w*}, '').strip
+      # Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
+      return current_version.gsub(%r{^//\w*}, '').strip
     end
 
     # rubocop:disable Style/Next

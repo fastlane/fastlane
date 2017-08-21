@@ -129,8 +129,8 @@ open class Snapshot: NSObject {
 
     class func pathPrefix() -> URL? {
         let homeDir: URL
-        //on OSX config is stored in /Users/<username>/Library
-        //and on iOS/tvOS/WatchOS it's in simulator's home dir
+        // on OSX config is stored in /Users/<username>/Library
+        // and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
             guard let user = ProcessInfo().environment["USER"] else {
                 print("Couldn't find Snapshot configuration files - can't detect current user ")

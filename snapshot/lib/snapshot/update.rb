@@ -21,7 +21,7 @@ module Snapshot
       paths.each do |path|
         UI.message "Updating '#{path}'..."
         input_path = Snapshot::Runner.path_to_helper_file_from_gem
-        File.write(path, File.read(input_path)) #File.read("#{Snapshot::ROOT}/lib/assets/SnapshotHelper.swift"))
+        File.write(path, File.read(input_path)) # File.read("#{Snapshot::ROOT}/lib/assets/SnapshotHelper.swift"))
       end
 
       UI.success "Successfully updated helper files"
