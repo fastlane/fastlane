@@ -339,20 +339,6 @@ module Deliver
       options
     end
 
-    # Normalizes languages keys from symbols to strings
-    def normalize_language_keys(options)
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-
-        current.keys.each do |language|
-          current[language.to_s] = current.delete(language)
-        end
-      end
-
-      options
-    end
-
     def set_trade_representative_contact_information(v, options)
       return unless options[:trade_representative_contact_information]
       info = options[:trade_representative_contact_information]
