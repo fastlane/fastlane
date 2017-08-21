@@ -102,10 +102,12 @@ module Gym
     end
 
     def detect_project_profile_mapping
-      provisioning_profile_mapping = {}
+      provisioning_profile_mapping = {}  
+      specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
 
       self.project_paths.each do |project_path|
         UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
+        UI.verbose("Finding provision profiles for '#{specified_configuration}'") if specified_configuration
 
         begin
           # Storing bundle identifiers with duplicate profiles
@@ -117,6 +119,7 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
+              next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
               provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
