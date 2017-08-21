@@ -102,7 +102,7 @@ module Gym
     end
 
     def detect_project_profile_mapping
-      provisioning_profile_mapping = {}  
+      provisioning_profile_mapping = {}
       specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
 
       self.project_paths.each do |project_path|
