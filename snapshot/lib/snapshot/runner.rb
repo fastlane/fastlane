@@ -88,10 +88,10 @@ module Snapshot
 
       current_version = ""
       if Helper.xcode_at_least?("9.0")
-        bundled_helper = File.read File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
+        bundled_helper = File.read(File.expand_path('../assets/SnapshotHelper.swift', runner_dir))
         current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
       else
-        bundled_helper = File.read File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir)
+        bundled_helper = File.read(File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir))
         current_version = bundled_helper.match(/\n.*SnapshotHelperXcode8Version \[.+\]/)[0]
       end
 
