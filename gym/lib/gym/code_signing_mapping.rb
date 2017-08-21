@@ -17,6 +17,9 @@ module Gym
       final_mapping = (primary_mapping || {}).dup # for verbose output at the end of the method
       secondary_mapping ||= self.detect_project_profile_mapping # default to Xcode project
 
+      final_mapping = Hash[final_mapping.map{|k,v| [k.to_sym, v] }]
+      secondary_mapping = Hash[secondary_mapping.map{|k,v| [k.to_sym, v] }]
+
       # Now it's time to merge the (potentially) existing mapping
       #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
       # with the secondary hash we just created (or was provided as parameter).
@@ -33,7 +36,6 @@ module Gym
       #     3.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
       #
       # To get a better sense of this, check out code_signing_spec.rb for some test cases
-
       secondary_mapping.each do |bundle_identifier, provisioning_profile|
         if final_mapping[bundle_identifier].nil?
           final_mapping[bundle_identifier] = provisioning_profile

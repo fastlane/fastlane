@@ -62,7 +62,7 @@ describe Gym::CodeSigningMapping do
                                        secondary_mapping: { "identifier.1" => "value.1" },
                                            export_method: "app-store")
 
-      expect(result).to eq({ "identifier.1" => "value.1" })
+      expect(result).to eq({ :"identifier.1" => "value.1" })
     end
 
     it "only mapping from match (user) is available" do
@@ -70,7 +70,7 @@ describe Gym::CodeSigningMapping do
                                        secondary_mapping: {},
                                            export_method: "app-store")
 
-      expect(result).to eq({ "identifier.1" => "value.1" })
+      expect(result).to eq({ :"identifier.1" => "value.1" })
     end
 
     it "keeps both profiles if they don't conflict" do
@@ -78,7 +78,7 @@ describe Gym::CodeSigningMapping do
                                        secondary_mapping: { "identifier.2" => "value.2" },
                                            export_method: "app-store")
 
-      expect(result).to eq({ "identifier.1" => "value.1", "identifier.2" => "value.2" })
+      expect(result).to eq({ :"identifier.1" => "value.1", :"identifier.2" => "value.2" })
     end
 
     it "doesn't crash if nil is provided" do
@@ -92,7 +92,7 @@ describe Gym::CodeSigningMapping do
       expect(csm).to receive(:detect_project_profile_mapping).and_return({ "identifier.1" => "value.1" })
       result = csm.merge_profile_mapping(primary_mapping: {}, export_method: "app-store")
 
-      expect(result).to eq({ "identifier.1" => "value.1" })
+      expect(result).to eq({ :"identifier.1" => "value.1" })
     end
 
     describe "handle conflicts" do
@@ -101,23 +101,23 @@ describe Gym::CodeSigningMapping do
                                        secondary_mapping: { "identifier.1" => "Ap-pStoreValue1" },
                                            export_method: "app-store")
 
-        expect(result).to eq({ "identifier.1" => "Ap-pStoreValue2" })
+        expect(result).to eq({ :"identifier.1" => "Ap-pStoreValue2" })
       end
 
-      it "Both primary and secondary are available, and and the secondary is the only one that matches the export type" do
+      it "Both primary and secondary are available, and the secondary is the only one that matches the export type" do
         result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
                                        secondary_mapping: { "identifier.1" => "Ad-HocValue" },
                                            export_method: "app-store")
 
-        expect(result).to eq({ "identifier.1" => "Ap-p StoreValue1" })
+        expect(result).to eq({ :"identifier.1" => "Ap-p StoreValue1" })
       end
 
-      it "Both primary and secondary are available, and and the seocndary is the only one that matches the export type" do
+      it "Both primary and secondary are available, and the seocndary is the only one that matches the export type" do
         result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
                                        secondary_mapping: { "identifier.1" => "Ad-HocValue" },
                                            export_method: "ad-hoc")
 
-        expect(result).to eq({ "identifier.1" => "Ad-HocValue" })
+        expect(result).to eq({ :"identifier.1" => "Ad-HocValue" })
       end
 
       it "both primary and secondary are available, and neither of them match the export type, it should choose the secondary_mapping" do
@@ -125,9 +125,46 @@ describe Gym::CodeSigningMapping do
                                        secondary_mapping: { "identifier.1" => "Adhoc" },
                                            export_method: "development")
 
-        expect(result).to eq({ "identifier.1" => "Adhoc" })
+        expect(result).to eq({ :"identifier.1" => "Adhoc" })
+      end
+
+      context "when both primary and secondary are available and same value" do
+        let(:result) do
+          csm.merge_profile_mapping(primary_mapping: { primary_key => "AppStore" },
+                                    secondary_mapping: { secondary_key => "AppStore" },
+                                    export_method: "development")
+        end
+        context "when primary's key is symbol and secondary's key is also symbol" do
+          let(:primary_key) { :"identifier.1" }
+          let(:secondary_key) { :"identifier.1" }
+          it "is merged correctly" do
+            expect(result).to eq({ :"identifier.1" => "AppStore" })
+          end
+        end
+        context "when primary's key is symbol and secondary's key is string" do
+          let(:primary_key) { :"identifier.1" }
+          let(:secondary_key) { "identifier.1" }
+          it "is merged correctly" do
+            expect(result).to eq({ :"identifier.1" => "AppStore" })
+          end
+        end
+        context "when primary's key is string and secondary's key is also string" do
+          let(:primary_key) { "identifier.1" }
+          let(:secondary_key) { "identifier.1" }
+            it "is merged correctly" do
+              expect(result).to eq({ :"identifier.1" => "AppStore" })
+          end
+        end
+        context "when primary's key is string and secondary's key is also symbol" do
+          let(:primary_key) { "identifier.1" }
+          let(:secondary_key) { :"identifier.1" }
+          it "is merged correctly" do
+            expect(result).to eq({ :"identifier.1" => "AppStore" })
+          end
+        end
       end
     end
+
     describe "#test_target?" do
       let(:csm) { Gym::CodeSigningMapping.new(project: nil) }
       context "when build_setting include TEST_TARGET_NAME" do
