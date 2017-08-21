@@ -264,12 +264,6 @@ module Deliver
         lang == "default"
       end.uniq
 
-      # Reject "default" language from getting enabled
-      # because "default" is not an iTC language
-      enabled_languages = enabled_languages.reject do |lang|
-        lang == "default"
-      end.uniq
-
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
         lng_text = "language"
