@@ -5,7 +5,7 @@ module Snapshot
       snapfile_path = File.join(path, 'Snapfile')
 
       if File.exist?(snapfile_path)
-        UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'snapshot' to use snapshot.")
+        UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'fastlane snapshot' to generate screenshots.")
       end
 
       File.write(snapfile_path, File.read("#{Snapshot::ROOT}/lib/assets/SnapfileTemplate"))
