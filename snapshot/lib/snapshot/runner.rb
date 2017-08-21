@@ -83,17 +83,24 @@ module Snapshot
       end
     end
 
-    def version_of_bundled_helper
+    # Depending on the Xcode version, the return value is different
+    def self.path_to_helper_file_from_gem
       runner_dir = File.dirname(__FILE__)
 
-      current_version = ""
       if Helper.xcode_at_least?("9.0")
-        bundled_helper = File.read(File.expand_path('../assets/SnapshotHelper.swift', runner_dir))
-        current_version = bundled_helper.match(/\n.*SnapshotHelperVersion \[.+\]/)[0]
+        return File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
       else
-        bundled_helper = File.read(File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir))
-        current_version = bundled_helper.match(/\n.*SnapshotHelperXcode8Version \[.+\]/)[0]
+        return File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir)
       end
+    end
+
+    def version_of_bundled_helper
+      current_version = ""
+      asset_path = self.class.path_to_helper_file_from_gem
+      regex_to_use = Helper.xcode_at_least?("9.0") ? /\n.*SnapshotHelperVersion \[.+\]/ : /\n.*SnapshotHelperXcode8Version \[.+\]/
+
+      bundled_helper = File.read(asset_path)
+      current_version = bundled_helper.match(regex_to_use)[0]
 
       ## Something like "// SnapshotHelperVersion [1.2]", but be relaxed about whitespace
       current_version.gsub(%r{^//\w*}, '').strip
