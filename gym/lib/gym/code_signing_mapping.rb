@@ -36,6 +36,7 @@ module Gym
       #     3.3) If none has the right export_method, we'll use whatever is defined in the Xcode project
       #
       # To get a better sense of this, check out code_signing_spec.rb for some test cases
+
       secondary_mapping.each do |bundle_identifier, provisioning_profile|
         if final_mapping[bundle_identifier].nil?
           final_mapping[bundle_identifier] = provisioning_profile

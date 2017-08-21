@@ -151,8 +151,8 @@ describe Gym::CodeSigningMapping do
         context "when primary's key is string and secondary's key is also string" do
           let(:primary_key) { "identifier.1" }
           let(:secondary_key) { "identifier.1" }
-            it "is merged correctly" do
-              expect(result).to eq({ :"identifier.1" => "AppStore" })
+          it "is merged correctly" do
+            expect(result).to eq({ :"identifier.1" => "AppStore" })
           end
         end
         context "when primary's key is string and secondary's key is also symbol" do
