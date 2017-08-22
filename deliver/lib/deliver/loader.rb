@@ -7,7 +7,7 @@ module Deliver
     APPLE_TV_DIR_NAME = "appleTV".freeze
     IMESSAGE_DIR_NAME = "iMessage".freeze
     DEFAULT_DIR_NAME = "default".freeze
-    
+
     SPECIAL_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME].freeze
 
     EXCEPTION_DIRECTORIES = UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase).freeze
