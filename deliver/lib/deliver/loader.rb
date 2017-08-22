@@ -35,7 +35,7 @@ module Deliver
 
       unless rejected_folders.empty?
         rejected_folders = rejected_folders.map { |path| File.basename(path) }
-        UI.user_error! "Unsupport directory name(s) for screenshots/metadata: #{rejected_folders.join(', ')}\n\nValid languages are: #{allowed_directory_names}"
+        UI.user_error! "Unsupport directory name(s) for screenshots/metadata: #{rejected_folders.join(', ')}\n\nValid directory names are: #{allowed_directory_names}"
       end
 
       selected_folders

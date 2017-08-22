@@ -40,6 +40,6 @@ describe Deliver::Loader do
     FileUtils.mkdir(File.join(@root, 'unrelated-dir'))
     expect do
       @folders = Deliver::Loader.language_folders(@root)
-    end.to raise_error FastlaneCore::Interface::FastlaneError, "Unsupport directory name(s) for screenshots/metadata: unrelated-dir\n\nValid languages are: #{allowed_directory_names}"
+    end.to raise_error FastlaneCore::Interface::FastlaneError, "Unsupport directory name(s) for screenshots/metadata: unrelated-dir\n\nValid directory names are: #{allowed_directory_names}"
   end
 end
