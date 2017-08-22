@@ -94,12 +94,9 @@ module Fastlane
 
       # return a proper regex object if regex string is single-quoted
       def self.ensure_regex_is_not_string!(regex)
-        unless regex.nil?
-          if regex.kind_of?(String)
-            regex = Regexp.new(regex)
-          end
-        end
-        return regex
+        return regex unless regex.kind_of?(String)
+
+        Regexp.new(regex)
       end
 
       #####################################################
