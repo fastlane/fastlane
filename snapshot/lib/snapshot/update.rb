@@ -3,7 +3,7 @@ module Snapshot
   class Update
     # @return [Array] A list of helper files (usually just one)
     def self.find_helper
-      Dir["./**/SnapshotHelper.swift"]
+      Dir["./**/SnapshotHelper.swift"] + Dir["./**/SnapshotHelperXcode8.swift"]
     end
 
     def update
@@ -22,7 +22,7 @@ module Snapshot
       paths.each do |path|
         UI.message "Updating '#{path}'..."
         input_path = Snapshot::Runner.path_to_helper_file_from_gem
-        File.write(path, File.read(input_path)) # File.read("#{Snapshot::ROOT}/lib/assets/SnapshotHelper.swift"))
+        File.write(path, File.read(input_path))
       end
 
       UI.success "Successfully updated helper files"
