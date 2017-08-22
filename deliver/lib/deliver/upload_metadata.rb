@@ -211,33 +211,6 @@ module Deliver
         .uniq
     end
 
-    def detect_languages(options)
-      # Build a complete list of the required languages
-      enabled_languages = options[:languages] || []
-
-      # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-
-      # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
-      end
-
-      # Mapping to strings because :default symbol can be passed in
-      enabled_languages
-        .map(&:to_s)
-        .uniq
-    end
-
     # Makes sure all languages we need are actually created
     def verify_available_languages!(options)
       return if options[:skip_metadata]
