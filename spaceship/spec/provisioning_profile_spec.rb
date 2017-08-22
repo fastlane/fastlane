@@ -66,7 +66,7 @@ describe Spaceship::ProvisioningProfile do
       expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
       expect(client).not_to receive(:provisioning_profiles)
       expect(client).not_to receive(:provisioning_profile_details)
-      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
 
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
@@ -74,19 +74,27 @@ describe Spaceship::ProvisioningProfile do
       expect(client).not_to receive(:provisioning_profiles_via_xcode_api)
       expect(client).to receive(:provisioning_profiles).and_call_original
       expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(6).times
-      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
   end
 
   describe '#find_by_bundle_id' do
     it "returns [] if there are no profiles" do
-      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("notExistent")
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "notExistent")
       expect(profiles).to eq([])
     end
 
-    it "returns the profile in an array if matching" do
-      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.1")
-      expect(profiles.count).to eq(6)
+    it "returns the profile in an array if matching for ios" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "net.sunapps.1")
+      expect(profiles.count).to eq(5)
+
+      expect(profiles.first.app.bundle_id).to eq('net.sunapps.1')
+      expect(profiles.first.distribution_method).to eq('store')
+    end
+
+    it "returns the profile in an array if matching for tvos" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "net.sunapps.1", sub_platform: 'tvOS')
+      expect(profiles.count).to eq(1)
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.1')
       expect(profiles.first.distribution_method).to eq('store')
