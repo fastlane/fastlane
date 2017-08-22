@@ -8,6 +8,7 @@ module Snapshot
 
     def update
       paths = self.class.find_helper
+      UI.user_error!("Couldn't find any SnapshotHelper files in current directory") if paths.count == 0
 
       UI.message "Found the following SnapshotHelper:"
       paths.each { |p| UI.message "\t#{p}" }
