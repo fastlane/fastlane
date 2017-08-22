@@ -7,6 +7,8 @@ module Deliver
     APPLE_TV_DIR_NAME = "appleTV".freeze
     IMESSAGE_DIR_NAME = "iMessage".freeze
     DEFAULT_DIR_NAME = "default".freeze
+    
+    SPECIAL_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME].freeze
 
     EXCEPTION_DIRECTORIES = UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase).freeze
 
@@ -19,7 +21,7 @@ module Deliver
         available_languages = Spaceship::Tunes.client.available_languages.sort
       end
 
-      all_languages = (available_languages + [APPLE_TV_DIR_NAME, APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME]).map(&:downcase).freeze
+      all_languages = (available_languages + SPECIAL_DIR_NAMES).map(&:downcase).freeze
 
       selected_folders = folders.select do |path|
         File.directory?(path) && all_languages.include?(File.basename(path).downcase)
