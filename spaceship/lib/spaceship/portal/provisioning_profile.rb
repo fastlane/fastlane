@@ -316,9 +316,12 @@ module Spaceship
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id(bundle_id, mac: false)
+        def find_by_bundle_id(bundle_id: nil, mac: false, sub_platform: nil)
+          raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          find_tvos_profiles = sub_platform == 'tvOS'
           all(mac: mac).find_all do |profile|
-            profile.app.bundle_id == bundle_id
+            profile.app.bundle_id == bundle_id && profile.tvos? == find_tvos_profiles
           end
         end
       end
