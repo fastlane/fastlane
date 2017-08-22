@@ -67,7 +67,14 @@ module Pilot
         # If no groups are passed to options, remove the tester from the app-level,
         # otherwise remove the tester from the groups specified.
         if config[:groups].nil? && tester.kind_of?(Spaceship::Tunes::Tester::External)
-          test_flight_tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: tester.email)
+          test_flight_testers = Spaceship::TestFlight::Tester.search(app_id: app.apple_id, text: tester.email, is_email_exact_match: true)
+
+          if test_flight_testers.length > 1
+            UI.user_error!("Could not remove #{tester.email} from app: #{app.name}, reason: too many matches: #{test_flight_testers}")
+          elsif test_flight_testers.length == 0
+            UI.user_error!("Could not remove #{tester.email} from app: #{app.name}, reason: unable to find tester on app")
+          end
+          test_flight_tester = test_flight_testers.first
           test_flight_tester.remove_from_app!(app_id: app.apple_id)
           UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app.name}")
         else

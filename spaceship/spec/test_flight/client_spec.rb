@@ -134,6 +134,14 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  context '#search_for_tester_in_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
+      subject.search_for_tester_in_app(app_id: app_id, text: "fake+tester+text")
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers?order=asc&search=fake%2Btester%2Btext&sort=status')
+    end
+  end
+
   context '#delete_tester_from_app' do
     it 'executes the request' do
       MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers/fake-tester-id') {}
