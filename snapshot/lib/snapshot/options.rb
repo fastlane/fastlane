@@ -181,6 +181,11 @@ module Snapshot
                                      env_name: "SNAPSHOT_NAMESPACE_LOG_FILES",
                                      description: "Separate the log files per device and per language",
                                      optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :concurrent_simulators,
+                                     env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
+                                     description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
+                                     default_value: true,
                                      is_string: false)
       ]
     end

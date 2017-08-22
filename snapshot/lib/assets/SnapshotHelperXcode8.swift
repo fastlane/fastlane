@@ -1,5 +1,5 @@
 //
-//  SnapshotHelper.swift
+//  SnapshotHelperXcode8.swift
 //  Example
 //
 //  Created by Felix Krause on 10/8/15.
@@ -7,10 +7,10 @@
 //
 
 // -----------------------------------------------------
-// IMPORTANT: When modifying this file, make sure to
+// IMPORTANT: When modifying this file, make sure to 
 //            increment the version number at the very
 //            bottom of the file to notify users about
-//            the new SnapshotHelper.swift
+//            the new SnapshotHelperXcode8.swift
 // -----------------------------------------------------
 
 import Foundation
@@ -32,48 +32,20 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
-enum SnapshotError: Error, CustomDebugStringConvertible {
-    case cannotDetectUser
-    case cannotFindHomeDirectory
-    case cannotFindSimulatorHomeDirectory
-    case cannotAccessSimulatorHomeDirectory(String)
-    
-    var debugDescription: String {
-        switch self {
-        case .cannotDetectUser:
-            return "Couldn't find Snapshot configuration files - can't detect current user "
-        case .cannotFindHomeDirectory:
-            return "Couldn't find Snapshot configuration files - can't detect `Users` dir"
-        case .cannotFindSimulatorHomeDirectory:
-            return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
-        case .cannotAccessSimulatorHomeDirectory(let simulatorHostHome):
-            return "Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?"
-        }
-    }
-}
-
 open class Snapshot: NSObject {
-    static var app: XCUIApplication!
-    static var cacheDirectory: URL!
-    static var screenshotsDirectory: URL? {
-        return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
-    }
 
     open class func setupSnapshot(_ app: XCUIApplication) {
-        do {
-            let cacheDir = try pathPrefix()
-            Snapshot.cacheDirectory = cacheDir
-            Snapshot.app = app
-            setLanguage(app)
-            setLocale(app)
-            setLaunchArguments(app)
-        } catch let error {
-            print(error)
-        }
+        setLanguage(app)
+        setLocale(app)
+        setLaunchArguments(app)
     }
 
     class func setLanguage(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("language.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("language.txt")
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
@@ -85,7 +57,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLocale(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("locale.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("locale.txt")
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
@@ -100,7 +76,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLaunchArguments(_ app: XCUIApplication) {
-        let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
+        guard let prefix = pathPrefix() else {
+            return
+        }
+
+        let path = prefix.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
         do {
@@ -125,18 +105,12 @@ open class Snapshot: NSObject {
 
         sleep(1) // Waiting for the animation to be finished (kind of)
 
-        #if os(OSX)
+        #if os(tvOS)
+            XCUIApplication().childrenMatchingType(.Browser).count
+        #elseif os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
-            let screenshot = app.windows.firstMatch.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
-            let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
-            do {
-                try screenshot.pngRepresentation.write(to: path)
-            } catch let error {
-                print("Problem writing screenshot: \(name) to \(path)")
-                print(error)
-            }
+            XCUIDevice.shared().orientation = .unknown
         #endif
     }
 
@@ -153,26 +127,30 @@ open class Snapshot: NSObject {
         }
     }
 
-    class func pathPrefix() throws -> URL? {
+    class func pathPrefix() -> URL? {
         let homeDir: URL
         // on OSX config is stored in /Users/<username>/Library
         // and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
             guard let user = ProcessInfo().environment["USER"] else {
-                throw SnapshotError.cannotDetectUser
+                print("Couldn't find Snapshot configuration files - can't detect current user ")
+                return nil
             }
 
             guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
-                throw SnapshotError.cannotFindHomeDirectory
+                print("Couldn't find Snapshot configuration files - can't detect `Users` dir")
+                return nil
             }
 
             homeDir = usersDir.appendingPathComponent(user)
         #else
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
-                throw SnapshotError.cannotFindSimulatorHomeDirectory
+                print("Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable.")
+                return nil
             }
             guard let homeDirUrl = URL(string: simulatorHostHome) else {
-                throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
+                print("Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?")
+                return nil
             }
             homeDir = URL(fileURLWithPath: homeDirUrl.path)
         #endif
@@ -192,4 +170,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.5]
+// SnapshotHelperXcode8Version [1.4]
