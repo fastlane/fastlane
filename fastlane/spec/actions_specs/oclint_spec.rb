@@ -95,7 +95,7 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
-              select_regex: '/AppDelegate/'
+              select_regex: \"\/AppDelegate\"
             )
           end").runner.execute(:test)
 

@@ -96,9 +96,7 @@ module Fastlane
       def self.ensure_regex_is_not_string!(regex)
         unless regex.nil?
           if regex.kind_of?(String)
-            # rubocop:disable Security/Eval
-            regex = eval(regex)
-            # rubocop:enable Security/Eval
+            regex = Regexp.new(regex)
           end
         end
         return regex
