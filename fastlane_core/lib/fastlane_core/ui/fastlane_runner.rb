@@ -125,7 +125,7 @@ module Commander
     end
 
     def rescue_file_error(e)
-      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
+      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stack trace
       puts ""
       FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
       FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
