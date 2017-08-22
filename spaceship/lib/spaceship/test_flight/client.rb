@@ -112,6 +112,14 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def search_for_tester_in_app(app_id: nil, text: nil)
+      assert_required_params(__method__, binding)
+      text = CGI.escape(text)
+      url = "providers/#{team_id}/apps/#{app_id}/testers?order=asc&search=#{text}&sort=status"
+      response = request(:get, url)
+      handle_response(response)
+    end
+
     def resend_invite_to_external_tester(app_id: nil, tester_id: nil)
       assert_required_params(__method__, binding)
       url = "/testflight/v1/invites/#{app_id}/resend?testerId=#{tester_id}"

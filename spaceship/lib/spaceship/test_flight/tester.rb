@@ -20,11 +20,13 @@ module Spaceship::TestFlight
       client.testers_for_app(app_id: app_id).map { |data| self.new(data) }
     end
 
-    # @return (Spaceship::TestFlight::Tester) Returns the tester matching the parameter
-    #   as either the Tester id or email
-    # @param email (String) (required): Value used to filter the tester, case insensitive
-    def self.find(app_id: nil, email: nil)
-      self.all(app_id: app_id).find { |tester| tester.email == email }
+    # @return (Spaceship::TestFlight::Tester) Returns the testers matching the parameter.
+    # ITC searchs all fields, and is full text. The search results are the union of all words in the search text
+    # @param text (String) (required): Value used to filter the tester, case insensitive
+    def self.search(app_id: nil, text: nil)
+      testers_matching_email = client.search_for_tester_in_app(app_id: app_id, text: text).map { |data| self.new(data) }
+      testers_matching_email ||= []
+      return testers_matching_email
     end
 
     def self.create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
