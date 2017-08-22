@@ -79,7 +79,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
-- Take screenshots in multiple simulators concurrently to cut down execution time (Xcode 9 only)
+- Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
