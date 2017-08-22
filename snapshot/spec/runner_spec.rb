@@ -21,15 +21,6 @@ describe Snapshot do
     end
 
     describe 'Decides on the number of sims to launch when simultaneously snapshotting' do
-      it 'finds that the # of CPUs -1 is the number of sims to launch' do
-        snapshot_config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {})
-        launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
-
-        sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
-        expect(sims).to eq(Snapshot::CPUInspector.cpu_count - 1)
-        expect(sims >= 1).to be(true)
-      end
-
       it 'returns 1 if CPUs is 1' do
         snapshot_config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {})
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
@@ -46,6 +37,15 @@ describe Snapshot do
 
         sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
         expect(sims).to eq(2)
+      end
+
+      it 'returns 3 if CPUs is 4' do
+        snapshot_config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {})
+        launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: snapshot_config)
+        allow(Snapshot::CPUInspector).to receive(:cpu_count).and_return(4)
+
+        sims = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).default_number_of_simultaneous_simulators
+        expect(sims).to eq(3)
       end
     end
   end
