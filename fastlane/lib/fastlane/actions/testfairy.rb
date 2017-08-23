@@ -25,9 +25,13 @@ module Fastlane
           options[:symbols_file] = Faraday::UploadIO.new(symbols_file, 'application/octet-stream')
         end
 
-        connection.post do |req|
-          req.url("/api/upload/")
-          req.body = options
+        begin
+          connection.post do |req|
+            req.url("/api/upload/")
+            req.body = options
+          end
+        rescue Faraday::Error::TimeoutError
+          UI.crash!("Uploading build to TestFairy timed out ⏳")
         end
       end
 
