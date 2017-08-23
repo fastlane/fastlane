@@ -350,6 +350,7 @@ module FastlaneCore
           detail: install_method
         },
         secondary_target: {
+
           name: 'ci',
           detail: secondary_target_string(ci)
         },
