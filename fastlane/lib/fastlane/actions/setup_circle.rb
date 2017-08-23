@@ -3,10 +3,19 @@ module Fastlane
     class SetupCircleAction < Action
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force]
-          UI.message "Currently not running on CI system, skipping circle setup"
+        if !Helper.is_ci? && !params[:force] && ENV["CIRCLECI"].to_s.length == 0
+          UI.message "Currently not running on Circle system, skipping circle setup"
           return
         end
+
+        circle_artifacts = ENV["CIRCLE_ARTIFACTS"]
+
+        UI.message("Setting ouput directory for actions to Circle artifacts directory '#{circle_artifacts}'")
+        ENV["XCPRETTY_REPORT_HTML"] = circle_artifacts
+        ENV["SCAN_OUTPUT_DIRECTORY"] = circle_artifacts
+        ENV["BACKUP_XCARCHIVE_DESTINATION"] = circle_artifacts
+        ENV["GYM_OUTPUT_DIRECTORY"] = circle_artifacts
+        ENV["GYM_BUILD_PATH"] = circle_artifacts
 
         # Enable readonly mode for match by default
         # we don't want to generate new identities and
