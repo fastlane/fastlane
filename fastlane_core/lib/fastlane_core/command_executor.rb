@@ -26,6 +26,7 @@ module FastlaneCore
       # @param command [String] The command to be executed
       # @param print_all [Boolean] Do we want to print out the command output while running?
       # @param print_command [Boolean] Should we print the command that's being executed
+      # @param pidCreated [Block] A block that's called when the new process is spawned and we have a PID, it can be used later on to control the new process
       # @param error [Block] A block that's called if an error occurs
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
