@@ -43,6 +43,6 @@ describe Deliver::Loader do
       @folders = Deliver::Loader.language_folders(@root, false)
     end.to raise_error FastlaneCore::Interface::FastlaneError, "Unsupported directory name(s) for screenshots/metadata in '#{@root}': unrelated-dir" \
                                                                "\nValid directory names are: #{allowed_directory_names}" \
-                                                               "\n\nEnabled 'ignore_language_directory_validation' to prevent this validation from happening"
+                                                               "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening"
   end
 end
