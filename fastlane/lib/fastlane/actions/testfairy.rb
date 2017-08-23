@@ -12,6 +12,7 @@ module Fastlane
         connection = Faraday.new(url: "https://upload.testfairy.com") do |builder|
           builder.request :multipart
           builder.request :url_encoded
+          builder.request :retry, max: 3, interval: 5
           builder.response :json, content_type: /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
